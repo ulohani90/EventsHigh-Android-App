@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:background="@color/day_selector_color"
+    android:gravity="center_vertical|center_horizontal"
+    android:clickable="true">
+
+    <TextView
+        style="@style/DateButtonText"
+        android:textColor="@color/day_selector_day_week_text"
+        android:id="@+id/day_of_week"
+        android:focusable="false"
+        android:textSize="12dp"
+        android:typeface="sans"/>
+    <TextView
+        style="@style/DateButtonText"
+        android:textColor="@color/day_selector_date_number_text"
+        android:id="@+id/date"
+        android:typeface="serif"
+        android:textSize="18dp"/>
+    <TextView
+        style="@style/DateButtonText"
+        android:textColor="@color/day_selector_month_text"
+        android:id="@+id/month"
+        android:typeface="sans"
+        android:textSize="12dp"/>
+
+</LinearLayout>
