@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app;
 
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.net.http.HttpResponseCache;
@@ -26,6 +27,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -40,23 +42,75 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+/**
+ * Maps activity which shows users events happening in given locality. The events are marked
+ * across Map and user can zoom in, zoom out or move around the map to discover more events.
+ *
+ * In additions to location, an date filter is also provided. The date filter is filled with
+ * days from upcoming week and user can select perticular date. By default, today's events are
+ * shown.
+ */
 public class MapsActivity extends FragmentActivity {
 
+    // ***********************
+    //      CONSTANTS
+    // ***********************
+
+    // log tag used for debugging.
     private static final String LOG_TAG = MapsActivity.class.getSimpleName();
-    private static final int NUM_MARKERS_SHOWN = 5;
+
+    // TO avoid the map cluttering and to provide sense of relevance, we show few
+    // event marker is bigger size (highlighted). This constant controls how
+    // many markers are highlighted in a view.
+    private static final int NUM_MARKERS_HIGHLIGHTED = 5;
+
+    // To avoid cluttering, we do not show marker for event if it happens to be within
+    // small distance from other event. This parameter controls that distance as measured
+    // in screen units.
+    private static final int MIN_MARKER_DISTANCE_SQ = 4000;
+
+    // For performance reasons, we fetch the events for CITY and do not fetch events
+    // when users is still within same city. The following parameter is used to
+    // not check for city change if distance is small.
     private static final int CITY_BOUNDARY_METERS = 40000;
 
+
+    // ***********************
+    //      MEMBERS
+    // ***********************
+
+    // Google Map View shows to user using MapFragment.
     private GoogleMap map;
+    // LocationClient used to determine user current city and location.
     private LocationClient locationClient;
+    // Day selector widget which is shown to user to select any day from upcoming week.
     private DaySelector daySelector;
+    // Last location from which city was deduced and events are shown.
     private LatLng shownLocation;
+    // Selected day from upcoming week for which events are shown.
+    // 0: today, 1: tomorrow and so on.
     private int shownDay;
+    // Markers currently created on Maps. Each marker represents one event.
+    // Note that all markers may not be visible to user and it is controlled
+    // through code below.
     private Map<Marker, Event> markers = new HashMap<Marker, Event>();
+    // Set of Markers which are in highlighted state.
+    private Set<Marker> highlightedMarkers = new HashSet<Marker>(NUM_MARKERS_HIGHLIGHTED);
+    // Marker which user clicked last time. We always show this marker no matter
+    // what relevance. This is user shown interest.
     private Marker lastClickedMarker;
+    // font-awesome font.
     private Typeface font;
+
+
+    // ***********************
+    //      View Methods
+    // ***********************
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +118,7 @@ public class MapsActivity extends FragmentActivity {
         setContentView(R.layout.activity_maps);
         setUpAll();
 
-        // HttpResponseCache
+        // Setup HttpResponseCache.
         try {
             File httpCacheDir = new File(getCacheDir(), "http");
             long httpCacheSize = 10 * 1024 * 1024; // 10 MiB
@@ -78,13 +132,19 @@ public class MapsActivity extends FragmentActivity {
     protected void onResume() {
         super.onResume();
         setUpAll();
+
+        // We need to repopulate daySelector as user might have reopened the
+        // app on next day.
         daySelector.populate();
+        // Connect the locationclient to know user's location and city.
         locationClient.connect();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
+        // Avoid battery drain by turning of location client.
         if (locationClient != null) {
             locationClient.disconnect();
         }
@@ -99,15 +159,18 @@ public class MapsActivity extends FragmentActivity {
         }
     }
 
+
+    // ***********************
+    //      Setup Helper Methods
+    // ***********************
+
     private void setUpAll() {
         setUpLocationClientIfNeeded();
         setUpMapIfNeeded();
         setUpDaySelectorIfNeeded();
-        shownLocation = null;
+        setupFontIfNeeded();
 
-        if (font == null) {
-            font = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
-        }
+        shownLocation = null;
     }
 
     private void setUpMapIfNeeded() {
@@ -142,6 +205,17 @@ public class MapsActivity extends FragmentActivity {
         }
     }
 
+    private void setupFontIfNeeded() {
+        if (font == null) {
+            font = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        }
+    }
+
+
+    // ***********************
+    //      Other Helper Methods
+    // ***********************
+
     private void animateCamera(Location userLocation) {
         map.animateCamera(
                 CameraUpdateFactory.newCameraPosition(
@@ -170,8 +244,14 @@ public class MapsActivity extends FragmentActivity {
         return true;
     }
 
+    // Updates the listing for current maps projection. This method decides which markers should
+    // be visible and which one should not be visible. Also few markers are highlighted to
+    // give relevance information.
     private void updateListingForProjection() {
-        LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
+        // First find the markers which are withing visible region bound. All other
+        // markers are marked invisible.
+        Projection projection = map.getProjection();
+        LatLngBounds bounds = projection.getVisibleRegion().latLngBounds;
         List<Marker> markersInProjection = new ArrayList<Marker>();
         for (Marker marker : markers.keySet()) {
             if (bounds.contains(marker.getPosition())) {
@@ -181,6 +261,8 @@ public class MapsActivity extends FragmentActivity {
             }
         }
 
+        // We now sort the markers within visible region based on the relevance or
+        // popularity score.
         Collections.sort(markersInProjection, new Comparator<Marker>() {
             @Override
             public int compare(Marker lhs, Marker rhs) {
@@ -196,15 +278,56 @@ public class MapsActivity extends FragmentActivity {
             }
         });
 
-        for (int i = 0; i < markersInProjection.size(); i++) {
-            markersInProjection.get(i).setVisible(i < NUM_MARKERS_SHOWN);
+        // We now show as much point as possible so that no two markers are very close.
+        // Few first markers (high popularity score) are highlighted.
+        List<Point> shownPoints = new ArrayList<Point>(markersInProjection.size());
+        for (Marker marker : markersInProjection) {
+            Event event = markers.get(marker);
+            Point point = projection.toScreenLocation(event.location);
+            boolean toClose = false;
+            for (Point shownPoint : shownPoints) {
+                if (Utils.getDistanceSQ(shownPoint, point) < MIN_MARKER_DISTANCE_SQ) {
+                    toClose = true;
+                    break;
+                }
+            }
+
+            if (toClose) {
+                marker.setVisible(false);
+                continue;
+            }
+
+            if (shownPoints.size() < NUM_MARKERS_HIGHLIGHTED) {
+                if (! highlightedMarkers.contains(marker)) {
+                    marker.setIcon(event.category.icon(getLayoutInflater(), font, false));
+                    highlightedMarkers.add(marker);
+                }
+            } else {
+                if (highlightedMarkers.contains(marker) || marker.getAlpha() > 0.8f) {
+                    highlightedMarkers.remove(marker);
+                    marker.setIcon(event.category.icon(getLayoutInflater(), font, true));
+                    marker.setAlpha(0.7f);
+                }
+            }
+
+            marker.setVisible(true);
+            shownPoints.add(point);
         }
 
+        // Show the info card for highest popular event.
         if (!markersInProjection.isEmpty()) {
             markersInProjection.get(0).showInfoWindow();
         }
     }
 
+
+    // ***********************
+    //    Callbacks
+    // ***********************
+
+    // Callback for LocationClient. This is called when locationClient is
+    // ready to accept requests. We first move map's camera position to last
+    // known location and then send the request to fetch the user location.
     private ConnectionCallbacks mConnectionCallbacks = new ConnectionCallbacks() {
 
         private final LocationRequest REQUEST = LocationRequest.create()
@@ -235,7 +358,9 @@ public class MapsActivity extends FragmentActivity {
         }
     };
 
-
+    // Callback for LocationClient which user location is available. We move the
+    // map's camera to user location and disable the future updates for user location
+    // change. User can still click on map to move the map's camera to new location.
     private LocationListener mLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
@@ -245,6 +370,9 @@ public class MapsActivity extends FragmentActivity {
         }
     };
 
+    // This is called when maps camera position is changed (zoom in, zoom out or
+    // user dragging the map around). We refresh the events listing if there is
+    // change in city otherwise we refresh the event markers shown to user.
     private OnCameraChangeListener mOnCameraChangeListener = new OnCameraChangeListener() {
         @Override
         public void onCameraChange(CameraPosition cameraPosition) {
@@ -262,6 +390,8 @@ public class MapsActivity extends FragmentActivity {
         }
     };
 
+    // This is called when user changes the day for events are shown.
+    // We refresh the maps listing.
     private DaySelectionListener mDaySelectionListener = new DaySelectionListener() {
         @Override
         public void onDaySelection(int dayNo) {
@@ -269,6 +399,7 @@ public class MapsActivity extends FragmentActivity {
         }
     };
 
+    // This is called when we need to present the InfoWindow to user for selected marker.
     private InfoWindowAdapter mInfoWindowAdapter = new InfoWindowAdapter() {
         @Override
         public View getInfoWindow(Marker marker) {
@@ -293,6 +424,8 @@ public class MapsActivity extends FragmentActivity {
         }
     };
 
+    // This callback is called by EventsFetcher when new set of events are available. We build the
+    // markers for all events and then call method to show selected markers.
     private EventsFetcherCallBack mEventsFetcherCallBack = new EventsFetcherCallBack() {
         @Override
         public void OnEventsAvailable(List<Event> events) {
@@ -300,9 +433,8 @@ public class MapsActivity extends FragmentActivity {
             for(Event event : events) {
                 Marker marker = map.addMarker(
                         new MarkerOptions()
-                        .position(new LatLng(event.location.latitude, event.location.longitude))
-                        .visible(false)
-                        .alpha(0.7f)
+                                .position(new LatLng(event.location.latitude, event.location.longitude))
+                                .visible(false)
                 );
 
                 markers.put(marker, event);

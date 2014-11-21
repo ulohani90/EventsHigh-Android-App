@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app;
 
+import android.graphics.Point;
 import android.location.Location;
 
 import com.eventshigh.nearme.app.data.Event;
@@ -11,6 +12,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Pattern;
 
+/**
+ * Utility class. All Misc helper methods are here.
+ */
 public class Utils {
 
     private Utils() {
@@ -21,6 +25,12 @@ public class Utils {
         return new LatLng(location.getLatitude(), location.getLongitude());
     }
 
+    /**
+     * Get the date for give dayItemNo.
+     *   dayItemNo 0: Today
+     *   dayItemNo 1: Tomorrow
+     *   and so on.
+     */
     public static Date getDate(int dayItemNo) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, dayItemNo);
@@ -60,5 +70,10 @@ public class Utils {
         String time = TIME_FORMAT.format(event.startTime) +
                 (event.endTime == null ? "" : " - " + TIME_FORMAT.format(event.endTime));
         return  LEADING_ZEROS.matcher(ZEROS.matcher(time).replaceAll("")).replaceAll("\\1");
+    }
+
+
+    public static float getDistanceSQ(Point p1, Point p2) {
+        return (p1.x - p2.x) * (p1.x - p2.x) +  (p1.y - p2.y) * (p1.y - p2.y);
     }
 }

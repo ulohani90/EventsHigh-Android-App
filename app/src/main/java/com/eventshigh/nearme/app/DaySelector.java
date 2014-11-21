@@ -11,6 +11,9 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * This is an Widget which is used to show user day selection for upcoming week.
+ */
 public class DaySelector {
 
     private static final int NUM_DAYS = 7;

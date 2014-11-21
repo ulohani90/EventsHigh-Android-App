@@ -25,6 +25,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+
+/**
+ * An {@link AsyncTask} which is used to fetch the Events. Once events are available,
+ * the callback is called on UI thread. The Caller can then use Callback to refresh the events.
+ *
+ * Before using EventsFetcher, its recommended to setup {@link android.net.http.HttpResponseCache}
+ * for better performance.
+ */
 public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event>> {
 
     private static final String LOG_TAG = EventsFetcher.class.getSimpleName();
