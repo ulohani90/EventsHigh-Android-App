@@ -3,12 +3,16 @@
               android:orientation="horizontal"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content">
-    <ImageView
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:id="@+id/event_catergory_image"
-        android:src="@drawable/ic_launcher"
-        android:contentDescription="@string/category"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/event_info_card_popularity_icon_margin"
+        android:layout_marginRight="@dimen/event_info_card_popularity_icon_margin"
+        android:id="@+id/event_catergory"
+        android:textSize="@dimen/event_info_card_height"
+        android:text="@string/fa_play"
+        android:textColor="@color/day_selector_color"
+        />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:orientation="vertical"
@@ -31,10 +35,10 @@
                 android:layout_weight="1"
                 android:id="@+id/event_time" />
             <ImageView
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="5dp"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_marginLeft="@dimen/event_info_card_popularity_icon_margin"
+                android:layout_marginRight="@dimen/event_info_card_popularity_icon_margin"
+                android:layout_width="@dimen/event_info_card_popularity_icon"
+                android:layout_height="@dimen/event_info_card_popularity_icon"
                 android:src="@drawable/eh_popularity_icon_details_page"
                 android:contentDescription="@string/num_people_interested"/>
             <TextView

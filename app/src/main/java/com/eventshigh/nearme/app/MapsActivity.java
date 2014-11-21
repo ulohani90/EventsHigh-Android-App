@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app;
 
+import android.graphics.Typeface;
 import android.location.Location;
 import android.net.http.HttpResponseCache;
 import android.os.Bundle;
@@ -55,6 +56,7 @@ public class MapsActivity extends FragmentActivity {
     private int shownDay;
     private Map<Marker, Event> markers = new HashMap<Marker, Event>();
     private Marker lastClickedMarker;
+    private Typeface font;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +104,10 @@ public class MapsActivity extends FragmentActivity {
         setUpMapIfNeeded();
         setUpDaySelectorIfNeeded();
         shownLocation = null;
+
+        if (font == null) {
+            font = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        }
     }
 
     private void setUpMapIfNeeded() {
@@ -274,6 +280,8 @@ public class MapsActivity extends FragmentActivity {
             Event event = markers.get(marker);
 
             View infoView = getLayoutInflater().inflate(R.layout.event_info_card, null);
+            ((TextView)infoView.findViewById(R.id.event_catergory)).setTypeface(font);
+            ((TextView)infoView.findViewById(R.id.event_catergory)).setText(event.category.getIconStringId());
             ((TextView)infoView.findViewById(R.id.event_title)).setText(
                     Utils.shortenIfNeeded(event.title));
             ((TextView)infoView.findViewById(R.id.event_time)).setText(

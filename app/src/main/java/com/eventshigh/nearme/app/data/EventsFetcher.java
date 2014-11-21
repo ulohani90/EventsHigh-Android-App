@@ -29,7 +29,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
 
     private static final String LOG_TAG = EventsFetcher.class.getSimpleName();
     private static final String API_ENDPOINT =
-            "http://api.eventshigh.com/date/CITY/DATE?sortby=popularity&limit=50";
+            "http://apiserver.eventshigh.com:8888/api/date/CITY/DATE?sortby=popularity&limit=200";
 
     private static final Map<String, String> cityNameMapping = new HashMap<String, String>();
     static {
