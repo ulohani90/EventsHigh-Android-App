@@ -2,8 +2,6 @@ package com.eventshigh.nearme.app.data;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -20,10 +18,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 
 /**
@@ -38,11 +33,6 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
     private static final String LOG_TAG = EventsFetcher.class.getSimpleName();
     private static final String API_ENDPOINT =
             "http://apiserver.eventshigh.com:8888/api/date/CITY/DATE?sortby=popularity&limit=200";
-
-    private static final Map<String, String> cityNameMapping = new HashMap<String, String>();
-    static {
-        cityNameMapping.put("bengaluru", "bangalore");
-    }
 
     public static interface EventsFetcherCallBack {
         public void OnEventsAvailable(List<Event> events);
@@ -70,25 +60,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
     protected List<Event> doInBackground(EventFetcherParam... params) {
         EventFetcherParam param = params[0];
 
-        Geocoder gcd = new Geocoder(context, Locale.getDefault());
-        List<Address> addresses = null;
-        try {
-            addresses = gcd.getFromLocation(param.location.latitude, param.location.longitude, 1);
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Failed to locate city from location!", e);
-        }
-
-        if (addresses == null || addresses.size() == 0) {
-            // Failed
-            return  null;
-        }
-
-        String city = addresses.get(0).getLocality().toLowerCase();
-        if (cityNameMapping.containsKey(city)) {
-            city = cityNameMapping.get(city);
-        }
-
-        String url = API_ENDPOINT.replace("CITY", city)
+        String url = API_ENDPOINT.replace("CITY", param.city.toString().toLowerCase())
                 .replace("DATE", Utils.getDateString(Utils.getDate(param.day)));
         Log.d(LOG_TAG, "fetching: " + url);
 

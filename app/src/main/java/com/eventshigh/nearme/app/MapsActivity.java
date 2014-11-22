@@ -10,8 +10,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.eventshigh.nearme.app.DaySelector.DaySelectionListener;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.data.EventsFetcher;
@@ -34,7 +36,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.android.SphericalUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,10 +75,8 @@ public class MapsActivity extends FragmentActivity {
     // in screen units.
     private static final int MIN_MARKER_DISTANCE_SQ = 4000;
 
-    // For performance reasons, we fetch the events for CITY and do not fetch events
-    // when users is still within same city. The following parameter is used to
-    // not check for city change if distance is small.
-    private static final int CITY_BOUNDARY_METERS = 40000;
+    // For performance reasons, we show events only where user has reasonable zoom level.
+    private static final int MIN_ZOOM_LEVEL = 11;
 
 
     // ***********************
@@ -90,8 +89,8 @@ public class MapsActivity extends FragmentActivity {
     private LocationClient locationClient;
     // Day selector widget which is shown to user to select any day from upcoming week.
     private DaySelector daySelector;
-    // Last location from which city was deduced and events are shown.
-    private LatLng shownLocation;
+    // Last city for which events are shown.
+    private City shownCity;
     // Selected day from upcoming week for which events are shown.
     // 0: today, 1: tomorrow and so on.
     private int shownDay;
@@ -106,6 +105,8 @@ public class MapsActivity extends FragmentActivity {
     private Marker lastClickedMarker;
     // font-awesome font.
     private Typeface font;
+    // Have we shown various helper toast to user. We show them only once application lifetime.
+    boolean showZoomToast = true;
 
 
     // ***********************
@@ -170,7 +171,7 @@ public class MapsActivity extends FragmentActivity {
         setUpDaySelectorIfNeeded();
         setupFontIfNeeded();
 
-        shownLocation = null;
+        shownCity = null;
     }
 
     private void setUpMapIfNeeded() {
@@ -227,20 +228,42 @@ public class MapsActivity extends FragmentActivity {
         );
     }
 
+    private void clear() {
+        map.clear();
+        markers.clear();
+        shownCity = null;
+    }
+
     private boolean refreshListingsIfNeeded(CameraPosition cameraPosition) {
-        // Do nothing, if last shown location is within same city and there is no day change.
-        if (shownLocation != null &&
-                shownDay == daySelector.getSelectedDay() &&
-                SphericalUtil.computeDistanceBetween(shownLocation, cameraPosition.target) < CITY_BOUNDARY_METERS) {
+        City userCity = City.getCity(cameraPosition.target);
+        if (userCity == null) {
+            // We do not support this city.
+            clear();
+            return true;
+        }
+
+        // If user has zoomed out too much, do not show events marker.
+        // We also show toast for first time of application runtime.
+        if (cameraPosition.zoom < MIN_ZOOM_LEVEL) {
+            if (showZoomToast) {
+                Toast.makeText(this, R.string.zoom, Toast.LENGTH_SHORT).show();
+                showZoomToast = false;
+            }
+            clear();
+            return true;
+        }
+
+        // Do nothing, if user has not changed the city and there is no day change.
+        if (shownCity != null && shownCity == userCity &&
+            shownDay == daySelector.getSelectedDay()) {
             return false;
         }
 
-        shownLocation = cameraPosition.target;
+        clear();
+        shownCity = userCity;
         shownDay = daySelector.getSelectedDay();
-        map.clear();
-        markers.clear();
         EventsFetcher fetcher = new EventsFetcher(MapsActivity.this, mEventsFetcherCallBack);
-        fetcher.execute(new EventFetcherParam(shownLocation, shownDay));
+        fetcher.execute(new EventFetcherParam(shownCity, shownDay));
         return true;
     }
 
@@ -429,7 +452,6 @@ public class MapsActivity extends FragmentActivity {
     private EventsFetcherCallBack mEventsFetcherCallBack = new EventsFetcherCallBack() {
         @Override
         public void OnEventsAvailable(List<Event> events) {
-            markers.clear();
             for(Event event : events) {
                 Marker marker = map.addMarker(
                         new MarkerOptions()

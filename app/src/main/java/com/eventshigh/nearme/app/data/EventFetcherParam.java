@@ -1,18 +1,16 @@
 package com.eventshigh.nearme.app.data;
 
-import com.google.android.gms.maps.model.LatLng;
-
 /**
  * Simplified Parameter for fetching events. The current Fetcher supports fetching
  * events for a day and give city.
  */
 public class EventFetcherParam {
 
-    public final LatLng location;
+    public final City city;
     public final int day;
 
-    public EventFetcherParam(LatLng location, int day) {
-        this.location = location;
+    public EventFetcherParam(City city, int day) {
+        this.city = city;
         this.day = day;
     }
 }
