@@ -13,4 +13,9 @@ public class EventFetcherParam {
         this.city = city;
         this.day = day;
     }
+
+    @Override
+    public String toString() {
+        return EventFetcherParam.class.getSimpleName() + " (City: " + city + ", day=" + day + ")";
+    }
 }

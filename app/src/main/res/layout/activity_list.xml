@@ -6,20 +6,12 @@
     android:orientation="vertical"
     >
 
-    <fragment
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:map="http://schemas.android.com/apk/res-auto"
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:id="@+id/map"
-        tools:context=".MapsActivity"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        map:cameraBearing="112.5"
-        map:cameraTargetLat="12.975"
-        map:cameraTargetLng="77.604"
-        map:cameraZoom="13.0"
-    />
+        android:id="@+id/event_list"
+        />
 
     <LinearLayout
         android:layout_height="@dimen/abc_action_button_min_height_material"
@@ -28,5 +20,5 @@
         android:background="@android:color/transparent"
         android:layout_marginBottom="@dimen/abc_action_bar_subtitle_bottom_margin_material"
         android:id="@+id/daySelector"
-     />
+        />
 </LinearLayout>

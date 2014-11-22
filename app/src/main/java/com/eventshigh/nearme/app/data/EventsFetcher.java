@@ -35,12 +35,13 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
             "http://apiserver.eventshigh.com:8888/api/date/CITY/DATE?sortby=popularity&limit=200";
 
     public static interface EventsFetcherCallBack {
-        public void OnEventsAvailable(List<Event> events);
+        public void OnEventsAvailable(EventFetcherParam param, List<Event> events);
     }
 
     private final Context context;
     private final EventsFetcherCallBack callback;
     private ProgressDialog pDialog;
+    private EventFetcherParam param;
 
     public EventsFetcher(Context context, EventsFetcherCallBack callback) {
         this.context = context;
@@ -58,7 +59,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
 
     @Override
     protected List<Event> doInBackground(EventFetcherParam... params) {
-        EventFetcherParam param = params[0];
+        param = params[0];
 
         String url = API_ENDPOINT.replace("CITY", param.city.toString().toLowerCase())
                 .replace("DATE", Utils.getDateString(Utils.getDate(param.day)));
@@ -111,6 +112,6 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
             return;
         }
 
-        callback.OnEventsAvailable(result);
+        callback.OnEventsAvailable(param, result);
     }
 }

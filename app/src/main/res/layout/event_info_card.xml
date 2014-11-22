@@ -10,14 +10,15 @@
         android:layout_marginRight="@dimen/event_info_card_popularity_icon_margin"
         android:id="@+id/event_catergory"
         android:textSize="@dimen/event_info_card_height"
-        android:text="@string/fa_play"
         android:textColor="@color/day_selector_color"
-        />
+    />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:orientation="vertical"
-                  android:layout_width="wrap_content"
-                  android:layout_height="match_parent">
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        >
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="0dp"
@@ -26,9 +27,11 @@
             android:id="@+id/event_title" />
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                      android:orientation="horizontal"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content">
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

@@ -2,29 +2,15 @@ package com.eventshigh.nearme.app;
 
 import android.content.Intent;
 import android.graphics.Point;
-import android.graphics.Typeface;
-import android.location.Location;
 import android.net.http.HttpResponseCache;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.eventshigh.nearme.app.DaySelector.DaySelectionListener;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventFetcherParam;
-import com.eventshigh.nearme.app.data.EventsFetcher;
-import com.eventshigh.nearme.app.data.EventsFetcher.EventsFetcherCallBack;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
-import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
-import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
@@ -58,7 +44,7 @@ import java.util.Set;
  * days from upcoming week and user can select perticular date. By default, today's events are
  * shown.
  */
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends LocationAwareEventActivity {
 
     // ***********************
     // CONSTANTS
@@ -87,15 +73,6 @@ public class MapsActivity extends FragmentActivity {
 
     // Google Map View shows to user using MapFragment.
     private GoogleMap map;
-    // LocationClient used to determine user current city and location.
-    private LocationClient locationClient;
-    // Day selector widget which is shown to user to select any day from upcoming week.
-    private DaySelector daySelector;
-    // Last city for which events are shown.
-    private City shownCity;
-    // Selected day from upcoming week for which events are shown.
-    // 0: today, 1: tomorrow and so on.
-    private int shownDay;
     // Markers currently created on Maps. Each marker represents one event.
     // Note that all markers may not be visible to user and it is controlled
     // through code below.
@@ -105,8 +82,6 @@ public class MapsActivity extends FragmentActivity {
     // Marker which user clicked last time. We always show this marker no matter
     // what relevance. This is user shown interest.
     private Marker lastClickedMarker;
-    // font-awesome font.
-    private Typeface font;
     // Have we shown various helper toast to user. We show them only once application lifetime.
     boolean showZoomToast = true;
 
@@ -122,30 +97,16 @@ public class MapsActivity extends FragmentActivity {
         setContentView(R.layout.activity_maps);
 
         // Setup the local member variables.
+        setUpMapIfNeeded();
         setUpAll();
 
         // Setup HttpResponseCache.
         try {
             File httpCacheDir = new File(getCacheDir(), "http");
-            long httpCacheSize = 10 * 1024 * 1024; // 10 MiB
+            long httpCacheSize = 10 * 1024 * 1024; // 10 MB
             HttpResponseCache.install(httpCacheDir, httpCacheSize);
         } catch (IOException e) {
-                Log.i(LOG_TAG, "HTTP response cache installation failed:" + e);
-        }
-    }
-
-    protected void onStop() {
-        super.onStop();
-
-        // Avoid battery drain by turning of location client.
-        if (locationClient != null) {
-            locationClient.disconnect();
-        }
-
-        // Save the cache.
-        HttpResponseCache cache = HttpResponseCache.getInstalled();
-        if (cache != null) {
-            cache.flush();
+            Log.w(LOG_TAG, "HTTP response cache installation failed:" + e);
         }
     }
 
@@ -153,14 +114,6 @@ public class MapsActivity extends FragmentActivity {
     // ***********************
     // Setup Helper Methods
     // ***********************
-
-    private void setUpAll() {
-        setUpLocationClientIfNeeded();
-        setUpMapIfNeeded();
-        setUpDaySelectorIfNeeded();
-        setupFontIfNeeded();
-    }
-
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (map == null) {
@@ -179,83 +132,50 @@ public class MapsActivity extends FragmentActivity {
         }
     }
 
-    private void setUpLocationClientIfNeeded() {
-        if (locationClient == null) {
-            locationClient = new LocationClient(
-                    getApplicationContext(),
-                    mConnectionCallbacks,
-                    mOnConnectionFailedListener);
-            locationClient.connect();
-        }
-    }
-
-    private void setUpDaySelectorIfNeeded() {
-        if (daySelector == null) {
-            daySelector = new DaySelector(this, (ViewGroup)findViewById(R.id.daySelector));
-            daySelector.setDaySelectionListener(mDaySelectionListener);
-            daySelector.populate();
-        }
-    }
-
-    private void setupFontIfNeeded() {
-        if (font == null) {
-            font = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
-        }
-    }
-
-
     // ***********************
     // Other Helper Methods
     // ***********************
 
-    private void animateCamera(Location userLocation) {
-        map.animateCamera(
-                CameraUpdateFactory.newCameraPosition(
-                        CameraPosition.builder()
-                                .target(Utils.locationToLatLng(userLocation))
-                                .zoom(map.getCameraPosition().zoom)
-                                .build()
-                )
-        );
-    }
-
     private void clear() {
         map.clear();
         markers.clear();
-        shownCity = null;
     }
 
-    private boolean refreshListingsIfNeeded(CameraPosition cameraPosition) {
-        City userCity = City.getCity(cameraPosition.target);
-        if (userCity == null) {
-            // We do not support this city.
-            clear();
-            return true;
-        }
-
-        // If user has zoomed out too much, do not show events marker.
-        // We also show toast for first time of application runtime.
-        if (cameraPosition.zoom < MIN_ZOOM_LEVEL) {
-            if (showZoomToast) {
-                Toast.makeText(this, R.string.zoom, Toast.LENGTH_SHORT).show();
-                showZoomToast = false;
-            }
-            clear();
-            return true;
-        }
-
-        // Do nothing, if user has not changed the city and there is no day change.
-        if (shownCity != null && shownCity == userCity &&
-            shownDay == daySelector.getSelectedDay()) {
-            return false;
-        }
-
+    @Override
+    protected void updateNewEvents(List<Event> events) {
         clear();
-        shownCity = userCity;
-        shownDay = daySelector.getSelectedDay();
-        EventsFetcher fetcher = new EventsFetcher(MapsActivity.this, mEventsFetcherCallBack);
-        fetcher.execute(new EventFetcherParam(shownCity, shownDay));
+
+        for(Event event : events) {
+            Marker marker = map.addMarker(
+                    new MarkerOptions()
+                            .position(new LatLng(event.location.latitude, event.location.longitude))
+                            .visible(false)
+            );
+
+            markers.put(marker, event);
+        }
+
+        updateListingForProjection();
+    }
+
+    @Override
+    protected boolean setUserLocation(@Nullable LatLng userLocation) {
+        if (userLocation != null) {
+            map.animateCamera(
+                    CameraUpdateFactory.newCameraPosition(
+                            CameraPosition.builder()
+                                    .target(userLocation)
+                                    .zoom(map.getCameraPosition().zoom)
+                                    .build()
+                    )
+            );
+        }
+
         return true;
+    }
+
+    private boolean setUserLocationSuper(@Nullable LatLng userLocation) {
+        return super.setUserLocation(userLocation);
     }
 
     // Updates the listing for current maps projection. This method decides which markers should
@@ -335,62 +255,25 @@ public class MapsActivity extends FragmentActivity {
     }
 
 
-    // ***********************
-    // Callbacks
-    // ***********************
-
-    // Callback for LocationClient. This is called when locationClient is
-    // ready to accept requests. We first move map's camera position to last
-    // known location and then send the request to fetch the user location.
-    private ConnectionCallbacks mConnectionCallbacks = new ConnectionCallbacks() {
-
-        private final LocationRequest REQUEST = LocationRequest.create()
-                .setInterval(5000)          // 5 sec
-                .setFastestInterval(1600)   // 16ms = 60fps, 1600ms = 0.6 fps
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        @Override
-        public void onConnected(Bundle bundle) {
-            Log.w(LOG_TAG, "in onConnected");
-            locationClient.requestLocationUpdates(REQUEST, mLocationListener);
-            if (locationClient.getLastLocation() != null) {
-                animateCamera(locationClient.getLastLocation());
-            }
-        }
-
-        @Override
-        public void onDisconnected() {
-            // do nothing for now.
-        }
-    };
-
-    private OnConnectionFailedListener mOnConnectionFailedListener = new OnConnectionFailedListener() {
-
-        @Override
-        public void onConnectionFailed(ConnectionResult connectionResult) {
-            // do nothing for now.
-        }
-    };
-
-    // Callback for LocationClient which user location is available. We move the
-    // map's camera to user location and disable the future updates for user location
-    // change. User can still click on map to move the map's camera to new location.
-    private LocationListener mLocationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            Log.v(LOG_TAG, "in onLocationChanged:" + location.toString());
-            animateCamera(location);
-            locationClient.disconnect();
-        }
-    };
-
     // This is called when maps camera position is changed (zoom in, zoom out or
     // user dragging the map around). We refresh the events listing if there is
     // change in city otherwise we refresh the event markers shown to user.
     private OnCameraChangeListener mOnCameraChangeListener = new OnCameraChangeListener() {
         @Override
         public void onCameraChange(CameraPosition cameraPosition) {
-            if (!refreshListingsIfNeeded(cameraPosition)) {
+            // If user has zoomed out too much, do not show events marker.
+            // We also show helper toast once per application runtime.
+            if (cameraPosition.zoom < MIN_ZOOM_LEVEL) {
+                if (showZoomToast) {
+                    Toast.makeText(MapsActivity.this, R.string.zoom, Toast.LENGTH_SHORT).show();
+                    showZoomToast = false;
+                }
+
+                setUserLocationSuper(null);
+                return;
+            }
+
+            if (!setUserLocationSuper(cameraPosition.target)) {
                 updateListingForProjection();
             }
         }
@@ -401,15 +284,6 @@ public class MapsActivity extends FragmentActivity {
         public boolean onMarkerClick(Marker marker) {
             lastClickedMarker = marker;
             return false;
-        }
-    };
-
-    // This is called when user changes the day for events are shown.
-    // We refresh the maps listing.
-    private DaySelectionListener mDaySelectionListener = new DaySelectionListener() {
-        @Override
-        public void onDaySelection(int dayNo) {
-            refreshListingsIfNeeded(map.getCameraPosition());
         }
     };
 
@@ -443,28 +317,8 @@ public class MapsActivity extends FragmentActivity {
         @Override
         public void onInfoWindowClick(Marker marker) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                    markers.get(marker).getEventDetailsURI(shownCity));
+                    getEventUri(markers.get(marker)));
             startActivity(browserIntent);
         }
     };
-
-    // This callback is called by EventsFetcher when new set of events are available. We build the
-    // markers for all events and then call method to show selected markers.
-    private EventsFetcherCallBack mEventsFetcherCallBack = new EventsFetcherCallBack() {
-        @Override
-        public void OnEventsAvailable(List<Event> events) {
-            for(Event event : events) {
-                Marker marker = map.addMarker(
-                        new MarkerOptions()
-                                .position(new LatLng(event.location.latitude, event.location.longitude))
-                                .visible(false)
-                );
-
-                markers.put(marker, event);
-            }
-
-            updateListingForProjection();
-        }
-    };
-
 }
