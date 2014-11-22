@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
+>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/event_info_card_popularity_icon_margin"
+        android:layout_marginRight="@dimen/event_info_card_popularity_icon_margin"
+        android:id="@+id/event_catergory"
+        android:textSize="@dimen/event_info_card_height"
+        android:textColor="@color/day_selector_color"
+        android:layout_gravity="center_vertical"
+    />
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+    >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:id="@+id/event_title"
+        />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/event_locality"
+        />
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+        >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/event_time"
+            />
+            <ImageView
+                android:layout_marginLeft="@dimen/event_info_card_popularity_icon_margin"
+                android:layout_marginRight="@dimen/event_info_card_popularity_icon_margin"
+                android:layout_width="@dimen/event_info_card_popularity_icon"
+                android:layout_height="@dimen/event_info_card_popularity_icon"
+                android:src="@drawable/eh_popularity_icon_details_page"
+                android:contentDescription="@string/num_people_interested"
+            />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/num_people_interested"
+            />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

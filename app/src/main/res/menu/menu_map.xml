@@ -3,9 +3,9 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.eventshigh.nearme.app.ListActivity">
 
-    <item android:id="@+id/action_list"
-          android:title="@string/action_list"
-          android:icon="@drawable/ic_action_view_as_list"
+    <item android:id="@+id/action_map"
+          android:title="@string/action_map"
+          android:icon="@android:drawable/ic_dialog_map"
           android:showAsAction="ifRoom"
     />
 

@@ -26,6 +26,7 @@ public class Event {
     public final String title;
     public final EventCategory category;
     public final LatLng location;
+    public final String locality;
     public final Date startTime;
     public final Date endTime;
     public final int numPeopleInterested;
@@ -33,12 +34,14 @@ public class Event {
     public final boolean ehRecommended;
 
 
-    public Event(String id, String title, EventCategory category, LatLng location, Date startTime, Date endTime,
-                 int numPeopleInterested, Double popularityScore, boolean ehRecommended) {
+    public Event(String id, String title, EventCategory category, LatLng location, String locality,
+                 Date startTime, Date endTime, int numPeopleInterested, Double popularityScore,
+                 boolean ehRecommended) {
         this.id = id;
         this.title = title;
         this.category = category;
         this.location = location;
+        this.locality = (locality == null || locality.equalsIgnoreCase("null") ? "" : locality);
         this.startTime = startTime;
         this.endTime = endTime;
         this.numPeopleInterested = numPeopleInterested;
@@ -77,6 +80,7 @@ public class Event {
             double popularity_score = upcomingEvents.getJSONObject(i).getDouble("popularity_score");
             double lat = upcomingEvents.getJSONObject(i).getJSONObject("venue_info").getDouble("lat");
             double lon = upcomingEvents.getJSONObject(i).getJSONObject("venue_info").getDouble("lon");
+            String locality = upcomingEvents.getJSONObject(i).getString("locality");
             String date = upcomingEvents.getJSONObject(i).getString("date");
             String start_time = upcomingEvents.getJSONObject(i).getString("start_time");
             String end_time = upcomingEvents.getJSONObject(i).getString("end_time");
@@ -89,9 +93,14 @@ public class Event {
                 category = EventCategory.fromString(tags.getJSONObject(j).getString("tag"));
             }
 
+            if (Math.abs(lat) < 1 || Math.abs(lon) < 1) {
+                // Invalid latitude and longitude.
+                // Ignore.
+                continue;
+            }
+
             /**
              String description = upcomingEvents.getJSONObject(i).getString("description");
-             String locality = upcomingEvents.getJSONObject(i).getString("locality");
              String img_url = upcomingEvents.getJSONObject(i).getString("img_url");
              String source_url = upcomingEvents.getJSONObject(i).getString("source_url");
              **/
@@ -100,6 +109,7 @@ public class Event {
                     title,
                     category,
                     new LatLng(lat, lon),
+                    locality,
                     Utils.mergeDateTime(date, start_time),
                     Utils.mergeDateTime(date, end_time),
                     num_people_interested,

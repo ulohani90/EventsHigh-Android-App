@@ -100,15 +100,9 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
             pDialog.dismiss();
         }
 
-        if (result == null) {
+        if (result == null || result.isEmpty()) {
             // Failed. Show toast and return empty list.
             Toast.makeText(context, R.string.failed, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (result.isEmpty()) {
-            // Failed. Show toast and return empty list.
-            Toast.makeText(context, R.string.no_event, Toast.LENGTH_SHORT).show();
             return;
         }
 

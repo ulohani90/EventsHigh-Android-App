@@ -88,47 +88,22 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
     protected abstract void updateNewEvents(List<Event> events);
 
 
+    /**
+     * Updates the user location as reported by LocationClient. When parent activity
+     * is created, it calls {@link #setUpAll()} method, which sets up the location
+     * client to know user location. When the information is available, parent
+     * activity is notified about user location.
+     *
+     * @param userLocation user location as reported by location client.
+     */
+    protected void updateUserLocation(LatLng userLocation) {
+        refreshListingsIfNeeded(userLocation);
+    }
+
+
     // ***********************
     // Setup Helper Methods
     // ***********************
-
-    /**
-     * Sets the new user location as reported by location client or parent activity. If user
-     * city has changed as per new location, request is sent to fetch events for new city.
-     *
-     * Parent activity can pass {@code NULL} to cleanup any state (lastCity) hold
-     * by this.
-     *
-     * @param userLocation location of user.
-     * @return true if city was updated as per new location and request for
-     * fetching new events was submitted.
-     */
-    protected boolean setUserLocation(@Nullable LatLng userLocation) {
-        if (userLocation == null) {
-            lastCity = null;
-            updateNewEvents(new ArrayList<Event>());
-            return true;
-        }
-
-        City userCity = City.getCity(userLocation);
-        if (userCity == null) {
-            lastCity = null;
-            updateNewEvents(new ArrayList<Event>());
-            return true;
-        }
-
-        if (lastCity == null || !lastCity.equals(userCity)) {
-            fetchNewListing(userCity);
-            return true;
-        }
-
-        return false;
-    }
-
-
-    protected Uri getEventUri(Event event) {
-        return event.getEventDetailsURI(lastCity);
-    }
 
     /**
      * This method sets up the internal variables and states maintained. The parent
@@ -168,12 +143,49 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
     // ***********************
     // Helper methods
     // ***********************
+
     private void fetchNewListing(City userCity) {
         if (userCity != null) {
             EventsFetcher fetcher = new EventsFetcher(LocationAwareEventActivity.this, mEventsFetcherCallBack);
             fetcher.execute(new EventFetcherParam(userCity, daySelector.getSelectedDay()));
         }
     }
+
+    /**
+     * Refresh the event listings if user city has changed as per new location.
+     * Parent activity can pass {@code NULL} to cleanup any state like {@code lastCity}.
+     *
+     * @param userLocation location of user.
+     * @return true if city was updated as per new location and request for
+     * fetching new events was submitted.
+     */
+    protected boolean refreshListingsIfNeeded(@Nullable LatLng userLocation) {
+        if (userLocation == null) {
+            lastCity = null;
+            updateNewEvents(new ArrayList<Event>());
+            return true;
+        }
+
+        City userCity = City.getCity(userLocation);
+        if (userCity == null) {
+            lastCity = null;
+            updateNewEvents(new ArrayList<Event>());
+            return true;
+        }
+
+        if (lastCity == null || !lastCity.equals(userCity)) {
+            fetchNewListing(userCity);
+            return true;
+        }
+
+        return false;
+    }
+
+
+    protected Uri getEventUri(Event event) {
+        return event.getEventDetailsURI(lastCity);
+    }
+
 
     // ***********************
     // Callbacks
@@ -186,7 +198,7 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
         @Override
         public void onConnected(Bundle bundle) {
             if (locationClient.getLastLocation() != null) {
-                setUserLocation(Utils.locationToLatLng(locationClient.getLastLocation()));
+                updateUserLocation(Utils.locationToLatLng(locationClient.getLastLocation()));
                 locationClient.disconnect();
             } else {
                 LocationRequest REQUEST = LocationRequest.create()
@@ -217,7 +229,7 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
     private LocationListener mLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            setUserLocation(Utils.locationToLatLng(location));
+            updateUserLocation(Utils.locationToLatLng(location));
             locationClient.disconnect();
         }
     };

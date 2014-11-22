@@ -4,8 +4,9 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.net.http.HttpResponseCache;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -110,6 +111,27 @@ public class MapsActivity extends LocationAwareEventActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_list) {
+            startActivity(new Intent(this, ListActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            );
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     // ***********************
     // Setup Helper Methods
@@ -131,6 +153,7 @@ public class MapsActivity extends LocationAwareEventActivity {
             }
         }
     }
+
 
     // ***********************
     // Other Helper Methods
@@ -159,8 +182,7 @@ public class MapsActivity extends LocationAwareEventActivity {
     }
 
     @Override
-    protected boolean setUserLocation(@Nullable LatLng userLocation) {
-        if (userLocation != null) {
+    protected void updateUserLocation(LatLng userLocation) {
             map.animateCamera(
                     CameraUpdateFactory.newCameraPosition(
                             CameraPosition.builder()
@@ -169,13 +191,6 @@ public class MapsActivity extends LocationAwareEventActivity {
                                     .build()
                     )
             );
-        }
-
-        return true;
-    }
-
-    private boolean setUserLocationSuper(@Nullable LatLng userLocation) {
-        return super.setUserLocation(userLocation);
     }
 
     // Updates the listing for current maps projection. This method decides which markers should
@@ -255,6 +270,10 @@ public class MapsActivity extends LocationAwareEventActivity {
     }
 
 
+    // ***********************
+    // Callbacks
+    // ***********************
+
     // This is called when maps camera position is changed (zoom in, zoom out or
     // user dragging the map around). We refresh the events listing if there is
     // change in city otherwise we refresh the event markers shown to user.
@@ -269,11 +288,11 @@ public class MapsActivity extends LocationAwareEventActivity {
                     showZoomToast = false;
                 }
 
-                setUserLocationSuper(null);
+                refreshListingsIfNeeded(null);
                 return;
             }
 
-            if (!setUserLocationSuper(cameraPosition.target)) {
+            if (!refreshListingsIfNeeded(cameraPosition.target)) {
                 updateListingForProjection();
             }
         }
