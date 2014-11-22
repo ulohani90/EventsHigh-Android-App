@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app;
 
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.location.Location;
@@ -28,6 +29,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -59,7 +61,7 @@ import java.util.Set;
 public class MapsActivity extends FragmentActivity {
 
     // ***********************
-    //      CONSTANTS
+    // CONSTANTS
     // ***********************
 
     // log tag used for debugging.
@@ -80,7 +82,7 @@ public class MapsActivity extends FragmentActivity {
 
 
     // ***********************
-    //      MEMBERS
+    // MEMBERS
     // ***********************
 
     // Google Map View shows to user using MapFragment.
@@ -110,13 +112,16 @@ public class MapsActivity extends FragmentActivity {
 
 
     // ***********************
-    //      View Methods
+    // Activity lifecycle  Methods
+    // See http://developer.android.com/training/basics/activity-lifecycle/starting.html
     // ***********************
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        // Setup the local member variables.
         setUpAll();
 
         // Setup HttpResponseCache.
@@ -129,31 +134,15 @@ public class MapsActivity extends FragmentActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setUpAll();
-
-        // We need to repopulate daySelector as user might have reopened the
-        // app on next day.
-        daySelector.populate();
-        // Connect the locationclient to know user's location and city.
-        locationClient.connect();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
 
         // Avoid battery drain by turning of location client.
         if (locationClient != null) {
             locationClient.disconnect();
         }
-    }
 
-    protected void onStop() {
-        super.onStop();
-
+        // Save the cache.
         HttpResponseCache cache = HttpResponseCache.getInstalled();
         if (cache != null) {
             cache.flush();
@@ -162,7 +151,7 @@ public class MapsActivity extends FragmentActivity {
 
 
     // ***********************
-    //      Setup Helper Methods
+    // Setup Helper Methods
     // ***********************
 
     private void setUpAll() {
@@ -170,8 +159,6 @@ public class MapsActivity extends FragmentActivity {
         setUpMapIfNeeded();
         setUpDaySelectorIfNeeded();
         setupFontIfNeeded();
-
-        shownCity = null;
     }
 
     private void setUpMapIfNeeded() {
@@ -180,12 +167,14 @@ public class MapsActivity extends FragmentActivity {
             // Try to obtain the map from the SupportMapFragment.
             map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
+
             // Check if we were successful in obtaining the map.
             if (map != null) {
                 map.setMyLocationEnabled(true);
                 map.setOnCameraChangeListener(mOnCameraChangeListener);
                 map.setInfoWindowAdapter(mInfoWindowAdapter);
                 map.setOnMarkerClickListener(mOnMarkerClickListener);
+                map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
             }
         }
     }
@@ -196,6 +185,7 @@ public class MapsActivity extends FragmentActivity {
                     getApplicationContext(),
                     mConnectionCallbacks,
                     mOnConnectionFailedListener);
+            locationClient.connect();
         }
     }
 
@@ -203,6 +193,7 @@ public class MapsActivity extends FragmentActivity {
         if (daySelector == null) {
             daySelector = new DaySelector(this, (ViewGroup)findViewById(R.id.daySelector));
             daySelector.setDaySelectionListener(mDaySelectionListener);
+            daySelector.populate();
         }
     }
 
@@ -214,7 +205,7 @@ public class MapsActivity extends FragmentActivity {
 
 
     // ***********************
-    //      Other Helper Methods
+    // Other Helper Methods
     // ***********************
 
     private void animateCamera(Location userLocation) {
@@ -345,7 +336,7 @@ public class MapsActivity extends FragmentActivity {
 
 
     // ***********************
-    //    Callbacks
+    // Callbacks
     // ***********************
 
     // Callback for LocationClient. This is called when locationClient is
@@ -447,6 +438,16 @@ public class MapsActivity extends FragmentActivity {
         }
     };
 
+    // When user clicks on info window, we open the browser with details URL.
+    private OnInfoWindowClickListener mOnInfoWindowClickListener = new OnInfoWindowClickListener() {
+        @Override
+        public void onInfoWindowClick(Marker marker) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                    markers.get(marker).getEventDetailsURI(shownCity));
+            startActivity(browserIntent);
+        }
+    };
+
     // This callback is called by EventsFetcher when new set of events are available. We build the
     // markers for all events and then call method to show selected markers.
     private EventsFetcherCallBack mEventsFetcherCallBack = new EventsFetcherCallBack() {
@@ -465,4 +466,5 @@ public class MapsActivity extends FragmentActivity {
             updateListingForProjection();
         }
     };
+
 }

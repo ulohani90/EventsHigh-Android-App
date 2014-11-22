@@ -1,5 +1,7 @@
 package com.eventshigh.nearme.app.data;
 
+import android.net.Uri;
+
 import com.eventshigh.nearme.app.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -18,7 +20,9 @@ import java.util.List;
 public class Event {
     // 20% boost for EH recommeded events.
     private static final double EH_RECOMMENDATION_BOOST = 1.2;
+    private static final String EVENTS_HIGH_DETAIL_URI = "http://www.eventshigh.com/detail/CITY/ID";
 
+    public final String id;
     public final String title;
     public final EventCategory category;
     public final LatLng location;
@@ -29,8 +33,9 @@ public class Event {
     public final boolean ehRecommended;
 
 
-    public Event(String title, EventCategory category, LatLng location, Date startTime, Date endTime,
+    public Event(String id, String title, EventCategory category, LatLng location, Date startTime, Date endTime,
                  int numPeopleInterested, Double popularityScore, boolean ehRecommended) {
+        this.id = id;
         this.title = title;
         this.category = category;
         this.location = location;
@@ -39,6 +44,12 @@ public class Event {
         this.numPeopleInterested = numPeopleInterested;
         this.popularityScore = popularityScore;
         this.ehRecommended = ehRecommended;
+    }
+
+    public Uri getEventDetailsURI(City city) {
+        return Uri.parse(EVENTS_HIGH_DETAIL_URI
+                .replace("CITY", city.toString())
+                .replace("ID", id));
     }
 
     public static List<Event> fromJSON(String jsonStr) throws JSONException, ParseException {
@@ -60,6 +71,7 @@ public class Event {
 
 
         for (int i = 0; i < upcomingEvents.length(); i++) {
+            String id = upcomingEvents.getJSONObject(i).getString("id");
             String title = upcomingEvents.getJSONObject(i).getString("title");
             int num_people_interested = upcomingEvents.getJSONObject(i).getInt("num_people_interested");
             double popularity_score = upcomingEvents.getJSONObject(i).getDouble("popularity_score");
@@ -84,7 +96,8 @@ public class Event {
              String source_url = upcomingEvents.getJSONObject(i).getString("source_url");
              **/
 
-            Event event = new Event(title,
+            Event event = new Event(id,
+                    title,
                     category,
                     new LatLng(lat, lon),
                     Utils.mergeDateTime(date, start_time),
