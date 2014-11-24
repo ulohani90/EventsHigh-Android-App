@@ -15,6 +15,9 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.data.EventsFetcher;
 import com.eventshigh.nearme.app.data.EventsFetcher.EventsFetcherCallBack;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
@@ -50,6 +53,8 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
     private City lastCity;
     // font-awesome font, used for icons.
     protected static Typeface font;
+    // Tracker
+    protected static Tracker tracker;
 
 
     // ***********************
@@ -113,6 +118,7 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
         setupFontIfNeeded();
         setUpDaySelectorIfNeeded();
         setUpLocationClientIfNeeded();
+        setUpGoogleAnalyticsIfNeeded();
     }
 
     private void setUpLocationClientIfNeeded() {
@@ -139,6 +145,12 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
         }
     }
 
+    private void setUpGoogleAnalyticsIfNeeded() {
+        if (tracker == null) {
+            tracker = GoogleAnalytics.getInstance(this).newTracker(R.xml.analytics);
+            tracker.enableAdvertisingIdCollection(true);
+        }
+    }
 
     // ***********************
     // Helper methods
@@ -146,6 +158,13 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
 
     private void fetchNewListing(City userCity) {
         if (userCity != null) {
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory(getClass().getSimpleName())
+                    .setAction("fetchNewListing")
+                    .setLabel("")
+                    .setValue(1)
+                    .build());
+
             EventsFetcher fetcher = new EventsFetcher(LocationAwareEventActivity.this, mEventsFetcherCallBack);
             fetcher.execute(new EventFetcherParam(userCity, daySelector.getSelectedDay()));
         }
@@ -239,6 +258,13 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
     private DaySelectionListener mDaySelectionListener = new DaySelectionListener() {
         @Override
         public void onDaySelection(int dayNo) {
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory(getClass().getSimpleName())
+                    .setAction("onDaySelection")
+                    .setLabel("")
+                    .setValue(1)
+                    .build());
+
             fetchNewListing(lastCity);
         }
     };

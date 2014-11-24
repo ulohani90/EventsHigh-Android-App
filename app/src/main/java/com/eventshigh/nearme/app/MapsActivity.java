@@ -12,6 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.data.Event;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
@@ -109,6 +111,15 @@ public class MapsActivity extends LocationAwareEventActivity {
         } catch (IOException e) {
             Log.w(LOG_TAG, "HTTP response cache installation failed:" + e);
         }
+
+        // Automatic Google Analytics reporting.
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     @Override
@@ -292,6 +303,13 @@ public class MapsActivity extends LocationAwareEventActivity {
                 return;
             }
 
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory(LOG_TAG)
+                    .setAction("onCameraChange")
+                    .setLabel("")
+                    .setValue(1)
+                    .build());
+
             if (!refreshListingsIfNeeded(cameraPosition.target)) {
                 updateListingForProjection();
             }
@@ -301,6 +319,13 @@ public class MapsActivity extends LocationAwareEventActivity {
     private OnMarkerClickListener mOnMarkerClickListener = new OnMarkerClickListener() {
         @Override
         public boolean onMarkerClick(Marker marker) {
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory(LOG_TAG)
+                    .setAction("onMarkerClick")
+                    .setLabel("")
+                    .setValue(1)
+                    .build());
+
             lastClickedMarker = marker;
             return false;
         }
@@ -335,6 +360,13 @@ public class MapsActivity extends LocationAwareEventActivity {
     private OnInfoWindowClickListener mOnInfoWindowClickListener = new OnInfoWindowClickListener() {
         @Override
         public void onInfoWindowClick(Marker marker) {
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory(LOG_TAG)
+                    .setAction("onInfoWindowClick")
+                    .setLabel("")
+                    .setValue(1)
+                    .build());
+
             Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                     getEventUri(markers.get(marker)));
             startActivity(browserIntent);

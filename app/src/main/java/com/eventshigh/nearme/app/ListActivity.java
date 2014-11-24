@@ -13,6 +13,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.data.Event;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 
@@ -24,6 +26,8 @@ import java.util.Map;
 
 
 public class ListActivity extends LocationAwareEventActivity {
+    // log tag used for debugging.
+    private static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
     private LatLng userLocation;
     private EventListAdapter mEventsListAdapter;
@@ -46,6 +50,15 @@ public class ListActivity extends LocationAwareEventActivity {
         mEventsListAdapter = new EventListAdapter();
         eventListView.setAdapter(mEventsListAdapter);
         eventListView.setOnItemClickListener(mOnItemClickListener);
+
+        // Automatic Google Analytics reporting.
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     @Override
@@ -128,6 +141,13 @@ public class ListActivity extends LocationAwareEventActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory(LOG_TAG)
+                    .setAction("getView")
+                    .setLabel("")
+                    .setValue(1)
+                    .build());
+
             View view = convertView == null ?
                     getLayoutInflater().inflate(R.layout.event_card, parent, false) :
                     convertView;
@@ -149,6 +169,13 @@ public class ListActivity extends LocationAwareEventActivity {
     private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory(LOG_TAG)
+                    .setAction("onItemClick")
+                    .setLabel("")
+                    .setValue(1)
+                    .build());
+
             Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                     getEventUri(mEventsListAdapter.getItem(position)));
             startActivity(browserIntent);
