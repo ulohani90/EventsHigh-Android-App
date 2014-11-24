@@ -41,7 +41,7 @@ public class Event {
         this.title = title;
         this.category = category;
         this.location = location;
-        this.locality = (locality == null || locality.equalsIgnoreCase("null") ? "" : locality);
+        this.locality = (locality == null || locality.equalsIgnoreCase("null") || locality.equalsIgnoreCase("unknown")? "" : locality);
         this.startTime = startTime;
         this.endTime = endTime;
         this.numPeopleInterested = numPeopleInterested;

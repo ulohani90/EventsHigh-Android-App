@@ -87,6 +87,7 @@ public class MapsActivity extends LocationAwareEventActivity {
     private Marker lastClickedMarker;
     // Have we shown various helper toast to user. We show them only once application lifetime.
     boolean showZoomToast = true;
+    boolean showInfoWindow = true;
 
 
     // ***********************
@@ -275,8 +276,9 @@ public class MapsActivity extends LocationAwareEventActivity {
         }
 
         // Show the info card for highest popular event.
-        if (!markersInProjection.isEmpty()) {
+        if (showInfoWindow && !markersInProjection.isEmpty()) {
             markersInProjection.get(0).showInfoWindow();
+            showInfoWindow = false;
         }
     }
 

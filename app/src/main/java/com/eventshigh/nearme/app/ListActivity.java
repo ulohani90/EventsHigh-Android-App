@@ -58,6 +58,13 @@ public class ListActivity extends LocationAwareEventActivity {
     @Override
     protected void onStop() {
         super.onStop();
+
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory(LOG_TAG)
+                .setAction("getView")
+                .setLabel("")
+                .setValue(mEventsListAdapter.numViews)
+                .build());
         GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
@@ -135,18 +142,15 @@ public class ListActivity extends LocationAwareEventActivity {
     // ***********************
 
     private class EventListAdapter extends ArrayAdapter<Event> {
+        public int numViews = 0;
+
         private EventListAdapter() {
             super(ListActivity.this, R.layout.event_card, R.id.event_title);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(LOG_TAG)
-                    .setAction("getView")
-                    .setLabel("")
-                    .setValue(1)
-                    .build());
+            numViews ++;
 
             View view = convertView == null ?
                     getLayoutInflater().inflate(R.layout.event_card, parent, false) :
