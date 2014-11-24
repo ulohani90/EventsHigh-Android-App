@@ -51,7 +51,7 @@ public class Event {
 
     public Uri getEventDetailsURI(City city) {
         return Uri.parse(EVENTS_HIGH_DETAIL_URI
-                .replace("CITY", city.toString())
+                .replace("CITY", Utils.capitalize(city.toString()))
                 .replace("ID", id));
     }
 
@@ -119,5 +119,17 @@ public class Event {
         }
 
         return events;
+    }
+
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object another) {
+        return another instanceof Event &&
+                id.equals(((Event) another).id);
     }
 }

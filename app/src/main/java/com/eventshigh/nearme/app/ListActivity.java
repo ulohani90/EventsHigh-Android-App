@@ -84,7 +84,7 @@ public class ListActivity extends LocationAwareEventActivity {
     protected void updateNewEvents(List<Event> events) {
         // Sort the events based on popularity and distance from user location.
         // If event has e**N users going, we reduce 500*N meters from its distance.
-        final Map<Event, Double> eventToDistanceMap = new HashMap<Event, Double>(events.size());
+        final Map<String, Double> eventToDistanceMap = new HashMap<String, Double>(events.size());
         Collections.sort(events, new Comparator<Event>() {
             @Override
             public int compare(Event lhs, Event rhs) {
@@ -102,18 +102,24 @@ public class ListActivity extends LocationAwareEventActivity {
 
     // Find the distance of events from user's position with weight for popular events.
     // If event has e**N users going, we reduce 500*N meters from its distance.
-    private double weightedDistance(Event event, Map<Event, Double> eventToDistanceMap) {
-        Double result = eventToDistanceMap.get(event);
+    private double weightedDistance(Event event, Map<String, Double> eventToDistanceMap) {
+        Double result = eventToDistanceMap.get(event.id);
         if (result != null) {
             return result;
         }
 
         double distance = SphericalUtil.computeDistanceBetween(event.location, userLocation);
-        double weight = event.numPeopleInterested > 0 ? Math.log(event.numPeopleInterested) * 500 : 0;
+        double weight = (event.numPeopleInterested > 0 ? Math.log(event.numPeopleInterested) * 500 : 0)
+                + (event.ehRecommended ? 1000 : 0) ;
         double weightedDistance = distance - weight;
-        eventToDistanceMap.put(event, weightedDistance);
+        eventToDistanceMap.put(event.id, weightedDistance);
         return weightedDistance;
     }
+
+
+    // ***********************
+    // Callbacks
+    // ***********************
 
     private class EventListAdapter extends ArrayAdapter<Event> {
         private EventListAdapter() {

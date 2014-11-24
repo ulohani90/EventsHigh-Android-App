@@ -76,4 +76,13 @@ public class Utils {
     public static float getDistanceSQ(Point p1, Point p2) {
         return (p1.x - p2.x) * (p1.x - p2.x) +  (p1.y - p2.y) * (p1.y - p2.y);
     }
+
+
+    public static String capitalize(String original){
+        if(original == null || original.length() == 0) {
+            return original;
+        }
+
+        return original.substring(0, 1).toUpperCase() + original.substring(1).toLowerCase();
+    }
 }
