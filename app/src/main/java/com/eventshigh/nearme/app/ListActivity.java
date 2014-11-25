@@ -1,7 +1,12 @@
 package com.eventshigh.nearme.app;
 
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,13 +21,16 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 
 public class ListActivity extends LocationAwareEventActivity {
@@ -30,6 +38,7 @@ public class ListActivity extends LocationAwareEventActivity {
     private static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
     private EventListAdapter mEventsListAdapter;
+    private TextView mLocalityView;
 
     // ***********************
     // Activity lifecycle  Methods
@@ -52,6 +61,7 @@ public class ListActivity extends LocationAwareEventActivity {
         setUpAll(param);
 
         // Setup adapter.
+        mLocalityView = (TextView) findViewById(R.id.event_locality_header);
         ListView eventListView = (ListView) findViewById(R.id.event_list);
         mEventsListAdapter = new EventListAdapter();
         eventListView.setAdapter(mEventsListAdapter);
@@ -105,6 +115,10 @@ public class ListActivity extends LocationAwareEventActivity {
 
     @Override
     protected void updateNewEvents(List<Event> events) {
+        // Show the location.
+        mLocalityView.setText(Utils.capitalize(lastEventFetcherParam.city.toString()));
+        mUpdateLocationTask.execute(lastEventFetcherParam.location);
+
         // Sort the events based on popularity and distance from user location.
         // If event has e**N users going, we reduce 500*N meters from its distance.
         final Map<String, Double> eventToDistanceMap = new HashMap<String, Double>(events.size());
@@ -187,6 +201,55 @@ public class ListActivity extends LocationAwareEventActivity {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                     getEventUri(mEventsListAdapter.getItem(position)));
             startActivity(browserIntent);
+        }
+    };
+
+    private AsyncTask<LatLng, Void, String> mUpdateLocationTask = new AsyncTask<LatLng, Void, String>() {
+        private final Pattern INVALID_LOCALITY_PATTERN = Pattern.compile("[^a-zA-Z]+[a-zA-Z]?");
+
+        @Override
+        protected String doInBackground(LatLng... params) {
+            String locality = null;
+            List<Address> addresses = null;
+            try {
+                addresses = new Geocoder(ListActivity.this)
+                        .getFromLocation(params[0].latitude, params[0].longitude, 1);
+            } catch (IOException e) {
+                Log.w(LOG_TAG, "failed to get address", e);
+            }
+
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+
+                locality = address.getSubLocality();
+                if (locality == null) {
+                    locality = checkLocality(address.getFeatureName());
+                }
+
+                for (int i = 0; locality == null && i < address.getMaxAddressLineIndex(); i++) {
+                    locality = checkLocality(address.getAddressLine(i));
+                }
+
+                String city = address.getLocality();
+                if (city != null) {
+                    locality = (locality == null ? "" : locality + ", ") + city;
+                }
+            }
+            return locality;
+        }
+
+        @Override
+        protected void onPostExecute(@Nullable String locality) {
+            if (locality != null && !locality.isEmpty()) {
+                mLocalityView.setText(locality);
+            }
+        }
+
+        private String checkLocality(String locality) {
+            if (INVALID_LOCALITY_PATTERN.matcher(locality).matches()) {
+                return null;
+            }
+            return locality;
         }
     };
 }
