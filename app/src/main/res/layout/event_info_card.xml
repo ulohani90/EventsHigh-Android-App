@@ -9,6 +9,7 @@
         android:layout_margin="@dimen/abc_action_bar_subtitle_bottom_margin_material"
         android:textSize="@dimen/abc_text_size_display_1_material"
         android:textColor="@color/day_selector_color"
+        android:gravity="center_vertical"
         android:id="@+id/event_catergory"
     />
 

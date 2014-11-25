@@ -163,7 +163,7 @@ public class ListActivity extends LocationAwareEventActivity {
         public int numViews = 0;
 
         private EventListAdapter() {
-            super(ListActivity.this, R.layout.event_card, R.id.event_title);
+            super(ListActivity.this, R.layout.list_item_event, R.id.event_title);
         }
 
         @Override
@@ -171,18 +171,15 @@ public class ListActivity extends LocationAwareEventActivity {
             numViews ++;
 
             View view = convertView == null ?
-                    getLayoutInflater().inflate(R.layout.event_card, parent, false) :
+                    getLayoutInflater().inflate(R.layout.list_item_event, parent, false) :
                     convertView;
             Event event = getItem(position);
-            ((TextView)view.findViewById(R.id.event_catergory)).setTypeface(font);
-            ((TextView)view.findViewById(R.id.event_catergory)).setText(event.category.getIconStringId());
             ((TextView)view.findViewById(R.id.event_title)).setText(event.title);
-            ((TextView)view.findViewById(R.id.event_locality)).setText(event.locality);
+            ((TextView)view.findViewById(R.id.event_venue)).setText(event.locality);
             ((TextView)view.findViewById(R.id.event_time)).setText(
                     Utils.getEventTime(event));
             ((TextView)view.findViewById(R.id.num_people_interested)).setText(
                     Integer.toString(event.numPeopleInterested));
-
 
             return view;
         }

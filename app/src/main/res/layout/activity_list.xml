@@ -15,7 +15,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_menu_mylocation"/>
+            android:src="@drawable/ic_action_location_found"/>
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
