@@ -35,11 +35,20 @@ import java.util.List;
  * This is abstract class the event UI is left to implementing class.
  * <p/>
  *
- * The Parent activity must call the {@link #setUpAll()} method in its {@link #onCreate}
- * method after populating view. The parent activity view should have
- * {@link android.widget.LinearLayout} to hold day picker.
+ * The Parent activity must call the
+ * {@link #setUpAll(com.eventshigh.nearme.app.data.EventFetcherParam)} ()}
+ * method in its {@link #onCreate} method after populating view. The parent
+ * activity view should have {@link android.widget.LinearLayout} to hold day picker.
  */
 public abstract class LocationAwareEventActivity extends FragmentActivity {
+
+    // ***********************
+    // CONSTANTS
+    // ***********************
+
+    // log tag used for debugging.
+    public static final String EXTRA_EVENT_FETCHER_PARAM = EventFetcherParam.class.getSimpleName();
+
 
     // ***********************
     // MEMBERS
@@ -49,8 +58,8 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
     private LocationClient locationClient;
     // Day selector widget which is shown to user to select any day from upcoming week.
     private DaySelector daySelector;
-    // Last city for which events are shown.
-    private City lastCity;
+    // Last city,day for which events are shown.
+    protected EventFetcherParam lastEventFetcherParam;
     // font-awesome font, used for icons.
     protected static Typeface font;
     // Tracker
@@ -92,12 +101,11 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
      */
     protected abstract void updateNewEvents(List<Event> events);
 
-
     /**
      * Updates the user location as reported by LocationClient. When parent activity
-     * is created, it calls {@link #setUpAll()} method, which sets up the location
-     * client to know user location. When the information is available, parent
-     * activity is notified about user location.
+     * is created, it calls {@link #setUpAll(com.eventshigh.nearme.app.data.EventFetcherParam)} ()}
+     * method, which sets up the location client to know user location. When the information
+     * is available, parent activity is notified about user location.
      *
      * @param userLocation user location as reported by location client.
      */
@@ -114,28 +122,39 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
      * This method sets up the internal variables and states maintained. The parent
      * activity must call once its view is populated.
      */
-    protected void setUpAll() {
+    protected void setUpAll(@Nullable EventFetcherParam param) {
         setupFontIfNeeded();
-        setUpDaySelectorIfNeeded();
-        setUpLocationClientIfNeeded();
+        setUpDaySelectorIfNeeded(param);
+        setUpLocationClientIfNeeded(param);
         setUpGoogleAnalyticsIfNeeded();
+
+        if (param != null) {
+            updateUserLocation(param.location);
+        }
     }
 
-    private void setUpLocationClientIfNeeded() {
+    private void setUpLocationClientIfNeeded(@Nullable EventFetcherParam param) {
         if (locationClient == null) {
             locationClient = new LocationClient(
                     getApplicationContext(),
                     mConnectionCallbacks,
                     mOnConnectionFailedListener);
-            locationClient.connect();
+
+            if (param == null) {
+                locationClient.connect();
+            }
         }
     }
 
-    private void setUpDaySelectorIfNeeded() {
+    private void setUpDaySelectorIfNeeded(@Nullable EventFetcherParam param) {
         if (daySelector == null) {
             daySelector = new DaySelector(this, (ViewGroup)findViewById(R.id.daySelector));
             daySelector.setDaySelectionListener(mDaySelectionListener);
             daySelector.populate();
+        }
+
+        if (param != null) {
+            daySelector.setSelected(param.day);
         }
     }
 
@@ -156,18 +175,17 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
     // Helper methods
     // ***********************
 
-    private void fetchNewListing(City userCity) {
-        if (userCity != null) {
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(getClass().getSimpleName())
-                    .setAction("fetchNewListing")
-                    .setLabel("")
-                    .setValue(1)
-                    .build());
+    private void fetchNewListing(EventFetcherParam param) {
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory(getClass().getSimpleName())
+                .setAction("fetchNewListing")
+                .setLabel("")
+                .setValue(1)
+                .build());
 
-            EventsFetcher fetcher = new EventsFetcher(LocationAwareEventActivity.this, mEventsFetcherCallBack);
-            fetcher.execute(new EventFetcherParam(userCity, daySelector.getSelectedDay()));
-        }
+        EventsFetcher fetcher =
+                new EventsFetcher(LocationAwareEventActivity.this, mEventsFetcherCallBack);
+        fetcher.execute(param);
     }
 
     /**
@@ -180,29 +198,30 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
      */
     protected boolean refreshListingsIfNeeded(@Nullable LatLng userLocation) {
         if (userLocation == null) {
-            lastCity = null;
+            lastEventFetcherParam = null;
             updateNewEvents(new ArrayList<Event>());
             return true;
         }
 
         City userCity = City.getCity(userLocation);
         if (userCity == null) {
-            lastCity = null;
+            lastEventFetcherParam = null;
             updateNewEvents(new ArrayList<Event>());
             return true;
         }
 
-        if (lastCity == null || !lastCity.equals(userCity)) {
-            fetchNewListing(userCity);
+        EventFetcherParam newEventFetcherParam =
+                new EventFetcherParam(userCity, userLocation, daySelector.getSelectedDay());
+        if (!newEventFetcherParam.equals(lastEventFetcherParam)) {
+            fetchNewListing(newEventFetcherParam);
             return true;
         }
 
         return false;
     }
 
-
     protected Uri getEventUri(Event event) {
-        return event.getEventDetailsURI(lastCity);
+        return event.getEventDetailsURI(lastEventFetcherParam.city);
     }
 
 
@@ -265,7 +284,10 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
                     .setValue(1)
                     .build());
 
-            fetchNewListing(lastCity);
+            if (lastEventFetcherParam != null) {
+                fetchNewListing(new EventFetcherParam(lastEventFetcherParam.city,
+                        lastEventFetcherParam.location, dayNo));
+            }
         }
     };
 
@@ -274,7 +296,7 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
     private EventsFetcherCallBack mEventsFetcherCallBack = new EventsFetcherCallBack() {
         @Override
         public void OnEventsAvailable(EventFetcherParam param, List<Event> events) {
-            lastCity = param.city;
+            lastEventFetcherParam = param;
             updateNewEvents(events);
         }
     };

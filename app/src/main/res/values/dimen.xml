@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="event_info_card_height">48sp</dimen>
-    <dimen name="event_info_card_popularity_icon">24dp</dimen>
-    <dimen name="event_info_card_popularity_icon_margin">10dp</dimen>
-
-    <dimen name="event_marker">18sp</dimen>
-    <dimen name="event_marker_small">9sp</dimen>
-</resources>

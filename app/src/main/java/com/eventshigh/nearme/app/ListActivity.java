@@ -13,9 +13,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 
 import java.util.Collections;
@@ -29,7 +29,6 @@ public class ListActivity extends LocationAwareEventActivity {
     // log tag used for debugging.
     private static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
-    private LatLng userLocation;
     private EventListAdapter mEventsListAdapter;
 
     // ***********************
@@ -42,8 +41,15 @@ public class ListActivity extends LocationAwareEventActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
+        // See if we have location passed to us within intent.
+        Intent intent = getIntent();
+        EventFetcherParam param = null;
+        if (intent != null) {
+            param = intent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
+        }
+
         // Setup the local member variables.
-        setUpAll();
+        setUpAll(param);
 
         // Setup adapter.
         ListView eventListView = (ListView) findViewById(R.id.event_list);
@@ -78,11 +84,14 @@ public class ListActivity extends LocationAwareEventActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_map) {
-            startActivity(new Intent(this, MapsActivity.class)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            );
+            if (lastEventFetcherParam != null) {
+                startActivity(new Intent(this, MapsActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                .putExtra(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam)
+                );
+            }
             return true;
         }
 
@@ -93,12 +102,6 @@ public class ListActivity extends LocationAwareEventActivity {
     // ***********************
     // Helper Methods
     // ***********************
-
-    @Override
-    protected void updateUserLocation(LatLng userLocation) {
-        this.userLocation = userLocation;
-        super.updateUserLocation(userLocation);
-    }
 
     @Override
     protected void updateNewEvents(List<Event> events) {
@@ -128,7 +131,8 @@ public class ListActivity extends LocationAwareEventActivity {
             return result;
         }
 
-        double distance = SphericalUtil.computeDistanceBetween(event.location, userLocation);
+        double distance = SphericalUtil.computeDistanceBetween(event.location,
+                lastEventFetcherParam.location);
         double weight = (event.numPeopleInterested > 0 ? Math.log(event.numPeopleInterested) * 500 : 0)
                 + (event.ehRecommended ? 1000 : 0) ;
         double weightedDistance = distance - weight;

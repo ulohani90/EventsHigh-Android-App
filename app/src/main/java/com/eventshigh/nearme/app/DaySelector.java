@@ -37,15 +37,16 @@ public class DaySelector {
         parent.removeAllViews();
 
         for (int i = 0; i < NUM_DAYS; i++) {
-            LinearLayout daySelectorItem = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.day_selector_item, parent, false);
+            LinearLayout daySelectorItem =
+                    (LinearLayout) LayoutInflater.from(context).inflate(
+                            R.layout.day_selector_item, parent, false);
             parent.addView(daySelectorItem);
             daySelectorItems[i] = daySelectorItem;
             populateDaySelectorItem(i);
             daySelectorItem.setOnClickListener(new DayItemOnClickListener(i));
         }
 
-        selectedDay = 0;
-        setSelected(selectedDay);
+        setSelected(0);
     }
 
     public void setDaySelectionListener(DaySelectionListener daySelectionListener) {
@@ -54,6 +55,26 @@ public class DaySelector {
 
     public int getSelectedDay() {
         return selectedDay;
+    }
+
+    public void setSelected(int selectedDayNo) {
+        if (selectedDay >= 0) {
+            daySelectorItems[selectedDay].setBackgroundColor(
+                    context.getResources().getColor(R.color.day_selector_color));
+            ((TextView) daySelectorItems[selectedDay].findViewById(R.id.day_of_week)).setTextColor(
+                    context.getResources().getColor(R.color.day_selector_day_week_text));
+            ((TextView) daySelectorItems[selectedDay].findViewById(R.id.month)).setTextColor(
+                    context.getResources().getColor(R.color.day_selector_month_text));
+        }
+
+        daySelectorItems[selectedDayNo].setBackgroundColor(
+                context.getResources().getColor(R.color.day_selector_pressed_color));
+        ((TextView)daySelectorItems[selectedDayNo].findViewById(R.id.day_of_week)).setTextColor(
+                context.getResources().getColor(R.color.day_selector_day_week_selected_text));
+        ((TextView)daySelectorItems[selectedDayNo].findViewById(R.id.month)).setTextColor(
+                context.getResources().getColor(R.color.day_selector_month_selected_text));
+
+        selectedDay = selectedDayNo;
     }
 
     private class DayItemOnClickListener implements  OnClickListener {
@@ -66,32 +87,11 @@ public class DaySelector {
 
         @Override
         public void onClick(View view) {
-            setNotSelected(selectedDay);
-            selectedDay = dayItemNo;
-            setSelected(selectedDay);
+            setSelected(dayItemNo);
             if (daySelectionListener != null) {
                 daySelectionListener.onDaySelection(dayItemNo);
             }
         }
-    }
-
-    private void setSelected(int selectedDayNo) {
-        daySelectorItems[selectedDayNo].setBackgroundColor(
-                context.getResources().getColor(R.color.day_selector_pressed_color));
-        ((TextView)daySelectorItems[selectedDayNo].findViewById(R.id.day_of_week)).setTextColor(
-                context.getResources().getColor(R.color.day_selector_day_week_selected_text));
-        ((TextView)daySelectorItems[selectedDayNo].findViewById(R.id.month)).setTextColor(
-                context.getResources().getColor(R.color.day_selector_month_selected_text));
-    }
-
-    private void setNotSelected(int oldSelectedDayNo) {
-        if (oldSelectedDayNo < 0) return;
-        daySelectorItems[oldSelectedDayNo].setBackgroundColor(
-                context.getResources().getColor(R.color.day_selector_color));
-        ((TextView)daySelectorItems[oldSelectedDayNo].findViewById(R.id.day_of_week)).setTextColor(
-                context.getResources().getColor(R.color.day_selector_day_week_text));
-        ((TextView)daySelectorItems[oldSelectedDayNo].findViewById(R.id.month)).setTextColor(
-                context.getResources().getColor(R.color.day_selector_month_text));
     }
 
     private static final SimpleDateFormat DAY = new SimpleDateFormat("EE");

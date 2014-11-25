@@ -3,15 +3,14 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/activity_vertical_margin"
+    android:layout_marginBottom="@dimen/abc_text_size_body_1_material"
 >
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/event_info_card_popularity_icon_margin"
-        android:layout_marginRight="@dimen/event_info_card_popularity_icon_margin"
+        android:padding="@dimen/abc_dropdownitem_text_padding_left"
         android:id="@+id/event_catergory"
-        android:textSize="@dimen/event_info_card_height"
+        android:textSize="@dimen/abc_text_size_display_1_material"
         android:textColor="@color/day_selector_color"
         android:layout_gravity="center_vertical"
     />
@@ -27,7 +26,7 @@
             style="@style/TextAppearance.AppCompat.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/abc_text_size_body_1_material"
             android:id="@+id/event_title"
         />
 
@@ -50,10 +49,9 @@
                 android:id="@+id/event_time"
             />
             <ImageView
-                android:layout_marginLeft="@dimen/event_info_card_popularity_icon_margin"
-                android:layout_marginRight="@dimen/event_info_card_popularity_icon_margin"
-                android:layout_width="@dimen/event_info_card_popularity_icon"
-                android:layout_height="@dimen/event_info_card_popularity_icon"
+                android:padding="@dimen/abc_dropdownitem_text_padding_left"
+                android:layout_width="@dimen/abc_text_size_body_1_material"
+                android:layout_height="@dimen/abc_text_size_body_1_material"
                 android:src="@drawable/eh_popularity_icon_details_page"
                 android:contentDescription="@string/num_people_interested"
             />

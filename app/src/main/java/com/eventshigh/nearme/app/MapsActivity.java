@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -100,9 +101,16 @@ public class MapsActivity extends LocationAwareEventActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        // See if we have location passed to us within intent.
+        Intent intent = getIntent();
+        EventFetcherParam param = null;
+        if (intent != null) {
+            param = (EventFetcherParam) intent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
+        }
+
         // Setup the local member variables.
         setUpMapIfNeeded();
-        setUpAll();
+        setUpAll(param);
 
         // Setup HttpResponseCache.
         try {
@@ -133,11 +141,21 @@ public class MapsActivity extends LocationAwareEventActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_list) {
-            startActivity(new Intent(this, ListActivity.class)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            );
+            if (lastEventFetcherParam == null) {
+                Toast.makeText(this, R.string.no_event, Toast.LENGTH_SHORT).show();
+            } else {
+                EventFetcherParam param = new EventFetcherParam(
+                        lastEventFetcherParam.city,
+                        map.getCameraPosition().target,
+                        lastEventFetcherParam.day);
+                Log.w(LOG_TAG, "Passing: " + lastEventFetcherParam);
+                startActivity(new Intent(this, ListActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                .putExtra(EXTRA_EVENT_FETCHER_PARAM, param)
+                );
+            }
             return true;
         }
 
