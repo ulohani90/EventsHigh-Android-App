@@ -252,8 +252,8 @@ public class MapsActivity extends LocationAwareEventActivity {
                     return 1;
                 }
 
-                return markers.get(rhs).popularityScore.compareTo(
-                        markers.get(lhs).popularityScore);
+                return Integer.valueOf(markers.get(rhs).getPopularityScore()).compareTo(
+                        markers.get(lhs).getPopularityScore());
             }
         });
 

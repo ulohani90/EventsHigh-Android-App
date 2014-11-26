@@ -18,35 +18,42 @@ import java.util.List;
  * This class describes one Event. Event have few attributes like title, category, location etc.
  */
 public class Event {
-    // 20% boost for EH recommeded events.
-    private static final double EH_RECOMMENDATION_BOOST = 1.2;
+    // EH_RECOMMENDED is same as 100 people going to event.
+    private static final int EH_RECOMMENDATION_BOOST = 100;
     private static final String EVENTS_HIGH_DETAIL_URI = "http://www.eventshigh.com/detail/CITY/ID";
 
     public final String id;
     public final String title;
     public final EventCategory category;
+    public final String img_url;
+
     public final LatLng location;
     public final String locality;
+
     public final Date startTime;
     public final Date endTime;
+
     public final int numPeopleInterested;
-    public final Double popularityScore;
     public final boolean ehRecommended;
 
 
-    public Event(String id, String title, EventCategory category, LatLng location, String locality,
-                 Date startTime, Date endTime, int numPeopleInterested, Double popularityScore,
-                 boolean ehRecommended) {
+    public Event(String id, String title, EventCategory category, String img_url,
+                 int numPeopleInterested, boolean ehRecommended,
+                 Date startTime, Date endTime,
+                 LatLng location, String locality) {
         this.id = id;
         this.title = title;
         this.category = category;
+        this.img_url = img_url;
+
+        this.numPeopleInterested = numPeopleInterested;
+        this.ehRecommended = ehRecommended;
+
         this.location = location;
-        this.locality = (locality == null || locality.equalsIgnoreCase("null") || locality.equalsIgnoreCase("unknown")? "" : locality);
+        this.locality = locality;
+
         this.startTime = startTime;
         this.endTime = endTime;
-        this.numPeopleInterested = numPeopleInterested;
-        this.popularityScore = popularityScore;
-        this.ehRecommended = ehRecommended;
     }
 
     public Uri getEventDetailsURI(City city) {
@@ -61,31 +68,27 @@ public class Event {
         JSONObject eventsJSON = new JSONObject(jsonStr);
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
 
-        // Get Max popularity score so that we can normalize everything else.
-        // Give 20% boost to recommended events.
-        double maxScore = 0;
-        for (int i = 0; i < upcomingEvents.length(); i++) {
-            double popularity_score = upcomingEvents.getJSONObject(i).getDouble("popularity_score");
-            if (maxScore < popularity_score) {
-                maxScore = popularity_score;
-            }
-        }
-        maxScore *= EH_RECOMMENDATION_BOOST;
-
 
         for (int i = 0; i < upcomingEvents.length(); i++) {
             String id = upcomingEvents.getJSONObject(i).getString("id");
             String title = upcomingEvents.getJSONObject(i).getString("title");
+            String img_url = checkIfUnknown(upcomingEvents.getJSONObject(i).getString("img_url"));
+
             int num_people_interested = upcomingEvents.getJSONObject(i).getInt("num_people_interested");
-            double popularity_score = upcomingEvents.getJSONObject(i).getDouble("popularity_score");
-            double lat = upcomingEvents.getJSONObject(i).getJSONObject("venue_info").getDouble("lat");
-            double lon = upcomingEvents.getJSONObject(i).getJSONObject("venue_info").getDouble("lon");
-            String locality = upcomingEvents.getJSONObject(i).getString("locality");
+            boolean eh_recommends = upcomingEvents.getJSONObject(i).has("eh_recommends") &&
+                    upcomingEvents.getJSONObject(i).getBoolean("eh_recommends");
+
             String date = upcomingEvents.getJSONObject(i).getString("date");
             String start_time = upcomingEvents.getJSONObject(i).getString("start_time");
             String end_time = upcomingEvents.getJSONObject(i).getString("end_time");
-            boolean eh_recommends = upcomingEvents.getJSONObject(i).has("eh_recommends") &&
-                    upcomingEvents.getJSONObject(i).getBoolean("eh_recommends");
+
+            JSONObject venue = upcomingEvents.getJSONObject(i).getJSONObject("venue_info");
+            double lat = venue.getDouble("lat");
+            double lon = venue.getDouble("lon");
+            String locality = checkIfUnknown(venue.getString("name"));
+            if (locality == null) {
+                locality = checkIfUnknown(upcomingEvents.getJSONObject(i).getString("locality"));
+            }
 
             EventCategory category = EventCategory.OTHER;
             JSONArray tags = upcomingEvents.getJSONObject(i).getJSONArray("tags");
@@ -95,26 +98,24 @@ public class Event {
 
             if (Math.abs(lat) < 1 || Math.abs(lon) < 1) {
                 // Invalid latitude and longitude.
-                // Ignore.
+                // Ignore the entry.
                 continue;
             }
-
-            /**
-             String description = upcomingEvents.getJSONObject(i).getString("description");
-             String img_url = upcomingEvents.getJSONObject(i).getString("img_url");
-             String source_url = upcomingEvents.getJSONObject(i).getString("source_url");
-             **/
 
             Event event = new Event(id,
                     title,
                     category,
-                    new LatLng(lat, lon),
-                    locality,
+                    img_url,
+
+                    num_people_interested,
+                    eh_recommends,
+
                     Utils.mergeDateTime(date, start_time),
                     Utils.mergeDateTime(date, end_time),
-                    num_people_interested,
-                    popularity_score / maxScore * (eh_recommends ? EH_RECOMMENDATION_BOOST : 1),
-                    eh_recommends);
+
+                    new LatLng(lat, lon),
+                    locality
+            );
             events.add(event);
         }
 
@@ -131,5 +132,19 @@ public class Event {
     public boolean equals(Object another) {
         return another instanceof Event &&
                 id.equals(((Event) another).id);
+    }
+
+
+    public int getPopularityScore() {
+        return ehRecommended ? Math.max(EH_RECOMMENDATION_BOOST, numPeopleInterested) : numPeopleInterested;
+    }
+
+    private static String checkIfUnknown(String string) {
+        return (string == null ||
+                string.isEmpty() ||
+                string.equalsIgnoreCase("null") ||
+                string.equalsIgnoreCase("unknown")
+                ? null
+                : string);
     }
 }

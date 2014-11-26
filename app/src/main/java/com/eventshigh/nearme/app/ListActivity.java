@@ -1,6 +1,8 @@
 package com.eventshigh.nearme.app;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
@@ -14,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -173,13 +177,21 @@ public class ListActivity extends LocationAwareEventActivity {
             View view = convertView == null ?
                     getLayoutInflater().inflate(R.layout.list_item_event, parent, false) :
                     convertView;
+            EventCard eventCard = new EventCard(view);
+
             Event event = getItem(position);
-            ((TextView)view.findViewById(R.id.event_title)).setText(event.title);
-            ((TextView)view.findViewById(R.id.event_venue)).setText(event.locality);
-            ((TextView)view.findViewById(R.id.event_time)).setText(
-                    Utils.getEventTime(event));
-            ((TextView)view.findViewById(R.id.num_people_interested)).setText(
+
+            new DownloadImageTask(eventCard.bgView).execute(event.img_url);
+            eventCard.titleView.setText(event.title);
+            eventCard.timeView.setText(Utils.getEventTime(event));
+            eventCard.numPeopleInterestedView.setText(
                     Integer.toString(event.numPeopleInterested));
+            if (event.locality == null) {
+                eventCard.venueView.setVisibility(View.GONE);
+            } else {
+                eventCard.venueView.setVisibility(View.VISIBLE);
+                eventCard.venueView.setText(event.locality);
+            }
 
             return view;
         }
@@ -249,4 +261,51 @@ public class ListActivity extends LocationAwareEventActivity {
             return locality;
         }
     };
+
+    private static class EventCard {
+        private final ImageView bgView;
+        private final TextView titleView;
+        private final TextView venueView;
+        private final TextView timeView;
+        private final TextView numPeopleInterestedView;
+
+        private EventCard(View cardView) {
+            bgView = (ImageView) cardView.findViewById(R.id.event_bg);
+            titleView = (TextView) cardView.findViewById(R.id.event_title);
+            venueView = (TextView) cardView.findViewById(R.id.event_venue);
+            timeView = (TextView) cardView.findViewById(R.id.event_time);
+            numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
+        }
+    }
+
+    private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            Bitmap image = null;
+            if (urls.length > 0 && urls[0] != null) {
+                try {
+                    InputStream in = new java.net.URL(urls[0]).openStream();
+                    image = BitmapFactory.decodeStream(in);
+                } catch (Exception e) {
+                    Log.e("Error", e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+            return image;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            if (result != null) {
+                bmImage.setImageBitmap(result);
+            } else {
+                bmImage.setImageResource(R.drawable.eh_default);
+            }
+        }
+    }
+
 }

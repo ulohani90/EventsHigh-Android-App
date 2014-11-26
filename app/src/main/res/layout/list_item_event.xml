@@ -83,7 +83,7 @@
                 android:drawableEnd="@drawable/eh_popularity_score_icon"
                 android:background="@android:color/transparent"
                 android:textSize="@dimen/abc_text_size_body_1_material"
-                android:gravity="center"
+                android:gravity="bottom"
                 android:layout_gravity="end"
                 android:shadowColor="@android:color/black"
                 android:shadowDx="-2"
