@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="@dimen/abc_control_padding_material"
-            android:background="@android:color/transparent"
+            android:background="#33000000"
             android:layout_gravity="bottom"
         >
 
@@ -43,7 +43,6 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
             >
 
                 <TextView
@@ -54,7 +53,6 @@
                     android:textSize="@dimen/abc_text_size_small_material"
                     android:maxLines="1"
                     android:textStyle="bold"
-                    android:gravity="center_vertical"
                     android:ellipsize="end"
                     android:shadowColor="@android:color/black"
                     android:drawableStart="@drawable/ic_action_place"
@@ -68,7 +66,6 @@
                     android:textColor="@android:color/white"
                     android:textSize="@dimen/abc_text_size_small_material"
                     android:maxLines="1"
-                    android:gravity="center_vertical"
                     android:drawableStart="@drawable/ic_action_time"
                     android:drawableLeft="@drawable/ic_action_time"
                 />
@@ -84,11 +81,6 @@
                 android:background="@android:color/transparent"
                 android:textSize="@dimen/abc_text_size_body_1_material"
                 android:gravity="bottom"
-                android:layout_gravity="end"
-                android:shadowColor="@android:color/black"
-                android:shadowDx="-2"
-                android:shadowDy="2"
-                android:shadowRadius="1"
                 android:textColor="@android:color/white"
                 android:layout_marginRight="@dimen/abc_control_padding_material"
                 android:layout_marginEnd="@dimen/abc_control_padding_material"
