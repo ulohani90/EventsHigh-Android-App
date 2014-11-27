@@ -9,7 +9,7 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Pair;
-import android.widget.EditText;
+import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
@@ -33,7 +33,8 @@ public class LocationPickerDialog {
         builder.setTitle(R.string.ask_locality);
 
         // Set up the input
-        final EditText input = new EditText(context);
+        final AutoCompleteTextView input = new AutoCompleteTextView(context);
+        input.setAdapter(new PlacesAutoCompleteAdapter(context, android.R.layout.simple_dropdown_item_1line));
         builder.setView(input);
 
         // Set up the buttons
@@ -53,7 +54,7 @@ public class LocationPickerDialog {
         builder.show();
     }
 
-    private static class LatLngFetcher extends AsyncTask<String, Void, Pair<String, LatLng>> {
+    public static class LatLngFetcher extends AsyncTask<String, Void, Pair<String, LatLng>> {
 
         private final Context context;
         private final OnLocationSelection onLocationSelection;
