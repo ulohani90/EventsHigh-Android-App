@@ -13,15 +13,19 @@ import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.DownloadImageTask;
+import com.eventshigh.nearme.app.utils.LocationPickerDialog;
+import com.eventshigh.nearme.app.utils.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.utils.UpdateLocationTask;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 
 import java.util.Collections;
@@ -32,7 +36,7 @@ import java.util.Map;
 
 public class ListActivity extends LocationAwareEventActivity {
     // log tag used for debugging.
-    private static final String LOG_TAG = MapsActivity.class.getSimpleName();
+    private static final String LOG_TAG = ListActivity.class.getSimpleName();
 
     private ListView mEventListView;
     private EventListAdapter mEventsListAdapter;
@@ -60,6 +64,7 @@ public class ListActivity extends LocationAwareEventActivity {
 
         // Setup adapter.
         mLocalityView = (TextView) findViewById(R.id.event_locality_header);
+        mLocalityView.setOnClickListener(mLocalityClickListener);
         mEventListView = (ListView) findViewById(R.id.event_list);
         mEventsListAdapter = new EventListAdapter();
         mEventListView.setAdapter(mEventsListAdapter);
@@ -113,8 +118,12 @@ public class ListActivity extends LocationAwareEventActivity {
     @Override
     protected void updateNewEvents(List<Event> events) {
         // Show the location.
-        mLocalityView.setText(Utils.capitalize(lastEventFetcherParam.city.toString()));
-        new UpdateLocationTask(this, mLocalityView).execute(lastEventFetcherParam.location);
+        if (lastEventFetcherParam != null) {
+            mLocalityView.setText(Utils.capitalize(lastEventFetcherParam.city.toString()));
+            new UpdateLocationTask(this, mLocalityView).execute(lastEventFetcherParam.location);
+        } else {
+            Toast.makeText(this, R.string.failed, Toast.LENGTH_SHORT).show();
+        }
 
         // Sort the events based on popularity and distance from user location.
         // If event has e**N users going, we reduce 500*N meters from its distance.
@@ -151,10 +160,52 @@ public class ListActivity extends LocationAwareEventActivity {
         return weightedDistance;
     }
 
+    private void showEventDetails(Event event) {
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory(LOG_TAG)
+                .setAction("showEventDetails")
+                .setLabel("")
+                .setValue(1)
+                .build());
+
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, getEventUri(event));
+        startActivity(browserIntent);
+    }
+
+    private void shareEvent(Event event) {
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory(LOG_TAG)
+                .setAction("shareEvent")
+                .setLabel("")
+                .setValue(1)
+                .build());
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT,
+                event.title + " | " + getEventUri(event) + " | EventsHigh");
+        sendIntent.setType("text/plain");
+        startActivity(sendIntent);
+    }
+
 
     // ***********************
     // Callbacks
     // ***********************
+
+    private final OnClickListener mLocalityClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            LocationPickerDialog.show(ListActivity.this, new OnLocationSelection() {
+                @Override
+                public void onLocationSelection(String locationString, LatLng locationPoint) {
+                    mLocalityView.setText(locationString);
+                    updateUserLocation(locationPoint);
+                }
+            });
+        }
+    };
+
     private class EventListAdapter extends ArrayAdapter<Event> {
         public int numViews = 0;
 
@@ -214,34 +265,6 @@ public class ListActivity extends LocationAwareEventActivity {
 
             return view;
         }
-    }
-
-    private void showEventDetails(Event event) {
-        tracker.send(new HitBuilders.EventBuilder()
-                .setCategory(LOG_TAG)
-                .setAction("showEventDetails")
-                .setLabel("")
-                .setValue(1)
-                .build());
-
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, getEventUri(event));
-        startActivity(browserIntent);
-    }
-
-    private void shareEvent(Event event) {
-        tracker.send(new HitBuilders.EventBuilder()
-                .setCategory(LOG_TAG)
-                .setAction("shareEvent")
-                .setLabel("")
-                .setValue(1)
-                .build());
-
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT,
-                event.title + " | " + getEventUri(event) + " | EventsHigh");
-        sendIntent.setType("text/plain");
-        startActivity(sendIntent);
     }
 
     private static class EventCard {
