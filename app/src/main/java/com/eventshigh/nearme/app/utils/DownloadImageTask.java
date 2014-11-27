@@ -7,7 +7,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.ImageView;
 
-import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
 * {@link android.os.AsyncTask} which can be used to download an image and update
@@ -24,8 +25,10 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         Bitmap image = null;
         if (urls.length > 0 && urls[0] != null) {
             try {
-                InputStream in = new java.net.URL(urls[0]).openStream();
-                image = BitmapFactory.decodeStream(in);
+                HttpURLConnection urlConnection = (HttpURLConnection) new URL(urls[0]).openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+                image = BitmapFactory.decodeStream(urlConnection.getInputStream());
             } catch (Exception e) {
                 Log.e("Error", e.getMessage());
                 e.printStackTrace();

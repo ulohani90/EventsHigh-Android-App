@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/selector_touch"
-    android:descendantFocusability="blocksDescendants"
 >
 
     <ImageView
@@ -18,11 +17,21 @@
     />
 
     <ImageView
+        android:id="@+id/event_share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_share"
+        android:background="#66000000"
+        android:layout_gravity="end|top"
+        tools:ignore="ContentDescription"
+    />
+
+    <ImageView
         android:id="@+id/event_recommended"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/eh_recommend_icon"
-        android:layout_gravity="start"
+        android:layout_gravity="start|top"
         tools:ignore="ContentDescription"
     />
 
@@ -38,6 +47,7 @@
             android:id="@+id/event_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textIsSelectable="true"
             android:textColor="@android:color/white"
             android:maxLines="1"
             android:ellipsize="end"

@@ -20,7 +20,8 @@ import java.util.List;
 public class Event {
     // EH_RECOMMENDED is same as 100 people going to event.
     private static final int EH_RECOMMENDATION_BOOST = 100;
-    private static final String EVENTS_HIGH_DETAIL_URI = "http://www.eventshigh.com/detail/CITY/ID";
+    private static final String EVENTS_HIGH_DETAIL_URI =
+            "http://www.eventshigh.com/detail/CITY/ID?src=ehm";
 
     public final String id;
     public final String title;

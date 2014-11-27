@@ -5,9 +5,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
@@ -64,7 +63,6 @@ public class ListActivity extends LocationAwareEventActivity {
         mEventListView = (ListView) findViewById(R.id.event_list);
         mEventsListAdapter = new EventListAdapter();
         mEventListView.setAdapter(mEventsListAdapter);
-        mEventListView.setOnItemClickListener(mOnItemClickListener);
 
         // Automatic Google Analytics reporting.
         GoogleAnalytics.getInstance(this).reportActivityStart(this);
@@ -173,7 +171,7 @@ public class ListActivity extends LocationAwareEventActivity {
                     getLayoutInflater().inflate(R.layout.list_item_event, parent, false) :
                     convertView;
             EventCard eventCard = new EventCard(view);
-            Event event = getItem(position);
+            final Event event = getItem(position);
 
             // Set the background image.
             eventCard.bgView.setImageResource(R.drawable.eh_default);
@@ -200,28 +198,55 @@ public class ListActivity extends LocationAwareEventActivity {
             eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE :
                     View.INVISIBLE);
 
+            // Set the click listener.
+            eventCard.bgView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showEventDetails(event);
+                }
+            });
+            eventCard.shareView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    shareEvent(event);
+                }
+            });
+
             return view;
         }
     }
 
-    private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(LOG_TAG)
-                    .setAction("onItemClick")
-                    .setLabel("")
-                    .setValue(1)
-                    .build());
+    private void showEventDetails(Event event) {
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory(LOG_TAG)
+                .setAction("showEventDetails")
+                .setLabel("")
+                .setValue(1)
+                .build());
 
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                    getEventUri(mEventsListAdapter.getItem(position)));
-            startActivity(browserIntent);
-        }
-    };
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, getEventUri(event));
+        startActivity(browserIntent);
+    }
+
+    private void shareEvent(Event event) {
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory(LOG_TAG)
+                .setAction("shareEvent")
+                .setLabel("")
+                .setValue(1)
+                .build());
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT,
+                event.title + " | " + getEventUri(event) + " | EventsHigh");
+        sendIntent.setType("text/plain");
+        startActivity(sendIntent);
+    }
 
     private static class EventCard {
         private final ImageView bgView;
+        private final ImageView shareView;
         private final ImageView recommendedImageView;
         private final TextView titleView;
         private final TextView venueView;
@@ -230,6 +255,7 @@ public class ListActivity extends LocationAwareEventActivity {
 
         private EventCard(View cardView) {
             bgView = (ImageView) cardView.findViewById(R.id.event_bg);
+            shareView = (ImageView) cardView.findViewById(R.id.event_share);
             recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
             titleView = (TextView) cardView.findViewById(R.id.event_title);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
