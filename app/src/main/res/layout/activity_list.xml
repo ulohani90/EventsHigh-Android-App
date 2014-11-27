@@ -16,13 +16,13 @@
             android:src="@drawable/ic_action_location_found"
         />
         <TextView
+            android:id="@+id/event_locality_header"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:text="@string/loading"
             android:textSize="@dimen/abc_text_size_small_material"
-            android:id="@+id/event_locality_header"
         />
     </LinearLayout>
 
@@ -33,19 +33,19 @@
     />
 
     <ListView
+        android:id="@+id/event_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:padding="@dimen/abc_control_padding_material"
-        android:id="@+id/event_list"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="12dp"
     />
 
     <LinearLayout
+        android:id="@+id/daySelector"
         android:layout_height="@dimen/abc_action_button_min_height_material"
         android:layout_width="match_parent"
         android:orientation="horizontal"
-        android:background="@android:color/transparent"
-        android:layout_marginBottom="@dimen/abc_action_bar_subtitle_bottom_margin_material"
-        android:id="@+id/daySelector"
     />
 </LinearLayout>

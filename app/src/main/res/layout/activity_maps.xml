@@ -26,7 +26,5 @@
         android:layout_height="@dimen/abc_action_button_min_height_material"
         android:layout_width="match_parent"
         android:orientation="horizontal"
-        android:background="@android:color/transparent"
-        android:layout_marginBottom="@dimen/abc_action_bar_subtitle_bottom_margin_material"
      />
 </LinearLayout>

@@ -253,6 +253,8 @@ public class MapsActivity extends LocationAwareEventActivity {
                     Utils.getEventTime(event));
             ((TextView)infoView.findViewById(R.id.num_people_interested)).setText(
                     Integer.toString(event.numPeopleInterested));
+            infoView.findViewById(R.id.event_recommended).setVisibility(
+                    event.ehRecommended ? View.VISIBLE : View.INVISIBLE);
 
             return infoView;
         }

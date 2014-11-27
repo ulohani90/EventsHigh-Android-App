@@ -168,28 +168,37 @@ public class ListActivity extends LocationAwareEventActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             numViews ++;
 
+            // Build the view, reuse existing if possible.
             View view = convertView == null ?
                     getLayoutInflater().inflate(R.layout.list_item_event, parent, false) :
                     convertView;
             EventCard eventCard = new EventCard(view);
-
             Event event = getItem(position);
 
+            // Set the background image.
             eventCard.bgView.setImageResource(R.drawable.eh_default);
             eventCard.bgView.setLayoutParams(new FrameLayout.LayoutParams(
                     LayoutParams.MATCH_PARENT,
                     mEventListView.getHeight() / 2));
             new DownloadImageTask(eventCard.bgView).execute(event.img_url);
+
+            // Set the title, time etc.
             eventCard.titleView.setText(event.title);
             eventCard.timeView.setText(Utils.getEventTime(event));
             eventCard.numPeopleInterestedView.setText(
                     Integer.toString(event.numPeopleInterested));
+
+            // Set the locality
             if (event.locality == null) {
                 eventCard.venueView.setVisibility(View.INVISIBLE);
             } else {
                 eventCard.venueView.setVisibility(View.VISIBLE);
                 eventCard.venueView.setText(event.locality);
             }
+
+            // Check if its recommended event.
+            eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE :
+                    View.INVISIBLE);
 
             return view;
         }
@@ -213,6 +222,7 @@ public class ListActivity extends LocationAwareEventActivity {
 
     private static class EventCard {
         private final ImageView bgView;
+        private final ImageView recommendedImageView;
         private final TextView titleView;
         private final TextView venueView;
         private final TextView timeView;
@@ -220,6 +230,7 @@ public class ListActivity extends LocationAwareEventActivity {
 
         private EventCard(View cardView) {
             bgView = (ImageView) cardView.findViewById(R.id.event_bg);
+            recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
             titleView = (TextView) cardView.findViewById(R.id.event_title);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             timeView = (TextView) cardView.findViewById(R.id.event_time);

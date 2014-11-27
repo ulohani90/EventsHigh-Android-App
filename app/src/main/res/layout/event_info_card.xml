@@ -1,59 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content">
-    <TextView
-        android:id="@+id/event_catergory"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+>
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/abc_action_bar_subtitle_bottom_margin_material"
-        android:textSize="@dimen/abc_text_size_display_1_material"
-        android:textColor="@color/day_selector_color"
         android:gravity="center_vertical"
-    />
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
     >
-
         <TextView
-            android:id="@+id/event_title"
+            android:id="@+id/event_catergory"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:minEms="8"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/abc_text_size_display_1_material"
+            android:textColor="@color/day_selector_color"
+            android:layout_marginRight="@dimen/abc_action_bar_subtitle_bottom_margin_material"
+            android:layout_marginEnd="@dimen/abc_action_bar_subtitle_bottom_margin_material"
         />
 
         <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
         >
-
             <TextView
-                android:id="@+id/event_time"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-            />
-            <ImageView
-                android:layout_marginEnd="@dimen/abc_action_bar_subtitle_bottom_margin_material"
-                android:layout_marginRight="@dimen/abc_action_bar_subtitle_bottom_margin_material"
-                android:layout_width="@dimen/abc_text_size_body_1_material"
-                android:layout_height="@dimen/abc_text_size_body_1_material"
-                android:src="@drawable/eh_popularity_icon_details_page"
-                android:contentDescription="@string/num_people_interested"
-            />
-            <TextView
-                android:id="@+id/num_people_interested"
+                android:id="@+id/event_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minEms="8"
+                android:maxLines="1"
+                android:layout_marginBottom="@dimen/abc_action_bar_subtitle_bottom_margin_material"
             />
-        </LinearLayout>
 
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+            >
+
+                <TextView
+                    android:id="@+id/event_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                />
+                <ImageView
+                    android:layout_marginEnd="@dimen/abc_action_bar_subtitle_bottom_margin_material"
+                    android:layout_marginRight="@dimen/abc_action_bar_subtitle_bottom_margin_material"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/abc_text_size_body_1_material"
+                    android:src="@drawable/eh_popularity_icon_details_page"
+                    android:contentDescription="@string/num_people_interested"
+                />
+                <TextView
+                    android:id="@+id/num_people_interested"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/event_recommended"
+        android:layout_width="@dimen/abc_dropdownitem_icon_width"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/eh_recommend_icon"
+        tools:ignore="ContentDescription"
+    />
+
+</RelativeLayout>
+

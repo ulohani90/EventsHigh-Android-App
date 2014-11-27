@@ -9,8 +9,4 @@
     <color name="day_selector_day_week_selected_text">#ffffff</color>
     <color name="day_selector_month_selected_text">#ffffff</color>
 
-    <color name="layer_color">#88000000</color>
-    <color name="title_color">#003e4c</color>
-    <color name="category_color">#26a9e0</color>
-
 </resources>

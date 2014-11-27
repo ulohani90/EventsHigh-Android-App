@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -57,7 +56,6 @@ public class EventFetcherParam implements Parcelable {
             double lng = in.readDouble();
             int day = in.readInt();
 
-            Log.w("TEST", "GOT: day:" + day + "; lat:" + lat + "; lng: " + lng + "; city: " + city);
             return new EventFetcherParam(City.valueOf(city), new LatLng(lat,lng), day);
         }
 
