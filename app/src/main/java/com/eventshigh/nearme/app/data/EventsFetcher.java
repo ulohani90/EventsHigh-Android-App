@@ -8,7 +8,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.Utils;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONException;
 

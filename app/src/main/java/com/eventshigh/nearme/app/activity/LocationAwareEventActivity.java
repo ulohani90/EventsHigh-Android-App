@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app;
+package com.eventshigh.nearme.app.activity;
 
 import android.graphics.Typeface;
 import android.location.Location;
@@ -9,7 +9,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.view.ViewGroup;
 
-import com.eventshigh.nearme.app.DaySelector.DaySelectionListener;
+import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.utils.DaySelector;
+import com.eventshigh.nearme.app.utils.DaySelector.DaySelectionListener;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;

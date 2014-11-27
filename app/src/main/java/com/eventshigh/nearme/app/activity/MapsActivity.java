@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app;
+package com.eventshigh.nearme.app.activity;
 
 import android.content.Intent;
 import android.graphics.Point;
@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.google.android.gms.analytics.GoogleAnalytics;

@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app;
+package com.eventshigh.nearme.app.utils;
 
 import android.graphics.Point;
 import android.location.Location;

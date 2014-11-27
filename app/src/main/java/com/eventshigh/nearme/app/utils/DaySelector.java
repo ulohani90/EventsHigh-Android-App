@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app;
+package com.eventshigh.nearme.app.utils;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,6 +7,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.eventshigh.nearme.app.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

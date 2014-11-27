@@ -2,7 +2,7 @@ package com.eventshigh.nearme.app.data;
 
 import android.net.Uri;
 
-import com.eventshigh.nearme.app.Utils;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
