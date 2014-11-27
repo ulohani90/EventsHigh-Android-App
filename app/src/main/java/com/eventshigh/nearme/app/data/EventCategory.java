@@ -3,9 +3,8 @@ package com.eventshigh.nearme.app.data;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Typeface;
-import android.util.Pair;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.View.MeasureSpec;
 import android.widget.TextView;
 
@@ -42,15 +41,6 @@ public enum EventCategory {
     TECH,
     WORKSHOPS,
     OTHER;
-
-    public static EventCategory fromString(String categoryString) {
-        EventCategory category = ALL_CATEGORIES.get(categoryString.toLowerCase());
-        if (category == null) {
-            return EventCategory.OTHER;
-        }
-
-        return  category;
-    }
 
     /**
      * @return and String ID from resource which represents the category icon from font-awesome.
@@ -104,38 +94,40 @@ public enum EventCategory {
 
     /**
      * Get an Icon associated with this Category.
+     *
      * @param inflater the inflater to be used to generate Icon.
      * @param font font-awesome font from assets.
-     * @param small true if you need smaller version of icon
      * @return an BitmapDescriptor for Icon.
      */
-    public BitmapDescriptor icon(LayoutInflater inflater, Typeface font, boolean small) {
-        Pair<BitmapDescriptor, BitmapDescriptor> icons = CATEGORY_ICONS.get(this);
-        if (icons == null) {
-            icons = Pair.create(
-                    getCategoryIcon(inflater, font, true),
-                    getCategoryIcon(inflater, font, false));
-            CATEGORY_ICONS.put(this, icons);
+    public BitmapDescriptor icon(LayoutInflater inflater, Typeface font) {
+        BitmapDescriptor icon = CATEGORY_ICONS.get(this);
+        if (icon == null) {
+            icon = getCategoryIcon(inflater, font);
+            CATEGORY_ICONS.put(this, icon);
         }
-        return small ? icons.first : icons.second;
+        return icon;
     }
 
-    private static Map<String, EventCategory> ALL_CATEGORIES = new HashMap<String, EventCategory>();
-    static {
-        for (EventCategory category : EventCategory.values()) {
-            ALL_CATEGORIES.put(category.toString().replace('_', ' ').toLowerCase(), category);
+    public static BitmapDescriptor circleIcon() {
+        if (CIRCLE_ICON == null) {
+            CIRCLE_ICON = BitmapDescriptorFactory.fromResource(R.drawable.dot0);
         }
+
+        return CIRCLE_ICON;
     }
 
-    private static Map<EventCategory, Pair<BitmapDescriptor, BitmapDescriptor>> CATEGORY_ICONS =
-            new HashMap<EventCategory, Pair<BitmapDescriptor, BitmapDescriptor>>();
-    private BitmapDescriptor getCategoryIcon(LayoutInflater inflater, Typeface font, boolean small) {
+
+    private static BitmapDescriptor CIRCLE_ICON;
+    private static final Map<EventCategory, BitmapDescriptor> CATEGORY_ICONS =
+            new HashMap<EventCategory,BitmapDescriptor>();
+    private BitmapDescriptor getCategoryIcon(LayoutInflater inflater, Typeface font) {
         TextView view = (TextView) inflater.inflate(R.layout.category_icon, null);
         view.setTypeface(font);
         view.setText(getIconStringId());
-        if (small) {
-            view.setTextSize(TypedValue.COMPLEX_UNIT_PX, view.getTextSize() / 2);
-        }
+        return viewToBitmapDescriptorFactory(view);
+    }
+
+    private static BitmapDescriptor viewToBitmapDescriptorFactory(View view) {
         int specWidth = MeasureSpec.makeMeasureSpec(0 /* any */, MeasureSpec.UNSPECIFIED);
         view.measure(specWidth, specWidth);
         Bitmap bitmap = Bitmap.createBitmap(

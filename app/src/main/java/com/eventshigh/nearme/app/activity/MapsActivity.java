@@ -12,9 +12,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -37,10 +39,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Maps activity which shows users events happening in given locality. The events are marked
@@ -59,15 +59,14 @@ public class MapsActivity extends LocationAwareEventActivity {
     // log tag used for debugging.
     private static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
-    // TO avoid the map cluttering and to provide sense of relevance, we show few
-    // event marker is bigger size (highlighted). This constant controls how
-    // many markers are highlighted in a view.
-    private static final int NUM_MARKERS_HIGHLIGHTED = 5;
+    // TO avoid the map cluttering and to provide sense of relevance, we show icon
+    // markers for event which has interest from minimum number of users.
+    private static final int MIN_RELEVANCE_FOR_MARKER = 20;
 
     // To avoid cluttering, we do not show marker for event if it happens to be within
     // small distance from other event. This parameter controls that distance as measured
     // in screen units.
-    private static final int MIN_MARKER_DISTANCE_SQ = 4000;
+    private static final int MIN_MARKER_DISTANCE_SQ = 2000;
 
     // For performance reasons, we show events only where user has reasonable zoom level.
     private static final int MIN_ZOOM_LEVEL = 11;
@@ -83,8 +82,6 @@ public class MapsActivity extends LocationAwareEventActivity {
     // Note that all markers may not be visible to user and it is controlled
     // through code below.
     private Map<Marker, Event> markers = new HashMap<Marker, Event>();
-    // Set of Markers which are in highlighted state.
-    private Set<Marker> highlightedMarkers = new HashSet<Marker>(NUM_MARKERS_HIGHLIGHTED);
     // Marker which user clicked last time. We always show this marker no matter
     // what relevance. This is user shown interest.
     private Marker lastClickedMarker;
@@ -107,7 +104,7 @@ public class MapsActivity extends LocationAwareEventActivity {
         Intent intent = getIntent();
         EventFetcherParam param = null;
         if (intent != null) {
-            param = (EventFetcherParam) intent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
+            param = intent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
         }
 
         // Setup the local member variables.
@@ -182,6 +179,8 @@ public class MapsActivity extends LocationAwareEventActivity {
                 map.setInfoWindowAdapter(mInfoWindowAdapter);
                 map.setOnMarkerClickListener(mOnMarkerClickListener);
                 map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
+
+                MapsInitializer.initialize(this);
             }
         }
     }
@@ -205,6 +204,9 @@ public class MapsActivity extends LocationAwareEventActivity {
                     new MarkerOptions()
                             .position(new LatLng(event.location.latitude, event.location.longitude))
                             .visible(false)
+                            .icon(event.getPopularityScore() < MIN_RELEVANCE_FOR_MARKER ?
+                                EventCategory.circleIcon():
+                                event.category.icon(getLayoutInflater(), font))
             );
 
             markers.put(marker, event);
@@ -265,6 +267,8 @@ public class MapsActivity extends LocationAwareEventActivity {
         for (Marker marker : markersInProjection) {
             Event event = markers.get(marker);
             Point point = projection.toScreenLocation(event.location);
+
+            // Is this marker too close to other marker? if yes then we do not show it.
             boolean toClose = false;
             for (Point shownPoint : shownPoints) {
                 if (Utils.getDistanceSQ(shownPoint, point) < MIN_MARKER_DISTANCE_SQ) {
@@ -273,26 +277,10 @@ public class MapsActivity extends LocationAwareEventActivity {
                 }
             }
 
-            if (toClose) {
-                marker.setVisible(false);
-                continue;
+            marker.setVisible(!toClose);
+            if (!toClose) {
+                shownPoints.add(point);
             }
-
-            if (shownPoints.size() < NUM_MARKERS_HIGHLIGHTED) {
-                if (! highlightedMarkers.contains(marker)) {
-                    marker.setIcon(event.category.icon(getLayoutInflater(), font, false));
-                    highlightedMarkers.add(marker);
-                }
-            } else {
-                if (highlightedMarkers.contains(marker) || marker.getAlpha() > 0.8f) {
-                    highlightedMarkers.remove(marker);
-                    marker.setIcon(event.category.icon(getLayoutInflater(), font, true));
-                    marker.setAlpha(0.7f);
-                }
-            }
-
-            marker.setVisible(true);
-            shownPoints.add(point);
         }
 
         // Show the info card for highest popular event.

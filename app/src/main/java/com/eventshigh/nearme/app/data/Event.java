@@ -93,7 +93,12 @@ public class Event {
             EventCategory category = EventCategory.OTHER;
             JSONArray tags = upcomingEvents.getJSONObject(i).getJSONArray("tags");
             for (int j = 0; category == EventCategory.OTHER && j < tags.length(); j++) {
-                category = EventCategory.fromString(tags.getJSONObject(j).getString("tag"));
+                try {
+                    category = EventCategory.valueOf(
+                            tags.getJSONObject(j).getString("tag").toUpperCase().replaceAll(" ", "_"));
+                } catch (IllegalArgumentException e) {
+                    // Ignore. Unsupported category.
+                }
             }
 
             if (Math.abs(lat) < 1 || Math.abs(lon) < 1) {

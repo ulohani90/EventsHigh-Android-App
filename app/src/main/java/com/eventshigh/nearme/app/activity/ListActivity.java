@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,6 +35,7 @@ public class ListActivity extends LocationAwareEventActivity {
     // log tag used for debugging.
     private static final String LOG_TAG = MapsActivity.class.getSimpleName();
 
+    private ListView mEventListView;
     private EventListAdapter mEventsListAdapter;
     private TextView mLocalityView;
 
@@ -58,10 +61,10 @@ public class ListActivity extends LocationAwareEventActivity {
 
         // Setup adapter.
         mLocalityView = (TextView) findViewById(R.id.event_locality_header);
-        ListView eventListView = (ListView) findViewById(R.id.event_list);
+        mEventListView = (ListView) findViewById(R.id.event_list);
         mEventsListAdapter = new EventListAdapter();
-        eventListView.setAdapter(mEventsListAdapter);
-        eventListView.setOnItemClickListener(mOnItemClickListener);
+        mEventListView.setAdapter(mEventsListAdapter);
+        mEventListView.setOnItemClickListener(mOnItemClickListener);
 
         // Automatic Google Analytics reporting.
         GoogleAnalytics.getInstance(this).reportActivityStart(this);
@@ -173,13 +176,16 @@ public class ListActivity extends LocationAwareEventActivity {
             Event event = getItem(position);
 
             eventCard.bgView.setImageResource(R.drawable.eh_default);
+            eventCard.bgView.setLayoutParams(new FrameLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    mEventListView.getHeight() / 2));
             new DownloadImageTask(eventCard.bgView).execute(event.img_url);
             eventCard.titleView.setText(event.title);
             eventCard.timeView.setText(Utils.getEventTime(event));
             eventCard.numPeopleInterestedView.setText(
                     Integer.toString(event.numPeopleInterested));
             if (event.locality == null) {
-                eventCard.venueView.setVisibility(View.GONE);
+                eventCard.venueView.setVisibility(View.INVISIBLE);
             } else {
                 eventCard.venueView.setVisibility(View.VISIBLE);
                 eventCard.venueView.setText(event.locality);
