@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.utils;
 
 import android.graphics.Point;
+import android.util.Pair;
 
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
@@ -29,9 +30,12 @@ public class MarkerManager {
     // CONSTANTS
     // ***********************
 
-    // TO avoid the map cluttering and to provide sense of relevance, we show icon
-    // markers for event which has interest from minimum number of users.
-    private static final int MIN_RELEVANCE_FOR_MARKER = 20;
+    // To avoid the map cluttering, we might show few event markers as DOT instead of
+    // as category icon. We show event marker as dot, only if total number of events
+    // shown is greater than NUM_MIN_EVENTS and if event popularity score is less than
+    // MIN_POPULARITY.
+    private static final int NUM_MIN_EVENTS = 8;
+    private static final int MIN_POPULARITY = 20;
 
     // To avoid cluttering, we do not show marker for event if it happens to be within
     // small distance from other event. This parameter controls that distance as measured
@@ -51,7 +55,7 @@ public class MarkerManager {
 
         public MarkerInfo(Event event) {
             this.event = event;
-            canShowAsDot = event.getPopularityScore() < MIN_RELEVANCE_FOR_MARKER;
+            canShowAsDot = event.getPopularityScore() < MIN_POPULARITY;
             shownAsDot = canShowAsDot;
         }
     }
@@ -128,15 +132,20 @@ public class MarkerManager {
 
         // We now show as much point as possible so that no two markers are very close.
         // Few first markers (high popularity score) are highlighted.
-        List<Point> shownPoints = new ArrayList<Point>(markersInProjection.size());
+        List<Pair<Point, Boolean>> shownPoints =
+                new ArrayList<Pair<Point, Boolean>>(markersInProjection.size());
         for (Marker marker : markersInProjection) {
             Event event = markers.get(marker).event;
             Point point = projection.toScreenLocation(event.location);
 
             // Is this marker too close to other marker? if yes then we do not show it.
             boolean toClose = false;
-            for (Point shownPoint : shownPoints) {
-                if (Utils.getDistanceSQ(shownPoint, point) < MIN_MARKER_DISTANCE_SQ) {
+            for (Pair<Point, Boolean> shownPoint : shownPoints) {
+                // if we have shown the marker as dot, we can reduce the min distance constrain.
+                int minDistSq = shownPoint.second ?
+                        MIN_MARKER_DISTANCE_SQ :
+                        MIN_MARKER_DISTANCE_SQ / 4;
+                if (Utils.getDistanceSQ(shownPoint.first, point) < minDistSq) {
                     toClose = true;
                     break;
                 }
@@ -144,7 +153,17 @@ public class MarkerManager {
 
             marker.setVisible(!toClose);
             if (!toClose) {
-                shownPoints.add(point);
+                MarkerInfo markerInfo = markers.get(marker);
+                if (!marker.isInfoWindowShown() && markerInfo.canShowAsDot) {
+                    boolean shouldShowAtDot = markersInProjection.size() > NUM_MIN_EVENTS;
+                    if (shouldShowAtDot != markerInfo.shownAsDot) {
+                        marker.setIcon(shouldShowAtDot ?
+                                EventCategory.circleIcon() :
+                                event.category.icon());
+                        markerInfo.shownAsDot = shouldShowAtDot;
+                    }
+                }
+                shownPoints.add(Pair.create(point, markerInfo.shownAsDot));
             }
         }
 
