@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.ViewGroup;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.DaySelector;
 import com.eventshigh.nearme.app.utils.DaySelector.DaySelectionListener;
@@ -165,6 +166,7 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
         if (font == null) {
             font = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
         }
+        EventCategory.setIconResources(getLayoutInflater(), font);
     }
 
     private void setUpGoogleAnalyticsIfNeeded() {

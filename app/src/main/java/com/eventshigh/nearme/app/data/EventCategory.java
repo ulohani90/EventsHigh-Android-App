@@ -95,14 +95,15 @@ public enum EventCategory {
     /**
      * Get an Icon associated with this Category.
      *
-     * @param inflater the inflater to be used to generate Icon.
-     * @param font font-awesome font from assets.
-     * @return an BitmapDescriptor for Icon.
+     \     * @return an BitmapDescriptor for Icon.
      */
-    public BitmapDescriptor icon(LayoutInflater inflater, Typeface font) {
+    public BitmapDescriptor icon() {
         BitmapDescriptor icon = CATEGORY_ICONS.get(this);
         if (icon == null) {
-            icon = getCategoryIcon(inflater, font);
+            TextView view = (TextView) INFLATOR.inflate(R.layout.category_icon, null);
+            view.setTypeface(FONT);
+            view.setText(getIconStringId());
+            icon = viewToBitmapDescriptorFactory(view);
             CATEGORY_ICONS.put(this, icon);
         }
         return icon;
@@ -116,16 +117,22 @@ public enum EventCategory {
         return CIRCLE_ICON;
     }
 
+    /**
+     * Sets the resources which can be used to populate icons.
+     *
+     * @param inflater the inflater to be used to generate Icon.
+     * @param font font-awesome font from assets.
+\     */
+    private static LayoutInflater INFLATOR;
+    private static Typeface FONT;
+    public static void setIconResources(LayoutInflater inflater, Typeface font) {
+        INFLATOR = inflater;
+        FONT = font;
+    }
 
     private static BitmapDescriptor CIRCLE_ICON;
     private static final Map<EventCategory, BitmapDescriptor> CATEGORY_ICONS =
             new HashMap<EventCategory,BitmapDescriptor>();
-    private BitmapDescriptor getCategoryIcon(LayoutInflater inflater, Typeface font) {
-        TextView view = (TextView) inflater.inflate(R.layout.category_icon, null);
-        view.setTypeface(font);
-        view.setText(getIconStringId());
-        return viewToBitmapDescriptorFactory(view);
-    }
 
     private static BitmapDescriptor viewToBitmapDescriptorFactory(View view) {
         int specWidth = MeasureSpec.makeMeasureSpec(0 /* any */, MeasureSpec.UNSPECIFIED);
