@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.data;
 
 import android.net.Uri;
+import android.util.Log;
 
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
@@ -71,63 +72,68 @@ public class Event {
 
 
         for (int i = 0; i < upcomingEvents.length(); i++) {
-            String id = upcomingEvents.getJSONObject(i).getString("id");
-            String title = upcomingEvents.getJSONObject(i).getString("title");
-            String img_url = checkIfUnknown(upcomingEvents.getJSONObject(i).getString("img_url"));
+            try {
+                JSONObject eventJson = upcomingEvents.getJSONObject(i);
+                String id = eventJson.getString("id");
+                String title = eventJson.getString("title");
+                String img_url = checkIfUnknown(eventJson.getString("img_url"));
 
-            int num_people_interested = upcomingEvents.getJSONObject(i).getInt("num_people_interested");
-            boolean eh_recommends = upcomingEvents.getJSONObject(i).has("eh_recommends") &&
-                    upcomingEvents.getJSONObject(i).getBoolean("eh_recommends");
+                int num_people_interested = eventJson.getInt("num_people_interested");
+                boolean eh_recommends = eventJson.has("eh_recommends") &&
+                        eventJson.getBoolean("eh_recommends");
 
-            String date = upcomingEvents.getJSONObject(i).getString("date");
-            String start_time = upcomingEvents.getJSONObject(i).getString("start_time");
-            String end_time = upcomingEvents.getJSONObject(i).getString("end_time");
+                String date = eventJson.getString("date");
+                String start_time = eventJson.getString("start_time");
+                String end_time = eventJson.getString("end_time");
 
-            JSONObject venue = upcomingEvents.getJSONObject(i).getJSONObject("venue_info");
-            double lat = venue.getDouble("lat");
-            double lon = venue.getDouble("lon");
-            String locality = checkIfUnknown(venue.getString("name"));
-            if (locality == null) {
-                locality = checkIfUnknown(upcomingEvents.getJSONObject(i).getString("locality"));
-            }
-
-            EventCategory category = EventCategory.OTHER;
-            JSONArray tags = upcomingEvents.getJSONObject(i).getJSONArray("tags");
-            for (int j = 0; category == EventCategory.OTHER && j < tags.length(); j++) {
-                try {
-                    category = EventCategory.valueOf(
-                            tags.getJSONObject(j).getString("tag").toUpperCase().replaceAll(" ", "_"));
-                } catch (IllegalArgumentException e) {
-                    // Ignore. Unsupported category.
+                JSONObject venue = eventJson.getJSONObject("venue_info");
+                double lat = venue.getDouble("lat");
+                double lon = venue.getDouble("lon");
+                String locality = checkIfUnknown(venue.getString("name"));
+                if (locality == null) {
+                    locality = checkIfUnknown(eventJson.getString("locality"));
                 }
+
+                EventCategory category = EventCategory.OTHER;
+                JSONArray tags = eventJson.getJSONArray("tags");
+                for (int j = 0; category == EventCategory.OTHER && j < tags.length(); j++) {
+                    try {
+                        category = EventCategory.valueOf(
+                                tags.getJSONObject(j).getString("tag").toUpperCase().replaceAll(" ", "_"));
+                    } catch (IllegalArgumentException e) {
+                        // Ignore. Unsupported category.
+                    }
+                }
+
+                if (Math.abs(lat) < 1 || Math.abs(lon) < 1) {
+                    // Invalid latitude and longitude.
+                    // Ignore the entry.
+                    continue;
+                }
+
+                Event event = new Event(id,
+                        title,
+                        category,
+                        img_url,
+
+                        num_people_interested,
+                        eh_recommends,
+
+                        Utils.mergeDateTime(date, start_time),
+                        Utils.mergeDateTime(date, end_time),
+
+                        new LatLng(lat, lon),
+                        locality
+                );
+                events.add(event);
+            } catch (JSONException ex) {
+                // Malformed JSON, ignore.
+                Log.w(Event.class.getSimpleName(), "malformed JSON", ex);
             }
-
-            if (Math.abs(lat) < 1 || Math.abs(lon) < 1) {
-                // Invalid latitude and longitude.
-                // Ignore the entry.
-                continue;
-            }
-
-            Event event = new Event(id,
-                    title,
-                    category,
-                    img_url,
-
-                    num_people_interested,
-                    eh_recommends,
-
-                    Utils.mergeDateTime(date, start_time),
-                    Utils.mergeDateTime(date, end_time),
-
-                    new LatLng(lat, lon),
-                    locality
-            );
-            events.add(event);
         }
 
         return events;
     }
-
 
     @Override
     public int hashCode() {
@@ -139,7 +145,6 @@ public class Event {
         return another instanceof Event &&
                 id.equals(((Event) another).id);
     }
-
 
     public int getPopularityScore() {
         return ehRecommended ? Math.max(EH_RECOMMENDATION_BOOST, numPeopleInterested) : numPeopleInterested;
