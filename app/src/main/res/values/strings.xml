@@ -12,6 +12,8 @@
     <string name="ask_locality">Enter the locality, city</string>
     <string name="failed_locality">Could not find locality, did you enter cityname ?</string>
 
+    <string name="failed_share">Sharing failed as we could not save image</string>
+
     <string name="action_list">Show as List</string>
     <string name="action_map">Show on Map</string>
 

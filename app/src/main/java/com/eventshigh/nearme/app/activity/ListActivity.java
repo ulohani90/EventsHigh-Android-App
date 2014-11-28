@@ -1,7 +1,11 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
+import android.support.v4.content.FileProvider;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +32,9 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -173,7 +180,7 @@ public class ListActivity extends LocationAwareEventActivity {
         startActivity(browserIntent);
     }
 
-    private void shareEvent(Event event) {
+    private void shareEvent(View eventView, Event event) {
         tracker.send(new HitBuilders.EventBuilder()
                 .setCategory(LOG_TAG)
                 .setAction("shareEvent")
@@ -181,12 +188,33 @@ public class ListActivity extends LocationAwareEventActivity {
                 .setValue(1)
                 .build());
 
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT,
-                event.title + " | " + getEventUri(event) + " | EventsHigh");
-        sendIntent.setType("text/plain");
-        startActivity(sendIntent);
+        View shareView = eventView.findViewById(R.id.event_share);
+        shareView.setVisibility(View.INVISIBLE);
+        eventView.setDrawingCacheEnabled(true);
+        Bitmap bitmap = eventView.getDrawingCache();
+        shareView.setVisibility(View.VISIBLE);
+
+        try {
+            File file = File.createTempFile("event", ".jpg", getCacheDir());
+            FileOutputStream oStream = new FileOutputStream(file);
+            bitmap.compress(CompressFormat.JPEG, 90, oStream);
+            oStream.close();
+
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_STREAM,
+                    FileProvider.getUriForFile(ListActivity.this,
+                            "com.eventshigh.nearme.app.fileprovider", file));
+            sendIntent.putExtra(Intent.EXTRA_TITLE, event.title);
+            sendIntent.putExtra(Intent.EXTRA_TEXT,
+                    getEventUri(event) + " (shared via EventsHigh)");
+            sendIntent.setType("image/jpeg");
+            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(sendIntent);
+        } catch (IOException e) {
+            Toast.makeText(ListActivity.this, R.string.failed_share, Toast.LENGTH_SHORT).show();
+            Log.w(LOG_TAG, "failed to create file for sharing", e);
+        }
     }
 
 
@@ -228,7 +256,7 @@ public class ListActivity extends LocationAwareEventActivity {
             numViews ++;
 
             // Build the view, reuse existing if possible.
-            View view = convertView == null ?
+            final View view = convertView == null ?
                     getLayoutInflater().inflate(R.layout.list_item_event, parent, false) :
                     convertView;
             EventCard eventCard = new EventCard(view);
@@ -269,7 +297,7 @@ public class ListActivity extends LocationAwareEventActivity {
             eventCard.shareView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    shareEvent(event);
+                    shareEvent(view, event);
                 }
             });
 
