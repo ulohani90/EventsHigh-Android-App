@@ -7,6 +7,7 @@ import android.net.http.HttpResponseCache;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import com.eventshigh.nearme.app.R;
@@ -30,6 +31,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,6 +134,7 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
         setUpDaySelectorIfNeeded(param);
         setUpLocationClientIfNeeded(param);
         setUpGoogleAnalyticsIfNeeded();
+        setupHttpResponseCache();
 
         if (param != null) {
             updateUserLocation(param.location);
@@ -173,6 +177,20 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
         if (tracker == null) {
             tracker = GoogleAnalytics.getInstance(this).newTracker(R.xml.analytics);
             tracker.enableAdvertisingIdCollection(true);
+        }
+    }
+
+    private void setupHttpResponseCache() {
+        // Setup HttpResponseCache.
+        if (HttpResponseCache.getInstalled() == null) {
+            try {
+                File httpCacheDir = new File(getCacheDir(), "http");
+                long httpCacheSize = 10 * 1024 * 1024; // 10 MB
+                HttpResponseCache.install(httpCacheDir, httpCacheSize);
+            } catch (IOException e) {
+                Log.w(LocationAwareEventActivity.class.getSimpleName(),
+                        "HTTP response cache installation failed:" + e);
+            }
         }
     }
 

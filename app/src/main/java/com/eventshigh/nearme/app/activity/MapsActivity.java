@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.content.Intent;
-import android.net.http.HttpResponseCache;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -29,8 +28,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -87,15 +84,6 @@ public class MapsActivity extends LocationAwareEventActivity {
         // Setup the local member variables.
         setUpMapIfNeeded();
         setUpAll(param);
-
-        // Setup HttpResponseCache.
-        try {
-            File httpCacheDir = new File(getCacheDir(), "http");
-            long httpCacheSize = 10 * 1024 * 1024; // 10 MB
-            HttpResponseCache.install(httpCacheDir, httpCacheSize);
-        } catch (IOException e) {
-            Log.w(LOG_TAG, "HTTP response cache installation failed:" + e);
-        }
 
         // Automatic Google Analytics reporting.
         GoogleAnalytics.getInstance(this).reportActivityStart(this);
