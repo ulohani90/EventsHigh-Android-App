@@ -20,7 +20,6 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
 
-
 /**
  * An {@link AsyncTask} which is used to fetch the Events. Once events are available,
  * the callback is called on UI thread. The Caller can then use Callback to refresh the events.

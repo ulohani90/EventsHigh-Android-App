@@ -197,6 +197,13 @@ public class ListActivity extends LocationAwareEventActivity {
     private final OnClickListener mLocalityClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory(LOG_TAG)
+                    .setAction("LocalityClickListener")
+                    .setLabel("")
+                    .setValue(1)
+                    .build());
+
             LocationPickerDialog.show(ListActivity.this, new OnLocationSelection() {
                 @Override
                 public void onLocationSelection(String locationString, LatLng locationPoint) {
@@ -240,12 +247,12 @@ public class ListActivity extends LocationAwareEventActivity {
             eventCard.numPeopleInterestedView.setText(
                     Integer.toString(event.numPeopleInterested));
 
-            // Set the locality
-            if (event.locality == null) {
+            // Set the venue
+            if (event.venue == null) {
                 eventCard.venueView.setVisibility(View.INVISIBLE);
             } else {
                 eventCard.venueView.setVisibility(View.VISIBLE);
-                eventCard.venueView.setText(event.locality);
+                eventCard.venueView.setText(event.venue);
             }
 
             // Check if its recommended event.

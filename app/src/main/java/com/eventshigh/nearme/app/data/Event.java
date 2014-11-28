@@ -30,7 +30,7 @@ public class Event {
     public final String img_url;
 
     public final LatLng location;
-    public final String locality;
+    public final String venue;
 
     public final Date startTime;
     public final Date endTime;
@@ -42,7 +42,7 @@ public class Event {
     public Event(String id, String title, EventCategory category, String img_url,
                  int numPeopleInterested, boolean ehRecommended,
                  Date startTime, Date endTime,
-                 LatLng location, String locality) {
+                 LatLng location, String venue) {
         this.id = id;
         this.title = title;
         this.category = category;
@@ -52,7 +52,7 @@ public class Event {
         this.ehRecommended = ehRecommended;
 
         this.location = location;
-        this.locality = locality;
+        this.venue = venue;
 
         this.startTime = startTime;
         this.endTime = endTime;
@@ -86,12 +86,33 @@ public class Event {
                 String start_time = eventJson.getString("start_time");
                 String end_time = eventJson.getString("end_time");
 
-                JSONObject venue = eventJson.getJSONObject("venue_info");
-                double lat = venue.getDouble("lat");
-                double lon = venue.getDouble("lon");
-                String locality = checkIfUnknown(venue.getString("name"));
-                if (locality == null) {
-                    locality = checkIfUnknown(eventJson.getString("locality"));
+                double lat = 0;
+                double lon = 0;
+                JSONObject venueJson = null;
+                if (eventJson.has("venue_info")) {
+                    venueJson = eventJson.getJSONObject("venue_info");
+                    lat = venueJson.getDouble("lat");
+                    lon = venueJson.getDouble("lon");
+                }
+
+                if (Math.abs(lat) < 1 || Math.abs(lon) < 1) {
+                    // Invalid latitude and longitude. Try locality_info.
+                    if (eventJson.has("locality_info")) {
+                        JSONObject locality = eventJson.getJSONObject("locality_info");
+                        lat = locality.getDouble("lat");
+                        lon = locality.getDouble("lon");
+                    }
+                }
+
+                if (Math.abs(lat) < 1 || Math.abs(lon) < 1) {
+                    // Invalid latitude and longitude.
+                    // Ignore the entry.
+                    continue;
+                }
+
+                String venue = venueJson == null ? null : checkIfUnknown(venueJson.getString("name"));
+                if (venue == null) {
+                    venue = checkIfUnknown(eventJson.getString("locality"));
                 }
 
                 EventCategory category = EventCategory.OTHER;
@@ -103,12 +124,6 @@ public class Event {
                     } catch (IllegalArgumentException e) {
                         // Ignore. Unsupported category.
                     }
-                }
-
-                if (Math.abs(lat) < 1 || Math.abs(lon) < 1) {
-                    // Invalid latitude and longitude.
-                    // Ignore the entry.
-                    continue;
                 }
 
                 Event event = new Event(id,
@@ -123,7 +138,7 @@ public class Event {
                         Utils.mergeDateTime(date, end_time),
 
                         new LatLng(lat, lon),
-                        locality
+                        venue
                 );
                 events.add(event);
             } catch (JSONException ex) {
