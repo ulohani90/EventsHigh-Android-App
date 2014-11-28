@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -108,16 +107,9 @@ public class MapsActivity extends LocationAwareEventActivity {
             if (lastEventFetcherParam == null) {
                 Toast.makeText(this, R.string.no_event, Toast.LENGTH_SHORT).show();
             } else {
-                EventFetcherParam param = new EventFetcherParam(
-                        lastEventFetcherParam.city,
-                        map.getCameraPosition().target,
-                        lastEventFetcherParam.day);
-                Log.w(LOG_TAG, "Passing: " + lastEventFetcherParam);
                 startActivity(new Intent(this, ListActivity.class)
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                .putExtra(EXTRA_EVENT_FETCHER_PARAM, param)
+                                .putExtra(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam)
                 );
             }
             return true;

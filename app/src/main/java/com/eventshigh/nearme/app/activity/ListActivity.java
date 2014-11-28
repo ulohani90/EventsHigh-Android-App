@@ -104,8 +104,6 @@ public class ListActivity extends LocationAwareEventActivity {
         if (item.getItemId() == R.id.action_map) {
             if (lastEventFetcherParam != null) {
                 startActivity(new Intent(this, MapsActivity.class)
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                 .putExtra(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam)
                 );

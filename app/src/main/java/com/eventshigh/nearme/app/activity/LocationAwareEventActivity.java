@@ -240,6 +240,7 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
             return true;
         }
 
+        lastEventFetcherParam = newEventFetcherParam;
         return false;
     }
 
