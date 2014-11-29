@@ -1,7 +1,8 @@
 package com.eventshigh.nearme.app.utils;
 
-import android.content.Context;
-import android.view.LayoutInflater;
+import android.app.Activity;
+import android.graphics.Point;
+import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -24,24 +25,26 @@ public class DaySelector {
         public void onDaySelection(int dayNo);
     }
 
-    private final Context context;
+    private final Activity activity;
     private final ViewGroup parent;
     private DaySelectionListener daySelectionListener = null;
     private LinearLayout[] daySelectorItems = new LinearLayout[NUM_DAYS];
     private int selectedDay = -1;
 
-    public DaySelector(Context context, ViewGroup parent) {
-        this.context = context;
+    public DaySelector(Activity activity, ViewGroup parent) {
+        this.activity = activity;
         this.parent = parent;
     }
 
     public void populate() {
         parent.removeAllViews();
 
+        int minWidth = getMinWidth();
         for (int i = 0; i < NUM_DAYS; i++) {
             LinearLayout daySelectorItem =
-                    (LinearLayout) LayoutInflater.from(context).inflate(
+                    (LinearLayout) activity.getLayoutInflater().inflate(
                             R.layout.day_selector_item, parent, false);
+            daySelectorItem.setMinimumWidth(minWidth);
             parent.addView(daySelectorItem);
             daySelectorItems[i] = daySelectorItem;
             populateDaySelectorItem(i);
@@ -62,19 +65,19 @@ public class DaySelector {
     public void setSelected(int selectedDayNo) {
         if (selectedDay >= 0) {
             daySelectorItems[selectedDay].setBackgroundColor(
-                    context.getResources().getColor(R.color.day_selector_color));
+                    activity.getResources().getColor(R.color.day_selector_color));
             ((TextView) daySelectorItems[selectedDay].findViewById(R.id.day_of_week)).setTextColor(
-                    context.getResources().getColor(R.color.day_selector_day_week_text));
+                    activity.getResources().getColor(R.color.day_selector_day_week_text));
             ((TextView) daySelectorItems[selectedDay].findViewById(R.id.month)).setTextColor(
-                    context.getResources().getColor(R.color.day_selector_month_text));
+                    activity.getResources().getColor(R.color.day_selector_month_text));
         }
 
         daySelectorItems[selectedDayNo].setBackgroundColor(
-                context.getResources().getColor(R.color.day_selector_pressed_color));
+                activity.getResources().getColor(R.color.day_selector_pressed_color));
         ((TextView)daySelectorItems[selectedDayNo].findViewById(R.id.day_of_week)).setTextColor(
-                context.getResources().getColor(R.color.day_selector_day_week_selected_text));
+                activity.getResources().getColor(R.color.day_selector_day_week_selected_text));
         ((TextView)daySelectorItems[selectedDayNo].findViewById(R.id.month)).setTextColor(
-                context.getResources().getColor(R.color.day_selector_month_selected_text));
+                activity.getResources().getColor(R.color.day_selector_month_selected_text));
 
         selectedDay = selectedDayNo;
     }
@@ -106,5 +109,13 @@ public class DaySelector {
         ((TextView)daySelectorItems[dayItemNo].findViewById(R.id.date)).setText(DATE.format(date));
         ((TextView)daySelectorItems[dayItemNo].findViewById(R.id.month)).setText(MONTH.format(date));
         daySelectorItems[dayItemNo].setClickable(true);
+    }
+
+    // Get MinWidth for daySelector item.
+    private int getMinWidth() {
+        Display display = activity.getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        return size.x / 7;
     }
 }

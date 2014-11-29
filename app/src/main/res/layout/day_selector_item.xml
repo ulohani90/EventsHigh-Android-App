@@ -3,7 +3,6 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:minWidth="?android:attr/listPreferredItemHeightSmall"
     android:background="@color/day_selector_color"
     android:gravity="center_vertical|center_horizontal"
     android:padding="@dimen/abc_control_padding_material"
