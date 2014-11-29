@@ -11,6 +11,8 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.utils.LocationPickerDialog;
+import com.eventshigh.nearme.app.utils.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.utils.MarkerManager;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -115,6 +117,22 @@ public class MapsActivity extends LocationAwareEventActivity {
             return true;
         }
 
+        if (item.getItemId() == R.id.action_change_location) {
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory(LOG_TAG)
+                    .setAction("menu_change_location")
+                    .setLabel("")
+                    .setValue(1)
+                    .build());
+
+            new LocationPickerDialog().show(this, new OnLocationSelection() {
+                @Override
+                public void onLocationSelection(String locationString, LatLng locationPoint) {
+                    updateUserLocation(locationPoint);
+                }
+            });
+
+        }
         return super.onOptionsItemSelected(item);
     }
 

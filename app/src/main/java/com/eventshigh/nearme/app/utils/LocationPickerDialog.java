@@ -9,7 +9,11 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Pair;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
@@ -28,13 +32,29 @@ public class LocationPickerDialog {
         public void onLocationSelection(String locationString, LatLng locationPoint);
     }
 
-    public static void show(final Context context, final OnLocationSelection onLocationSelection) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(R.string.ask_locality);
+    AlertDialog dialog = null;
 
+    public  void show(final Context context, final OnLocationSelection onLocationSelection) {
         // Set up the input
         final AutoCompleteTextView input = new AutoCompleteTextView(context);
+        input.setSingleLine();
+        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setAdapter(new PlacesAutoCompleteAdapter(context, android.R.layout.simple_dropdown_item_1line));
+        input.setOnEditorActionListener(new OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    new LatLngFetcher(context, onLocationSelection).execute(input.getText().toString());
+                    close();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        // Setup the dialog box.
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(R.string.ask_locality);
         builder.setView(input);
 
         // Set up the buttons
@@ -51,7 +71,13 @@ public class LocationPickerDialog {
             }
         });
 
-        builder.show();
+        dialog = builder.show();
+    }
+
+    public void close() {
+        if(dialog != null && dialog.isShowing()) {
+            dialog.cancel();
+        }
     }
 
     public static class LatLngFetcher extends AsyncTask<String, Void, Pair<String, LatLng>> {

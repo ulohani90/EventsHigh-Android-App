@@ -230,7 +230,7 @@ public class ListActivity extends LocationAwareEventActivity {
                     .setValue(1)
                     .build());
 
-            LocationPickerDialog.show(ListActivity.this, new OnLocationSelection() {
+            new LocationPickerDialog().show(ListActivity.this, new OnLocationSelection() {
                 @Override
                 public void onLocationSelection(String locationString, LatLng locationPoint) {
                     mLocalityView.setText(locationString);
