@@ -18,7 +18,7 @@ import java.util.Date;
  */
 public class DaySelector {
 
-    private static final int NUM_DAYS = 7;
+    private static final int NUM_DAYS = 14;
 
     public interface DaySelectionListener {
         public void onDaySelection(int dayNo);

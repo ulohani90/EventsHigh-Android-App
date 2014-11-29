@@ -16,10 +16,16 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
     />
 
-    <LinearLayout
-        android:id="@+id/daySelector"
-        android:layout_height="@dimen/abc_action_button_min_height_material"
+    <HorizontalScrollView
         android:layout_width="match_parent"
-        android:orientation="horizontal"
-     />
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+    >
+        <LinearLayout
+            android:id="@+id/daySelector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+         />
+    </HorizontalScrollView>
 </LinearLayout>

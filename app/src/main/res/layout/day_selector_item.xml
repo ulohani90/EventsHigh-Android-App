@@ -2,10 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:layout_weight="1"
+    android:layout_height="wrap_content"
+    android:minWidth="?android:attr/listPreferredItemHeightSmall"
     android:background="@color/day_selector_color"
     android:gravity="center_vertical|center_horizontal"
+    android:padding="@dimen/abc_control_padding_material"
     android:clickable="true"
     android:descendantFocusability="blocksDescendants"
 >
@@ -14,8 +15,7 @@
         android:id="@+id/day_of_week"
         style="@style/DateButtonText"
         android:textColor="@color/day_selector_day_week_text"
-        android:focusable="false"
-        android:textSize="12sp"
+        android:textSize="@dimen/abc_text_size_caption_material"
         android:typeface="sans"
     />
     <TextView
@@ -23,14 +23,14 @@
         style="@style/DateButtonText"
         android:textColor="@color/day_selector_date_number_text"
         android:typeface="serif"
-        android:textSize="18sp"
+        android:textSize="@dimen/abc_text_size_body_1_material"
     />
     <TextView
         android:id="@+id/month"
         style="@style/DateButtonText"
         android:textColor="@color/day_selector_month_text"
         android:typeface="sans"
-        android:textSize="12sp"
+        android:textSize="@dimen/abc_text_size_caption_material"
     />
 
 </LinearLayout>
