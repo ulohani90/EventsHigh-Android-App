@@ -1,7 +1,10 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.Context;
 import android.graphics.Typeface;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.net.http.HttpResponseCache;
 import android.os.Bundle;
@@ -9,17 +12,20 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.utils.Utils;
-import com.eventshigh.nearme.app.utils.DaySelector;
-import com.eventshigh.nearme.app.utils.DaySelector.DaySelectionListener;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.data.EventsFetcher;
 import com.eventshigh.nearme.app.data.EventsFetcher.EventsFetcherCallBack;
+import com.eventshigh.nearme.app.utils.DaySelector;
+import com.eventshigh.nearme.app.utils.DaySelector.DaySelectionListener;
+import com.eventshigh.nearme.app.utils.LocationPickerDialog;
+import com.eventshigh.nearme.app.utils.LocationPickerDialog.OnLocationSelection;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -211,6 +217,15 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
         fetcher.execute(param);
     }
 
+    protected void askUserForLocation() {
+        new LocationPickerDialog().show(this, new OnLocationSelection() {
+            @Override
+            public void onLocationSelection(String locationString, LatLng locationPoint) {
+                updateUserLocation(locationPoint);
+            }
+        });
+    }
+
     /**
      * Refresh the event listings if user city has changed as per new location.
      * Parent activity can pass {@code NULL} to cleanup any state like {@code lastCity}.
@@ -263,17 +278,26 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
                 updateUserLocation(Utils.locationToLatLng(locationClient.getLastLocation()));
                 locationClient.disconnect();
             } else {
-                LocationRequest REQUEST = LocationRequest.create()
-                        .setInterval(5000)          // 5 sec
-                        .setFastestInterval(1600)   // 16ms = 60fps, 1600ms = 0.6 fps
-                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                locationClient.requestLocationUpdates(REQUEST, mLocationListener);
+                // Check if location access is enabled or not. If not we ask user for the location.
+                LocationManager locationManager =
+                        (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                Criteria criteria = new Criteria();
+                criteria.setHorizontalAccuracy(Criteria.ACCURACY_MEDIUM);
+                if (locationManager.getProviders(criteria, true).isEmpty()) {
+                    mOnConnectionFailedListener.onConnectionFailed(null);
+                } else {
+                    LocationRequest REQUEST = LocationRequest.create()
+                            .setInterval(5000)          // 5 sec
+                            .setFastestInterval(1600)   // 16ms = 60fps, 1600ms = 0.6 fps
+                            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                    locationClient.requestLocationUpdates(REQUEST, mLocationListener);
+                }
             }
         }
 
         @Override
         public void onDisconnected() {
-            // do nothing for now.
+            // do nothing.
         }
     };
 
@@ -281,7 +305,9 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
 
         @Override
         public void onConnectionFailed(ConnectionResult connectionResult) {
-            // do nothing for now.
+            Toast.makeText(LocationAwareEventActivity.this,
+                    R.string.failed_location, Toast.LENGTH_SHORT).show();
+            askUserForLocation();
         }
     };
 

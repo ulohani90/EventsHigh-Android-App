@@ -23,8 +23,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.DownloadImageTask;
-import com.eventshigh.nearme.app.utils.LocationPickerDialog;
-import com.eventshigh.nearme.app.utils.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.utils.UpdateLocationTask;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -135,6 +133,12 @@ public class ListActivity extends LocationAwareEventActivity {
                 lastEventFetcherParam == null ? null : lastEventFetcherParam.location);
     }
 
+    protected void updateUserLocation(LatLng userLocation) {
+        if (!refreshListingsIfNeeded(userLocation)) {
+            updateListingForUserLocation(userLocation);
+        }
+    }
+
     private void updateListingForUserLocation(final LatLng userLocation) {
         // Sort the events based on popularity and distance from user location.
         // If event has e**N users going, we reduce 500*N meters from its distance.
@@ -230,15 +234,7 @@ public class ListActivity extends LocationAwareEventActivity {
                     .setValue(1)
                     .build());
 
-            new LocationPickerDialog().show(ListActivity.this, new OnLocationSelection() {
-                @Override
-                public void onLocationSelection(String locationString, LatLng locationPoint) {
-                    mLocalityView.setText(locationString);
-                    if (!refreshListingsIfNeeded(locationPoint)) {
-                        updateListingForUserLocation(locationPoint);
-                    }
-                }
-            });
+            askUserForLocation();
         }
     };
 

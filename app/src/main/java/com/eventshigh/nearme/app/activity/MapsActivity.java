@@ -11,8 +11,6 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
-import com.eventshigh.nearme.app.utils.LocationPickerDialog;
-import com.eventshigh.nearme.app.utils.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.utils.MarkerManager;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -125,13 +123,7 @@ public class MapsActivity extends LocationAwareEventActivity {
                     .setValue(1)
                     .build());
 
-            new LocationPickerDialog().show(this, new OnLocationSelection() {
-                @Override
-                public void onLocationSelection(String locationString, LatLng locationPoint) {
-                    updateUserLocation(locationPoint);
-                }
-            });
-
+            askUserForLocation();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -172,14 +164,14 @@ public class MapsActivity extends LocationAwareEventActivity {
 
     @Override
     protected void updateUserLocation(LatLng userLocation) {
-            map.animateCamera(
-                    CameraUpdateFactory.newCameraPosition(
-                            CameraPosition.builder()
-                                    .target(userLocation)
-                                    .zoom(map.getCameraPosition().zoom)
-                                    .build()
-                    )
-            );
+        map.animateCamera(
+            CameraUpdateFactory.newCameraPosition(
+                CameraPosition.builder()
+                    .target(userLocation)
+                    .zoom(Math.max(map.getCameraPosition().zoom, MIN_ZOOM_LEVEL + 1))
+                    .build()
+            )
+        );
     }
 
     // ***********************
@@ -190,20 +182,24 @@ public class MapsActivity extends LocationAwareEventActivity {
     // user dragging the map around). We refresh the events listing if there is
     // change in city otherwise we refresh the event markers shown to user.
     private OnCameraChangeListener mOnCameraChangeListener = new OnCameraChangeListener() {
+        private boolean firstCall = true;
+
         @Override
         public void onCameraChange(CameraPosition cameraPosition) {
             // If user has zoomed out too much, do not show events marker.
             // We also show helper toast once per application runtime.
             if (cameraPosition.zoom < MIN_ZOOM_LEVEL) {
-                if (showZoomToast) {
+                if (!firstCall && showZoomToast) {
                     Toast.makeText(MapsActivity.this, R.string.zoom, Toast.LENGTH_SHORT).show();
                     showZoomToast = false;
                 }
 
+                firstCall = false;
                 refreshListingsIfNeeded(null);
                 return;
             }
 
+            firstCall = false;
             tracker.send(new HitBuilders.EventBuilder()
                     .setCategory(LOG_TAG)
                     .setAction("onCameraChange")

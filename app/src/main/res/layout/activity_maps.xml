@@ -14,11 +14,6 @@
         android:layout_weight="1"
         tools:context=".MapsActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment"
-        map:cameraBearing="112.5"
-        map:cameraTargetLat="12.975"
-        map:cameraTargetLng="77.604"
-        map:cameraZoom="13.0"
-        tools:ignore="MissingPrefix"
     />
 
     <LinearLayout
