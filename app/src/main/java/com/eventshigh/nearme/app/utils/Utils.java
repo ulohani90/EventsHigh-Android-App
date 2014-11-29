@@ -63,13 +63,12 @@ public class Utils {
                 title.substring(0, TITLE_MAX_LENGHT - 3) + "...";
     }
 
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("hh:mm a");
+    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("h:mm a");
     private static final Pattern ZEROS = Pattern.compile(":00");
-    private static final Pattern LEADING_ZEROS = Pattern.compile("0\\d");
     public static String getEventTime(Event event) {
         String time = TIME_FORMAT.format(event.startTime) +
                 (event.endTime == null ? "" : " - " + TIME_FORMAT.format(event.endTime));
-        return  LEADING_ZEROS.matcher(ZEROS.matcher(time).replaceAll("")).replaceAll("\\1");
+        return ZEROS.matcher(time).replaceAll("");
     }
 
 
