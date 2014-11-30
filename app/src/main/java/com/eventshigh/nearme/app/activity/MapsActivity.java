@@ -265,9 +265,7 @@ public class MapsActivity extends LocationAwareEventActivity {
                     .setValue(1)
                     .build());
 
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                    getEventUri(markerManager.getEvent(marker)));
-            startActivity(browserIntent);
+            showEventDetails(markerManager.getEvent(marker));
         }
     };
 }

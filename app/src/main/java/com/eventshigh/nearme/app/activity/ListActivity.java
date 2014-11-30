@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -170,7 +171,7 @@ public class ListActivity extends LocationAwareEventActivity {
         return weightedDistance;
     }
 
-    private void showEventDetails(Event event) {
+    private void openEventDetails(Event event) {
         tracker.send(new HitBuilders.EventBuilder()
                 .setCategory(LOG_TAG)
                 .setAction("showEventDetails")
@@ -178,8 +179,7 @@ public class ListActivity extends LocationAwareEventActivity {
                 .setValue(1)
                 .build());
 
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, getEventUri(event));
-        startActivity(browserIntent);
+        showEventDetails(event);
     }
 
     private void shareEvent(View eventView, Event event) {
@@ -214,8 +214,11 @@ public class ListActivity extends LocationAwareEventActivity {
             sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(sendIntent);
         } catch (IOException e) {
-            Toast.makeText(ListActivity.this, R.string.failed_share, Toast.LENGTH_SHORT).show();
+            Toast.makeText(ListActivity.this, R.string.failed_save, Toast.LENGTH_SHORT).show();
             Log.w(LOG_TAG, "failed to create file for sharing", e);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(ListActivity.this, R.string.failed_share, Toast.LENGTH_SHORT).show();
+            Log.w(LOG_TAG, "failed sharing", e);
         }
     }
 
@@ -285,7 +288,7 @@ public class ListActivity extends LocationAwareEventActivity {
             eventCard.bgView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showEventDetails(event);
+                    openEventDetails(event);
                 }
             });
             eventCard.shareView.setOnClickListener(new OnClickListener() {

@@ -1,6 +1,8 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.location.Criteria;
 import android.location.Location;
@@ -224,6 +226,19 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
                 updateUserLocation(locationPoint);
             }
         });
+    }
+
+    /**
+     * Open events details page.
+     * @param event event for which to show details page.
+     */
+    protected void showEventDetails(Event event) {
+        try {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, getEventUri(event));
+            startActivity(browserIntent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, R.string.failed_open, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**

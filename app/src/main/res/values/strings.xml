@@ -2,21 +2,21 @@
 <resources>
 
     <string name="app_name">EventsHigh alpha</string>
-
     <string name="loading">Loading …</string>
     <string name="failed">Failed to load events information!</string>
     <string name="no_event">No events found in your city!</string>
     <string name="zoom">Please zoom in to see interesting events!</string>
     <string name="num_people_interested">number of people interested</string>
-
     <string name="ask_locality">Enter the locality, city</string>
     <string name="failed_locality">Could not find locality, did you enter cityname ?</string>
-
-    <string name="failed_share">Sharing failed as we could not save image</string>
+    <string name="failed_save">Sharing failed as we could not save image</string>
+    <string name="failed_open">Could not open details as there is no browser application installed</string>
+    <string name="failed_share">Sharing failed as there is no application installed</string>
     <string name="failed_location">Could not determine your location</string>
-
     <string name="action_list">Show as List</string>
     <string name="action_map">Show on Map</string>
     <string name="action_edit_location">Change Location</string>
+    <string name="title_event_list">Events</string>
+    <string name="title_event_detail">Event Detail</string>
 
 </resources>
