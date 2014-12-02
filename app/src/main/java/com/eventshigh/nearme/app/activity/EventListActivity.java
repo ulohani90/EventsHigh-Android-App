@@ -83,7 +83,7 @@ public class EventListActivity extends LocationAwareEventActivity
 
             // In two-pane mode, list items should be given the
             // 'activated' state when touched.
-            mEventListFragment.setActivateOnItemClick(true);
+            mEventListFragment.setIsTwoPane(true);
         }
 
         // See if we have location passed to us within intent.

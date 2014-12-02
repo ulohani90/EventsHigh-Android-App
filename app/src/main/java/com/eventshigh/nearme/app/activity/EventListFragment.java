@@ -59,6 +59,11 @@ public class EventListFragment extends ListFragment {
     private EventListAdapter mEventsListAdapter;
 
     /**
+     * Are we showing two pane layout ?
+     */
+    private boolean isTwoPane = false;
+
+    /**
      * A callback interface that all activities containing this fragment must
      * implement. This mechanism allows activities to be notified of item
      * selections.
@@ -102,7 +107,7 @@ public class EventListFragment extends ListFragment {
         // Restore the previously serialized activated item position.
         if (savedInstanceState != null
                 && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
-            setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
+            mActivatedPosition = savedInstanceState.getInt(STATE_ACTIVATED_POSITION);
         }
     }
 
@@ -135,7 +140,6 @@ public class EventListFragment extends ListFragment {
         }
     }
 
-
     // ***********************
     // Helper methods used by parent activity.
     // ***********************
@@ -143,6 +147,8 @@ public class EventListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
+
+        mActivatedPosition = position;
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
@@ -167,16 +173,32 @@ public class EventListFragment extends ListFragment {
                 );
             }
         });
+
+        if (mEventsListAdapter.isEmpty()) {
+            return;
+        }
+
+        if (mActivatedPosition == ListView.INVALID_POSITION ||
+                mActivatedPosition >= mEventsListAdapter.getCount()) {
+            mActivatedPosition = 0;
+        }
+
+        getListView().smoothScrollToPosition(mActivatedPosition);
+        if (isTwoPane) {
+            getListView().setItemChecked(mActivatedPosition, true);
+            onListItemClick(getListView(), null, mActivatedPosition, 0);
+        }
     }
 
     /**
      * Turns on activate-on-click mode. When this mode is on, list items will be
      * given the 'activated' state when touched.
      */
-    public void setActivateOnItemClick(boolean activateOnItemClick) {
+    public void setIsTwoPane(boolean isTwoPane) {
+        this.isTwoPane = isTwoPane;
         // When setting CHOICE_MODE_SINGLE, ListView will automatically
         // give items the 'activated' state when touched.
-        getListView().setChoiceMode(activateOnItemClick
+        getListView().setChoiceMode(isTwoPane
                 ? ListView.CHOICE_MODE_SINGLE
                 : ListView.CHOICE_MODE_NONE);
     }
@@ -185,18 +207,6 @@ public class EventListFragment extends ListFragment {
     // ***********************
     // Helper methods.
     // ***********************
-
-    private void setActivatedPosition(int position) {
-        if (position == ListView.INVALID_POSITION) {
-            getListView().setItemChecked(mActivatedPosition, false);
-        } else {
-            getListView().setItemChecked(position, true);
-        }
-
-        mActivatedPosition = position;
-    }
-
-
     /**
      * A dummy implementation of the {@link Callbacks} interface that does
      * nothing. Used only when this fragment is not attached to an activity.
@@ -250,6 +260,8 @@ public class EventListFragment extends ListFragment {
             eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE :
                     View.INVISIBLE);
 
+            // Set share view.
+            eventCard.shareView.setVisibility(isTwoPane ?  View.GONE : View.VISIBLE);
             eventCard.shareView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {

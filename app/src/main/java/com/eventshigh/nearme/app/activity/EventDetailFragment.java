@@ -18,6 +18,8 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.utils.DownloadImageTask;
 import com.eventshigh.nearme.app.utils.Utils;
 
+import java.util.regex.Pattern;
+
 /**
  * A fragment representing a single Event detail screen.
  * This fragment is either contained in a {@link EventListActivity}
@@ -106,10 +108,8 @@ public class EventDetailFragment extends Fragment {
         }
 
         // Set description.
-        if (mEvent.description.contains("<p") || mEvent.description.contains("<P")
-                || mEvent.description.contains("<a") ||  mEvent.description.contains("<A")
-                || mEvent.description.contains("<span") ||  mEvent.description.contains("<SPAN")
-           ) {
+
+        if (htmlCheckPattern.matcher(mEvent.description).find()) {
             mEventCard.descriptionView.setText(Html.fromHtml(mEvent.description));
         } else {
             mEventCard.descriptionView.setText(mEvent.description);
@@ -140,4 +140,5 @@ public class EventDetailFragment extends Fragment {
         }
     }
 
+    private static final Pattern htmlCheckPattern = Pattern.compile("<[A-Za-z].*</[A-Za-z]");
 }
