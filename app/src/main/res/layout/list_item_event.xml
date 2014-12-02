@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/selector_touch"
+    android:descendantFocusability="blocksDescendants"
 >
 
     <ImageView
@@ -47,7 +48,6 @@
             android:id="@+id/event_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textIsSelectable="true"
             android:textColor="@android:color/white"
             android:maxLines="1"
             android:ellipsize="end"

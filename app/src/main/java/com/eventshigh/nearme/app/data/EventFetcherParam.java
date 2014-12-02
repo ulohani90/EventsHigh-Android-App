@@ -41,8 +41,7 @@ public class EventFetcherParam implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(city.toString());
-        dest.writeDouble(location.latitude);
-        dest.writeDouble(location.longitude);
+        dest.writeParcelable(location, flags);
         dest.writeInt(day);
     }
 
@@ -52,11 +51,10 @@ public class EventFetcherParam implements Parcelable {
             new Parcelable.Creator<EventFetcherParam>() {
         public EventFetcherParam createFromParcel(Parcel in) {
             String city = in.readString();
-            double lat = in.readDouble();
-            double lng = in.readDouble();
+            LatLng location = in.readParcelable(LatLng.class.getClassLoader());
             int day = in.readInt();
 
-            return new EventFetcherParam(City.valueOf(city), new LatLng(lat,lng), day);
+            return new EventFetcherParam(City.valueOf(city), location, day);
         }
 
         public EventFetcherParam[] newArray(int size) {

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              tools:context="com.eventshigh.nearme.app.activity.EventListActivity"
+              android:orientation="vertical"
+>
+    <TextView
+        android:id="@+id/event_locality_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@string/loading"
+        android:textSize="@dimen/abc_text_size_body_1_material"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:background="@android:color/black"
+        android:textColor="@android:color/white"
+        android:drawableStart="@drawable/ic_action_location_found"
+        android:drawableLeft="@drawable/ic_action_location_found"
+        android:drawableEnd="@drawable/ic_action_edit"
+        android:drawableRight="@drawable/ic_action_edit"
+    />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:baselineAligned="false"
+        android:divider="?android:attr/dividerHorizontal"
+        android:orientation="horizontal"
+        android:showDividers="middle"
+    >
+
+        <!--
+        This layout is a two-pane layout for the Events master/detail flow.
+        -->
+
+        <fragment
+            android:id="@+id/event_list"
+            android:name="com.eventshigh.nearme.app.activity.EventListFragment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            tools:layout="@android:layout/list_content"
+        />
+
+        <FrameLayout
+            android:id="@+id/event_detail_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+        />
+
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+    >
+        <LinearLayout
+            android:id="@+id/daySelector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+        />
+    </HorizontalScrollView>
+
+</LinearLayout>

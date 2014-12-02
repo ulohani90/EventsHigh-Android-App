@@ -1,6 +1,9 @@
 package com.eventshigh.nearme.app.data;
 
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.eventshigh.nearme.app.utils.Utils;
@@ -18,7 +21,7 @@ import java.util.List;
 /**
  * This class describes one Event. Event have few attributes like title, category, location etc.
  */
-public class Event {
+public class Event implements Parcelable {
     // EH_RECOMMENDED is same as 100 people going to event.
     private static final int EH_RECOMMENDATION_BOOST = 100;
     private static final String EVENTS_HIGH_DETAIL_URI =
@@ -27,22 +30,21 @@ public class Event {
     public final String id;
     public final String title;
     public final EventCategory category;
-    public final String img_url;
-
-    public final LatLng location;
-    public final String venue;
-
-    public final Date startTime;
-    public final Date endTime;
+    @Nullable public final String img_url;
 
     public final int numPeopleInterested;
     public final boolean ehRecommended;
 
+    @Nullable public final Date startTime;
+    @Nullable public final Date endTime;
 
-    public Event(String id, String title, EventCategory category, String img_url,
+    public final LatLng location;
+    @Nullable public final String venue;
+
+    public Event(String id, String title, EventCategory category, @Nullable String img_url,
                  int numPeopleInterested, boolean ehRecommended,
-                 Date startTime, Date endTime,
-                 LatLng location, String venue) {
+                 @Nullable Date startTime, @Nullable Date endTime,
+                 LatLng location, @Nullable String venue) {
         this.id = id;
         this.title = title;
         this.category = category;
@@ -51,11 +53,11 @@ public class Event {
         this.numPeopleInterested = numPeopleInterested;
         this.ehRecommended = ehRecommended;
 
-        this.location = location;
-        this.venue = venue;
-
         this.startTime = startTime;
         this.endTime = endTime;
+
+        this.location = location;
+        this.venue = venue;
     }
 
     public Uri getEventDetailsURI(City city) {
@@ -63,6 +65,82 @@ public class Event {
                 .replace("CITY", Utils.capitalize(city.toString()))
                 .replace("ID", id));
     }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object another) {
+        return another instanceof Event &&
+                id.equals(((Event) another).id);
+    }
+
+    public int getPopularityScore() {
+        return ehRecommended ? Math.max(EH_RECOMMENDATION_BOOST, numPeopleInterested) : numPeopleInterested;
+    }
+
+
+    /**********************************
+     Parcel management methods.
+     *********************************/
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeBooleanArray(new boolean[] { ehRecommended});
+
+        dest.writeString(id);
+        dest.writeString(title);
+        dest.writeString(category.toString());
+        dest.writeString(emptyIfNull(img_url));
+
+        dest.writeInt(numPeopleInterested);
+
+        dest.writeLong(startTime == null ? 0 : startTime.getTime());
+        dest.writeLong(endTime == null ? 0 : endTime.getTime());
+
+        dest.writeParcelable(location, flags);
+        dest.writeString(emptyIfNull(venue));
+    }
+
+    // This is used to regenerate your object. All Parcelables must have
+    // a CREATOR that implements these two methods
+    public static final Parcelable.Creator<Event> CREATOR =
+            new Parcelable.Creator<Event>() {
+                public Event createFromParcel(Parcel in) {
+                    boolean[] boolArray = new boolean[1];
+                    in.readBooleanArray(boolArray);
+
+                    return new Event(in.readString(),
+                            in.readString(),
+                            EventCategory.valueOf(in.readString()),
+                            checkIfUnknown(in.readString()),
+
+                            in.readInt(),
+                            boolArray[0],
+
+                            new Date(in.readLong()),
+                            new Date(in.readLong()),
+
+                            (LatLng) in.readParcelable(LatLng.class.getClassLoader()),
+                            checkIfUnknown(in.readString())
+                    );
+                }
+
+                public Event[] newArray(int size) {
+                    return new Event[size];
+                }
+            };
+
+
+    /**********************************
+     Helper static methods, used for JSON parsing
+     *********************************/
 
     public static List<Event> fromJSON(String jsonStr) throws JSONException, ParseException {
         List<Event> events = new ArrayList<Event>();
@@ -150,21 +228,6 @@ public class Event {
         return events;
     }
 
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object another) {
-        return another instanceof Event &&
-                id.equals(((Event) another).id);
-    }
-
-    public int getPopularityScore() {
-        return ehRecommended ? Math.max(EH_RECOMMENDATION_BOOST, numPeopleInterested) : numPeopleInterested;
-    }
-
     private static String checkIfUnknown(String string) {
         return (string == null ||
                 string.isEmpty() ||
@@ -172,5 +235,9 @@ public class Event {
                 string.equalsIgnoreCase("unknown")
                 ? null
                 : string);
+    }
+
+    private static String emptyIfNull(@Nullable String string) {
+        return (string == null ? "" : string);
     }
 }

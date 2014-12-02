@@ -107,7 +107,7 @@ public class MapsActivity extends LocationAwareEventActivity {
             if (lastEventFetcherParam == null) {
                 Toast.makeText(this, R.string.no_event, Toast.LENGTH_SHORT).show();
             } else {
-                startActivity(new Intent(this, ListActivity.class)
+                startActivity(new Intent(this, EventListActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                 .putExtra(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam)
                 );

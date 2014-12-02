@@ -72,6 +72,7 @@ public class LocationPickerDialog {
         });
 
         dialog = builder.show();
+        input.requestFocus();
     }
 
     public void close() {
