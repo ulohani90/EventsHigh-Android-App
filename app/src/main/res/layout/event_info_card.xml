@@ -52,7 +52,7 @@
                     android:layout_marginRight="@dimen/abc_action_bar_subtitle_bottom_margin_material"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/abc_text_size_body_1_material"
-                    android:src="@drawable/eh_popularity_icon_details_page"
+                    android:src="@drawable/eh_popularity_score_icon_dark"
                     android:contentDescription="@string/num_people_interested"
                 />
                 <TextView
