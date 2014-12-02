@@ -46,6 +46,8 @@ public class Utils {
     public static Date mergeDateTime(String date, String time) throws ParseException {
         if (date == null || time == null
                 || date.isEmpty() || time.isEmpty()
+                || time.startsWith("01:02")
+                || time.startsWith("01:01")
                 || date.equalsIgnoreCase("null") || time.equalsIgnoreCase("null")) {
             return null;
         }
@@ -66,6 +68,10 @@ public class Utils {
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("h:mm a");
     private static final Pattern ZEROS = Pattern.compile(":00");
     public static String getEventTime(Event event) {
+        if (event.startTime == null) {
+            return "";
+        }
+
         String time = TIME_FORMAT.format(event.startTime) +
                 (event.endTime == null ? "" : " - " + TIME_FORMAT.format(event.endTime));
         return ZEROS.matcher(time).replaceAll("");

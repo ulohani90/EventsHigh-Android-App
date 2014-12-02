@@ -14,4 +14,11 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
     </style>
+
+    <style name="EventDetailText" parent="android:style/TextAppearance.Medium">
+        <item name="android:padding">8dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textIsSelectable">true</item>
+    </style>
+
 </resources>

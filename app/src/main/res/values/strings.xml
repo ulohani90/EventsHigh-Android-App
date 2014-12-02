@@ -23,5 +23,10 @@
     <string name="action_list">Show as List</string>
     <string name="action_map">Show on Map</string>
     <string name="action_edit_location">Change Location</string>
+    <string name="action_share">Share</string>
 
+    <plurals name="people_interested">
+        <item quantity="one">One person interested.</item>
+        <item quantity="other">%,d people interested.</item>
+    </plurals>
 </resources>

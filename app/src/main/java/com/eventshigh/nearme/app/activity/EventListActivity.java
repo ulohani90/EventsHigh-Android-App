@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -112,7 +113,7 @@ public class EventListActivity extends LocationAwareEventActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_map, menu);
+        getMenuInflater().inflate(R.menu.activity_list, menu);
         return true;
     }
 
@@ -195,7 +196,6 @@ public class EventListActivity extends LocationAwareEventActivity
      */
     @Override
     public void onItemSelected(Event event) {
-        // TODO: FIX
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a fragment transaction.
@@ -217,21 +217,25 @@ public class EventListActivity extends LocationAwareEventActivity
 
     @Override
     public void shareEvent(View eventView, Event event) {
+        View shareView = eventView.findViewById(R.id.event_share);
+        shareView.setVisibility(View.INVISIBLE);
+        shareEvent(this, eventView, event);
+        shareView.setVisibility(View.VISIBLE);
+    }
+
+    public static void shareEvent(Activity activity, View eventView, Event event) {
         tracker.send(new HitBuilders.EventBuilder()
-                .setCategory(LOG_TAG)
+                .setCategory(activity.getClass().getSimpleName())
                 .setAction("shareEvent")
                 .setLabel("")
                 .setValue(1)
                 .build());
 
-        View shareView = eventView.findViewById(R.id.event_share);
-        shareView.setVisibility(View.INVISIBLE);
         eventView.setDrawingCacheEnabled(true);
         Bitmap bitmap = eventView.getDrawingCache();
-        shareView.setVisibility(View.VISIBLE);
 
         try {
-            File file = File.createTempFile("event", ".jpg", getCacheDir());
+            File file = File.createTempFile("event", ".jpg", activity.getCacheDir());
             FileOutputStream oStream = new FileOutputStream(file);
             bitmap.compress(CompressFormat.JPEG, 90, oStream);
             oStream.close();
@@ -239,22 +243,21 @@ public class EventListActivity extends LocationAwareEventActivity
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_STREAM,
-                    FileProvider.getUriForFile(this,
+                    FileProvider.getUriForFile(activity,
                             "com.eventshigh.nearme.app.fileprovider", file));
             sendIntent.putExtra(Intent.EXTRA_TITLE, event.title);
             sendIntent.putExtra(Intent.EXTRA_TEXT,
-                    getEventUri(event) + " (shared via EventsHigh)");
+                    event.getEventDetailsURI() + " (shared via EventsHigh)");
             sendIntent.setType("image/jpeg");
             sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(sendIntent);
+            activity.startActivity(sendIntent);
         } catch (IOException e) {
-            Toast.makeText(this, R.string.failed_save, Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.failed_save, Toast.LENGTH_SHORT).show();
             Log.w(LOG_TAG, "failed to create file for sharing", e);
         } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.failed_share, Toast.LENGTH_SHORT).show();
             Log.w(LOG_TAG, "failed sharing", e);
         }
     }
-
 
 }

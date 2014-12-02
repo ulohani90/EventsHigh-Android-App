@@ -7,7 +7,6 @@ import android.graphics.Typeface;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.net.http.HttpResponseCache;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -234,7 +233,7 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
      */
     protected void showEventDetails(Event event) {
         try {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, getEventUri(event));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, event.getEventDetailsURI());
             startActivity(browserIntent);
         } catch (ActivityNotFoundException e) {
             Toast.makeText(this, R.string.failed_open, Toast.LENGTH_SHORT).show();
@@ -272,10 +271,6 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
 
         lastEventFetcherParam = newEventFetcherParam;
         return false;
-    }
-
-    protected Uri getEventUri(Event event) {
-        return event.getEventDetailsURI(lastEventFetcherParam.city);
     }
 
 

@@ -97,7 +97,7 @@ public class MapsActivity extends LocationAwareEventActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_list, menu);
+        getMenuInflater().inflate(R.menu.activity_map, menu);
         return true;
     }
 

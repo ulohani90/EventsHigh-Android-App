@@ -31,7 +31,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
 
     private static final String LOG_TAG = EventsFetcher.class.getSimpleName();
     private static final String API_ENDPOINT =
-            "http://apiserver.eventshigh.com:8888/api/date/CITY/DATE?sortby=popularity&limit=200&mobile=1";
+            "http://apiserver.eventshigh.com:8888/api/date/CITY/DATE?sortby=popularity&limit=200&mobile=2";
 
     public static interface EventsFetcherCallBack {
         public void OnEventsAvailable(EventFetcherParam param, List<Event> events);
@@ -76,7 +76,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line);
                 }
-                return Event.fromJSON(buffer.toString());
+                return Event.fromJSON(param.city, buffer.toString());
             } finally {
                 urlConnection.disconnect();
             }

@@ -28,8 +28,10 @@ public class Event implements Parcelable {
             "http://www.eventshigh.com/detail/CITY/ID?src=ehm";
 
     public final String id;
+    public final City city;
     public final String title;
     public final EventCategory category;
+    public final String description;
     @Nullable public final String img_url;
 
     public final int numPeopleInterested;
@@ -40,14 +42,18 @@ public class Event implements Parcelable {
 
     public final LatLng location;
     @Nullable public final String venue;
+    @Nullable public final String address;
 
-    public Event(String id, String title, EventCategory category, @Nullable String img_url,
+    public Event(String id, City city, String title,
+                 EventCategory category, String description, @Nullable String img_url,
                  int numPeopleInterested, boolean ehRecommended,
                  @Nullable Date startTime, @Nullable Date endTime,
-                 LatLng location, @Nullable String venue) {
+                 LatLng location, @Nullable String venue, @Nullable String address) {
         this.id = id;
+        this.city = city;
         this.title = title;
         this.category = category;
+        this.description = description;
         this.img_url = img_url;
 
         this.numPeopleInterested = numPeopleInterested;
@@ -58,9 +64,10 @@ public class Event implements Parcelable {
 
         this.location = location;
         this.venue = venue;
+        this.address = address;
     }
 
-    public Uri getEventDetailsURI(City city) {
+    public Uri getEventDetailsURI() {
         return Uri.parse(EVENTS_HIGH_DETAIL_URI
                 .replace("CITY", Utils.capitalize(city.toString()))
                 .replace("ID", id));
@@ -95,8 +102,10 @@ public class Event implements Parcelable {
         dest.writeBooleanArray(new boolean[] { ehRecommended});
 
         dest.writeString(id);
+        dest.writeString(city.toString());
         dest.writeString(title);
         dest.writeString(category.toString());
+        dest.writeString(description);
         dest.writeString(emptyIfNull(img_url));
 
         dest.writeInt(numPeopleInterested);
@@ -106,6 +115,7 @@ public class Event implements Parcelable {
 
         dest.writeParcelable(location, flags);
         dest.writeString(emptyIfNull(venue));
+        dest.writeString(emptyIfNull(address));
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -117,8 +127,10 @@ public class Event implements Parcelable {
                     in.readBooleanArray(boolArray);
 
                     return new Event(in.readString(),
+                            City.valueOf(in.readString()),
                             in.readString(),
                             EventCategory.valueOf(in.readString()),
+                            in.readString(),
                             checkIfUnknown(in.readString()),
 
                             in.readInt(),
@@ -128,6 +140,7 @@ public class Event implements Parcelable {
                             new Date(in.readLong()),
 
                             (LatLng) in.readParcelable(LatLng.class.getClassLoader()),
+                            checkIfUnknown(in.readString()),
                             checkIfUnknown(in.readString())
                     );
                 }
@@ -142,7 +155,7 @@ public class Event implements Parcelable {
      Helper static methods, used for JSON parsing
      *********************************/
 
-    public static List<Event> fromJSON(String jsonStr) throws JSONException, ParseException {
+    public static List<Event> fromJSON(City city, String jsonStr) throws JSONException, ParseException {
         List<Event> events = new ArrayList<Event>();
 
         JSONObject eventsJSON = new JSONObject(jsonStr);
@@ -154,6 +167,7 @@ public class Event implements Parcelable {
                 JSONObject eventJson = upcomingEvents.getJSONObject(i);
                 String id = eventJson.getString("id");
                 String title = eventJson.getString("title");
+                String description = eventJson.getString("description");
                 String img_url = checkIfUnknown(eventJson.getString("img_url"));
 
                 int num_people_interested = eventJson.getInt("num_people_interested");
@@ -166,32 +180,31 @@ public class Event implements Parcelable {
 
                 double lat = 0;
                 double lon = 0;
-                JSONObject venueJson = null;
-                if (eventJson.has("venue_info")) {
-                    venueJson = eventJson.getJSONObject("venue_info");
+                JSONObject venueJson = eventJson.optJSONObject("venue_info");
+                JSONObject localityJson = eventJson.optJSONObject("locality_info");
+                if (venueJson != null) {
                     lat = venueJson.getDouble("lat");
                     lon = venueJson.getDouble("lon");
                 }
 
-                if (Math.abs(lat) < 1 || Math.abs(lon) < 1) {
+                if (Math.abs(lat) < 1 && Math.abs(lon) < 1 && localityJson != null) {
                     // Invalid latitude and longitude. Try locality_info.
-                    if (eventJson.has("locality_info")) {
-                        JSONObject locality = eventJson.getJSONObject("locality_info");
-                        lat = locality.getDouble("lat");
-                        lon = locality.getDouble("lon");
-                    }
+                    lat = localityJson.getDouble("lat");
+                    lon = localityJson.getDouble("lon");
                 }
 
-                if (Math.abs(lat) < 1 || Math.abs(lon) < 1) {
+                if (Math.abs(lat) < 1 && Math.abs(lon) < 1) {
                     // Invalid latitude and longitude.
                     // Ignore the entry.
                     continue;
                 }
 
-                String venue = venueJson == null ? null : checkIfUnknown(venueJson.getString("name"));
-                if (venue == null) {
-                    venue = checkIfUnknown(eventJson.getString("locality"));
+                String venue = venueJson == null ? null : checkIfUnknown(venueJson.optString("name"));
+                if (venue == null && localityJson != null) {
+                    venue = localityJson.optString("locality");
                 }
+
+                String address = venueJson == null ? null : checkIfUnknown(venueJson.optString("address"));
 
                 EventCategory category = EventCategory.OTHER;
                 JSONArray tags = eventJson.getJSONArray("tags");
@@ -205,8 +218,10 @@ public class Event implements Parcelable {
                 }
 
                 Event event = new Event(id,
+                        city,
                         title,
                         category,
+                        description,
                         img_url,
 
                         num_people_interested,
@@ -216,7 +231,8 @@ public class Event implements Parcelable {
                         Utils.mergeDateTime(date, end_time),
 
                         new LatLng(lat, lon),
-                        venue
+                        venue,
+                        address
                 );
                 events.add(event);
             } catch (JSONException ex) {
