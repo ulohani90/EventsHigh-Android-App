@@ -13,8 +13,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.MarkerManager;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
@@ -43,9 +41,6 @@ public class MapsActivity extends LocationAwareEventActivity {
     // CONSTANTS
     // ***********************
 
-    // log tag used for debugging.
-    private static final String LOG_TAG = MapsActivity.class.getSimpleName();
-
     // For performance reasons, we show events only where user has reasonable zoom level.
     private static final int MIN_ZOOM_LEVEL = 11;
 
@@ -59,7 +54,8 @@ public class MapsActivity extends LocationAwareEventActivity {
     // Manager for all markers drawn on map. Manager is responsible for hiding/showing markers
     // on map.
     private MarkerManager markerManager = new MarkerManager();
-    // Have we shown various helper toast to user. We show them only once application lifetime.
+    // We show the helper toast asking user to zoom in to see events.
+    // We show them only once application lifetime.
     boolean showZoomToast = true;
 
 
@@ -83,15 +79,6 @@ public class MapsActivity extends LocationAwareEventActivity {
         // Setup the local member variables.
         setUpMapIfNeeded();
         setUpAll(param);
-
-        // Automatic Google Analytics reporting.
-        GoogleAnalytics.getInstance(this).reportActivityStart(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     @Override
@@ -116,15 +103,10 @@ public class MapsActivity extends LocationAwareEventActivity {
         }
 
         if (item.getItemId() == R.id.action_change_location) {
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(LOG_TAG)
-                    .setAction("menu_change_location")
-                    .setLabel("")
-                    .setValue(1)
-                    .build());
-
             askUserForLocation();
+            return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -132,6 +114,7 @@ public class MapsActivity extends LocationAwareEventActivity {
     // ***********************
     // Setup Helper Methods
     // ***********************
+
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (map == null) {
@@ -186,6 +169,8 @@ public class MapsActivity extends LocationAwareEventActivity {
 
         @Override
         public void onCameraChange(CameraPosition cameraPosition) {
+            reportActionToAnalytics("onCameraChange");
+
             // If user has zoomed out too much, do not show events marker.
             // We also show helper toast once per application runtime.
             if (cameraPosition.zoom < MIN_ZOOM_LEVEL) {
@@ -200,13 +185,6 @@ public class MapsActivity extends LocationAwareEventActivity {
             }
 
             firstCall = false;
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(LOG_TAG)
-                    .setAction("onCameraChange")
-                    .setLabel("")
-                    .setValue(1)
-                    .build());
-
             if (!refreshListingsIfNeeded(cameraPosition.target)) {
                 markerManager.updateListingForProjection(map.getProjection());
             }
@@ -216,13 +194,7 @@ public class MapsActivity extends LocationAwareEventActivity {
     private OnMarkerClickListener mOnMarkerClickListener = new OnMarkerClickListener() {
         @Override
         public boolean onMarkerClick(Marker marker) {
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(LOG_TAG)
-                    .setAction("onMarkerClick")
-                    .setLabel("")
-                    .setValue(1)
-                    .build());
-
+            reportActionToAnalytics("onMarkerClick");
             return false;
         }
     };
@@ -258,13 +230,6 @@ public class MapsActivity extends LocationAwareEventActivity {
     private OnInfoWindowClickListener mOnInfoWindowClickListener = new OnInfoWindowClickListener() {
         @Override
         public void onInfoWindowClick(Marker marker) {
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(LOG_TAG)
-                    .setAction("onInfoWindowClick")
-                    .setLabel("")
-                    .setValue(1)
-                    .build());
-
             showEventDetails(markerManager.getEvent(marker));
         }
     };

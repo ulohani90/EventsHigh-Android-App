@@ -73,11 +73,6 @@ public class EventListFragment extends ListFragment {
          * Callback for when an item has been selected.
          */
         public void onItemSelected(Event event);
-
-        /**
-         * Share the Event.
-         */
-        public void shareEvent(View eventView, Event event);
     }
 
     /**
@@ -215,10 +210,6 @@ public class EventListFragment extends ListFragment {
         @Override
         public void onItemSelected(Event event) {
         }
-
-        @Override
-        public void shareEvent(View eventView, Event event) {
-        }
     };
 
     private class EventListAdapter extends ArrayAdapter<Event> {
@@ -265,7 +256,11 @@ public class EventListFragment extends ListFragment {
             eventCard.shareView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mCallbacks.shareEvent(view, event);
+                    View shareView = view.findViewById(R.id.event_share);
+                    shareView.setVisibility(View.INVISIBLE);
+                    BaseActivity activity = (BaseActivity) getActivity();
+                    activity.shareEvent(view, event);
+                    shareView.setVisibility(View.VISIBLE);
                 }
             });
 

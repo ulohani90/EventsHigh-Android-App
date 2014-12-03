@@ -21,8 +21,6 @@ import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.DownloadImageTask;
 import com.eventshigh.nearme.app.utils.UpdateLocationTask;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 
@@ -32,9 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ListActivity extends LocationAwareEventActivity {
-    // log tag used for debugging.
-    private static final String LOG_TAG = ListActivity.class.getSimpleName();
-
     private ListView mEventListView;
     private EventListAdapter mEventsListAdapter;
     private TextView mLocalityView;
@@ -65,22 +60,6 @@ public class ListActivity extends LocationAwareEventActivity {
         mEventListView = (ListView) findViewById(R.id.event_list);
         mEventsListAdapter = new EventListAdapter();
         mEventListView.setAdapter(mEventsListAdapter);
-
-        // Automatic Google Analytics reporting.
-        GoogleAnalytics.getInstance(this).reportActivityStart(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        tracker.send(new HitBuilders.EventBuilder()
-                .setCategory(LOG_TAG)
-                .setAction("getView")
-                .setLabel("")
-                .setValue(mEventsListAdapter.numViews)
-                .build());
-        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     @Override
@@ -163,25 +142,6 @@ public class ListActivity extends LocationAwareEventActivity {
         return weightedDistance;
     }
 
-    private void openEventDetails(Event event) {
-        tracker.send(new HitBuilders.EventBuilder()
-                .setCategory(LOG_TAG)
-                .setAction("showEventDetails")
-                .setLabel("")
-                .setValue(1)
-                .build());
-
-        showEventDetails(event);
-    }
-
-    private void shareEvent(View eventView, Event event) {
-        View shareView = eventView.findViewById(R.id.event_share);
-        shareView.setVisibility(View.INVISIBLE);
-        EventListActivity.shareEvent(this, eventView, event);
-        shareView.setVisibility(View.VISIBLE);
-    }
-
-
     // ***********************
     // Callbacks
     // ***********************
@@ -189,27 +149,17 @@ public class ListActivity extends LocationAwareEventActivity {
     private final OnClickListener mLocalityClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(LOG_TAG)
-                    .setAction("LocalityClickListener")
-                    .setLabel("")
-                    .setValue(1)
-                    .build());
-
             askUserForLocation();
         }
     };
 
     private class EventListAdapter extends ArrayAdapter<Event> {
-        public int numViews = 0;
-
         private EventListAdapter() {
             super(ListActivity.this, R.layout.list_item_event, R.id.event_title);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            numViews ++;
 
             // Build the view, reuse existing if possible.
             final View view = convertView == null ?
@@ -248,13 +198,16 @@ public class ListActivity extends LocationAwareEventActivity {
             eventCard.bgView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    openEventDetails(event);
+                    showEventDetails(event);
                 }
             });
             eventCard.shareView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    View shareView = view.findViewById(R.id.event_share);
+                    shareView.setVisibility(View.INVISIBLE);
                     shareEvent(view, event);
+                    shareView.setVisibility(View.VISIBLE);
                 }
             });
 
@@ -281,5 +234,4 @@ public class ListActivity extends LocationAwareEventActivity {
             numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
         }
     }
-
 }

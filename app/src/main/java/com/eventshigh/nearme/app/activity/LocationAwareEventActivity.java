@@ -1,17 +1,13 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.http.HttpResponseCache;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
@@ -27,9 +23,6 @@ import com.eventshigh.nearme.app.utils.DaySelector.DaySelectionListener;
 import com.eventshigh.nearme.app.utils.LocationPickerDialog;
 import com.eventshigh.nearme.app.utils.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
@@ -38,8 +31,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,13 +45,12 @@ import java.util.List;
  * method in its {@link #onCreate} method after populating view. The parent
  * activity view should have {@link android.widget.LinearLayout} to hold day picker.
  */
-public abstract class LocationAwareEventActivity extends FragmentActivity {
+public abstract class LocationAwareEventActivity extends BaseActivity {
 
     // ***********************
     // CONSTANTS
     // ***********************
 
-    // log tag used for debugging.
     public static final String EXTRA_EVENT_FETCHER_PARAM = EventFetcherParam.class.getSimpleName();
 
 
@@ -76,8 +66,6 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
     protected EventFetcherParam lastEventFetcherParam;
     // font-awesome font, used for icons.
     protected static Typeface font;
-    // Tracker
-    protected static Tracker tracker;
 
 
     // ***********************
@@ -89,14 +77,8 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
         super.onStop();
 
         // Avoid battery drain by turning of location client.
-        if (locationClient != null) {
+        if (locationClient != null && locationClient.isConnected()) {
             locationClient.disconnect();
-        }
-
-        // Save the cache.
-        HttpResponseCache cache = HttpResponseCache.getInstalled();
-        if (cache != null) {
-            cache.flush();
         }
     }
 
@@ -140,8 +122,6 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
         setupFontIfNeeded();
         setUpDaySelectorIfNeeded(param);
         setUpLocationClientIfNeeded(param);
-        setUpGoogleAnalyticsIfNeeded();
-        setupHttpResponseCache();
 
         if (param != null) {
             updateUserLocation(param.location);
@@ -154,10 +134,9 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
                     getApplicationContext(),
                     mConnectionCallbacks,
                     mOnConnectionFailedListener);
-
-            if (param == null) {
-                locationClient.connect();
-            }
+        }
+        if (param == null) {
+            locationClient.connect();
         }
     }
 
@@ -180,45 +159,19 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
         EventCategory.setIconResources(getLayoutInflater(), font);
     }
 
-    private void setUpGoogleAnalyticsIfNeeded() {
-        if (tracker == null) {
-            tracker = GoogleAnalytics.getInstance(this).newTracker(R.xml.analytics);
-            tracker.enableAdvertisingIdCollection(true);
-        }
-    }
-
-    private void setupHttpResponseCache() {
-        // Setup HttpResponseCache.
-        if (HttpResponseCache.getInstalled() == null) {
-            try {
-                File httpCacheDir = new File(getCacheDir(), "http");
-                long httpCacheSize = 10 * 1024 * 1024; // 10 MB
-                HttpResponseCache.install(httpCacheDir, httpCacheSize);
-            } catch (IOException e) {
-                Log.w(LocationAwareEventActivity.class.getSimpleName(),
-                        "HTTP response cache installation failed:" + e);
-            }
-        }
-    }
-
     // ***********************
     // Helper methods
     // ***********************
 
     private void fetchNewListing(EventFetcherParam param) {
-        tracker.send(new HitBuilders.EventBuilder()
-                .setCategory(getClass().getSimpleName())
-                .setAction("fetchNewListing")
-                .setLabel("")
-                .setValue(1)
-                .build());
-
+        reportActionToAnalytics("fetchNewListing");
         EventsFetcher fetcher =
                 new EventsFetcher(LocationAwareEventActivity.this, mEventsFetcherCallBack);
         fetcher.execute(param);
     }
 
     protected void askUserForLocation() {
+        reportActionToAnalytics("askUserForLocation");
         new LocationPickerDialog().show(this, new OnLocationSelection() {
             @Override
             public void onLocationSelection(String locationString, LatLng locationPoint) {
@@ -232,12 +185,10 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
      * @param event event for which to show details page.
      */
     protected void showEventDetails(Event event) {
-        try {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, event.getEventDetailsURI());
-            startActivity(browserIntent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, R.string.failed_open, Toast.LENGTH_SHORT).show();
-        }
+        reportActionToAnalytics("showEventDetails");
+        Intent detailIntent = new Intent(this, EventDetailActivity.class);
+        detailIntent.putExtra(EventDetailFragment.ARG_ITEM_ID, event);
+        startActivity(detailIntent);
     }
 
     /**
@@ -315,6 +266,7 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
 
         @Override
         public void onConnectionFailed(ConnectionResult connectionResult) {
+            reportActionToAnalytics("locationFailed");
             Toast.makeText(LocationAwareEventActivity.this,
                     R.string.failed_location, Toast.LENGTH_SHORT).show();
             askUserForLocation();
@@ -337,13 +289,7 @@ public abstract class LocationAwareEventActivity extends FragmentActivity {
     private DaySelectionListener mDaySelectionListener = new DaySelectionListener() {
         @Override
         public void onDaySelection(int dayNo) {
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(getClass().getSimpleName())
-                    .setAction("onDaySelection")
-                    .setLabel("")
-                    .setValue(1)
-                    .build());
-
+            reportActionToAnalytics("onDaySelection");
             if (lastEventFetcherParam != null) {
                 fetchNewListing(new EventFetcherParam(lastEventFetcherParam.city,
                         lastEventFetcherParam.location, dayNo));

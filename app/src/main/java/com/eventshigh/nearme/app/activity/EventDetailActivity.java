@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.activity;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
-import android.app.Activity;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
@@ -18,7 +17,7 @@ import com.eventshigh.nearme.app.R;
  * This activity is mostly just a 'shell' activity containing nothing
  * more than a {@link EventDetailFragment}.
  */
-public class EventDetailActivity extends Activity {
+public class EventDetailActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

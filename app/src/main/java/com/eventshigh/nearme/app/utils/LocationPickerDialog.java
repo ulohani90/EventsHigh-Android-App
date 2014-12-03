@@ -106,7 +106,6 @@ public class LocationPickerDialog {
                         new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude()));
             } catch (IOException e) {
                 Log.w(LOG_TAG, "failed to fetch the address", e);
-                Toast.makeText(context, R.string.failed_locality, Toast.LENGTH_SHORT).show();
                 return null;
             }
         }
@@ -115,6 +114,8 @@ public class LocationPickerDialog {
         protected void onPostExecute(@Nullable Pair<String, LatLng> locality) {
             if (locality != null) {
                 onLocationSelection.onLocationSelection(locality.first, locality.second);
+            } else {
+                Toast.makeText(context, R.string.failed_locality, Toast.LENGTH_SHORT).show();
             }
         }
     }

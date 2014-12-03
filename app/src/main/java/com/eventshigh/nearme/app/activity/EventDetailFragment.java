@@ -62,7 +62,8 @@ public class EventDetailFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_share) {
             mEventCard.descriptionView.setVisibility(View.GONE);
-            EventListActivity.shareEvent(getActivity(), mEventCard.rootView, mEvent);
+            BaseActivity baseActivity = (BaseActivity)getActivity();
+            baseActivity.shareEvent(mEventCard.rootView, mEvent);
             mEventCard.descriptionView.setVisibility(View.VISIBLE);
             return true;
         }

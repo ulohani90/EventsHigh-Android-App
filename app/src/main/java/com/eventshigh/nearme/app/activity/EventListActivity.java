@@ -1,15 +1,9 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.ActionBar;
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.FileProvider;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,13 +16,8 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.UpdateLocationTask;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -99,15 +88,6 @@ public class EventListActivity extends LocationAwareEventActivity
         // Setup locality click listener.
         mLocalityView = (TextView) findViewById(R.id.event_locality_header);
         mLocalityView.setOnClickListener(mLocalityClickListener);
-
-        // Automatic Google Analytics reporting.
-        GoogleAnalytics.getInstance(this).reportActivityStart(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     @Override
@@ -162,8 +142,9 @@ public class EventListActivity extends LocationAwareEventActivity
         }
 
         mEventListFragment.updateNewEvents(events);
-        mEventListFragment.updateListingForUserLocation(
-                lastEventFetcherParam == null ? null : lastEventFetcherParam.location);
+        if (lastEventFetcherParam != null) {
+            mEventListFragment.updateListingForUserLocation(lastEventFetcherParam.location);
+        }
     }
 
     protected void updateUserLocation(LatLng userLocation) {
@@ -179,13 +160,6 @@ public class EventListActivity extends LocationAwareEventActivity
     private final OnClickListener mLocalityClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(LOG_TAG)
-                    .setAction("LocalityClickListener")
-                    .setLabel("")
-                    .setValue(1)
-                    .build());
-
             askUserForLocation();
         }
     };
@@ -196,6 +170,8 @@ public class EventListActivity extends LocationAwareEventActivity
      */
     @Override
     public void onItemSelected(Event event) {
+        reportActionToAnalytics("onItemSelected");
+
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a fragment transaction.
@@ -209,55 +185,7 @@ public class EventListActivity extends LocationAwareEventActivity
         } else {
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
-            Intent detailIntent = new Intent(this, EventDetailActivity.class);
-            detailIntent.putExtra(EventDetailFragment.ARG_ITEM_ID, event);
-            startActivity(detailIntent);
+            showEventDetails(event);
         }
     }
-
-    @Override
-    public void shareEvent(View eventView, Event event) {
-        View shareView = eventView.findViewById(R.id.event_share);
-        shareView.setVisibility(View.INVISIBLE);
-        shareEvent(this, eventView, event);
-        shareView.setVisibility(View.VISIBLE);
-    }
-
-    public static void shareEvent(Activity activity, View eventView, Event event) {
-        tracker.send(new HitBuilders.EventBuilder()
-                .setCategory(activity.getClass().getSimpleName())
-                .setAction("shareEvent")
-                .setLabel("")
-                .setValue(1)
-                .build());
-
-        eventView.setDrawingCacheEnabled(true);
-        Bitmap bitmap = eventView.getDrawingCache();
-
-        try {
-            File file = File.createTempFile("event", ".jpg", activity.getCacheDir());
-            FileOutputStream oStream = new FileOutputStream(file);
-            bitmap.compress(CompressFormat.JPEG, 90, oStream);
-            oStream.close();
-
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_STREAM,
-                    FileProvider.getUriForFile(activity,
-                            "com.eventshigh.nearme.app.fileprovider", file));
-            sendIntent.putExtra(Intent.EXTRA_TITLE, event.title);
-            sendIntent.putExtra(Intent.EXTRA_TEXT,
-                    event.getEventDetailsURI() + " (shared via EventsHigh)");
-            sendIntent.setType("image/jpeg");
-            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            activity.startActivity(sendIntent);
-        } catch (IOException e) {
-            Toast.makeText(activity, R.string.failed_save, Toast.LENGTH_SHORT).show();
-            Log.w(LOG_TAG, "failed to create file for sharing", e);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(activity, R.string.failed_share, Toast.LENGTH_SHORT).show();
-            Log.w(LOG_TAG, "failed sharing", e);
-        }
-    }
-
 }
