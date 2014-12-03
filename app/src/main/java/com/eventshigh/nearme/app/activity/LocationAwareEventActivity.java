@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
@@ -170,11 +171,14 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         fetcher.execute(param);
     }
 
-    protected void askUserForLocation() {
+    protected void askUserForLocation(@Nullable final TextView locationView) {
         reportActionToAnalytics("askUserForLocation");
         new LocationPickerDialog().show(this, new OnLocationSelection() {
             @Override
             public void onLocationSelection(String locationString, LatLng locationPoint) {
+                if (locationView != null) {
+                    locationView.setText(locationString);
+                }
                 updateUserLocation(locationPoint);
             }
         });
@@ -269,7 +273,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             reportActionToAnalytics("locationFailed");
             Toast.makeText(LocationAwareEventActivity.this,
                     R.string.failed_location, Toast.LENGTH_SHORT).show();
-            askUserForLocation();
+            askUserForLocation(null);
         }
     };
 

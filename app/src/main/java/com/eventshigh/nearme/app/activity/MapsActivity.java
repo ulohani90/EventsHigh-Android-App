@@ -103,7 +103,7 @@ public class MapsActivity extends LocationAwareEventActivity {
         }
 
         if (item.getItemId() == R.id.action_change_location) {
-            askUserForLocation();
+            askUserForLocation(null);
             return true;
         }
 

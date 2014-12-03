@@ -160,7 +160,7 @@ public class EventListActivity extends LocationAwareEventActivity
     private final OnClickListener mLocalityClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            askUserForLocation();
+            askUserForLocation(mLocalityView);
         }
     };
 
