@@ -6,11 +6,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
-import android.widget.FrameLayout.LayoutParams;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,7 +13,7 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
-import com.eventshigh.nearme.app.utils.DownloadImageTask;
+import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.eventshigh.nearme.app.utils.UpdateLocationTask;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
@@ -58,7 +53,7 @@ public class ListActivity extends LocationAwareEventActivity {
         mLocalityView = (TextView) findViewById(R.id.event_locality_header);
         mLocalityView.setOnClickListener(mLocalityClickListener);
         mEventListView = (ListView) findViewById(R.id.event_list);
-        mEventsListAdapter = new EventListAdapter();
+        mEventsListAdapter = new EventListAdapter(this, true);
         mEventListView.setAdapter(mEventsListAdapter);
     }
 
@@ -152,86 +147,4 @@ public class ListActivity extends LocationAwareEventActivity {
             askUserForLocation(mLocalityView);
         }
     };
-
-    private class EventListAdapter extends ArrayAdapter<Event> {
-        private EventListAdapter() {
-            super(ListActivity.this, R.layout.list_item_event, R.id.event_title);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            // Build the view, reuse existing if possible.
-            final View view = convertView == null ?
-                    getLayoutInflater().inflate(R.layout.list_item_event, parent, false) :
-                    convertView;
-            EventCard eventCard = new EventCard(view);
-            final Event event = getItem(position);
-
-            // Set the background image.
-            eventCard.bgView.setImageResource(R.drawable.eh_default);
-            eventCard.bgView.setLayoutParams(new FrameLayout.LayoutParams(
-                    LayoutParams.MATCH_PARENT,
-                    mEventListView.getHeight() / 2));
-            new DownloadImageTask(eventCard.bgView).execute(event.img_url);
-
-            // Set the title, time etc.
-            eventCard.titleView.setText(event.title);
-            eventCard.timeView.setVisibility(event.startTime == null ? View.INVISIBLE : View.VISIBLE);
-            eventCard.timeView.setText(Utils.getEventTime(event));
-            eventCard.numPeopleInterestedView.setText(
-                    Integer.toString(event.numPeopleInterested));
-
-            // Set the venue
-            if (event.venue == null) {
-                eventCard.venueView.setVisibility(View.INVISIBLE);
-            } else {
-                eventCard.venueView.setVisibility(View.VISIBLE);
-                eventCard.venueView.setText(event.venue);
-            }
-
-            // Check if its recommended event.
-            eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE :
-                    View.INVISIBLE);
-
-            // Set the click listener.
-            eventCard.bgView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showEventDetails(event);
-                }
-            });
-            eventCard.shareView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    View shareView = view.findViewById(R.id.event_share);
-                    shareView.setVisibility(View.INVISIBLE);
-                    shareEvent(view, event);
-                    shareView.setVisibility(View.VISIBLE);
-                }
-            });
-
-            return view;
-        }
-    }
-
-    private static class EventCard {
-        private final ImageView bgView;
-        private final ImageView shareView;
-        private final ImageView recommendedImageView;
-        private final TextView titleView;
-        private final TextView venueView;
-        private final TextView timeView;
-        private final TextView numPeopleInterestedView;
-
-        private EventCard(View cardView) {
-            bgView = (ImageView) cardView.findViewById(R.id.event_bg);
-            shareView = (ImageView) cardView.findViewById(R.id.event_share);
-            recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
-            titleView = (TextView) cardView.findViewById(R.id.event_title);
-            venueView = (TextView) cardView.findViewById(R.id.event_venue);
-            timeView = (TextView) cardView.findViewById(R.id.event_time);
-            numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
-        }
-    }
 }

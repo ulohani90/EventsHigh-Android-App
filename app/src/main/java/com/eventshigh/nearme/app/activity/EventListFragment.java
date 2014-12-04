@@ -4,19 +4,11 @@ import android.app.Activity;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
-import android.widget.FrameLayout.LayoutParams;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.utils.DownloadImageTask;
-import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 
@@ -91,7 +83,7 @@ public class EventListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mEventsListAdapter = new EventListAdapter();
+        mEventsListAdapter = new EventListAdapter((BaseActivity)getActivity(), !isTwoPane);
         setListAdapter(mEventsListAdapter);
     }
 
@@ -191,6 +183,8 @@ public class EventListFragment extends ListFragment {
      */
     public void setIsTwoPane(boolean isTwoPane) {
         this.isTwoPane = isTwoPane;
+        mEventsListAdapter.setShowShareIcon(!isTwoPane);
+
         // When setting CHOICE_MODE_SINGLE, ListView will automatically
         // give items the 'activated' state when touched.
         getListView().setChoiceMode(isTwoPane
@@ -212,82 +206,6 @@ public class EventListFragment extends ListFragment {
         }
     };
 
-    private class EventListAdapter extends ArrayAdapter<Event> {
-
-        private EventListAdapter() {
-            super(getActivity(), R.layout.list_item_event, R.id.event_title);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            // Build the view, reuse existing if possible.
-            final View view = convertView == null ?
-                    getActivity().getLayoutInflater().inflate(R.layout.list_item_event, parent, false) :
-                    convertView;
-            EventCard eventCard = new EventCard(view);
-            final Event event = getItem(position);
-
-            // Set the background image.
-            eventCard.bgView.setImageResource(R.drawable.eh_default);
-            eventCard.bgView.setLayoutParams(new FrameLayout.LayoutParams(
-                    LayoutParams.MATCH_PARENT, findOptimalHeight(parent)));
-            new DownloadImageTask(eventCard.bgView).execute(event.img_url);
-
-            // Set the title, time etc.
-            eventCard.titleView.setText(event.title);
-            eventCard.timeView.setText(Utils.getEventTime(event));
-            eventCard.numPeopleInterestedView.setText(
-                    Integer.toString(event.numPeopleInterested));
-
-            // Set the venue
-            if (event.venue == null) {
-                eventCard.venueView.setVisibility(View.INVISIBLE);
-            } else {
-                eventCard.venueView.setVisibility(View.VISIBLE);
-                eventCard.venueView.setText(event.venue);
-            }
-
-            // Check if its recommended event.
-            eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE :
-                    View.INVISIBLE);
-
-            // Set share view.
-            eventCard.shareView.setVisibility(isTwoPane ?  View.GONE : View.VISIBLE);
-            eventCard.shareView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    View shareView = view.findViewById(R.id.event_share);
-                    shareView.setVisibility(View.INVISIBLE);
-                    BaseActivity activity = (BaseActivity) getActivity();
-                    activity.shareEvent(view, event);
-                    shareView.setVisibility(View.VISIBLE);
-                }
-            });
-
-            return view;
-        }
-    }
-
-    private static class EventCard {
-        private final ImageView bgView;
-        private final ImageView shareView;
-        private final ImageView recommendedImageView;
-        private final TextView titleView;
-        private final TextView venueView;
-        private final TextView timeView;
-        private final TextView numPeopleInterestedView;
-
-        private EventCard(View cardView) {
-            bgView = (ImageView) cardView.findViewById(R.id.event_bg);
-            shareView = (ImageView) cardView.findViewById(R.id.event_share);
-            recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
-            titleView = (TextView) cardView.findViewById(R.id.event_title);
-            venueView = (TextView) cardView.findViewById(R.id.event_venue);
-            timeView = (TextView) cardView.findViewById(R.id.event_time);
-            numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
-        }
-    }
-
     // Find the distance of events from user's position with weight for popular events.
     // If event has e**N users going, we reduce 500*N meters from its distance.
     private static double weightedDistance(Event event, LatLng userLocation, Map<String, Double> eventToDistanceMap) {
@@ -302,17 +220,5 @@ public class EventListFragment extends ListFragment {
         double weightedDistance = distance - weight;
         eventToDistanceMap.put(event.id, weightedDistance);
         return weightedDistance;
-    }
-
-
-    // What would be optimal height for event card? Width of event card is same as
-    // width of parent. In landscape mode, we want event card height to match the parent
-    // height so that one event card is fully visible. In portrait mode, we want event cards
-    // to be 9:16 shape.
-    private static int findOptimalHeight(ViewGroup parent) {
-        int parentWidth = parent.getMeasuredWidth();
-        int parentHeight = parent.getMeasuredHeight();
-
-        return Math.min(9 * parentWidth / 16, parentHeight);
     }
 }

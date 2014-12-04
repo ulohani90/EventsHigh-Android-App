@@ -1,0 +1,112 @@
+package com.eventshigh.nearme.app.utils;
+
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.data.Event;
+
+/**
+ * An {@link android.widget.ListAdapter} which can be used to populate the
+ * Event card.
+ */
+public class EventListAdapter extends ArrayAdapter<Event> {
+    private final BaseActivity mBaseActivity;
+    private boolean mShowShareIcon;
+
+    public EventListAdapter(BaseActivity activity, boolean showShareIcon) {
+        super(activity, R.layout.list_item_event, R.id.event_title);
+        mBaseActivity = activity;
+        mShowShareIcon = showShareIcon;
+    }
+
+    public void setShowShareIcon(boolean showShareIcon) {
+        mShowShareIcon = showShareIcon;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        // Build the view, reuse existing if possible.
+        final View view = convertView == null ?
+                mBaseActivity.getLayoutInflater().inflate(R.layout.list_item_event, parent, false) :
+                convertView;
+        EventCard eventCard = new EventCard(view);
+        final Event event = getItem(position);
+
+        // Set the background image.
+        eventCard.bgView.setImageResource(R.drawable.eh_default);
+        eventCard.bgView.setLayoutParams(new FrameLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT, findOptimalHeight(parent)));
+        new DownloadImageTask(eventCard.bgView).execute(event.img_url);
+
+        // Set the title, time etc.
+        eventCard.titleView.setText(event.title);
+        eventCard.timeView.setText(Utils.getEventTime(event));
+        eventCard.numPeopleInterestedView.setText(
+                Integer.toString(event.numPeopleInterested));
+
+        // Set the venue
+        if (event.venue == null) {
+            eventCard.venueView.setVisibility(View.INVISIBLE);
+        } else {
+            eventCard.venueView.setVisibility(View.VISIBLE);
+            eventCard.venueView.setText(event.venue);
+        }
+
+        // Check if its recommended event.
+        eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE :
+                View.INVISIBLE);
+
+        // Set share view.
+        eventCard.shareView.setVisibility(mShowShareIcon ? View.VISIBLE : View.GONE);
+        eventCard.shareView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View shareView = view.findViewById(R.id.event_share);
+                shareView.setVisibility(View.INVISIBLE);
+                mBaseActivity.shareEvent(view, event);
+                shareView.setVisibility(View.VISIBLE);
+            }
+        });
+
+        return view;
+    }
+
+    public static class EventCard {
+        private final ImageView bgView;
+        private final ImageView shareView;
+        private final ImageView recommendedImageView;
+        private final TextView titleView;
+        private final TextView venueView;
+        private final TextView timeView;
+        private final TextView numPeopleInterestedView;
+
+        private EventCard(View cardView) {
+            bgView = (ImageView) cardView.findViewById(R.id.event_bg);
+            shareView = (ImageView) cardView.findViewById(R.id.event_share);
+            recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
+            titleView = (TextView) cardView.findViewById(R.id.event_title);
+            venueView = (TextView) cardView.findViewById(R.id.event_venue);
+            timeView = (TextView) cardView.findViewById(R.id.event_time);
+            numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
+        }
+    }
+
+    // What would be optimal height for event card? Width of event card is same as
+    // width of parent. In landscape mode, we want event card height to match the parent
+    // height so that one event card is fully visible. In portrait mode, we want event cards
+    // to be 9:16 shape.
+    private static int findOptimalHeight(ViewGroup parent) {
+        int parentWidth = parent.getMeasuredWidth();
+        int parentHeight = parent.getMeasuredHeight();
+
+        return Math.min(9 * parentWidth / 16, parentHeight);
+    }
+}

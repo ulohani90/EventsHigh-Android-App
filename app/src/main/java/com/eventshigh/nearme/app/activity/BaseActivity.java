@@ -90,7 +90,7 @@ public abstract class BaseActivity extends FragmentActivity {
      * Helper method to share an Event. This method coverts and view
      * into jpeg image which is then shared with external tool.
      */
-    protected void shareEvent(View eventView, Event event) {
+    public void shareEvent(View eventView, Event event) {
         reportActionToAnalytics("shareEvent");
 
         eventView.setDrawingCacheEnabled(true);
