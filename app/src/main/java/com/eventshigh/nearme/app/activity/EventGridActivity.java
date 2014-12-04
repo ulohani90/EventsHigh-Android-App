@@ -8,71 +8,44 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.eventshigh.nearme.app.utils.UpdateLocationTask;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.SphericalUtil;
 
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-/**
- * An activity representing a list of Events. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link EventDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
- * <p/>
- * The activity makes heavy use of fragments. The list of items is a
- * {@link EventListFragment} and the item details
- * (if present) is a {@link EventDetailFragment}.
- * <p/>
- * This activity also implements the required
- * {@link EventListFragment.Callbacks} interface
- * to listen for item selections.
- */
-public class EventListActivity extends LocationAwareEventActivity
-        implements EventListFragment.Callbacks {
-    // log tag used for debugging.
-    private static final String LOG_TAG = EventListActivity.class.getSimpleName();
-
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
-    private boolean mTwoPane;
+public class EventGridActivity extends LocationAwareEventActivity {
+    private EventListAdapter mEventsListAdapter;
     private TextView mLocalityView;
-    private EventListFragment mEventListFragment;
+
+    // ***********************
+    // Activity lifecycle  Methods
+    // See http://developer.android.com/training/basics/activity-lifecycle/starting.html
+    // ***********************
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event_list);
+        setContentView(R.layout.activity_event_grid);
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-
-        // See if we are in two pane mode.
-        mEventListFragment = ((EventListFragment) getFragmentManager()
-                .findFragmentById(R.id.event_list));
-        if (findViewById(R.id.event_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-large and
-            // res/values-sw600dp). If this view is present, then the
-            // activity should be in two-pane mode.
-            mTwoPane = true;
-
-            // In two-pane mode, list items should be given the
-            // 'activated' state when touched.
-            mEventListFragment.setIsTwoPane(true);
         }
 
         // See if we have location passed to us within intent.
@@ -85,9 +58,15 @@ public class EventListActivity extends LocationAwareEventActivity
         // Setup the local member variables.
         setUpAll(param);
 
-        // Setup locality click listener.
+        // Setup the locality view.
         mLocalityView = (TextView) findViewById(R.id.event_locality_header);
         mLocalityView.setOnClickListener(mLocalityClickListener);
+
+        // Setup adapter.
+        GridView eventGridView = (GridView) findViewById(R.id.event_grid);
+        mEventsListAdapter = new EventListAdapter(this, true);
+        eventGridView.setAdapter(mEventsListAdapter);
+        eventGridView.setOnItemClickListener(mOnItemClickListener);
     }
 
     @Override
@@ -115,8 +94,8 @@ public class EventListActivity extends LocationAwareEventActivity
         if (id == R.id.action_map) {
             if (lastEventFetcherParam != null) {
                 startActivity(new Intent(this, MapsActivity.class)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                .putExtra(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        .putExtra(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam)
                 );
             }
             return true;
@@ -124,7 +103,6 @@ public class EventListActivity extends LocationAwareEventActivity
 
         return super.onOptionsItemSelected(item);
     }
-
 
 
     // ***********************
@@ -141,16 +119,47 @@ public class EventListActivity extends LocationAwareEventActivity
             Toast.makeText(this, R.string.failed, Toast.LENGTH_SHORT).show();
         }
 
-        mEventListFragment.updateNewEvents(events);
-        if (lastEventFetcherParam != null) {
-            mEventListFragment.updateListingForUserLocation(lastEventFetcherParam.location);
-        }
+        mEventsListAdapter.clear();
+        mEventsListAdapter.addAll(events);
+        updateListingForUserLocation(
+                lastEventFetcherParam == null ? null : lastEventFetcherParam.location);
     }
 
     protected void updateUserLocation(LatLng userLocation) {
         if (!refreshListingsIfNeeded(userLocation)) {
-            mEventListFragment.updateListingForUserLocation(userLocation);
+            updateListingForUserLocation(userLocation);
         }
+    }
+
+    private void updateListingForUserLocation(final LatLng userLocation) {
+        // Sort the events based on popularity and distance from user location.
+        // If event has e**N users going, we reduce 500*N meters from its distance.
+        final Map<String, Double> eventToDistanceMap = new HashMap<String, Double>(mEventsListAdapter.getCount());
+        mEventsListAdapter.sort(new Comparator<Event>() {
+            @Override
+            public int compare(Event lhs, Event rhs) {
+                return Double.compare(
+                        weightedDistance(lhs, userLocation, eventToDistanceMap),
+                        weightedDistance(rhs, userLocation, eventToDistanceMap)
+                );
+            }
+        });
+    }
+
+    // Find the distance of events from user's position with weight for popular events.
+    // If event has e**N users going, we reduce 500*N meters from its distance.
+    private static double weightedDistance(Event event, LatLng userLocation, Map<String, Double> eventToDistanceMap) {
+        Double result = eventToDistanceMap.get(event.id);
+        if (result != null) {
+            return result;
+        }
+
+        double distance = SphericalUtil.computeDistanceBetween(event.location, userLocation);
+        double weight = (event.numPeopleInterested > 0 ? Math.log(event.numPeopleInterested) * 500 : 0)
+                + (event.ehRecommended ? 1000 : 0) ;
+        double weightedDistance = distance - weight;
+        eventToDistanceMap.put(event.id, weightedDistance);
+        return weightedDistance;
     }
 
     // ***********************
@@ -164,28 +173,10 @@ public class EventListActivity extends LocationAwareEventActivity
         }
     };
 
-    /**
-     * Callback method from {@link EventListFragment.Callbacks}
-     * indicating that the item with the given ID was selected.
-     */
-    @Override
-    public void onItemSelected(Event event) {
-        reportActionToAnalytics("onItemSelected");
-
-        if (mTwoPane) {
-            // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putParcelable(EventDetailFragment.ARG_EVENT_INFO, event);
-            EventDetailFragment fragment = new EventDetailFragment();
-            fragment.setArguments(arguments);
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.event_detail_container, fragment)
-                    .commit();
-        } else {
-            // In single-pane mode, simply start the detail activity
-            // for the selected item ID.
-            showEventDetails(event);
+    private final OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            showEventDetails(mEventsListAdapter.getItem(position));
         }
-    }
+    };
 }

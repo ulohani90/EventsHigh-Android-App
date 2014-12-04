@@ -64,7 +64,7 @@ public class EventDetailActivity extends BaseActivity {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-            NavUtils.navigateUpTo(this, new Intent(this, EventListActivity.class));
+            NavUtils.navigateUpTo(this, new Intent(this, EventGridActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);

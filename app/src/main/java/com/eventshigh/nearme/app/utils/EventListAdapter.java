@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -107,6 +108,11 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         int parentWidth = parent.getMeasuredWidth();
         int parentHeight = parent.getMeasuredHeight();
 
-        return Math.min(9 * parentWidth / 16, parentHeight);
+        int cardWidth = parentWidth;
+        if (parent instanceof GridView) {
+            cardWidth = parentWidth / ((GridView) parent).getNumColumns();
+        }
+
+        return Math.min(9 * cardWidth / 16, parentHeight);
     }
 }
