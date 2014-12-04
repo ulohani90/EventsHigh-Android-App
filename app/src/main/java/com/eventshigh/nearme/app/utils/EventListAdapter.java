@@ -20,16 +20,10 @@ import com.eventshigh.nearme.app.data.Event;
  */
 public class EventListAdapter extends ArrayAdapter<Event> {
     private final BaseActivity mBaseActivity;
-    private boolean mShowShareIcon;
 
-    public EventListAdapter(BaseActivity activity, boolean showShareIcon) {
+    public EventListAdapter(BaseActivity activity) {
         super(activity, R.layout.list_item_event, R.id.event_title);
         mBaseActivity = activity;
-        mShowShareIcon = showShareIcon;
-    }
-
-    public void setShowShareIcon(boolean showShareIcon) {
-        mShowShareIcon = showShareIcon;
     }
 
     @Override
@@ -42,10 +36,9 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         final Event event = getItem(position);
 
         // Set the background image.
-        eventCard.bgView.setImageResource(R.drawable.eh_default);
         eventCard.bgView.setLayoutParams(new FrameLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT, findOptimalHeight(parent)));
-        new DownloadImageTask(eventCard.bgView).execute(event.img_url);
+        DownloadImageTask.setImage(eventCard.bgView, event.img_url, R.drawable.eh_default);
 
         // Set the title, time etc.
         eventCard.titleView.setText(event.title);
@@ -66,7 +59,6 @@ public class EventListAdapter extends ArrayAdapter<Event> {
                 View.INVISIBLE);
 
         // Set share view.
-        eventCard.shareView.setVisibility(mShowShareIcon ? View.VISIBLE : View.GONE);
         eventCard.shareView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

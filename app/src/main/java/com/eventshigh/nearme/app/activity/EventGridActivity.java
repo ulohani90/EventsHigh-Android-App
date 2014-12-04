@@ -64,7 +64,7 @@ public class EventGridActivity extends LocationAwareEventActivity {
 
         // Setup adapter.
         GridView eventGridView = (GridView) findViewById(R.id.event_grid);
-        mEventsListAdapter = new EventListAdapter(this, true);
+        mEventsListAdapter = new EventListAdapter(this);
         eventGridView.setAdapter(mEventsListAdapter);
         eventGridView.setOnItemClickListener(mOnItemClickListener);
     }

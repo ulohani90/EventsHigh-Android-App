@@ -163,7 +163,7 @@ public class EventDetailFragment extends Fragment {
         if (mEvent.img_url == null) {
             mEventCard.bgView.setVisibility(View.GONE);
         } else {
-            new DownloadImageTask(mEventCard.bgView).execute(mEvent.img_url);
+            DownloadImageTask.setImage(mEventCard.bgView, mEvent.img_url, -1);
         }
 
         // Set description.
