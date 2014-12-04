@@ -32,7 +32,10 @@ public class Event implements Parcelable {
     public final String title;
     public final EventCategory category;
     public final String description;
+
     @Nullable public final String img_url;
+    @Nullable public final String source_url;
+    @Nullable public final String booking_url;
 
     public final int numPeopleInterested;
     public final boolean ehRecommended;
@@ -44,8 +47,8 @@ public class Event implements Parcelable {
     @Nullable public final String venue;
     @Nullable public final String address;
 
-    public Event(String id, City city, String title,
-                 EventCategory category, String description, @Nullable String img_url,
+    public Event(String id, City city, String title, EventCategory category, String description,
+                 @Nullable String img_url, @Nullable String source_url, @Nullable String booking_url,
                  int numPeopleInterested, boolean ehRecommended,
                  @Nullable Date startTime, @Nullable Date endTime,
                  LatLng location, @Nullable String venue, @Nullable String address) {
@@ -54,17 +57,20 @@ public class Event implements Parcelable {
         this.title = title;
         this.category = category;
         this.description = description;
-        this.img_url = img_url;
+
+        this.img_url = checkIfUnknown(img_url);
+        this.source_url = checkIfUnknown(source_url);
+        this.booking_url = checkIfUnknown(booking_url);
 
         this.numPeopleInterested = numPeopleInterested;
         this.ehRecommended = ehRecommended;
 
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.startTime = startTime != null && startTime.getTime() > 0 ? startTime : null;
+        this.endTime = endTime != null && endTime.getTime() > 0 ? endTime : null;
 
         this.location = location;
-        this.venue = venue;
-        this.address = address;
+        this.venue = checkIfUnknown(venue);
+        this.address = checkIfUnknown(address);
     }
 
     public Uri getEventDetailsURI() {
@@ -106,7 +112,10 @@ public class Event implements Parcelable {
         dest.writeString(title);
         dest.writeString(category.toString());
         dest.writeString(description);
+
         dest.writeString(emptyIfNull(img_url));
+        dest.writeString(emptyIfNull(source_url));
+        dest.writeString(emptyIfNull(booking_url));
 
         dest.writeInt(numPeopleInterested);
 
@@ -131,7 +140,10 @@ public class Event implements Parcelable {
                             in.readString(),
                             EventCategory.valueOf(in.readString()),
                             in.readString(),
-                            checkIfUnknown(in.readString()),
+
+                            in.readString(),
+                            in.readString(),
+                            in.readString(),
 
                             in.readInt(),
                             boolArray[0],
@@ -140,8 +152,8 @@ public class Event implements Parcelable {
                             new Date(in.readLong()),
 
                             (LatLng) in.readParcelable(LatLng.class.getClassLoader()),
-                            checkIfUnknown(in.readString()),
-                            checkIfUnknown(in.readString())
+                            in.readString(),
+                            in.readString()
                     );
                 }
 
@@ -168,7 +180,10 @@ public class Event implements Parcelable {
                 String id = eventJson.getString("id");
                 String title = eventJson.getString("title");
                 String description = eventJson.getString("description");
-                String img_url = checkIfUnknown(eventJson.getString("img_url"));
+
+                String img_url = eventJson.getString("img_url");
+                String source_url = eventJson.getString("source_url");
+                String booking_url = eventJson.getString("booking_url");
 
                 int num_people_interested = eventJson.getInt("num_people_interested");
                 boolean eh_recommends = eventJson.has("eh_recommends") &&
@@ -176,7 +191,7 @@ public class Event implements Parcelable {
 
                 String date = eventJson.getString("date");
                 String start_time = eventJson.getString("start_time");
-                String end_time = eventJson.getString("end_time");
+                String end_time = null; // eventJson.getString("end_time");
 
                 double lat = 0;
                 double lon = 0;
@@ -199,12 +214,16 @@ public class Event implements Parcelable {
                     continue;
                 }
 
-                String venue = venueJson == null ? null : checkIfUnknown(venueJson.optString("name"));
+                String venue = null;
+                String address = null;
+                if (venueJson != null) {
+                    venue =  checkIfUnknown(venueJson.optString("name"));
+                    address = venueJson.optString("address");
+                }
+
                 if (venue == null && localityJson != null) {
                     venue = localityJson.optString("locality");
                 }
-
-                String address = venueJson == null ? null : checkIfUnknown(venueJson.optString("address"));
 
                 EventCategory category = EventCategory.OTHER;
                 JSONArray tags = eventJson.getJSONArray("tags");
@@ -222,7 +241,10 @@ public class Event implements Parcelable {
                         title,
                         category,
                         description,
+
                         img_url,
+                        source_url,
+                        booking_url,
 
                         num_people_interested,
                         eh_recommends,

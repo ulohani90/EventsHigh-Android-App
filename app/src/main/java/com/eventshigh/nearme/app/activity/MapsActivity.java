@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,6 +44,7 @@ public class MapsActivity extends LocationAwareEventActivity {
 
     // For performance reasons, we show events only where user has reasonable zoom level.
     private static final int MIN_ZOOM_LEVEL = 11;
+    private static final int DEFAULT_ZOOM_LEVEL = 14;
 
 
     // ***********************
@@ -54,6 +56,8 @@ public class MapsActivity extends LocationAwareEventActivity {
     // Manager for all markers drawn on map. Manager is responsible for hiding/showing markers
     // on map.
     private MarkerManager markerManager = new MarkerManager();
+    // font-awesome font, used for icons.
+    protected static Typeface font;
     // We show the helper toast asking user to zoom in to see events.
     // We show them only once application lifetime.
     boolean showZoomToast = true;
@@ -78,6 +82,7 @@ public class MapsActivity extends LocationAwareEventActivity {
 
         // Setup the local member variables.
         setUpMapIfNeeded();
+        setupFontIfNeeded();
         setUpAll(param);
     }
 
@@ -135,6 +140,12 @@ public class MapsActivity extends LocationAwareEventActivity {
         }
     }
 
+    private void setupFontIfNeeded() {
+        if (font == null) {
+            font = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
+        }
+    }
+
 
     // ***********************
     // Other Helper Methods
@@ -151,7 +162,7 @@ public class MapsActivity extends LocationAwareEventActivity {
             CameraUpdateFactory.newCameraPosition(
                 CameraPosition.builder()
                     .target(userLocation)
-                    .zoom(Math.max(map.getCameraPosition().zoom, MIN_ZOOM_LEVEL + 1))
+                    .zoom(Math.max(map.getCameraPosition().zoom, DEFAULT_ZOOM_LEVEL))
                     .build()
             )
         );

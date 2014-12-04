@@ -176,7 +176,7 @@ public class EventListActivity extends LocationAwareEventActivity
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putParcelable(EventDetailFragment.ARG_ITEM_ID, event);
+            arguments.putParcelable(EventDetailFragment.ARG_EVENT_INFO, event);
             EventDetailFragment fragment = new EventDetailFragment();
             fragment.setArguments(arguments);
             getFragmentManager().beginTransaction()

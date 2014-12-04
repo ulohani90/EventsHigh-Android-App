@@ -12,14 +12,30 @@
         android:orientation="vertical"
     >
 
-        <ImageView
-            android:id="@+id/eh_recommend_banner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/eh_recommends_banner"
-            android:adjustViewBounds="true"
-            tools:ignore="ContentDescription"
-        />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/eh_recommend_banner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/eh_recommends_banner"
+                android:adjustViewBounds="true"
+                tools:ignore="ContentDescription"
+            />
+            <TextView
+                android:id="@+id/event_from"
+                style="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/darker_gray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/abc_action_bar_icon_vertical_padding_material"
+                android:layout_gravity="end"
+                android:clickable="true"
+                android:layout_marginTop="@dimen/abc_action_bar_subtitle_top_margin_material"
+            />
+        </FrameLayout>
 
         <TextView
             android:id="@+id/event_title"
@@ -43,6 +59,7 @@
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/ic_action_place_dark"
             android:drawableLeft="@drawable/ic_action_place_dark"
+            android:clickable="true"
         />
 
         <TextView
@@ -52,6 +69,7 @@
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/ic_action_time_dark"
             android:drawableLeft="@drawable/ic_action_time_dark"
+            android:clickable="true"
         />
 
         <TextView

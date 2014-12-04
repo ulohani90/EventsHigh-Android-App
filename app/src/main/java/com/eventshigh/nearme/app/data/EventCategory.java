@@ -1,13 +1,5 @@
 package com.eventshigh.nearme.app.data;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Typeface;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.MeasureSpec;
-import android.widget.TextView;
-
 import com.eventshigh.nearme.app.R;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -36,10 +28,8 @@ public enum EventCategory {
     NIGHTLIFE,
     PHOTOGRAPHY,
     PLAYS,
-    SPIRITUAL,
     SPORTS,
     TECH,
-    WORKSHOPS,
     OTHER;
 
     /**
@@ -79,14 +69,10 @@ public enum EventCategory {
                 return R.string.fa_camera;
             case PLAYS:
                 return R.string.fa_paw;
-            case SPIRITUAL:
-                return R.string.fa_empire;
             case SPORTS:
                 return R.string.fa_soccer_ball_o;
             case TECH:
                 return R.string.fa_linux;
-            case WORKSHOPS:
-                return R.string.fa_institution;
         }
 
         return R.string.fa_calendar;
@@ -95,15 +81,21 @@ public enum EventCategory {
     /**
      * Get an Icon associated with this Category.
      *
-     \     * @return an BitmapDescriptor for Icon.
+     * @return an BitmapDescriptor for Icon.
      */
     public BitmapDescriptor icon() {
         BitmapDescriptor icon = CATEGORY_ICONS.get(this);
         if (icon == null) {
-            TextView view = (TextView) INFLATOR.inflate(R.layout.category_icon, null);
-            view.setTypeface(FONT);
-            view.setText(getIconStringId());
-            icon = viewToBitmapDescriptorFactory(view);
+            int resId = R.drawable.icon_other;
+            try {
+                resId = R.drawable.class.getField("icon_" + toString().toLowerCase()).getInt(null);
+            } catch (IllegalAccessException e) {
+                // Ignore
+            } catch (NoSuchFieldException e) {
+                // Ignore
+            }
+
+            icon = BitmapDescriptorFactory.fromResource(resId);
             CATEGORY_ICONS.put(this, icon);
         }
         return icon;
@@ -117,33 +109,7 @@ public enum EventCategory {
         return CIRCLE_ICON;
     }
 
-    /**
-     * Sets the resources which can be used to populate icons.
-     *
-     * @param inflater the inflater to be used to generate Icon.
-     * @param font font-awesome font from assets.
-\     */
-    private static LayoutInflater INFLATOR;
-    private static Typeface FONT;
-    public static void setIconResources(LayoutInflater inflater, Typeface font) {
-        INFLATOR = inflater;
-        FONT = font;
-    }
-
     private static BitmapDescriptor CIRCLE_ICON;
     private static final Map<EventCategory, BitmapDescriptor> CATEGORY_ICONS =
             new HashMap<EventCategory,BitmapDescriptor>();
-
-    private static BitmapDescriptor viewToBitmapDescriptorFactory(View view) {
-        int specWidth = MeasureSpec.makeMeasureSpec(0 /* any */, MeasureSpec.UNSPECIFIED);
-        view.measure(specWidth, specWidth);
-        Bitmap bitmap = Bitmap.createBitmap(
-                view.getMeasuredWidth(),
-                view.getMeasuredHeight(),
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
-        view.draw(canvas);
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
 }

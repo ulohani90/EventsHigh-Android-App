@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -15,7 +14,6 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.data.EventsFetcher;
 import com.eventshigh.nearme.app.data.EventsFetcher.EventsFetcherCallBack;
@@ -65,8 +63,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     private DaySelector daySelector;
     // Last city,day for which events are shown.
     protected EventFetcherParam lastEventFetcherParam;
-    // font-awesome font, used for icons.
-    protected static Typeface font;
 
 
     // ***********************
@@ -120,7 +116,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
      * activity must call once its view is populated.
      */
     protected void setUpAll(@Nullable EventFetcherParam param) {
-        setupFontIfNeeded();
         setUpDaySelectorIfNeeded(param);
         setUpLocationClientIfNeeded(param);
 
@@ -151,13 +146,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         if (param != null) {
             daySelector.setSelected(param.day);
         }
-    }
-
-    private void setupFontIfNeeded() {
-        if (font == null) {
-            font = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
-        }
-        EventCategory.setIconResources(getLayoutInflater(), font);
     }
 
     // ***********************
@@ -191,7 +179,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     protected void showEventDetails(Event event) {
         reportActionToAnalytics("showEventDetails");
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
-        detailIntent.putExtra(EventDetailFragment.ARG_ITEM_ID, event);
+        detailIntent.putExtra(EventDetailFragment.ARG_EVENT_INFO, event);
         startActivity(detailIntent);
     }
 

@@ -3,12 +3,27 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.eventshigh.nearme.app.activity.EventListFragment"
 >
-    <item android:id="@+id/action_share"
-          android:title="@string/action_share"
-          android:icon="@android:drawable/ic_menu_share"
+    <item android:id="@+id/action_direction"
+          android:title="@string/action_direction"
+          android:icon="@android:drawable/ic_menu_directions"
           android:orderInCategory="10"
           android:showAsAction="ifRoom"
           tools:ignore="AppCompatResource"
     />
 
+    <item android:id="@+id/action_cal"
+          android:title="@string/action_cal"
+          android:icon="@android:drawable/ic_menu_my_calendar"
+          android:orderInCategory="20"
+          android:showAsAction="ifRoom"
+          tools:ignore="AppCompatResource"
+    />
+
+    <item android:id="@+id/action_share"
+          android:title="@string/action_share"
+          android:icon="@android:drawable/ic_menu_share"
+          android:orderInCategory="30"
+          android:showAsAction="ifRoom"
+          tools:ignore="AppCompatResource"
+    />
 </menu>

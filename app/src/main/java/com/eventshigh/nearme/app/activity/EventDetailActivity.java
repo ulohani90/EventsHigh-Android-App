@@ -43,8 +43,8 @@ public class EventDetailActivity extends BaseActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putParcelable(EventDetailFragment.ARG_ITEM_ID,
-                    getIntent().getParcelableExtra(EventDetailFragment.ARG_ITEM_ID));
+            arguments.putParcelable(EventDetailFragment.ARG_EVENT_INFO,
+                    getIntent().getParcelableExtra(EventDetailFragment.ARG_EVENT_INFO));
             EventDetailFragment fragment = new EventDetailFragment();
             fragment.setArguments(arguments);
             getFragmentManager().beginTransaction()

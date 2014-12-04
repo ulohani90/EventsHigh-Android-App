@@ -1,23 +1,31 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.Fragment;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;
+import android.provider.CalendarContract.Events;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.utils.DownloadImageTask;
 import com.eventshigh.nearme.app.utils.Utils;
 
+import java.util.Calendar;
 import java.util.regex.Pattern;
 
 /**
@@ -27,13 +35,25 @@ import java.util.regex.Pattern;
  * on handsets.
  */
 public class EventDetailFragment extends Fragment {
-    /**
-     * The fragment argument representing the item ID that this fragment
-     * represents.
-     */
-    public static final String ARG_ITEM_ID = "event_info";
 
+    /**********************************
+     CONSTANTS
+     **********************************/
+
+    // The fragment argument representing the event that this fragment represents
+    public static final String ARG_EVENT_INFO = "event_info";
+
+    // Regex to check if description is plane text or html.
+    private static final Pattern htmlCheckPattern = Pattern.compile("<[A-Za-z].*</[A-Za-z]");
+
+
+    /**********************************
+     Members
+     **********************************/
+
+    // Event shown through this fragment.
     private Event mEvent;
+    // Event card which holds the UI elements.
     private EventCard mEventCard;
 
     /**
@@ -46,8 +66,8 @@ public class EventDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
-            mEvent = getArguments().getParcelable(ARG_ITEM_ID);
+        if (getArguments().containsKey(ARG_EVENT_INFO)) {
+            mEvent = getArguments().getParcelable(ARG_EVENT_INFO);
         }
         setHasOptionsMenu(mEvent != null);
     }
@@ -56,15 +76,26 @@ public class EventDetailFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.fragment_detail, menu);
+        if (mEvent.startTime == null) {
+            menu.getItem(R.id.action_cal).setVisible(false);
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_share) {
-            mEventCard.descriptionView.setVisibility(View.GONE);
-            BaseActivity baseActivity = (BaseActivity)getActivity();
-            baseActivity.shareEvent(mEventCard.rootView, mEvent);
-            mEventCard.descriptionView.setVisibility(View.VISIBLE);
+        int selectedItemId = item.getItemId();
+        if (selectedItemId == R.id.action_share) {
+            shareEvent();
+            return true;
+        }
+
+        if (selectedItemId == R.id.action_direction) {
+            showDirections();
+            return true;
+        }
+
+        if (selectedItemId == R.id.action_cal) {
+            addToCalendar();
             return true;
         }
 
@@ -88,12 +119,39 @@ public class EventDetailFragment extends Fragment {
         // Set EH recommendation banner
         mEventCard.recommendedImageView.setVisibility(mEvent.ehRecommended ? View.VISIBLE : View.GONE);
 
+        // Add attribution.
+        if (mEvent.source_url == null) {
+            mEventCard.fromView.setVisibility(View.GONE);
+        } else {
+            final Uri fromUri =  Uri.parse(mEvent.source_url);
+            String eventFrom = String.format(
+                    getResources().getString(R.string.event_detail_from),
+                    fromUri.getHost());
+            mEventCard.fromView.setText(eventFrom);
+            mEventCard.fromView.setOnClickListener(mOpenSource);
+        }
+
         // Set Venue.
         mEventCard.venueView.setText(mEvent.address == null ? mEvent.venue : mEvent.address);
+        mEventCard.venueView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDirections();
+            }
+        });
 
         // Set time.
-        mEventCard.timeView.setVisibility(mEvent.startTime == null ? View.GONE: View.VISIBLE);
-        mEventCard.timeView.setText(Utils.getEventTime(mEvent));
+        if (mEvent.startTime == null) {
+            mEventCard.timeView.setVisibility(View.GONE);
+        } else {
+            mEventCard.timeView.setText(Utils.getEventTime(mEvent));
+            mEventCard.timeView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    addToCalendar();
+                }
+            });
+        }
 
         // Set Num people Interested
         Resources res = getResources();
@@ -105,11 +163,10 @@ public class EventDetailFragment extends Fragment {
         if (mEvent.img_url == null) {
             mEventCard.bgView.setVisibility(View.GONE);
         } else {
-            new DownloadImageTask((ImageView) rootView.findViewById(R.id.event_bg)).execute(mEvent.img_url);
+            new DownloadImageTask(mEventCard.bgView).execute(mEvent.img_url);
         }
 
         // Set description.
-
         if (htmlCheckPattern.matcher(mEvent.description).find()) {
             mEventCard.descriptionView.setText(Html.fromHtml(mEvent.description));
         } else {
@@ -119,9 +176,77 @@ public class EventDetailFragment extends Fragment {
         return rootView;
     }
 
+
+    /**********************************
+     Callbacks, action handlers
+     **********************************/
+
+    private OnClickListener mOpenSource = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mEvent.source_url));
+            try {
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                // No activity to open url. ignore.
+            }
+        }
+    };
+
+    private void shareEvent() {
+        mEventCard.descriptionView.setVisibility(View.GONE);
+        BaseActivity baseActivity = (BaseActivity)getActivity();
+        baseActivity.shareEvent(mEventCard.rootView, mEvent);
+        mEventCard.descriptionView.setVisibility(View.VISIBLE);
+    }
+
+    private void showDirections() {
+        BaseActivity baseActivity = (BaseActivity)getActivity();
+        baseActivity.reportActionToAnalytics("showDirections");
+
+        Uri locationUri = Uri.parse("geo:0,0?q=" +
+                mEvent.location.latitude + "," + mEvent.location.longitude +
+                " (" + mEvent.title + ")");
+        Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
+
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // No activity to open maps.
+            Toast.makeText(baseActivity, R.string.no_map_app, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void addToCalendar() {
+        BaseActivity baseActivity = (BaseActivity)getActivity();
+        baseActivity.reportActionToAnalytics("addToCalendar");
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(mEvent.startTime);
+        Intent intent = new Intent(Intent.ACTION_INSERT)
+                .setData(Events.CONTENT_URI)
+                .putExtra(Events.TITLE, mEvent.title)
+                .putExtra(Events.EVENT_LOCATION, mEventCard.venueView.getText())
+                .putExtra(Events.DESCRIPTION,
+                        mEvent.getEventDetailsURI().toString() + "\n\n" + mEvent.description)
+                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, cal);
+
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // No activity to open cal.
+            Toast.makeText(getActivity(), R.string.no_cal_app, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**********************************
+     Helper class to hold all UI elements.
+     **********************************/
+
     private static class EventCard {
         private final View rootView;
         private final TextView titleView;
+        private final TextView fromView;
         private final ImageView recommendedImageView;
         private final TextView venueView;
         private final TextView timeView;
@@ -132,6 +257,7 @@ public class EventDetailFragment extends Fragment {
         private EventCard(View rootView) {
             this.rootView = rootView;
             titleView = (TextView) rootView.findViewById(R.id.event_title);
+            fromView = (TextView) rootView.findViewById(R.id.event_from);
             recommendedImageView = (ImageView) rootView.findViewById(R.id.eh_recommend_banner);
             venueView = (TextView) rootView.findViewById(R.id.event_venue);
             timeView = (TextView) rootView.findViewById(R.id.event_time);
@@ -141,5 +267,4 @@ public class EventDetailFragment extends Fragment {
         }
     }
 
-    private static final Pattern htmlCheckPattern = Pattern.compile("<[A-Za-z].*</[A-Za-z]");
 }
