@@ -31,7 +31,9 @@ public class Event implements Parcelable {
     public final City city;
     public final String title;
     public final EventCategory category;
+
     public final String description;
+    public final String[] tags;
 
     @Nullable public final String img_url;
     @Nullable public final String source_url;
@@ -47,7 +49,8 @@ public class Event implements Parcelable {
     @Nullable public final String venue;
     @Nullable public final String address;
 
-    public Event(String id, City city, String title, EventCategory category, String description,
+    public Event(String id, City city, String title, EventCategory category,
+                 String description, String[] tags,
                  @Nullable String img_url, @Nullable String source_url, @Nullable String booking_url,
                  int numPeopleInterested, boolean ehRecommended,
                  @Nullable Date startTime, @Nullable Date endTime,
@@ -56,7 +59,9 @@ public class Event implements Parcelable {
         this.city = city;
         this.title = title;
         this.category = category;
+
         this.description = description;
+        this.tags = tags;
 
         this.img_url = checkIfUnknown(img_url);
         this.source_url = checkIfUnknown(source_url);
@@ -105,19 +110,20 @@ public class Event implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeBooleanArray(new boolean[] { ehRecommended});
-
         dest.writeString(id);
         dest.writeString(city.toString());
         dest.writeString(title);
         dest.writeString(category.toString());
+
         dest.writeString(description);
+        dest.writeStringArray(tags);
 
         dest.writeString(emptyIfNull(img_url));
         dest.writeString(emptyIfNull(source_url));
         dest.writeString(emptyIfNull(booking_url));
 
         dest.writeInt(numPeopleInterested);
+        dest.writeBooleanArray(new boolean[]{ehRecommended});
 
         dest.writeLong(startTime == null ? 0 : startTime.getTime());
         dest.writeLong(endTime == null ? 0 : endTime.getTime());
@@ -132,21 +138,20 @@ public class Event implements Parcelable {
     public static final Parcelable.Creator<Event> CREATOR =
             new Parcelable.Creator<Event>() {
                 public Event createFromParcel(Parcel in) {
-                    boolean[] boolArray = new boolean[1];
-                    in.readBooleanArray(boolArray);
-
                     return new Event(in.readString(),
                             City.valueOf(in.readString()),
                             in.readString(),
                             EventCategory.valueOf(in.readString()),
+
                             in.readString(),
+                            in.createStringArray(),
 
                             in.readString(),
                             in.readString(),
                             in.readString(),
 
                             in.readInt(),
-                            boolArray[0],
+                            in.createBooleanArray()[0],
 
                             new Date(in.readLong()),
                             new Date(in.readLong()),
@@ -166,103 +171,108 @@ public class Event implements Parcelable {
     /**********************************
      Helper static methods, used for JSON parsing
      *********************************/
+    public static Event fromJSON(City city, JSONObject eventJson) throws JSONException, ParseException {
+        String id = eventJson.getString("id");
+        String title = eventJson.getString("title");
+        String description = eventJson.getString("description");
 
-    public static List<Event> fromJSON(City city, String jsonStr) throws JSONException, ParseException {
-        List<Event> events = new ArrayList<Event>();
+        String img_url = eventJson.getString("img_url");
+        String source_url = eventJson.getString("source_url");
+        String booking_url = eventJson.getString("booking_url");
 
-        JSONObject eventsJSON = new JSONObject(jsonStr);
-        JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
+        int num_people_interested = eventJson.getInt("num_people_interested");
+        boolean eh_recommends = eventJson.has("eh_editor") && eventJson.getBoolean("eh_editor");
 
-        for (int i = 0; i < upcomingEvents.length(); i++) {
-            try {
-                JSONObject eventJson = upcomingEvents.getJSONObject(i);
-                String id = eventJson.getString("id");
-                String title = eventJson.getString("title");
-                String description = eventJson.getString("description");
+        String date = eventJson.getString("date");
+        String start_time = eventJson.getString("start_time");
+        String end_time = null; // eventJson.getString("end_time");
 
-                String img_url = eventJson.getString("img_url");
-                String source_url = eventJson.getString("source_url");
-                String booking_url = eventJson.getString("booking_url");
+        double lat = 0;
+        double lon = 0;
+        JSONObject venueJson = eventJson.optJSONObject("venue_info");
+        JSONObject localityJson = eventJson.optJSONObject("locality_info");
+        if (venueJson != null) {
+            lat = venueJson.getDouble("lat");
+            lon = venueJson.getDouble("lon");
+        }
 
-                int num_people_interested = eventJson.getInt("num_people_interested");
-                boolean eh_recommends = eventJson.has("eh_editor") &&
-                        eventJson.getBoolean("eh_editor");
+        if (Math.abs(lat) < 1 && Math.abs(lon) < 1 && localityJson != null) {
+            // Invalid latitude and longitude. Try locality_info.
+            lat = localityJson.getDouble("lat");
+            lon = localityJson.getDouble("lon");
+        }
 
-                String date = eventJson.getString("date");
-                String start_time = eventJson.getString("start_time");
-                String end_time = null; // eventJson.getString("end_time");
+        if (Math.abs(lat) < 1 && Math.abs(lon) < 1) {
+            // Invalid latitude and longitude.
+            // Ignore the entry.
+            throw new ParseException("invalid latitude and longitude for " + id, 0);
+        }
 
-                double lat = 0;
-                double lon = 0;
-                JSONObject venueJson = eventJson.optJSONObject("venue_info");
-                JSONObject localityJson = eventJson.optJSONObject("locality_info");
-                if (venueJson != null) {
-                    lat = venueJson.getDouble("lat");
-                    lon = venueJson.getDouble("lon");
+        String venue = null;
+        String address = null;
+        if (venueJson != null) {
+            venue =  checkIfUnknown(venueJson.optString("name"));
+            address = venueJson.optString("address");
+        }
+
+        if (venue == null && localityJson != null) {
+            venue = localityJson.optString("locality");
+        }
+
+        EventCategory category = EventCategory.OTHER;
+        JSONArray tagsJsonArr = eventJson.getJSONArray("tags");
+        String[] tags = new String[tagsJsonArr.length()];
+        for (int j = 0; j < tagsJsonArr.length(); j++) {
+            String tag = tagsJsonArr.getJSONObject(j).getString("tag");
+            tags[j] = tag;
+            if (category == EventCategory.OTHER) {
+                try {
+                    category = EventCategory.valueOf(tag.toUpperCase().replaceAll(" ", "_"));
+                } catch (IllegalArgumentException e) {
+                    // Ignore. Unsupported category.
                 }
-
-                if (Math.abs(lat) < 1 && Math.abs(lon) < 1 && localityJson != null) {
-                    // Invalid latitude and longitude. Try locality_info.
-                    lat = localityJson.getDouble("lat");
-                    lon = localityJson.getDouble("lon");
-                }
-
-                if (Math.abs(lat) < 1 && Math.abs(lon) < 1) {
-                    // Invalid latitude and longitude.
-                    // Ignore the entry.
-                    continue;
-                }
-
-                String venue = null;
-                String address = null;
-                if (venueJson != null) {
-                    venue =  checkIfUnknown(venueJson.optString("name"));
-                    address = venueJson.optString("address");
-                }
-
-                if (venue == null && localityJson != null) {
-                    venue = localityJson.optString("locality");
-                }
-
-                EventCategory category = EventCategory.OTHER;
-                JSONArray tags = eventJson.getJSONArray("tags");
-                for (int j = 0; category == EventCategory.OTHER && j < tags.length(); j++) {
-                    try {
-                        category = EventCategory.valueOf(
-                                tags.getJSONObject(j).getString("tag").toUpperCase().replaceAll(" ", "_"));
-                    } catch (IllegalArgumentException e) {
-                        // Ignore. Unsupported category.
-                    }
-                }
-
-                Event event = new Event(id,
-                        city,
-                        title,
-                        category,
-                        description,
-
-                        img_url,
-                        source_url,
-                        booking_url,
-
-                        num_people_interested,
-                        eh_recommends,
-
-                        Utils.mergeDateTime(date, start_time),
-                        Utils.mergeDateTime(date, end_time),
-
-                        new LatLng(lat, lon),
-                        venue,
-                        address
-                );
-                events.add(event);
-            } catch (JSONException ex) {
-                // Malformed JSON, ignore.
-                Log.w(Event.class.getSimpleName(), "malformed JSON", ex);
             }
         }
 
+        return new Event(id,
+                city,
+                title,
+                category,
+
+                description,
+                tags,
+
+                img_url,
+                source_url,
+                booking_url,
+
+                num_people_interested,
+                eh_recommends,
+
+                Utils.mergeDateTime(date, start_time),
+                Utils.mergeDateTime(date, end_time),
+
+                new LatLng(lat, lon),
+                venue,
+                address);
+    }
+
+    public static List<Event> fromJSON(City city, JSONArray jsonArray) {
+        List<Event> events = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                events.add(fromJSON(city, jsonArray.getJSONObject(i)));
+            } catch (JSONException | ParseException e) {
+                Log.w(Event.class.getSimpleName(), "malformed JSON", e);
+            }
+        }
         return events;
+    }
+
+    public static List<Event> parseUpcomingEvents(City city, String jsonStr) throws JSONException {
+        JSONObject eventsJSON = new JSONObject(jsonStr);
+        JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
+        return fromJSON(city, upcomingEvents);
     }
 
     private static String checkIfUnknown(String string) {

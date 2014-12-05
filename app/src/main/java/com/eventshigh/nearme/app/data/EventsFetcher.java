@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -76,17 +75,11 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line);
                 }
-                return Event.fromJSON(param.city, buffer.toString());
+                return Event.parseUpcomingEvents(param.city, buffer.toString());
             } finally {
                 urlConnection.disconnect();
             }
-        } catch (ParseException e) {
-            Log.e(LOG_TAG, "Failed to fetch events, malformed DATE!", e);
-            return null;
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Failed to fetch events, malformed JSON!", e);
-            return null;
-        } catch (IOException e) {
+        } catch (JSONException|IOException e) {
             Log.e(LOG_TAG, "Failed to fetch events!", e);
             return null;
         }
