@@ -5,16 +5,17 @@
             android:layout_height="match_parent"
             android:background="@android:color/white"
             tools:context="com.eventshigh.nearme.app.activity.EventDetailFragment"
-    >
+>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        >
+    >
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+        >
 
             <ImageView
                 android:id="@+id/eh_recommend_banner"
@@ -23,7 +24,7 @@
                 android:src="@drawable/eh_recommends_banner"
                 android:adjustViewBounds="true"
                 tools:ignore="ContentDescription"
-                />
+            />
             <TextView
                 android:id="@+id/event_from"
                 style="?android:attr/textAppearanceSmall"
@@ -34,7 +35,7 @@
                 android:layout_gravity="end"
                 android:clickable="true"
                 android:layout_marginTop="@dimen/abc_action_bar_subtitle_top_margin_material"
-                />
+            />
         </FrameLayout>
 
         <TextView
@@ -44,13 +45,13 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/abc_action_bar_icon_vertical_padding_material"
             android:textIsSelectable="true"
-            />
+        />
 
         <View
             android:layout_width="fill_parent"
             android:layout_height="2dp"
             android:background="@android:color/darker_gray"
-            />
+        />
 
         <TextView
             android:id="@+id/event_venue"
@@ -60,7 +61,7 @@
             android:drawableStart="@drawable/ic_action_place_dark"
             android:drawableLeft="@drawable/ic_action_place_dark"
             android:clickable="true"
-            />
+        />
 
         <TextView
             android:id="@+id/event_time"
@@ -70,22 +71,22 @@
             android:drawableStart="@drawable/ic_action_time_dark"
             android:drawableLeft="@drawable/ic_action_time_dark"
             android:clickable="true"
-            />
+        />
 
         <TextView
             android:id="@+id/num_people_interested"
             style="@style/EventDetailText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/eh_popularity_score_icon_dark"
-            android:drawableLeft="@drawable/eh_popularity_score_icon_dark"
-            />
+            android:drawableStart="@drawable/ic_action_group_dark"
+            android:drawableLeft="@drawable/ic_action_group_dark"
+        />
 
         <View
             android:layout_width="fill_parent"
             android:layout_height="2dp"
             android:background="@android:color/darker_gray"
-            />
+        />
 
         <ImageView
             android:id="@+id/event_bg"
@@ -93,20 +94,20 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             tools:ignore="ContentDescription"
-            />
+        />
 
         <View
             android:layout_width="fill_parent"
             android:layout_height="2dp"
             android:background="@android:color/darker_gray"
-            />
+        />
 
         <TextView
             android:id="@+id/event_description"
             style="@style/EventDetailText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            />
+        />
 
     </LinearLayout>
 </ScrollView>
