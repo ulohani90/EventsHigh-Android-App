@@ -173,7 +173,6 @@ public class Event implements Parcelable {
         JSONObject eventsJSON = new JSONObject(jsonStr);
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
 
-
         for (int i = 0; i < upcomingEvents.length(); i++) {
             try {
                 JSONObject eventJson = upcomingEvents.getJSONObject(i);
@@ -186,8 +185,8 @@ public class Event implements Parcelable {
                 String booking_url = eventJson.getString("booking_url");
 
                 int num_people_interested = eventJson.getInt("num_people_interested");
-                boolean eh_recommends = eventJson.has("eh_recommends") &&
-                        eventJson.getBoolean("eh_recommends");
+                boolean eh_recommends = eventJson.has("eh_editor") &&
+                        eventJson.getBoolean("eh_editor");
 
                 String date = eventJson.getString("date");
                 String start_time = eventJson.getString("start_time");
