@@ -179,7 +179,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     protected void showEventDetails(Event event) {
         reportActionToAnalytics("showEventDetails");
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
-        detailIntent.putExtra(EventDetailFragment.ARG_EVENT_INFO, event);
+        detailIntent.putExtra(EventDetailActivity.ARG_EVENT_INFO, event);
         startActivity(detailIntent);
     }
 
