@@ -42,6 +42,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
 
         // Set the title, time etc.
         eventCard.titleView.setText(event.title);
+        eventCard.timeView.setVisibility(event.startTime == null ? View.GONE : View.VISIBLE);
         eventCard.timeView.setText(Utils.getEventTime(event));
         eventCard.numPeopleInterestedView.setText(
                 Integer.toString(event.numPeopleInterested));

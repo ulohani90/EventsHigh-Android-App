@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.activity;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
@@ -21,7 +22,6 @@ import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.eventshigh.nearme.app.utils.UpdateLocationTask;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.android.SphericalUtil;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -154,10 +154,12 @@ public class EventGridActivity extends LocationAwareEventActivity {
             return result;
         }
 
-        double distance = SphericalUtil.computeDistanceBetween(event.location, userLocation);
+        float[] distance = new float[1];
+        Location.distanceBetween( event.location.latitude, event.location.longitude,
+                userLocation.latitude, userLocation.longitude, distance);
         double weight = (event.numPeopleInterested > 0 ? Math.log(event.numPeopleInterested) * 500 : 0)
                 + (event.ehRecommended ? 1000 : 0) ;
-        double weightedDistance = distance - weight;
+        double weightedDistance = distance[0] - weight;
         eventToDistanceMap.put(event.id, weightedDistance);
         return weightedDistance;
     }

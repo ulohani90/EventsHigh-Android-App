@@ -84,7 +84,7 @@ public class EventDetailActivity extends BaseActivity {
 
         getMenuInflater().inflate(R.menu.activity_detail, menu);
         if (mEvent.startTime == null) {
-            menu.getItem(R.id.action_cal).setVisible(false);
+            menu.removeItem(R.id.action_cal);
         }
         return true;
     }
