@@ -120,7 +120,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         return Math.min(9 * cardWidth / 16, parentHeight);
     }
 
-    private void showTag(TextView tagView, Event event, int tagNo) {
+    public static void showTag(TextView tagView, Event event, int tagNo) {
         if (tagNo >= event.tags.length) {
             tagView.setVisibility(View.GONE);
             return;

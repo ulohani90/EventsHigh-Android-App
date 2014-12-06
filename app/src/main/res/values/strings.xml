@@ -37,5 +37,5 @@
         <item quantity="one">One person interested.</item>
         <item quantity="other">%,d people interested.</item>
     </plurals>
-    <string name="event_detail_from">Event details from\n%s</string>
+    <string name="event_detail_from">Source: %s</string>
 </resources>

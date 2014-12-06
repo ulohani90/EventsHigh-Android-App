@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.utils.DownloadImageTask;
+import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.Calendar;
@@ -194,6 +195,9 @@ public class EventDetailActivity extends BaseActivity {
         private final TextView venueView;
         private final TextView timeView;
         private final TextView numPeopleInterestedView;
+        private final TextView tag0View;
+        private final TextView tag1View;
+        private final TextView tag2View;
         private final ImageView bgView;
         private final TextView descriptionView;
 
@@ -205,6 +209,9 @@ public class EventDetailActivity extends BaseActivity {
             venueView = (TextView) rootView.findViewById(R.id.event_venue);
             timeView = (TextView) rootView.findViewById(R.id.event_time);
             numPeopleInterestedView = (TextView) rootView.findViewById(R.id.num_people_interested);
+            tag0View = (TextView) rootView.findViewById(R.id.event_tag0);
+            tag1View = (TextView) rootView.findViewById(R.id.event_tag1);
+            tag2View = (TextView) rootView.findViewById(R.id.event_tag2);
             bgView = (ImageView) rootView.findViewById(R.id.event_bg);
             descriptionView = (TextView) rootView.findViewById(R.id.event_description);
         }
@@ -262,6 +269,11 @@ public class EventDetailActivity extends BaseActivity {
         String text = res.getQuantityString(R.plurals.people_interested,
                 mEvent.numPeopleInterested, mEvent.numPeopleInterested);
         mEventCard.numPeopleInterestedView.setText(text);
+
+        // Show tags.
+        EventListAdapter.showTag(mEventCard.tag0View, mEvent, 0);
+        EventListAdapter.showTag(mEventCard.tag1View, mEvent, 1);
+        EventListAdapter.showTag(mEventCard.tag2View, mEvent, 2);
 
         // Set Image
         if (mEvent.img_url == null) {

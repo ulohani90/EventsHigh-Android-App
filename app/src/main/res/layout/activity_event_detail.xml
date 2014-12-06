@@ -25,17 +25,6 @@
                 android:adjustViewBounds="true"
                 tools:ignore="ContentDescription"
             />
-            <TextView
-                android:id="@+id/event_from"
-                style="?android:attr/textAppearanceSmall"
-                android:textColor="@android:color/darker_gray"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/abc_action_bar_icon_vertical_padding_material"
-                android:layout_gravity="end"
-                android:clickable="true"
-                android:layout_marginTop="@dimen/abc_action_bar_subtitle_top_margin_material"
-            />
         </FrameLayout>
 
         <TextView
@@ -46,6 +35,44 @@
             android:padding="@dimen/abc_action_bar_icon_vertical_padding_material"
             android:textIsSelectable="true"
         />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@android:color/transparent"
+        >
+            <TextView
+                android:id="@+id/event_from"
+                style="@style/EventTagText"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textSize="8sp"
+                android:background="@android:color/transparent"
+                android:textColor="@android:color/darker_gray"
+                android:clickable="true"
+                tools:ignore="SmallSp"
+            />
+            <TextView
+                android:id="@+id/event_tag0"
+                style="@style/EventTagText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+            />
+            <TextView
+                android:id="@+id/event_tag1"
+                style="@style/EventTagText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+            />
+            <TextView
+                android:id="@+id/event_tag2"
+                style="@style/EventTagText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+            />
+        </LinearLayout>
 
         <View
             android:layout_width="fill_parent"
