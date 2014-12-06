@@ -47,7 +47,12 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         eventCard.numPeopleInterestedView.setText(
                 Integer.toString(event.numPeopleInterested));
 
-        // Set the venue
+        // Show tags.
+        showTag(eventCard.tag0View, event, 0);
+        showTag(eventCard.tag1View, event, 1);
+        showTag(eventCard.tag2View, event, 2);
+
+        // Set the venue.
         if (event.venue == null) {
             eventCard.venueView.setVisibility(View.INVISIBLE);
         } else {
@@ -81,6 +86,9 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         private final TextView venueView;
         private final TextView timeView;
         private final TextView numPeopleInterestedView;
+        private final TextView tag0View;
+        private final TextView tag1View;
+        private final TextView tag2View;
 
         private EventCard(View cardView) {
             bgView = (ImageView) cardView.findViewById(R.id.event_bg);
@@ -90,6 +98,9 @@ public class EventListAdapter extends ArrayAdapter<Event> {
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             timeView = (TextView) cardView.findViewById(R.id.event_time);
             numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
+            tag0View = (TextView) cardView.findViewById(R.id.event_tag0);
+            tag1View = (TextView) cardView.findViewById(R.id.event_tag1);
+            tag2View = (TextView) cardView.findViewById(R.id.event_tag2);
         }
     }
 
@@ -107,5 +118,15 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         }
 
         return Math.min(9 * cardWidth / 16, parentHeight);
+    }
+
+    private void showTag(TextView tagView, Event event, int tagNo) {
+        if (tagNo >= event.tags.length) {
+            tagView.setVisibility(View.GONE);
+            return;
+        }
+
+        tagView.setVisibility(View.VISIBLE);
+        tagView.setText(event.tags[tagNo]);
     }
 }

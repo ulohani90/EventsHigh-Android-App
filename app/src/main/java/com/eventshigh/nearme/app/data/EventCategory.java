@@ -14,7 +14,6 @@ import java.util.Map;
 public enum EventCategory {
     ADVENTURE,
     ART,
-    DANCE,
     FASHION,
     FOOD,
     FOR_COUPLES,
@@ -41,8 +40,6 @@ public enum EventCategory {
                 return R.string.fa_road;
             case ART:
                 return R.string.fa_photo;
-            case DANCE:
-                return R.string.fa_paw;
             case FASHION:
                 return R.string.fa_eye;
             case FOOD:
@@ -89,9 +86,7 @@ public enum EventCategory {
             int resId = R.drawable.icon_other;
             try {
                 resId = R.drawable.class.getField("icon_" + toString().toLowerCase()).getInt(null);
-            } catch (IllegalAccessException e) {
-                // Ignore
-            } catch (NoSuchFieldException e) {
+            } catch (IllegalAccessException| NoSuchFieldException e) {
                 // Ignore
             }
 
@@ -110,6 +105,5 @@ public enum EventCategory {
     }
 
     private static BitmapDescriptor CIRCLE_ICON;
-    private static final Map<EventCategory, BitmapDescriptor> CATEGORY_ICONS =
-            new HashMap<EventCategory,BitmapDescriptor>();
+    private static final Map<EventCategory, BitmapDescriptor> CATEGORY_ICONS = new HashMap<>();
 }

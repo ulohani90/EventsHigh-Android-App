@@ -36,61 +36,91 @@
         tools:ignore="ContentDescription"
     />
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#66000000"
+        android:orientation="vertical"
         android:layout_gravity="bottom"
     >
-
-        <TextView
-            style="@style/EventCardText"
-            android:id="@+id/event_title"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/abc_text_size_body_2_material"
-            android:textStyle="bold"
-            android:layout_margin="@dimen/abc_control_padding_material"
-        />
+            android:orientation="horizontal"
+            android:background="@android:color/transparent"
+        >
+            <TextView
+                android:id="@+id/event_tag0"
+                style="@style/EventTagText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+            />
+            <TextView
+                android:id="@+id/event_tag1"
+                style="@style/EventTagText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+            />
+            <TextView
+                android:id="@+id/event_tag2"
+                style="@style/EventTagText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+            />
+        </LinearLayout>
 
-        <TextView
-            style="@style/EventCardText"
-            android:id="@+id/event_venue"
-            android:layout_width="0dp"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_action_place"
-            android:drawableLeft="@drawable/ic_action_place"
-            android:layout_below="@id/event_title"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_toLeftOf="@+id/event_time"
-            android:layout_toStartOf="@+id/event_time"
-        />
+            android:background="#66000000"
+        >
+            <TextView
+                style="@style/EventCardText"
+                android:id="@+id/event_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/abc_text_size_body_2_material"
+                android:textStyle="bold"
+                android:layout_margin="@dimen/abc_control_padding_material"
+            />
 
-        <TextView
-            style="@style/EventCardText"
-            android:id="@+id/event_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_action_time"
-            android:drawableLeft="@drawable/ic_action_time"
-            android:layout_below="@id/event_title"
-            android:layout_toLeftOf="@+id/num_people_interested"
-            android:layout_toStartOf="@+id/num_people_interested"
-        />
+            <TextView
+                style="@style/EventCardText"
+                android:id="@+id/event_venue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_action_place"
+                android:drawableLeft="@drawable/ic_action_place"
+                android:layout_below="@id/event_title"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_toLeftOf="@+id/event_time"
+                android:layout_toStartOf="@+id/event_time"
+            />
 
-        <TextView
-            style="@style/EventCardText"
-            android:id="@+id/num_people_interested"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:drawableStart="@drawable/ic_action_group"
-            android:drawableLeft="@drawable/ic_action_group"
-            android:layout_below="@id/event_title"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-        />
+            <TextView
+                style="@style/EventCardText"
+                android:id="@+id/event_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_action_time"
+                android:drawableLeft="@drawable/ic_action_time"
+                android:layout_below="@id/event_title"
+                android:layout_toLeftOf="@+id/num_people_interested"
+                android:layout_toStartOf="@+id/num_people_interested"
+            />
 
-    </RelativeLayout>
+            <TextView
+                style="@style/EventCardText"
+                android:id="@+id/num_people_interested"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:drawableStart="@drawable/ic_action_group"
+                android:drawableLeft="@drawable/ic_action_group"
+                android:layout_below="@id/event_title"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+            />
+        </RelativeLayout>
+    </LinearLayout>
 </FrameLayout>
 

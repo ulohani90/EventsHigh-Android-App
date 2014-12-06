@@ -68,16 +68,12 @@ public class DaySelector {
                     activity.getResources().getColor(R.color.day_selector_color));
             ((TextView) daySelectorItems[selectedDay].findViewById(R.id.day_of_week)).setTextColor(
                     activity.getResources().getColor(R.color.day_selector_day_week_text));
-            ((TextView) daySelectorItems[selectedDay].findViewById(R.id.month)).setTextColor(
-                    activity.getResources().getColor(R.color.day_selector_month_text));
         }
 
         daySelectorItems[selectedDayNo].setBackgroundColor(
                 activity.getResources().getColor(R.color.day_selector_pressed_color));
         ((TextView)daySelectorItems[selectedDayNo].findViewById(R.id.day_of_week)).setTextColor(
                 activity.getResources().getColor(R.color.day_selector_day_week_selected_text));
-        ((TextView)daySelectorItems[selectedDayNo].findViewById(R.id.month)).setTextColor(
-                activity.getResources().getColor(R.color.day_selector_month_selected_text));
 
         selectedDay = selectedDayNo;
     }
@@ -100,14 +96,12 @@ public class DaySelector {
     }
 
     private static final SimpleDateFormat DAY = new SimpleDateFormat("EE");
-    private static final SimpleDateFormat MONTH = new SimpleDateFormat("MMM");
-    private static final SimpleDateFormat DATE = new SimpleDateFormat("d");
+    private static final SimpleDateFormat DATE = new SimpleDateFormat("d MMM");
 
     private void populateDaySelectorItem(int dayItemNo) {
         Date date = Utils.getDate(dayItemNo);
         ((TextView)daySelectorItems[dayItemNo].findViewById(R.id.day_of_week)).setText(DAY.format(date));
         ((TextView)daySelectorItems[dayItemNo].findViewById(R.id.date)).setText(DATE.format(date));
-        ((TextView)daySelectorItems[dayItemNo].findViewById(R.id.month)).setText(MONTH.format(date));
         daySelectorItems[dayItemNo].setClickable(true);
     }
 

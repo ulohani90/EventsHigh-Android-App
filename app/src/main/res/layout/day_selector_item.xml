@@ -9,27 +9,20 @@
     android:clickable="true"
     android:descendantFocusability="blocksDescendants"
 >
-
     <TextView
         android:id="@+id/day_of_week"
-        style="@style/DateButtonText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textColor="@color/day_selector_day_week_text"
-        android:textSize="@dimen/abc_text_size_caption_material"
+        android:textSize="@dimen/abc_text_size_body_1_material"
         android:typeface="sans"
     />
     <TextView
         android:id="@+id/date"
-        style="@style/DateButtonText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textColor="@color/day_selector_date_number_text"
-        android:typeface="serif"
-        android:textSize="@dimen/abc_text_size_body_1_material"
-    />
-    <TextView
-        android:id="@+id/month"
-        style="@style/DateButtonText"
-        android:textColor="@color/day_selector_month_text"
-        android:typeface="sans"
         android:textSize="@dimen/abc_text_size_caption_material"
+        android:typeface="serif"
     />
-
 </LinearLayout>
