@@ -24,7 +24,6 @@ import com.eventshigh.nearme.app.utils.DownloadImageTask;
 import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.eventshigh.nearme.app.utils.Utils;
 
-import java.util.Calendar;
 import java.util.regex.Pattern;
 
 /**
@@ -165,15 +164,15 @@ public class EventDetailActivity extends BaseActivity {
     private void addToCalendar() {
         reportActionToAnalytics("addToCalendar");
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(mEvent.startTime);
         Intent intent = new Intent(Intent.ACTION_INSERT)
                 .setData(Events.CONTENT_URI)
                 .putExtra(Events.TITLE, mEvent.title)
                 .putExtra(Events.EVENT_LOCATION, mEventCard.venueView.getText())
                 .putExtra(Events.DESCRIPTION,
-                        mEvent.getEventDetailsURI().toString() + "\n\n" + mEvent.description)
-                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, cal);
+                        mEvent.getEventDetailsURI().toString() + "\n\n" + mEvent.description);
+        if (mEvent.startTime != null) {
+            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, mEvent.startTime.getTime());
+        }
 
         try {
             startActivity(intent);

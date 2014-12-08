@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 /**
@@ -33,6 +34,9 @@ public class Utils {
      */
     public static Date getDate(int dayItemNo) {
         Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
         cal.add(Calendar.DAY_OF_MONTH, dayItemNo);
         return cal.getTime();
     }
@@ -68,6 +72,7 @@ public class Utils {
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("h:mm a");
     private static final Pattern ZEROS = Pattern.compile(":00");
     public static String getEventTime(Event event) {
+        TIME_FORMAT.setTimeZone(TimeZone.getTimeZone(event.city.timeZone));
         if (event.startTime == null) {
             return "";
         }
@@ -77,11 +82,9 @@ public class Utils {
         return ZEROS.matcher(time).replaceAll("");
     }
 
-
     public static float getDistanceSQ(Point p1, Point p2) {
         return (p1.x - p2.x) * (p1.x - p2.x) +  (p1.y - p2.y) * (p1.y - p2.y);
     }
-
 
     public static String capitalize(String original){
         if(original == null || original.length() == 0) {
