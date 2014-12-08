@@ -161,7 +161,10 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
     protected void askUserForLocation(@Nullable final TextView locationView) {
         reportActionToAnalytics("askUserForLocation");
-        new LocationPickerDialog().show(this, new OnLocationSelection() {
+        String countryCode =
+                lastEventFetcherParam == null || lastEventFetcherParam.city == null
+                        ? null : lastEventFetcherParam.city.countryCode;
+        new LocationPickerDialog().show(this, countryCode, new OnLocationSelection() {
             @Override
             public void onLocationSelection(String locationString, LatLng locationPoint) {
                 if (locationView != null) {

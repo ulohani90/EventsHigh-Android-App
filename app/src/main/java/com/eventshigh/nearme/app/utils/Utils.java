@@ -42,8 +42,8 @@ public class Utils {
         return DATE_FORMAT.format(date);
     }
 
-    private static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    public static Date mergeDateTime(String date, String time) throws ParseException {
+    private static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+    public static Date mergeDateTime(String date, String time, String timeZone) throws ParseException {
         if (date == null || time == null
                 || date.isEmpty() || time.isEmpty()
                 || time.startsWith("01:02")
@@ -56,7 +56,7 @@ public class Utils {
             time = time + ":00";
         }
 
-        return DATE_TIME_FORMAT.parse(date.split(":")[0] + " " + time);
+        return DATE_TIME_FORMAT.parse(date.split(":")[0] + " " + time + " " + timeZone);
     }
 
     private static final int TITLE_MAX_LENGHT = 32;

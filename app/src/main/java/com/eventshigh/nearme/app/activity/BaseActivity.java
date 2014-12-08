@@ -54,8 +54,7 @@ public abstract class BaseActivity extends FragmentActivity {
                 long httpCacheSize = 10 * 1024 * 1024; // 10 MB
                 HttpResponseCache.install(httpCacheDir, httpCacheSize);
             } catch (IOException e) {
-                Log.w(LocationAwareEventActivity.class.getSimpleName(),
-                        "HTTP response cache installation failed:" + e);
+                Log.w(LOG_TAG, "HTTP response cache installation failed!", e);
             }
         }
     }

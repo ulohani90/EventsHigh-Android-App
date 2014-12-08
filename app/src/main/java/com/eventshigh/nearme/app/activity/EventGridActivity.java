@@ -28,6 +28,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * An {@link android.app.Activity} which shows the events in Grid. On Phone,
+ * we have one column in portrait mode and two columns in landscape mode.
+ * On Tablet, we try to put more columns as per the width offered.
+ */
 public class EventGridActivity extends LocationAwareEventActivity {
     private EventListAdapter mEventsListAdapter;
     private TextView mLocalityView;
@@ -134,7 +139,7 @@ public class EventGridActivity extends LocationAwareEventActivity {
     private void updateListingForUserLocation(final LatLng userLocation) {
         // Sort the events based on popularity and distance from user location.
         // If event has e**N users going, we reduce 500*N meters from its distance.
-        final Map<String, Double> eventToDistanceMap = new HashMap<String, Double>(mEventsListAdapter.getCount());
+        final Map<String, Double> eventToDistanceMap = new HashMap<>(mEventsListAdapter.getCount());
         mEventsListAdapter.sort(new Comparator<Event>() {
             @Override
             public int compare(Event lhs, Event rhs) {

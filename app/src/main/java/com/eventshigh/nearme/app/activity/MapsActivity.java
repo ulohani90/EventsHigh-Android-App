@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -221,6 +222,7 @@ public class MapsActivity extends LocationAwareEventActivity {
         public View getInfoContents(Marker marker) {
             Event event = markerManager.getEvent(marker);
 
+            @SuppressLint("InflateParams")
             View infoView = getLayoutInflater().inflate(R.layout.event_info_card, null);
             ((TextView)infoView.findViewById(R.id.event_catergory)).setTypeface(font);
             ((TextView)infoView.findViewById(R.id.event_catergory)).setText(event.category.getIconStringId());

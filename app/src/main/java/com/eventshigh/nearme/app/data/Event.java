@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
@@ -263,8 +262,8 @@ public class Event implements Parcelable {
                 num_people_interested,
                 eh_recommends,
 
-                Utils.mergeDateTime(date, start_time),
-                Utils.mergeDateTime(date, end_time),
+                Utils.mergeDateTime(date, start_time, city.timeZone),
+                Utils.mergeDateTime(date, end_time, city.timeZone),
 
                 new LatLng(lat, lon),
                 venue,
@@ -277,7 +276,7 @@ public class Event implements Parcelable {
             try {
                 events.add(fromJSON(city, jsonArray.getJSONObject(i)));
             } catch (JSONException | ParseException e) {
-                Log.w(Event.class.getSimpleName(), "malformed JSON", e);
+                // Log.w(Event.class.getSimpleName(), "malformed JSON", e);
             }
         }
         return events;
