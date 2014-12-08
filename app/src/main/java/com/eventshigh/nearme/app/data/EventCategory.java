@@ -32,50 +32,6 @@ public enum EventCategory {
     OTHER;
 
     /**
-     * @return and String ID from resource which represents the category icon from font-awesome.
-     */
-    public int getIconStringId() {
-        switch (this) {
-            case ADVENTURE:
-                return R.string.fa_road;
-            case ART:
-                return R.string.fa_photo;
-            case FASHION:
-                return R.string.fa_eye;
-            case FOOD:
-                return R.string.fa_cutlery;
-            case FOR_COUPLES:
-                return R.string.fa_glass;
-            case FOR_FAMILY:
-                return R.string.fa_home;
-            case FOR_KIDS:
-                return R.string.fa_child;
-            case FOR_WOMEN:
-                return R.string.fa_female;
-            case HEALTH:
-                return R.string.fa_plus_square;
-            case LITERATURE:
-                return R.string.fa_book;
-            case MEETUPS:
-                return R.string.fa_users;
-            case MUSIC:
-                return R.string.fa_music;
-            case NIGHTLIFE:
-                return R.string.fa_moon_o;
-            case PHOTOGRAPHY:
-                return R.string.fa_camera;
-            case PLAYS:
-                return R.string.fa_paw;
-            case SPORTS:
-                return R.string.fa_soccer_ball_o;
-            case TECH:
-                return R.string.fa_linux;
-        }
-
-        return R.string.fa_calendar;
-    }
-
-    /**
      * Get an Icon associated with this Category.
      *
      * @return an BitmapDescriptor for Icon.

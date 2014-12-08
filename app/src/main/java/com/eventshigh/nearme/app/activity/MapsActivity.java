@@ -1,15 +1,12 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
@@ -17,10 +14,8 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.eventshigh.nearme.app.utils.MarkerManager;
-import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
@@ -62,12 +57,10 @@ public class MapsActivity extends LocationAwareEventActivity {
     // on map.
     private MarkerManager markerManager = new MarkerManager();
     // FrameLayout holding the Event Card.
-    FrameLayout eventCardContainer;
-    // font-awesome font, used for icons.
-    protected static Typeface font;
+    private FrameLayout eventCardContainer;
     // We show the helper toast asking user to zoom in to see events.
     // We show them only once application lifetime.
-    boolean showZoomToast = true;
+    private boolean showZoomToast = true;
 
 
     // ***********************
@@ -89,7 +82,6 @@ public class MapsActivity extends LocationAwareEventActivity {
 
         // Setup the local member variables.
         setUpMapIfNeeded();
-        setupFontIfNeeded();
         setUpAll(param);
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
     }
@@ -139,19 +131,12 @@ public class MapsActivity extends LocationAwareEventActivity {
             if (map != null) {
                 map.setMyLocationEnabled(true);
                 map.setOnCameraChangeListener(mOnCameraChangeListener);
-                map.setInfoWindowAdapter(mInfoWindowAdapter);
                 map.setOnMarkerClickListener(mOnMarkerClickListener);
                 map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
                 map.setOnMapClickListener(mOnMapClickListener);
 
                 MapsInitializer.initialize(this);
             }
-        }
-    }
-
-    private void setupFontIfNeeded() {
-        if (font == null) {
-            font = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
         }
     }
 
@@ -237,34 +222,6 @@ public class MapsActivity extends LocationAwareEventActivity {
             eventCardContainer.removeAllViews();
             eventCardContainer.addView(eventView);
             return false;
-        }
-    };
-
-    // This is called when we need to present the InfoWindow to user for selected marker.
-    private InfoWindowAdapter mInfoWindowAdapter = new InfoWindowAdapter() {
-        @Override
-        public View getInfoWindow(Marker marker) {
-            return null;
-        }
-
-        @Override
-        public View getInfoContents(Marker marker) {
-            Event event = markerManager.getEvent(marker);
-
-            @SuppressLint("InflateParams")
-            View infoView = getLayoutInflater().inflate(R.layout.event_info_card, null);
-            ((TextView)infoView.findViewById(R.id.event_catergory)).setTypeface(font);
-            ((TextView)infoView.findViewById(R.id.event_catergory)).setText(event.category.getIconStringId());
-            ((TextView)infoView.findViewById(R.id.event_title)).setText(
-                    Utils.shortenIfNeeded(event.title));
-            ((TextView)infoView.findViewById(R.id.event_time)).setText(
-                    Utils.getEventTime(event));
-            ((TextView)infoView.findViewById(R.id.num_people_interested)).setText(
-                    Integer.toString(event.numPeopleInterested));
-            infoView.findViewById(R.id.event_recommended).setVisibility(
-                    event.ehRecommended ? View.VISIBLE : View.INVISIBLE);
-
-            return infoView;
         }
     };
 

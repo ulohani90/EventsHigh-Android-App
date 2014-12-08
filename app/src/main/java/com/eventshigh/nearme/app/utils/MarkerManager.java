@@ -81,6 +81,7 @@ public class MarkerManager {
             Marker marker = map.addMarker(
                     new MarkerOptions()
                             .position(new LatLng(event.location.latitude, event.location.longitude))
+                            .title(Utils.shortenIfNeeded(event.title))
                             .visible(false)
                             .icon(markerInfo.canShowAsDot ?
                                     EventCategory.circleIcon() :
