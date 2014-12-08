@@ -62,11 +62,7 @@ public class MarkerManager {
 
     // Markers currently created on Maps. Each marker represents one event.
     // Note that all markers may not be visible to user.
-    private final Map<Marker, MarkerInfo> markers = new HashMap<Marker, MarkerInfo>();
-
-    // We show the InfoWindow explicitely for first time only.
-    boolean showInfoWindow = true;
-
+    private final Map<Marker, MarkerInfo> markers = new HashMap<>();
 
     // ***********************
     // Public methods which are used to manage markers.
@@ -100,11 +96,11 @@ public class MarkerManager {
     // Updates the listing for current maps projection. This method decides which markers should
     // be visible and which one should not be visible. Also few markers are highlighted to
     // give relevance information.
-    public void updateListingForProjection(Projection projection) {
+    public boolean updateListingForProjection(Projection projection) {
         // First find the markers which are withing visible region bound. All other
         // markers are marked invisible.
         LatLngBounds bounds = projection.getVisibleRegion().latLngBounds;
-        List<Marker> markersInProjection = new ArrayList<Marker>();
+        List<Marker> markersInProjection = new ArrayList<>();
         for (Marker marker : markers.keySet()) {
             if (bounds.contains(marker.getPosition())) {
                 markersInProjection.add(marker);
@@ -133,7 +129,7 @@ public class MarkerManager {
         // We now show as much point as possible so that no two markers are very close.
         // Few first markers (high popularity score) are highlighted.
         List<Pair<Point, Boolean>> shownPoints =
-                new ArrayList<Pair<Point, Boolean>>(markersInProjection.size());
+                new ArrayList<>(markersInProjection.size());
         for (Marker marker : markersInProjection) {
             Event event = markers.get(marker).event;
             Point point = projection.toScreenLocation(event.location);
@@ -167,10 +163,6 @@ public class MarkerManager {
             }
         }
 
-        // Show the info card for highest popular event.
-        if (showInfoWindow && !markersInProjection.isEmpty()) {
-            markersInProjection.get(0).showInfoWindow();
-            showInfoWindow = false;
-        }
+        return !markersInProjection.isEmpty() && markersInProjection.get(0).isInfoWindowShown();
     }
 }

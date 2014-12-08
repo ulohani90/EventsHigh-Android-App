@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.CalendarContract;
-import android.provider.CalendarContract.Events;
 import android.support.v4.app.NavUtils;
 import android.text.Html;
 import android.view.Menu;
@@ -16,7 +14,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
@@ -110,12 +107,12 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         if (id == R.id.action_direction) {
-            showDirections();
+            showDirections(mEvent);
             return true;
         }
 
         if (id == R.id.action_cal) {
-            addToCalendar();
+            addToCalendar(mEvent);
             return true;
         }
 
@@ -143,43 +140,6 @@ public class EventDetailActivity extends BaseActivity {
         mEventCard.descriptionView.setVisibility(View.GONE);
         shareEvent(mEventCard.rootView, mEvent);
         mEventCard.descriptionView.setVisibility(View.VISIBLE);
-    }
-
-    private void showDirections() {
-       reportActionToAnalytics("showDirections");
-
-        Uri locationUri = Uri.parse("geo:0,0?q=" +
-                mEvent.location.latitude + "," + mEvent.location.longitude +
-                " (" + mEvent.title + ")");
-        Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
-
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            // No activity to open maps.
-            Toast.makeText(this, R.string.no_map_app, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void addToCalendar() {
-        reportActionToAnalytics("addToCalendar");
-
-        Intent intent = new Intent(Intent.ACTION_INSERT)
-                .setData(Events.CONTENT_URI)
-                .putExtra(Events.TITLE, mEvent.title)
-                .putExtra(Events.EVENT_LOCATION, mEventCard.venueView.getText())
-                .putExtra(Events.DESCRIPTION,
-                        mEvent.getEventDetailsURI().toString() + "\n\n" + mEvent.description);
-        if (mEvent.startTime != null) {
-            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, mEvent.startTime.getTime());
-        }
-
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            // No activity to open cal.
-            Toast.makeText(this, R.string.no_cal_app, Toast.LENGTH_SHORT).show();
-        }
     }
 
     /**********************************
@@ -231,7 +191,7 @@ public class EventDetailActivity extends BaseActivity {
 
         // Add attribution.
         if (mEvent.source_url == null) {
-            mEventCard.fromView.setVisibility(View.GONE);
+            mEventCard.fromView.setVisibility(View.INVISIBLE);
         } else {
             final Uri fromUri =  Uri.parse(mEvent.source_url);
             String eventFrom = String.format(
@@ -246,7 +206,7 @@ public class EventDetailActivity extends BaseActivity {
         mEventCard.venueView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDirections();
+                showDirections(mEvent);
             }
         });
 
@@ -258,7 +218,7 @@ public class EventDetailActivity extends BaseActivity {
             mEventCard.timeView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    addToCalendar();
+                    addToCalendar(mEvent);
                 }
             });
         }

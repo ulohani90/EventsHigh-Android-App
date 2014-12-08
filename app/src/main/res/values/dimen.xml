@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="event_card_width">290dp</dimen>
+    <dimen name="event_card_height">163dp</dimen>
+</resources>

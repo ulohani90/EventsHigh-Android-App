@@ -12,7 +12,6 @@
     <style name="EventDetailText" parent="android:style/TextAppearance.Medium">
         <item name="android:padding">8dp</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:textIsSelectable">true</item>
     </style>
 
     <style name="EventCardText" parent="android:style/TextAppearance.Small">
@@ -26,6 +25,8 @@
 
     <style name="EventTagText" parent="EventCardText">
         <item name="android:background">@android:color/holo_orange_dark</item>
+        <item name="android:paddingLeft">@dimen/abc_control_padding_material</item>
+        <item name="android:paddingRight">@dimen/abc_control_padding_material</item>
     </style>
 
 </resources>

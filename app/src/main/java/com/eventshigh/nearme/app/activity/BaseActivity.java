@@ -4,8 +4,11 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.net.Uri;
 import android.net.http.HttpResponseCache;
 import android.os.Bundle;
+import android.provider.CalendarContract;
+import android.provider.CalendarContract.Events;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
@@ -51,7 +54,7 @@ public abstract class BaseActivity extends FragmentActivity {
         if (HttpResponseCache.getInstalled() == null) {
             try {
                 File httpCacheDir = new File(getCacheDir(), "http");
-                long httpCacheSize = 10 * 1024 * 1024; // 10 MB
+                long httpCacheSize = 20 * 1024 * 1024; // 20 MB
                 HttpResponseCache.install(httpCacheDir, httpCacheSize);
             } catch (IOException e) {
                 Log.w(LOG_TAG, "HTTP response cache installation failed!", e);
@@ -120,4 +123,43 @@ public abstract class BaseActivity extends FragmentActivity {
             Log.w(LOG_TAG, "failed sharing", e);
         }
     }
+
+    public void showDirections(Event event) {
+        reportActionToAnalytics("showDirections");
+
+        Uri locationUri = Uri.parse("geo:0,0?q=" +
+                event.location.latitude + "," + event.location.longitude +
+                " (" + event.title + ")");
+        Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
+
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // No activity to open maps.
+            Toast.makeText(this, R.string.no_map_app, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void addToCalendar(Event event) {
+        reportActionToAnalytics("addToCalendar");
+
+        String venue = event.address == null ? event.venue : event.address;
+        Intent intent = new Intent(Intent.ACTION_INSERT)
+                .setData(Events.CONTENT_URI)
+                .putExtra(Events.TITLE, event.title)
+                .putExtra(Events.EVENT_LOCATION, venue)
+                .putExtra(Events.DESCRIPTION,
+                        event.getEventDetailsURI().toString() + "\n\n" + event.description);
+        if (event.startTime != null) {
+            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.startTime.getTime());
+        }
+
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // No activity to open cal.
+            Toast.makeText(this, R.string.no_cal_app, Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }

@@ -9,5 +9,5 @@
           android:drawable="@android:color/holo_blue_light" />
 
     <!-- Default, "just hanging' out" state. -->
-    <item android:drawable="@drawable/shape_main_linear_layout" />
+    <item android:drawable="@drawable/shape_event_card" />
 </selector>

@@ -1,5 +1,7 @@
 package com.eventshigh.nearme.app.utils;
 
+import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -28,12 +30,17 @@ public class EventListAdapter extends ArrayAdapter<Event> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        return getView(getItem(position), mBaseActivity, convertView, parent);
+    }
+
+    // Build the view, reuse existing if possible.
+    public static View getView(final Event event, final BaseActivity activity,
+                               @Nullable View reuseView, ViewGroup parent) {
         // Build the view, reuse existing if possible.
-        final View view = convertView == null ?
-                mBaseActivity.getLayoutInflater().inflate(R.layout.list_item_event, parent, false) :
-                convertView;
+        final View view = reuseView == null ?
+                activity.getLayoutInflater().inflate(R.layout.list_item_event, parent, false) :
+                reuseView;
         EventCard eventCard = new EventCard(view);
-        final Event event = getItem(position);
 
         // Set the background image.
         eventCard.bgView.setLayoutParams(new FrameLayout.LayoutParams(
@@ -70,7 +77,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
             public void onClick(View v) {
                 View shareView = view.findViewById(R.id.event_share);
                 shareView.setVisibility(View.INVISIBLE);
-                mBaseActivity.shareEvent(view, event);
+                activity.shareEvent(view, event);
                 shareView.setVisibility(View.VISIBLE);
             }
         });

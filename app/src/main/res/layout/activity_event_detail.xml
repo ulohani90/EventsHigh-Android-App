@@ -16,7 +16,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
         >
-
             <ImageView
                 android:id="@+id/eh_recommend_banner"
                 android:layout_width="wrap_content"
@@ -40,16 +39,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@android:color/transparent"
         >
             <TextView
                 android:id="@+id/event_from"
-                style="@style/EventTagText"
+                style="@style/EventCardText"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:textSize="8sp"
-                android:background="@android:color/transparent"
+                android:background="@drawable/selector_event_text"
+                android:textSize="10sp"
                 android:textColor="@android:color/darker_gray"
                 android:clickable="true"
                 tools:ignore="SmallSp"
@@ -85,6 +83,7 @@
             style="@style/EventDetailText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/selector_event_text"
             android:drawableStart="@drawable/ic_action_place_dark"
             android:drawableLeft="@drawable/ic_action_place_dark"
             android:clickable="true"
@@ -95,6 +94,7 @@
             style="@style/EventDetailText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/selector_event_text"
             android:drawableStart="@drawable/ic_action_time_dark"
             android:drawableLeft="@drawable/ic_action_time_dark"
             android:clickable="true"
@@ -134,6 +134,7 @@
             style="@style/EventDetailText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textIsSelectable="true"
         />
 
     </LinearLayout>

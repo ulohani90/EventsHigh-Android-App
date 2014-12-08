@@ -148,6 +148,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         }
     }
 
+
     // ***********************
     // Helper methods
     // ***********************

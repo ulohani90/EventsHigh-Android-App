@@ -7,12 +7,15 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.eventshigh.nearme.app.utils.MarkerManager;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -57,6 +61,8 @@ public class MapsActivity extends LocationAwareEventActivity {
     // Manager for all markers drawn on map. Manager is responsible for hiding/showing markers
     // on map.
     private MarkerManager markerManager = new MarkerManager();
+    // FrameLayout holding the Event Card.
+    FrameLayout eventCardContainer;
     // font-awesome font, used for icons.
     protected static Typeface font;
     // We show the helper toast asking user to zoom in to see events.
@@ -85,6 +91,7 @@ public class MapsActivity extends LocationAwareEventActivity {
         setUpMapIfNeeded();
         setupFontIfNeeded();
         setUpAll(param);
+        eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
     }
 
     @Override
@@ -135,6 +142,7 @@ public class MapsActivity extends LocationAwareEventActivity {
                 map.setInfoWindowAdapter(mInfoWindowAdapter);
                 map.setOnMarkerClickListener(mOnMarkerClickListener);
                 map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
+                map.setOnMapClickListener(mOnMapClickListener);
 
                 MapsInitializer.initialize(this);
             }
@@ -154,6 +162,7 @@ public class MapsActivity extends LocationAwareEventActivity {
 
     @Override
     protected void updateNewEvents(List<Event> events) {
+        mOnMapClickListener.onMapClick(null);
         markerManager.setEvents(map, events);
     }
 
@@ -198,8 +207,17 @@ public class MapsActivity extends LocationAwareEventActivity {
 
             firstCall = false;
             if (!refreshListingsIfNeeded(cameraPosition.target)) {
-                markerManager.updateListingForProjection(map.getProjection());
+                if (!markerManager.updateListingForProjection(map.getProjection())) {
+                    mOnMapClickListener.onMapClick(null);
+                }
             }
+        }
+    };
+
+    private OnMapClickListener mOnMapClickListener = new OnMapClickListener() {
+        @Override
+        public void onMapClick(LatLng latLng) {
+            eventCardContainer.removeAllViews();
         }
     };
 
@@ -207,6 +225,17 @@ public class MapsActivity extends LocationAwareEventActivity {
         @Override
         public boolean onMarkerClick(Marker marker) {
             reportActionToAnalytics("onMarkerClick");
+            View eventView = eventCardContainer.getChildAt(0);
+            final Event event = markerManager.getEvent(marker);
+            eventView = EventListAdapter.getView(event, MapsActivity.this, eventView, eventCardContainer);
+            eventView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showEventDetails(event);
+                }
+            });
+            eventCardContainer.removeAllViews();
+            eventCardContainer.addView(eventView);
             return false;
         }
     };

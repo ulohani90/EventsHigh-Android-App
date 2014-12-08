@@ -4,16 +4,28 @@
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:orientation="vertical"
+    tools:context=".MapsActivity"
 >
 
-    <fragment
-        android:id="@+id/map"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        tools:context=".MapsActivity"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-    />
+    >
+        <fragment
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+        />
+        <FrameLayout
+            android:id="@+id/event_card_container"
+            android:layout_width="@dimen/event_card_width"
+            android:layout_height="@dimen/event_card_height"
+            android:layout_gravity="bottom|start"
+            android:background="@android:color/transparent"
+        />
+    </FrameLayout>
 
     <HorizontalScrollView
         android:layout_width="match_parent"
