@@ -12,23 +12,30 @@ import java.util.Map;
  * This Icon is used in event marker on Map or on Event Info card.
 */
 public enum EventCategory {
-    ADVENTURE,
     ART,
+    DANCE,
+    DJ,
+    ENVIRONMENT,
     FASHION,
+    FILM,
     FOOD,
     FOR_COUPLES,
     FOR_FAMILY,
     FOR_KIDS,
     FOR_WOMEN,
-    HEALTH,
+    HEALTH_WELLNESS,
+    KIDS,
     LITERATURE,
     MEETUPS,
     MUSIC,
     NIGHTLIFE,
+    OUTDOORS,
     PHOTOGRAPHY,
     PLAYS,
+    SPIRITUAL,
     SPORTS,
     TECH,
+    THEATRE,
     OTHER;
 
     /**

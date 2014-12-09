@@ -34,13 +34,13 @@ public class MarkerManager {
     // as category icon. We show event marker as dot, only if total number of events
     // shown is greater than NUM_MIN_EVENTS and if event popularity score is less than
     // MIN_POPULARITY.
-    private static final int NUM_MIN_EVENTS = 15;
-    private static final int MIN_POPULARITY = 20;
+    private static final int NUM_MIN_EVENTS = 25;
+    private static final int MIN_POPULARITY = 0;
 
     // To avoid cluttering, we do not show marker for event if it happens to be within
     // small distance from other event. This parameter controls that distance as measured
     // in screen units.
-    private static final int MIN_MARKER_DISTANCE_SQ = 2000;
+    private static final int MIN_MARKER_DISTANCE_SQ = 2500;
 
 
     // ***********************
