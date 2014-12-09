@@ -1,6 +1,8 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -20,6 +22,8 @@ import com.eventshigh.nearme.app.data.Event;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,7 +44,19 @@ public abstract class BaseActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Setup Google Analytics.
+        // Check for Google Play Services.
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (status != ConnectionResult.SUCCESS) {
+            Toast.makeText(this, GooglePlayServicesUtil.getErrorString(status), Toast.LENGTH_SHORT).show();
+            GooglePlayServicesUtil.getErrorDialog(status, this, 0, new OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    finish();
+                }
+            }).show();
+        }
+
+        // Seatup Google Analytics.
         if (googleAnalytics == null) {
             googleAnalytics = GoogleAnalytics.getInstance(this);
             tracker = googleAnalytics.newTracker(R.xml.analytics);
