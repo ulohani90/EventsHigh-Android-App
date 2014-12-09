@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.utils;
 
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -71,7 +70,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE :
                 View.INVISIBLE);
 
-        // Set share view.
+        // Set Callbacks.
         eventCard.shareView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,6 +78,18 @@ public class EventListAdapter extends ArrayAdapter<Event> {
                 shareView.setVisibility(View.INVISIBLE);
                 activity.shareEvent(view, event);
                 shareView.setVisibility(View.VISIBLE);
+            }
+        });
+        eventCard.timeView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.addToCalendar(event);
+            }
+        });
+        eventCard.venueView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.showDirections(event);
             }
         });
 
