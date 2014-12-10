@@ -13,6 +13,7 @@ import java.util.Map;
 */
 public enum EventCategory {
     ART,
+    COMEDY,
     DANCE,
     DJ,
     ENVIRONMENT,
@@ -27,7 +28,6 @@ public enum EventCategory {
     NIGHTLIFE,
     OUTDOORS,
     PHOTOGRAPHY,
-    PLAYS,
     SOCIAL_CAUSES,
     SPIRITUAL,
     SPORTS,
