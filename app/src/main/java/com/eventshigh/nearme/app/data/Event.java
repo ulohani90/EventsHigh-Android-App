@@ -176,6 +176,9 @@ public class Event implements Parcelable {
         String description = eventJson.getString("description");
 
         String img_url = eventJson.getString("img_url");
+        if (img_url.contains("eventviva") || img_url.endsWith("missing.png")) {
+            img_url = null;
+        }
         String source_url = eventJson.getString("source_url");
         String booking_url = eventJson.getString("booking_url");
 
