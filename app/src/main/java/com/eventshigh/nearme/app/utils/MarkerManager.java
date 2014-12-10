@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.utils;
 
 import android.graphics.Point;
+import android.support.annotation.Nullable;
 import android.util.Pair;
 
 import com.eventshigh.nearme.app.data.Event;
@@ -18,6 +19,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Manages the markers on {@link com.google.android.gms.maps.GoogleMap} for events.
@@ -63,6 +65,7 @@ public class MarkerManager {
     // Markers currently created on Maps. Each marker represents one event.
     // Note that all markers may not be visible to user.
     private final Map<Marker, MarkerInfo> markers = new HashMap<>();
+    private final OrderedMarkerCollection orderedMarkerCollection = new OrderedMarkerCollection();
 
     // ***********************
     // Public methods which are used to manage markers.
@@ -79,25 +82,31 @@ public class MarkerManager {
         for(Event event : events) {
             MarkerInfo markerInfo = new MarkerInfo(event);
             Marker marker = map.addMarker(
-                    new MarkerOptions()
-                            .position(new LatLng(event.location.latitude, event.location.longitude))
-                            .title(Utils.shortenIfNeeded(event.title))
-                            .visible(false)
-                            .icon(markerInfo.canShowAsDot ?
-                                    EventCategory.circleIcon() :
-                                    event.category.icon())
+                new MarkerOptions()
+                    .position(new LatLng(event.location.latitude, event.location.longitude))
+                    .title(Utils.shortenIfNeeded(event.title))
+                    .visible(false)
+                    .icon(markerInfo.canShowAsDot ? EventCategory.circleIcon() : event.category.icon())
             );
 
             markers.put(marker, markerInfo);
         }
 
-        updateListingForProjection(map.getProjection());
+        updateListingForProjection(map.getCameraPosition().target, map.getProjection());
+    }
+
+    // Gets the next marker, which are ordered based on user location and event popularity.
+    public Marker getNextMarker(Marker marker) {
+        return orderedMarkerCollection.getNextMarker(marker);
     }
 
     // Updates the listing for current maps projection. This method decides which markers should
     // be visible and which one should not be visible. Also few markers are highlighted to
     // give relevance information.
-    public boolean updateListingForProjection(Projection projection) {
+    public boolean updateListingForProjection(@Nullable LatLng center, Projection projection) {
+        // Order the markers if needed for new map center.
+        orderedMarkerCollection.orderListingForLocation(center);
+
         // First find the markers which are withing visible region bound. All other
         // markers are marked invisible.
         LatLngBounds bounds = projection.getVisibleRegion().latLngBounds;
@@ -148,11 +157,10 @@ public class MarkerManager {
                 }
             }
 
-            marker.setVisible(!toClose);
             if (!toClose) {
                 MarkerInfo markerInfo = markers.get(marker);
                 if (!marker.isInfoWindowShown() && markerInfo.canShowAsDot) {
-                    boolean shouldShowAtDot = markersInProjection.size() > NUM_MIN_EVENTS;
+                    boolean shouldShowAtDot = shownPoints.size() > NUM_MIN_EVENTS;
                     if (shouldShowAtDot != markerInfo.shownAsDot) {
                         marker.setIcon(shouldShowAtDot ?
                                 EventCategory.circleIcon() :
@@ -162,8 +170,46 @@ public class MarkerManager {
                 }
                 shownPoints.add(Pair.create(point, markerInfo.shownAsDot));
             }
+
+            marker.setVisible(!toClose);
         }
 
         return !markersInProjection.isEmpty() && markersInProjection.get(0).isInfoWindowShown();
+    }
+
+    // This class is responsible for keeping the order between all markers. This Order is then
+    // used when user swipes the event card to go to next event.
+    private class OrderedMarkerCollection {
+        // Minimum distance in meters before we reorder the events.
+        private static final int MIN_DISTANCE_FOR_REORDER = 2000;   // 2KM
+
+        // location for which the ordered marker information is maintained.
+        private LatLng location;
+
+        // ordered collection of markers.
+        private TreeSet<Marker> orderedMarkersSet;
+
+        public void orderListingForLocation(@Nullable final LatLng location) {
+            if (location == null ||
+                (this.location != null &&
+                 Utils.distanceInMeters(this.location, location) < MIN_DISTANCE_FOR_REORDER)) {
+                return;
+            }
+
+            this.location = location;
+            orderedMarkersSet = new TreeSet<>(new Comparator<Marker>() {
+                EventComparator eventComparator = new EventComparator(location);
+
+                @Override
+                public int compare(Marker lhs, Marker rhs) {
+                    return eventComparator.compare(markers.get(lhs).event, markers.get(rhs).event);
+                }
+            });
+            orderedMarkersSet.addAll(markers.keySet());
+        }
+
+        public Marker getNextMarker(Marker marker) {
+            return orderedMarkersSet.higher(marker);
+        }
     }
 }

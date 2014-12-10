@@ -4,10 +4,13 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.GestureDetectorCompat;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -57,11 +60,17 @@ public class MapsActivity extends LocationAwareEventActivity {
 
     // Google Map View shows to user using MapFragment.
     private GoogleMap map;
+    // Gesture detector.
+    private GestureDetectorCompat mDetector;
     // Manager for all markers drawn on map. Manager is responsible for hiding/showing markers
     // on map.
     private MarkerManager markerManager = new MarkerManager();
     // FrameLayout holding the Event Card.
     private FrameLayout eventCardContainer;
+    // Last marker for which the event info card is shown.
+    private Marker lastSelectedMarker;
+    // is the movement in camera position is because of app ?
+    private boolean isAppMovement = true;
     // We show the helper toast asking user to zoom in to see events.
     // We show them only once application lifetime.
     private boolean showZoomToast = true;
@@ -99,6 +108,7 @@ public class MapsActivity extends LocationAwareEventActivity {
 
         // Setup the local member variables.
         setUpMapIfNeeded();
+        setupGestureDetectorIfNeeded();
         setUpAll(param);
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
     }
@@ -156,6 +166,36 @@ public class MapsActivity extends LocationAwareEventActivity {
         }
     }
 
+    private void setupGestureDetectorIfNeeded() {
+        if (mDetector == null) {
+            mDetector = new GestureDetectorCompat(this, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onDown(MotionEvent event) {
+                    return true;
+                }
+
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    showEventDetails(markerManager.getEvent(lastSelectedMarker));
+                    return true;
+                }
+
+                @Override
+                public boolean onFling(MotionEvent event1, MotionEvent event2,
+                                       float velocityX, float velocityY) {
+                    Marker nextMarker = markerManager.getNextMarker(lastSelectedMarker);
+                    if (nextMarker != null) {
+                        lastSelectedMarker.hideInfoWindow();
+                        nextMarker.setVisible(true);
+                        nextMarker.showInfoWindow();
+                        updateUserLocation(nextMarker.getPosition());
+                        mOnMarkerClickListener.onMarkerClick(nextMarker);
+                    }
+                    return true;
+                }
+            });
+        }
+    }
 
     // ***********************
     // Other Helper Methods
@@ -169,6 +209,7 @@ public class MapsActivity extends LocationAwareEventActivity {
 
     @Override
     protected void updateUserLocation(LatLng userLocation) {
+        isAppMovement = true;
         map.animateCamera(
             CameraUpdateFactory.newCameraPosition(
                 CameraPosition.builder()
@@ -187,8 +228,6 @@ public class MapsActivity extends LocationAwareEventActivity {
     // user dragging the map around). We refresh the events listing if there is
     // change in city otherwise we refresh the event markers shown to user.
     private OnCameraChangeListener mOnCameraChangeListener = new OnCameraChangeListener() {
-        private boolean firstCall = true;
-
         @Override
         public void onCameraChange(CameraPosition cameraPosition) {
             reportActionToAnalytics("onCameraChange");
@@ -196,22 +235,22 @@ public class MapsActivity extends LocationAwareEventActivity {
             // If user has zoomed out too much, do not show events marker.
             // We also show helper toast once per application runtime.
             if (cameraPosition.zoom < MIN_ZOOM_LEVEL) {
-                if (!firstCall && showZoomToast) {
+                if (!isAppMovement && showZoomToast) {
                     Toast.makeText(MapsActivity.this, R.string.zoom, Toast.LENGTH_SHORT).show();
                     showZoomToast = false;
                 }
 
-                firstCall = false;
                 refreshListingsIfNeeded(null);
-                return;
-            }
-
-            firstCall = false;
-            if (!refreshListingsIfNeeded(cameraPosition.target)) {
-                if (!markerManager.updateListingForProjection(map.getProjection())) {
+            } else if (!refreshListingsIfNeeded(cameraPosition.target)) {
+                boolean listingShown = markerManager.updateListingForProjection(
+                    isAppMovement ? null : map.getCameraPosition().target,
+                    map.getProjection());
+                if (!listingShown) {
                     mOnMapClickListener.onMapClick(null);
                 }
             }
+
+            isAppMovement = false;
         }
     };
 
@@ -226,13 +265,15 @@ public class MapsActivity extends LocationAwareEventActivity {
         @Override
         public boolean onMarkerClick(Marker marker) {
             reportActionToAnalytics("onMarkerClick");
+
+            lastSelectedMarker = marker;
             View eventView = eventCardContainer.getChildAt(0);
-            final Event event = markerManager.getEvent(marker);
+            Event event = markerManager.getEvent(marker);
             eventView = EventListAdapter.getView(event, MapsActivity.this, eventView, eventCardContainer);
-            eventView.setOnClickListener(new OnClickListener() {
+            eventView.setOnTouchListener(new OnTouchListener() {
                 @Override
-                public void onClick(View v) {
-                    showEventDetails(event);
+                public boolean onTouch(View v, MotionEvent event) {
+                    return mDetector.onTouchEvent(event);
                 }
             });
             eventCardContainer.removeAllViews();

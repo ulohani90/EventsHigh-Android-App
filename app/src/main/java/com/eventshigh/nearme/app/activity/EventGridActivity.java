@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.activity;
 
 import android.app.ActionBar;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
@@ -18,15 +17,13 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.utils.EventComparator;
 import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.eventshigh.nearme.app.utils.UpdateLocationTask;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * An {@link android.app.Activity} which shows the events in Grid. On Phone,
@@ -138,36 +135,9 @@ public class EventGridActivity extends LocationAwareEventActivity {
 
     private void updateListingForUserLocation(final LatLng userLocation) {
         // Sort the events based on popularity and distance from user location.
-        // If event has e**N users going, we reduce 500*N meters from its distance.
-        final Map<String, Double> eventToDistanceMap = new HashMap<>(mEventsListAdapter.getCount());
-        mEventsListAdapter.sort(new Comparator<Event>() {
-            @Override
-            public int compare(Event lhs, Event rhs) {
-                return Double.compare(
-                        weightedDistance(lhs, userLocation, eventToDistanceMap),
-                        weightedDistance(rhs, userLocation, eventToDistanceMap)
-                );
-            }
-        });
+        mEventsListAdapter.sort(new EventComparator(userLocation));
     }
 
-    // Find the distance of events from user's position with weight for popular events.
-    // If event has e**N users going, we reduce 500*N meters from its distance.
-    private static double weightedDistance(Event event, LatLng userLocation, Map<String, Double> eventToDistanceMap) {
-        Double result = eventToDistanceMap.get(event.id);
-        if (result != null) {
-            return result;
-        }
-
-        float[] distance = new float[1];
-        Location.distanceBetween( event.location.latitude, event.location.longitude,
-                userLocation.latitude, userLocation.longitude, distance);
-        double weight = (event.numPeopleInterested > 0 ? Math.log(event.numPeopleInterested) * 500 : 0)
-                + (event.ehRecommended ? 1000 : 0) ;
-        double weightedDistance = distance[0] - weight;
-        eventToDistanceMap.put(event.id, weightedDistance);
-        return weightedDistance;
-    }
 
     // ***********************
     // Callbacks

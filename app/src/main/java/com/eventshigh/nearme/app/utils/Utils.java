@@ -93,4 +93,10 @@ public class Utils {
 
         return original.substring(0, 1).toUpperCase() + original.substring(1).toLowerCase();
     }
+
+    public static float distanceInMeters(LatLng loc1, LatLng loc2) {
+        float[] distance = new float[1];
+        Location.distanceBetween(loc1.latitude, loc1.longitude, loc2.latitude, loc2.longitude, distance);
+        return distance[0];
+    }
 }
