@@ -13,16 +13,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.utils.DaySelector;
 import com.eventshigh.nearme.app.utils.DownloadImageTask;
-import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.eventshigh.nearme.app.utils.Utils;
 
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 /**
@@ -82,10 +87,11 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         getMenuInflater().inflate(R.menu.activity_detail, menu);
+        MenuItem menuBookItem = menu.findItem(R.id.action_book);
         if (mEvent.booking_url == null) {
-            menu.removeItem(R.id.action_book);
+            menuBookItem.setVisible(false);
         } else {
-            menu.getItem(R.id.action_book).getActionView().setOnClickListener(new OnClickListener() {
+            menuBookItem.getActionView().setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                    gotoBookingSite();
@@ -93,13 +99,14 @@ public class EventDetailActivity extends BaseActivity {
             });
         }
 
-        if (mEvent.startTime == null) {
-            menu.removeItem(R.id.action_cal);
+        MenuItem menuCalItem = menu.findItem(R.id.action_cal);
+        if (mEvent.eventTimings.length == 0) {
+            menuCalItem.setVisible(false);
         } else {
-            menu.findItem(R.id.action_cal).getActionView().setOnClickListener(new OnClickListener() {
+            menuCalItem.getActionView().setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    addToCalendar(mEvent);
+                    addToCalendar(mEvent, null);
                 }
             });
         }
@@ -128,13 +135,18 @@ public class EventDetailActivity extends BaseActivity {
             return true;
         }
 
-        if (id == R.id.action_share) {
-            shareEvent();
+        if (id == R.id.action_book) {
+            gotoBookingSite();
             return true;
         }
 
         if (id == R.id.action_cal) {
-            addToCalendar(mEvent);
+            addToCalendar(mEvent, null);
+            return true;
+        }
+
+        if (id == R.id.action_share) {
+            shareEvent();
             return true;
         }
 
@@ -177,13 +189,11 @@ public class EventDetailActivity extends BaseActivity {
         private final ImageView recommendedImageView;
         private final ImageView bgView;
         private final TextView titleView;
-        private final TextView timeView;
+        private final LinearLayout timeView;
         private final TextView numPeopleInterestedView;
         private final TextView venueView;
         private final Button directionButton;
-        private final TextView tag0View;
-        private final TextView tag1View;
-        private final TextView tag2View;
+        private final GridView tagsGrid;
         private final TextView descriptionView;
         private final TextView fromView;
 
@@ -192,13 +202,11 @@ public class EventDetailActivity extends BaseActivity {
             recommendedImageView = (ImageView) rootView.findViewById(R.id.eh_recommend_banner);
             bgView = (ImageView) rootView.findViewById(R.id.event_bg);
             titleView = (TextView) rootView.findViewById(R.id.event_title);
-            timeView = (TextView) rootView.findViewById(R.id.event_time);
+            timeView = (LinearLayout) rootView.findViewById(R.id.event_time);
             numPeopleInterestedView = (TextView) rootView.findViewById(R.id.num_people_interested);
             venueView = (TextView) rootView.findViewById(R.id.event_venue);
             directionButton = (Button) rootView.findViewById(R.id.buttonDirection);
-            tag0View = (TextView) rootView.findViewById(R.id.event_tag0);
-            tag1View = (TextView) rootView.findViewById(R.id.event_tag1);
-            tag2View = (TextView) rootView.findViewById(R.id.event_tag2);
+            tagsGrid = (GridView) rootView.findViewById(R.id.event_tags);
             descriptionView = (TextView) rootView.findViewById(R.id.event_description);
             fromView = (TextView) rootView.findViewById(R.id.event_from);
         }
@@ -214,7 +222,6 @@ public class EventDetailActivity extends BaseActivity {
         // Set Image
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int windowHeightDp = 160 * metrics.heightPixels / metrics.densityDpi;
         mEventCard.bgView.setMaxHeight((int) (0.4 * metrics.heightPixels));
         if (mEvent.img_url == null) {
             mEventCard.bgView.setVisibility(View.GONE);
@@ -227,17 +234,6 @@ public class EventDetailActivity extends BaseActivity {
 
         // Set EH recommendation banner
         mEventCard.recommendedImageView.setVisibility(mEvent.ehRecommended ? View.VISIBLE : View.GONE);
-
-        // Add attribution.
-        if (mEvent.source_url == null) {
-            mEventCard.fromView.setVisibility(View.INVISIBLE);
-        } else {
-            final Uri fromUri =  Uri.parse(mEvent.source_url);
-            String eventFrom = String.format(
-                    getResources().getString(R.string.event_detail_from),
-                    fromUri.getHost());
-            mEventCard.fromView.setText(eventFrom);
-        }
 
         // Set Venue.
         mEventCard.venueView.setText(mEvent.address == null ? mEvent.venue : mEvent.address);
@@ -255,16 +251,21 @@ public class EventDetailActivity extends BaseActivity {
         });
 
         // Set time.
-        if (mEvent.startTime == null) {
+        if (mEvent.eventTimings.length == 0) {
             mEventCard.timeView.setVisibility(View.GONE);
         } else {
-            mEventCard.timeView.setText(Utils.getEventTime(mEvent));
-            mEventCard.timeView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    addToCalendar(mEvent);
-                }
-            });
+            for (long time : mEvent.eventTimings) {
+                final Date date = new Date(time);
+                LinearLayout daySelectorItem = DaySelector.getDaySelectorItem(
+                        this, mEventCard.timeView, date, TimeZone.getTimeZone(mEvent.city.timeZone));
+                mEventCard.timeView.addView(daySelectorItem);
+                daySelectorItem.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addToCalendar(mEvent, date);
+                    }
+                });
+            }
         }
 
         // Set Num people Interested
@@ -278,15 +279,25 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         // Show tags.
-        EventListAdapter.showTag(mEventCard.tag0View, mEvent, 0);
-        EventListAdapter.showTag(mEventCard.tag1View, mEvent, 1);
-        EventListAdapter.showTag(mEventCard.tag2View, mEvent, 2);
+        String[] allTags = Utils.mergeArray(mEvent.tagsWhiteList, mEvent.tagsOther);
+        mEventCard.tagsGrid.setAdapter(new ArrayAdapter<>(this, R.layout.event_tag, allTags));
 
         // Set description.
         if (htmlCheckPattern.matcher(mEvent.description).find()) {
             mEventCard.descriptionView.setText(Html.fromHtml(mEvent.description));
         } else {
             mEventCard.descriptionView.setText(mEvent.description);
+        }
+
+        // Add attribution.
+        if (mEvent.source_url == null) {
+            mEventCard.fromView.setVisibility(View.INVISIBLE);
+        } else {
+            final Uri fromUri =  Uri.parse(mEvent.source_url);
+            String eventFrom = String.format(
+                    getResources().getString(R.string.event_detail_from),
+                    fromUri.getHost());
+            mEventCard.fromView.setText(eventFrom);
         }
     }
 }

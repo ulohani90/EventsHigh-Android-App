@@ -5,6 +5,6 @@
     android:text="@string/action_cal"
     android:drawableLeft="@android:drawable/ic_menu_my_calendar"
     android:drawableStart="@android:drawable/ic_menu_my_calendar"
-    tools:background="@color/day_selector_color"
+    tools:background="@color/app_color"
     tools:context=".activity.EventDetailActivity"
 />

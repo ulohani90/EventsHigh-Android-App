@@ -48,8 +48,14 @@ public class EventListAdapter extends ArrayAdapter<Event> {
 
         // Set the title, time etc.
         eventCard.titleView.setText(event.title);
-        eventCard.timeView.setVisibility(event.startTime == null ? View.GONE : View.VISIBLE);
-        eventCard.timeView.setText(Utils.getEventTime(event));
+        String eventTime = Utils.getEventTime(event);
+        if (eventTime == null) {
+            eventCard.timeView.setVisibility(View.GONE);
+        } else {
+            eventCard.timeView.setVisibility(View.VISIBLE);
+            eventCard.timeView.setText(eventTime);
+        }
+
         if (event.numPeopleInterested <= 0) {
             eventCard.numPeopleInterestedView.setVisibility(View.INVISIBLE);
         } else {
@@ -58,7 +64,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
                     Integer.toString(event.numPeopleInterested));
         }
 
-        // Show tags.
+        // Show tagsWhiteList.
         showTag(eventCard.tag0View, event, 0);
         showTag(eventCard.tag1View, event, 1);
         showTag(eventCard.tag2View, event, 2);
@@ -88,7 +94,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         eventCard.timeView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.addToCalendar(event);
+                activity.addToCalendar(event, null);
             }
         });
         eventCard.venueView.setOnClickListener(new OnClickListener() {
@@ -144,12 +150,12 @@ public class EventListAdapter extends ArrayAdapter<Event> {
     }
 
     public static void showTag(TextView tagView, Event event, int tagNo) {
-        if (tagNo >= event.tags.length) {
+        if (tagNo >= event.tagsWhiteList.length) {
             tagView.setVisibility(View.GONE);
             return;
         }
 
         tagView.setVisibility(View.VISIBLE);
-        tagView.setText(event.tags[tagNo]);
+        tagView.setText(event.tagsWhiteList[tagNo]);
     }
 }

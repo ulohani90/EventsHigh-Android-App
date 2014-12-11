@@ -3,8 +3,8 @@
 
     <!-- Base application theme. -->
     <style name="EventsActionBar" parent="android:Widget.Holo.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/day_selector_color</item>
-        <item name="android:backgroundSplit">@color/day_selector_color</item>
+        <item name="android:background">@color/app_color</item>
+        <item name="android:backgroundSplit">@color/app_color</item>
     </style>
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/EventsActionBar</item>
@@ -48,7 +48,7 @@
     </style>
 
     <style name="EventTagText" parent="EventCardText">
-        <item name="android:background">@android:color/holo_orange_dark</item>
+        <item name="android:background">@drawable/rounded_bg</item>
         <item name="android:paddingLeft">@dimen/abc_control_padding_material</item>
         <item name="android:paddingRight">@dimen/abc_control_padding_material</item>
     </style>

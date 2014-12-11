@@ -2,14 +2,18 @@ package com.eventshigh.nearme.app.utils;
 
 import android.graphics.Point;
 import android.location.Location;
+import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.data.Event;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
@@ -24,6 +28,12 @@ public class Utils {
 
     public static LatLng locationToLatLng(Location location) {
         return new LatLng(location.getLatitude(), location.getLongitude());
+    }
+
+    public static float distanceInMeters(LatLng loc1, LatLng loc2) {
+        float[] distance = new float[1];
+        Location.distanceBetween(loc1.latitude, loc1.longitude, loc2.latitude, loc2.longitude, distance);
+        return distance[0];
     }
 
     /**
@@ -47,13 +57,14 @@ public class Utils {
     }
 
     private static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-    public static Date mergeDateTime(String date, String time, String timeZone) throws ParseException {
-        if (date == null || time == null
-                || date.isEmpty() || time.isEmpty()
-                || time.startsWith("01:02")
-                || time.startsWith("01:01")
-                || date.equalsIgnoreCase("null") || time.equalsIgnoreCase("null")) {
+    public static @Nullable Date mergeDateTime(String date, String time, String timeZone) throws ParseException {
+        if (date == null || date.isEmpty() || date.equalsIgnoreCase("null")) {
             return null;
+        }
+
+        if (time == null || time.isEmpty() || time.equalsIgnoreCase("null") ||
+            time.startsWith("01:02") || time.startsWith("01:01")) {
+            time = "00:00:00";
         }
 
         if (time.split(":").length == 2) {
@@ -71,15 +82,22 @@ public class Utils {
 
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("h:mm a");
     private static final Pattern ZEROS = Pattern.compile(":00");
-    public static String getEventTime(Event event) {
-        TIME_FORMAT.setTimeZone(TimeZone.getTimeZone(event.city.timeZone));
-        if (event.startTime == null) {
-            return "";
+    public static @Nullable String getEventTime(Event event) {
+        if (event.eventTimings.length == 0) {
+            return null;
         }
 
-        String time = TIME_FORMAT.format(event.startTime) +
-                (event.endTime == null ? "" : " - " + TIME_FORMAT.format(event.endTime));
-        return ZEROS.matcher(time).replaceAll("");
+        return getTimeString(new Date(event.eventTimings[0]),
+                TimeZone.getTimeZone(event.city.timeZone));
+    }
+
+    public static @Nullable String getTimeString(Date date, TimeZone timeZone) {
+        synchronized (TIME_FORMAT) {
+            TIME_FORMAT.setTimeZone(timeZone);
+            String time = TIME_FORMAT.format(date);
+            time = ZEROS.matcher(time).replaceAll("");
+            return time.equals("0") ? null : time;
+        }
     }
 
     public static float getDistanceSQ(Point p1, Point p2) {
@@ -94,9 +112,10 @@ public class Utils {
         return original.substring(0, 1).toUpperCase() + original.substring(1).toLowerCase();
     }
 
-    public static float distanceInMeters(LatLng loc1, LatLng loc2) {
-        float[] distance = new float[1];
-        Location.distanceBetween(loc1.latitude, loc1.longitude, loc2.latitude, loc2.longitude, distance);
-        return distance[0];
+    public static <T> T[] mergeArray(T[] first, T[] second) {
+        List<T> both = new ArrayList<T>(first.length + second.length);
+        Collections.addAll(both, first);
+        Collections.addAll(both, second);
+        return both.toArray(first);
     }
 }

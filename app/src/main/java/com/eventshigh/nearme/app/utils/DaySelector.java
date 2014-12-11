@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.utils;
 
 import android.app.Activity;
 import android.graphics.Point;
+import android.support.annotation.Nullable;
 import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -13,6 +14,7 @@ import com.eventshigh.nearme.app.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * This is an Widget which is used to show user day selection for upcoming week.
@@ -20,9 +22,31 @@ import java.util.Date;
 public class DaySelector {
 
     private static final int NUM_DAYS = 14;
+    private static final SimpleDateFormat DAY = new SimpleDateFormat("EE");
+    private static final SimpleDateFormat DATE = new SimpleDateFormat("d MMM");
 
     public interface DaySelectionListener {
         public void onDaySelection(int dayNo);
+    }
+
+    public static LinearLayout getDaySelectorItem(Activity activity, ViewGroup parent, Date date,
+                                                  @Nullable TimeZone timeZone) {
+        LinearLayout daySelectorItem =
+                (LinearLayout) activity.getLayoutInflater().inflate(
+                        R.layout.day_selector_item, parent, false);
+        ((TextView)daySelectorItem.findViewById(R.id.day_of_week)).setText(DAY.format(date));
+        ((TextView)daySelectorItem.findViewById(R.id.date)).setText(DATE.format(date));
+
+        TextView timeView = ((TextView)daySelectorItem.findViewById(R.id.event_time));
+        String time = timeZone == null ? null : Utils.getTimeString(date, timeZone);
+        if (time == null) {
+            timeView.setVisibility(View.GONE);
+        } else {
+            timeView.setText(time);
+        }
+
+        daySelectorItem.setClickable(true);
+        return daySelectorItem;
     }
 
     private final Activity activity;
@@ -41,14 +65,12 @@ public class DaySelector {
 
         int minWidth = getMinWidth();
         for (int i = 0; i < NUM_DAYS; i++) {
-            LinearLayout daySelectorItem =
-                    (LinearLayout) activity.getLayoutInflater().inflate(
-                            R.layout.day_selector_item, parent, false);
+            Date date = Utils.getDate(i);
+            LinearLayout daySelectorItem = getDaySelectorItem(activity, parent, date, null);
             daySelectorItem.setMinimumWidth(minWidth);
+            daySelectorItem.setOnClickListener(new DayItemOnClickListener(i));
             parent.addView(daySelectorItem);
             daySelectorItems[i] = daySelectorItem;
-            populateDaySelectorItem(i);
-            daySelectorItem.setOnClickListener(new DayItemOnClickListener(i));
         }
 
         setSelected(0);
@@ -65,7 +87,7 @@ public class DaySelector {
     public void setSelected(int selectedDayNo) {
         if (selectedDay >= 0) {
             daySelectorItems[selectedDay].setBackgroundColor(
-                    activity.getResources().getColor(R.color.day_selector_color));
+                    activity.getResources().getColor(R.color.app_color));
             ((TextView) daySelectorItems[selectedDay].findViewById(R.id.day_of_week)).setTextColor(
                     activity.getResources().getColor(R.color.day_selector_day_week_text));
         }
@@ -73,13 +95,12 @@ public class DaySelector {
         daySelectorItems[selectedDayNo].setBackgroundColor(
                 activity.getResources().getColor(R.color.day_selector_pressed_color));
         ((TextView)daySelectorItems[selectedDayNo].findViewById(R.id.day_of_week)).setTextColor(
-                activity.getResources().getColor(R.color.day_selector_day_week_selected_text));
+                activity.getResources().getColor(android.R.color.white));
 
         selectedDay = selectedDayNo;
     }
 
     private class DayItemOnClickListener implements  OnClickListener {
-
         private final int dayItemNo;
 
         private DayItemOnClickListener(int dayItemNo) {
@@ -93,16 +114,6 @@ public class DaySelector {
                 daySelectionListener.onDaySelection(dayItemNo);
             }
         }
-    }
-
-    private static final SimpleDateFormat DAY = new SimpleDateFormat("EE");
-    private static final SimpleDateFormat DATE = new SimpleDateFormat("d MMM");
-
-    private void populateDaySelectorItem(int dayItemNo) {
-        Date date = Utils.getDate(dayItemNo);
-        ((TextView)daySelectorItems[dayItemNo].findViewById(R.id.day_of_week)).setText(DAY.format(date));
-        ((TextView)daySelectorItems[dayItemNo].findViewById(R.id.date)).setText(DATE.format(date));
-        daySelectorItems[dayItemNo].setClickable(true);
     }
 
     // Get MinWidth for daySelector item.

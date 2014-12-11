@@ -9,6 +9,7 @@ import android.net.http.HttpResponseCache;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -24,6 +26,7 @@ import com.google.android.gms.analytics.Tracker;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Base activity class which does the common things like
@@ -140,7 +143,7 @@ public abstract class BaseActivity extends FragmentActivity {
         }
     }
 
-    public void addToCalendar(Event event) {
+    public void addToCalendar(Event event, @Nullable Date date) {
         reportActionToAnalytics("addToCalendar");
 
         String venue = event.address == null ? event.venue : event.address;
@@ -150,8 +153,16 @@ public abstract class BaseActivity extends FragmentActivity {
                 .putExtra(Events.EVENT_LOCATION, venue)
                 .putExtra(Events.DESCRIPTION,
                         event.getEventDetailsURI().toString() + "\n\n" + event.description);
-        if (event.startTime != null) {
-            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.startTime.getTime());
+
+        long eventTime = date != null ? date.getTime() :
+                (event.eventTimings.length > 0 ? event.eventTimings[0] : 0);
+        if (eventTime > 0) {
+            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, eventTime);
+        }
+
+        String time = Utils.getEventTime(event);
+        if (time == null) {
+            intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
         }
 
         try {

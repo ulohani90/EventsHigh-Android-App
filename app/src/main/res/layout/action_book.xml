@@ -5,6 +5,6 @@
     android:text="@string/action_book"
     android:drawableLeft="@drawable/action_book_it"
     android:drawableStart="@drawable/action_book_it"
-    tools:background="@color/day_selector_color"
+    tools:background="@color/app_color"
     tools:context=".activity.EventDetailActivity"
 />

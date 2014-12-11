@@ -39,7 +39,8 @@
             android:orientation="horizontal"
             android:divider="?android:attr/listDivider"
             android:showDividers="middle"
-            tools:listitem="day_selector_item"
+            tools:listitem="@layout/day_selector_item"
+            tools:layout_height="30dp"
          />
     </HorizontalScrollView>
 </LinearLayout>

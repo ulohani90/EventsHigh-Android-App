@@ -5,6 +5,6 @@
     android:text="@string/action_share"
     android:drawableLeft="@android:drawable/ic_menu_share"
     android:drawableStart="@android:drawable/ic_menu_share"
-    tools:background="@color/day_selector_color"
+    tools:background="@color/app_color"
     tools:context=".activity.EventDetailActivity"
 />

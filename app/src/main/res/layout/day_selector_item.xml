@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/day_selector_color"
+    android:background="@color/app_color"
     android:gravity="center_vertical|center_horizontal"
     android:padding="@dimen/abc_control_padding_material"
     android:clickable="true"
@@ -23,9 +23,18 @@
         android:id="@+id/date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/day_selector_date_number_text"
+        android:textColor="@android:color/white"
         android:textSize="@dimen/abc_text_size_caption_material"
         android:typeface="serif"
         tools:text="31 Dec"
+    />
+    <TextView
+        android:id="@+id/event_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_orange_light"
+        android:textSize="@dimen/abc_text_size_caption_material"
+        android:typeface="monospace"
+        tools:text="8:30 pm"
     />
 </LinearLayout>
