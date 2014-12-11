@@ -30,7 +30,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
 
     private static final String LOG_TAG = EventsFetcher.class.getSimpleName();
     private static final String API_ENDPOINT =
-            "http://apiserver.eventshigh.com:8888/api/date/CITY/DATE?sortby=popularity&limit=200&mobile=3";
+            "http://apiserver.eventshigh.com:8888/api/date/CITY/DATE?sortby=popularity&limit=300&mobile=4";
 
     public static interface EventsFetcherCallBack {
         public void OnEventsAvailable(EventFetcherParam param, List<Event> events);
