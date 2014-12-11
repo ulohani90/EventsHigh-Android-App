@@ -196,6 +196,8 @@ activity#com.eventshigh.nearme.app.activity.EventDetailActivity
 ADDED from AndroidManifest.xml:92:9
 	android:label
 		ADDED from AndroidManifest.xml:94:13
+	android:uiOptions
+		ADDED from AndroidManifest.xml:96:13
 	android:parentActivityName
 		ADDED from AndroidManifest.xml:95:13
 	android:name
