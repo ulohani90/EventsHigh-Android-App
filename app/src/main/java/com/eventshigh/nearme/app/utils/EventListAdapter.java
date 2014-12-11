@@ -50,8 +50,13 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         eventCard.titleView.setText(event.title);
         eventCard.timeView.setVisibility(event.startTime == null ? View.GONE : View.VISIBLE);
         eventCard.timeView.setText(Utils.getEventTime(event));
-        eventCard.numPeopleInterestedView.setText(
-                Integer.toString(event.numPeopleInterested));
+        if (event.numPeopleInterested <= 0) {
+            eventCard.numPeopleInterestedView.setVisibility(View.INVISIBLE);
+        } else {
+            eventCard.numPeopleInterestedView.setVisibility(View.VISIBLE);
+            eventCard.numPeopleInterestedView.setText(
+                    Integer.toString(event.numPeopleInterested));
+        }
 
         // Show tags.
         showTag(eventCard.tag0View, event, 0);

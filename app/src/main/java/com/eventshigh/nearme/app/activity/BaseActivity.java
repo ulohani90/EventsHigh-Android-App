@@ -127,9 +127,9 @@ public abstract class BaseActivity extends FragmentActivity {
     public void showDirections(Event event) {
         reportActionToAnalytics("showDirections");
 
-        Uri locationUri = Uri.parse("geo:0,0?q=" +
-                event.location.latitude + "," + event.location.longitude +
-                " (" + event.title + ")");
+        String query = event.address != null ? event.address :
+                event.location.latitude + "," + event.location.longitude +  " (" + event.title + ")";
+        Uri locationUri = Uri.parse("geo:0,0?q=" + query);
         Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
 
         try {

@@ -12,8 +12,14 @@
     <string name="action_map">Show on Map</string>
     <string name="action_edit_location">Change Location</string>
     <string name="action_share">Share</string>
-    <string name="action_direction">Direction</string>
-    <string name="action_cal">Add to calendar</string>
+    <string name="action_cal">Calendar</string>
+    <string name="action_book">Book</string>
+    <string name="action_direction">Show Directions</string>
+
+    <!-- Other Strings used in UI -->
+    <string name="ui_event_timings">Event Timings</string>
+    <string name="ui_event_tags">Event Tags</string>
+    <string name="ui_event_description">Event Description</string>
 
     <!-- Helper messages -->
     <string name="loading">Loading …</string>
@@ -37,5 +43,5 @@
         <item quantity="one">One person interested.</item>
         <item quantity="other">%,d people interested.</item>
     </plurals>
-    <string name="event_detail_from">Source: %s</string>
+    <string name="event_detail_from">Event details from: %s</string>
 </resources>

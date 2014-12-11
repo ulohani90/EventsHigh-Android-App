@@ -226,7 +226,7 @@ public class Event implements Parcelable {
         ArrayList<String> tags = new ArrayList<>(tagsJsonArr.length());
         for (int j = 0; j < tagsJsonArr.length(); j++) {
             String tag = tagsJsonArr.getJSONObject(j).getString("tag");
-            String tagU = tag.toUpperCase().replaceAll(" ", "_").replaceAll("& ", "");
+            String tagU = tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "");
             String tagToShow = Utils.capitalize(tag);
 
             try {

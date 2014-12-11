@@ -4,16 +4,40 @@
     <!-- Base application theme. -->
     <style name="EventsActionBar" parent="android:Widget.Holo.Light.ActionBar.Solid.Inverse">
         <item name="android:background">@color/day_selector_color</item>
+        <item name="android:backgroundSplit">@color/day_selector_color</item>
     </style>
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/EventsActionBar</item>
     </style>
 
-    <style name="EventDetailText" parent="android:style/TextAppearance.Medium">
-        <item name="android:padding">8dp</item>
+    <!-- Theme used for Events Details Pane -->
+    <style name="EventDetailText" parent="android:style/TextAppearance.Small">
+        <item name="android:paddingLeft">@dimen/abc_dropdownitem_text_padding_left</item>
         <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">@dimen/abc_text_size_caption_material</item>
+        <item name="android:typeface">serif</item>
     </style>
 
+    <style name="EventDetailHeader" parent="android:style/TextAppearance.Medium">
+        <item name="android:padding">@dimen/abc_dropdownitem_text_padding_left</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">@dimen/abc_text_size_body_1_material</item>
+        <item name="android:typeface">sans</item>
+    </style>
+
+    <!-- Theme used for Events Details Action Icons -->
+    <style name="EventActionMenuItem" parent="android:style/TextAppearance.Medium">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/abc_text_size_body_1_material</item>
+        <item name="android:padding">@dimen/abc_control_padding_material</item>
+        <item name="android:background">@drawable/selector_menu_action</item>
+        <item name="android:clickable">true</item>
+    </style>
+
+    <!-- Theme used for Events Cards -->
     <style name="EventCardText" parent="android:style/TextAppearance.Small">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:maxLines">1</item>
