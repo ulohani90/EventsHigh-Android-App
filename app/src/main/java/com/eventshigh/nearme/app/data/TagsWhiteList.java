@@ -7,14 +7,13 @@ package com.eventshigh.nearme.app.data;
  */
 public enum  TagsWhiteList {
     BOLLYWOOD,
-    COMEDY,
     COURSES,
     CYCLING,
     EDUCATION,
     HACKATHON,
     MEDITATION,
     MYTHOLOGY,
-    PARTIES,
+    NIGHTLIFE,
     PHILOSOPHY,
     SCIENCE,
     TRAVEL
