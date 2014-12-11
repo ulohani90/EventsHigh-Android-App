@@ -48,8 +48,14 @@ public class EventListAdapter extends ArrayAdapter<Event> {
 
         // Set the title, time etc.
         eventCard.titleView.setText(event.title);
-        eventCard.timeView.setVisibility(event.startTime == null ? View.GONE : View.VISIBLE);
-        eventCard.timeView.setText(Utils.getEventTime(event));
+        String eventTime = Utils.getEventTime(event);
+        if (eventTime == null) {
+            eventCard.timeView.setVisibility(View.GONE);
+        } else {
+            eventCard.timeView.setVisibility(View.VISIBLE);
+            eventCard.timeView.setText(eventTime);
+        }
+
         if (event.numPeopleInterested <= 0) {
             eventCard.numPeopleInterestedView.setVisibility(View.INVISIBLE);
         } else {
@@ -88,7 +94,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         eventCard.timeView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.addToCalendar(event);
+                activity.addToCalendar(event, null);
             }
         });
         eventCard.venueView.setOnClickListener(new OnClickListener() {

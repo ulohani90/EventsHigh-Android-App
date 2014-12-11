@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="day_selector_color">#0b6fb8</color>
+    <color name="app_color">#0b6fb8</color>
+
     <color name="day_selector_day_week_text">#86cbf0</color>
-    <color name="day_selector_date_number_text">#ffffff</color>
     <color name="day_selector_pressed_color">#25aae1</color>
-    <color name="day_selector_day_week_selected_text">#ffffff</color>
+    <color name="event_detail_gray">#fff5f5f5</color>
 
 </resources>

@@ -3,19 +3,10 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".activity.EventDetailActivity"
 >
-    <item android:id="@+id/action_share"
-          android:title="@string/action_share"
-          android:icon="@android:drawable/ic_menu_share"
-          android:orderInCategory="10"
-          android:showAsAction="ifRoom"
-          android:actionLayout="@layout/action_share"
-          tools:ignore="AppCompatResource"
-    />
-
     <item android:id="@+id/action_book"
           android:title="@string/action_book"
           android:icon="@drawable/action_book_it"
-          android:orderInCategory="20"
+          android:orderInCategory="10"
           android:showAsAction="ifRoom"
           android:actionLayout="@layout/action_book"
           tools:ignore="AppCompatResource"
@@ -24,9 +15,19 @@
     <item android:id="@+id/action_cal"
           android:title="@string/action_cal"
           android:icon="@android:drawable/ic_menu_my_calendar"
-          android:orderInCategory="30"
+          android:orderInCategory="20"
           android:showAsAction="ifRoom"
           android:actionLayout="@layout/action_cal"
           tools:ignore="AppCompatResource"
     />
+
+    <item android:id="@+id/action_share"
+          android:title="@string/action_share"
+          android:icon="@android:drawable/ic_menu_share"
+          android:orderInCategory="30"
+          android:showAsAction="ifRoom"
+          android:actionLayout="@layout/action_share"
+          tools:ignore="AppCompatResource"
+    />
+
 </menu>

@@ -74,7 +74,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#fff5f5f5"
+            android:background="@color/event_detail_gray"
             android:padding="@dimen/abc_dropdownitem_text_padding_left"
         >
             <Button
@@ -83,11 +83,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:paddingTop="@dimen/abc_control_padding_material"
-                android:paddingBottom="@dimen/abc_control_padding_material"
                 android:paddingLeft="@dimen/abc_action_bar_icon_vertical_padding_material"
                 android:paddingRight="@dimen/abc_action_bar_icon_vertical_padding_material"
-                android:background="@color/day_selector_color"
+                android:background="@color/app_color"
                 android:text="@string/action_direction"
                 android:textColor="@android:color/white"
             />
@@ -100,38 +98,50 @@
             android:layout_height="wrap_content"
             android:text="@string/ui_event_timings"
         />
-        <TextView
-            android:id="@+id/event_time"
-            style="@style/EventDetailText"
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/selector_event_text"
-            android:drawableStart="@drawable/ic_action_time_dark"
-            android:drawableLeft="@drawable/ic_action_time_dark"
-            android:clickable="true"
-            tools:text="8pm"
-        />
+            android:scrollbars="horizontal"
+            android:paddingLeft="@dimen/abc_action_bar_icon_vertical_padding_material"
+            android:paddingRight="@dimen/abc_action_bar_icon_vertical_padding_material"
+            android:paddingBottom="@dimen/abc_control_padding_material"
+        >
+            <LinearLayout
+                android:id="@+id/event_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:divider="?android:attr/listDivider"
+                android:showDividers="middle"
+                android:dividerPadding="@dimen/abc_action_bar_icon_vertical_padding_material"
+                tools:listitem="@layout/day_selector_item"
+                tools:layout_height="30dp"
+            />
+        </HorizontalScrollView>
 
         <!-- Event tags -->
         <TextView
             style="@style/EventDetailHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#fff5f5f5"
+            android:background="@color/event_detail_gray"
             android:text="@string/ui_event_tags"
         />
         <GridView
             android:id="@+id/event_tags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#fff5f5f5"
+            android:background="@color/event_detail_gray"
             android:scrollbars="none"
-            android:padding="@dimen/abc_control_padding_material"
+            android:paddingTop="@dimen/abc_control_padding_material"
+            android:paddingBottom="@dimen/abc_control_padding_material"
+            android:paddingLeft="@dimen/abc_action_bar_icon_vertical_padding_material"
+            android:paddingRight="@dimen/abc_action_bar_icon_vertical_padding_material"
             android:columnWidth="100dp"
             android:numColumns="auto_fit"
             android:stretchMode="columnWidth"
             android:gravity="start"
-            tools:listitem="@android:layout/simple_list_item_1"
+            tools:listitem="@layout/event_tag"
         />
 
         <!-- Event Description -->
@@ -158,8 +168,8 @@
             android:layout_width="wrap_content"
             android:background="@drawable/selector_event_text"
             android:textColor="@android:color/holo_purple"
-            android:layout_marginTop="@dimen/abc_action_bar_icon_vertical_padding_material"
-            android:layout_marginBottom="@dimen/abc_action_bar_icon_vertical_padding_material"
+            android:layout_marginTop="@dimen/abc_dropdownitem_icon_width"
+            android:layout_marginBottom="@dimen/abc_dropdownitem_icon_width"
             android:clickable="true"
             android:onClick="openSourceSite"
             tools:text="Event details from: www.eventshigh.com"
