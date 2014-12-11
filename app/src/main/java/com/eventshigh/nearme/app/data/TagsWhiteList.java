@@ -16,6 +16,5 @@ public enum  TagsWhiteList {
     MYTHOLOGY,
     PARTIES,
     PHILOSOPHY,
-    SCIENCE,
-    TRAVEL
+    SCIENCE
 }
