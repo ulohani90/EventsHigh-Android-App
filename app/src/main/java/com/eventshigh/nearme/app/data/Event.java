@@ -32,7 +32,8 @@ public class Event implements Parcelable {
     public final EventCategory category;
 
     public final String description;
-    public final String[] tags;
+    public final String[] tagsWhiteList;
+    public final String[] tagsOther;
 
     @Nullable public final String img_url;
     @Nullable public final String source_url;
@@ -49,7 +50,7 @@ public class Event implements Parcelable {
     @Nullable public final String address;
 
     public Event(String id, City city, String title, EventCategory category,
-                 String description, String[] tags,
+                 String description, String[] tagsWhiteList, String[] tagsOther,
                  @Nullable String img_url, @Nullable String source_url, @Nullable String booking_url,
                  int numPeopleInterested, boolean ehRecommended,
                  @Nullable Date startTime, @Nullable Date endTime,
@@ -60,7 +61,8 @@ public class Event implements Parcelable {
         this.category = category;
 
         this.description = description;
-        this.tags = tags;
+        this.tagsWhiteList = tagsWhiteList;
+        this.tagsOther = tagsOther;
 
         this.img_url = checkIfUnknown(img_url);
         this.source_url = checkIfUnknown(source_url);
@@ -115,7 +117,8 @@ public class Event implements Parcelable {
         dest.writeString(category.toString());
 
         dest.writeString(description);
-        dest.writeStringArray(tags);
+        dest.writeStringArray(tagsWhiteList);
+        dest.writeStringArray(tagsOther);
 
         dest.writeString(emptyIfNull(img_url));
         dest.writeString(emptyIfNull(source_url));
@@ -143,6 +146,7 @@ public class Event implements Parcelable {
                             EventCategory.valueOf(in.readString()),
 
                             in.readString(),
+                            in.createStringArray(),
                             in.createStringArray(),
 
                             in.readString(),
@@ -223,7 +227,8 @@ public class Event implements Parcelable {
 
         EventCategory category = EventCategory.OTHER;
         JSONArray tagsJsonArr = eventJson.getJSONArray("tags");
-        ArrayList<String> tags = new ArrayList<>(tagsJsonArr.length());
+        ArrayList<String> tagsWhiteList = new ArrayList<>(tagsJsonArr.length());
+        ArrayList<String> otherTags = new ArrayList<>(tagsJsonArr.length());
         for (int j = 0; j < tagsJsonArr.length(); j++) {
             String tag = tagsJsonArr.getJSONObject(j).getString("tag");
             String tagU = tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "");
@@ -233,9 +238,9 @@ public class Event implements Parcelable {
                 EventCategory tagCategory = EventCategory.valueOf(tagU);
                 if (category == EventCategory.OTHER) {
                     category = tagCategory;
-                    tags.add(0, tagToShow);
+                    tagsWhiteList.add(0, tagToShow);
                 } else {
-                    tags.add(tagToShow);
+                    tagsWhiteList.add(tagToShow);
                 }
                 continue;
             } catch (IllegalArgumentException e) {
@@ -244,10 +249,13 @@ public class Event implements Parcelable {
 
             try {
                 TagsWhiteList.valueOf(tagU);
-                tags.add(tagToShow);
+                tagsWhiteList.add(tagToShow);
+                continue;
             } catch (IllegalArgumentException e) {
-                // Ignore. Unsupported category.
+                // Ignore. Not a whitelisted category.
             }
+
+            otherTags.add(tagToShow);
         }
 
         return new Event(id,
@@ -256,7 +264,8 @@ public class Event implements Parcelable {
                 category,
 
                 description,
-                tags.toArray(new String[tags.size()]),
+                tagsWhiteList.toArray(new String[tagsWhiteList.size()]),
+                otherTags.toArray(new String[otherTags.size()]),
 
                 img_url,
                 source_url,

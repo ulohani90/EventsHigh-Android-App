@@ -13,14 +13,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.utils.DownloadImageTask;
-import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.regex.Pattern;
@@ -181,9 +182,7 @@ public class EventDetailActivity extends BaseActivity {
         private final TextView numPeopleInterestedView;
         private final TextView venueView;
         private final Button directionButton;
-        private final TextView tag0View;
-        private final TextView tag1View;
-        private final TextView tag2View;
+        private final GridView tagsGrid;
         private final TextView descriptionView;
         private final TextView fromView;
 
@@ -196,9 +195,7 @@ public class EventDetailActivity extends BaseActivity {
             numPeopleInterestedView = (TextView) rootView.findViewById(R.id.num_people_interested);
             venueView = (TextView) rootView.findViewById(R.id.event_venue);
             directionButton = (Button) rootView.findViewById(R.id.buttonDirection);
-            tag0View = (TextView) rootView.findViewById(R.id.event_tag0);
-            tag1View = (TextView) rootView.findViewById(R.id.event_tag1);
-            tag2View = (TextView) rootView.findViewById(R.id.event_tag2);
+            tagsGrid = (GridView) rootView.findViewById(R.id.event_tags);
             descriptionView = (TextView) rootView.findViewById(R.id.event_description);
             fromView = (TextView) rootView.findViewById(R.id.event_from);
         }
@@ -214,7 +211,6 @@ public class EventDetailActivity extends BaseActivity {
         // Set Image
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int windowHeightDp = 160 * metrics.heightPixels / metrics.densityDpi;
         mEventCard.bgView.setMaxHeight((int) (0.4 * metrics.heightPixels));
         if (mEvent.img_url == null) {
             mEventCard.bgView.setVisibility(View.GONE);
@@ -277,10 +273,9 @@ public class EventDetailActivity extends BaseActivity {
             mEventCard.numPeopleInterestedView.setText(text);
         }
 
-        // Show tags.
-        EventListAdapter.showTag(mEventCard.tag0View, mEvent, 0);
-        EventListAdapter.showTag(mEventCard.tag1View, mEvent, 1);
-        EventListAdapter.showTag(mEventCard.tag2View, mEvent, 2);
+        // Show white listed tags.
+        String[] allTags = Utils.mergeArray(mEvent.tagsWhiteList, mEvent.tagsOther);
+        mEventCard.tagsGrid.setAdapter(new ArrayAdapter<>(this, R.layout.event_tag, allTags));
 
         // Set description.
         if (htmlCheckPattern.matcher(mEvent.description).find()) {

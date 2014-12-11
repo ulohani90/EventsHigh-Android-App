@@ -58,7 +58,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
                     Integer.toString(event.numPeopleInterested));
         }
 
-        // Show tags.
+        // Show tagsWhiteList.
         showTag(eventCard.tag0View, event, 0);
         showTag(eventCard.tag1View, event, 1);
         showTag(eventCard.tag2View, event, 2);
@@ -144,12 +144,12 @@ public class EventListAdapter extends ArrayAdapter<Event> {
     }
 
     public static void showTag(TextView tagView, Event event, int tagNo) {
-        if (tagNo >= event.tags.length) {
+        if (tagNo >= event.tagsWhiteList.length) {
             tagView.setVisibility(View.GONE);
             return;
         }
 
         tagView.setVisibility(View.VISIBLE);
-        tagView.setText(event.tags[tagNo]);
+        tagView.setText(event.tagsWhiteList[tagNo]);
     }
 }

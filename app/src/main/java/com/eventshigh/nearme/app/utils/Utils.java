@@ -8,8 +8,11 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
@@ -24,6 +27,12 @@ public class Utils {
 
     public static LatLng locationToLatLng(Location location) {
         return new LatLng(location.getLatitude(), location.getLongitude());
+    }
+
+    public static float distanceInMeters(LatLng loc1, LatLng loc2) {
+        float[] distance = new float[1];
+        Location.distanceBetween(loc1.latitude, loc1.longitude, loc2.latitude, loc2.longitude, distance);
+        return distance[0];
     }
 
     /**
@@ -94,9 +103,10 @@ public class Utils {
         return original.substring(0, 1).toUpperCase() + original.substring(1).toLowerCase();
     }
 
-    public static float distanceInMeters(LatLng loc1, LatLng loc2) {
-        float[] distance = new float[1];
-        Location.distanceBetween(loc1.latitude, loc1.longitude, loc2.latitude, loc2.longitude, distance);
-        return distance[0];
+    public static <T> T[] mergeArray(T[] first, T[] second) {
+        List<T> both = new ArrayList<T>(first.length + second.length);
+        Collections.addAll(both, first);
+        Collections.addAll(both, second);
+        return both.toArray(first);
     }
 }

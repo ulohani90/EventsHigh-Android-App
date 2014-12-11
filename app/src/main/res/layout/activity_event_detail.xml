@@ -120,35 +120,19 @@
             android:background="#fff5f5f5"
             android:text="@string/ui_event_tags"
         />
-        <LinearLayout
+        <GridView
+            android:id="@+id/event_tags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:background="#fff5f5f5"
-            android:padding="@dimen/abc_dropdownitem_text_padding_left"
-        >
-            <TextView
-                android:id="@+id/event_tag0"
-                style="@style/EventTagText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Comedy"
-            />
-            <TextView
-                android:id="@+id/event_tag1"
-                style="@style/EventTagText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Drama"
-            />
-            <TextView
-                android:id="@+id/event_tag2"
-                style="@style/EventTagText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Kids"
-            />
-        </LinearLayout>
+            android:scrollbars="none"
+            android:padding="@dimen/abc_control_padding_material"
+            android:columnWidth="100dp"
+            android:numColumns="auto_fit"
+            android:stretchMode="columnWidth"
+            android:gravity="start"
+            tools:listitem="@android:layout/simple_list_item_1"
+        />
 
         <!-- Event Description -->
         <TextView
