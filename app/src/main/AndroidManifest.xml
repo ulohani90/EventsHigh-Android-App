@@ -92,11 +92,12 @@
         <activity
             android:name=".activity.EventDetailActivity"
             android:label="@string/title_event_detail"
-            android:parentActivityName="com.eventshigh.nearme.app.activity.EventListActivity"
+            android:parentActivityName="com.eventshigh.nearme.app.activity.EventGridActivity"
+            android:uiOptions="splitActionBarWhenNarrow"
         >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.eventshigh.nearme.app.activity.EventListActivity"
+                android:value="com.eventshigh.nearme.app.activity.EventGridActivity"
             />
         </activity>
     </application>

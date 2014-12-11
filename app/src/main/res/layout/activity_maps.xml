@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    tools:context=".MapsActivity"
+    tools:context=".activity.MapsActivity"
 >
 
     <FrameLayout
@@ -39,6 +39,7 @@
             android:orientation="horizontal"
             android:divider="?android:attr/listDivider"
             android:showDividers="middle"
+            tools:listitem="day_selector_item"
          />
     </HorizontalScrollView>
 </LinearLayout>

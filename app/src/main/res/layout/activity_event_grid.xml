@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    tools:context="com.eventshigh.nearme.app.activity.EventGridActivity"
+    tools:context=".activity.EventGridActivity"
 >
 
     <TextView
@@ -23,6 +23,7 @@
         android:drawableLeft="@drawable/ic_action_location_found"
         android:drawableEnd="@drawable/ic_action_edit"
         android:drawableRight="@drawable/ic_action_edit"
+        tools:text="MG Road, Bangalore"
     />
 
     <View
@@ -41,6 +42,7 @@
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
         android:gravity="center"
+        tools:listitem="list_item_event"
     />
 
     <HorizontalScrollView
@@ -55,6 +57,7 @@
             android:orientation="horizontal"
             android:divider="?android:attr/listDivider"
             android:showDividers="middle"
+            tools:listitem="day_selector_item"
         />
     </HorizontalScrollView>
 
