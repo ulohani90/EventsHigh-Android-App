@@ -9,7 +9,6 @@ public enum  TagsWhiteList {
     BOLLYWOOD,
     COURSES,
     CYCLING,
-    EDUCATION,
     HACKATHON,
     MEDITATION,
     MYTHOLOGY,

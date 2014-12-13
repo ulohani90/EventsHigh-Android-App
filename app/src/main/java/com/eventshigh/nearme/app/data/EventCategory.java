@@ -16,6 +16,7 @@ public enum EventCategory {
     COMEDY,
     DANCE,
     DJ,
+    EDUCATION,
     ENVIRONMENT,
     FASHION,
     FILM,
