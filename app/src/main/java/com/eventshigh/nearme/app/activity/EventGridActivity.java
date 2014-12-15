@@ -118,7 +118,7 @@ public class EventGridActivity extends LocationAwareEventActivity {
             mLocalityView.setText(Utils.capitalize(lastEventFetcherParam.city.toString()));
             new UpdateLocationTask(this, mLocalityView).execute(lastEventFetcherParam.location);
         } else {
-            Toast.makeText(this, R.string.failed, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.failed_load, Toast.LENGTH_SHORT).show();
         }
 
         mEventsListAdapter.clear();

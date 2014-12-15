@@ -73,6 +73,9 @@ public class EventDetailActivity extends BaseActivity {
 
         // Get the event from Intent.
         mEvent = getIntent().getParcelableExtra(ARG_EVENT_INFO);
+        if (actionBar != null && mEvent != null) {
+            actionBar.setTitle(mEvent.title);
+        }
 
         // Populate View.
         mEventCard = new EventCard(getWindow().getDecorView());

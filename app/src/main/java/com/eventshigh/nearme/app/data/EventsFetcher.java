@@ -94,7 +94,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
 
         if (result == null || result.isEmpty()) {
             // Failed. Show toast and return empty list.
-            Toast.makeText(context, R.string.failed, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.failed_load, Toast.LENGTH_SHORT).show();
             return;
         }
 

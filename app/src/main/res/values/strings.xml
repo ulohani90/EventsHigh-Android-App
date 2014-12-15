@@ -28,7 +28,7 @@
     <string name="ask_locality">Enter the locality, city</string>
 
     <!-- Failed messages -->
-    <string name="failed">Failed to load events information!</string>
+    <string name="failed_load">Failed to load events information!</string>
     <string name="no_event">No events found in your city!</string>
     <string name="failed_locality">Could not find locality, did you enter cityname ?</string>
     <string name="failed_save">Sharing failed as we could not save image</string>
