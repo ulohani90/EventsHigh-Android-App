@@ -21,7 +21,6 @@ public enum EventCategory {
     FASHION,
     FILM,
     FOOD,
-    FOR_KIDS,
     HEALTH_WELLNESS,
     KIDS,
     LITERATURE,
