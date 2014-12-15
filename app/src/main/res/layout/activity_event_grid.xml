@@ -7,31 +7,6 @@
     tools:context=".activity.EventGridActivity"
 >
 
-    <TextView
-        android:id="@+id/event_locality_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:text="@string/loading"
-        android:textSize="@dimen/abc_text_size_body_1_material"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:gravity="center_vertical"
-        android:background="@android:color/black"
-        android:textColor="@android:color/white"
-        android:drawableStart="@drawable/ic_action_location_found"
-        android:drawableLeft="@drawable/ic_action_location_found"
-        android:drawableEnd="@drawable/ic_action_edit"
-        android:drawableRight="@drawable/ic_action_edit"
-        tools:text="MG Road, Bangalore"
-    />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@android:color/darker_gray"
-    />
-
     <GridView
         android:id="@+id/event_grid"
         android:layout_width="match_parent"

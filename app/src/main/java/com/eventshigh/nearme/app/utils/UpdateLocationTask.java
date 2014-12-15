@@ -1,12 +1,12 @@
 package com.eventshigh.nearme.app.utils;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -25,11 +25,11 @@ public class UpdateLocationTask extends AsyncTask<LatLng, Void, String> {
     private static final Pattern INVALID_LOCALITY_PATTERN = Pattern.compile("[^a-zA-Z]+[a-zA-Z]?");
 
     private final Context mContext;
-    private final TextView mLocalityView;
+    private final ActionBar actionBar;
 
-    public UpdateLocationTask(Context context, TextView localityView) {
+    public UpdateLocationTask(Context context, ActionBar actionBar) {
         this.mContext = context;
-        this.mLocalityView = localityView;
+        this.actionBar = actionBar;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class UpdateLocationTask extends AsyncTask<LatLng, Void, String> {
     @Override
     protected void onPostExecute(@Nullable String locality) {
         if (locality != null && !locality.isEmpty()) {
-            mLocalityView.setText(locality);
+            actionBar.setSubtitle(locality);
         }
     }
 

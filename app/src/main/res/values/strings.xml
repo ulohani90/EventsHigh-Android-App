@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Titles -->
+    <!-- Title -->
     <string name="app_name">EventsHigh beta</string>
-
-    <string name="title_event_list">Events</string>
-    <string name="title_event_detail">Event Detail</string>
 
     <!-- Actions, like menu items -->
     <string name="action_list">Show as List</string>
@@ -29,10 +26,9 @@
 
     <!-- Failed messages -->
     <string name="failed_load">Failed to load events information!</string>
-    <string name="no_event">No events found in your city!</string>
+    <string name="no_event">Sorry, we are not in your city, yet!</string>
     <string name="failed_locality">Could not find locality, did you enter cityname ?</string>
     <string name="failed_save">Sharing failed as we could not save image</string>
-    <string name="failed_open">Could not open details as there is no browser application installed</string>
     <string name="failed_share">Sharing failed as there is no application installed</string>
     <string name="failed_location">Could not determine your location</string>
     <string name="no_map_app">Maps application not found!</string>

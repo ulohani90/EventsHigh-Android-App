@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.EventsCollection.Builder;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONException;
@@ -17,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 
 /**
  * An {@link AsyncTask} which is used to fetch the Events. Once events are available,
@@ -26,14 +26,14 @@ import java.util.List;
  * Before using EventsFetcher, its recommended to setup {@link android.net.http.HttpResponseCache}
  * for better performance.
  */
-public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event>> {
+public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsCollection> {
 
     private static final String LOG_TAG = EventsFetcher.class.getSimpleName();
     private static final String API_ENDPOINT =
             "http://apiserver.eventshigh.com:8888/api/date/CITY/DATE?sortby=popularity&limit=200&mobile=18";
 
     public static interface EventsFetcherCallBack {
-        public void OnEventsAvailable(EventFetcherParam param, List<Event> events);
+        public void OnEventsAvailable(EventFetcherParam param, EventsCollection events);
     }
 
     private final Context context;
@@ -56,7 +56,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
     }
 
     @Override
-    protected List<Event> doInBackground(EventFetcherParam... params) {
+    protected EventsCollection doInBackground(EventFetcherParam... params) {
         param = params[0];
 
         String url = API_ENDPOINT.replace("CITY", param.city.toString().toLowerCase())
@@ -75,7 +75,9 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line);
                 }
-                return Event.parseUpcomingEvents(param.city, buffer.toString());
+
+                return new Builder().addAllEvent(
+                        Event.parseUpcomingEvents(param.city, buffer.toString())).build();
             } finally {
                 urlConnection.disconnect();
             }
@@ -86,13 +88,13 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, List<Event
     }
 
     @Override
-    protected void onPostExecute(@Nullable List<Event> result) {
+    protected void onPostExecute(@Nullable EventsCollection result) {
         super.onPostExecute(result);
         if (pDialog != null && pDialog.isShowing()) {
             pDialog.dismiss();
         }
 
-        if (result == null || result.isEmpty()) {
+        if (result == null || result.getTags().isEmpty()) {
             // Failed. Show toast and return empty list.
             Toast.makeText(context, R.string.failed_load, Toast.LENGTH_SHORT).show();
             return;

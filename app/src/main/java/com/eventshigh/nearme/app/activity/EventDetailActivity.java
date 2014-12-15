@@ -24,7 +24,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.utils.DaySelector;
 import com.eventshigh.nearme.app.utils.DownloadImageTask;
-import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.Date;
 import java.util.TimeZone;
@@ -282,8 +281,8 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         // Show tags.
-        String[] allTags = Utils.mergeArray(mEvent.tagsWhiteList, mEvent.tagsOther);
-        mEventCard.tagsGrid.setAdapter(new ArrayAdapter<>(this, R.layout.event_tag, allTags));
+        mEventCard.tagsGrid.setAdapter(
+                new ArrayAdapter<>(this, R.layout.event_tag, mEvent.getAllTags()));
 
         // Set description.
         if (htmlCheckPattern.matcher(mEvent.description).find()) {

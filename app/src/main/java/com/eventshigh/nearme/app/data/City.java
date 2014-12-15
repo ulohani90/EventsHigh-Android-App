@@ -1,5 +1,7 @@
 package com.eventshigh.nearme.app.data;
 
+import android.support.annotation.Nullable;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
@@ -27,7 +29,11 @@ public enum City {
         this.countryCode = countryCode;
     }
 
-    public static City getCity(LatLng point) {
+    public static City getCity(@Nullable LatLng point) {
+        if (point == null) {
+            return null;
+        }
+
         for (City city : City.values()) {
             if (city.cityBounds.contains(point)) {
                 return city;

@@ -1,26 +1,20 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.ActionBar;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.EventComparator;
 import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.eventshigh.nearme.app.utils.UpdateLocationTask;
-import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
@@ -32,7 +26,6 @@ import java.util.List;
  */
 public class EventGridActivity extends LocationAwareEventActivity {
     private EventListAdapter mEventsListAdapter;
-    private TextView mLocalityView;
 
     // ***********************
     // Activity lifecycle  Methods
@@ -50,25 +43,14 @@ public class EventGridActivity extends LocationAwareEventActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        // See if we have location passed to us within intent.
-        Intent intent = getIntent();
-        EventFetcherParam param = null;
-        if (intent != null) {
-            param = intent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
-        }
-
-        // Setup the local member variables.
-        setUpAll(param);
-
-        // Setup the locality view.
-        mLocalityView = (TextView) findViewById(R.id.event_locality_header);
-        mLocalityView.setOnClickListener(mLocalityClickListener);
-
         // Setup adapter.
         GridView eventGridView = (GridView) findViewById(R.id.event_grid);
         mEventsListAdapter = new EventListAdapter(this);
         eventGridView.setAdapter(mEventsListAdapter);
         eventGridView.setOnItemClickListener(mOnItemClickListener);
+
+        // Setup the local member variables.
+        setUpAll();
     }
 
     @Override
@@ -94,12 +76,12 @@ public class EventGridActivity extends LocationAwareEventActivity {
         }
 
         if (id == R.id.action_map) {
-            if (lastEventFetcherParam != null) {
-                startActivity(new Intent(this, MapsActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        .putExtra(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam)
-                );
-            }
+            switchTo(MapsActivity.class);
+            return true;
+        }
+
+        if (id == R.id.action_change_location) {
+            askUserForLocation(getActionBar());
             return true;
         }
 
@@ -113,14 +95,6 @@ public class EventGridActivity extends LocationAwareEventActivity {
 
     @Override
     protected void updateNewEvents(List<Event> events) {
-        // Show the location.
-        if (lastEventFetcherParam != null) {
-            mLocalityView.setText(Utils.capitalize(lastEventFetcherParam.city.toString()));
-            new UpdateLocationTask(this, mLocalityView).execute(lastEventFetcherParam.location);
-        } else {
-            Toast.makeText(this, R.string.failed_load, Toast.LENGTH_SHORT).show();
-        }
-
         mEventsListAdapter.clear();
         mEventsListAdapter.addAll(events);
         updateListingForUserLocation(
@@ -128,6 +102,12 @@ public class EventGridActivity extends LocationAwareEventActivity {
     }
 
     protected void updateUserLocation(LatLng userLocation) {
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null &&
+                (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0)) {
+            new UpdateLocationTask(this, actionBar).execute(userLocation);
+        }
+
         if (!refreshListingsIfNeeded(userLocation)) {
             updateListingForUserLocation(userLocation);
         }
@@ -142,13 +122,6 @@ public class EventGridActivity extends LocationAwareEventActivity {
     // ***********************
     // Callbacks
     // ***********************
-
-    private final OnClickListener mLocalityClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            askUserForLocation(mLocalityView);
-        }
-    };
 
     private final OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
         @Override

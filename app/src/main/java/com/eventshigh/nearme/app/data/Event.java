@@ -84,6 +84,14 @@ public class Event implements Parcelable {
                 .replace("ID", id));
     }
 
+    public int getPopularityScore() {
+        return ehRecommended ? Math.max(EH_RECOMMENDATION_BOOST, numPeopleInterested) : numPeopleInterested;
+    }
+
+    public String[] getAllTags() {
+        return Utils.mergeArray(tagsWhiteList, tagsOther);
+    }
+
     @Override
     public int hashCode() {
         return id.hashCode();
@@ -93,10 +101,6 @@ public class Event implements Parcelable {
     public boolean equals(Object another) {
         return another instanceof Event &&
                 id.equals(((Event) another).id);
-    }
-
-    public int getPopularityScore() {
-        return ehRecommended ? Math.max(EH_RECOMMENDATION_BOOST, numPeopleInterested) : numPeopleInterested;
     }
 
 

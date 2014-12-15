@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.activity;
 
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.eventshigh.nearme.app.utils.MarkerManager;
 import com.google.android.gms.common.ConnectionResult;
@@ -99,17 +97,10 @@ public class MapsActivity extends LocationAwareEventActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        // See if we have location passed to us within intent.
-        Intent intent = getIntent();
-        EventFetcherParam param = null;
-        if (intent != null) {
-            param = intent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
-        }
-
         // Setup the local member variables.
         setUpMapIfNeeded();
         setupGestureDetectorIfNeeded();
-        setUpAll(param);
+        setUpAll();
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
     }
 
@@ -122,19 +113,13 @@ public class MapsActivity extends LocationAwareEventActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_list) {
-            if (lastEventFetcherParam == null) {
-                Toast.makeText(this, R.string.no_event, Toast.LENGTH_SHORT).show();
-            } else {
-                startActivity(new Intent(this, EventGridActivity.class)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                .putExtra(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam)
-                );
-            }
+        int id = item.getItemId();
+        if (id == R.id.action_list) {
+            switchTo(EventGridActivity.class);
             return true;
         }
 
-        if (item.getItemId() == R.id.action_change_location) {
+        if (id == R.id.action_change_location) {
             askUserForLocation(null);
             return true;
         }
@@ -219,6 +204,7 @@ public class MapsActivity extends LocationAwareEventActivity {
             )
         );
     }
+
 
     // ***********************
     // Callbacks

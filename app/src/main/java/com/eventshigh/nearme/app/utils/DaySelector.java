@@ -50,17 +50,15 @@ public class DaySelector {
     }
 
     private final Activity activity;
-    private final ViewGroup parent;
     private DaySelectionListener daySelectionListener = null;
     private LinearLayout[] daySelectorItems = new LinearLayout[NUM_DAYS];
     private int selectedDay = -1;
 
-    public DaySelector(Activity activity, ViewGroup parent) {
+    public DaySelector(Activity activity) {
         this.activity = activity;
-        this.parent = parent;
     }
 
-    public void populate() {
+    public void populate(ViewGroup parent) {
         parent.removeAllViews();
 
         int minWidth = getMinWidth();

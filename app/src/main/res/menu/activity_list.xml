@@ -3,10 +3,17 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.eventshigh.nearme.app.activity.EventGridActivity">
 
+    <item android:id="@+id/action_change_location"
+          android:title="@string/action_edit_location"
+          android:icon="@drawable/ic_action_place"
+          android:orderInCategory="10"
+          android:showAsAction="ifRoom"
+          tools:ignore="AppCompatResource"
+    />
     <item android:id="@+id/action_map"
           android:title="@string/action_map"
           android:icon="@android:drawable/ic_dialog_map"
-          android:orderInCategory="100"
+          android:orderInCategory="20"
           android:showAsAction="ifRoom"
           tools:ignore="AppCompatResource"
     />
