@@ -369,7 +369,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                 for (Pair<String, Integer> tag : tags) {
                     actionBar.addTab(
                             actionBar.newTab()
-                                    .setText(tag.first + "\n(" + tag.second + " )")
+                                    .setText(tag.first + "\n(" + tag.second + ")")
                                     .setTag(tag.first)
                                     .setTabListener(mTabListener), false);
                 }

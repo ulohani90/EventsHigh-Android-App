@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -142,7 +141,7 @@ public class EventDetailActivity extends BaseActivity {
             return true;
         }
 
-        if (id == R.id.action_cal) {
+        if (id == R.id.action_save) {
             addToCalendar(mEvent, null);
             return true;
         }
@@ -194,7 +193,7 @@ public class EventDetailActivity extends BaseActivity {
         private final LinearLayout timeView;
         private final TextView numPeopleInterestedView;
         private final TextView venueView;
-        private final Button directionButton;
+        private final TextView directionView;
         private final GridView tagsGrid;
         private final TextView descriptionView;
         private final TextView fromView;
@@ -207,7 +206,7 @@ public class EventDetailActivity extends BaseActivity {
             timeView = (LinearLayout) rootView.findViewById(R.id.event_time);
             numPeopleInterestedView = (TextView) rootView.findViewById(R.id.num_people_interested);
             venueView = (TextView) rootView.findViewById(R.id.event_venue);
-            directionButton = (Button) rootView.findViewById(R.id.buttonDirection);
+            directionView = (TextView) rootView.findViewById(R.id.buttonDirection);
             tagsGrid = (GridView) rootView.findViewById(R.id.event_tags);
             descriptionView = (TextView) rootView.findViewById(R.id.event_description);
             fromView = (TextView) rootView.findViewById(R.id.event_from);
@@ -245,7 +244,7 @@ public class EventDetailActivity extends BaseActivity {
                 showDirections(mEvent);
             }
         });
-        mEventCard.directionButton.setOnClickListener(new OnClickListener() {
+        mEventCard.directionView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDirections(mEvent);
