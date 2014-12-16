@@ -168,7 +168,15 @@ public class MapsActivity extends LocationAwareEventActivity {
                 @Override
                 public boolean onFling(MotionEvent event1, MotionEvent event2,
                                        float velocityX, float velocityY) {
-                    Marker nextMarker = markerManager.getNextMarker(lastSelectedMarker);
+                    if (Math.abs(velocityY) > Math.abs(velocityX)) {
+                        // this is either up or down movement, ignore.
+                        return  false;
+                    }
+
+
+                    Marker nextMarker = velocityX > 0 ?
+                            markerManager.getPrevMarker(lastSelectedMarker) :
+                            markerManager.getNextMarker(lastSelectedMarker);
                     if (nextMarker != null) {
                         lastSelectedMarker.hideInfoWindow();
                         nextMarker.setVisible(true);

@@ -78,6 +78,7 @@ public class MarkerManager {
     public void setEvents(GoogleMap map, List<Event> events) {
         map.clear();
         markers.clear();
+        orderedMarkerCollection.clear();
 
         for(Event event : events) {
             MarkerInfo markerInfo = new MarkerInfo(event);
@@ -98,6 +99,10 @@ public class MarkerManager {
     // Gets the next marker, which are ordered based on user location and event popularity.
     public Marker getNextMarker(Marker marker) {
         return orderedMarkerCollection.getNextMarker(marker);
+    }
+
+    public Marker getPrevMarker(Marker marker) {
+        return orderedMarkerCollection.getPrevMarker(marker);
     }
 
     // Updates the listing for current maps projection. This method decides which markers should
@@ -187,11 +192,12 @@ public class MarkerManager {
         private LatLng location;
 
         // ordered collection of markers.
-        private TreeSet<Marker> orderedMarkersSet;
+        private TreeSet<Marker> orderedMarkersSet = new TreeSet<>();
 
         public void orderListingForLocation(@Nullable final LatLng location) {
             if (location == null ||
                 (this.location != null &&
+                 this.orderedMarkersSet.size() > 0 &&
                  Utils.distanceInMeters(this.location, location) < MIN_DISTANCE_FOR_REORDER)) {
                 return;
             }
@@ -208,8 +214,27 @@ public class MarkerManager {
             orderedMarkersSet.addAll(markers.keySet());
         }
 
+        public void clear() {
+            orderedMarkersSet.clear();
+            location = null;
+        }
+
         public Marker getNextMarker(Marker marker) {
-            return orderedMarkersSet.higher(marker);
+            Marker next = orderedMarkersSet.higher(marker);
+            if (next ==  null) {
+                next = orderedMarkersSet.first();
+            }
+
+            return next;
+        }
+
+        public Marker getPrevMarker(Marker marker) {
+            Marker prev = orderedMarkersSet.lower(marker);
+            if (prev ==  null) {
+                prev = orderedMarkersSet.last();
+            }
+
+            return prev;
         }
     }
 }
