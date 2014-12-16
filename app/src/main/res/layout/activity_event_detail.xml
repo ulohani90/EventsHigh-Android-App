@@ -140,20 +140,17 @@
             android:background="@color/event_detail_gray"
             android:text="@string/ui_event_tags"
         />
-        <GridView
+        <LinearLayout
             android:id="@+id/event_tags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/event_detail_gray"
-            android:scrollbars="none"
             android:paddingTop="@dimen/abc_control_padding_material"
             android:paddingBottom="@dimen/abc_control_padding_material"
             android:paddingLeft="@dimen/abc_action_bar_icon_vertical_padding_material"
             android:paddingRight="@dimen/abc_action_bar_icon_vertical_padding_material"
             android:columnWidth="100dp"
-            android:numColumns="auto_fit"
-            android:stretchMode="columnWidth"
-            android:gravity="start"
+            android:orientation="vertical"
             tools:listitem="@layout/event_tag"
         />
 

@@ -5,18 +5,19 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.text.Html;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
@@ -194,7 +195,7 @@ public class EventDetailActivity extends BaseActivity {
         private final TextView numPeopleInterestedView;
         private final TextView venueView;
         private final TextView directionView;
-        private final GridView tagsGrid;
+        private final LinearLayout tagsView;
         private final TextView descriptionView;
         private final TextView fromView;
 
@@ -207,7 +208,7 @@ public class EventDetailActivity extends BaseActivity {
             numPeopleInterestedView = (TextView) rootView.findViewById(R.id.num_people_interested);
             venueView = (TextView) rootView.findViewById(R.id.event_venue);
             directionView = (TextView) rootView.findViewById(R.id.buttonDirection);
-            tagsGrid = (GridView) rootView.findViewById(R.id.event_tags);
+            tagsView = (LinearLayout) rootView.findViewById(R.id.event_tags);
             descriptionView = (TextView) rootView.findViewById(R.id.event_description);
             fromView = (TextView) rootView.findViewById(R.id.event_from);
         }
@@ -279,10 +280,6 @@ public class EventDetailActivity extends BaseActivity {
             mEventCard.numPeopleInterestedView.setText(text);
         }
 
-        // Show tags.
-        mEventCard.tagsGrid.setAdapter(
-                new ArrayAdapter<>(this, R.layout.event_tag, mEvent.getAllTags()));
-
         // Set description.
         if (htmlCheckPattern.matcher(mEvent.description).find()) {
             mEventCard.descriptionView.setText(Html.fromHtml(mEvent.description));
@@ -299,6 +296,54 @@ public class EventDetailActivity extends BaseActivity {
                     getResources().getString(R.string.event_detail_from),
                     fromUri.getHost());
             mEventCard.fromView.setText(eventFrom);
+        }
+
+        // Show tags.
+        new ShowTagsTask().execute();
+    }
+
+    private class ShowTagsTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void results) {
+            int maxWidth = mEventCard.tagsView.getWidth()
+                    - mEventCard.tagsView.getPaddingRight()
+                    - mEventCard.tagsView.getPaddingLeft();
+            LinearLayout llAlso = getLL();
+            for (String tag : mEvent.getAllTags()) {
+                TextView tagView = addTag(llAlso, tag);
+                llAlso.measure(maxWidth, 0);
+                if (llAlso.getMeasuredWidth() < maxWidth) {
+                    continue;
+                }
+
+                tagView.setVisibility(View.GONE);
+                llAlso = getLL();
+                addTag(llAlso, tag);
+            }
+        }
+
+        private TextView addTag(LinearLayout ll, String tag) {
+            getLayoutInflater().inflate(R.layout.event_tag, ll);
+            TextView tagView = (TextView) ll.getChildAt(ll.getChildCount() - 1);
+            tagView.setText(tag);
+            return  tagView;
+        }
+
+        private LinearLayout getLL() {
+            LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+            int margin = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()));
+            layoutParams.setMargins(margin, 0 , margin, 0);
+            LinearLayout ll = new LinearLayout(EventDetailActivity.this);
+            ll.setLayoutParams(layoutParams);
+            ll.setOrientation(LinearLayout.HORIZONTAL);
+            mEventCard.tagsView.addView(ll);
+            return  ll;
         }
     }
 }
