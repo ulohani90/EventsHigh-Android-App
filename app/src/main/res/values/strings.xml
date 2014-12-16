@@ -9,7 +9,7 @@
     <string name="action_map">Show on Map</string>
     <string name="action_edit_location">Change Location</string>
     <string name="action_share">Share</string>
-    <string name="action_cal">Calendar</string>
+    <string name="action_save">Save</string>
     <string name="action_book">Book</string>
     <string name="action_direction">Show Directions</string>
 

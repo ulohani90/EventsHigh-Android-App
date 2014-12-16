@@ -180,10 +180,12 @@ public class Event implements Parcelable {
         String title = eventJson.getString("title");
         String description = eventJson.getString("description");
 
-        String source_url = eventJson.getString("source_url");
-        String booking_url = eventJson.getString("booking_url");
-        String img_url = eventJson.getString("img_url");
-        if (source_url.toLowerCase().contains("eventviva") || img_url.endsWith("missing.png")) {
+        JSONObject mashup = eventJson.optJSONObject("mashup");
+        String source_url = eventJson.optString("source_url");
+        String booking_url = mashup == null ? null : mashup.optString("booking_url");
+        String img_url = eventJson.optString("img_url");
+        if ((source_url != null && source_url.toLowerCase().contains("eventviva")) ||
+            (img_url != null && img_url.endsWith("missing.png"))) {
             img_url = null;
         }
 
@@ -323,7 +325,7 @@ public class Event implements Parcelable {
         return fromJSON(city, upcomingEvents);
     }
 
-    private static String checkIfUnknown(String string) {
+    private static String checkIfUnknown(@Nullable String string) {
         return (string == null ||
                 string.isEmpty() ||
                 string.equalsIgnoreCase("null") ||

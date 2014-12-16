@@ -101,11 +101,11 @@ public class EventDetailActivity extends BaseActivity {
             });
         }
 
-        MenuItem menuCalItem = menu.findItem(R.id.action_cal);
+        MenuItem menuSaveItem = menu.findItem(R.id.action_save);
         if (mEvent.eventTimings.length == 0) {
-            menuCalItem.setVisible(false);
+            menuSaveItem.setVisible(false);
         } else {
-            menuCalItem.getActionView().setOnClickListener(new OnClickListener() {
+            menuSaveItem.getActionView().setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     addToCalendar(mEvent, null);

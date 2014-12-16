@@ -2,7 +2,7 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
     style="@style/EventActionMenuItem"
-    android:text="@string/action_cal"
+    android:text="@string/action_save"
     android:drawableLeft="@android:drawable/ic_menu_my_calendar"
     android:drawableStart="@android:drawable/ic_menu_my_calendar"
     tools:background="@color/app_color"
