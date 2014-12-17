@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -48,6 +49,11 @@ public abstract class BaseActivity extends FragmentActivity {
             googleAnalytics = GoogleAnalytics.getInstance(this);
             tracker = googleAnalytics.newTracker(R.xml.analytics);
             tracker.enableAdvertisingIdCollection(true);
+
+            // Disable GA reporting in debug build.
+            if (BuildConfig.DEBUG) {
+                googleAnalytics.setAppOptOut(true);
+            }
         }
 
         // Automatic Google Analytics reporting.
