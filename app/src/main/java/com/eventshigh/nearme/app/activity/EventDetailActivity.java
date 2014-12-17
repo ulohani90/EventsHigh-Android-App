@@ -319,7 +319,7 @@ public class EventDetailActivity extends BaseActivity {
             LinearLayout ll = getLL(layoutParams);
             for (String tag : mEvent.getAllTags()) {
                 TextView tagView = addTag(ll, tag);
-                ll.measure(maxWidth, 0);
+                ll.measure(0, 0);
                 if (ll.getMeasuredWidth() < maxWidth) {
                     continue;
                 }
