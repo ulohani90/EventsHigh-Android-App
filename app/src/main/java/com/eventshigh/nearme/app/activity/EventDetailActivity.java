@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.text.Html;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -308,6 +309,14 @@ public class EventDetailActivity extends BaseActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
+            while (mEventCard.tagsView.getWidth() < 100) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    // Ignore.
+                }
+            }
+
             return null;
         }
 
