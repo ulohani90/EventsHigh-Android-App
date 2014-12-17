@@ -147,8 +147,6 @@
             android:background="@color/event_detail_gray"
             android:paddingTop="@dimen/abc_control_padding_material"
             android:paddingBottom="@dimen/abc_control_padding_material"
-            android:paddingLeft="@dimen/abc_action_bar_icon_vertical_padding_material"
-            android:paddingRight="@dimen/abc_action_bar_icon_vertical_padding_material"
             android:columnWidth="100dp"
             android:orientation="vertical"
             tools:listitem="@layout/event_tag"

@@ -313,20 +313,20 @@ public class EventDetailActivity extends BaseActivity {
 
         @Override
         protected void onPostExecute(Void results) {
+            LayoutParams layoutParams = getLayoutParam();
             int maxWidth = mEventCard.tagsView.getWidth()
-                    - mEventCard.tagsView.getPaddingRight()
-                    - mEventCard.tagsView.getPaddingLeft();
-            LinearLayout llAlso = getLL();
+                    - layoutParams.leftMargin - layoutParams.rightMargin;
+            LinearLayout ll = getLL(layoutParams);
             for (String tag : mEvent.getAllTags()) {
-                TextView tagView = addTag(llAlso, tag);
-                llAlso.measure(maxWidth, 0);
-                if (llAlso.getMeasuredWidth() < maxWidth) {
+                TextView tagView = addTag(ll, tag);
+                ll.measure(maxWidth, 0);
+                if (ll.getMeasuredWidth() < maxWidth) {
                     continue;
                 }
 
                 tagView.setVisibility(View.GONE);
-                llAlso = getLL();
-                addTag(llAlso, tag);
+                ll = getLL(layoutParams);
+                addTag(ll, tag);
             }
         }
 
@@ -337,15 +337,19 @@ public class EventDetailActivity extends BaseActivity {
             return  tagView;
         }
 
-        private LinearLayout getLL() {
-            LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-            int margin = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()));
-            layoutParams.setMargins(margin, 0 , margin, 0);
+        private LinearLayout getLL(LayoutParams layoutParams) {
             LinearLayout ll = new LinearLayout(EventDetailActivity.this);
             ll.setLayoutParams(layoutParams);
             ll.setOrientation(LinearLayout.HORIZONTAL);
             mEventCard.tagsView.addView(ll);
             return  ll;
+        }
+
+        private LayoutParams getLayoutParam() {
+            LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            int margin = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()));
+            layoutParams.setMargins(margin, 0 , margin, 0);
+            return layoutParams;
         }
     }
 }
