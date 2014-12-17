@@ -7,8 +7,10 @@
 >
     <TextView
         style="@style/EventActionMenuItem"
-        android:text="@string/action_share"
-        android:drawableLeft="@android:drawable/ic_menu_share"
-        android:drawableStart="@android:drawable/ic_menu_share"
+        android:text="@string/action_call"
+        android:drawableLeft="@android:drawable/ic_menu_call"
+        android:drawableStart="@android:drawable/ic_menu_call"
+        tools:background="@color/app_color"
+        tools:context=".activity.EventDetailActivity"
     />
 </FrameLayout>

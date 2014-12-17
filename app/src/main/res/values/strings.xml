@@ -11,6 +11,7 @@
     <string name="action_share">Share</string>
     <string name="action_save">Save</string>
     <string name="action_book">Book</string>
+    <string name="action_call">Call</string>
     <string name="action_direction">Show Directions</string>
 
     <!-- Other Strings used in UI -->

@@ -101,6 +101,18 @@ public class EventDetailActivity extends BaseActivity {
             });
         }
 
+        MenuItem menuCallItem = menu.findItem(R.id.action_call);
+        if (mEvent.organizerPhone == null) {
+            menuCallItem.setVisible(false);
+        } else {
+            menuCallItem.getActionView().setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    call(null);
+                }
+            });
+        }
+
         MenuItem menuSaveItem = menu.findItem(R.id.action_save);
         if (mEvent.eventTimings.length == 0) {
             menuSaveItem.setVisible(false);
