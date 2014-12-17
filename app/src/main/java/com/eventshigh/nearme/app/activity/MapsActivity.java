@@ -226,8 +226,6 @@ public class MapsActivity extends LocationAwareEventActivity {
     private OnCameraChangeListener mOnCameraChangeListener = new OnCameraChangeListener() {
         @Override
         public void onCameraChange(CameraPosition cameraPosition) {
-            reportActionToAnalytics("onCameraChange");
-
             // If user has zoomed out too much, do not show events marker.
             // We also show helper toast once per application runtime.
             if (cameraPosition.zoom < MIN_ZOOM_LEVEL) {
@@ -238,6 +236,9 @@ public class MapsActivity extends LocationAwareEventActivity {
 
                 refreshListingsIfNeeded(null);
             } else if (!refreshListingsIfNeeded(cameraPosition.target)) {
+                if (!isAppMovement && lastSelectedMarker == null) {
+                    reportActionToAnalytics("onCameraChange");
+                }
                 boolean listingShown = markerManager.updateListingForProjection(
                     isAppMovement ? null : map.getCameraPosition().target,
                     map.getProjection());
@@ -253,7 +254,10 @@ public class MapsActivity extends LocationAwareEventActivity {
     private OnMapClickListener mOnMapClickListener = new OnMapClickListener() {
         @Override
         public void onMapClick(LatLng latLng) {
-            reportActionToAnalytics("onMapClick");
+            if (latLng != null) {
+                reportActionToAnalytics("onMapClick");
+            }
+            lastSelectedMarker = null;
             eventCardContainer.removeAllViews();
         }
     };

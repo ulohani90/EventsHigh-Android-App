@@ -236,6 +236,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     }
 
     protected void switchTo(Class<?> cls) {
+        reportActionToAnalytics("switchView");
         Intent intent = new Intent(this, cls)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         if (lastEventFetcherParam != null) {
