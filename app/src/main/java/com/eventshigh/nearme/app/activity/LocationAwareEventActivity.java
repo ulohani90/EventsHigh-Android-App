@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsCollection.Builder;
@@ -368,12 +369,18 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                 }
 
                 for (Pair<String, Integer> tag : tags) {
-                    actionBar.addTab(
-                        actionBar.newTab()
-                            .setText(tag.first + "\n(" + tag.second + ")")
-                            .setTag(tag.first)
-                            .setTabListener(mTabListener),
-                        false);
+                    Tab tab = actionBar.newTab()
+                                .setText("  " + tag.first + "  \n  (" + tag.second + ")  ")
+                                .setTag(tag.first)
+                                .setTabListener(mTabListener);
+                    EventCategory category = Event.getCategoryFromTag(tag.first);
+                    if (category != null) {
+                        int iconRes = category.getIconResourceId();
+                        if (iconRes != R.drawable.icon_other) {
+                            tab.setIcon(iconRes);
+                        }
+                    }
+                    actionBar.addTab(tab, false);
                 }
 
                 actionBar.setSelectedNavigationItem(selectedItem);

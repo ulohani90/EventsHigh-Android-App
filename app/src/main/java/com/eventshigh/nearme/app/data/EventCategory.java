@@ -43,17 +43,21 @@ public enum EventCategory {
     public BitmapDescriptor icon() {
         BitmapDescriptor icon = CATEGORY_ICONS.get(this);
         if (icon == null) {
-            int resId = R.drawable.icon_other;
-            try {
-                resId = R.drawable.class.getField("icon_" + toString().toLowerCase()).getInt(null);
-            } catch (IllegalAccessException| NoSuchFieldException e) {
-                // Ignore
-            }
-
-            icon = BitmapDescriptorFactory.fromResource(resId);
+            icon = BitmapDescriptorFactory.fromResource(getIconResourceId());
             CATEGORY_ICONS.put(this, icon);
         }
         return icon;
+    }
+
+    public int getIconResourceId() {
+        int resId = R.drawable.icon_other;
+        try {
+            resId = R.drawable.class.getField("icon_" + toString().toLowerCase()).getInt(null);
+        } catch (IllegalAccessException| NoSuchFieldException e) {
+            // Ignore
+        }
+
+        return resId;
     }
 
     public static BitmapDescriptor circleIcon() {

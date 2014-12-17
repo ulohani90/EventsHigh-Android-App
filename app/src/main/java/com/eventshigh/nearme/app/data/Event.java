@@ -231,11 +231,11 @@ public class Event implements Parcelable {
         ArrayList<String> otherTags = new ArrayList<>(tagsJsonArr.length());
         for (int j = 0; j < tagsJsonArr.length(); j++) {
             String tag = tagsJsonArr.getJSONObject(j).getString("tag");
-            String tagU = tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "");
+            String tagU = toCategoryParsableString(tag);
             String tagToShow = Utils.capitalize(tag);
 
-            try {
-                EventCategory tagCategory = EventCategory.valueOf(tagU);
+            EventCategory tagCategory = getCategoryFromCategoryParsableString(tagU);
+            if (tagCategory != null) {
                 if (category == EventCategory.OTHER) {
                     category = tagCategory;
                     tagsWhiteList.add(0, tagToShow);
@@ -243,8 +243,6 @@ public class Event implements Parcelable {
                     tagsWhiteList.add(tagToShow);
                 }
                 continue;
-            } catch (IllegalArgumentException e) {
-                // Ignore. Unsupported category.
             }
 
             try {
@@ -252,7 +250,7 @@ public class Event implements Parcelable {
                 tagsWhiteList.add(tagToShow);
                 continue;
             } catch (IllegalArgumentException e) {
-                // Ignore. Not a whitelisted category.
+                // Ignore. Not a white listed category.
             }
 
             otherTags.add(tagToShow);
@@ -324,6 +322,23 @@ public class Event implements Parcelable {
         JSONObject eventsJSON = new JSONObject(jsonStr);
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
         return fromJSON(city, upcomingEvents);
+    }
+
+    public static @Nullable EventCategory getCategoryFromTag(String tag) {
+        return  getCategoryFromCategoryParsableString(toCategoryParsableString(tag));
+    }
+
+    private static @Nullable EventCategory getCategoryFromCategoryParsableString(String tagU) {
+        try {
+            return EventCategory.valueOf(tagU);
+        } catch (IllegalArgumentException e) {
+            // Ignore. Unsupported category.
+        }
+        return  null;
+    }
+
+    private static String toCategoryParsableString(String tag) {
+        return tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "");
     }
 
     private static String checkIfUnknown(@Nullable String string) {
