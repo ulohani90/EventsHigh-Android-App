@@ -251,7 +251,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {
-            Tab selectedTab = actionBar.getSelectedTab();
+            String lastSelectedTagSave = lastSelectedTag;
             actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             actionBar.removeAllTabs();
             actionBar.addTab(
@@ -265,8 +265,8 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                             .setTag(EventsCollection.RECOMMENDED_EVENTS_CATEGORY)
                             .setTabListener(mTabListener));
 
-            if (selectedTab != null) {
-                lastSelectedTag = selectedTab.getTag().toString();
+            if (lastSelectedTagSave != null) {
+                lastSelectedTag = lastSelectedTagSave;
             }
         }
     }
