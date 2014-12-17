@@ -4,8 +4,10 @@ import android.graphics.Point;
 import android.support.annotation.Nullable;
 import android.util.Pair;
 
+import com.eventshigh.nearme.app.activity.MapsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
@@ -44,6 +46,12 @@ public class MarkerManager {
     // in screen units.
     private static final int MIN_MARKER_DISTANCE_SQ = 3000;
 
+    // When events are loaded, we zoom out if there are not enough events shown on map.
+    private static final int MIN_EVENTS_TO_SHOW = 3;
+    // Because screens are not perfect circle, we do approximation here to diagonal distance
+    // needed is 2.79f times the event distance. Note: 2.79 ~= 1.25 * (sq root of 5), where
+    // (sq root of 5) is diagonal distance for 9:16 wide screens.
+    private static final float DIAGONAL_DISTANCE_MULTIPLIER = 2.79f;
 
     // ***********************
     // MEMBERS
@@ -94,6 +102,9 @@ public class MarkerManager {
         }
 
         updateListingForProjection(map.getCameraPosition().target, map.getProjection());
+
+        // If the user has zoomed in too much, zoom out a bit.
+        zoomOutIfNeeded(map);
     }
 
     // Gets the next marker, which are ordered based on user location and event popularity.
@@ -182,6 +193,28 @@ public class MarkerManager {
         return !markersInProjection.isEmpty() && markersInProjection.get(0).isInfoWindowShown();
     }
 
+    private void zoomOutIfNeeded(GoogleMap map) {
+        if (markers.isEmpty()) {
+            return;
+        }
+        int numMinMarkers = Math.min(MIN_EVENTS_TO_SHOW, markers.size());
+        Marker marker = orderedMarkerCollection.getFirstMarker();
+        for (int i = 1; i < numMinMarkers; i++) {
+            marker = getNextMarker(marker);
+        }
+
+        float minDiagonalDistance = DIAGONAL_DISTANCE_MULTIPLIER *  Utils.distanceInMeters(
+               marker.getPosition(), map.getCameraPosition().target);
+        float currentDiagonalDistance =  Utils.distanceInMeters(
+                map.getProjection().getVisibleRegion().farLeft,
+                map.getProjection().getVisibleRegion().nearRight);
+        if (currentDiagonalDistance < minDiagonalDistance) {
+            float zoomOutNeeded = (float) (Math.log(minDiagonalDistance/currentDiagonalDistance) / Math.log(2));
+            float zoom = Math.max(map.getCameraPosition().zoom - zoomOutNeeded, MapsActivity.MIN_ZOOM_LEVEL);
+            map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
+        }
+    }
+
     // This class is responsible for keeping the order between all markers. This Order is then
     // used when user swipes the event card to go to next event.
     private class OrderedMarkerCollection {
@@ -217,6 +250,10 @@ public class MarkerManager {
         public void clear() {
             orderedMarkersSet.clear();
             location = null;
+        }
+
+        Marker getFirstMarker() {
+            return orderedMarkersSet.first();
         }
 
         public Marker getNextMarker(Marker marker) {

@@ -48,8 +48,8 @@ public class MapsActivity extends LocationAwareEventActivity {
     // ***********************
 
     // For performance reasons, we show events only where user has reasonable zoom level.
-    private static final int MIN_ZOOM_LEVEL = 11;
-    private static final int DEFAULT_ZOOM_LEVEL = 14;
+    public static final int MIN_ZOOM_LEVEL = 11;
+    public static final int DEFAULT_ZOOM_LEVEL = 14;
 
 
     // ***********************
