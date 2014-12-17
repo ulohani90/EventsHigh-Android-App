@@ -346,8 +346,10 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         private LayoutParams getLayoutParam() {
-            LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            int margin = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()));
+            LayoutParams layoutParams =
+                    new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            int margin = Math.round(TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()));
             layoutParams.setMargins(margin, 0 , margin, 0);
             return layoutParams;
         }

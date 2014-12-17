@@ -189,22 +189,21 @@ public class Event implements Parcelable {
             img_url = null;
         }
 
-        int num_people_interested = eventJson.getInt("num_people_interested");
-        boolean eh_recommends = eventJson.has("eh_editor") && eventJson.getBoolean("eh_editor");
+        int num_people_interested = eventJson.optInt("num_people_interested", 0);
+        boolean eh_recommends = eventJson.optBoolean("eh_editor");
 
         double lat = 0;
         double lon = 0;
-        JSONObject venueJson = eventJson.optJSONObject("venue_info");
-        JSONObject localityJson = eventJson.optJSONObject("locality_info");
-        if (venueJson != null) {
-            lat = venueJson.getDouble("lat");
-            lon = venueJson.getDouble("lon");
+        if (mashup != null) {
+            lat = mashup.optDouble("lat", 0);
+            lon = mashup.optDouble("lon", 0);
         }
 
+        JSONObject localityJson = eventJson.optJSONObject("locality_info");
         if (Math.abs(lat) < 1 && Math.abs(lon) < 1 && localityJson != null) {
             // Invalid latitude and longitude. Try locality_info.
-            lat = localityJson.getDouble("lat");
-            lon = localityJson.getDouble("lon");
+            lat = localityJson.optDouble("lat", 0);
+            lon = localityJson.optDouble("lon", 0);
         }
 
         if (Math.abs(lat) < 1 && Math.abs(lon) < 1) {
@@ -215,6 +214,7 @@ public class Event implements Parcelable {
 
         String venue = null;
         String address = null;
+        JSONObject venueJson = eventJson.optJSONObject("venue_info");
         if (venueJson != null) {
             venue =  checkIfUnknown(venueJson.optString("name"));
             address = venueJson.optString("address");
@@ -260,7 +260,8 @@ public class Event implements Parcelable {
 
         // Event timings.
         TreeSet<Long> eventTimings = new TreeSet<>();
-        Date eventTiming =  Utils.mergeDateTime(eventJson.optString("date"), eventJson.optString("start_time"), city.timeZone);
+        Date eventTiming =  Utils.mergeDateTime(eventJson.optString("date"),
+                eventJson.optString("start_time"), city.timeZone);
         if (eventTiming != null) {
             eventTimings.add(eventTiming.getTime());
         }
