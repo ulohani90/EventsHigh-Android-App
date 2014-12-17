@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
@@ -44,6 +45,8 @@ public class EventDetailActivity extends BaseActivity {
     // Regex to check if description is plane text or html.
     private static final Pattern htmlCheckPattern = Pattern.compile("<[A-Za-z].*</[A-Za-z]");
 
+    // Number of taps needed for GA opt out.
+    private static final int NUM_TAPS_FOR_GA_OPT_OUT = 7;
 
     /**********************************
      Members
@@ -53,6 +56,9 @@ public class EventDetailActivity extends BaseActivity {
     private Event mEvent;
     // Event card which holds the UI elements.
     private EventCard mEventCard;
+    // Hidden trick to disable a device from GA reporting is to tap on
+    // num_people_interested text multiple times.
+    private int gaOptOutCounter = 0;
 
 
     /**********************************
@@ -203,6 +209,14 @@ public class EventDetailActivity extends BaseActivity {
         }
     }
 
+    public void gaOptOutCounter(View view) {
+        gaOptOutCounter ++;
+        if (gaOptOutCounter == NUM_TAPS_FOR_GA_OPT_OUT) {
+            Toast.makeText(this, "GA reporting disabled on this device", Toast.LENGTH_SHORT).show();
+            googleAnalytics.setAppOptOut(true);
+        }
+    }
+
     public void getDirections(View view) {
         showDirections(mEvent);
     }
@@ -233,7 +247,6 @@ public class EventDetailActivity extends BaseActivity {
         private final LinearLayout timeView;
         private final TextView numPeopleInterestedView;
         private final TextView venueView;
-        private final TextView directionView;
         private final LinearLayout tagsView;
         private final TextView descriptionView;
         private final TextView fromView;
@@ -254,7 +267,6 @@ public class EventDetailActivity extends BaseActivity {
             timeView = (LinearLayout) rootView.findViewById(R.id.event_time);
             numPeopleInterestedView = (TextView) rootView.findViewById(R.id.num_people_interested);
             venueView = (TextView) rootView.findViewById(R.id.event_venue);
-            directionView = (TextView) rootView.findViewById(R.id.buttonDirection);
             tagsView = (LinearLayout) rootView.findViewById(R.id.event_tags);
             descriptionView = (TextView) rootView.findViewById(R.id.event_description);
             fromView = (TextView) rootView.findViewById(R.id.event_from);

@@ -44,7 +44,7 @@ public abstract class BaseActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Seatup Google Analytics.
+        // Setup Google Analytics.
         if (googleAnalytics == null) {
             googleAnalytics = GoogleAnalytics.getInstance(this);
             tracker = googleAnalytics.newTracker(R.xml.analytics);
