@@ -8,6 +8,7 @@
     <TextView
         style="@style/EventActionMenuItem"
         android:text="@string/action_share"
+        android:clickable="false"
         android:drawableLeft="@android:drawable/ic_menu_share"
         android:drawableStart="@android:drawable/ic_menu_share"
     />

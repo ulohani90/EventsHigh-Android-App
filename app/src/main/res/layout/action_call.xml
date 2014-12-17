@@ -10,7 +10,6 @@
         android:text="@string/action_call"
         android:drawableLeft="@android:drawable/ic_menu_call"
         android:drawableStart="@android:drawable/ic_menu_call"
-        tools:background="@color/app_color"
-        tools:context=".activity.EventDetailActivity"
+        android:clickable="false"
     />
 </FrameLayout>
