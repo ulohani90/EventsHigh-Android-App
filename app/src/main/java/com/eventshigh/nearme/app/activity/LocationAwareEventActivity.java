@@ -214,6 +214,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         City userCity = City.getCity(userLocation);
         if (userCity == null) {
             if (userLocation != null) {
+                reportActionToAnalytics("unsupportedCity");
                 Toast.makeText(this, R.string.no_event, Toast.LENGTH_SHORT).show();
             }
             lastEventFetcherParam = null;
@@ -368,10 +369,11 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
                 for (Pair<String, Integer> tag : tags) {
                     actionBar.addTab(
-                            actionBar.newTab()
-                                    .setText(tag.first + "\n(" + tag.second + ")")
-                                    .setTag(tag.first)
-                                    .setTabListener(mTabListener), false);
+                        actionBar.newTab()
+                            .setText(tag.first + "\n(" + tag.second + ")")
+                            .setTag(tag.first)
+                            .setTabListener(mTabListener),
+                        false);
                 }
 
                 actionBar.setSelectedNavigationItem(selectedItem);
@@ -384,7 +386,11 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         public void onTabSelected(Tab tab, FragmentTransaction ft) {
             if (events != null) {
                 lastSelectedTag = tab.getTag().toString();
-                updateNewEvents(events.getEvents(tab.getPosition()));
+                List<Event> eventsForTag = events.getEvents(tab.getPosition());
+                if (!eventsForTag.isEmpty()) {
+                    reportActionToAnalytics("filterByCategory");
+                }
+                updateNewEvents(eventsForTag);
             }
         }
 

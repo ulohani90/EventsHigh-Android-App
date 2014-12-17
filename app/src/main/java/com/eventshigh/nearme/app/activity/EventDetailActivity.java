@@ -161,6 +161,7 @@ public class EventDetailActivity extends BaseActivity {
      **********************************/
 
     public void openSourceSite(View view) {
+        reportActionToAnalytics("openSource");
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mEvent.source_url));
         try {
             startActivity(intent);
@@ -174,6 +175,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     private void gotoBookingSite() {
+        reportActionToAnalytics("bookTicket");
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mEvent.booking_url));
         try {
             startActivity(intent);

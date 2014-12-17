@@ -170,10 +170,12 @@ public class MapsActivity extends LocationAwareEventActivity {
                                        float velocityX, float velocityY) {
                     if (Math.abs(velocityY) > Math.abs(velocityX)) {
                         // this is either up or down movement, ignore.
+                        reportActionToAnalytics("swipeVertical");
                         return  false;
                     }
 
 
+                    reportActionToAnalytics("swipe");
                     Marker nextMarker = velocityX > 0 ?
                             markerManager.getPrevMarker(lastSelectedMarker) :
                             markerManager.getNextMarker(lastSelectedMarker);
@@ -251,6 +253,7 @@ public class MapsActivity extends LocationAwareEventActivity {
     private OnMapClickListener mOnMapClickListener = new OnMapClickListener() {
         @Override
         public void onMapClick(LatLng latLng) {
+            reportActionToAnalytics("onMapClick");
             eventCardContainer.removeAllViews();
         }
     };
@@ -276,7 +279,7 @@ public class MapsActivity extends LocationAwareEventActivity {
         }
     };
 
-    // When user clicks on info window, we open the browser with details URL.
+    // When user clicks on info window, we open the details screen.
     private OnInfoWindowClickListener mOnInfoWindowClickListener = new OnInfoWindowClickListener() {
         @Override
         public void onInfoWindowClick(Marker marker) {
