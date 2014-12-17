@@ -36,9 +36,9 @@ public class Event implements Parcelable {
     public final String[] tagsWhiteList;
     public final String[] tagsOther;
 
-    @Nullable public final String img_url;
-    @Nullable public final String source_url;
-    @Nullable public final String booking_url;
+    @Nullable public final String imgUrl;
+    @Nullable public final String sourceUrl;
+    @Nullable public final String bookingUrl;
 
     public final int numPeopleInterested;
     public final boolean ehRecommended;
@@ -49,12 +49,17 @@ public class Event implements Parcelable {
     @Nullable public final String venue;
     @Nullable public final String address;
 
+    @Nullable public final String organizerName;
+    @Nullable public final String organizerPhone;
+    @Nullable public final String organizerWebsite;
+
     public Event(String id, City city, String title, EventCategory category,
                  String description, String[] tagsWhiteList, String[] tagsOther,
-                 @Nullable String img_url, @Nullable String source_url, @Nullable String booking_url,
+                 @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
                  int numPeopleInterested, boolean ehRecommended,
                  long[] eventTimings,
-                 LatLng location, @Nullable String venue, @Nullable String address) {
+                 LatLng location, @Nullable String venue, @Nullable String address,
+                 String organizerName, String organizerPhone, String organizerWebsite) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -64,9 +69,9 @@ public class Event implements Parcelable {
         this.tagsWhiteList = tagsWhiteList;
         this.tagsOther = tagsOther;
 
-        this.img_url = checkIfUnknown(img_url);
-        this.source_url = checkIfUnknown(source_url);
-        this.booking_url = checkIfUnknown(booking_url);
+        this.imgUrl = checkIfUnknown(imgUrl);
+        this.sourceUrl = checkIfUnknown(sourceUrl);
+        this.bookingUrl = checkIfUnknown(bookingUrl);
 
         this.numPeopleInterested = numPeopleInterested;
         this.ehRecommended = ehRecommended;
@@ -76,6 +81,10 @@ public class Event implements Parcelable {
         this.location = location;
         this.venue = checkIfUnknown(venue);
         this.address = checkIfUnknown(address);
+
+        this.organizerName = checkIfUnknown(organizerName);
+        this.organizerPhone = checkIfUnknown(organizerPhone);
+        this.organizerWebsite = checkIfUnknown(organizerWebsite);
     }
 
     public Uri getEventDetailsURI() {
@@ -123,9 +132,9 @@ public class Event implements Parcelable {
         dest.writeStringArray(tagsWhiteList);
         dest.writeStringArray(tagsOther);
 
-        dest.writeString(emptyIfNull(img_url));
-        dest.writeString(emptyIfNull(source_url));
-        dest.writeString(emptyIfNull(booking_url));
+        dest.writeString(emptyIfNull(imgUrl));
+        dest.writeString(emptyIfNull(sourceUrl));
+        dest.writeString(emptyIfNull(bookingUrl));
 
         dest.writeInt(numPeopleInterested);
         dest.writeBooleanArray(new boolean[]{ehRecommended});
@@ -135,6 +144,10 @@ public class Event implements Parcelable {
         dest.writeParcelable(location, flags);
         dest.writeString(emptyIfNull(venue));
         dest.writeString(emptyIfNull(address));
+
+        dest.writeString(emptyIfNull(organizerName));
+        dest.writeString(emptyIfNull(organizerPhone));
+        dest.writeString(emptyIfNull(organizerWebsite));
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -161,6 +174,10 @@ public class Event implements Parcelable {
                             in.createLongArray(),
 
                             (LatLng) in.readParcelable(LatLng.class.getClassLoader()),
+                            in.readString(),
+                            in.readString(),
+
+                            in.readString(),
                             in.readString(),
                             in.readString()
                     );
@@ -283,6 +300,11 @@ public class Event implements Parcelable {
             i++;
         }
 
+        // Organizer Info.
+        String organizerName = mashup == null ? null : mashup.optString("organizer_name");
+        String organizerPhone = mashup == null ? null : mashup.optString("organizer_phone");
+        String organizerWebsite = mashup == null ? null : mashup.optString("organizer_website");
+
         return new Event(id,
                 city,
                 title,
@@ -303,7 +325,12 @@ public class Event implements Parcelable {
 
                 new LatLng(lat, lon),
                 venue,
-                address);
+                address,
+
+                organizerName,
+                organizerPhone,
+                organizerWebsite
+        );
     }
 
     public static List<Event> fromJSON(City city, JSONArray jsonArray) {

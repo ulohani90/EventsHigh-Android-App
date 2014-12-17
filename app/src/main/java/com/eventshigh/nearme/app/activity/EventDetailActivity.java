@@ -90,7 +90,7 @@ public class EventDetailActivity extends BaseActivity {
 
         getMenuInflater().inflate(R.menu.activity_detail, menu);
         MenuItem menuBookItem = menu.findItem(R.id.action_book);
-        if (mEvent.booking_url == null) {
+        if (mEvent.bookingUrl == null) {
             menuBookItem.setVisible(false);
         } else {
             menuBookItem.getActionView().setOnClickListener(new OnClickListener() {
@@ -162,12 +162,37 @@ public class EventDetailActivity extends BaseActivity {
 
     public void openSourceSite(View view) {
         reportActionToAnalytics("openSource");
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mEvent.source_url));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mEvent.sourceUrl));
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
             // No activity to open url. ignore.
         }
+    }
+
+    public void call(View view) {
+        reportActionToAnalytics("callOrganizer");
+        Intent intent = new Intent(Intent.ACTION_DIAL)
+                .setData(Uri.parse("tel:" + mEvent.organizerPhone));
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // No activity to call. ignore.
+        }
+    }
+
+    public void openOrganizerWebsite(View view) {
+        reportActionToAnalytics("openOrganizerWebsite");
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mEvent.organizerWebsite));
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // No activity to open url. ignore.
+        }
+    }
+
+    public void getDirections(View view) {
+        showDirections(mEvent);
     }
 
     private void shareEvent() {
@@ -176,7 +201,7 @@ public class EventDetailActivity extends BaseActivity {
 
     private void gotoBookingSite() {
         reportActionToAnalytics("bookTicket");
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mEvent.booking_url));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mEvent.bookingUrl));
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
@@ -200,6 +225,14 @@ public class EventDetailActivity extends BaseActivity {
         private final LinearLayout tagsView;
         private final TextView descriptionView;
         private final TextView fromView;
+        private final LinearLayout organizerNameRow;
+        private final TextView organizerNameView;
+        private final LinearLayout organizerAddressRow;
+        private final TextView organizerAddressView;
+        private final LinearLayout organizerPhoneRow;
+        private final TextView organizerPhoneView;
+        private final LinearLayout organizerWebsiteRow;
+        private final TextView organizerWebsiteView;
 
         private EventCard(View rootView) {
             this.rootView = rootView;
@@ -213,6 +246,14 @@ public class EventDetailActivity extends BaseActivity {
             tagsView = (LinearLayout) rootView.findViewById(R.id.event_tags);
             descriptionView = (TextView) rootView.findViewById(R.id.event_description);
             fromView = (TextView) rootView.findViewById(R.id.event_from);
+            organizerNameRow = (LinearLayout) rootView.findViewById(R.id.orgnizer_name_row);
+            organizerNameView = (TextView) rootView.findViewById(R.id.orgnizer_name);
+            organizerAddressRow = (LinearLayout) rootView.findViewById(R.id.orgnizer_address_row);
+            organizerAddressView = (TextView) rootView.findViewById(R.id.orgnizer_address);
+            organizerPhoneRow = (LinearLayout) rootView.findViewById(R.id.orgnizer_phone_row);
+            organizerPhoneView = (TextView) rootView.findViewById(R.id.orgnizer_phone);
+            organizerWebsiteRow = (LinearLayout) rootView.findViewById(R.id.orgnizer_website_row);
+            organizerWebsiteView = (TextView) rootView.findViewById(R.id.orgnizer_website);
         }
     }
 
@@ -227,10 +268,10 @@ public class EventDetailActivity extends BaseActivity {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         mEventCard.bgView.setMaxHeight((int) (0.4 * metrics.heightPixels));
-        if (mEvent.img_url == null) {
+        if (mEvent.imgUrl == null) {
             mEventCard.bgView.setVisibility(View.GONE);
         } else {
-            DownloadImageTask.setImage(mEventCard.bgView, mEvent.img_url, -1);
+            DownloadImageTask.setImage(mEventCard.bgView, mEvent.imgUrl, -1);
         }
 
         // Set title
@@ -240,19 +281,7 @@ public class EventDetailActivity extends BaseActivity {
         mEventCard.recommendedImageView.setVisibility(mEvent.ehRecommended ? View.VISIBLE : View.GONE);
 
         // Set Venue.
-        mEventCard.venueView.setText(mEvent.address == null ? mEvent.venue : mEvent.address);
-        mEventCard.venueView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDirections(mEvent);
-            }
-        });
-        mEventCard.directionView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDirections(mEvent);
-            }
-        });
+        mEventCard.venueView.setText(mEvent.venue != null ? mEvent.venue : mEvent.address);
 
         // Set time.
         if (mEvent.eventTimings.length == 0) {
@@ -290,14 +319,39 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         // Add attribution.
-        if (mEvent.source_url == null) {
+        if (mEvent.sourceUrl == null) {
             mEventCard.fromView.setVisibility(View.INVISIBLE);
         } else {
-            final Uri fromUri =  Uri.parse(mEvent.source_url);
+            final Uri fromUri =  Uri.parse(mEvent.sourceUrl);
             String eventFrom = String.format(
                     getResources().getString(R.string.event_detail_from),
                     fromUri.getHost());
             mEventCard.fromView.setText(eventFrom);
+        }
+
+        // Organizer Info.
+        if (mEvent.organizerName == null) {
+            mEventCard.organizerNameRow.setVisibility(View.GONE);
+        } else {
+            mEventCard.organizerNameView.setText(mEvent.organizerName);
+        }
+
+        if (mEvent.address == null) {
+            mEventCard.organizerAddressRow.setVisibility(View.GONE);
+        } else {
+            mEventCard.organizerAddressView.setText(mEvent.address);
+        }
+
+        if (mEvent.organizerPhone == null) {
+            mEventCard.organizerPhoneRow.setVisibility(View.GONE);
+        } else {
+            mEventCard.organizerPhoneView.setText(mEvent.organizerPhone);
+        }
+
+        if (mEvent.organizerWebsite == null) {
+            mEventCard.organizerWebsiteRow.setVisibility(View.GONE);
+        } else {
+            mEventCard.organizerWebsiteView.setText(mEvent.organizerWebsite);
         }
 
         // Show tags.
@@ -340,7 +394,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     private LinearLayout getLL(LayoutParams layoutParams) {
-        LinearLayout ll = new LinearLayout(EventDetailActivity.this);
+        LinearLayout ll = new LinearLayout(this);
         ll.setLayoutParams(layoutParams);
         ll.setOrientation(LinearLayout.HORIZONTAL);
         mEventCard.tagsView.addView(ll);
