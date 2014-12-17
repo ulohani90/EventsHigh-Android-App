@@ -195,7 +195,8 @@ public class Event implements Parcelable {
     public static Event fromJSON(City city, JSONObject eventJson) throws JSONException, ParseException {
         String id = eventJson.getString("id");
         String title = eventJson.getString("title");
-        String description = eventJson.getString("description");
+        String description = eventJson.getString("description")
+                .replaceAll("\\s+\n", "\n\n");
 
         JSONObject mashup = eventJson.optJSONObject("mashup");
         String source_url = eventJson.optString("source_url");
