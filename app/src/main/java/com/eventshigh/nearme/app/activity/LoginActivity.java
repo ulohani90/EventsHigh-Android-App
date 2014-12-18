@@ -10,6 +10,7 @@ import com.digits.sdk.android.AuthCallback;
 import com.digits.sdk.android.DigitsAuthButton;
 import com.digits.sdk.android.DigitsException;
 import com.digits.sdk.android.DigitsSession;
+import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.google.android.gms.analytics.HitBuilders;
 import com.twitter.sdk.android.Twitter;
@@ -43,7 +44,7 @@ public class LoginActivity extends BaseActivity {
         // Check if we should ask for login or not. If not, go to MapsActivity.
         settings = getSharedPreferences(PREFS_FILE_NAME, 0);
         boolean askForLogIn = settings.getBoolean(PREF_ASK_LOGIN, true);
-        if (!askForLogIn) {
+        if (!BuildConfig.DEBUG && !askForLogIn) {
             launchMaps();
         }
 
