@@ -51,9 +51,15 @@
             android:name="com.google.android.gms.analytics.globalConfigResource"
             android:resource="@xml/analytics"
         />
+		<!-- Setup the Crash Reporting -->
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="88e38bba3d2788a9338644aa2f1a2b9f0ee92991"
+        />
 
 
-        <!-- Enable the file provider which will be used when we share the image
+        <!--
+         Enable the file provider which will be used when we share the image
          from our local cache directory to other applications.
         -->
         <provider
@@ -71,8 +77,10 @@
 
         <!-- Activities within our application -->
         <activity
-            android:name=".activity.MapsActivity"
+            android:name=".activity.LoginActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:noHistory="true"
         >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -80,9 +88,13 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activity.MapsActivity"
+            android:label="@string/app_name"
+        />
+        <activity
             android:name=".activity.EventGridActivity"
             android:label="@string/app_name"
-            android:parentActivityName="com.eventshigh.nearme.app.activity.MapsActivity"
+            android:parentActivityName=".activity.MapsActivity"
         >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

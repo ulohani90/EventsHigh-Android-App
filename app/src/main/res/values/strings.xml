@@ -5,6 +5,7 @@
     <string name="app_name">EventsHigh beta</string>
 
     <!-- Actions, like menu items -->
+    <string name="action_skip_login">Not Now</string>
     <string name="action_list">Show as List</string>
     <string name="action_map">Show on Map</string>
     <string name="action_edit_location">Change Location</string>
@@ -20,7 +21,7 @@
     <string name="ui_event_description">Event Description</string>
     <string name="ui_organizer">Organizer</string>
     <string name="ui_name">Name</string>
-    <string name="ui_address">Addess</string>
+    <string name="ui_address">Address</string>
     <string name="ui_phone">Phone</string>
     <string name="ui_website">Website</string>
 
@@ -31,6 +32,7 @@
     <string name="ask_locality">Enter the locality, city</string>
 
     <!-- Failed messages -->
+    <string name="failed_login">Failed to login! You can retry or skip.</string>
     <string name="failed_load">Failed to load events information!</string>
     <string name="no_event">Sorry, we are not in your city, yet!</string>
     <string name="failed_locality">Could not find locality, did you enter cityname ?</string>

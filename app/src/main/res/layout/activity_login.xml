@@ -1,0 +1,70 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.LoginActivity"
+>
+    <ImageView
+        android:id="@+id/eh_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/eh"
+        android:adjustViewBounds="true"
+    />
+
+    <TextView
+        android:id="@+id/register_message"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/abc_action_bar_icon_vertical_padding_material"
+        android:text="Get the most of this app by registering with EventsHigh"
+        android:layout_below="@+id/eh_image"
+    />
+    <com.digits.sdk.android.DigitsAuthButton
+        android:id="@+id/auth_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/register_message"
+        android:layout_centerHorizontal="true"
+    />
+
+    <!-- Directions Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/event_detail_gray"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/abc_dropdownitem_text_padding_left"
+        android:padding="@dimen/abc_dropdownitem_text_padding_left"
+        android:layout_alignParentBottom="true"
+    >
+        <View
+            android:layout_height="1dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+        />
+        <TextView
+            style="@style/EventDetailText"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:background="@color/app_color"
+            android:textSize="@dimen/abc_text_size_large_material"
+            android:text="@string/action_skip_login"
+            android:textColor="@android:color/white"
+            android:clickable="true"
+            android:onClick="skip"
+            android:padding="@dimen/abc_dropdownitem_text_padding_left"
+        />
+        <View
+            android:layout_height="1dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+        />
+    </LinearLayout>
+
+</RelativeLayout>
