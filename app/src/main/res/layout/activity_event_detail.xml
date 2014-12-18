@@ -81,7 +81,7 @@
             android:orientation="horizontal"
             android:layout_marginTop="@dimen/abc_dropdownitem_text_padding_left"
             android:padding="@dimen/abc_dropdownitem_text_padding_left"
-            >
+        >
             <View
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
@@ -120,7 +120,7 @@
             android:scrollbars="horizontal"
             android:paddingLeft="@dimen/abc_action_bar_icon_vertical_padding_material"
             android:paddingRight="@dimen/abc_action_bar_icon_vertical_padding_material"
-            android:paddingBottom="@dimen/abc_control_padding_material"
+            android:paddingBottom="@dimen/abc_dropdownitem_text_padding_left"
         >
             <LinearLayout
                 android:id="@+id/event_time"
@@ -149,7 +149,7 @@
             android:layout_height="wrap_content"
             android:background="@color/event_detail_gray"
             android:paddingTop="@dimen/abc_control_padding_material"
-            android:paddingBottom="@dimen/abc_control_padding_material"
+            android:paddingBottom="@dimen/abc_dropdownitem_text_padding_left"
             android:orientation="vertical"
             tools:listitem="@layout/event_tag"
         />
@@ -166,9 +166,21 @@
             style="@style/EventDetailText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/abc_control_padding_material"
             android:textIsSelectable="true"
             tools:text="...\n,,,\n---"
+        />
+        <TextView
+            android:id="@+id/event_from"
+            style="@style/EventDetailText"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@drawable/selector_event_text"
+            android:textColor="@android:color/holo_purple"
+            android:layout_marginTop="@dimen/abc_dropdownitem_text_padding_left"
+            android:layout_marginBottom="@dimen/abc_dropdownitem_text_padding_left"
+            android:clickable="true"
+            android:onClick="openSourceSite"
+            tools:text="Event details from: www.eventshigh.com"
         />
 
         <!-- Organizer Info -->
@@ -314,20 +326,10 @@
             />
         </LinearLayout>
 
-        <!-- Event Description -->
-        <TextView
-            android:id="@+id/event_from"
-            style="@style/EventDetailText"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:background="@drawable/selector_event_text"
-            android:textColor="@android:color/holo_purple"
-            android:layout_marginTop="@dimen/abc_dropdownitem_icon_width"
-            android:layout_marginBottom="@dimen/abc_dropdownitem_icon_width"
-            android:clickable="true"
-            android:onClick="openSourceSite"
-            tools:text="Event details from: www.eventshigh.com"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/abc_dropdownitem_icon_width"
+            android:background="@android:color/transparent"
         />
-
     </LinearLayout>
 </ScrollView>
