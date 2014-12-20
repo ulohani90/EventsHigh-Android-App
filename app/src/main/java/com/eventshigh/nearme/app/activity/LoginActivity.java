@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -12,6 +11,7 @@ import com.digits.sdk.android.DigitsException;
 import com.digits.sdk.android.DigitsSession;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.user.Account;
 import com.google.android.gms.analytics.HitBuilders;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -25,26 +25,17 @@ public class LoginActivity extends BaseActivity {
     private static final String TWITTER_KEY = "1g1NOFbZKxr4jktowhU0W5w6P";
     private static final String TWITTER_SECRET = "fiPgdcRUfBWmAiJIXmpD5T1BNpuGj19PkN9WWlTpyXrdZ7Io7U";
 
-    private static final String PREFS_FILE_NAME = "user_creds";
-    private static final String PREF_USER_ID = "user_id";
-    private static final String PREF_PHONE_NO = "phone_no";
-    private static final String PREF_NUM_LOGIN_ATTEMPTS = "num_login_attemts";
-    private static final String PREF_ASK_LOGIN = "ask_login";
-
-    private static final int MAX_FAILED_ATTEMPT = 3;
-
-    private SharedPreferences settings;
     private boolean isGoingToMaps = false;
     private long activityStartTime = 0;
+    private Account account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Check if we should ask for login or not. If not, go to MapsActivity.
-        settings = getSharedPreferences(PREFS_FILE_NAME, 0);
-        boolean askForLogIn = settings.getBoolean(PREF_ASK_LOGIN, true);
-        if (!BuildConfig.DEBUG && !askForLogIn) {
+        account = new Account(this);
+        if (!account.shouldAskForLogin()) {
             launchMaps();
         }
 
@@ -63,29 +54,17 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void success(DigitsSession session, String phoneNumber) {
                 reportActionToAnalytics("loginSuccess");
-
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putLong(PREF_USER_ID, session.getId());
-                editor.putString(PREF_PHONE_NO, phoneNumber);
-                editor.putBoolean(PREF_ASK_LOGIN, false);
-                editor.apply();
-
+                account.recordSuccess(session, phoneNumber);
                 launchMaps();
             }
 
             @Override
             public void failure(DigitsException exception) {
                 reportActionToAnalytics("loginFailed");
-
                 Toast.makeText(LoginActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();
-
-                SharedPreferences.Editor editor = settings.edit();
-                int numFailedLogin = settings.getInt(PREF_NUM_LOGIN_ATTEMPTS, 0) + 1;
-                editor.putInt(PREF_NUM_LOGIN_ATTEMPTS, numFailedLogin);
-                if (numFailedLogin >= MAX_FAILED_ATTEMPT) {
-                    editor.putBoolean(PREF_ASK_LOGIN, false);
+                if (account.recordFailure()) {
+                    launchMaps();
                 }
-                editor.apply();
             }
         });
     }
@@ -101,10 +80,9 @@ public class LoginActivity extends BaseActivity {
 
     public void skip(View view) {
         reportActionToAnalytics("loginSkipped");
-
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean(PREF_ASK_LOGIN, false);
-        editor.apply();
+        if (!BuildConfig.DEBUG) {
+            account.recordSkip();
+        }
 
         launchMaps();
     }
