@@ -12,6 +12,7 @@ import com.digits.sdk.android.DigitsSession;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.TwitterUtils;
 import com.google.android.gms.analytics.HitBuilders;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -21,10 +22,6 @@ import java.util.Date;
 import io.fabric.sdk.android.Fabric;
 
 public class LoginActivity extends BaseActivity {
-    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-    private static final String TWITTER_KEY = "1g1NOFbZKxr4jktowhU0W5w6P";
-    private static final String TWITTER_SECRET = "fiPgdcRUfBWmAiJIXmpD5T1BNpuGj19PkN9WWlTpyXrdZ7Io7U";
-
     private boolean isGoingToMaps = false;
     private long activityStartTime = 0;
     private Account account;
@@ -41,7 +38,7 @@ public class LoginActivity extends BaseActivity {
 
         // Initialize Digits.
         activityStartTime = new Date().getTime();
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        TwitterAuthConfig authConfig = TwitterUtils.getAuthConfig();
         Fabric.with(this, new Twitter(authConfig));
 
         // Setup the content of login screen.

@@ -1,0 +1,3 @@
+-include  proguard-com.twitter.sdk.android.twitter.txt
+-keep class com.eventshigh.nearme.app.user.**
+-keep class com.eventshigh.nearme.app.data.**
