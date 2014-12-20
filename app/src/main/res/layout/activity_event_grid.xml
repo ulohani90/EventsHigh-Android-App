@@ -17,6 +17,7 @@
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
         android:gravity="center"
+        android:background="?android:attr/selectableItemBackground"
         tools:listitem="list_item_event"
     />
 
@@ -32,6 +33,7 @@
             android:orientation="horizontal"
             android:divider="?android:attr/listDivider"
             android:showDividers="middle"
+            android:background="?android:attr/selectableItemBackground"
             tools:listitem="@layout/day_selector_item"
             tools:layout_height="30dp"
         />

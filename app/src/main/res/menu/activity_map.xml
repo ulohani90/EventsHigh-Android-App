@@ -3,17 +3,25 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.eventshigh.nearme.app.activity.EventGridActivity">
 
+    <item android:id="@+id/action_search"
+          android:title="@string/abc_searchview_description_search"
+          android:icon="@android:drawable/ic_menu_search"
+          android:orderInCategory="10"
+          android:showAsAction="ifRoom|collapseActionView"
+          android:actionViewClass="android.widget.SearchView"
+          tools:ignore="AppCompatResource"
+    />
     <item android:id="@+id/action_change_location"
           android:title="@string/action_edit_location"
           android:icon="@drawable/ic_action_place"
-          android:orderInCategory="10"
+          android:orderInCategory="20"
           android:showAsAction="ifRoom"
           tools:ignore="AppCompatResource"
     />
     <item android:id="@+id/action_list"
           android:title="@string/action_list"
           android:icon="@drawable/ic_action_view_as_list"
-          android:orderInCategory="20"
+          android:orderInCategory="30"
           android:showAsAction="ifRoom"
           tools:ignore="AppCompatResource"
     />

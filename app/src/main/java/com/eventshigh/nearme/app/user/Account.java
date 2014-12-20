@@ -11,10 +11,10 @@ import com.digits.sdk.android.DigitsSession;
  */
 public class Account {
     // Constants used for SharedPreferences.
-    private static final String PREFS_FILE_NAME = "user_creds";
+    private static final String PREFS_FILE_NAME = "eh_user_credentials";
     private static final String PREF_USER_ID = "user_id";
     private static final String PREF_PHONE_NO = "phone_no";
-    private static final String PREF_NUM_LOGIN_ATTEMPTS = "num_login_attemts";
+    private static final String PREF_NUM_LOGIN_ATTEMPTS = "num_login_attempts";
     private static final String PREF_ASK_LOGIN = "ask_login";
 
     // Constant used to skip the login screen if there are too many failed login attempts

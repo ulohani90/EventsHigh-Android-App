@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
     style="@style/EventActionMenuItem"
+    android:background="?android:attr/selectableItemBackground"
     tools:background="@color/app_color"
     tools:context=".activity.EventDetailActivity"
 >
