@@ -11,6 +11,7 @@
         android:layout_alignParentTop="true"
         android:src="@drawable/eh"
         android:adjustViewBounds="true"
+        tools:ignore="ContentDescription"
     />
 
     <TextView
@@ -20,7 +21,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="@dimen/abc_action_bar_icon_vertical_padding_material"
-        android:text="Get the most of this app by registering with EventsHigh"
+        android:text="@string/register_message"
         android:layout_below="@+id/eh_image"
     />
     <com.digits.sdk.android.DigitsAuthButton
