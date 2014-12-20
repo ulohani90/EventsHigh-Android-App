@@ -69,6 +69,8 @@ public abstract class BaseActivity extends FragmentActivity {
                 Log.w(LOG_TAG, "HTTP response cache installation failed!", e);
             }
         }
+
+        overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_translate);
     }
 
     protected void onStop() {
