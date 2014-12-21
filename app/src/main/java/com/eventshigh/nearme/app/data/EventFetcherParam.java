@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -11,26 +12,41 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class EventFetcherParam implements Parcelable {
 
-    public final City city;
-    public final LatLng location;
-    public final int day;
+    @Nullable public City city;
+    @Nullable public LatLng location;
+    public int day;
+    public String query;
 
-    public EventFetcherParam(City city, LatLng location, int day) {
-        this.city = city;
-        this.location = location;
+    public EventFetcherParam(@Nullable LatLng location, int day, String query) {
         this.day = day;
+        this.query = query;
+        changeLocation(location);
+    }
+
+    public boolean changeLocation(@Nullable LatLng location) {
+        this.location = location;
+        City oldCity = city;
+        city = City.getCity(location);
+        return (oldCity == null && city == null) || (oldCity != null && oldCity.equals(city));
     }
 
     @Override
     public String toString() {
-        return EventFetcherParam.class.getSimpleName() + " (City: " + city + ", day=" + day + ")";
+        return EventFetcherParam.class.getSimpleName() +
+                " (City: " + city +
+                ", day: " + day +
+                ", query: '" + query + "')";
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
     }
 
     @Override
     public boolean equals(Object another) {
         return another != null && another instanceof EventFetcherParam &&
-                city.equals(((EventFetcherParam)another).city) &&
-                day == ((EventFetcherParam)another).day;
+            toString().equals(another.toString());
     }
 
     @Override
@@ -40,9 +56,9 @@ public class EventFetcherParam implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(city.toString());
         dest.writeParcelable(location, flags);
         dest.writeInt(day);
+        dest.writeString(query);
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -50,11 +66,11 @@ public class EventFetcherParam implements Parcelable {
     public static final Parcelable.Creator<EventFetcherParam> CREATOR =
             new Parcelable.Creator<EventFetcherParam>() {
         public EventFetcherParam createFromParcel(Parcel in) {
-            String city = in.readString();
             LatLng location = in.readParcelable(LatLng.class.getClassLoader());
             int day = in.readInt();
+            String query = in.readString();
 
-            return new EventFetcherParam(City.valueOf(city), location, day);
+            return new EventFetcherParam(location, day, query);
         }
 
         public EventFetcherParam[] newArray(int size) {

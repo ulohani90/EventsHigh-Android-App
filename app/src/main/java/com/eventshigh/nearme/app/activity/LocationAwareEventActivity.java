@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
@@ -133,6 +134,14 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     }
 
 
+    @Override
+    public boolean onSearchRequested() {
+        Bundle appData = new Bundle();
+        appData.putParcelable(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam);
+        startSearch(null, false, appData, false);
+        return true;
+    }
+
     // ***********************
     // Setup Helper Methods
     // ***********************
@@ -142,26 +151,53 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
      * activity must call once its view is populated.
      */
     protected void setUpAll() {
+        // Set the context in term of lastEventFetcherParam.
+        lastEventFetcherParam = new EventFetcherParam(null, 0, "");
+
         // See if we have location passed to us within intent.
         Intent intent = getIntent();
-        EventFetcherParam param = null;
         if (intent != null) {
-            param = intent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
+            EventFetcherParam param = intent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
+            if (param == null) {
+                Bundle appData = intent.getBundleExtra(SearchManager.APP_DATA);
+                if (appData != null) {
+                    param = appData.getParcelable(EXTRA_EVENT_FETCHER_PARAM);
+                }
+            }
+            if (param != null) {
+                lastEventFetcherParam = param;
+            }
+
             lastSelectedTag = intent.getStringExtra(EXTRA_TAG_NAME_PARAM);
+
+            if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+                String query = intent.getStringExtra(SearchManager.QUERY);
+                lastEventFetcherParam.query = query;
+            }
+        }
+
+        // Show query as title.
+        if (!lastEventFetcherParam.query.isEmpty()) {
+            ActionBar actionBar = getActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(lastEventFetcherParam.query);
+            }
         }
 
         // Populate the Day selection bar.
-        daySelector.populate((ViewGroup)findViewById(R.id.daySelector));
-        if (param != null) {
-            daySelector.setSelected(param.day);
+        if (lastEventFetcherParam.query.isEmpty()) {
+            daySelector.populate((ViewGroup) findViewById(R.id.daySelector));
+            daySelector.setSelected(lastEventFetcherParam.day);
         }
 
         // If location is passed in param, use it. Otherwise ask GoogleApiClient for
         // user location.
-        if (param == null) {
+        if (lastEventFetcherParam.location == null) {
             googleApiClient.connect();
         } else {
-            updateUserLocation(param.location);
+            LatLng location = lastEventFetcherParam.location;
+            lastEventFetcherParam.changeLocation(null);
+            updateUserLocation(location);
         }
     }
 
@@ -169,18 +205,17 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     // Helper methods
     // ***********************
 
-    private void fetchNewListing(EventFetcherParam param) {
+    private void fetchNewListing() {
         reportActionToAnalytics("fetchNewListing");
         EventsFetcher fetcher =
                 new EventsFetcher(LocationAwareEventActivity.this, mEventsFetcherCallBack);
-        fetcher.execute(param);
+        fetcher.execute(lastEventFetcherParam);
     }
 
     protected void askUserForLocation(@Nullable final ActionBar actionBar) {
         reportActionToAnalytics("askUserForLocation");
-        String countryCode =
-                lastEventFetcherParam == null || lastEventFetcherParam.city == null
-                        ? null : lastEventFetcherParam.city.countryCode;
+        String countryCode = lastEventFetcherParam.city == null ?
+                null : lastEventFetcherParam.city.countryCode;
         new LocationPickerDialog().show(this, countryCode, new OnLocationSelection() {
             @Override
             public void onLocationSelection(String locationString, LatLng locationPoint) {
@@ -218,30 +253,25 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                 reportActionToAnalytics("unsupportedCity");
                 Toast.makeText(this, R.string.no_event, Toast.LENGTH_SHORT).show();
             }
-            lastEventFetcherParam = null;
+            lastEventFetcherParam.changeLocation(null);
             basicTabs();
             return true;
         }
 
-        EventFetcherParam newEventFetcherParam =
-                new EventFetcherParam(userCity, userLocation, daySelector.getSelectedDay());
-        if (!newEventFetcherParam.equals(lastEventFetcherParam)) {
+        if (!lastEventFetcherParam.changeLocation(userLocation)) {
             basicTabs();
-            fetchNewListing(newEventFetcherParam);
+            fetchNewListing();
             return true;
         }
 
-        lastEventFetcherParam = newEventFetcherParam;
         return false;
     }
 
     protected void switchTo(Class<?> cls) {
         reportActionToAnalytics("switchView");
         Intent intent = new Intent(this, cls)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        if (lastEventFetcherParam != null) {
-            intent.putExtra(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam);
-        }
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .putExtra(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam);
         if (lastSelectedTag != null) {
             intent.putExtra(EXTRA_TAG_NAME_PARAM, lastSelectedTag);
         }
@@ -340,10 +370,8 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         @Override
         public void onDaySelection(int dayNo) {
             reportActionToAnalytics("onDaySelection");
-            if (lastEventFetcherParam != null) {
-                fetchNewListing(new EventFetcherParam(lastEventFetcherParam.city,
-                        lastEventFetcherParam.location, dayNo));
-            }
+            lastEventFetcherParam.day = dayNo;
+            fetchNewListing();
         }
     };
 

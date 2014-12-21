@@ -42,6 +42,7 @@
     <string name="failed_location">Could not determine your location</string>
     <string name="no_map_app">Maps application not found!</string>
     <string name="no_cal_app">Calendar application not found!</string>
+    <string name="no_events">No events found!</string>
 
     <!-- formatting -->
     <plurals name="people_interested">

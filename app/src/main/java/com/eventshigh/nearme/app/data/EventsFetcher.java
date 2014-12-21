@@ -16,8 +16,10 @@ import org.json.JSONException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 
 /**
  * An {@link AsyncTask} which is used to fetch the Events. Once events are available,
@@ -29,8 +31,10 @@ import java.net.URL;
 public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsCollection> {
 
     private static final String LOG_TAG = EventsFetcher.class.getSimpleName();
-    private static final String API_ENDPOINT =
+    private static final String API_ENDPOINT_DATE =
             "http://apiserver.eventshigh.com:8888/api/date/CITY/DATE?sortby=popularity&limit=200&mobile=1";
+    private static final String API_ENDPOINT_QUERY =
+            "http://apiserver.eventshigh.com:8888/api/events/CITY/QUERY?sortby=popularity&limit=200&mobile=1";
 
     public static interface EventsFetcherCallBack {
         public void OnEventsAvailable(EventFetcherParam param, EventsCollection events);
@@ -59,8 +63,24 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsColl
     protected EventsCollection doInBackground(EventFetcherParam... params) {
         param = params[0];
 
-        String url = API_ENDPOINT.replace("CITY", param.city.toString().toLowerCase())
-                .replace("DATE", Utils.getDateString(Utils.getDate(param.day)));
+        if (param.city == null) {
+            Log.w(LOG_TAG, "No City for: " + param.toString());
+            return null;
+        }
+
+        String url;
+        if (param.query.isEmpty()) {
+            url = API_ENDPOINT_DATE.replace("CITY", param.city.toString().toLowerCase())
+                    .replace("DATE", Utils.getDateString(Utils.getDate(param.day)));
+        } else {
+            try {
+                url = API_ENDPOINT_QUERY.replace("CITY", param.city.toString().toLowerCase())
+                        .replace("QUERY", URLEncoder.encode(param.query, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                Log.w(LOG_TAG, "Invalid Query", e);
+                return null;
+            }
+        }
         Log.d(LOG_TAG, "fetching: " + url);
 
         try {
@@ -94,9 +114,15 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsColl
             pDialog.dismiss();
         }
 
-        if (result == null || result.getTags().isEmpty()) {
+        if (result == null) {
             // Failed. Show toast and return empty list.
             Toast.makeText(context, R.string.failed_load, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (result.getTags().isEmpty()) {
+            // Failed. Show toast and return empty list.
+            Toast.makeText(context, R.string.no_events, Toast.LENGTH_SHORT).show();
             return;
         }
 
