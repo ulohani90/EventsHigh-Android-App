@@ -279,7 +279,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     }
 
     private void basicTabs() {
-        events = new Builder().build();
+        events = new Builder(true).build();
 
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {

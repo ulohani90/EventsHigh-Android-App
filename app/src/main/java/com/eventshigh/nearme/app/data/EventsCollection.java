@@ -21,7 +21,12 @@ public class EventsCollection {
     public static final String RECOMMENDED_EVENTS_CATEGORY = "Recommended";
 
     public static class Builder {
+        private final boolean showAllTags;
         private final Map<String, List<Event>> events = new HashMap<>();
+
+        public Builder(boolean showAllTags) {
+            this.showAllTags = showAllTags;
+        }
 
         public Builder addEvent(Event event) {
 
@@ -30,8 +35,10 @@ public class EventsCollection {
                 addEvent(RECOMMENDED_EVENTS_CATEGORY, event);
             }
 
-            for (String tag : event.getAllTags()) {
-                addEvent(Utils.capitalize(tag), event);
+            if (showAllTags) {
+                for (String tag : event.getAllTags()) {
+                    addEvent(Utils.capitalize(tag), event);
+                }
             }
 
             return this;

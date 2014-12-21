@@ -96,7 +96,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsColl
                     buffer.append(line);
                 }
 
-                return new Builder().addAllEvent(
+                return new Builder(param.query.isEmpty()).addAllEvent(
                         Event.parseUpcomingEvents(param.city, buffer.toString())).build();
             } finally {
                 urlConnection.disconnect();
