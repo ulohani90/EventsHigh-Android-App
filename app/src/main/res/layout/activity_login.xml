@@ -32,40 +32,20 @@
         android:layout_centerHorizontal="true"
     />
 
-    <!-- Directions Button -->
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- Skip Button -->
+    <TextView
+        style="@style/EventDetailText"
         android:layout_height="wrap_content"
-        android:background="@color/event_detail_gray"
-        android:orientation="horizontal"
-        android:layout_marginTop="@dimen/abc_dropdownitem_text_padding_left"
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:background="?android:attr/selectableItemBackground"
+        android:text="@string/action_skip_login"
+        android:clickable="true"
+        android:onClick="skip"
         android:padding="@dimen/abc_dropdownitem_text_padding_left"
         android:layout_alignParentBottom="true"
-    >
-        <View
-            android:layout_height="1dp"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-        />
-        <TextView
-            style="@style/EventDetailText"
-            android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:layout_weight="3"
-            android:gravity="center"
-            android:background="@color/app_color"
-            android:textSize="@dimen/abc_text_size_large_material"
-            android:text="@string/action_skip_login"
-            android:textColor="@android:color/white"
-            android:clickable="true"
-            android:onClick="skip"
-            android:padding="@dimen/abc_dropdownitem_text_padding_left"
-        />
-        <View
-            android:layout_height="1dp"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-        />
-    </LinearLayout>
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+    />
 
 </RelativeLayout>
