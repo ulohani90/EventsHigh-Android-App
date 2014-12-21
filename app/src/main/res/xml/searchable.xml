@@ -3,4 +3,6 @@
     android:label="@string/app_name"
     android:hint="Search Events"
     android:includeInGlobalSearch="true"
+    android:searchSuggestAuthority="com.eventshigh.nearme.app.EventSearchRecentSuggestionsProvider"
+    android:searchSuggestSelection=" ?"
 />

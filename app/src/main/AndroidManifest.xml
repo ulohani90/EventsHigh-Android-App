@@ -74,6 +74,12 @@
             />
         </provider>
 
+        <!-- Enable the search recent suggestion provider -->
+        <provider
+            android:authorities="com.eventshigh.nearme.app.EventSearchRecentSuggestionsProvider"
+            android:name=".utils.EventSearchSuggestionsProvider"
+            android:exported="false"
+        />
 
         <!-- Activities within our application -->
         <!-- activity

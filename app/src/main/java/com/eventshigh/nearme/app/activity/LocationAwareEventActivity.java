@@ -27,6 +27,7 @@ import com.eventshigh.nearme.app.data.EventsFetcher;
 import com.eventshigh.nearme.app.data.EventsFetcher.EventsFetcherCallBack;
 import com.eventshigh.nearme.app.utils.DaySelector;
 import com.eventshigh.nearme.app.utils.DaySelector.DaySelectionListener;
+import com.eventshigh.nearme.app.utils.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.utils.LocationPickerDialog;
 import com.eventshigh.nearme.app.utils.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -116,6 +117,8 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         if (fetcher != null) {
             fetcher.destroy();
         }
+
+        super.onDestroy();
     }
 
     @Override
@@ -125,6 +128,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         appData.putParcelable(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam);
         return super.onSearchRequested();
     }
+
 
     // ***********************
     // Delegated methods
@@ -184,6 +188,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
                 lastEventFetcherParam.query = intent.getStringExtra(SearchManager.QUERY);
                 reportActionToAnalytics("search", lastEventFetcherParam.query);
+                EventSearchSuggestionsProvider.saveRecentQuery(this, lastEventFetcherParam.query);
             }
         }
 
