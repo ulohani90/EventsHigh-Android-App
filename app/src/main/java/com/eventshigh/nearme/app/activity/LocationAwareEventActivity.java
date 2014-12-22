@@ -75,6 +75,8 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     private EventsCollection events;
     // Tag selected from tab bar for which events are shown.
     private String lastSelectedTag;
+    // last fetcher used to fetch events.
+    private EventsFetcher fetcher;
 
 
     // ***********************
@@ -82,6 +84,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     // See http://developer.android.com/training/basics/activity-lifecycle/starting.html
     // ***********************
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -97,6 +100,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         daySelector.setDaySelectionListener(mDaySelectionListener);
     }
 
+    @Override
     protected void onStop() {
         super.onStop();
 
@@ -106,6 +110,13 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        // See http://stackoverflow.com/questions/22924825/view-not-attached-to-window-manager-crash.
+        if (fetcher != null) {
+            fetcher.destroy();
+        }
+    }
 
     // ***********************
     // Delegated methods
@@ -171,8 +182,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             lastSelectedTag = intent.getStringExtra(EXTRA_TAG_NAME_PARAM);
 
             if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-                String query = intent.getStringExtra(SearchManager.QUERY);
-                lastEventFetcherParam.query = query;
+                lastEventFetcherParam.query = intent.getStringExtra(SearchManager.QUERY);
             }
         }
 
@@ -207,8 +217,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
     private void fetchNewListing() {
         reportActionToAnalytics("fetchNewListing");
-        EventsFetcher fetcher =
-                new EventsFetcher(LocationAwareEventActivity.this, mEventsFetcherCallBack);
+        fetcher = new EventsFetcher(LocationAwareEventActivity.this, mEventsFetcherCallBack);
         fetcher.execute(lastEventFetcherParam);
     }
 

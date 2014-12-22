@@ -1,7 +1,7 @@
 package com.eventshigh.nearme.app.data;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -40,21 +40,28 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsColl
         public void OnEventsAvailable(EventFetcherParam param, EventsCollection events);
     }
 
-    private final Context context;
+    private final Activity activity;
     private final EventsFetcherCallBack callback;
     private ProgressDialog pDialog;
     private EventFetcherParam param;
 
-    public EventsFetcher(Context context, EventsFetcherCallBack callback) {
-        this.context = context;
+    public EventsFetcher(Activity activity, EventsFetcherCallBack callback) {
+        this.activity = activity;
         this.callback = callback;
+    }
+
+    public void destroy() {
+        if (pDialog != null && pDialog.isShowing()) {
+            pDialog.dismiss();
+            pDialog = null;
+        }
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        pDialog = new ProgressDialog(context);
-        pDialog.setMessage(context.getString(R.string.loading));
+        pDialog = new ProgressDialog(activity);
+        pDialog.setMessage(activity.getString(R.string.loading));
         pDialog.setCancelable(false);
         pDialog.show();
     }
@@ -110,19 +117,22 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsColl
     @Override
     protected void onPostExecute(@Nullable EventsCollection result) {
         super.onPostExecute(result);
-        if (pDialog != null && pDialog.isShowing()) {
-            pDialog.dismiss();
+
+        if (activity.isFinishing()) {
+            return;
         }
+
+        destroy();
 
         if (result == null) {
             // Failed. Show toast and return empty list.
-            Toast.makeText(context, R.string.failed_load, Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.failed_load, Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (result.getTags().isEmpty()) {
             // Failed. Show toast and return empty list.
-            Toast.makeText(context, R.string.no_events, Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.no_events, Toast.LENGTH_SHORT).show();
             return;
         }
 
