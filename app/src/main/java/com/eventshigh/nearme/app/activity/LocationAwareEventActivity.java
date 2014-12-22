@@ -59,6 +59,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     // ***********************
     public static final String EXTRA_EVENT_FETCHER_PARAM = EventFetcherParam.class.getSimpleName();
     public static final String EXTRA_TAG_NAME_PARAM = "extra.event.tag.name";
+    public static final int NUM_MAX_TABS = 7;
 
 
     // ***********************
@@ -403,6 +404,9 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                 actionBar.removeAllTabs();
                 int selectedItem = 0;
                 List<Pair<String, Integer>> tags = events.getTags();
+                if (tags.size() > NUM_MAX_TABS) {
+                    tags = tags.subList(0, NUM_MAX_TABS);
+                }
                 if (lastSelectedTag != null) {
                     for (int i = 0; i < tags.size(); i++) {
                         if (tags.get(i).first.equalsIgnoreCase(lastSelectedTag)) {

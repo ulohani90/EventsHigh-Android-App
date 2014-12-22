@@ -9,9 +9,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Collection for events which has tags based filtering in built.
@@ -19,6 +21,11 @@ import java.util.Map.Entry;
 public class EventsCollection {
     public static final String ALL_EVENTS_CATEGORY = "All";
     public static final String RECOMMENDED_EVENTS_CATEGORY = "Recommended";
+
+    private static final Set<String> TAGS_BLACKLIST = new HashSet<>();
+    static {
+        TAGS_BLACKLIST.add("courses");
+    }
 
     public static class Builder {
         private final boolean showAllTags;
@@ -37,7 +44,9 @@ public class EventsCollection {
 
             if (showAllTags) {
                 for (String tag : event.getAllTags()) {
-                    addEvent(Utils.capitalize(tag), event);
+                    if (! TAGS_BLACKLIST.contains(tag.toLowerCase())) {
+                        addEvent(Utils.capitalize(tag), event);
+                    }
                 }
             }
 
