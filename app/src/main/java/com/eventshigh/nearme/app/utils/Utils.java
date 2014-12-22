@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.utils;
 
+import android.content.Context;
 import android.graphics.Point;
 import android.location.Location;
 import android.support.annotation.Nullable;
@@ -7,6 +8,10 @@ import android.support.annotation.Nullable;
 import com.eventshigh.nearme.app.data.Event;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -113,9 +118,29 @@ public class Utils {
     }
 
     public static <T> T[] mergeArray(T[] first, T[] second) {
-        List<T> both = new ArrayList<T>(first.length + second.length);
+        List<T> both = new ArrayList<>(first.length + second.length);
         Collections.addAll(both, first);
         Collections.addAll(both, second);
         return both.toArray(first);
+    }
+
+
+    public static String[] readAssetFile(Context context, String filename) throws IOException {
+        InputStream is = context.getAssets().open(filename);
+        try {
+            return readStream(is);
+        } finally {
+            is.close();
+        }
+    }
+
+    public static String[] readStream(InputStream is) throws IOException {
+        ArrayList<String> lines = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            lines.add(line);
+        }
+        return lines.toArray(new String[lines.size()]);
     }
 }

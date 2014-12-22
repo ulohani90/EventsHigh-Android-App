@@ -13,9 +13,7 @@ import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -95,16 +93,12 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsColl
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
             try {
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(urlConnection.getInputStream()));
-                StringBuilder buffer = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line);
+                StringBuilder jsonBuffer = new StringBuilder();
+                for (String json : Utils.readStream(urlConnection.getInputStream())) {
+                    jsonBuffer.append(json);
                 }
-
                 return new Builder(param.query.isEmpty()).addAllEvent(
-                        Event.parseUpcomingEvents(param.city, buffer.toString())).build();
+                        Event.parseUpcomingEvents(param.city, jsonBuffer.toString())).build();
             } finally {
                 urlConnection.disconnect();
             }
