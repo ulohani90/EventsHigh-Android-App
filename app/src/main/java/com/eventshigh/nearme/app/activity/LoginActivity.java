@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.digits.sdk.android.AuthCallback;
 import com.digits.sdk.android.DigitsAuthButton;
 import com.digits.sdk.android.DigitsException;
@@ -39,7 +40,7 @@ public class LoginActivity extends BaseActivity {
         // Initialize Digits.
         activityStartTime = new Date().getTime();
         TwitterAuthConfig authConfig = TwitterUtils.getAuthConfig();
-        Fabric.with(this, new Twitter(authConfig));
+        Fabric.with(this, new Twitter(authConfig), new Crashlytics());
 
         // Setup the content of login screen.
         setContentView(R.layout.activity_login);
