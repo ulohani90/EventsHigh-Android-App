@@ -31,6 +31,10 @@ public class Utils {
         // No public constructor for helper class.
     }
 
+
+    /*******************************************************
+     Helper methods for managing location and latlng
+     *******************************************************/
     public static LatLng locationToLatLng(Location location) {
         return new LatLng(location.getLatitude(), location.getLongitude());
     }
@@ -41,6 +45,14 @@ public class Utils {
         return distance[0];
     }
 
+    public static float getDistanceSQ(Point p1, Point p2) {
+        return (p1.x - p2.x) * (p1.x - p2.x) +  (p1.y - p2.y) * (p1.y - p2.y);
+    }
+
+
+    /*******************************************************
+     Helper methods for managing date and time.
+     *******************************************************/
     /**
      * Get the date for give dayItemNo.
      *   dayItemNo 0: Today
@@ -56,12 +68,12 @@ public class Utils {
         return cal.getTime();
     }
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat FULL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     public static String getDateString(Date date) {
-        return DATE_FORMAT.format(date);
+        return FULL_DATE_FORMAT.format(date);
     }
 
-    private static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+    private static final SimpleDateFormat FULL_DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
     public static @Nullable Date mergeDateTime(String date, String time, String timeZone) throws ParseException {
         if (date == null || date.isEmpty() || date.equalsIgnoreCase("null")) {
             return null;
@@ -76,37 +88,46 @@ public class Utils {
             time = time + ":00";
         }
 
-        return DATE_TIME_FORMAT.parse(date.split(":")[0] + " " + time + " " + timeZone);
+        return FULL_DATE_TIME_FORMAT.parse(date.split(":")[0] + " " + time + " " + timeZone);
     }
 
-    private static final int TITLE_MAX_LENGHT = 32;
-    public static String shortenIfNeeded(String title) {
-        return title.length() < TITLE_MAX_LENGHT ? title :
-                title.substring(0, TITLE_MAX_LENGHT - 3) + "...";
-    }
-
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("h:mm a");
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("MMM d");
+    private static final SimpleDateFormat SIMPLE_TIME_FORMAT = new SimpleDateFormat("h:mm a");
     private static final Pattern ZEROS = Pattern.compile(":00");
-    public static @Nullable String getEventTime(Event event) {
+    public static @Nullable String getEventTime(Event event, boolean includeDate) {
         if (event.eventTimings.length == 0) {
             return null;
         }
 
-        return getTimeString(new Date(event.eventTimings[0]),
-                TimeZone.getTimeZone(event.city.timeZone));
-    }
+        TimeZone timeZone =  TimeZone.getTimeZone(event.city.timeZone);
+        Date eventTime = new Date(event.eventTimings[0]);
+        String timeString = getTimeString(eventTime, timeZone);
+        if (!includeDate) {
+            return timeString;
+        }
 
-    public static @Nullable String getTimeString(Date date, TimeZone timeZone) {
-        synchronized (TIME_FORMAT) {
-            TIME_FORMAT.setTimeZone(timeZone);
-            String time = TIME_FORMAT.format(date);
-            time = ZEROS.matcher(time).replaceAll("");
-            return time.equals("0") ? null : time;
+        synchronized (SIMPLE_DATE_FORMAT) {
+            SIMPLE_DATE_FORMAT.setTimeZone(timeZone);
+            return SIMPLE_DATE_FORMAT.format(eventTime) + (timeString == null ? "" : ", " + timeString);
         }
     }
 
-    public static float getDistanceSQ(Point p1, Point p2) {
-        return (p1.x - p2.x) * (p1.x - p2.x) +  (p1.y - p2.y) * (p1.y - p2.y);
+    public static @Nullable String getTimeString(Date date, TimeZone timeZone) {
+        synchronized (SIMPLE_TIME_FORMAT) {
+            SIMPLE_TIME_FORMAT.setTimeZone(timeZone);
+            String time = SIMPLE_TIME_FORMAT.format(date);
+            time = ZEROS.matcher(time).replaceAll("");
+            return time.equals("0") || time.equals("12 am") ? null : time;
+        }
+    }
+
+    /*******************************************************
+     Helper methods for managing strings and titles.
+     *******************************************************/
+    private static final int TITLE_MAX_LENGHT = 32;
+    public static String shortenIfNeeded(String title) {
+        return title.length() < TITLE_MAX_LENGHT ? title :
+                title.substring(0, TITLE_MAX_LENGHT - 3) + "...";
     }
 
     public static String capitalize(String original){
@@ -125,6 +146,9 @@ public class Utils {
     }
 
 
+    /*******************************************************
+     Helper methods for reading stream or asserts file
+     *******************************************************/
     public static String[] readAssetFile(Context context, String filename) throws IOException {
         InputStream is = context.getAssets().open(filename);
         try {

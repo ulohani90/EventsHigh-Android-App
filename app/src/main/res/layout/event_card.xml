@@ -96,6 +96,8 @@
                 android:drawableStart="@drawable/ic_action_place"
                 android:drawableLeft="@drawable/ic_action_place"
                 android:layout_below="@id/event_title"
+                android:layout_marginLeft="0dp"
+                android:layout_marginStart="0dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_toLeftOf="@+id/event_time"

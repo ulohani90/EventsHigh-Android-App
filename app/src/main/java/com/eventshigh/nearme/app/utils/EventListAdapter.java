@@ -21,23 +21,28 @@ import com.eventshigh.nearme.app.data.Event;
  */
 public class EventListAdapter extends ArrayAdapter<Event> {
     private final BaseActivity mBaseActivity;
+    private boolean showDate = false;
 
     public EventListAdapter(BaseActivity activity) {
-        super(activity, R.layout.list_item_event, R.id.event_title);
+        super(activity, R.layout.event_card, R.id.event_title);
         mBaseActivity = activity;
+    }
+
+    public void setShowDate(boolean showDate) {
+        this.showDate = showDate;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return getView(getItem(position), mBaseActivity, convertView, parent);
+        return getView(getItem(position), mBaseActivity, convertView, parent, showDate);
     }
 
     // Build the view, reuse existing if possible.
     public static View getView(final Event event, final BaseActivity activity,
-                               @Nullable View reuseView, ViewGroup parent) {
+                               @Nullable View reuseView, ViewGroup parent, boolean showDate) {
         // Build the view, reuse existing if possible.
         final View view = reuseView == null ?
-                activity.getLayoutInflater().inflate(R.layout.list_item_event, parent, false) :
+                activity.getLayoutInflater().inflate(R.layout.event_card, parent, false) :
                 reuseView;
         EventCard eventCard = new EventCard(view);
 
@@ -48,7 +53,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
 
         // Set the title, time etc.
         eventCard.titleView.setText(event.title);
-        String eventTime = Utils.getEventTime(event);
+        String eventTime = Utils.getEventTime(event, showDate);
         if (eventTime == null) {
             eventCard.timeView.setVisibility(View.GONE);
         } else {

@@ -176,7 +176,7 @@ public abstract class BaseActivity extends FragmentActivity {
             intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, eventTime);
         }
 
-        String time = Utils.getEventTime(event);
+        String time = Utils.getEventTime(event, false);
         if (time == null) {
             intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
         }
