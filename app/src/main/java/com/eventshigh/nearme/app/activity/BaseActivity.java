@@ -91,11 +91,19 @@ public abstract class BaseActivity extends FragmentActivity {
      * @param actionName name of action to be reported.
      */
     protected void reportActionToAnalytics(String actionName) {
+        reportActionToAnalytics(actionName, "");
+    }
+
+    protected void reportActionToAnalytics(String actionName, String label) {
+        reportActionToAnalytics(actionName, label, 1);
+    }
+
+    protected void reportActionToAnalytics(String actionName, String label, long value) {
         tracker.send(new HitBuilders.EventBuilder()
                 .setCategory(getClass().getSimpleName())
                 .setAction(actionName)
-                .setLabel("")
-                .setValue(1)
+                .setLabel(label)
+                .setValue(value)
                 .build());
     }
 

@@ -118,6 +118,14 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public boolean onSearchRequested() {
+        reportActionToAnalytics("onSearchRequested");
+        Bundle appData = new Bundle();
+        appData.putParcelable(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam);
+        return super.onSearchRequested();
+    }
+
     // ***********************
     // Delegated methods
     // ***********************
@@ -144,14 +152,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         refreshListingsIfNeeded(userLocation);
     }
 
-
-    @Override
-    public boolean onSearchRequested() {
-        Bundle appData = new Bundle();
-        appData.putParcelable(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam);
-        startSearch(null, false, appData, false);
-        return true;
-    }
 
     // ***********************
     // Setup Helper Methods
@@ -183,6 +183,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
             if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
                 lastEventFetcherParam.query = intent.getStringExtra(SearchManager.QUERY);
+                reportActionToAnalytics("search", lastEventFetcherParam.query);
             }
         }
 

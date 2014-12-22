@@ -14,7 +14,6 @@ import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.TwitterUtils;
-import com.google.android.gms.analytics.HitBuilders;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 
@@ -89,12 +88,8 @@ public class LoginActivity extends BaseActivity {
         // Report the time taken by login action.
         isGoingToMaps = true;
         if (activityStartTime > 0) {
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(getClass().getSimpleName())
-                    .setAction("loginActionTimeMillis")
-                    .setLabel("")
-                    .setValue(new Date().getTime() - activityStartTime)
-                    .build());
+            reportActionToAnalytics("loginActionTimeMillis", "",
+                    new Date().getTime() - activityStartTime);
         }
 
         startActivity(new Intent(this, MapsActivity.class));
