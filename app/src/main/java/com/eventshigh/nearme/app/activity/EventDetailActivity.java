@@ -291,11 +291,13 @@ public class EventDetailActivity extends BaseActivity {
         // Set Image
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        mEventCard.bgView.setMaxHeight((int) (0.4 * metrics.heightPixels));
+        int maxHeight = (int) (0.4 * metrics.heightPixels);
+        mEventCard.bgView.setMaxHeight(maxHeight);
         if (mEvent.imgUrl == null) {
             mEventCard.bgView.setVisibility(View.GONE);
         } else {
-            DownloadImageTask.setImage(mEventCard.bgView, mEvent.imgUrl, -1);
+            DownloadImageTask.setImage(mEventCard.bgView, mEvent.imgUrl, -1,
+                    metrics.widthPixels, maxHeight);
         }
 
         // Set title

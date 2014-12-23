@@ -47,9 +47,11 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         EventCard eventCard = new EventCard(view);
 
         // Set the background image.
+        int height = findOptimalHeight(parent);
         eventCard.bgView.setLayoutParams(new FrameLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, findOptimalHeight(parent)));
-        DownloadImageTask.setImage(eventCard.bgView, event.imgUrl, R.drawable.eh_default);
+                LayoutParams.MATCH_PARENT, height));
+        DownloadImageTask.setImage(eventCard.bgView, event.imgUrl, R.drawable.eh_default,
+                parent.getMeasuredWidth(), height);
 
         // Set the title, time etc.
         eventCard.titleView.setText(event.title);

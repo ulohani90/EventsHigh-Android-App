@@ -5,8 +5,12 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.LruCache;
 import android.widget.ImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,14 +29,31 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
     private static final Map<ImageView, URL> IMAGE_VIEW_URL_MAP =
             Collections.synchronizedMap(new WeakHashMap<ImageView, URL>());
 
-    private final ImageView imageView;
-    private final URL url;
+    // In memory cache for recent bitmap. This cache can use upto 1/8th of available
+    // memory.
+    private static final LruCache<URL, Bitmap> bitmapCache =
+            new LruCache<URL, Bitmap>((int) (Runtime.getRuntime().maxMemory() / (8* 1024))) {
+                @Override
+                protected int sizeOf(URL key, Bitmap bitmap) {
+                    // The cache size will be measured in kilobytes rather than
+                    // number of items.
+                    return bitmap.getByteCount() / 1024;
+                }
+            };
 
-    public static void setImage(ImageView imageView, @Nullable String url, int placeHolderImageId) {
+    public static void setImage(ImageView imageView, @Nullable String urlStr, int placeHolderImageId,
+                                int width, int height) {
         try {
             DownloadImageTask task = null;
-            if (url != null) {
-                task = new DownloadImageTask(imageView, new URL(url));
+            if (urlStr != null) {
+                URL url = new URL(urlStr);
+                Bitmap bitmap = bitmapCache.get(url);
+                if (bitmap == null) {
+                    task = new DownloadImageTask(imageView, url, width, height);
+                } else {
+                    imageView.setImageBitmap(bitmap);
+                    return;
+                }
             }
             if (placeHolderImageId > 0) {
                 imageView.setImageResource(placeHolderImageId);
@@ -45,9 +66,17 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
         }
     }
 
-    public DownloadImageTask(ImageView imageView, URL url) {
-        this.imageView = imageView;
+    private final WeakReference<ImageView> imageViewReference;
+    private final URL url;
+    private final int width;
+    private final int height;
+
+    public DownloadImageTask(ImageView imageView, URL url, int width, int height) {
+        imageViewReference = new WeakReference<>(imageView);
         this.url = url;
+        this.width = width;
+        this.height = height;
+
         synchronized (IMAGE_VIEW_URL_MAP) {
             IMAGE_VIEW_URL_MAP.put(imageView, url);
         }
@@ -58,7 +87,32 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
-            return BitmapFactory.decodeStream(urlConnection.getInputStream());
+            InputStream is = urlConnection.getInputStream();
+            try {
+                // Read Image data.
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int nRead;
+                byte[] data = new byte[16384];
+                while ((nRead = is.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+                buffer.flush();
+                byte[] imageData = buffer.toByteArray();
+
+                // See Image Dimensions and set scaling.
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeByteArray(imageData, 0, imageData.length, options);
+                options.inSampleSize = calculateInSampleSize(options, width, height);
+
+                // Load Bitmap.
+                options.inJustDecodeBounds = false;
+                Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length, options);
+                bitmapCache.put(url, bitmap);
+                return bitmap;
+            } finally {
+                is.close();
+            }
         } catch (Exception e) {
             Log.e(DownloadImageTask.class.getSimpleName(),
                     "Failed to load image: " + url.toString(), e);
@@ -68,6 +122,11 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
     }
 
     protected void onPostExecute(@Nullable Bitmap result) {
+        ImageView imageView = imageViewReference.get();
+        if (imageView == null) {
+            return;
+        }
+
         synchronized (IMAGE_VIEW_URL_MAP) {
             URL url = IMAGE_VIEW_URL_MAP.get(imageView);
             if (url != null && url.equals(this.url)) {
@@ -77,5 +136,36 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
                 IMAGE_VIEW_URL_MAP.remove(imageView);
             }
         }
+    }
+
+    private static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Set default if needed.
+        if (reqHeight <= 0) {
+            reqHeight = 768;   // 0.4 * 1920
+        }
+        if (reqWidth <= 0) {
+            reqWidth = 1080;
+        }
+
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 }
