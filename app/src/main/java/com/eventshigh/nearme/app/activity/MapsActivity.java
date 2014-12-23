@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,8 +12,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -20,6 +26,10 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.utils.EventListAdapter;
 import com.eventshigh.nearme.app.utils.MarkerManager;
+import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ActionItemTarget;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,6 +44,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -75,6 +86,8 @@ public class MapsActivity extends LocationAwareEventActivity {
     // We show the helper toast asking user to zoom in to see events.
     // We show them only once application lifetime.
     private boolean showZoomToast = true;
+    // ShowcaseView used for on boarding
+    private ShowcaseView showcaseView;
 
 
     // ***********************
@@ -183,7 +196,6 @@ public class MapsActivity extends LocationAwareEventActivity {
                         return  false;
                     }
 
-
                     reportActionToAnalytics("swipe");
                     Marker nextMarker = velocityX > 0 ?
                             markerManager.getPrevMarker(lastSelectedMarker) :
@@ -209,6 +221,18 @@ public class MapsActivity extends LocationAwareEventActivity {
     protected void updateNewEvents(List<Event> events) {
         mOnMapClickListener.onMapClick(null);
         markerManager.setEvents(map, events);
+
+        // Show Helper information.
+        if (! events.isEmpty()) {
+            View dateView = ((LinearLayout) findViewById(R.id.daySelector)).getChildAt(1);
+            showcaseView = new ShowcaseView.Builder(this, true)
+                    .setTarget(new ViewTarget(dateView))
+                    .setContentText(R.string.onboarding_change_date)
+                    .setStyle(R.style.ShowcaseTheme)
+                    .setOnClickListener(mShowcaseViewClickListener)
+                    .singleShot(1)
+                    .build();
+        }
     }
 
     @Override
@@ -289,6 +313,34 @@ public class MapsActivity extends LocationAwareEventActivity {
             });
             eventCardContainer.removeAllViews();
             eventCardContainer.addView(eventView);
+
+            // Show Helper with swipe information.
+            showcaseView = new ShowcaseView.Builder(MapsActivity.this, true)
+                    .setTarget(new ViewTarget(eventView))
+                    .setContentText(R.string.onboarding_swipe)
+                    .setStyle(R.style.ShowcaseTheme)
+                    .singleShot(2)
+                    .setShowcaseEventListener(new OnShowcaseEventListener() {
+                        ImageView swipeImage;
+                        @Override
+                        public void onShowcaseViewHide(ShowcaseView showcaseView) {
+                            swipeImage.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
+                        }
+
+                        @Override
+                        public void onShowcaseViewShow(ShowcaseView showcaseView) {
+                            swipeImage = new ImageView(MapsActivity.this);
+                            swipeImage.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+                            swipeImage.setImageResource(R.drawable.gestures_flick);
+                            swipeImage.setScaleType(ScaleType.CENTER_INSIDE);
+                            eventCardContainer.addView(swipeImage);
+                        }
+                    })
+                    .build();
             return false;
         }
     };
@@ -298,6 +350,38 @@ public class MapsActivity extends LocationAwareEventActivity {
         @Override
         public void onInfoWindowClick(Marker marker) {
             showEventDetails(markerManager.getEvent(marker));
+        }
+    };
+
+    private OnClickListener mShowcaseViewClickListener = new OnClickListener() {
+        int target = 0;
+
+        @Override
+        public void onClick(View v) {
+            switch (target) {
+                case 0:
+                    showcaseView.setShowcase(new ActionItemTarget(MapsActivity.this, R.id.action_change_location), true);
+                    showcaseView.setContentText(getText(R.string.onboarding_action));
+                    break;
+
+                case 1:
+                    try {
+                        ActionBar actionBar = getActionBar();
+                        Field mTabScrollViewField = actionBar.getClass().getDeclaredField("mTabScrollView");
+                        mTabScrollViewField.setAccessible(true);
+                        View view = (View) mTabScrollViewField.get(actionBar);
+                        showcaseView.setShowcase(new ViewTarget(view), true);
+                        showcaseView.setContentText(getText(R.string.onboarding_filter));
+                        showcaseView.setButtonText("Close");
+                    } catch (Exception e) {
+                        showcaseView.hide();
+                    }
+                    break;
+
+                default:
+                    showcaseView.hide();
+            }
+            target ++;
         }
     };
 }
