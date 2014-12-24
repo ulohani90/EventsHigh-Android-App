@@ -3,23 +3,11 @@ package com.eventshigh.nearme.app.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-import com.digits.sdk.android.AuthCallback;
-import com.digits.sdk.android.DigitsAuthButton;
-import com.digits.sdk.android.DigitsException;
-import com.digits.sdk.android.DigitsSession;
 import com.eventshigh.nearme.app.BuildConfig;
-import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.TwitterUtils;
-import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
 
 import java.util.Date;
-
-import io.fabric.sdk.android.Fabric;
 
 public class LoginActivity extends BaseActivity {
     private boolean isGoingToMaps = false;
@@ -38,9 +26,8 @@ public class LoginActivity extends BaseActivity {
 
         // Initialize Digits.
         activityStartTime = new Date().getTime();
-        TwitterAuthConfig authConfig = TwitterUtils.getAuthConfig();
-        Fabric.with(this, new Twitter(authConfig), new Crashlytics());
 
+        /**
         // Setup the content of login screen.
         setContentView(R.layout.activity_login);
         DigitsAuthButton digitsButton = (DigitsAuthButton) findViewById(R.id.auth_button);
@@ -64,6 +51,7 @@ public class LoginActivity extends BaseActivity {
                 }
             }
         });
+         **/
     }
 
     @Override

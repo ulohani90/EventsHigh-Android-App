@@ -121,6 +121,7 @@
             android:paddingLeft="@dimen/abc_action_bar_icon_vertical_padding_material"
             android:paddingRight="@dimen/abc_action_bar_icon_vertical_padding_material"
             android:paddingBottom="@dimen/abc_dropdownitem_text_padding_left"
+            android:layout_marginBottom="@dimen/abc_dropdownitem_text_padding_left"
         >
             <LinearLayout
                 android:id="@+id/event_time"
@@ -192,38 +193,6 @@
             android:text="@string/ui_organizer"
         />
         <LinearLayout
-            android:id="@+id/orgnizer_name_row"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/event_detail_gray"
-            android:paddingTop="@dimen/abc_control_padding_material"
-            android:paddingBottom="@dimen/abc_control_padding_material"
-            android:orientation="horizontal"
-        >
-            <TextView
-                style="@style/EventDetailText"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:text="@string/ui_name"
-            />
-            <TextView
-                style="@style/EventDetailText"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:text=":"
-                tools:ignore="HardcodedText"
-            />
-            <TextView
-                android:id="@+id/orgnizer_name"
-                style="@style/EventDetailText"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                tools:text="Counter Culture"
-            />
-        </LinearLayout>
-        <LinearLayout
             android:id="@+id/orgnizer_address_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -256,6 +225,38 @@
                 android:clickable="true"
                 android:onClick="getDirections"
                 tools:text="Near Hoodi Circle, Whitefield Road, Bangalore"
+            />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/orgnizer_name_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/event_detail_gray"
+            android:paddingTop="@dimen/abc_control_padding_material"
+            android:paddingBottom="@dimen/abc_control_padding_material"
+            android:orientation="horizontal"
+        >
+            <TextView
+                style="@style/EventDetailText"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="@string/ui_name"
+            />
+            <TextView
+                style="@style/EventDetailText"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text=":"
+                tools:ignore="HardcodedText"
+            />
+            <TextView
+                android:id="@+id/orgnizer_name"
+                style="@style/EventDetailText"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                tools:text="Counter Culture"
             />
         </LinearLayout>
         <LinearLayout

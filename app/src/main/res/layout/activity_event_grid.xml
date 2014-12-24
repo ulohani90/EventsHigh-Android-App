@@ -18,7 +18,7 @@
         android:stretchMode="columnWidth"
         android:gravity="center"
         android:background="?android:attr/selectableItemBackground"
-        tools:listitem="list_item_event"
+        tools:listitem="@layout/event_card"
     />
 
     <HorizontalScrollView

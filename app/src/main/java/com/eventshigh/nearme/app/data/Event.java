@@ -212,19 +212,30 @@ public class Event implements Parcelable {
 
         double lat = 0;
         double lon = 0;
+        boolean hasLatLonFound = false;
         if (mashup != null) {
             lat = mashup.optDouble("lat", 0);
             lon = mashup.optDouble("lon", 0);
+
+            // Check for valid latitude and longitude.
+            if (city.cityBounds.contains(new LatLng(lat, lon))) {
+                hasLatLonFound = true;
+            }
         }
 
         JSONObject localityJson = eventJson.optJSONObject("locality_info");
-        if (Math.abs(lat) < 1 && Math.abs(lon) < 1 && localityJson != null) {
+        if (!hasLatLonFound && localityJson != null) {
             // Invalid latitude and longitude. Try locality_info.
             lat = localityJson.optDouble("lat", 0);
             lon = localityJson.optDouble("lon", 0);
+
+            // Check for valid latitude and longitude.
+            if (city.cityBounds.contains(new LatLng(lat, lon))) {
+                hasLatLonFound = true;
+            }
         }
 
-        if (Math.abs(lat) < 1 && Math.abs(lon) < 1) {
+        if (!hasLatLonFound) {
             // Invalid latitude and longitude.
             // Ignore the entry.
             throw new ParseException("invalid latitude and longitude for " + id, 0);

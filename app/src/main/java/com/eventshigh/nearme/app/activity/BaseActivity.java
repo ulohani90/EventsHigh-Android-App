@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
@@ -28,6 +29,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Base activity class which does the common things like
@@ -70,7 +73,13 @@ public abstract class BaseActivity extends FragmentActivity {
             }
         }
 
+        // Animation.
         overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_translate);
+
+        // Twitter Digits and CrashAnalytics
+        // TwitterAuthConfig authConfig = TwitterUtils.getAuthConfig();
+        // Fabric.with(this, new Twitter(authConfig), new Crashlytics());
+        Fabric.with(this, new Crashlytics());
     }
 
     protected void onStop() {

@@ -2,7 +2,7 @@
 <resources>
 
     <!-- Title -->
-    <string name="app_name">EventsHigh beta</string>
+    <string name="app_name">EventsHigh Beta</string>
 
     <!-- Actions, like menu items -->
     <string name="action_skip_login">Skip</string>
@@ -16,11 +16,11 @@
     <string name="action_direction">Show Directions</string>
 
     <!-- Other Strings used in UI -->
-    <string name="ui_event_timings">Event Timings</string>
-    <string name="ui_event_tags">Event Tags</string>
-    <string name="ui_event_description">Event Description</string>
-    <string name="ui_organizer">Organizer</string>
-    <string name="ui_name">Name</string>
+    <string name="ui_event_timings">Timings</string>
+    <string name="ui_event_tags">Categories</string>
+    <string name="ui_event_description">Description</string>
+    <string name="ui_organizer">More Details</string>
+    <string name="ui_name">Organizer Name</string>
     <string name="ui_address">Address</string>
     <string name="ui_phone">Phone</string>
     <string name="ui_website">Website</string>

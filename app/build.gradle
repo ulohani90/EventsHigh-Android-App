@@ -23,8 +23,8 @@ android {
         applicationId "com.eventshigh.nearme.app"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 22
-        versionName "beta-0.6"
+        versionCode 23
+        versionName "beta-0.7"
     }
     buildTypes {
         release {
@@ -48,9 +48,9 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.github.amlcurran.showcaseview:library:5.0.0'
-    compile('com.twitter.sdk.android:twitter:1.1.1@aar') {
-        transitive = true;
-    }
+//    compile('com.twitter.sdk.android:twitter:1.1.1@aar') {
+//        transitive = true;
+//    }
     compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
         transitive = true;
     }

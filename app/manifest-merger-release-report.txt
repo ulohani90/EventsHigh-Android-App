@@ -24,6 +24,7 @@ MERGED from com.twitter.sdk.android:twitter-core:1.1.1:11:5
 MERGED from com.twitter.sdk.android:twitter-core:1.1.1:11:5
 MERGED from com.digits.sdk.android:digits:1.1.0:11:5
 MERGED from com.twitter.sdk.android:twitter-core:1.1.1:11:5
+MERGED from com.crashlytics.sdk.android:crashlytics:2.2.0:11:5
 	android:name
 		ADDED from AndroidManifest.xml:8:22
 uses-permission#android.permission.ACCESS_NETWORK_STATE
@@ -144,6 +145,12 @@ MERGED from com.twitter.sdk.android:twitter-core:1.1.1:13:5
 MERGED from io.fabric.sdk.android:fabric:1.1.0:11:5
 MERGED from io.fabric.sdk.android:fabric:1.1.0:11:5
 MERGED from io.fabric.sdk.android:fabric:1.1.0:11:5
+MERGED from com.crashlytics.sdk.android:crashlytics:2.2.0:13:5
+MERGED from com.crashlytics.sdk.android:answers:1.1.0:11:5
+MERGED from io.fabric.sdk.android:fabric:1.1.0:11:5
+MERGED from com.crashlytics.sdk.android:beta:1.1.0:11:5
+MERGED from io.fabric.sdk.android:fabric:1.1.0:11:5
+MERGED from io.fabric.sdk.android:fabric:1.1.0:11:5
 	android:label
 		ADDED from AndroidManifest.xml:36:9
 	android:allowBackup
@@ -192,66 +199,88 @@ ADDED from AndroidManifest.xml:71:13
 		ADDED from AndroidManifest.xml:73:17
 	android:name
 		ADDED from AndroidManifest.xml:72:17
-activity#com.eventshigh.nearme.app.activity.LoginActivity
-ADDED from AndroidManifest.xml:79:9
-	android:screenOrientation
+provider#com.eventshigh.nearme.app.utils.EventSearchSuggestionsProvider
+ADDED from AndroidManifest.xml:78:9
+	android:grantUriPermissions
 		ADDED from AndroidManifest.xml:82:13
-	android:noHistory
-		ADDED from AndroidManifest.xml:83:13
-	android:label
+	android:exported
 		ADDED from AndroidManifest.xml:81:13
+	android:authorities
+		ADDED from AndroidManifest.xml:79:13
+	android:readPermission
+		ADDED from AndroidManifest.xml:83:13
 	android:name
 		ADDED from AndroidManifest.xml:80:13
-intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:85:13
-action#android.intent.action.MAIN
-ADDED from AndroidManifest.xml:86:17
-	android:name
-		ADDED from AndroidManifest.xml:86:25
-category#android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:87:17
-	android:name
-		ADDED from AndroidManifest.xml:87:27
+	android:writePermission
+		ADDED from AndroidManifest.xml:84:13
+path-permission
+ADDED from AndroidManifest.xml:86:13
+	android:readPermission
+		ADDED from AndroidManifest.xml:87:30
+	android:pathPrefix
+		ADDED from AndroidManifest.xml:86:30
 activity#com.eventshigh.nearme.app.activity.MapsActivity
-ADDED from AndroidManifest.xml:90:9
+ADDED from AndroidManifest.xml:97:9
 	android:label
-		ADDED from AndroidManifest.xml:92:13
+		ADDED from AndroidManifest.xml:99:13
 	android:name
-		ADDED from AndroidManifest.xml:91:13
+		ADDED from AndroidManifest.xml:98:13
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:101:13
+action#android.intent.action.MAIN
+ADDED from AndroidManifest.xml:102:17
+	android:name
+		ADDED from AndroidManifest.xml:102:25
+category#android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:103:17
+	android:name
+		ADDED from AndroidManifest.xml:103:27
 intent-filter#android.intent.action.SEARCH
-ADDED from AndroidManifest.xml:94:13
+ADDED from AndroidManifest.xml:105:13
 action#android.intent.action.SEARCH
-ADDED from AndroidManifest.xml:95:17
+ADDED from AndroidManifest.xml:106:17
 	android:name
-		ADDED from AndroidManifest.xml:95:25
+		ADDED from AndroidManifest.xml:106:25
+intent-filter#android.intent.category.DEFAULT+android.search.action.GLOBAL_SEARCH
+ADDED from AndroidManifest.xml:108:13
+	android:priority
+		ADDED from AndroidManifest.xml:108:28
+action#android.search.action.GLOBAL_SEARCH
+ADDED from AndroidManifest.xml:109:17
+	android:name
+		ADDED from AndroidManifest.xml:109:25
+category#android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:110:17
+	android:name
+		ADDED from AndroidManifest.xml:110:27
 meta-data#android.app.searchable
-ADDED from AndroidManifest.xml:97:13
+ADDED from AndroidManifest.xml:112:13
 	android:resource
-		ADDED from AndroidManifest.xml:98:24
+		ADDED from AndroidManifest.xml:113:24
 	android:name
-		ADDED from AndroidManifest.xml:97:24
+		ADDED from AndroidManifest.xml:112:24
 activity#com.eventshigh.nearme.app.activity.EventGridActivity
-ADDED from AndroidManifest.xml:101:9
+ADDED from AndroidManifest.xml:116:9
 	android:label
-		ADDED from AndroidManifest.xml:103:13
+		ADDED from AndroidManifest.xml:118:13
 	android:parentActivityName
-		ADDED from AndroidManifest.xml:104:13
+		ADDED from AndroidManifest.xml:119:13
 	android:name
-		ADDED from AndroidManifest.xml:102:13
+		ADDED from AndroidManifest.xml:117:13
 meta-data#android.support.PARENT_ACTIVITY
-ADDED from AndroidManifest.xml:106:13
+ADDED from AndroidManifest.xml:121:13
 	android:name
-		ADDED from AndroidManifest.xml:107:17
+		ADDED from AndroidManifest.xml:122:17
 	android:value
-		ADDED from AndroidManifest.xml:108:17
+		ADDED from AndroidManifest.xml:123:17
 activity#com.eventshigh.nearme.app.activity.EventDetailActivity
-ADDED from AndroidManifest.xml:111:9
+ADDED from AndroidManifest.xml:126:9
 	android:label
-		ADDED from AndroidManifest.xml:113:13
+		ADDED from AndroidManifest.xml:128:13
 	android:uiOptions
-		ADDED from AndroidManifest.xml:114:13
+		ADDED from AndroidManifest.xml:129:13
 	android:name
-		ADDED from AndroidManifest.xml:112:13
+		ADDED from AndroidManifest.xml:127:13
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from com.google.android.gms:play-services:6.1.71:15:5
@@ -259,6 +288,7 @@ MERGED from com.android.support:support-v4:21.0.3:15:5
 MERGED from com.android.support:appcompat-v7:21.0.3:15:5
 MERGED from com.android.support:support-v4:21.0.3:15:5
 MERGED from com.android.support:support-v4:21.0.3:15:5
+MERGED from com.github.amlcurran.showcaseview:library:5.0.0:7:5
 MERGED from com.twitter.sdk.android:twitter:1.1.1:7:5
 MERGED from com.twitter.sdk.android:tweet-composer:0.7.2:7:5
 MERGED from io.fabric.sdk.android:fabric:1.1.0:7:5
@@ -274,6 +304,12 @@ MERGED from io.fabric.sdk.android:fabric:1.1.0:7:5
 MERGED from com.digits.sdk.android:digits:1.1.0:7:5
 MERGED from com.twitter.sdk.android:twitter-core:1.1.1:7:5
 MERGED from io.fabric.sdk.android:fabric:1.1.0:7:5
+MERGED from io.fabric.sdk.android:fabric:1.1.0:7:5
+MERGED from io.fabric.sdk.android:fabric:1.1.0:7:5
+MERGED from com.crashlytics.sdk.android:crashlytics:2.2.0:7:5
+MERGED from com.crashlytics.sdk.android:answers:1.1.0:7:5
+MERGED from io.fabric.sdk.android:fabric:1.1.0:7:5
+MERGED from com.crashlytics.sdk.android:beta:1.1.0:7:5
 MERGED from io.fabric.sdk.android:fabric:1.1.0:7:5
 MERGED from io.fabric.sdk.android:fabric:1.1.0:7:5
 	android:targetSdkVersion

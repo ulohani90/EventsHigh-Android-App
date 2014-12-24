@@ -3,8 +3,6 @@ package com.eventshigh.nearme.app.user;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.digits.sdk.android.DigitsSession;
-
 /**
  * Manages the user account on this device. The account information is stored in
  * SharedPreferences.
@@ -45,6 +43,7 @@ public class Account {
         return tooManyFailures;
     }
 
+    /**
     public void recordSuccess(DigitsSession session, String phoneNumber) {
         SharedPreferences.Editor editor = accountInfo.edit();
         editor.putLong(PREF_USER_ID, session.getId());
@@ -52,7 +51,7 @@ public class Account {
         editor.putBoolean(PREF_ASK_LOGIN, false);
         editor.apply();
     }
-
+  **/
     public void recordSkip() {
         SharedPreferences.Editor editor = accountInfo.edit();
         editor.putBoolean(PREF_ASK_LOGIN, false);
