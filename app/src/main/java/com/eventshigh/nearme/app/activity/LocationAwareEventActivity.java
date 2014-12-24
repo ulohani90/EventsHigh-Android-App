@@ -60,7 +60,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     // ***********************
     public static final String EXTRA_EVENT_FETCHER_PARAM = EventFetcherParam.class.getSimpleName();
     public static final String EXTRA_TAG_NAME_PARAM = "extra.event.tag.name";
-    public static final int NUM_MAX_TABS = 7;
+    public static final int NUM_MAX_TABS = 10;
 
 
     // ***********************
