@@ -299,9 +299,8 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         events = new Builder(Collections.EMPTY_SET).build();
 
         ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
+        if (actionBar != null && actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS) {
             String lastSelectedTagSave = lastSelectedTag;
-            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             actionBar.removeAllTabs();
             actionBar.addTab(
                     actionBar.newTab()
@@ -400,14 +399,26 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             lastEventFetcherParam = param;
             LocationAwareEventActivity.this.events = events;
 
+            // Update tabs if needed.
             ActionBar actionBar = getActionBar();
-            if (actionBar != null) {
-                actionBar.removeAllTabs();
-                int selectedItem = 0;
-                List<Pair<String, Integer>> tags = events.getTags();
-                if (tags.size() > NUM_MAX_TABS) {
-                    tags = tags.subList(0, NUM_MAX_TABS);
+            if (actionBar == null) {
+                return;
+            }
+
+            List<Pair<String, Integer>> tags = events.getTags();
+            if (tags.size() > NUM_MAX_TABS) {
+                tags = tags.subList(0, NUM_MAX_TABS);
+            }
+
+            if (actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS || tags.size() > 1) {
+                if (!param.query.isEmpty()) {
+                    actionBar.setTitle(param.query);
                 }
+
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+                actionBar.removeAllTabs();
+
+                int selectedItem = 0;
                 if (lastSelectedTag != null) {
                     for (int i = 0; i < tags.size(); i++) {
                         if (tags.get(i).first.equalsIgnoreCase(lastSelectedTag)) {
@@ -419,9 +430,9 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
                 for (Pair<String, Integer> tag : tags) {
                     Tab tab = actionBar.newTab()
-                                .setText("  " + tag.first + "  \n  (" + tag.second + ")  ")
-                                .setTag(tag.first)
-                                .setTabListener(mTabListener);
+                            .setText("  " + tag.first + "  \n  (" + tag.second + ")  ")
+                            .setTag(tag.first)
+                            .setTabListener(mTabListener);
                     EventCategory category = Event.getCategoryFromTag(tag.first);
                     if (category != null) {
                         int iconRes = category.getIconResourceId();
@@ -433,6 +444,13 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                 }
 
                 actionBar.setSelectedNavigationItem(selectedItem);
+            } else {
+                if (!param.query.isEmpty()) {
+                    int numEvents = tags.isEmpty() ? 0 : events.getEvents(0).size();
+                    actionBar.setTitle(param.query + " (" + numEvents + ")");
+                }
+
+                updateNewEvents(events.getEvents(0));
             }
         }
     };
