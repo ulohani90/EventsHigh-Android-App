@@ -292,11 +292,16 @@ public class EventDetailActivity extends BaseActivity {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int maxHeight = (int) (0.4 * metrics.heightPixels);
+        int infographResId = mEvent.category.getInfographResourceId();
         mEventCard.bgView.setMaxHeight(maxHeight);
         if (mEvent.imgUrl == null) {
-            mEventCard.bgView.setVisibility(View.GONE);
+            if (infographResId == R.drawable.eh_default) {
+                mEventCard.bgView.setVisibility(View.GONE);
+            } else {
+                mEventCard.bgView.setImageResource(infographResId);
+            }
         } else {
-            DownloadImageTask.setImage(mEventCard.bgView, mEvent.imgUrl, -1,
+            DownloadImageTask.setImage(mEventCard.bgView, mEvent.imgUrl, infographResId,
                     metrics.widthPixels, maxHeight);
         }
 
@@ -431,8 +436,8 @@ public class EventDetailActivity extends BaseActivity {
         LayoutParams layoutParams =
                 new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         int margin = Math.round(TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()));
-        layoutParams.setMargins(margin, 0 , margin, 0);
+                TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
+        layoutParams.setMargins(0, 0 , margin, 0);
         return layoutParams;
     }
 }

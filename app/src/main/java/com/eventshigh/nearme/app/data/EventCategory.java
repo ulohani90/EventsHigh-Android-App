@@ -26,8 +26,8 @@ public enum EventCategory {
     LITERATURE,
     MUSIC,
     OUTDOORS,
-    PHOTOGRAPHY,
     PARTIES,
+    PHOTOGRAPHY,
     SOCIAL_CAUSES,
     SPIRITUAL,
     SPORTS,
@@ -53,6 +53,17 @@ public enum EventCategory {
         int resId = R.drawable.icon_other;
         try {
             resId = R.drawable.class.getField("icon_" + toString().toLowerCase()).getInt(null);
+        } catch (IllegalAccessException| NoSuchFieldException e) {
+            // Ignore
+        }
+
+        return resId;
+    }
+
+    public int getInfographResourceId() {
+        int resId = R.drawable.eh_default;
+        try {
+            resId = R.drawable.class.getField("infograph_" + toString().toLowerCase()).getInt(null);
         } catch (IllegalAccessException| NoSuchFieldException e) {
             // Ignore
         }

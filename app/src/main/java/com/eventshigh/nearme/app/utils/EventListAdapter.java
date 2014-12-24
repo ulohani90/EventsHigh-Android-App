@@ -50,7 +50,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         int height = findOptimalHeight(parent);
         eventCard.bgView.setLayoutParams(new FrameLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT, height));
-        DownloadImageTask.setImage(eventCard.bgView, event.imgUrl, R.drawable.eh_default,
+        DownloadImageTask.setImage(eventCard.bgView, event.imgUrl, event.category.getInfographResourceId(),
                 parent.getMeasuredWidth(), height);
 
         // Set the title, time etc.
