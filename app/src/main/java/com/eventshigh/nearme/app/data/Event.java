@@ -15,7 +15,9 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -357,10 +359,20 @@ public class Event implements Parcelable {
         return events;
     }
 
-    public static List<Event> parseUpcomingEvents(City city, String jsonStr) throws JSONException {
+    public static EventsCollection parseUpcomingEvents(City city, String jsonStr) throws JSONException {
         JSONObject eventsJSON = new JSONObject(jsonStr);
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
-        return fromJSON(city, upcomingEvents);
+        JSONArray whitelistCategoriesJSON = eventsJSON.optJSONArray("categories");
+
+        Set<String> whitelistCategories = new HashSet<>();
+        if (whitelistCategoriesJSON != null) {
+            for (int i = 0; i < whitelistCategoriesJSON.length(); i++) {
+                whitelistCategories.add(whitelistCategoriesJSON.getString(i).toLowerCase());
+            }
+        }
+
+        EventsCollection.Builder builder = new EventsCollection.Builder(whitelistCategories);
+        return builder.addAllEvent(fromJSON(city, upcomingEvents)).build();
     }
 
     public static @Nullable EventCategory getCategoryFromTag(String tag) {

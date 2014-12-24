@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,17 +21,12 @@ public class EventsCollection {
     public static final String ALL_EVENTS_CATEGORY = "All";
     public static final String RECOMMENDED_EVENTS_CATEGORY = "Recommended";
 
-    private static final Set<String> TAGS_BLACKLIST = new HashSet<>();
-    static {
-        TAGS_BLACKLIST.add("courses");
-    }
-
     public static class Builder {
-        private final boolean showAllTags;
+        private final Set<String> whiteListedTagCategories;
         private final Map<String, List<Event>> events = new HashMap<>();
 
-        public Builder(boolean showAllTags) {
-            this.showAllTags = showAllTags;
+        public Builder(Set<String> whiteListedTagCategories) {
+            this.whiteListedTagCategories = whiteListedTagCategories;
         }
 
         public Builder addEvent(Event event) {
@@ -42,9 +36,9 @@ public class EventsCollection {
                 addEvent(RECOMMENDED_EVENTS_CATEGORY, event);
             }
 
-            if (showAllTags) {
+            if (!whiteListedTagCategories.isEmpty()) {
                 for (String tag : event.getAllTags()) {
-                    if (! TAGS_BLACKLIST.contains(tag.toLowerCase())) {
+                    if (whiteListedTagCategories.contains(tag.toLowerCase())) {
                         addEvent(Utils.capitalize(tag), event);
                     }
                 }

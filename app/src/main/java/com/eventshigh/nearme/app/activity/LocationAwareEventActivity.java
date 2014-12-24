@@ -40,6 +40,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -295,7 +296,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     }
 
     private void basicTabs() {
-        events = new Builder(true).build();
+        events = new Builder(Collections.EMPTY_SET).build();
 
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {

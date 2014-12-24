@@ -8,7 +8,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.EventsCollection.Builder;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONException;
@@ -97,8 +96,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsColl
                 for (String json : Utils.readStream(urlConnection.getInputStream())) {
                     jsonBuffer.append(json);
                 }
-                return new Builder(param.query.isEmpty()).addAllEvent(
-                        Event.parseUpcomingEvents(param.city, jsonBuffer.toString())).build();
+                return Event.parseUpcomingEvents(param.city, jsonBuffer.toString());
             } finally {
                 urlConnection.disconnect();
             }
