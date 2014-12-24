@@ -230,6 +230,7 @@ public class MapsActivity extends LocationAwareEventActivity {
                     .setContentText(R.string.onboarding_change_date)
                     .setStyle(R.style.ShowcaseTheme)
                     .setOnClickListener(mShowcaseViewClickListener)
+                    .hideOnTouchOutside()
                     .singleShot(1)
                     .build();
         }
@@ -320,6 +321,7 @@ public class MapsActivity extends LocationAwareEventActivity {
                     .setContentText(R.string.onboarding_swipe)
                     .setStyle(R.style.ShowcaseTheme)
                     .singleShot(2)
+                    .hideOnTouchOutside()
                     .setShowcaseEventListener(new OnShowcaseEventListener() {
                         ImageView swipeImage;
                         @Override

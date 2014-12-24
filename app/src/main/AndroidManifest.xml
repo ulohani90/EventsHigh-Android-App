@@ -51,7 +51,7 @@
             android:name="com.google.android.gms.analytics.globalConfigResource"
             android:resource="@xml/analytics"
         />
-		<!-- Setup the Crash Reporting -->
+        <!-- Setup the Crash Reporting -->
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="88e38bba3d2788a9338644aa2f1a2b9f0ee92991"
@@ -88,12 +88,14 @@
         </provider>
 
         <!-- Activities within our application -->
-        <!-- activity
+        <!--
+        <activity
             android:name=".activity.LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:noHistory="true"
-        / -->
+        />
+        -->
         <activity
             android:name=".activity.MapsActivity"
             android:label="@string/app_name"
@@ -105,12 +107,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-            <intent-filter android:priority="500">
-                <action android:name="android.search.action.GLOBAL_SEARCH" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <meta-data android:name="android.app.searchable"
-                       android:resource="@xml/searchable"
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"
             />
         </activity>
         <activity
@@ -127,6 +127,20 @@
             android:name=".activity.EventDetailActivity"
             android:label="@string/app_name"
             android:uiOptions="splitActionBarWhenNarrow"
-        />
+            android:configChanges="orientation|keyboardHidden|screenSize"
+        >
+            <intent-filter>
+                <!-- Accepts URIs that begin with "http://www.eventshigh.com/detail/" -->
+                <action android:name="android.intent.action.VIEW" />
+                <data
+                    android:scheme="http"
+                    android:host="www.eventshigh.com"
+                    android:pathPrefix="/detail"
+                />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="andrsoid.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
     </application>
+
 </manifest>

@@ -79,7 +79,9 @@ public abstract class BaseActivity extends FragmentActivity {
         // Twitter Digits and CrashAnalytics
         // TwitterAuthConfig authConfig = TwitterUtils.getAuthConfig();
         // Fabric.with(this, new Twitter(authConfig), new Crashlytics());
-        Fabric.with(this, new Crashlytics());
+        if(!BuildConfig.DEBUG) {
+            Fabric.with(this, new Crashlytics());
+        }
     }
 
     protected void onStop() {
@@ -114,6 +116,17 @@ public abstract class BaseActivity extends FragmentActivity {
                 .setLabel(label)
                 .setValue(value)
                 .build());
+    }
+
+    /**
+     * Open events details page.
+     * @param event event for which to show details page.
+     */
+    protected void showEventDetails(Event event) {
+        reportActionToAnalytics("showEventDetails");
+        Intent detailIntent = new Intent(this, EventDetailActivity.class);
+        detailIntent.putExtra(EventDetailFragment.ARG_EVENT_INFO, event);
+        startActivity(detailIntent);
     }
 
     /**

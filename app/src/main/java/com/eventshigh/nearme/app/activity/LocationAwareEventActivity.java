@@ -245,17 +245,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     }
 
     /**
-     * Open events details page.
-     * @param event event for which to show details page.
-     */
-    protected void showEventDetails(Event event) {
-        reportActionToAnalytics("showEventDetails");
-        Intent detailIntent = new Intent(this, EventDetailActivity.class);
-        detailIntent.putExtra(EventDetailActivity.ARG_EVENT_INFO, event);
-        startActivity(detailIntent);
-    }
-
-    /**
      * Refresh the event listings if user city has changed as per new location.
      * Parent activity can pass {@code NULL} to cleanup any state like {@code lastCity}.
      *

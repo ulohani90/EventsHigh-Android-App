@@ -47,7 +47,7 @@ public class Event implements Parcelable {
 
     public final long[] eventTimings;    // each start time is stored as milliseconds since epoch.
 
-    public final LatLng location;
+    @Nullable public final LatLng location;
     @Nullable public final String venue;
     @Nullable public final String address;
 
@@ -60,7 +60,7 @@ public class Event implements Parcelable {
                  @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
                  int numPeopleInterested, boolean ehRecommended,
                  long[] eventTimings,
-                 LatLng location, @Nullable String venue, @Nullable String address,
+                 @Nullable LatLng location, @Nullable String venue, @Nullable String address,
                  String organizerName, String organizerPhone, String organizerWebsite) {
         this.id = id;
         this.city = city;
@@ -80,7 +80,7 @@ public class Event implements Parcelable {
 
         this.eventTimings = eventTimings;
 
-        this.location = location;
+        this.location = location != null && city.cityBounds.contains(location) ? location : null;
         this.venue = checkIfUnknown(venue);
         this.address = checkIfUnknown(address);
 
@@ -114,6 +114,29 @@ public class Event implements Parcelable {
                 id.equals(((Event) another).id);
     }
 
+    public Uri getWebUri() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("http://www.eventshigh.com/detail/");
+        appendUriSuffix(sb);
+        return Uri.parse(sb.toString());
+    }
+
+    public Uri getAppUri() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("android-app://com.eventshigh.nearme.app/http/www.eventshigh.com/detail/");
+        appendUriSuffix(sb);
+        return Uri.parse(sb.toString());
+    }
+
+    private void appendUriSuffix(StringBuilder sb) {
+        sb.append(Utils.capitalize(city.toString())).append("/");
+        sb.append(id);
+        String [] titleKgrams = title.replaceAll("\\p{C}", "").split("[\\p{Punct}\\s]+");
+        for (int i = 0; i < 5 && i < titleKgrams.length; i++) {
+            sb.append("-");
+            sb.append(titleKgrams[i]);
+        }
+    }
 
     /**********************************
      Parcel management methods.
@@ -143,7 +166,7 @@ public class Event implements Parcelable {
 
         dest.writeLongArray(eventTimings);
 
-        dest.writeParcelable(location, flags);
+        dest.writeParcelable(location == null ? new LatLng(0, 0) : location, flags);
         dest.writeString(emptyIfNull(venue));
         dest.writeString(emptyIfNull(address));
 
@@ -214,33 +237,16 @@ public class Event implements Parcelable {
 
         double lat = 0;
         double lon = 0;
-        boolean hasLatLonFound = false;
         if (mashup != null) {
             lat = mashup.optDouble("lat", 0);
             lon = mashup.optDouble("lon", 0);
-
-            // Check for valid latitude and longitude.
-            if (city.cityBounds.contains(new LatLng(lat, lon))) {
-                hasLatLonFound = true;
-            }
         }
 
         JSONObject localityJson = eventJson.optJSONObject("locality_info");
-        if (!hasLatLonFound && localityJson != null) {
+        if (!city.cityBounds.contains(new LatLng(lat, lon)) && localityJson != null) {
             // Invalid latitude and longitude. Try locality_info.
             lat = localityJson.optDouble("lat", 0);
             lon = localityJson.optDouble("lon", 0);
-
-            // Check for valid latitude and longitude.
-            if (city.cityBounds.contains(new LatLng(lat, lon))) {
-                hasLatLonFound = true;
-            }
-        }
-
-        if (!hasLatLonFound) {
-            // Invalid latitude and longitude.
-            // Ignore the entry.
-            throw new ParseException("invalid latitude and longitude for " + id, 0);
         }
 
         String venue = null;
@@ -351,7 +357,10 @@ public class Event implements Parcelable {
         List<Event> events = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
-                events.add(fromJSON(city, jsonArray.getJSONObject(i)));
+                Event event = fromJSON(city, jsonArray.getJSONObject(i));
+                if (event.location != null) {
+                    events.add(event);
+                }
             } catch (JSONException | ParseException e) {
                 // Log.w(Event.class.getSimpleName(), "malformed JSON", e);
             }
@@ -359,8 +368,7 @@ public class Event implements Parcelable {
         return events;
     }
 
-    public static EventsCollection parseUpcomingEvents(City city, String jsonStr) throws JSONException {
-        JSONObject eventsJSON = new JSONObject(jsonStr);
+    public static EventsCollection parseUpcomingEvents(City city, JSONObject eventsJSON) throws JSONException {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
         JSONArray whitelistCategoriesJSON = eventsJSON.optJSONArray("categories");
 

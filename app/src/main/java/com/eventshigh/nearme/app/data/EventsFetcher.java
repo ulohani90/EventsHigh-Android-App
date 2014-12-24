@@ -14,8 +14,6 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
 
 /**
@@ -32,6 +30,8 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsColl
             "http://apiserver.eventshigh.com:8888/api/date/CITY/DATE?sortby=popularity&limit=200&mobile=1";
     private static final String API_ENDPOINT_QUERY =
             "http://apiserver.eventshigh.com:8888/api/events/CITY/QUERY?sortby=popularity&limit=200&mobile=1";
+    public static final String API_ENDPOINT_EVENT =
+            "http://apiserver.eventshigh.com:8888/api/get_event_uber_info/EVENT_ID?mobile=1";
 
     public static interface EventsFetcherCallBack {
         public void OnEventsAvailable(EventFetcherParam param, EventsCollection events);
@@ -88,18 +88,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsColl
         Log.d(LOG_TAG, "fetching: " + url);
 
         try {
-            HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-            try {
-                StringBuilder jsonBuffer = new StringBuilder();
-                for (String json : Utils.readStream(urlConnection.getInputStream())) {
-                    jsonBuffer.append(json);
-                }
-                return Event.parseUpcomingEvents(param.city, jsonBuffer.toString());
-            } finally {
-                urlConnection.disconnect();
-            }
+            return Event.parseUpcomingEvents(param.city, Utils.fetchJSON(url));
         } catch (JSONException|IOException e) {
             Log.e(LOG_TAG, "Failed to fetch events!", e);
             return null;
