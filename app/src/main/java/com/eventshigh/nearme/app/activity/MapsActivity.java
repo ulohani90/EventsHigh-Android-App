@@ -317,6 +317,7 @@ public class MapsActivity extends LocationAwareEventActivity {
 
                         @Override
                         public void onShowcaseViewHide(ShowcaseView showcaseView) {
+                            reportActionToAnalytics("endOnboardingSwipe");
                             isVisible = false;
                             swipeImage.setVisibility(View.GONE);
                         }
@@ -327,6 +328,7 @@ public class MapsActivity extends LocationAwareEventActivity {
 
                         @Override
                         public void onShowcaseViewShow(ShowcaseView showcaseView) {
+                            reportActionToAnalytics("startOnboardingSwipe");
                             isVisible = true;
                             swipeImage = new ImageView(MapsActivity.this);
                             swipeImage.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));

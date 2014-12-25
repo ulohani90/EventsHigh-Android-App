@@ -1,13 +1,13 @@
 package com.eventshigh.nearme.app.utils;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.ActionItemTarget;
@@ -26,7 +26,7 @@ public class OnBoardingHelper {
     private ShowcaseView showcaseView;
 
     // Activity in which this OnBoarding messages are shown.
-    private final Activity activity;
+    private final BaseActivity activity;
 
     // Is the OnBoarding is shown ?
     private boolean isShowing = false;
@@ -35,7 +35,7 @@ public class OnBoardingHelper {
     private int targetsIndex = 0;
     private final List<Pair<Target, Integer>> targets;
 
-    public OnBoardingHelper(Activity activity) {
+    public OnBoardingHelper(BaseActivity activity) {
         this.activity = activity;
 
         targets = new ArrayList<>();
@@ -87,6 +87,7 @@ public class OnBoardingHelper {
     private OnShowcaseEventListener mShowcaseEventListener = new OnShowcaseEventListener() {
         @Override
         public void onShowcaseViewHide(ShowcaseView showcaseView) {
+            activity.reportActionToAnalytics("endOnboarding");
             isShowing = false;
         }
 
@@ -96,6 +97,7 @@ public class OnBoardingHelper {
 
         @Override
         public void onShowcaseViewShow(ShowcaseView showcaseView) {
+            activity.reportActionToAnalytics("startOnboarding");
             isShowing = true;
         }
     };

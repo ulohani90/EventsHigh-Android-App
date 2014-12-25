@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.amplitude.api.Amplitude;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
@@ -94,6 +95,10 @@ public abstract class BaseActivity extends FragmentActivity {
         FlurryAgent.setLogEnabled(false);
         FlurryAgent.setReportLocation(false);
         FlurryAgent.onStartSession(this);
+
+        // Setup Amplitude
+        Amplitude.initialize(this, "41ed6c5c945d7f1c2f2d829b90288562");
+        Amplitude.startSession();
     }
 
     protected void onStop() {
@@ -104,6 +109,9 @@ public abstract class BaseActivity extends FragmentActivity {
 
         // Flurry reporting
         FlurryAgent.onEndSession(this);
+
+        // Amplitude reporting.
+        Amplitude.endSession();
 
         // Save the Http cache.
         HttpResponseCache cache = HttpResponseCache.getInstalled();
@@ -116,15 +124,15 @@ public abstract class BaseActivity extends FragmentActivity {
      * Helper method which can be used to report any action.
      * @param actionName name of action to be reported.
      */
-    protected void reportActionToAnalytics(String actionName) {
+    public void reportActionToAnalytics(String actionName) {
         reportActionToAnalytics(actionName, "");
     }
 
-    protected void reportActionToAnalytics(String actionName, String label) {
+    public void reportActionToAnalytics(String actionName, String label) {
         reportActionToAnalytics(actionName, label, 1);
     }
 
-    protected void reportActionToAnalytics(String actionName, String label, long value) {
+    public void reportActionToAnalytics(String actionName, String label, long value) {
         if (tracker != null) {
             tracker.send(new HitBuilders.EventBuilder()
                     .setCategory(getClass().getSimpleName())
@@ -134,6 +142,7 @@ public abstract class BaseActivity extends FragmentActivity {
                     .build());
 
             FlurryAgent.logEvent(actionName);
+            Amplitude.logEvent(actionName);
         }
     }
 
@@ -141,7 +150,7 @@ public abstract class BaseActivity extends FragmentActivity {
      * Open events details page.
      * @param event event for which to show details page.
      */
-    protected void showEventDetails(Event event) {
+    public void showEventDetails(Event event) {
         reportActionToAnalytics("showEventDetails");
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.putExtra(EventDetailFragment.ARG_EVENT_INFO, event);
