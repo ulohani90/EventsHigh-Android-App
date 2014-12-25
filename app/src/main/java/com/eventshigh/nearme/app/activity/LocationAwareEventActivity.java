@@ -30,6 +30,7 @@ import com.eventshigh.nearme.app.utils.DaySelector.DaySelectionListener;
 import com.eventshigh.nearme.app.utils.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.utils.LocationPickerDialog;
 import com.eventshigh.nearme.app.utils.LocationPickerDialog.OnLocationSelection;
+import com.eventshigh.nearme.app.utils.OnBoardingHelper;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -80,6 +81,8 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     private String lastSelectedTag;
     // last fetcher used to fetch events.
     private EventsFetcher fetcher;
+    // On boarding helper.
+    private OnBoardingHelper onBoardingHelper;
 
 
     // ***********************
@@ -144,7 +147,15 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
      *
      * @param events a list of events as returned by {@link com.eventshigh.nearme.app.data.EventsFetcher}
      */
-    protected abstract void updateNewEvents(List<Event> events);
+    protected void updateNewEvents(List<Event> events) {
+        if (!events.isEmpty()) {
+            if (onBoardingHelper == null) {
+                onBoardingHelper = new OnBoardingHelper(this);
+            }
+
+            onBoardingHelper.next();
+        }
+    }
 
     /**
      * Updates the user location as reported by LocationClient. When parent activity

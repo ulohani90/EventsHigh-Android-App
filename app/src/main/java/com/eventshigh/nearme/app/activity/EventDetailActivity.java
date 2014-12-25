@@ -84,6 +84,7 @@ public class EventDetailActivity extends BaseActivity {
 
         String action = intent.getAction();
         if (Intent.ACTION_VIEW.equals(action)) {
+            reportActionToAnalytics("deepLink", "detail");
             new EventFetcher(this).execute(intent.getData());
         }
     }
