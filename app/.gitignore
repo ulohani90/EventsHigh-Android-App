@@ -1,2 +1,3 @@
 build/
+libs/
 **/crashlytics-build.properties

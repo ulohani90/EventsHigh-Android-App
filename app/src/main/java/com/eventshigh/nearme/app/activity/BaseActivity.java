@@ -21,6 +21,7 @@ import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.flurry.android.FlurryAgent;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -47,21 +48,6 @@ public abstract class BaseActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Setup Google Analytics.
-        if (googleAnalytics == null) {
-            googleAnalytics = GoogleAnalytics.getInstance(this);
-            tracker = googleAnalytics.newTracker(R.xml.analytics);
-            tracker.enableAdvertisingIdCollection(true);
-
-            // Disable GA reporting in debug build.
-            if (BuildConfig.DEBUG) {
-                googleAnalytics.setAppOptOut(true);
-            }
-        }
-
-        // Automatic Google Analytics reporting.
-        googleAnalytics.reportActivityStart(this);
-
         // Setup Http cache.
         if (HttpResponseCache.getInstalled() == null) {
             try {
@@ -84,11 +70,40 @@ public abstract class BaseActivity extends FragmentActivity {
         }
     }
 
+    protected void onStart() {
+        super.onStart();
+
+        // Setup Google Analytics.
+        if (googleAnalytics == null) {
+            googleAnalytics = GoogleAnalytics.getInstance(this);
+            tracker = googleAnalytics.newTracker(R.xml.analytics);
+            tracker.enableAdvertisingIdCollection(true);
+
+            // Disable GA reporting in debug build.
+            if (BuildConfig.DEBUG) {
+                googleAnalytics.setAppOptOut(true);
+            }
+        }
+
+        // Google Analytics reporting.
+        googleAnalytics.reportActivityStart(this);
+
+        // Setup Flurry.
+        FlurryAgent.setVersionName(BuildConfig.VERSION_NAME);
+        FlurryAgent.init(this, "2MD4D4TP7WQZH6Q6257T");
+        FlurryAgent.setLogEnabled(false);
+        FlurryAgent.setReportLocation(false);
+        FlurryAgent.onStartSession(this);
+    }
+
     protected void onStop() {
         super.onStop();
 
-        // Automatic Google Analytics reporting.
+        // Google Analytics reporting.
         googleAnalytics.reportActivityStop(this);
+
+        // Flurry reporting
+        FlurryAgent.onEndSession(this);
 
         // Save the Http cache.
         HttpResponseCache cache = HttpResponseCache.getInstalled();
@@ -110,12 +125,16 @@ public abstract class BaseActivity extends FragmentActivity {
     }
 
     protected void reportActionToAnalytics(String actionName, String label, long value) {
-        tracker.send(new HitBuilders.EventBuilder()
-                .setCategory(getClass().getSimpleName())
-                .setAction(actionName)
-                .setLabel(label)
-                .setValue(value)
-                .build());
+        if (tracker != null) {
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory(getClass().getSimpleName())
+                    .setAction(actionName)
+                    .setLabel(label)
+                    .setValue(value)
+                    .build());
+
+            FlurryAgent.logEvent(actionName);
+        }
     }
 
     /**
@@ -168,8 +187,16 @@ public abstract class BaseActivity extends FragmentActivity {
     public void showDirections(Event event) {
         reportActionToAnalytics("showDirections");
 
-        String query = event.address != null ? event.address :
-                event.location.latitude + "," + event.location.longitude +  " (" + event.title + ")";
+        String query = event.address;
+        if (query == null) {
+            if (event.location == null) {
+                reportActionToAnalytics("skipDirectionsNoLocation");
+                Toast.makeText(this, R.string.failed_event_location, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            query = event.location.latitude + "," + event.location.longitude +  " (" + event.title + ")";
+        }
+
         Uri locationUri = Uri.parse("geo:0,0?q=" + query);
         Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
 
@@ -210,5 +237,4 @@ public abstract class BaseActivity extends FragmentActivity {
             Toast.makeText(this, R.string.no_cal_app, Toast.LENGTH_SHORT).show();
         }
     }
-
 }

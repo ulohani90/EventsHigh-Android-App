@@ -46,6 +46,7 @@
     <string name="failed_save">Sharing failed as we could not save image</string>
     <string name="failed_share">Sharing failed as there is no application installed</string>
     <string name="failed_location">Could not determine your location</string>
+    <string name="failed_event_location">Could not find the location for the event!</string>
     <string name="no_map_app">Maps application not found!</string>
     <string name="no_cal_app">Calendar application not found!</string>
     <string name="no_events">No events found!</string>
