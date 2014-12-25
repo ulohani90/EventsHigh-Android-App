@@ -104,6 +104,13 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"
+            />
         </activity>
         <activity
             android:name=".activity.MapsActivity"
@@ -111,13 +118,9 @@
             android:parentActivityName=".activity.LaunchActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
         >
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
             <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable"
+                android:name="android.app.default_searchable"
+                android:value=".activity.LaunchActivity"
             />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -130,6 +133,10 @@
             android:parentActivityName=".activity.LaunchActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
         >
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".activity.LaunchActivity"
+            />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.eventshigh.nearme.app.activity.LaunchActivity"

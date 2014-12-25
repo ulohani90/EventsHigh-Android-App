@@ -1,14 +1,15 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.ActionBar;
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
+import android.widget.SearchView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
@@ -57,35 +58,17 @@ public class EventGridActivity extends LocationAwareEventActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.activity_list, menu);
+
+        // Search View.
+        if (!LaunchActivity.isMapsViewDefault(this)) {
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        } else {
+            menu.findItem(R.id.action_search).setVisible(false);
+        }
+
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            // This ID represents the Home or Up button. In the case of this
-            // activity, the Up button is shown. Use NavUtils to allow users
-            // to navigate up one level in the application structure. For
-            // more details, see the Navigation pattern on Android Design:
-            //
-            // http://developer.android.com/design/patterns/navigation.html#up-vs-back
-            //
-            NavUtils.navigateUpFromSameTask(this);
-            return true;
-        }
-
-        if (id == R.id.action_map) {
-            switchTo(MapsActivity.class);
-            return true;
-        }
-
-        if (id == R.id.action_change_location) {
-            askUserForLocation(getActionBar());
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
 

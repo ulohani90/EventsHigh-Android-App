@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -54,7 +55,21 @@ public class LaunchActivity extends Activity {
         }
 
         Class target = isMapsViewDefault(preferences) ? MapsActivity.class : EventGridActivity.class;
-        startActivity(new Intent(this, target));
+        Intent outIntent = new Intent(this, target);
+
+        // Check if this is called as part of search intent. if yes, copy extra search data
+        Intent inIntent = getIntent();
+        if (inIntent != null && Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
+            outIntent.setAction(Intent.ACTION_SEARCH);
+            outIntent.putExtra(SearchManager.QUERY, inIntent.getStringExtra(SearchManager.QUERY));
+            Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
+            if (appData != null) {
+                outIntent.putExtra(SearchManager.APP_DATA, appData);
+            }
+        }
+
+        // Go to target activity.
+        startActivity(outIntent);
     }
 
     public static boolean isMapsViewDefault(Context context) {
