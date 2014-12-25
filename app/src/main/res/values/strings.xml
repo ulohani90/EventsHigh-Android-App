@@ -26,7 +26,7 @@
     <string name="ui_website">Website</string>
 
     <!-- Onbaording message -->
-    <string name="onboarding_filter">Filter events by selecting a category. Swipe right to see more!</string>
+    <string name="onboarding_filter">Filter events by selecting a category!</string>
     <string name="onboarding_action">Use these action buttons to search, change location or see events in list view!</string>
     <string name="onboarding_change_date">\nChoose the date for which events are shown at the bottom!</string>
     <string name="onboarding_swipe">\nSwipe right to go to next event!</string>

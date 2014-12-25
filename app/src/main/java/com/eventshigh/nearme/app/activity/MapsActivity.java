@@ -1,10 +1,10 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -27,8 +27,6 @@ import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.ShowcaseView.Builder;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
@@ -91,21 +89,14 @@ public class MapsActivity extends LocationAwareEventActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Check for Google Play Services.
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (status != ConnectionResult.SUCCESS) {
-            Toast.makeText(this, GooglePlayServicesUtil.getErrorString(status), Toast.LENGTH_SHORT).show();
-            GooglePlayServicesUtil.getErrorDialog(status, this, 0, new OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    finish();
-                }
-            }).show();
-            return;
-        }
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        // Show the Up button in the action bar.
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(!LaunchActivity.isMapsViewDefault(this));
+        }
 
         // Setup the local member variables.
         setUpMapIfNeeded();
@@ -130,6 +121,18 @@ public class MapsActivity extends LocationAwareEventActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        if (id == android.R.id.home) {
+            // This ID represents the Home or Up button. In the case of this
+            // activity, the Up button is shown. Use NavUtils to allow users
+            // to navigate up one level in the application structure. For
+            // more details, see the Navigation pattern on Android Design:
+            //
+            // http://developer.android.com/design/patterns/navigation.html#up-vs-back
+            //
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
+        }
+
         if (id == R.id.action_list) {
             switchTo(EventGridActivity.class);
             return true;

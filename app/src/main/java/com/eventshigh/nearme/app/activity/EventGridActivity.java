@@ -40,7 +40,7 @@ public class EventGridActivity extends LocationAwareEventActivity {
         // Show the Up button in the action bar.
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(LaunchActivity.isMapsViewDefault(this));
         }
 
         // Setup adapter.
