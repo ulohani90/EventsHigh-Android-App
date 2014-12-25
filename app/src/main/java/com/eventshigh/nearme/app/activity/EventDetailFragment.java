@@ -372,7 +372,7 @@ public class EventDetailFragment extends Fragment {
                 final Date date = new Date(time);
                 LinearLayout daySelectorItem = DaySelector.getDaySelectorItem(
                         activity, mEventCard.timeView, date, TimeZone.getTimeZone(mEvent.city.timeZone));
-                mEventCard.timeView.addView(daySelectorItem);
+                mEventCard.timeView.addView(daySelectorItem, getLayoutParam());
                 daySelectorItem.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
