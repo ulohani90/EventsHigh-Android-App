@@ -5,7 +5,6 @@ import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.eventshigh.nearme.app.data.Event;
 import com.google.android.gms.maps.model.LatLng;
@@ -202,8 +201,6 @@ public class Utils {
             builder.encodedQuery(webUri.getEncodedQuery());
         }
 
-        Uri androidUri = builder.build();
-        Log.w("TEXT", "web= '" + webUri.toString() + "', app='"+ androidUri.toString() + "'");
-        return  androidUri;
+        return builder.build();
     }
 }
