@@ -99,11 +99,14 @@
         <activity android:name=".activity.LaunchActivity"
             android:label="@string/app_name"
             android:noHistory="true"
+            android:exported="true"
         >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Accept Search requests withing app -->
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -111,7 +114,54 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"
             />
+
+            <!-- Accepts URIs "http://www.eventshigh.com/" -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data
+                    android:scheme="http"
+                    android:host="www.eventshigh.com"
+                    android:path="/"
+                />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="andrsoid.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data
+                    android:scheme="http"
+                    android:host="www.eventshigh.com"
+                    android:path=""
+                />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="andrsoid.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <!-- Accepts URIs that begin with "http://www.eventshigh.com/city/" -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data
+                    android:scheme="http"
+                    android:host="www.eventshigh.com"
+                    android:pathPrefix="/city"
+                />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="andrsoid.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <!-- Accepts URIs that begin with "http://www.eventshigh.com/search" -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data
+                    android:scheme="http"
+                    android:host="www.eventshigh.com"
+                    android:pathPrefix="/search"
+                />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="andrsoid.intent.category.BROWSABLE" />
+            </intent-filter>
         </activity>
+
         <activity
             android:name=".activity.MapsActivity"
             android:label="@string/app_name"
@@ -148,9 +198,10 @@
             android:uiOptions="splitActionBarWhenNarrow"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
+            android:exported="true"
         >
+            <!-- Accepts URIs that begin with "http://www.eventshigh.com/detail/" -->
             <intent-filter>
-                <!-- Accepts URIs that begin with "http://www.eventshigh.com/detail/" -->
                 <action android:name="android.intent.action.VIEW" />
                 <data
                     android:scheme="http"

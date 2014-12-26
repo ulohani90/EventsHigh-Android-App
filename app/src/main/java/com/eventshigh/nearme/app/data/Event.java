@@ -117,18 +117,6 @@ public class Event implements Parcelable {
     public Uri getWebUri() {
         StringBuilder sb = new StringBuilder();
         sb.append("http://www.eventshigh.com/detail/");
-        appendUriSuffix(sb);
-        return Uri.parse(sb.toString());
-    }
-
-    public Uri getAppUri() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("android-app://com.eventshigh.nearme.app/http/www.eventshigh.com/detail/");
-        appendUriSuffix(sb);
-        return Uri.parse(sb.toString());
-    }
-
-    private void appendUriSuffix(StringBuilder sb) {
         sb.append(Utils.capitalize(city.toString())).append("/");
         sb.append(id);
         String [] titleKgrams = title.replaceAll("\\p{C}", "").split("[\\p{Punct}\\s]+");
@@ -136,6 +124,7 @@ public class Event implements Parcelable {
             sb.append("-");
             sb.append(titleKgrams[i]);
         }
+        return Uri.parse(sb.toString());
     }
 
     /**********************************

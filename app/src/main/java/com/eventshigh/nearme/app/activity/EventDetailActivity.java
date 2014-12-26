@@ -76,17 +76,16 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     @Override
-    protected void onNewIntent(@Nullable Intent intent) {
-        if (intent == null) {
-            finish();
-            return;
-        }
-
+    protected void onNewIntent(Intent intent) {
         String action = intent.getAction();
         if (Intent.ACTION_VIEW.equals(action)) {
             reportActionToAnalytics("deepLink", "detail");
             new EventFetcher(this).execute(intent.getData());
+            return;
         }
+
+        Toast.makeText(this, "No event to show!", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     private void showEventFragment(Event event) {

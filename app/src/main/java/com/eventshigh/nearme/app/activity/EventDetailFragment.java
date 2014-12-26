@@ -28,6 +28,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.utils.DaySelector;
 import com.eventshigh.nearme.app.utils.DownloadImageTask;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -200,8 +201,9 @@ public class EventDetailFragment extends Fragment {
         client.registerConnectionCallbacks(new ConnectionCallbacks() {
             @Override
             public void onConnected(Bundle bundle) {
-                AppIndex.AppIndexApi.view(client, activity, mEvent.getAppUri(),
-                        mEvent.title, mEvent.getWebUri(), null);
+                Uri webUri = mEvent.getWebUri();
+                AppIndex.AppIndexApi.view(client, activity, Utils.getAppUri(webUri),
+                        mEvent.title, webUri, null);
             }
 
             @Override
@@ -220,7 +222,8 @@ public class EventDetailFragment extends Fragment {
         super.onStop();
 
         if (client.isConnected()) {
-            AppIndex.AppIndexApi.viewEnd(client, activity, mEvent.getAppUri());
+            Uri webUri = mEvent.getWebUri();
+            AppIndex.AppIndexApi.viewEnd(client, activity, Utils.getAppUri(webUri));
             client.disconnect();
         }
     }

@@ -65,7 +65,7 @@ public class MapsActivity extends LocationAwareEventActivity {
     // Google Map View shows to user using MapFragment.
     private GoogleMap map;
     // Gesture detector.
-    private GestureDetectorCompat mDetector;
+    private GestureDetectorCompat gestureDetector;
     // Manager for all markers drawn on map. Manager is responsible for hiding/showing markers
     // on map.
     private MarkerManager markerManager = new MarkerManager();
@@ -145,8 +145,8 @@ public class MapsActivity extends LocationAwareEventActivity {
     }
 
     private void setupGestureDetectorIfNeeded() {
-        if (mDetector == null) {
-            mDetector = new GestureDetectorCompat(this, new GestureDetector.SimpleOnGestureListener() {
+        if (gestureDetector == null) {
+            gestureDetector = new GestureDetectorCompat(this, new GestureDetector.SimpleOnGestureListener() {
                 @Override
                 public boolean onDown(MotionEvent event) {
                     return true;
@@ -271,7 +271,7 @@ public class MapsActivity extends LocationAwareEventActivity {
             eventView.setOnTouchListener(new OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-                    return mDetector.onTouchEvent(event);
+                    return gestureDetector.onTouchEvent(event);
                 }
             });
             eventCardContainer.removeAllViews();

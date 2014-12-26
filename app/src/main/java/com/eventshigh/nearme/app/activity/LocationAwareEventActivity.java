@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
@@ -218,31 +217,19 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         // Set the context in term of lastEventFetcherParam.
         lastEventFetcherParam = new EventFetcherParam(null, 0, "");
 
-        // See if we have location passed to us within intent.
+        // See if we have context passed to us within intent.
         Intent intent = getIntent();
-        if (intent != null) {
-            EventFetcherParam param = intent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
-            if (param == null) {
-                Bundle appData = intent.getBundleExtra(SearchManager.APP_DATA);
-                if (appData != null) {
-                    param = appData.getParcelable(EXTRA_EVENT_FETCHER_PARAM);
-                }
-            }
-            if (param != null) {
-                lastEventFetcherParam = param;
-            }
-
-            lastSelectedTag = intent.getStringExtra(EXTRA_TAG_NAME_PARAM);
-
-            if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-                lastEventFetcherParam.query = intent.getStringExtra(SearchManager.QUERY);
-                reportActionToAnalytics("search", lastEventFetcherParam.query);
-                EventSearchSuggestionsProvider.saveRecentQuery(this, lastEventFetcherParam.query);
-            }
+        EventFetcherParam param = intent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
+        if (param != null) {
+            lastEventFetcherParam = param;
         }
+        lastSelectedTag = intent.getStringExtra(EXTRA_TAG_NAME_PARAM);
 
         // Show query as title.
         if (!lastEventFetcherParam.query.isEmpty()) {
+            reportActionToAnalytics("search", lastEventFetcherParam.query);
+            EventSearchSuggestionsProvider.saveRecentQuery(this, lastEventFetcherParam.query);
+
             ActionBar actionBar = getActionBar();
             if (actionBar != null) {
                 actionBar.setTitle(lastEventFetcherParam.query);

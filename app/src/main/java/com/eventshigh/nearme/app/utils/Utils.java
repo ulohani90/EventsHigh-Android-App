@@ -3,7 +3,9 @@ package com.eventshigh.nearme.app.utils;
 import android.content.Context;
 import android.graphics.Point;
 import android.location.Location;
+import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.eventshigh.nearme.app.data.Event;
 import com.google.android.gms.maps.model.LatLng;
@@ -187,5 +189,21 @@ public class Utils {
         } finally {
             urlConnection.disconnect();
         }
+    }
+
+    public static Uri getAppUri(Uri webUri) {
+        Uri.Builder builder = Uri.parse("android-app://com.eventshigh.nearme.app/").buildUpon();
+        builder.appendPath(webUri.getScheme());
+        builder.appendPath(webUri.getHost());
+        for (String pathSegment : webUri.getPathSegments()) {
+            builder.appendPath(pathSegment);
+        }
+        if (webUri.getQuery() != null) {
+            builder.encodedQuery(webUri.getEncodedQuery());
+        }
+
+        Uri androidUri = builder.build();
+        Log.w("TEXT", "web= '" + webUri.toString() + "', app='"+ androidUri.toString() + "'");
+        return  androidUri;
     }
 }
