@@ -41,14 +41,12 @@ public class OnBoardingHelper {
         targets = new ArrayList<>();
         LinearLayout daySelector = (LinearLayout) activity.findViewById(R.id.daySelector);
         if (daySelector != null && daySelector.getChildCount() > 1) {
-            targets.add(Pair.create(
-                    (Target) new ViewTarget(daySelector.getChildAt(1)),
-                    R.string.onboarding_change_date));
+            addTarget(new ViewTarget(daySelector.getChildAt(1)),
+                    R.string.onboarding_change_date);
         }
 
-        targets.add(Pair.create(
-                (Target) new ActionItemTarget(activity, R.id.action_change_location),
-                R.string.onboarding_action));
+        addTarget(new ActionItemTarget(activity, R.id.action_change_location),
+                R.string.onboarding_action);
 
         try {
             ActionBar actionBar = activity.getActionBar();
@@ -57,9 +55,7 @@ public class OnBoardingHelper {
                 mTabScrollViewField.setAccessible(true);
                 View view = (View) mTabScrollViewField.get(actionBar);
                 if (view != null) {
-                    targets.add(Pair.create(
-                            (Target) new ViewTarget(view),
-                            R.string.onboarding_filter));
+                    addTarget(new ViewTarget(view), R.string.onboarding_filter);
                 }
             }
         } catch (Exception e) {
@@ -118,4 +114,15 @@ public class OnBoardingHelper {
             }
         }
     };
+
+    private void addTarget(Target target, int messageResId) {
+        try {
+            target.getPoint();
+            targets.add(Pair.create(target, messageResId));
+        } catch (Exception e) {
+            // Workaround for NPE for hidden items
+            // See https://github.com/amlcurran/ShowcaseView/issues/195
+            // do nothing.
+        }
+    }
 }
