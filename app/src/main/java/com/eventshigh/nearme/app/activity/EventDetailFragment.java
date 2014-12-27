@@ -339,15 +339,11 @@ public class EventDetailFragment extends Fragment {
         int maxHeight = (int) (0.4 * metrics.heightPixels);
         int infographResId = mEvent.category.getInfographResourceId();
         mEventCard.bgView.setMaxHeight(maxHeight);
-        if (mEvent.imgUrl == null) {
-            if (infographResId == R.drawable.eh_default) {
-                mEventCard.bgView.setVisibility(View.GONE);
-            } else {
-                mEventCard.bgView.setImageResource(infographResId);
-            }
+        if (mEvent.imgUrl == null && infographResId == R.drawable.eh_default) {
+            mEventCard.bgView.setVisibility(View.GONE);
         } else {
-            DownloadImageTask.setImage(mEventCard.bgView, mEvent.imgUrl, infographResId,
-                    metrics.widthPixels, maxHeight);
+            DownloadImageTask.setImage(mEventCard.bgView, getResources(),
+                    mEvent.imgUrl, infographResId, metrics.widthPixels, maxHeight);
         }
 
         // Set title

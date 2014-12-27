@@ -12,7 +12,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
@@ -80,7 +79,6 @@ public class LaunchActivity extends Activity {
 
         // Check for Google Play Services.
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        Log.w("TEXT", "status: " + status);
         if (status != ConnectionResult.SUCCESS) {
             Toast.makeText(this, GooglePlayServicesUtil.getErrorString(status), Toast.LENGTH_SHORT).show();
             GooglePlayServicesUtil.getErrorDialog(status, this, 0, new OnCancelListener() {
