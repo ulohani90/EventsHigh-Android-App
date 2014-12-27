@@ -12,8 +12,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -53,19 +55,7 @@ public class LaunchActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Check for Google Play Services.
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (status != ConnectionResult.SUCCESS) {
-            Toast.makeText(this, GooglePlayServicesUtil.getErrorString(status), Toast.LENGTH_SHORT).show();
-            GooglePlayServicesUtil.getErrorDialog(status, this, 0, new OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    finish();
-                }
-            }).show();
-            return;
-        }
+        setContentView(R.layout.activity_event_detail);
 
         // Set default activity if needed and launch.
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -87,6 +77,20 @@ public class LaunchActivity extends Activity {
 
     public void onStart() {
         super.onStart();
+
+        // Check for Google Play Services.
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        Log.w("TEXT", "status: " + status);
+        if (status != ConnectionResult.SUCCESS) {
+            Toast.makeText(this, GooglePlayServicesUtil.getErrorString(status), Toast.LENGTH_SHORT).show();
+            GooglePlayServicesUtil.getErrorDialog(status, this, 0, new OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    finish();
+                }
+            }).show();
+            return;
+        }
 
         // Setup GoogleApiClient
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.APP_INDEX_API).build();

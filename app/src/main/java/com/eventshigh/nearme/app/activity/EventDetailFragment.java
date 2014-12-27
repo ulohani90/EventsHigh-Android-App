@@ -87,6 +87,8 @@ public class EventDetailFragment extends Fragment {
     private int gaOptOutCounter = 0;
     // GoogleApiClient to report the page view.
     private GoogleApiClient client;
+    // Number of MenuItems as actions.
+    int numMenuItemsAsAction = 0;
 
     public EventDetailFragment() {
         // Required empty public constructor
@@ -123,48 +125,46 @@ public class EventDetailFragment extends Fragment {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.activity_detail, menu);
 
-        MenuItem menuBookItem = menu.findItem(R.id.action_book);
-        if (mEvent.bookingUrl == null) {
-            menuBookItem.setVisible(false);
-        } else {
-            menuBookItem.getActionView().setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    gotoBookingSite();
-                }
-            });
-        }
+        // Set the action handlers.
+        initMenuItem(menu.findItem(R.id.action_book),
+                mEvent.bookingUrl != null,
+                R.layout.action_book,
+                new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        gotoBookingSite();
+                    }
+                });
 
-        MenuItem menuCallItem = menu.findItem(R.id.action_call);
-        if (mEvent.organizerPhone == null) {
-            menuCallItem.setVisible(false);
-        } else {
-            menuCallItem.getActionView().setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    call();
-                }
-            });
-        }
+        initMenuItem(menu.findItem(R.id.action_call),
+                mEvent.organizerPhone != null,
+                R.layout.action_call,
+                new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        call();
+                    }
+                });
 
-        MenuItem menuSaveItem = menu.findItem(R.id.action_save);
-        if (mEvent.eventTimings.length == 0) {
-            menuSaveItem.setVisible(false);
-        } else {
-            menuSaveItem.getActionView().setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.addToCalendar(mEvent, null);
-                }
-            });
-        }
+        initMenuItem(menu.findItem(R.id.action_save),
+                mEvent.eventTimings.length > 0,
+                R.layout.action_save,
+                new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        activity.addToCalendar(mEvent, null);
+                    }
+                });
 
-        menu.findItem(R.id.action_share).getActionView().setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                shareEvent();
-            }
-        });
+        initMenuItem(menu.findItem(R.id.action_share),
+                true,
+                R.layout.action_share,
+                new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        shareEvent();
+                    }
+                });
     }
 
     @Override
@@ -526,5 +526,20 @@ public class EventDetailFragment extends Fragment {
                 TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
         layoutParams.setMargins(0, 0 , margin, 0);
         return layoutParams;
+    }
+
+    private void initMenuItem(MenuItem menuItem, boolean visibility, int actionView,
+            OnClickListener onClickListener) {
+        if (!visibility) {
+            menuItem.setVisible(false);
+            return;
+        }
+
+        if (numMenuItemsAsAction < 2) {
+            menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            menuItem.setActionView(actionView);
+            menuItem.getActionView().setOnClickListener(onClickListener);
+            numMenuItemsAsAction ++;
+        }
     }
 }
