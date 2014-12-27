@@ -130,9 +130,9 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
         private final WeakReference<DownloadImageTask> DownloadImageTaskReference;
 
         public AsyncDrawable(Resources res, Bitmap bitmap,
-                             DownloadImageTask bitmapWorkerTask) {
+                             DownloadImageTask downloadImageTask) {
             super(res, bitmap);
-            DownloadImageTaskReference = new WeakReference<>(bitmapWorkerTask);
+            DownloadImageTaskReference = new WeakReference<>(downloadImageTask);
         }
 
         public DownloadImageTask getDownloadImageTask() {
@@ -207,7 +207,7 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
         }
 
         // Try to load for placeholder.
-        if (src.placeHolderImageId > 1) {
+        if (src.placeHolderImageId > 0) {
             // See Image Dimensions and set scaling.
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
@@ -226,7 +226,8 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 
     protected void onPostExecute(@Nullable Bitmap result) {
         ImageView imageView = imageViewReference.get();
-        if (isCancelled() || imageView == null || getDownloadImageTask(imageView) != this) {
+        if (isCancelled() || imageView == null || result == null ||
+                getDownloadImageTask(imageView) != this) {
             return;
         }
 
