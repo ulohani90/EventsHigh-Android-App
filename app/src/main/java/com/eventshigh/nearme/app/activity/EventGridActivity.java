@@ -49,9 +49,6 @@ public class EventGridActivity extends LocationAwareEventActivity {
         mEventsListAdapter = new EventListAdapter(this);
         eventGridView.setAdapter(mEventsListAdapter);
         eventGridView.setOnItemClickListener(mOnItemClickListener);
-
-        // Setup the local member variables.
-        setUpAll();
     }
 
     @Override
@@ -83,8 +80,6 @@ public class EventGridActivity extends LocationAwareEventActivity {
         mEventsListAdapter.setShowDate(!lastEventFetcherParam.query.isEmpty());
         updateListingForUserLocation(
                 lastEventFetcherParam.location == null ? null : lastEventFetcherParam.location);
-
-        super.updateNewEvents(events);
     }
 
     protected void updateUserLocation(LatLng userLocation) {

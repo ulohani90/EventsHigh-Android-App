@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/app_color"
+    android:background="@drawable/selector_button"
     android:gravity="center_vertical|center_horizontal"
     android:padding="@dimen/abc_control_padding_material"
     android:clickable="true"

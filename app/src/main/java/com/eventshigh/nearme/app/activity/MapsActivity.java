@@ -99,7 +99,6 @@ public class MapsActivity extends LocationAwareEventActivity {
         // Setup the local member variables.
         setUpMapIfNeeded();
         setupGestureDetectorIfNeeded();
-        setUpAll();
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
     }
 
@@ -192,7 +191,6 @@ public class MapsActivity extends LocationAwareEventActivity {
     protected void updateNewEvents(List<Event> events) {
         mOnMapClickListener.onMapClick(null);
         markerManager.setEvents(map, events);
-        super.updateNewEvents(events);
     }
 
     @Override

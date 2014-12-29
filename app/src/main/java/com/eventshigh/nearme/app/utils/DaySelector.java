@@ -78,14 +78,10 @@ public class DaySelector {
         this.daySelectionListener = daySelectionListener;
     }
 
-    public int getSelectedDay() {
-        return selectedDay;
-    }
-
     public void setSelected(int selectedDayNo) {
         if (selectedDay >= 0) {
-            daySelectorItems[selectedDay].setBackgroundColor(
-                    activity.getResources().getColor(R.color.app_color));
+            daySelectorItems[selectedDay].setBackgroundResource(
+                    R.drawable.selector_button);
             ((TextView) daySelectorItems[selectedDay].findViewById(R.id.day_of_week)).setTextColor(
                     activity.getResources().getColor(R.color.day_selector_day_week_text));
         }
@@ -107,9 +103,11 @@ public class DaySelector {
 
         @Override
         public void onClick(View view) {
-            setSelected(dayItemNo);
-            if (daySelectionListener != null) {
-                daySelectionListener.onDaySelection(dayItemNo);
+            if (selectedDay != dayItemNo) {
+                setSelected(dayItemNo);
+                if (daySelectionListener != null) {
+                    daySelectionListener.onDaySelection(dayItemNo);
+                }
             }
         }
     }

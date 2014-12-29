@@ -23,7 +23,6 @@
             android:layout_width="@dimen/event_card_width"
             android:layout_height="@dimen/event_card_height"
             android:layout_gravity="bottom|start"
-            android:background="?android:attr/selectableItemBackground"
         />
     </FrameLayout>
 
@@ -39,7 +38,6 @@
             android:orientation="horizontal"
             android:divider="?android:attr/listDivider"
             android:showDividers="middle"
-            android:background="?android:attr/selectableItemBackground"
             tools:listitem="@layout/day_selector_item"
             tools:layout_height="30dp"
          />

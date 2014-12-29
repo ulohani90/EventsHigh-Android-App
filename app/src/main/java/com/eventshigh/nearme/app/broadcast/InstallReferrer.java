@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.security.Signer;
@@ -33,14 +33,13 @@ public class InstallReferrer extends BroadcastReceiver {
         if (intent.getAction().equals("com.android.vending.INSTALL_REFERRER")) {
             try {
                 String referrer = intent.getStringExtra("referrer");
-                Toast.makeText(context, "Found referrer: " + referrer, Toast.LENGTH_LONG).show();
                 if (referrer == null) {
                     return;
                 }
 
                 referrer = URLDecoder.decode(referrer, "UTF-8");
                 if (new Account(context).recordReferrer(referrer) || BuildConfig.DEBUG) {
-                    new ReportReferrer().execute(referrer);
+                    new ReportReferrer(context).execute(referrer);
                 }
             } catch (UnsupportedEncodingException e) {
                 // Ignore.
@@ -49,6 +48,12 @@ public class InstallReferrer extends BroadcastReceiver {
     }
 
     public static class ReportReferrer extends AsyncTask<String, Void, Void> {
+        private final Context context;
+
+        public ReportReferrer(Context context) {
+            this.context = context;
+        }
+
         @Override
         protected Void doInBackground(String... params) {
             String referrer = params[0];
@@ -56,7 +61,8 @@ public class InstallReferrer extends BroadcastReceiver {
                 Uri uri = Uri.parse("http://apiserver.eventshigh.com:8888/mobileapp/reportReferrer")
                     .buildUpon()
                     .appendQueryParameter("referrer", referrer)
-                    .appendQueryParameter("android_id", Secure.ANDROID_ID)
+                    .appendQueryParameter("android_id",
+                            Settings.Secure.getString(context.getContentResolver(), Secure.ANDROID_ID))
                     .build();
 
                 Utils.fetchJSON(Signer.sign(uri).toString());

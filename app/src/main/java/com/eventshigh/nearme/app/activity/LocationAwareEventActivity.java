@@ -48,12 +48,12 @@ import java.util.List;
 /**
  * Base activity for location aware events listing. This class implements
  * common methods to get user location and fetch listings when needed.
- * This is abstract class the event UI is left to implementing class.
+ * This is an abstract activity and the event UI is left to implementing
+ * class.
  * <p/>
  *
- * The Parent activity must call the {@link #setUpAll()} ()} method in its
- * {@link #onCreate} method after populating view. The parent activity view
- * should have {@link android.widget.LinearLayout} to hold day picker.
+ * The parent activity view should have {@link android.widget.LinearLayout}
+ * to hold day picker.
  */
 public abstract class LocationAwareEventActivity extends BaseActivity {
 
@@ -105,6 +105,29 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         // Setup DaySelector.
         daySelector = new DaySelector(this);
         daySelector.setDaySelectionListener(mDaySelectionListener);
+
+        // Set the context in term of lastEventFetcherParam. Use Inent
+        // to restore the context.
+        lastEventFetcherParam = new EventFetcherParam(null, 0, "");
+
+        // See if we have context passed to us within intent.
+        Intent intent = getIntent();
+        EventFetcherParam param = intent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
+        if (param != null) {
+            lastEventFetcherParam = param;
+        }
+        lastSelectedTag = intent.getStringExtra(EXTRA_TAG_NAME_PARAM);
+
+        // Show query as title.
+        if (!lastEventFetcherParam.query.isEmpty()) {
+            reportActionToAnalytics("search", lastEventFetcherParam.query);
+            EventSearchSuggestionsProvider.saveRecentQuery(this, lastEventFetcherParam.query);
+
+            ActionBar actionBar = getActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(lastEventFetcherParam.query);
+            }
+        }
     }
 
     @Override
@@ -125,6 +148,27 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         }
 
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Populate the Day selection bar.
+        if (lastEventFetcherParam.query.isEmpty()) {
+            daySelector.populate((ViewGroup) findViewById(R.id.daySelector));
+            daySelector.setSelected(lastEventFetcherParam.day);
+        }
+
+        // If location is passed in param, use it. Otherwise ask GoogleApiClient for
+        // user location.
+        if (lastEventFetcherParam.location == null) {
+            googleApiClient.connect();
+        } else {
+            LatLng location = lastEventFetcherParam.location;
+            lastEventFetcherParam.changeLocation(null);
+            updateUserLocation(location);
+        }
     }
 
     @Override
@@ -182,7 +226,23 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
      *
      * @param events a list of events as returned by {@link com.eventshigh.nearme.app.data.EventsFetcher}
      */
-    protected void updateNewEvents(List<Event> events) {
+    protected abstract void updateNewEvents(List<Event> events);
+
+    /**
+     * Updates the user location as reported by LocationClient.
+     *
+     * @param userLocation user location as reported by location client.
+     */
+    protected abstract void updateUserLocation(LatLng userLocation);
+
+
+    // ***********************
+    // Helper methods
+    // ***********************
+
+    private void updateListingAndShowHelpIfNeeded(List<Event> events) {
+        updateNewEvents(events);
+
         if (!events.isEmpty()) {
             if (onBoardingHelper == null) {
                 onBoardingHelper = new OnBoardingHelper(this);
@@ -191,71 +251,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             onBoardingHelper.next();
         }
     }
-
-    /**
-     * Updates the user location as reported by LocationClient. When parent activity
-     * is created, it calls {@link #setUpAll()} ()}
-     * method, which sets up the location client to know user location. When the information
-     * is available, parent activity is notified about user location.
-     *
-     * @param userLocation user location as reported by location client.
-     */
-    protected void updateUserLocation(LatLng userLocation) {
-        refreshListingsIfNeeded(userLocation);
-    }
-
-
-    // ***********************
-    // Setup Helper Methods
-    // ***********************
-
-    /**
-     * This method sets up the internal variables and states maintained. The parent
-     * activity must call once its view is populated.
-     */
-    protected void setUpAll() {
-        // Set the context in term of lastEventFetcherParam.
-        lastEventFetcherParam = new EventFetcherParam(null, 0, "");
-
-        // See if we have context passed to us within intent.
-        Intent intent = getIntent();
-        EventFetcherParam param = intent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
-        if (param != null) {
-            lastEventFetcherParam = param;
-        }
-        lastSelectedTag = intent.getStringExtra(EXTRA_TAG_NAME_PARAM);
-
-        // Show query as title.
-        if (!lastEventFetcherParam.query.isEmpty()) {
-            reportActionToAnalytics("search", lastEventFetcherParam.query);
-            EventSearchSuggestionsProvider.saveRecentQuery(this, lastEventFetcherParam.query);
-
-            ActionBar actionBar = getActionBar();
-            if (actionBar != null) {
-                actionBar.setTitle(lastEventFetcherParam.query);
-            }
-        }
-
-        // Populate the Day selection bar.
-        if (lastEventFetcherParam.query.isEmpty()) {
-            daySelector.populate((ViewGroup) findViewById(R.id.daySelector));
-            daySelector.setSelected(lastEventFetcherParam.day);
-        }
-
-        // If location is passed in param, use it. Otherwise ask GoogleApiClient for
-        // user location.
-        if (lastEventFetcherParam.location == null) {
-            googleApiClient.connect();
-        } else {
-            LatLng location = lastEventFetcherParam.location;
-            lastEventFetcherParam.changeLocation(null);
-            updateUserLocation(location);
-        }
-    }
-
-    // ***********************
-    // Helper methods
-    // ***********************
 
     private void fetchNewListing() {
         reportActionToAnalytics("fetchNewListing");
@@ -473,7 +468,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                     actionBar.setTitle(param.query + " (" + numEvents + ")");
                 }
 
-                updateNewEvents(events.getEvents(0));
+                updateListingAndShowHelpIfNeeded(events.getEvents(0));
             }
         }
     };
@@ -487,7 +482,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                 if (!eventsForTag.isEmpty()) {
                     reportActionToAnalytics("filterByCategory");
                 }
-                updateNewEvents(eventsForTag);
+                updateListingAndShowHelpIfNeeded(eventsForTag);
             }
         }
 
