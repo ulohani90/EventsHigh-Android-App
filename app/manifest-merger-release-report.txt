@@ -295,6 +295,18 @@ ADDED from AndroidManifest.xml:195:9
 		ADDED from AndroidManifest.xml:196:13
 	android:launchMode
 		ADDED from AndroidManifest.xml:200:13
+receiver#com.eventshigh.nearme.app.broadcast.InstallReferrer
+ADDED from AndroidManifest.xml:216:9
+	android:exported
+		ADDED from AndroidManifest.xml:217:13
+	android:name
+		ADDED from AndroidManifest.xml:216:19
+intent-filter#com.android.vending.INSTALL_REFERRER
+ADDED from AndroidManifest.xml:219:13
+action#com.android.vending.INSTALL_REFERRER
+ADDED from AndroidManifest.xml:220:17
+	android:name
+		ADDED from AndroidManifest.xml:220:25
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from com.google.android.gms:play-services:6.1.71:15:5
