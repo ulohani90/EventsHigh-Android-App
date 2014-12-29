@@ -212,6 +212,15 @@
                 <category android:name="andrsoid.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".broadcast.InstallReferrer"
+            android:exported="true"
+        >
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

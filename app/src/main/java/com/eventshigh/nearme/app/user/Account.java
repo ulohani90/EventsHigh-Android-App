@@ -10,13 +10,16 @@ import android.content.SharedPreferences;
 public class Account {
     // Constants used for SharedPreferences.
     private static final String PREFS_FILE_NAME = "eh_user_credentials";
-    private static final String PREF_USER_ID = "user_id";
+
+    private static final String PREF_DIGITS_USER_ID = "digits_user_id";
     private static final String PREF_PHONE_NO = "phone_no";
     private static final String PREF_NUM_LOGIN_ATTEMPTS = "num_login_attempts";
     private static final String PREF_ASK_LOGIN = "ask_login";
 
+    private static final String PREF_REFERRER = "referrer";
+
     // Constant used to skip the login screen if there are too many failed login attempts
-    private static final int MAX_FAILED_ATTEMPT = 3;
+    private static final int NUM_MAX_LOGIN_ATTEMPT = 3;
 
     // Member variables used to store the user account details in preferences.
     private SharedPreferences accountInfo;
@@ -34,7 +37,7 @@ public class Account {
         int numFailedLogin = accountInfo.getInt(PREF_NUM_LOGIN_ATTEMPTS, 0) + 1;
         SharedPreferences.Editor editor = accountInfo.edit();
         editor.putInt(PREF_NUM_LOGIN_ATTEMPTS, numFailedLogin);
-        if (numFailedLogin >= MAX_FAILED_ATTEMPT) {
+        if (numFailedLogin >= NUM_MAX_LOGIN_ATTEMPT) {
             tooManyFailures = true;
             editor.putBoolean(PREF_ASK_LOGIN, false);
         }
@@ -51,10 +54,18 @@ public class Account {
         editor.putBoolean(PREF_ASK_LOGIN, false);
         editor.apply();
     }
-  **/
-    public void recordSkip() {
-        SharedPreferences.Editor editor = accountInfo.edit();
-        editor.putBoolean(PREF_ASK_LOGIN, false);
-        editor.apply();
+    **/
+
+    public void recordSkipLogin() {
+        accountInfo.edit().putBoolean(PREF_ASK_LOGIN, false).apply();
+    }
+
+    public boolean recordReferrer(String referrer) {
+        if (!accountInfo.contains(PREF_REFERRER)) {
+            accountInfo.edit().putString(PREF_REFERRER, referrer).apply();
+            return true;
+        }
+
+        return false;
     }
 }

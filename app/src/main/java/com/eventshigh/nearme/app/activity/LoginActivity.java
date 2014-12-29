@@ -66,7 +66,7 @@ public class LoginActivity extends BaseActivity {
     public void skip(View view) {
         reportActionToAnalytics("loginSkipped");
         if (!BuildConfig.DEBUG) {
-            account.recordSkip();
+            account.recordSkipLogin();
         }
 
         launchMaps();
