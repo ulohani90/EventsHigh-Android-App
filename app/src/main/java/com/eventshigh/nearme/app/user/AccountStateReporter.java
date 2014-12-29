@@ -19,43 +19,54 @@ import java.security.GeneralSecurityException;
 
 public class AccountStateReporter {
 
+    public static interface OnSuccessHandler {
+        public void onSuccess();
+    }
+
     public static class ReferrerReporter extends AsyncTask<String, Void, Void> {
         private final Context context;
+        private final OnSuccessHandler onSuccessHandler;
 
-        public ReferrerReporter(Context context) {
+        public ReferrerReporter(Context context, OnSuccessHandler onSuccessHandler) {
             this.context = context;
+            this.onSuccessHandler = onSuccessHandler;
         }
 
         @Override
         protected Void doInBackground(String... params) {
             sendSignedRequest(getBaseUri(context, "reportReferrer")
                 .appendQueryParameter("referrer", params[0])
-                .build());
+                .build(), onSuccessHandler);
             return null;
         }
     }
 
     public static class ReferrerIdReporter extends AsyncTask<String, Void, Void> {
         private final Context context;
+        private final OnSuccessHandler onSuccessHandler;
 
-        public ReferrerIdReporter(Context context) {
+        public ReferrerIdReporter(Context context, OnSuccessHandler onSuccessHandler) {
             this.context = context;
+            this.onSuccessHandler = onSuccessHandler;
         }
 
         @Override
         protected Void doInBackground(String... params) {
             sendSignedRequest(getBaseUri(context, "reportReferrerId")
-                    .appendQueryParameter("referrerId", params[0])
-                    .build());
+                    .appendQueryParameter("referrer_id", params[0])
+                    .build(), onSuccessHandler);
             return null;
         }
     }
 
-    private static void sendSignedRequest(Uri uri) {
+    private static boolean sendSignedRequest(Uri uri, OnSuccessHandler onSuccessHandler) {
         try {
             Utils.fetchJSON(Signer.sign(uri).toString());
+            onSuccessHandler.onSuccess();
+            return true;
         } catch (IOException | JSONException | GeneralSecurityException e) {
             Log.w(InstallReferrer.class.getSimpleName(), "Failed to report referrerId", e);
+            return false;
         }
     }
 

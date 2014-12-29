@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.user;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.eventshigh.nearme.app.user.AccountStateReporter.OnSuccessHandler;
 import com.eventshigh.nearme.app.user.AccountStateReporter.ReferrerIdReporter;
 import com.eventshigh.nearme.app.user.AccountStateReporter.ReferrerReporter;
 
@@ -25,19 +26,33 @@ public class Account {
 
     // The referrer for this user. this user installed the app via this referrer.
     private static final String PREF_REFERRER = "referrer";
+    private static final String PREF_REFERRER_UPLOADED = "referrer_uploaded";
 
     // The referrer code for installation happened because of this user. This
     // user has asked his friends to install the app and passed this code.
-    private static final String PREF_USER_REFERRER_CODE = "user_referrer_code";
+    private static final String PREF_REFERRER_CODE = "referrer_code";
+    private static final String PREF_REFERRER_CODE_UPLOADED = "referrer_code_uploaded";
 
     // Constant used to skip the login screen if there are too many failed login attempts
     private static final int NUM_MAX_LOGIN_ATTEMPT = 3;
 
     // Member variables used to store the user account details in preferences.
-    private SharedPreferences accountInfo;
+    private final Context context;
+    private final SharedPreferences accountInfo;
 
     public Account(Context context) {
+        this.context = context;
         accountInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
+
+        // Check if we need to upload the data.
+        if (accountInfo.contains(PREF_REFERRER) &&
+            !accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false)) {
+            uploadReferrer(accountInfo.getString(PREF_REFERRER, null));
+        }
+        if (accountInfo.contains(PREF_REFERRER_CODE) &&
+                !accountInfo.getBoolean(PREF_REFERRER_CODE_UPLOADED, false)) {
+            uploadReferrerCode(accountInfo.getString(PREF_REFERRER_CODE, null));
+        }
     }
 
     public boolean shouldAskForLogin() {
@@ -72,30 +87,48 @@ public class Account {
         accountInfo.edit().putBoolean(PREF_ASK_LOGIN, false).apply();
     }
 
-    public boolean recordReferrer(Context context, String referrer) {
+    public boolean recordReferrer(String referrer) {
         if (!accountInfo.contains(PREF_REFERRER)) {
             accountInfo.edit().putString(PREF_REFERRER, referrer).apply();
-            new ReferrerReporter(context).execute(referrer);
+            uploadReferrer(referrer);
             return true;
         }
 
         return false;
     }
 
-    public String getUserReferrerCode(Context context) {
-        String referrerCode = accountInfo.getString(PREF_USER_REFERRER_CODE, null);
+    public String getUserReferrerCode() {
+        String referrerCode = accountInfo.getString(PREF_REFERRER_CODE, null);
         if (referrerCode != null) {
             return referrerCode;
         }
 
         try {
             referrerCode = URLEncoder.encode(UUID.randomUUID().toString(), "UTF-8");
-            accountInfo.edit().putString(PREF_USER_REFERRER_CODE, referrerCode).apply();
-            new ReferrerIdReporter(context).execute(referrerCode);
+            accountInfo.edit().putString(PREF_REFERRER_CODE, referrerCode).apply();
+            uploadReferrerCode(referrerCode);
             return referrerCode;
         } catch (UnsupportedEncodingException e) {
-            // Ignore.
-            return null;
+            throw new RuntimeException(e);
         }
+    }
+
+
+    private void uploadReferrer(String referrer) {
+        new ReferrerReporter(context, new OnSuccessHandler() {
+            @Override
+            public void onSuccess() {
+                accountInfo.edit().putBoolean(PREF_REFERRER_UPLOADED, true).apply();
+            }
+        }).execute(referrer);
+    }
+
+    private void uploadReferrerCode(String referrerCode) {
+        new ReferrerIdReporter(context, new OnSuccessHandler() {
+            @Override
+            public void onSuccess() {
+                accountInfo.edit().putBoolean(PREF_REFERRER_CODE_UPLOADED, true).apply();
+            }
+        }).execute(referrerCode);
     }
 }

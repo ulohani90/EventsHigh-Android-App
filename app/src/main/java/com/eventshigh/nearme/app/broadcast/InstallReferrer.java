@@ -26,7 +26,7 @@ public class InstallReferrer extends BroadcastReceiver {
                 }
 
                 referrer = URLDecoder.decode(referrer, "UTF-8");
-                new Account(context).recordReferrer(context, referrer);
+                new Account(context).recordReferrer(referrer);
             } catch (UnsupportedEncodingException e) {
                 // Ignore.
             }
