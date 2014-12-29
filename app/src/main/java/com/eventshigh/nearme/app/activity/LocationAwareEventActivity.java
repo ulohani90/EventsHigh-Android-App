@@ -63,6 +63,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     public static final String EXTRA_EVENT_FETCHER_PARAM = EventFetcherParam.class.getSimpleName();
     public static final String EXTRA_TAG_NAME_PARAM = "extra.event.tag.name";
     public static final int NUM_MAX_TABS = 10;
+    public static final int SECONDS_FOR_REFRESH = 600;
 
 
     // ***********************
@@ -84,6 +85,8 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     private EventsFetcher fetcher;
     // On boarding helper.
     private OnBoardingHelper onBoardingHelper;
+    // when was this activity last started on.
+    private long lastStartedAt;
 
 
     // ***********************
@@ -94,6 +97,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        lastStartedAt = 0;
 
         // Setup GoogleApiClient to fetch location.
         googleApiClient = new GoogleApiClient.Builder(this)
@@ -134,21 +138,29 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
 
-        // Populate the Day selection bar.
-        if (lastEventFetcherParam.query.isEmpty()) {
-            daySelector.populate((ViewGroup) findViewById(R.id.daySelector));
-            daySelector.setSelected(lastEventFetcherParam.day);
+        // The activity could have started either for first time or when user
+        // launches the sleeping app or when he returns from details pane.
+        // We do not refresh the app if user is in same session or has returned
+        // within {@code SECONDS_FOR_REFRESH} seconds.
+        if (lastStartedAt < System.currentTimeMillis() - SECONDS_FOR_REFRESH * 1000) {
+            // Populate the Day selection bar.
+            if (lastEventFetcherParam.query.isEmpty()) {
+                daySelector.populate((ViewGroup) findViewById(R.id.daySelector));
+                daySelector.setSelected(lastEventFetcherParam.day);
+            }
+
+            // If location is passed in param, use it. Otherwise ask GoogleApiClient for
+            // user location.
+            if (lastEventFetcherParam.location == null) {
+                googleApiClient.connect();
+            } else {
+                LatLng location = lastEventFetcherParam.location;
+                lastEventFetcherParam.changeLocation(null);
+                updateUserLocation(location);
+            }
         }
 
-        // If location is passed in param, use it. Otherwise ask GoogleApiClient for
-        // user location.
-        if (lastEventFetcherParam.location == null) {
-            googleApiClient.connect();
-        } else {
-            LatLng location = lastEventFetcherParam.location;
-            lastEventFetcherParam.changeLocation(null);
-            updateUserLocation(location);
-        }
+        lastStartedAt = System.currentTimeMillis();
     }
 
     @Override

@@ -14,6 +14,7 @@
     <string name="action_book">Book</string>
     <string name="action_call">Call</string>
     <string name="action_direction">Show Directions</string>
+    <string name="action_share_app">Share This App?</string>
 
     <!-- Other Strings used in UI -->
     <string name="ui_event_timings">Timings</string>
@@ -37,6 +38,7 @@
     <string name="zoom">Please zoom in to see interesting events!</string>
     <string name="num_people_interested">number of people interested</string>
     <string name="ask_locality">Enter the locality, city</string>
+    <string name="message_share_app">Would you like to share this app with your friends and help them find amazing events?</string>
 
     <!-- Failed messages -->
     <string name="failed_login">Failed to login! You can retry or skip.</string>
@@ -57,4 +59,5 @@
         <item quantity="other">%,d people interested.</item>
     </plurals>
     <string name="event_detail_from">Event details from: %s</string>
+    <string name="share_app_text">Hey, Check out this app to find amazing events! https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&amp;referrer=%s</string>
 </resources>

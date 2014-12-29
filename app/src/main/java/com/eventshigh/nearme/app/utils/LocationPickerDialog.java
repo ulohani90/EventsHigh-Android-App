@@ -42,8 +42,8 @@ public class LocationPickerDialog {
     private OnLocationSelection onLocationSelection;
     private Context context;
 
-    public  void show(final Context context, String countryCode,
-                      final OnLocationSelection onLocationSelection) {
+    public void show(final Context context, String countryCode,
+                     final OnLocationSelection onLocationSelection) {
         this.context = context;
         this.onLocationSelection = onLocationSelection;
 
@@ -79,19 +79,18 @@ public class LocationPickerDialog {
         builder.setIcon(R.drawable.ic_action_place_dark);
 
         // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 close(input.getText().toString());
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
         });
-
 
         dialog = builder.create();
         dialog.getWindow().setSoftInputMode(

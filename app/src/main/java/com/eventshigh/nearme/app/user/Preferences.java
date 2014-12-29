@@ -9,7 +9,7 @@ import android.preference.PreferenceManager;
  */
 public class Preferences {
     private static final String PREF_DEFAULT_ACTIVITY_MAPS = "eh_pref_default_activity_MAPS";
-    private static final String PREF_FIRST_ACTION = "eh_pref_first_action";
+    private static final String PREF_NUM_ACTIVITIES = "eh_pref_num_activities";
 
     private final SharedPreferences sharedPreferences;
 
@@ -21,11 +21,13 @@ public class Preferences {
         return sharedPreferences.getBoolean(PREF_DEFAULT_ACTIVITY_MAPS, false);
     }
 
-    public boolean isFirstActivity() {
-        boolean isFirst = sharedPreferences.getBoolean(PREF_FIRST_ACTION, true);
-        if (isFirst) {
-            sharedPreferences.edit().putBoolean(PREF_FIRST_ACTION, false).apply();
-        }
-        return isFirst;
+    public int reportActivityStart() {
+        int numActions = sharedPreferences.getInt(PREF_NUM_ACTIVITIES, 0) + 1;
+        sharedPreferences.edit().putInt(PREF_NUM_ACTIVITIES, numActions).apply();
+        return numActions;
+    }
+
+    public int getNumActivities() {
+        return sharedPreferences.getInt(PREF_NUM_ACTIVITIES, 0);
     }
 }
