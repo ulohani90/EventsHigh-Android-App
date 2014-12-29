@@ -66,7 +66,7 @@ public abstract class BaseActivity extends FragmentActivity {
         // Twitter Digits and CrashAnalytics
         // TwitterAuthConfig authConfig = TwitterUtils.getAuthConfig();
         // Fabric.with(this, new Twitter(authConfig), new Crashlytics());
-        if(!BuildConfig.DEBUG) {
+        if (!BuildConfig.DEBUG) {
             Fabric.with(this, new Crashlytics());
         }
     }

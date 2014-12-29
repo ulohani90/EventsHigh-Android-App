@@ -5,23 +5,25 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.eventshigh.nearme.app.BuildConfig;
+import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.user.Account;
 
 import java.util.Date;
 
 public class LoginActivity extends BaseActivity {
-    private boolean isGoingToMaps = false;
+    private boolean isGoingToEvents = false;
     private long activityStartTime = 0;
     private Account account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
 
         // Check if we should ask for login or not. If not, go to MapsActivity.
         account = new Account(this);
         if (!account.shouldAskForLogin()) {
-            launchMaps();
+            launchEventsActivity();
         }
 
         // Initialize Digits.
@@ -29,7 +31,6 @@ public class LoginActivity extends BaseActivity {
 
         /**
         // Setup the content of login screen.
-        setContentView(R.layout.activity_login);
         DigitsAuthButton digitsButton = (DigitsAuthButton) findViewById(R.id.auth_button);
 
         // Setup the Digits button.
@@ -39,7 +40,7 @@ public class LoginActivity extends BaseActivity {
             public void success(DigitsSession session, String phoneNumber) {
                 reportActionToAnalytics("loginSuccess");
                 account.recordSuccess(session, phoneNumber);
-                launchMaps();
+                launchEventsActivity();
             }
 
             @Override
@@ -47,7 +48,7 @@ public class LoginActivity extends BaseActivity {
                 reportActionToAnalytics("loginFailed");
                 Toast.makeText(LoginActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();
                 if (account.recordFailure()) {
-                    launchMaps();
+                    launchEventsActivity();
                 }
             }
         });
@@ -56,7 +57,7 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected void onStop() {
-        if (!isGoingToMaps) {
+        if (!isGoingToEvents) {
             reportActionToAnalytics("loginBounced");
         }
 
@@ -69,17 +70,19 @@ public class LoginActivity extends BaseActivity {
             account.recordSkipLogin();
         }
 
-        launchMaps();
+        launchEventsActivity();
     }
 
-    private void launchMaps() {
+    private void launchEventsActivity() {
         // Report the time taken by login action.
-        isGoingToMaps = true;
+        isGoingToEvents = true;
         if (activityStartTime > 0) {
             reportActionToAnalytics("loginActionTimeMillis", "",
                     new Date().getTime() - activityStartTime);
         }
 
-        startActivity(new Intent(this, MapsActivity.class));
+        Class target = LaunchActivity.isMapsViewDefault(this)
+                ? MapsActivity.class : EventGridActivity.class;
+        startActivity(new Intent(this, target));
     }
 }

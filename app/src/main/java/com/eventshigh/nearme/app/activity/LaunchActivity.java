@@ -25,8 +25,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 
-import java.util.Random;
-
 /**
  * A placeholder {@link android.app.Activity} which is responsible for launching
  * either {@link com.eventshigh.nearme.app.activity.MapsActivity} or
@@ -37,7 +35,6 @@ import java.util.Random;
  */
 public class LaunchActivity extends Activity {
     private static final String PREF_DEFAULT_ACTIVITY_MAPS = "eh_pref_default_activity_MAPS";
-    private static final Random RANDOM = new Random(System.currentTimeMillis());
     private static final String WEB_URI_BASE = "http://www.eventshigh.com/";
 
     // Web URI associated with this activity, it is used to
@@ -60,7 +57,7 @@ public class LaunchActivity extends Activity {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (!preferences.contains(PREF_DEFAULT_ACTIVITY_MAPS)) {
             Editor editor = preferences.edit();
-            editor.putBoolean(PREF_DEFAULT_ACTIVITY_MAPS, RANDOM.nextBoolean());
+            editor.putBoolean(PREF_DEFAULT_ACTIVITY_MAPS, false);
             editor.apply();
         }
 

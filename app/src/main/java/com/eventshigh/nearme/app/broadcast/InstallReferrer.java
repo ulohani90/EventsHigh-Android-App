@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.Settings.Secure;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.security.Signer;
@@ -32,6 +33,7 @@ public class InstallReferrer extends BroadcastReceiver {
         if (intent.getAction().equals("com.android.vending.INSTALL_REFERRER")) {
             try {
                 String referrer = intent.getStringExtra("referrer");
+                Toast.makeText(context, "Found referrer: " + referrer, Toast.LENGTH_LONG).show();
                 if (referrer == null) {
                     return;
                 }

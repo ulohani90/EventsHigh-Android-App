@@ -49,7 +49,7 @@ public class Account {
     /**
     public void recordSuccess(DigitsSession session, String phoneNumber) {
         SharedPreferences.Editor editor = accountInfo.edit();
-        editor.putLong(PREF_USER_ID, session.getId());
+        editor.putLong(PREF_DIGITS_USER_ID, session.getId());
         editor.putString(PREF_PHONE_NO, phoneNumber);
         editor.putBoolean(PREF_ASK_LOGIN, false);
         editor.apply();
