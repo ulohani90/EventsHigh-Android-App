@@ -19,7 +19,6 @@
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
         android:gravity="center"
-        android:background="?android:attr/selectableItemBackground"
         tools:listitem="@layout/event_card"
     />
 

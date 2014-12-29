@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_menu_share"
-        android:background="#66000000"
+        android:background="@drawable/selector_event_card_share"
         android:layout_gravity="end|top"
         tools:ignore="ContentDescription"
     />
@@ -75,7 +75,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#66000000"
+            android:background="@color/event_card_text_bg"
         >
             <TextView
                 style="@style/EventCardText"
@@ -102,6 +102,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_toLeftOf="@+id/event_time"
                 android:layout_toStartOf="@+id/event_time"
+                android:background="?android:attr/selectableItemBackground"
                 tools:text="Jagriti theatre, Whitefield"
             />
 
@@ -115,6 +116,7 @@
                 android:layout_below="@id/event_title"
                 android:layout_toLeftOf="@+id/num_people_interested"
                 android:layout_toStartOf="@+id/num_people_interested"
+                android:background="?android:attr/selectableItemBackground"
                 tools:text="8 pm"
             />
 
