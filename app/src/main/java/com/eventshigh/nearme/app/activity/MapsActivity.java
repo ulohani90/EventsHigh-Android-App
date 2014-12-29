@@ -93,7 +93,7 @@ public class MapsActivity extends LocationAwareEventActivity {
         // Show the Up button in the action bar.
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(!LaunchActivity.isMapsViewDefault(this));
+            actionBar.setDisplayHomeAsUpEnabled(!pref.isMapsViewDefault());
         }
 
         // Setup the local member variables.
@@ -108,7 +108,7 @@ public class MapsActivity extends LocationAwareEventActivity {
         getMenuInflater().inflate(R.menu.activity_map, menu);
 
         // Search View.
-        if (LaunchActivity.isMapsViewDefault(this)) {
+        if (pref.isMapsViewDefault()) {
             SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
             SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));

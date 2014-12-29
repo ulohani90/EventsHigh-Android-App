@@ -21,6 +21,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -44,6 +45,7 @@ public abstract class BaseActivity extends FragmentActivity {
     // Google Analytics
     protected GoogleAnalytics googleAnalytics;
     protected Tracker tracker;
+    protected Preferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,9 @@ public abstract class BaseActivity extends FragmentActivity {
         if (!BuildConfig.DEBUG) {
             Fabric.with(this, new Crashlytics());
         }
+
+        // Open the shared preferences.
+        pref = new Preferences(this);
     }
 
     protected void onStart() {
@@ -99,6 +104,12 @@ public abstract class BaseActivity extends FragmentActivity {
         // Setup Amplitude
         Amplitude.initialize(this, "41ed6c5c945d7f1c2f2d829b90288562");
         Amplitude.startSession();
+
+        // Check if this is first activity by user, if yes report special event.
+        // See if this is first action by user. If yes, report it.
+        if (pref.isFirstActivity()) {
+            reportActionToAnalytics("firstActivity");
+        }
     }
 
     protected void onStop() {

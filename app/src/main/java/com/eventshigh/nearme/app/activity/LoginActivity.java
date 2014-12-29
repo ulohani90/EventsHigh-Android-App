@@ -81,7 +81,7 @@ public class LoginActivity extends BaseActivity {
                     new Date().getTime() - activityStartTime);
         }
 
-        Class target = LaunchActivity.isMapsViewDefault(this)
+        Class target = pref.isMapsViewDefault()
                 ? MapsActivity.class : EventGridActivity.class;
         startActivity(new Intent(this, target));
     }

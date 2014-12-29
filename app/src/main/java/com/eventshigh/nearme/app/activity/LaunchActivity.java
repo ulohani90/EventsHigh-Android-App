@@ -2,21 +2,18 @@ package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
 import android.app.SearchManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
@@ -34,7 +31,6 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
  * preference in future.
  */
 public class LaunchActivity extends Activity {
-    private static final String PREF_DEFAULT_ACTIVITY_MAPS = "eh_pref_default_activity_MAPS";
     private static final String WEB_URI_BASE = "http://www.eventshigh.com/";
 
     // Web URI associated with this activity, it is used to
@@ -53,16 +49,9 @@ public class LaunchActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail);
 
-        // Set default activity if needed and launch.
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (!preferences.contains(PREF_DEFAULT_ACTIVITY_MAPS)) {
-            Editor editor = preferences.edit();
-            editor.putBoolean(PREF_DEFAULT_ACTIVITY_MAPS, false);
-            editor.apply();
-        }
-
         // Set defaults when there is no incoming intent.
-        Class target = isMapsViewDefault(preferences) ? MapsActivity.class : EventGridActivity.class;
+        Class target = new Preferences(this).isMapsViewDefault() ?
+                MapsActivity.class : EventGridActivity.class;
         outIntent = new Intent(this, target);
         webUri = Uri.parse(WEB_URI_BASE);
         title = "amazing events near you";
@@ -120,14 +109,6 @@ public class LaunchActivity extends Activity {
             AppIndex.AppIndexApi.viewEnd(client, this, Utils.getAppUri(webUri));
             client.disconnect();
         }
-    }
-
-    public static boolean isMapsViewDefault(Context context) {
-        return isMapsViewDefault(PreferenceManager.getDefaultSharedPreferences(context));
-    }
-
-    private static boolean isMapsViewDefault(SharedPreferences preferences) {
-        return preferences.getBoolean(PREF_DEFAULT_ACTIVITY_MAPS, false);
     }
 
     private void processIntent(Intent inIntent) {

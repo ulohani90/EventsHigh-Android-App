@@ -131,6 +131,27 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Populate the Day selection bar.
+        if (lastEventFetcherParam.query.isEmpty()) {
+            daySelector.populate((ViewGroup) findViewById(R.id.daySelector));
+            daySelector.setSelected(lastEventFetcherParam.day);
+        }
+
+        // If location is passed in param, use it. Otherwise ask GoogleApiClient for
+        // user location.
+        if (lastEventFetcherParam.location == null) {
+            googleApiClient.connect();
+        } else {
+            LatLng location = lastEventFetcherParam.location;
+            lastEventFetcherParam.changeLocation(null);
+            updateUserLocation(location);
+        }
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
 
@@ -148,27 +169,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         }
 
         super.onDestroy();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Populate the Day selection bar.
-        if (lastEventFetcherParam.query.isEmpty()) {
-            daySelector.populate((ViewGroup) findViewById(R.id.daySelector));
-            daySelector.setSelected(lastEventFetcherParam.day);
-        }
-
-        // If location is passed in param, use it. Otherwise ask GoogleApiClient for
-        // user location.
-        if (lastEventFetcherParam.location == null) {
-            googleApiClient.connect();
-        } else {
-            LatLng location = lastEventFetcherParam.location;
-            lastEventFetcherParam.changeLocation(null);
-            updateUserLocation(location);
-        }
     }
 
     @Override
