@@ -97,16 +97,20 @@ public abstract class BaseActivity extends FragmentActivity {
         // Google Analytics reporting.
         googleAnalytics.reportActivityStart(this);
 
-        // Setup Flurry.
-        FlurryAgent.setVersionName(BuildConfig.VERSION_NAME);
-        FlurryAgent.init(this, "2MD4D4TP7WQZH6Q6257T");
-        FlurryAgent.setLogEnabled(false);
-        FlurryAgent.setReportLocation(false);
-        FlurryAgent.onStartSession(this);
+        if (!BuildConfig.DEBUG) {
+            // Setup Flurry.
+            FlurryAgent.setVersionName(BuildConfig.VERSION_NAME);
+            FlurryAgent.init(this, "2MD4D4TP7WQZH6Q6257T");
+            FlurryAgent.setLogEnabled(false);
+            FlurryAgent.setReportLocation(false);
+            FlurryAgent.onStartSession(this);
+            FlurryAgent.logEvent(getClass().getSimpleName());
 
-        // Setup Amplitude
-        Amplitude.initialize(this, "41ed6c5c945d7f1c2f2d829b90288562");
-        Amplitude.startSession();
+            // Setup Amplitude
+            Amplitude.initialize(this, "41ed6c5c945d7f1c2f2d829b90288562");
+            Amplitude.startSession();
+            Amplitude.logEvent(getClass().getSimpleName());
+        }
 
         // Check if this is first activity by user, if yes report special event.
         // See if this is first action by user. If yes, report it.
@@ -153,10 +157,12 @@ public abstract class BaseActivity extends FragmentActivity {
         googleAnalytics.reportActivityStop(this);
 
         // Flurry reporting
-        FlurryAgent.onEndSession(this);
+        if (!BuildConfig.DEBUG) {
+            FlurryAgent.onEndSession(this);
 
-        // Amplitude reporting.
-        Amplitude.endSession();
+            // Amplitude reporting.
+            Amplitude.endSession();
+        }
 
         // Save the Http cache.
         HttpResponseCache cache = HttpResponseCache.getInstalled();
@@ -186,8 +192,10 @@ public abstract class BaseActivity extends FragmentActivity {
                     .setValue(value)
                     .build());
 
-            FlurryAgent.logEvent(actionName);
-            Amplitude.logEvent(actionName);
+            if (!BuildConfig.DEBUG) {
+                FlurryAgent.logEvent(actionName);
+                Amplitude.logEvent(actionName);
+            }
         }
     }
 
