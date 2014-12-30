@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.eventshigh.nearme.app.user.Account;
+import com.google.android.gms.analytics.CampaignTrackingReceiver;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -31,5 +32,8 @@ public class InstallReferrer extends BroadcastReceiver {
                 // Ignore.
             }
         }
+
+        // Report the install referrer intent to Google Analytics.
+        new CampaignTrackingReceiver().onReceive(context, intent);
     }
 }
