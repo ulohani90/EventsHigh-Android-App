@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.utils;
+package com.eventshigh.nearme.app.ui;
 
 import android.content.Context;
 import android.util.Log;

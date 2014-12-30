@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.utils;
+package com.eventshigh.nearme.app.ui;
 
 import android.app.Activity;
 import android.graphics.Point;
@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,7 +39,7 @@ public class DaySelector {
         ((TextView)daySelectorItem.findViewById(R.id.date)).setText(DATE.format(date));
 
         TextView timeView = ((TextView)daySelectorItem.findViewById(R.id.event_time));
-        String time = timeZone == null ? null : Utils.getTimeString(date, timeZone);
+        String time = timeZone == null ? null : DateTimeUtils.getTimeString(date, timeZone);
         if (time == null) {
             timeView.setVisibility(View.GONE);
         } else {
@@ -63,7 +64,7 @@ public class DaySelector {
 
         int minWidth = getMinWidth();
         for (int i = 0; i < NUM_DAYS; i++) {
-            Date date = Utils.getDate(i);
+            Date date = DateTimeUtils.getDate(i);
             LinearLayout daySelectorItem = getDaySelectorItem(activity, parent, date, null);
             daySelectorItem.setMinimumWidth(minWidth);
             daySelectorItem.setOnClickListener(new DayItemOnClickListener(i));

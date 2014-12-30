@@ -1,8 +1,8 @@
-package com.eventshigh.nearme.app.data;
+package com.eventshigh.nearme.app.utils;
 
 import android.util.Pair;
 
-import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.data.Event;
 
 import java.util.ArrayList;
 import java.util.Collection;

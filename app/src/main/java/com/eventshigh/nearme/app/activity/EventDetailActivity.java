@@ -3,27 +3,15 @@ package com.eventshigh.nearme.app.activity;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.task.SingleEventFetcherTask;
+import com.eventshigh.nearme.app.task.SingleEventFetcherTask.OnEventFetchHandler;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsFetcher;
-import com.eventshigh.nearme.app.utils.Utils;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.List;
 
 /**
  * An activity representing a single Event detail screen.
@@ -80,7 +68,12 @@ public class EventDetailActivity extends BaseActivity {
         String action = intent.getAction();
         if (Intent.ACTION_VIEW.equals(action)) {
             reportActionToAnalytics("deepLink", "detail");
-            new EventFetcher(this).execute(intent.getData());
+            new SingleEventFetcherTask(this, new OnEventFetchHandler() {
+                @Override
+                public void onEventFetch(Event event) {
+                    showEventFragment(event);
+                }
+            }).execute(intent.getData());
             return;
         }
 
@@ -98,55 +91,4 @@ public class EventDetailActivity extends BaseActivity {
         tx.commit();
     }
 
-    public static class EventFetcher extends AsyncTask<Uri, Void, Event> {
-        private final EventDetailActivity activity;
-
-        public EventFetcher(EventDetailActivity activity) {
-            this.activity = activity;
-        }
-
-        @Override
-        protected Event doInBackground(Uri... params) {
-            Uri eventUri = params[0];
-            List<String> eventUriPathSegments = eventUri.getPathSegments();
-
-            if (eventUriPathSegments.size() < 2) {
-                Log.w(LOG_TAG, "Invalid data: " + eventUri);
-                return null;
-            }
-
-            City city;
-            try {
-                city = City.valueOf(
-                        eventUriPathSegments.get(eventUriPathSegments.size() - 2).toUpperCase());
-            } catch (IllegalArgumentException e) {
-                Log.w(LOG_TAG, "Invalid data, no city: " + eventUri, e);
-                return null;
-            }
-
-            String eventId = eventUriPathSegments.get(eventUriPathSegments.size() - 1).split("-", 2)[0];
-            String url = EventsFetcher.API_ENDPOINT_EVENT.replace("EVENT_ID", eventId);
-            try {
-                JSONObject eventJSON = Utils.fetchJSON(url);
-                return Event.fromJSON(city, eventJSON);
-            } catch (IOException | JSONException | ParseException e) {
-                Log.w(LOG_TAG, "Failed to fetch: " + url, e);
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(@Nullable Event result) {
-            super.onPostExecute(result);
-
-            if (result == null) {
-                // Failed. Show toast and return empty list.
-                Toast.makeText(activity, R.string.failed_load, Toast.LENGTH_SHORT).show();
-                activity.finish();
-                return;
-            }
-
-            activity.showEventFragment(result);
-        }
-    }
 }

@@ -77,7 +77,7 @@
         <!-- Enable the search recent suggestion provider -->
         <provider
             android:authorities="com.eventshigh.nearme.app.EventSearchRecentSuggestionsProvider"
-            android:name=".utils.EventSearchSuggestionsProvider"
+            android:name=".ui.EventSearchSuggestionsProvider"
             android:exported="true"
             android:grantUriPermissions="true"
             android:readPermission="com.eventshigh.nearme.app.provider.READ_MY_DATA"

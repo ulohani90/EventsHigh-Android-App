@@ -10,7 +10,7 @@ import android.util.Log;
 
 import com.eventshigh.nearme.app.broadcast.InstallReferrer;
 import com.eventshigh.nearme.app.security.Signer;
-import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.utils.StreamUtils;
 
 import org.json.JSONException;
 
@@ -61,7 +61,7 @@ public class AccountStateReporter {
 
     private static boolean sendSignedRequest(Uri uri, OnSuccessHandler onSuccessHandler) {
         try {
-            Utils.fetchJSON(Signer.sign(uri).toString());
+            StreamUtils.fetchJSON(Signer.sign(uri).toString());
             onSuccessHandler.onSuccess();
             return true;
         } catch (IOException | JSONException | GeneralSecurityException e) {

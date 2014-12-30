@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.utils;
+package com.eventshigh.nearme.app.ui;
 
 import android.app.ActionBar;
 import android.util.Pair;

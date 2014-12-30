@@ -21,18 +21,18 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.data.EventFetcherParam;
-import com.eventshigh.nearme.app.data.EventsCollection;
-import com.eventshigh.nearme.app.data.EventsCollection.Builder;
-import com.eventshigh.nearme.app.data.EventsFetcher;
-import com.eventshigh.nearme.app.data.EventsFetcher.EventsFetcherCallBack;
-import com.eventshigh.nearme.app.utils.DaySelector;
-import com.eventshigh.nearme.app.utils.DaySelector.DaySelectionListener;
-import com.eventshigh.nearme.app.utils.EventSearchSuggestionsProvider;
-import com.eventshigh.nearme.app.utils.LocationPickerDialog;
-import com.eventshigh.nearme.app.utils.LocationPickerDialog.OnLocationSelection;
-import com.eventshigh.nearme.app.utils.OnBoardingHelper;
-import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.task.EventsFetcherTask;
+import com.eventshigh.nearme.app.task.EventsFetcherTask.EventsFetcherCallBack;
+import com.eventshigh.nearme.app.ui.DaySelector;
+import com.eventshigh.nearme.app.ui.DaySelector.DaySelectionListener;
+import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
+import com.eventshigh.nearme.app.ui.LocationPickerDialog;
+import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
+import com.eventshigh.nearme.app.ui.OnBoardingHelper;
+import com.eventshigh.nearme.app.utils.EventFetcherParam;
+import com.eventshigh.nearme.app.utils.EventsCollection;
+import com.eventshigh.nearme.app.utils.EventsCollection.Builder;
+import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -82,7 +82,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     // Tag selected from tab bar for which events are shown.
     private String lastSelectedTag;
     // last fetcher used to fetch events.
-    private EventsFetcher fetcher;
+    private EventsFetcherTask fetcher;
     // On boarding helper.
     private OnBoardingHelper onBoardingHelper;
     // when was this activity last started on.
@@ -232,11 +232,11 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
     /**
      * Sets new events data. This is called when we get new events from
-     * {@link com.eventshigh.nearme.app.data.EventsFetcher}.
+     * {@link com.eventshigh.nearme.app.task.EventsFetcherTask}.
      *
      * EventFetcher could be asked to fetch events when user changes the city or day.
      *
-     * @param events a list of events as returned by {@link com.eventshigh.nearme.app.data.EventsFetcher}
+     * @param events a list of events as returned by {@link com.eventshigh.nearme.app.task.EventsFetcherTask}
      */
     protected abstract void updateNewEvents(List<Event> events);
 
@@ -266,7 +266,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
     private void fetchNewListing() {
         reportActionToAnalytics("fetchNewListing");
-        fetcher = new EventsFetcher(LocationAwareEventActivity.this, mEventsFetcherCallBack);
+        fetcher = new EventsFetcherTask(LocationAwareEventActivity.this, mEventsFetcherCallBack);
         fetcher.execute(lastEventFetcherParam);
     }
 
@@ -362,7 +362,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         public void onConnected(Bundle bundle) {
             Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (location != null) {
-                updateUserLocation(Utils.locationToLatLng(location));
+                updateUserLocation(LocationUtils.locationToLatLng(location));
                 googleApiClient.disconnect();
             } else {
                 // Check if location access is enabled or not. If not we ask user for the location.
@@ -405,7 +405,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     private LocationListener mLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            updateUserLocation(Utils.locationToLatLng(location));
+            updateUserLocation(LocationUtils.locationToLatLng(location));
             googleApiClient.disconnect();
         }
     };

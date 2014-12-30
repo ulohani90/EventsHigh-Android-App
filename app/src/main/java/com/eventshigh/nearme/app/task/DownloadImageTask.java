@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.utils;
+package com.eventshigh.nearme.app.task;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;

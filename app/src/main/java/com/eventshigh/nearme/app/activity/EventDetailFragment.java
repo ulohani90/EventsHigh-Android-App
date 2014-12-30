@@ -26,8 +26,8 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.utils.DaySelector;
-import com.eventshigh.nearme.app.utils.DownloadImageTask;
+import com.eventshigh.nearme.app.ui.DaySelector;
+import com.eventshigh.nearme.app.task.DownloadImageTask;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;

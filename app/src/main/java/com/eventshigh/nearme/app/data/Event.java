@@ -5,6 +5,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.EventsCollection;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -284,7 +286,7 @@ public class Event implements Parcelable {
 
         // Event timings.
         TreeSet<Long> eventTimings = new TreeSet<>();
-        Date eventTiming =  Utils.mergeDateTime(eventJson.optString("date"),
+        Date eventTiming =  DateTimeUtils.mergeDateTime(eventJson.optString("date"),
                 eventJson.optString("start_time"), city.timeZone);
         if (eventTiming != null) {
             eventTimings.add(eventTiming.getTime());
@@ -293,7 +295,7 @@ public class Event implements Parcelable {
         JSONArray upcoming_occurrences = eventJson.optJSONArray("upcoming_occurrences");
         if (upcoming_occurrences != null) {
             for (int i = 0; i < upcoming_occurrences.length(); i++) {
-                eventTiming =  Utils.mergeDateTime(
+                eventTiming =  DateTimeUtils.mergeDateTime(
                         upcoming_occurrences.getJSONObject(i).optString("date"),
                         upcoming_occurrences.getJSONObject(i).optString("start_time"), city.timeZone);
                 if (eventTiming != null) {

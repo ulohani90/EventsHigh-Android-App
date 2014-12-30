@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.utils.EventFetcherParam;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.AppIndex;

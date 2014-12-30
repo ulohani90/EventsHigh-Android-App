@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.data;
+package com.eventshigh.nearme.app.task;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -8,7 +8,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.EventFetcherParam;
+import com.eventshigh.nearme.app.utils.EventsCollection;
+import com.eventshigh.nearme.app.utils.StreamUtils;
 
 import org.json.JSONException;
 
@@ -23,9 +27,9 @@ import java.net.URLEncoder;
  * Before using EventsFetcher, its recommended to setup {@link android.net.http.HttpResponseCache}
  * for better performance.
  */
-public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsCollection> {
+public class EventsFetcherTask extends AsyncTask<EventFetcherParam, Void, EventsCollection> {
 
-    private static final String LOG_TAG = EventsFetcher.class.getSimpleName();
+    private static final String LOG_TAG = EventsFetcherTask.class.getSimpleName();
     private static final String API_ENDPOINT_DATE =
             "http://apiserver.eventshigh.com:8888/api/date/CITY/DATE?sortby=popularity&limit=200&mobile=1";
     private static final String API_ENDPOINT_QUERY =
@@ -42,7 +46,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsColl
     private ProgressDialog pDialog;
     private EventFetcherParam param;
 
-    public EventsFetcher(Activity activity, EventsFetcherCallBack callback) {
+    public EventsFetcherTask(Activity activity, EventsFetcherCallBack callback) {
         this.activity = activity;
         this.callback = callback;
     }
@@ -75,7 +79,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsColl
         String url;
         if (param.query.isEmpty()) {
             url = API_ENDPOINT_DATE.replace("CITY", param.city.toString().toLowerCase())
-                    .replace("DATE", Utils.getDateString(Utils.getDate(param.day)));
+                    .replace("DATE", DateTimeUtils.getDateString(DateTimeUtils.getDate(param.day)));
         } else {
             try {
                 url = API_ENDPOINT_QUERY.replace("CITY", param.city.toString().toLowerCase())
@@ -88,7 +92,7 @@ public class EventsFetcher extends AsyncTask<EventFetcherParam, Void, EventsColl
         Log.d(LOG_TAG, "fetching: " + url);
 
         try {
-            return Event.parseUpcomingEvents(param.city, Utils.fetchJSON(url));
+            return Event.parseUpcomingEvents(param.city, StreamUtils.fetchJSON(url));
         } catch (JSONException|IOException e) {
             Log.e(LOG_TAG, "Failed to fetch events!", e);
             return null;

@@ -25,7 +25,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
-import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -287,7 +287,7 @@ public abstract class BaseActivity extends FragmentActivity {
             intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, eventTime);
         }
 
-        String time = Utils.getEventTime(event, false);
+        String time = DateTimeUtils.getEventTime(event, false);
         if (time == null) {
             intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
         }

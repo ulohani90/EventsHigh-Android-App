@@ -14,8 +14,8 @@ import android.widget.SearchView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.utils.EventComparator;
-import com.eventshigh.nearme.app.utils.EventListAdapter;
-import com.eventshigh.nearme.app.utils.UpdateLocationTask;
+import com.eventshigh.nearme.app.ui.EventListAdapter;
+import com.eventshigh.nearme.app.task.UpdateLocationTask;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;

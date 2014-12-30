@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.utils;
+package com.eventshigh.nearme.app.ui;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;

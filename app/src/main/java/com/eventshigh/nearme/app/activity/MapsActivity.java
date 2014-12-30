@@ -19,8 +19,8 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.utils.EventListAdapter;
-import com.eventshigh.nearme.app.utils.MarkerManager;
+import com.eventshigh.nearme.app.ui.EventListAdapter;
+import com.eventshigh.nearme.app.ui.MarkerManager;
 import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.ShowcaseView.Builder;

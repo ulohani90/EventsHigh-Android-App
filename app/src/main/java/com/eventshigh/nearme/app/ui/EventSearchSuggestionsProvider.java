@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.utils;
+package com.eventshigh.nearme.app.ui;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.SearchRecentSuggestions;
 import android.util.Log;
+
+import com.eventshigh.nearme.app.utils.StreamUtils;
 
 import java.io.IOException;
 
@@ -58,7 +60,7 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
     private synchronized void readTags() {
         if (allTags == null) {
             try {
-                allTags = Utils.readAssetFile(getContext(), "all_tags.txt");
+                allTags = StreamUtils.readAssetFile(getContext(), "all_tags.txt");
             } catch (IOException e) {
                 Log.w(EventSearchSuggestionsProvider.class.getSimpleName(), "Failed to read tags", e);
                 allTags = new String[]{};

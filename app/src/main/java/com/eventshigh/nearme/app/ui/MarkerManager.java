@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.utils;
+package com.eventshigh.nearme.app.ui;
 
 import android.graphics.Point;
 import android.support.annotation.Nullable;
@@ -7,6 +7,9 @@ import android.util.Pair;
 import com.eventshigh.nearme.app.activity.MapsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
+import com.eventshigh.nearme.app.utils.EventComparator;
+import com.eventshigh.nearme.app.utils.LocationUtils;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
@@ -167,7 +170,7 @@ public class MarkerManager {
                 int minDistSq = shownPoint.second ?
                         MIN_MARKER_DISTANCE_SQ :
                         MIN_MARKER_DISTANCE_SQ / 4;
-                if (Utils.getDistanceSQ(shownPoint.first, point) < minDistSq) {
+                if (LocationUtils.getDistanceSQ(shownPoint.first, point) < minDistSq) {
                     toClose = true;
                     break;
                 }
@@ -203,9 +206,9 @@ public class MarkerManager {
             marker = getNextMarker(marker);
         }
 
-        float minDiagonalDistance = DIAGONAL_DISTANCE_MULTIPLIER *  Utils.distanceInMeters(
+        float minDiagonalDistance = DIAGONAL_DISTANCE_MULTIPLIER *  LocationUtils.distanceInMeters(
                marker.getPosition(), map.getCameraPosition().target);
-        float currentDiagonalDistance =  Utils.distanceInMeters(
+        float currentDiagonalDistance =  LocationUtils.distanceInMeters(
                 map.getProjection().getVisibleRegion().farLeft,
                 map.getProjection().getVisibleRegion().nearRight);
         if (currentDiagonalDistance < minDiagonalDistance) {
@@ -231,7 +234,7 @@ public class MarkerManager {
             if (location == null ||
                 (this.location != null &&
                  this.orderedMarkersSet.size() > 0 &&
-                 Utils.distanceInMeters(this.location, location) < MIN_DISTANCE_FOR_REORDER)) {
+                LocationUtils.distanceInMeters(this.location, location) < MIN_DISTANCE_FOR_REORDER)) {
                 return;
             }
 

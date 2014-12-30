@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.utils;
+package com.eventshigh.nearme.app.ui;
 
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -14,6 +14,8 @@ import android.widget.TextView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.task.DownloadImageTask;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
 
 /**
  * An {@link android.widget.ListAdapter} which can be used to populate the
@@ -55,7 +57,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
 
         // Set the title, time etc.
         eventCard.titleView.setText(event.title);
-        String eventTime = Utils.getEventTime(event, showDate);
+        String eventTime = DateTimeUtils.getEventTime(event, showDate);
         if (eventTime == null) {
             eventCard.timeView.setVisibility(View.GONE);
         } else {
