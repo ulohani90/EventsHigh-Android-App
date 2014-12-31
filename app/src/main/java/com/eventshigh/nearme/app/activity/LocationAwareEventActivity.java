@@ -362,7 +362,9 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         public void onConnected(Bundle bundle) {
             Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (location != null) {
-                updateUserLocation(LocationUtils.locationToLatLng(location));
+                LatLng userLatLng = LocationUtils.locationToLatLng(location);
+                gcmRegistration.setLastCity(City.getCity(userLatLng));
+                updateUserLocation(userLatLng);
                 googleApiClient.disconnect();
             } else {
                 // Check if location access is enabled or not. If not we ask user for the location.

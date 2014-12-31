@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.GAHelper;
@@ -118,7 +117,7 @@ public class LaunchActivity extends Activity {
     private void processIntent(Intent inIntent) {
         EventFetcherParam param = null;
 
-        Tracker tracker = GAHelper.getTracker(this, new Account(this)).second;
+        Tracker tracker = GAHelper.getTracker(this).second;
         if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
             param = processSearchIntent(inIntent, tracker);
         } else if (Intent.ACTION_VIEW.equals(inIntent.getAction())) {

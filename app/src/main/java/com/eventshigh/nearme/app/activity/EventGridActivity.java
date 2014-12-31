@@ -38,17 +38,21 @@ public class EventGridActivity extends LocationAwareEventActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_grid);
 
-        // Show the Up button in the action bar.
-        ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(pref.isMapsViewDefault());
-        }
-
         // Setup adapter.
         GridView eventGridView = (GridView) findViewById(R.id.event_grid);
         mEventsListAdapter = new EventListAdapter(this);
         eventGridView.setAdapter(mEventsListAdapter);
         eventGridView.setOnItemClickListener(mOnItemClickListener);
+    }
+
+    protected void onStart() {
+        super.onStart();
+
+        // Show the Up button in the action bar.
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(pref.isMapsViewDefault());
+        }
     }
 
     @Override

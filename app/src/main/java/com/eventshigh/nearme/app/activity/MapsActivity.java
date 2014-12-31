@@ -90,16 +90,20 @@ public class MapsActivity extends LocationAwareEventActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        // Show the Up button in the action bar.
-        ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(!pref.isMapsViewDefault());
-        }
-
         // Setup the local member variables.
         setUpMapIfNeeded();
         setupGestureDetectorIfNeeded();
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
+    }
+
+    protected void onStart() {
+        super.onStart();
+
+        // Show the Up button in the action bar.
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(pref.isMapsViewDefault());
+        }
     }
 
     @Override

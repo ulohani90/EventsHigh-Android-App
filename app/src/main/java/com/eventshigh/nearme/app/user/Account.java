@@ -2,11 +2,10 @@ package com.eventshigh.nearme.app.user;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
-import com.eventshigh.nearme.app.user.AccountStateReporter.OnSuccessHandler;
-import com.eventshigh.nearme.app.user.AccountStateReporter.ReferrerIdReporter;
-import com.eventshigh.nearme.app.user.AccountStateReporter.ReferrerReporter;
+import com.eventshigh.nearme.app.utils.AccountStateReporter;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -45,14 +44,7 @@ public class Account {
         accountInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
 
         // Check if we need to upload the data.
-        if (accountInfo.contains(PREF_REFERRER) &&
-            !accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false)) {
-            uploadReferrer(getReferrer());
-        }
-        if (accountInfo.contains(PREF_REFERRER_CODE) &&
-                !accountInfo.getBoolean(PREF_REFERRER_CODE_UPLOADED, false)) {
-            uploadReferrerCode(accountInfo.getString(PREF_REFERRER_CODE, null));
-        }
+        new AccountStateRegistar().execute();
     }
 
     public boolean shouldAskForLogin() {
@@ -84,14 +76,10 @@ public class Account {
         accountInfo.edit().putBoolean(PREF_ASK_LOGIN, false).apply();
     }
 
-    public @Nullable String getReferrer() {
-        return accountInfo.getString(PREF_REFERRER, null);
-    }
-
     public boolean recordReferrer(String referrer) {
         if (!accountInfo.contains(PREF_REFERRER)) {
             accountInfo.edit().putString(PREF_REFERRER, referrer).apply();
-            uploadReferrer(referrer);
+            new AccountStateRegistar().execute();
             return true;
         }
 
@@ -107,28 +95,40 @@ public class Account {
         try {
             referrerCode = URLEncoder.encode(UUID.randomUUID().toString(), "UTF-8");
             accountInfo.edit().putString(PREF_REFERRER_CODE, referrerCode).apply();
-            uploadReferrerCode(referrerCode);
+            new AccountStateRegistar().execute();
             return referrerCode;
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void uploadReferrer(String referrer) {
-        new ReferrerReporter(context, new OnSuccessHandler() {
-            @Override
-            public void onSuccess() {
-                accountInfo.edit().putBoolean(PREF_REFERRER_UPLOADED, true).apply();
+    private class AccountStateRegistar extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (!accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false)) {
+                uploadReferrer(accountInfo.getString(PREF_REFERRER, null));
             }
-        }).execute(referrer);
-    }
+            if (!accountInfo.getBoolean(PREF_REFERRER_CODE_UPLOADED, false)) {
+                uploadReferrerCode(accountInfo.getString(PREF_REFERRER_CODE, null));
+            }
 
-    private void uploadReferrerCode(String referrerCode) {
-        new ReferrerIdReporter(context, new OnSuccessHandler() {
-            @Override
-            public void onSuccess() {
-                accountInfo.edit().putBoolean(PREF_REFERRER_CODE_UPLOADED, true).apply();
+            return null;
+        }
+
+        private void uploadReferrer(@Nullable String referrer) {
+            if (referrer != null) {
+                if (AccountStateReporter.reportReferrer(context, referrer)) {
+                    accountInfo.edit().putBoolean(PREF_REFERRER_UPLOADED, true).apply();
+                }
             }
-        }).execute(referrerCode);
+        }
+
+        private void uploadReferrerCode(@Nullable String referrerCode) {
+            if (referrerCode != null) {
+                if (AccountStateReporter.reportReferrerCode(context, referrerCode)) {
+                    accountInfo.edit().putBoolean(PREF_REFERRER_CODE_UPLOADED, true).apply();
+                }
+            }
+        }
     }
 }

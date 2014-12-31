@@ -3,7 +3,9 @@ package com.eventshigh.nearme.app.broadcast;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.widget.Toast;
 
+import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.user.Account;
 import com.google.android.gms.analytics.CampaignTrackingReceiver;
 
@@ -22,6 +24,9 @@ public class InstallReferrer extends BroadcastReceiver {
         if (intent.getAction().equals("com.android.vending.INSTALL_REFERRER")) {
             try {
                 String referrer = intent.getStringExtra("referrer");
+                if (BuildConfig.DEBUG) {
+                    Toast.makeText(context, "Got INSTALL_REFERRER: " + referrer, Toast.LENGTH_SHORT).show();
+                }
                 if (referrer == null) {
                     return;
                 }
