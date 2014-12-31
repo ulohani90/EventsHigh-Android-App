@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.GAHelper;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -84,14 +86,11 @@ public abstract class BaseActivity extends FragmentActivity {
 
         // Setup Google Analytics.
         if (googleAnalytics == null) {
-            googleAnalytics = GoogleAnalytics.getInstance(this);
-            tracker = googleAnalytics.newTracker(R.xml.analytics);
-            tracker.enableAdvertisingIdCollection(true);
+            Pair<GoogleAnalytics, Tracker> trackerInfo =
+                    GAHelper.getTracker(this);
 
-            // Disable GA reporting in debug build.
-            if (BuildConfig.DEBUG) {
-                googleAnalytics.setAppOptOut(true);
-            }
+            googleAnalytics = trackerInfo.first;
+            tracker = trackerInfo.second;
         }
 
         // Google Analytics reporting.

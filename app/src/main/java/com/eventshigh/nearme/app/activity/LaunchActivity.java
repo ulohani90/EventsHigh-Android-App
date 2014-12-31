@@ -12,9 +12,12 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.utils.EventFetcherParam;
 import com.eventshigh.nearme.app.user.Preferences;
+import com.eventshigh.nearme.app.utils.EventFetcherParam;
+import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -114,10 +117,11 @@ public class LaunchActivity extends Activity {
     private void processIntent(Intent inIntent) {
         EventFetcherParam param = null;
 
+        Tracker tracker = GAHelper.getTracker(this).second;
         if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
-            param = processSearchIntent(inIntent);
+            param = processSearchIntent(inIntent, tracker);
         } else if (Intent.ACTION_VIEW.equals(inIntent.getAction())) {
-            param = processViewIntent(inIntent);
+            param = processViewIntent(inIntent, tracker);
         }
 
         if (param != null) {
@@ -127,8 +131,9 @@ public class LaunchActivity extends Activity {
         }
     }
 
-    private static EventFetcherParam processSearchIntent(Intent inIntent) {
+    private static EventFetcherParam processSearchIntent(Intent inIntent, Tracker tracker) {
         String query = inIntent.getStringExtra(SearchManager.QUERY);
+        reportToAnalytics(tracker, "search", query);
 
         EventFetcherParam param = null;
         Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
@@ -145,19 +150,22 @@ public class LaunchActivity extends Activity {
         return param;
     }
 
-    private static EventFetcherParam processViewIntent(Intent inIntent) {
+    private static EventFetcherParam processViewIntent(Intent inIntent, Tracker tracker) {
         Uri inUri = inIntent.getData();
 
         if (inUri.getPath().startsWith("/city")) {
-            return processCityViewIntent(inUri);
+            return processCityViewIntent(inUri, tracker);
         } else if (inUri.getPath().startsWith("/search")) {
-            return processSearchViewIntent(inUri);
+            return processSearchViewIntent(inUri, tracker);
         }
 
+        reportToAnalytics(tracker, "deepLink", "homepage");
         return  null;
     }
 
-    private static @Nullable EventFetcherParam processCityViewIntent(Uri webUri) {
+    private static @Nullable EventFetcherParam processCityViewIntent(Uri webUri, Tracker tracker) {
+        reportToAnalytics(tracker, "deepLink", "city");
+
         try {
             City city = City.valueOf(webUri.getLastPathSegment().toUpperCase());
             return getEventFetcherParamForCity(city);
@@ -168,7 +176,9 @@ public class LaunchActivity extends Activity {
         return null;
     }
 
-    private static @Nullable EventFetcherParam processSearchViewIntent(Uri webUri) {
+    private static @Nullable EventFetcherParam processSearchViewIntent(Uri webUri, Tracker tracker) {
+        reportToAnalytics(tracker, "deepLink", "search");
+
         EventFetcherParam param = null;
         try {
             City city = City.valueOf(webUri.getQueryParameter("city").toUpperCase());
@@ -196,6 +206,14 @@ public class LaunchActivity extends Activity {
     private static String getTitle(EventFetcherParam param) {
         return (param.query.isEmpty() ? "amazing" : param.query) + " events " +
             (param.city == null ? "near you" : "in " + param.city.toString().toLowerCase());
+    }
+
+    private static void reportToAnalytics(Tracker tracker, String action, String label) {
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory(LaunchActivity.class.getSimpleName())
+                .setAction(action)
+                .setLabel(label)
+                .build());
     }
 
     private static Uri getWebUri(EventFetcherParam param) {

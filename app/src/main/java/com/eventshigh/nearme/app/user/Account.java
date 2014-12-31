@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.user;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.user.AccountStateReporter.OnSuccessHandler;
 import com.eventshigh.nearme.app.user.AccountStateReporter.ReferrerIdReporter;
@@ -47,7 +48,7 @@ public class Account {
         // Check if we need to upload the data.
         if (accountInfo.contains(PREF_REFERRER) &&
             !accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false)) {
-            uploadReferrer(accountInfo.getString(PREF_REFERRER, null));
+            uploadReferrer(getReferrer());
         }
         if (accountInfo.contains(PREF_REFERRER_CODE) &&
                 !accountInfo.getBoolean(PREF_REFERRER_CODE_UPLOADED, false)) {
@@ -85,6 +86,10 @@ public class Account {
 
     public void recordSkipLogin() {
         accountInfo.edit().putBoolean(PREF_ASK_LOGIN, false).apply();
+    }
+
+    public @Nullable String getReferrer() {
+        return accountInfo.getString(PREF_REFERRER, null);
     }
 
     public boolean recordReferrer(String referrer) {

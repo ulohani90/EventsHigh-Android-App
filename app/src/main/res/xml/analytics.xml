@@ -2,7 +2,7 @@
 <resources>
     <string name="ga_trackingId">UA-46999528-1</string>
     <bool name="ga_autoActivityTracking">true</bool>
-    <bool name="ga_reportUncaughtExceptions">true</bool>
+    <bool name="ga_reportUncaughtExceptions">false</bool>
 
     <screenName name="com.eventshigh.nearme.app.activity.LaunchActivity">Launch</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.LoginActivity">Login</screenName>
