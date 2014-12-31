@@ -51,6 +51,7 @@ public abstract class BaseActivity extends FragmentActivity {
     protected GoogleAnalytics googleAnalytics;
     protected Tracker tracker;
     protected Preferences pref;
+    protected Account account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,24 +78,18 @@ public abstract class BaseActivity extends FragmentActivity {
             Fabric.with(this, new Crashlytics());
         }
 
-        // Open the shared preferences.
+        // Open the shared preferences and account information.
         pref = new Preferences(this);
-    }
-
-    protected void onStart() {
-        super.onStart();
+        account = new Account(this);
 
         // Setup Google Analytics.
         if (googleAnalytics == null) {
             Pair<GoogleAnalytics, Tracker> trackerInfo =
-                    GAHelper.getTracker(this);
+                    GAHelper.getTracker(this, account);
 
             googleAnalytics = trackerInfo.first;
             tracker = trackerInfo.second;
         }
-
-        // Google Analytics reporting.
-        googleAnalytics.reportActivityStart(this);
 
         if (!BuildConfig.DEBUG) {
             // Setup Flurry.
@@ -102,11 +97,23 @@ public abstract class BaseActivity extends FragmentActivity {
             FlurryAgent.init(this, "2MD4D4TP7WQZH6Q6257T");
             FlurryAgent.setLogEnabled(false);
             FlurryAgent.setReportLocation(false);
-            FlurryAgent.onStartSession(this);
-            FlurryAgent.logEvent(getClass().getSimpleName());
 
             // Setup Amplitude
             Amplitude.initialize(this, "41ed6c5c945d7f1c2f2d829b90288562");
+        }
+    }
+
+    protected void onStart() {
+        super.onStart();
+
+        // Google Analytics reporting.
+        googleAnalytics.reportActivityStart(this);
+
+        // Flurry, Amplitude reporting
+        if (!BuildConfig.DEBUG) {
+            FlurryAgent.onStartSession(this);
+            FlurryAgent.logEvent(getClass().getSimpleName());
+
             Amplitude.startSession();
             Amplitude.logEvent(getClass().getSimpleName());
         }
@@ -155,11 +162,9 @@ public abstract class BaseActivity extends FragmentActivity {
         // Google Analytics reporting.
         googleAnalytics.reportActivityStop(this);
 
-        // Flurry reporting
+        // Flurry, Amplitude reporting
         if (!BuildConfig.DEBUG) {
             FlurryAgent.onEndSession(this);
-
-            // Amplitude reporting.
             Amplitude.endSession();
         }
 

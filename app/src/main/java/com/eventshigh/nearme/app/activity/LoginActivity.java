@@ -39,7 +39,7 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void success(DigitsSession session, String phoneNumber) {
                 reportActionToAnalytics("loginSuccess");
-                account.recordSuccess(session, phoneNumber);
+                account.recordLoginSuccess(phoneNumber);
                 launchEventsActivity();
             }
 
@@ -47,7 +47,7 @@ public class LoginActivity extends BaseActivity {
             public void failure(DigitsException exception) {
                 reportActionToAnalytics("loginFailed");
                 Toast.makeText(LoginActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();
-                if (account.recordFailure()) {
+                if (account.recordLoginFailure()) {
                     launchEventsActivity();
                 }
             }

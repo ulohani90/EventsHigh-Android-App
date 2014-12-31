@@ -11,7 +11,7 @@ import com.google.android.gms.analytics.Tracker;
 
 public class GAHelper {
 
-    public static Pair<GoogleAnalytics, Tracker> getTracker(Context context) {
+    public static Pair<GoogleAnalytics, Tracker> getTracker(Context context, Account account) {
         GoogleAnalytics googleAnalytics = GoogleAnalytics.getInstance(context);
         Tracker tracker = googleAnalytics.newTracker(R.xml.analytics);
         tracker.enableAdvertisingIdCollection(true);
@@ -21,7 +21,7 @@ public class GAHelper {
             googleAnalytics.setAppOptOut(true);
         }
 
-        String referrer = new Account(context).getReferrer();
+        String referrer = account.getReferrer();
         if (referrer != null) {
             tracker.setReferrer(referrer);
         }

@@ -17,8 +17,6 @@ import com.eventshigh.nearme.app.data.Event;
  * An activity representing a single Event detail screen.
  */
 public class EventDetailActivity extends BaseActivity {
-    private static final String LOG_TAG = EventDetailActivity.class.getSimpleName();
-
     private ActionBar actionBar;
 
     /**********************************

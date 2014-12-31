@@ -20,7 +20,6 @@ public class Account {
     // Constants used for SharedPreferences.
     private static final String PREFS_FILE_NAME = "eh_user_credentials";
 
-    private static final String PREF_DIGITS_USER_ID = "digits_user_id";
     private static final String PREF_PHONE_NO = "phone_no";
     private static final String PREF_NUM_LOGIN_ATTEMPTS = "num_login_attempts";
     private static final String PREF_ASK_LOGIN = "ask_login";
@@ -60,7 +59,7 @@ public class Account {
         return accountInfo.getBoolean(PREF_ASK_LOGIN, true);
     }
 
-    public boolean recordFailure() {
+    public boolean recordLoginFailure() {
         boolean tooManyFailures = false;
         int numFailedLogin = accountInfo.getInt(PREF_NUM_LOGIN_ATTEMPTS, 0) + 1;
         SharedPreferences.Editor editor = accountInfo.edit();
@@ -74,15 +73,12 @@ public class Account {
         return tooManyFailures;
     }
 
-    /**
-    public void recordSuccess(DigitsSession session, String phoneNumber) {
+    public void recordLoginSuccess(String phoneNumber) {
         SharedPreferences.Editor editor = accountInfo.edit();
-        editor.putLong(PREF_DIGITS_USER_ID, session.getId());
         editor.putString(PREF_PHONE_NO, phoneNumber);
         editor.putBoolean(PREF_ASK_LOGIN, false);
         editor.apply();
     }
-    **/
 
     public void recordSkipLogin() {
         accountInfo.edit().putBoolean(PREF_ASK_LOGIN, false).apply();
@@ -117,7 +113,6 @@ public class Account {
             throw new RuntimeException(e);
         }
     }
-
 
     private void uploadReferrer(String referrer) {
         new ReferrerReporter(context, new OnSuccessHandler() {
