@@ -494,7 +494,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                 lastSelectedTag = tab.getTag().toString();
                 List<Event> eventsForTag = events.getEvents(tab.getPosition());
                 if (!eventsForTag.isEmpty()) {
-                    reportActionToAnalytics("filterByCategory");
+                    reportActionToAnalytics("filterByCategory", lastSelectedTag);
                 }
                 updateListingAndShowHelpIfNeeded(eventsForTag);
             }
