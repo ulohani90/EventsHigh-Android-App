@@ -59,9 +59,9 @@ public class GcmIntentService extends IntentService {
         NotificationManager mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        String eventId = msg.getString("event_id");
-        String title = msg.getString("title");
-        String message = msg.getString("message");
+        String eventId = msg.getString("id");
+        String title = msg.getString("t");
+        String message = msg.getString("m");
 
         GAHelper gaHelper = new GAHelper(this);
         if (eventId == null || message == null || title == null) {
@@ -89,7 +89,7 @@ public class GcmIntentService extends IntentService {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setSmallIcon(R.drawable.notification)
                         .setContentTitle(title)
                         .setContentText(message)
                         .setAutoCancel(true)
