@@ -12,13 +12,13 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.EventsCollection;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.StreamUtils;
 
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  * An {@link AsyncTask} which is used to fetch the Events. Once events are available,
@@ -28,14 +28,7 @@ import java.net.URLEncoder;
  * for better performance.
  */
 public class EventsFetcherTask extends AsyncTask<EventFetcherParam, Void, EventsCollection> {
-
     private static final String LOG_TAG = EventsFetcherTask.class.getSimpleName();
-    private static final String API_ENDPOINT_DATE =
-            "http://apiserver.eventshigh.com:8888/api/date/CITY/DATE?sortby=popularity&limit=200&mobile=1";
-    private static final String API_ENDPOINT_QUERY =
-            "http://apiserver.eventshigh.com:8888/api/events/CITY/QUERY?sortby=popularity&limit=200&mobile=1";
-    public static final String API_ENDPOINT_EVENT =
-            "http://apiserver.eventshigh.com:8888/api/get_event_uber_info/EVENT_ID?mobile=1";
 
     public static interface EventsFetcherCallBack {
         public void OnEventsAvailable(EventFetcherParam param, EventsCollection events);
@@ -78,12 +71,11 @@ public class EventsFetcherTask extends AsyncTask<EventFetcherParam, Void, Events
 
         String url;
         if (param.query.isEmpty()) {
-            url = API_ENDPOINT_DATE.replace("CITY", param.city.toString().toLowerCase())
-                    .replace("DATE", DateTimeUtils.getDateString(DateTimeUtils.getDate(param.day)));
+            url = EventsHighEndpoints.getApiEndpointDate(
+                    param.city, DateTimeUtils.getDate(param.day));
         } else {
             try {
-                url = API_ENDPOINT_QUERY.replace("CITY", param.city.toString().toLowerCase())
-                        .replace("QUERY", URLEncoder.encode(param.query, "UTF-8"));
+                url = EventsHighEndpoints.getApiEndpointQuery(param.city, param.query);
             } catch (UnsupportedEncodingException e) {
                 Log.w(LOG_TAG, "Invalid Query", e);
                 return null;

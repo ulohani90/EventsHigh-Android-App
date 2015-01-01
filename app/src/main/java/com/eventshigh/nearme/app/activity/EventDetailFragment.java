@@ -201,7 +201,7 @@ public class EventDetailFragment extends Fragment {
         client.registerConnectionCallbacks(new ConnectionCallbacks() {
             @Override
             public void onConnected(Bundle bundle) {
-                Uri webUri = mEvent.getWebUri();
+                Uri webUri = mEvent.getEventDetailsURI();
                 AppIndex.AppIndexApi.view(client, activity, Utils.getAppUri(webUri),
                         mEvent.title, webUri, null);
             }
@@ -222,7 +222,7 @@ public class EventDetailFragment extends Fragment {
         super.onStop();
 
         if (client.isConnected()) {
-            Uri webUri = mEvent.getWebUri();
+            Uri webUri = mEvent.getEventDetailsURI();
             AppIndex.AppIndexApi.viewEnd(client, activity, Utils.getAppUri(webUri));
             client.disconnect();
         }
@@ -395,7 +395,7 @@ public class EventDetailFragment extends Fragment {
                     gaOptOutCounter ++;
                     if (gaOptOutCounter == NUM_TAPS_FOR_GA_OPT_OUT) {
                         Toast.makeText(activity, "GA reporting disabled on this device", Toast.LENGTH_SHORT).show();
-                        activity.googleAnalytics.setAppOptOut(true);
+                        activity.gaHelper.setAppOptOut(true);
                     }
                 }
             });

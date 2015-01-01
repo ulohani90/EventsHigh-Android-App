@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsCollection;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -28,8 +29,6 @@ import java.util.TreeSet;
 public class Event implements Parcelable {
     // EH_RECOMMENDED is same as 100 people going to event.
     private static final int EH_RECOMMENDATION_BOOST = 100;
-    private static final String EVENTS_HIGH_DETAIL_URI =
-            "http://www.eventshigh.com/detail/CITY/ID?src=ehm";
 
     public final String id;
     public final City city;
@@ -92,9 +91,7 @@ public class Event implements Parcelable {
     }
 
     public Uri getEventDetailsURI() {
-        return Uri.parse(EVENTS_HIGH_DETAIL_URI
-                .replace("CITY", Utils.capitalize(city.toString()))
-                .replace("ID", id));
+        return EventsHighEndpoints.getEventDetailsURI(this);
     }
 
     public int getPopularityScore() {
@@ -114,19 +111,6 @@ public class Event implements Parcelable {
     public boolean equals(Object another) {
         return another instanceof Event &&
                 id.equals(((Event) another).id);
-    }
-
-    public Uri getWebUri() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("http://www.eventshigh.com/detail/");
-        sb.append(Utils.capitalize(city.toString())).append("/");
-        sb.append(id);
-        String [] titleKgrams = title.replaceAll("\\p{C}", "").split("[\\p{Punct}\\s]+");
-        for (int i = 0; i < 5 && i < titleKgrams.length; i++) {
-            sb.append("-");
-            sb.append(titleKgrams[i]);
-        }
-        return Uri.parse(sb.toString());
     }
 
     /**********************************

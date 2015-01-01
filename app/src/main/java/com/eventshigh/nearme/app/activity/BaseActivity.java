@@ -15,7 +15,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
-import android.util.Pair;
 import android.view.View;
 import android.widget.Toast;
 
@@ -30,9 +29,6 @@ import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.flurry.android.FlurryAgent;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,8 +45,7 @@ public abstract class BaseActivity extends FragmentActivity {
     private static final String LOG_TAG = BaseActivity.class.getSimpleName();
 
     // Google Analytics
-    protected GoogleAnalytics googleAnalytics;
-    protected Tracker tracker;
+    protected GAHelper gaHelper;
     protected Preferences pref;
     protected GcmRegistration gcmRegistration;
 
@@ -80,13 +75,7 @@ public abstract class BaseActivity extends FragmentActivity {
         }
 
         // Setup Google Analytics.
-        if (googleAnalytics == null) {
-            Pair<GoogleAnalytics, Tracker> trackerInfo =
-                    GAHelper.getTracker(this);
-
-            googleAnalytics = trackerInfo.first;
-            tracker = trackerInfo.second;
-        }
+        gaHelper = new GAHelper(this);
 
         if (!BuildConfig.DEBUG) {
             // Setup Flurry.
@@ -104,7 +93,7 @@ public abstract class BaseActivity extends FragmentActivity {
         super.onStart();
 
         // Google Analytics reporting.
-        googleAnalytics.reportActivityStart(this);
+        gaHelper.reportActivityStart(this);
 
         // Flurry, Amplitude reporting
         if (!BuildConfig.DEBUG) {
@@ -162,7 +151,7 @@ public abstract class BaseActivity extends FragmentActivity {
         super.onStop();
 
         // Google Analytics reporting.
-        googleAnalytics.reportActivityStop(this);
+        gaHelper.reportActivityStop(this);
 
         // Flurry, Amplitude reporting
         if (!BuildConfig.DEBUG) {
@@ -190,13 +179,8 @@ public abstract class BaseActivity extends FragmentActivity {
     }
 
     public void reportActionToAnalytics(String actionName, String label, long value) {
-        if (tracker != null) {
-            tracker.send(new HitBuilders.EventBuilder()
-                    .setCategory(getClass().getSimpleName())
-                    .setAction(actionName)
-                    .setLabel(label)
-                    .setValue(value)
-                    .build());
+        if (gaHelper != null) {
+            gaHelper.reportActionToAnalytics(getClass().getSimpleName(), actionName, label, value);
 
             if (!BuildConfig.DEBUG) {
                 FlurryAgent.logEvent(actionName);
@@ -239,7 +223,7 @@ public abstract class BaseActivity extends FragmentActivity {
                             "com.eventshigh.nearme.app.fileprovider", file));
             sendIntent.putExtra(Intent.EXTRA_TITLE, event.title);
             sendIntent.putExtra(Intent.EXTRA_TEXT,
-                    event.getEventDetailsURI() + " (shared via EventsHigh)");
+                    event.getEventDetailsURI() + "?src=ehm (shared via EventsHigh)");
             sendIntent.setType("image/jpeg");
             sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(sendIntent);
@@ -285,7 +269,7 @@ public abstract class BaseActivity extends FragmentActivity {
                 .putExtra(Events.TITLE, event.title)
                 .putExtra(Events.EVENT_LOCATION, venue)
                 .putExtra(Events.DESCRIPTION,
-                        event.getEventDetailsURI().toString() + "\n\n" + event.description);
+                        event.getEventDetailsURI().toString() + "?src=ehm \n\n" + event.description);
 
         long eventTime = date != null ? date.getTime() :
                 (event.eventTimings.length > 0 ? event.eventTimings[0] : 0);

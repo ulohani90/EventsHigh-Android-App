@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.StreamUtils;
 
 import org.json.JSONException;
@@ -57,7 +58,7 @@ public class SingleEventFetcherTask extends AsyncTask<Uri, Void, Event> {
         }
 
         String eventId = eventUriPathSegments.get(eventUriPathSegments.size() - 1).split("-", 2)[0];
-        String url = EventsFetcherTask.API_ENDPOINT_EVENT.replace("EVENT_ID", eventId);
+        String url = EventsHighEndpoints.getApiEndpointEventUber(eventId);
         try {
             JSONObject eventJSON = StreamUtils.fetchJSON(url);
             return Event.fromJSON(city, eventJSON);

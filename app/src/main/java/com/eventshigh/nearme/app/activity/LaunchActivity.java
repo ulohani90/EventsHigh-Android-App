@@ -14,10 +14,9 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.EventFetcherParam;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -34,7 +33,6 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
  * preference in future.
  */
 public class LaunchActivity extends Activity {
-    private static final String WEB_URI_BASE = "http://www.eventshigh.com/";
 
     // Web URI associated with this activity, it is used to
     // report the URI in as deep link to Google App Indexing.
@@ -56,7 +54,7 @@ public class LaunchActivity extends Activity {
         Class target = new Preferences(this).isMapsViewDefault() ?
                 MapsActivity.class : EventGridActivity.class;
         outIntent = new Intent(this, target);
-        webUri = Uri.parse(WEB_URI_BASE);
+        webUri = Uri.parse(EventsHighEndpoints.WEB_URI_BASE);
         title = "amazing events near you";
 
         // Process the incoming intent.
@@ -117,23 +115,23 @@ public class LaunchActivity extends Activity {
     private void processIntent(Intent inIntent) {
         EventFetcherParam param = null;
 
-        Tracker tracker = GAHelper.getTracker(this).second;
+        GAHelper gaHelper =  new GAHelper(this);
         if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
-            param = processSearchIntent(inIntent, tracker);
+            param = processSearchIntent(inIntent, gaHelper);
         } else if (Intent.ACTION_VIEW.equals(inIntent.getAction())) {
-            param = processViewIntent(inIntent, tracker);
+            param = processViewIntent(inIntent, gaHelper);
         }
 
         if (param != null) {
             outIntent.putExtra(LocationAwareEventActivity.EXTRA_EVENT_FETCHER_PARAM, param);
-            webUri = getWebUri(param);
+            webUri = EventsHighEndpoints.getWebUri(param);
             title = getTitle(param);
         }
     }
 
-    private static EventFetcherParam processSearchIntent(Intent inIntent, Tracker tracker) {
+    private static EventFetcherParam processSearchIntent(Intent inIntent, GAHelper gaHelper) {
         String query = inIntent.getStringExtra(SearchManager.QUERY);
-        reportToAnalytics(tracker, "search", query);
+        reportToAnalytics(gaHelper, "search", query);
 
         EventFetcherParam param = null;
         Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
@@ -150,21 +148,21 @@ public class LaunchActivity extends Activity {
         return param;
     }
 
-    private static EventFetcherParam processViewIntent(Intent inIntent, Tracker tracker) {
+    private static EventFetcherParam processViewIntent(Intent inIntent, GAHelper gaHelper) {
         Uri inUri = inIntent.getData();
 
         if (inUri.getPath().startsWith("/city")) {
-            return processCityViewIntent(inUri, tracker);
+            return processCityViewIntent(inUri, gaHelper);
         } else if (inUri.getPath().startsWith("/search")) {
-            return processSearchViewIntent(inUri, tracker);
+            return processSearchViewIntent(inUri, gaHelper);
         }
 
-        reportToAnalytics(tracker, "deepLink", "homepage");
+        reportToAnalytics(gaHelper, "deepLink", "homepage");
         return  null;
     }
 
-    private static @Nullable EventFetcherParam processCityViewIntent(Uri webUri, Tracker tracker) {
-        reportToAnalytics(tracker, "deepLink", "city");
+    private static @Nullable EventFetcherParam processCityViewIntent(Uri webUri, GAHelper gaHelper) {
+        reportToAnalytics(gaHelper, "deepLink", "city");
 
         try {
             City city = City.valueOf(webUri.getLastPathSegment().toUpperCase());
@@ -176,8 +174,8 @@ public class LaunchActivity extends Activity {
         return null;
     }
 
-    private static @Nullable EventFetcherParam processSearchViewIntent(Uri webUri, Tracker tracker) {
-        reportToAnalytics(tracker, "deepLink", "search");
+    private static @Nullable EventFetcherParam processSearchViewIntent(Uri webUri, GAHelper gaHelper) {
+        reportToAnalytics(gaHelper, "deepLink", "search");
 
         EventFetcherParam param = null;
         try {
@@ -208,27 +206,7 @@ public class LaunchActivity extends Activity {
             (param.city == null ? "near you" : "in " + param.city.toString().toLowerCase());
     }
 
-    private static void reportToAnalytics(Tracker tracker, String action, String label) {
-        tracker.send(new HitBuilders.EventBuilder()
-                .setCategory(LaunchActivity.class.getSimpleName())
-                .setAction(action)
-                .setLabel(label)
-                .build());
-    }
-
-    private static Uri getWebUri(EventFetcherParam param) {
-        StringBuilder sb = new StringBuilder(WEB_URI_BASE);
-        if (param.query.isEmpty()) {
-            if (param.city != null) {
-                sb.append("city/").append(param.city.toString().toLowerCase());
-            }
-            return Uri.parse(sb.toString());
-        }
-
-        Uri.Builder builder = Uri.parse(sb.append("search").toString()).buildUpon();
-        if (param.city != null) {
-            builder.appendQueryParameter("city", param.city.toString().toLowerCase());
-        }
-        return builder.appendQueryParameter("interest", param.query).build();
+    private static void reportToAnalytics(GAHelper gaHelper, String action, String label) {
+        gaHelper.reportActionToAnalytics(LaunchActivity.class.getSimpleName(), action, label, 1);
     }
 }

@@ -1,15 +1,21 @@
 package com.eventshigh.nearme.app.broadcast;
 
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.activity.LoginActivity;
+import com.eventshigh.nearme.app.activity.EventDetailActivity;
+import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.GAHelper;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 /**
@@ -40,7 +46,7 @@ public class GcmIntentService extends IntentService {
             if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 // This loop represents the service doing some work.
                 // Post notification of received message.
-                sendNotification("Received: " + extras.toString());
+                sendNotification(extras);
             }
         }
 
@@ -49,21 +55,53 @@ public class GcmIntentService extends IntentService {
     }
 
     // Put the message into a notification and post it.
-    private void sendNotification(String msg) {
+    private void sendNotification(Bundle msg) {
         NotificationManager mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, LoginActivity.class), 0);
+        String eventId = msg.getString("event_id");
+        String title = msg.getString("title");
+        String message = msg.getString("message");
+
+        GAHelper gaHelper = new GAHelper(this);
+        if (eventId == null || message == null || title == null) {
+            // Invalid notification. Ignore.
+            gaHelper.reportActionToAnalytics(
+                    getClass().getSimpleName(), "invalidNotification", "", 1);
+            Log.w(getClass().getSimpleName(),
+                    "Invalid notification: eventId: " + eventId +
+                    ", message: " + message +
+                    ", title: " + title);
+            return;
+        }
+
+        GcmRegistration gcmRegistration = new GcmRegistration(this);
+        City city = gcmRegistration.getLastCity();
+        if (city == null) {
+            // placeholder for city.
+            city = City.BANGALORE;
+        }
+
+        Intent intent = new Intent(this, EventDetailActivity.class);
+        intent.setAction(EventDetailActivity.NOTIFICATION_ACTION);
+        intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("GCM Notification")
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
-                        .setContentText(msg);
+                        .setContentTitle(title)
+                        .setContentText(message)
+                        .setAutoCancel(true)
+                        .setShowWhen(false)
+                        .setCategory(Notification.CATEGORY_RECOMMENDATION)
+                        .setPriority(NotificationCompat.PRIORITY_LOW)
+                        .setVisibility(Notification.VISIBILITY_PUBLIC)
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                        .setContentIntent(contentIntent);
 
-        mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        gaHelper.reportActionToAnalytics(
+                getClass().getSimpleName(), "notificationShown", eventId, 1);
     }
 }

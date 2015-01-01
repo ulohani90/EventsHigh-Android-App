@@ -17,6 +17,8 @@ import com.eventshigh.nearme.app.data.Event;
  * An activity representing a single Event detail screen.
  */
 public class EventDetailActivity extends BaseActivity {
+    public static final String NOTIFICATION_ACTION = "com.eventshigh.nearme.app.notification";
+
     private ActionBar actionBar;
 
     /**********************************
@@ -64,19 +66,29 @@ public class EventDetailActivity extends BaseActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         String action = intent.getAction();
+
+        boolean showEvent = false;
         if (Intent.ACTION_VIEW.equals(action)) {
             reportActionToAnalytics("deepLink", "detail");
+            showEvent = true;
+        }
+
+        if (NOTIFICATION_ACTION.equals(action)) {
+            reportActionToAnalytics("openNotification");
+            showEvent = true;
+        }
+
+        if (showEvent) {
             new SingleEventFetcherTask(this, new OnEventFetchHandler() {
                 @Override
                 public void onEventFetch(Event event) {
                     showEventFragment(event);
                 }
             }).execute(intent.getData());
-            return;
+        } else {
+            Toast.makeText(this, "No event to show!", Toast.LENGTH_SHORT).show();
+            finish();
         }
-
-        Toast.makeText(this, "No event to show!", Toast.LENGTH_SHORT).show();
-        finish();
     }
 
     private void showEventFragment(Event event) {

@@ -48,6 +48,15 @@ public class GcmRegistration {
         }
     }
 
+    public @Nullable City getLastCity() {
+        City city = null;
+        String cityName = gcmRegistrationInfo.getString(PREF_LAST_CITY, null);
+        if (cityName != null) {
+            city = City.valueOf(cityName);
+        }
+        return city;
+    }
+
     private class CityRegistar extends AsyncTask<City, Void, Void> {
         @Override
         protected Void doInBackground(City... params) {
