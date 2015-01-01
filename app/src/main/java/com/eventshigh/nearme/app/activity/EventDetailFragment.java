@@ -297,8 +297,6 @@ public class EventDetailFragment extends Fragment {
         private final TextView fromView;
         private final LinearLayout organizerNameRow;
         private final TextView organizerNameView;
-        private final LinearLayout organizerAddressRow;
-        private final TextView organizerAddressView;
         private final LinearLayout organizerPhoneRow;
         private final TextView organizerPhoneView;
         private final LinearLayout organizerWebsiteRow;
@@ -318,8 +316,6 @@ public class EventDetailFragment extends Fragment {
             fromView = (TextView) rootView.findViewById(R.id.event_from);
             organizerNameRow = (LinearLayout) rootView.findViewById(R.id.orgnizer_name_row);
             organizerNameView = (TextView) rootView.findViewById(R.id.orgnizer_name);
-            organizerAddressRow = (LinearLayout) rootView.findViewById(R.id.orgnizer_address_row);
-            organizerAddressView = (TextView) rootView.findViewById(R.id.orgnizer_address);
             organizerPhoneRow = (LinearLayout) rootView.findViewById(R.id.orgnizer_phone_row);
             organizerPhoneView = (TextView) rootView.findViewById(R.id.orgnizer_phone);
             organizerWebsiteRow = (LinearLayout) rootView.findViewById(R.id.orgnizer_website_row);
@@ -353,7 +349,7 @@ public class EventDetailFragment extends Fragment {
         mEventCard.recommendedImageView.setVisibility(mEvent.ehRecommended ? View.VISIBLE : View.GONE);
 
         // Set Venue.
-        mEventCard.venueView.setText(mEvent.venue != null ? mEvent.venue : mEvent.address);
+        mEventCard.venueView.setText(mEvent.address == null ? mEvent.venue : mEvent.address);
         OnClickListener showDirections = new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -430,18 +426,6 @@ public class EventDetailFragment extends Fragment {
             mEventCard.organizerNameRow.setVisibility(View.GONE);
         } else {
             mEventCard.organizerNameView.setText(mEvent.organizerName);
-        }
-
-        if (mEvent.address == null) {
-            mEventCard.organizerAddressRow.setVisibility(View.GONE);
-        } else {
-            mEventCard.organizerAddressView.setText(mEvent.address);
-            mEventCard.organizerAddressView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.showDirections(mEvent);
-                }
-            });
         }
 
         if (mEvent.organizerPhone == null) {

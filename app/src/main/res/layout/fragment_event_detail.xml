@@ -187,40 +187,6 @@
             android:text="@string/ui_organizer"
         />
         <LinearLayout
-            android:id="@+id/orgnizer_address_row"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/event_detail_gray"
-            android:paddingTop="@dimen/abc_control_padding_material"
-            android:paddingBottom="@dimen/abc_control_padding_material"
-            android:orientation="horizontal"
-        >
-            <TextView
-                style="@style/EventDetailText"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:text="@string/ui_address"
-            />
-            <TextView
-                style="@style/EventDetailText"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:text=":"
-                tools:ignore="HardcodedText"
-            />
-            <TextView
-                android:id="@+id/orgnizer_address"
-                style="@style/EventDetailText"
-                android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                tools:text="Near Hoodi Circle, Whitefield Road, Bangalore"
-            />
-        </LinearLayout>
-        <LinearLayout
             android:id="@+id/orgnizer_name_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
