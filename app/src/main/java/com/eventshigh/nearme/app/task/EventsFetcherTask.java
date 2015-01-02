@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.task;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
@@ -8,6 +7,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventFetcherParam;
@@ -16,9 +16,11 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.StreamUtils;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 
 /**
  * An {@link AsyncTask} which is used to fetch the Events. Once events are available,
@@ -34,13 +36,13 @@ public class EventsFetcherTask extends AsyncTask<EventFetcherParam, Void, Events
         public void OnEventsAvailable(EventFetcherParam param, EventsCollection events);
     }
 
-    private final Activity activity;
+    private final BaseActivity activity;
     private final boolean shouldOverrideCache;
     private final EventsFetcherCallBack callback;
     private ProgressDialog pDialog;
     private EventFetcherParam param;
 
-    public EventsFetcherTask(Activity activity, boolean shouldOverrideCache,
+    public EventsFetcherTask(BaseActivity activity, boolean shouldOverrideCache,
                              EventsFetcherCallBack callback) {
         this.activity = activity;
         this.shouldOverrideCache = shouldOverrideCache;
@@ -90,7 +92,10 @@ public class EventsFetcherTask extends AsyncTask<EventFetcherParam, Void, Events
         }
 
         try {
-            return Event.parseUpcomingEvents(param.city, StreamUtils.fetchJSON(url));
+            Date startedAt = new Date();
+            JSONObject eventsJSON = StreamUtils.fetchJSON(url);
+            activity.reportActionToAnalytics("fetchTime", "ms", new Date().getTime() - startedAt.getTime());
+            return Event.parseUpcomingEvents(param.city, eventsJSON);
         } catch (JSONException|IOException e) {
             Log.e(LOG_TAG, "Failed to fetch events!", e);
             return null;

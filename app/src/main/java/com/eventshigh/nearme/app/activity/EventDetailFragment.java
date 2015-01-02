@@ -295,6 +295,7 @@ public class EventDetailFragment extends Fragment {
         private final LinearLayout tagsView;
         private final TextView descriptionView;
         private final TextView fromView;
+        private final TextView organizerHeader;
         private final LinearLayout organizerNameRow;
         private final TextView organizerNameView;
         private final LinearLayout organizerPhoneRow;
@@ -314,12 +315,13 @@ public class EventDetailFragment extends Fragment {
             tagsView = (LinearLayout) rootView.findViewById(R.id.event_tags);
             descriptionView = (TextView) rootView.findViewById(R.id.event_description);
             fromView = (TextView) rootView.findViewById(R.id.event_from);
-            organizerNameRow = (LinearLayout) rootView.findViewById(R.id.orgnizer_name_row);
-            organizerNameView = (TextView) rootView.findViewById(R.id.orgnizer_name);
-            organizerPhoneRow = (LinearLayout) rootView.findViewById(R.id.orgnizer_phone_row);
-            organizerPhoneView = (TextView) rootView.findViewById(R.id.orgnizer_phone);
-            organizerWebsiteRow = (LinearLayout) rootView.findViewById(R.id.orgnizer_website_row);
-            organizerWebsiteView = (TextView) rootView.findViewById(R.id.orgnizer_website);
+            organizerHeader = (TextView) rootView.findViewById(R.id.organizer_header);
+            organizerNameRow = (LinearLayout) rootView.findViewById(R.id.organizer_name_row);
+            organizerNameView = (TextView) rootView.findViewById(R.id.organizer_name);
+            organizerPhoneRow = (LinearLayout) rootView.findViewById(R.id.organizer_phone_row);
+            organizerPhoneView = (TextView) rootView.findViewById(R.id.organizer_phone);
+            organizerWebsiteRow = (LinearLayout) rootView.findViewById(R.id.organizer_website_row);
+            organizerWebsiteView = (TextView) rootView.findViewById(R.id.organizer_website);
         }
     }
 
@@ -422,15 +424,18 @@ public class EventDetailFragment extends Fragment {
         }
 
         // Organizer Info.
+        boolean organizerInfoShown = false;
         if (mEvent.organizerName == null) {
             mEventCard.organizerNameRow.setVisibility(View.GONE);
         } else {
+            organizerInfoShown = true;
             mEventCard.organizerNameView.setText(mEvent.organizerName);
         }
 
         if (mEvent.organizerPhone == null) {
             mEventCard.organizerPhoneRow.setVisibility(View.GONE);
         } else {
+            organizerInfoShown = true;
             mEventCard.organizerPhoneView.setText(mEvent.organizerPhone);
             mEventCard.organizerPhoneView.setOnClickListener(new OnClickListener() {
                 @Override
@@ -443,6 +448,7 @@ public class EventDetailFragment extends Fragment {
         if (mEvent.organizerWebsite == null) {
             mEventCard.organizerWebsiteRow.setVisibility(View.GONE);
         } else {
+            organizerInfoShown = true;
             mEventCard.organizerWebsiteView.setText(mEvent.organizerWebsite);
             mEventCard.organizerWebsiteView.setOnClickListener(new OnClickListener() {
                 @Override
@@ -450,6 +456,10 @@ public class EventDetailFragment extends Fragment {
                     openOrganizerWebsite();
                 }
             });
+        }
+
+        if (!organizerInfoShown) {
+            mEventCard.organizerHeader.setVisibility(View.GONE);
         }
 
         // Show tags.

@@ -180,6 +180,7 @@
 
         <!-- Organizer Info -->
         <TextView
+            android:id="@+id/organizer_header"
             style="@style/EventDetailHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -187,7 +188,7 @@
             android:text="@string/ui_organizer"
         />
         <LinearLayout
-            android:id="@+id/orgnizer_name_row"
+            android:id="@+id/organizer_name_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/event_detail_gray"
@@ -210,7 +211,7 @@
                 tools:ignore="HardcodedText"
             />
             <TextView
-                android:id="@+id/orgnizer_name"
+                android:id="@+id/organizer_name"
                 style="@style/EventDetailText"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
@@ -219,7 +220,7 @@
             />
         </LinearLayout>
         <LinearLayout
-            android:id="@+id/orgnizer_phone_row"
+            android:id="@+id/organizer_phone_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/event_detail_gray"
@@ -242,7 +243,7 @@
                 tools:ignore="HardcodedText"
             />
             <TextView
-                android:id="@+id/orgnizer_phone"
+                android:id="@+id/organizer_phone"
                 style="@style/EventDetailText"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
@@ -253,7 +254,7 @@
             />
         </LinearLayout>
         <LinearLayout
-            android:id="@+id/orgnizer_website_row"
+            android:id="@+id/organizer_website_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/event_detail_gray"
@@ -276,7 +277,7 @@
                 tools:ignore="HardcodedText"
             />
             <TextView
-                android:id="@+id/orgnizer_website"
+                android:id="@+id/organizer_website"
                 style="@style/EventDetailText"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
