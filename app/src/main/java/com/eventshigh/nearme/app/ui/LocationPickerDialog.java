@@ -4,12 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.location.Address;
-import android.location.Geocoder;
-import android.os.AsyncTask;
-import android.support.annotation.Nullable;
-import android.util.Log;
-import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,13 +14,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.task.LatLngFetcher;
 import com.google.android.gms.maps.model.LatLng;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Shows a dialog box with text box to let user enter location.
@@ -106,42 +97,4 @@ public class LocationPickerDialog {
         }
     }
 
-    public static class LatLngFetcher extends AsyncTask<String, Void, Pair<String, LatLng>> {
-
-        private final Context context;
-        private final OnLocationSelection onLocationSelection;
-
-        private LatLngFetcher(Context context, OnLocationSelection onLocationSelection) {
-            this.context = context;
-            this.onLocationSelection = onLocationSelection;
-        }
-
-        @Override
-        protected Pair<String, LatLng> doInBackground(String... params) {
-            try {
-                Geocoder geocoder = new Geocoder(context);
-                List<Address> addresses = geocoder.getFromLocationName(params[0], 1);
-                if (addresses.isEmpty() ||
-                        !addresses.get(0).hasLatitude() ||
-                        !addresses.get(0).hasLatitude()) {
-                    throw new IOException("Geocoding failed, no address returned.");
-                }
-
-                return Pair.create(params[0],
-                        new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude()));
-            } catch (IOException e) {
-                Log.w(LOG_TAG, "failed to fetch the address", e);
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(@Nullable Pair<String, LatLng> locality) {
-            if (locality != null) {
-                onLocationSelection.onLocationSelection(locality.first, locality.second);
-            } else {
-                Toast.makeText(context, R.string.failed_locality, Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 }

@@ -81,7 +81,6 @@ public class EventsFetcherTask extends AsyncTask<EventFetcherParam, Void, Events
                 return null;
             }
         }
-        Log.d(LOG_TAG, "fetching: " + url);
 
         try {
             return Event.parseUpcomingEvents(param.city, StreamUtils.fetchJSON(url));

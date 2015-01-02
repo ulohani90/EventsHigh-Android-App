@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +18,8 @@ import java.util.ArrayList;
  * Helper methods for reading stream or asserts file.
  */
 public class StreamUtils {
+    private static final String LOG_TAG = StreamUtils.class.getSimpleName();
+
     public static String[] readAssetFile(Context context, String filename) throws IOException {
         InputStream is = context.getAssets().open(filename);
         try {
@@ -37,6 +40,8 @@ public class StreamUtils {
     }
 
     public static JSONObject fetchJSON(String url) throws IOException, JSONException {
+        Log.d(LOG_TAG, "Fetching: " + url);
+
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
         urlConnection.setRequestMethod("GET");
         urlConnection.connect();
@@ -45,6 +50,7 @@ public class StreamUtils {
             for (String jsonStr : readStream(urlConnection.getInputStream())) {
                 jsonBuffer.append(jsonStr);
             }
+            Log.d(LOG_TAG, "Fetching completed: " + url);
 
             return new JSONObject(jsonBuffer.toString());
         } finally {
