@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -13,9 +14,9 @@ import android.widget.SearchView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.utils.EventComparator;
-import com.eventshigh.nearme.app.ui.EventListAdapter;
 import com.eventshigh.nearme.app.task.UpdateLocationTask;
+import com.eventshigh.nearme.app.ui.EventListAdapter;
+import com.eventshigh.nearme.app.utils.EventComparator;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
@@ -72,6 +73,16 @@ public class EventGridActivity extends LocationAwareEventActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_change_location) {
+            askUserForLocation(getActionBar());
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     // ***********************
     // Helper Methods

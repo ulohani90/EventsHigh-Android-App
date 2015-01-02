@@ -48,6 +48,7 @@ public abstract class BaseActivity extends FragmentActivity {
     protected GAHelper gaHelper;
     protected Preferences pref;
     protected GcmRegistration gcmRegistration;
+    protected boolean isDebug;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +77,7 @@ public abstract class BaseActivity extends FragmentActivity {
 
         // Setup Google Analytics.
         gaHelper = new GAHelper(this);
+        isDebug = gaHelper.getAppOptOut();
 
         if (!BuildConfig.DEBUG) {
             // Setup Flurry.

@@ -36,6 +36,10 @@ public class GAHelper {
         googleAnalytics.setAppOptOut(optOut);
     }
 
+    public boolean getAppOptOut() {
+        return googleAnalytics.getAppOptOut();
+    }
+
     public void reportActionToAnalytics(String category, String actionName, String label, long value) {
         tracker.send(new HitBuilders.EventBuilder()
                 .setCategory(category)
