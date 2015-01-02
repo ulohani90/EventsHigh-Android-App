@@ -25,4 +25,13 @@
           android:showAsAction="ifRoom"
           tools:ignore="AppCompatResource"
     />
+
+    <item android:id="@+id/debug_cache_override"
+          android:title="Override Cache"
+          android:icon="@android:drawable/ic_menu_preferences"
+          android:orderInCategory="40"
+          android:checkable="true"
+          android:visible="false"
+          tools:ignore="HardcodedText"
+    />
 </menu>

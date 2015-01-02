@@ -87,6 +87,8 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     private OnBoardingHelper onBoardingHelper;
     // when was this activity last started on.
     private long lastStartedAt;
+    // override the cache?
+    private boolean shouldOverrideCache = false;
 
 
     // ***********************
@@ -222,6 +224,12 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             return true;
         }
 
+        if (id == R.id.debug_cache_override) {
+            shouldOverrideCache = !item.isChecked();
+            item.setChecked(shouldOverrideCache);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -266,7 +274,8 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
     private void fetchNewListing() {
         reportActionToAnalytics("fetchNewListing");
-        fetcher = new EventsFetcherTask(LocationAwareEventActivity.this, mEventsFetcherCallBack);
+        fetcher = new EventsFetcherTask(
+                LocationAwareEventActivity.this, shouldOverrideCache, mEventsFetcherCallBack);
         fetcher.execute(lastEventFetcherParam);
     }
 

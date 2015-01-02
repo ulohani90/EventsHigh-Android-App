@@ -70,6 +70,11 @@ public class EventGridActivity extends LocationAwareEventActivity {
             menu.findItem(R.id.action_search).setVisible(false);
         }
 
+        // Debug Views.
+        if (isDebug) {
+            menu.findItem(R.id.debug_cache_override).setVisible(true);
+        }
+
         return true;
     }
 

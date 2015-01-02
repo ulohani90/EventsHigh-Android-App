@@ -35,12 +35,15 @@ public class EventsFetcherTask extends AsyncTask<EventFetcherParam, Void, Events
     }
 
     private final Activity activity;
+    private final boolean shouldOverrideCache;
     private final EventsFetcherCallBack callback;
     private ProgressDialog pDialog;
     private EventFetcherParam param;
 
-    public EventsFetcherTask(Activity activity, EventsFetcherCallBack callback) {
+    public EventsFetcherTask(Activity activity, boolean shouldOverrideCache,
+                             EventsFetcherCallBack callback) {
         this.activity = activity;
+        this.shouldOverrideCache = shouldOverrideCache;
         this.callback = callback;
     }
 
@@ -80,6 +83,10 @@ public class EventsFetcherTask extends AsyncTask<EventFetcherParam, Void, Events
                 Log.w(LOG_TAG, "Invalid Query", e);
                 return null;
             }
+        }
+
+        if (shouldOverrideCache) {
+            url = url + "?cmode=bypass";
         }
 
         try {
