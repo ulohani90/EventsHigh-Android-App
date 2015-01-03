@@ -16,6 +16,7 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.task.DownloadImageTask;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.Utils;
 
 /**
  * An {@link android.widget.ListAdapter} which can be used to populate the
@@ -83,7 +84,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
             eventCard.venueView.setVisibility(View.INVISIBLE);
         } else {
             eventCard.venueView.setVisibility(View.VISIBLE);
-            eventCard.venueView.setText(event.venue);
+            eventCard.venueView.setText(Utils.capitalize(event.venue));
         }
 
         // Check if its recommended event.

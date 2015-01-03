@@ -224,14 +224,16 @@ public class Event implements Parcelable {
             lon = localityJson.optDouble("lon", 0);
         }
 
-        String venue = null;
         String address = null;
         JSONObject venueJson = eventJson.optJSONObject("venue_info");
         if (venueJson != null) {
-            venue =  checkIfUnknown(venueJson.optString("name"));
             address = venueJson.optString("address");
         }
 
+        String venue = null;
+        if (mashup != null) {
+            venue = checkIfUnknown(mashup.optString("venue_name"));
+        }
         if (venue == null && localityJson != null) {
             venue = localityJson.optString("locality");
         }
