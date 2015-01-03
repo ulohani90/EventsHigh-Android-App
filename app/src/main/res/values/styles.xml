@@ -25,6 +25,16 @@
         <item name="android:typeface">sans</item>
     </style>
 
+    <style name="EventDetailButton" parent="EventDetailText">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:clickable">true</item>
+        <item name="android:padding">@dimen/abc_control_padding_material</item>
+        <item name="android:background">@drawable/selector_button</item>
+        <item name="android:typeface">normal</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
+
     <!-- Theme used for Events Details Action Icons -->
     <style name="EventActionMenuItem" parent="android:style/TextAppearance.Widget.IconMenu.Item">
         <item name="android:layout_width">wrap_content</item>

@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/selector_button"
     android:gravity="center_vertical|center_horizontal"
-    android:padding="@dimen/abc_control_padding_material"
+    android:padding="@dimen/abc_dropdownitem_text_padding_left"
     android:clickable="true"
     android:descendantFocusability="blocksDescendants"
 >

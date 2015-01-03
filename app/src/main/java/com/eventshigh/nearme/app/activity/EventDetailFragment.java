@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -87,8 +88,6 @@ public class EventDetailFragment extends Fragment {
     private int gaOptOutCounter = 0;
     // GoogleApiClient to report the page view.
     private GoogleApiClient client;
-    // Number of MenuItems as actions.
-    int numMenuItemsAsAction = 0;
 
     public EventDetailFragment() {
         // Required empty public constructor
@@ -123,63 +122,19 @@ public class EventDetailFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
 
         // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.activity_detail, menu);
+        inflater.inflate(R.menu.fragment_detail, menu);
 
-        // Set the action handlers.
-        initMenuItem(menu.findItem(R.id.action_book),
-                mEvent.bookingUrl != null,
-                R.layout.action_book,
-                new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        gotoBookingSite();
-                    }
-                });
-
-        initMenuItem(menu.findItem(R.id.action_call),
-                mEvent.organizerPhone != null,
-                R.layout.action_call,
-                new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        call();
-                    }
-                });
-
-        initMenuItem(menu.findItem(R.id.action_save),
-                mEvent.eventTimings.length > 0,
-                R.layout.action_save,
-                new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        activity.addToCalendar(mEvent, null);
-                    }
-                });
-
-        initMenuItem(menu.findItem(R.id.action_share),
-                true,
-                R.layout.action_share,
-                new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        shareEvent();
-                    }
-                });
+        menu.findItem(R.id.action_share).getActionView().setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shareEvent();
+            }
+        });
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_book) {
-            gotoBookingSite();
-            return true;
-        }
-
-        if (id == R.id.action_save) {
-            activity.addToCalendar(mEvent, null);
-            return true;
-        }
-
         if (id == R.id.action_share) {
             shareEvent();
             return true;
@@ -265,10 +220,10 @@ public class EventDetailFragment extends Fragment {
     }
 
     private void shareEvent() {
-        activity.shareEvent(mEventCard.rootView, mEvent);
+        activity.shareEvent(mEventCard.shareView, mEvent);
     }
 
-    private void gotoBookingSite() {
+    private void openBookingSite() {
         activity.reportActionToAnalytics("bookTicket");
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mEvent.bookingUrl));
         try {
@@ -285,14 +240,21 @@ public class EventDetailFragment extends Fragment {
 
     private static class EventCard {
         private final View rootView;
+        private final View shareView;
         private final ImageView recommendedImageView;
         private final ImageView bgView;
         private final TextView titleView;
         private final LinearLayout timeView;
         private final TextView numPeopleInterestedView;
         private final TextView venueView;
+        private final TextView addressView;
+        private final FrameLayout bookView;
+        private final FrameLayout callView;
+        private final FrameLayout saveView;
         private final TextView directionView;
+        private final TextView tagsHeaderView;
         private final LinearLayout tagsView;
+        private final View tagsSeparatorView;
         private final TextView descriptionView;
         private final TextView fromView;
         private final TextView organizerHeader;
@@ -305,14 +267,21 @@ public class EventDetailFragment extends Fragment {
 
         private EventCard(View rootView) {
             this.rootView = rootView;
+            shareView = rootView.findViewById(R.id.share_view);
             recommendedImageView = (ImageView) rootView.findViewById(R.id.eh_recommend_banner);
             bgView = (ImageView) rootView.findViewById(R.id.event_bg);
             titleView = (TextView) rootView.findViewById(R.id.event_title);
             timeView = (LinearLayout) rootView.findViewById(R.id.event_time);
             numPeopleInterestedView = (TextView) rootView.findViewById(R.id.num_people_interested);
             venueView = (TextView) rootView.findViewById(R.id.event_venue);
+            addressView = (TextView) rootView.findViewById(R.id.event_address);
+            bookView = (FrameLayout) rootView.findViewById(R.id.book_ticket);
+            callView = (FrameLayout) rootView.findViewById(R.id.call);
+            saveView = (FrameLayout) rootView.findViewById(R.id.save);
             directionView = (TextView) rootView.findViewById(R.id.show_directions);
+            tagsHeaderView = (TextView) rootView.findViewById(R.id.event_tags_header);
             tagsView = (LinearLayout) rootView.findViewById(R.id.event_tags);
+            tagsSeparatorView = rootView.findViewById(R.id.event_tags_separator);
             descriptionView = (TextView) rootView.findViewById(R.id.event_description);
             fromView = (TextView) rootView.findViewById(R.id.event_from);
             organizerHeader = (TextView) rootView.findViewById(R.id.organizer_header);
@@ -350,35 +319,6 @@ public class EventDetailFragment extends Fragment {
         // Set EH recommendation banner
         mEventCard.recommendedImageView.setVisibility(mEvent.ehRecommended ? View.VISIBLE : View.GONE);
 
-        // Set Venue.
-        mEventCard.venueView.setText(mEvent.address == null ? mEvent.venue : mEvent.address);
-        OnClickListener showDirections = new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.showDirections(mEvent);
-            }
-        };
-        mEventCard.venueView.setOnClickListener(showDirections);
-        mEventCard.directionView.setOnClickListener(showDirections);
-
-        // Set time.
-        if (mEvent.eventTimings.length == 0) {
-            mEventCard.timeView.setVisibility(View.GONE);
-        } else {
-            for (long time : mEvent.eventTimings) {
-                final Date date = new Date(time);
-                LinearLayout daySelectorItem = DaySelector.getDaySelectorItem(
-                        activity, mEventCard.timeView, date, TimeZone.getTimeZone(mEvent.city.timeZone));
-                mEventCard.timeView.addView(daySelectorItem, getLayoutParam());
-                daySelectorItem.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        activity.addToCalendar(mEvent, date);
-                    }
-                });
-            }
-        }
-
         // Set Num people Interested
         if (mEvent.numPeopleInterested <= 0) {
             mEventCard.numPeopleInterestedView.setVisibility(View.GONE);
@@ -397,6 +337,69 @@ public class EventDetailFragment extends Fragment {
                     }
                 }
             });
+        }
+
+        // Set Venue and address.
+        if (mEvent.venue == null) {
+            mEventCard.venueView.setVisibility(View.GONE);
+        } else {
+            mEventCard.venueView.setText(Utils.capitalize(mEvent.venue));
+        }
+        mEventCard.addressView.setText(
+                mEvent.address == null ? Utils.capitalize(mEvent.city.toString()) : mEvent.address);
+        mEventCard.directionView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.showDirections(mEvent);
+            }
+        });
+
+        // Set action buttons.
+        if (mEvent.bookingUrl == null) {
+            mEventCard.bookView.setVisibility(View.GONE);
+        } else {
+            mEventCard.bookView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openBookingSite();
+                }
+            });
+        }
+
+        if (mEvent.organizerPhone == null) {
+            mEventCard.callView.setVisibility(View.GONE);
+        } else {
+            mEventCard.callView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    call();
+                }
+            });
+        }
+
+        // Set time.
+        if (mEvent.eventTimings.length == 0) {
+            mEventCard.timeView.setVisibility(View.GONE);
+            mEventCard.saveView.setVisibility(View.GONE);
+        } else {
+            mEventCard.saveView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.addToCalendar(mEvent, null);
+                }
+            });
+            for (long time : mEvent.eventTimings) {
+                final Date date = new Date(time);
+                LinearLayout daySelectorItem = DaySelector.getDaySelectorItem(
+                        activity, mEventCard.timeView, date, TimeZone.getTimeZone(mEvent.city.timeZone));
+                mEventCard.timeView.addView(daySelectorItem, getLayoutParam());
+                daySelectorItem.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        activity.addToCalendar(mEvent, date);
+                    }
+                });
+            }
         }
 
         // Set description.
@@ -463,7 +466,12 @@ public class EventDetailFragment extends Fragment {
         }
 
         // Show tags.
-        showTags();
+        if (mEvent.getAllTags().length > 0) {
+            showTags();
+        } else {
+            mEventCard.tagsSeparatorView.setVisibility(View.GONE);
+            mEventCard.tagsHeaderView.setVisibility(View.GONE);
+        }
     }
 
     private void showTags() {
@@ -516,20 +524,5 @@ public class EventDetailFragment extends Fragment {
                 TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
         layoutParams.setMargins(0, 0 , margin, 0);
         return layoutParams;
-    }
-
-    private void initMenuItem(MenuItem menuItem, boolean visibility, int actionView,
-            OnClickListener onClickListener) {
-        if (!visibility) {
-            menuItem.setVisible(false);
-            return;
-        }
-
-        if (numMenuItemsAsAction < 2) {
-            menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-            menuItem.setActionView(actionView);
-            menuItem.getActionView().setOnClickListener(onClickListener);
-            numMenuItemsAsAction ++;
-        }
     }
 }

@@ -225,7 +225,8 @@ public abstract class BaseActivity extends FragmentActivity {
                             "com.eventshigh.nearme.app.fileprovider", file));
             sendIntent.putExtra(Intent.EXTRA_TITLE, event.title);
             sendIntent.putExtra(Intent.EXTRA_TEXT,
-                    event.getEventDetailsURI() + "?src=ehm (shared via EventsHigh)");
+                    String.format(getResources().getString(R.string.share_event_text),
+                            event.getEventDetailsURI()));
             sendIntent.setType("image/jpeg");
             sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(sendIntent);
