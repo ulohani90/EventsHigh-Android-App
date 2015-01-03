@@ -8,6 +8,7 @@
     <color name="event_detail_gray">#fff5f5f5</color>
 
     <color name="event_card_text_bg">#99000000</color>
+    <color name="event_tag_bg">#444444</color>
 
     <color name="highlight_color">#ff35b5e5</color>
 </resources>

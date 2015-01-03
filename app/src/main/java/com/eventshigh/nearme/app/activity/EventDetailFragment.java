@@ -502,10 +502,16 @@ public class EventDetailFragment extends Fragment {
         }, 100);
     }
 
-    private TextView addTag(LinearLayout ll, String tag) {
+    private TextView addTag(LinearLayout ll, final String tag) {
         activity.getLayoutInflater().inflate(R.layout.event_tag, ll);
         TextView tagView = (TextView) ll.getChildAt(ll.getChildCount() - 1);
         tagView.setText(tag);
+        tagView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.showSearchView(tag);
+            }
+        });
         return  tagView;
     }
 

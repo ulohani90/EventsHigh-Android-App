@@ -8,6 +8,6 @@
     android:layout_marginRight="@dimen/abc_dropdownitem_text_padding_left"
     android:layout_marginEnd="@dimen/abc_dropdownitem_text_padding_left"
     android:layout_marginTop="@dimen/abc_control_padding_material"
-    android:background="#444444"
+    android:background="@drawable/selector_event_tag"
     tools:text="Comedy"
 />

@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.AlertDialog;
+import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -189,6 +190,14 @@ public abstract class BaseActivity extends FragmentActivity {
                 Amplitude.logEvent(actionName);
             }
         }
+    }
+
+    public void showSearchView(String query) {
+        reportActionToAnalytics("showSearch");
+        Intent searchIntent = new Intent(this, LaunchActivity.class);
+        searchIntent.setAction(Intent.ACTION_SEARCH);
+        searchIntent.putExtra(SearchManager.QUERY, query);
+        startActivity(searchIntent);
     }
 
     /**

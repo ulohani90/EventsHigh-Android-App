@@ -58,7 +58,7 @@
     </style>
 
     <style name="EventTagText" parent="EventCardText">
-        <item name="android:background">@drawable/rounded_bg</item>
+        <item name="android:background">@drawable/selector_event_tag_rounded</item>
         <item name="android:paddingLeft">@dimen/abc_control_padding_material</item>
         <item name="android:paddingRight">@dimen/abc_control_padding_material</item>
     </style>

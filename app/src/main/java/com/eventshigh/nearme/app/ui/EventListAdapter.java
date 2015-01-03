@@ -75,9 +75,9 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         }
 
         // Show tagsWhiteList.
-        showTag(eventCard.tag0View, event, 0);
-        showTag(eventCard.tag1View, event, 1);
-        showTag(eventCard.tag2View, event, 2);
+        showTag(eventCard.tag0View, event, 0, activity);
+        showTag(eventCard.tag1View, event, 1, activity);
+        showTag(eventCard.tag2View, event, 2, activity);
 
         // Set the venue.
         if (event.venue == null) {
@@ -159,13 +159,21 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         return Math.min(9 * cardWidth / 16, parentHeight);
     }
 
-    public static void showTag(TextView tagView, Event event, int tagNo) {
+    private static void showTag(TextView tagView, Event event, int tagNo,
+                                final BaseActivity activity) {
         if (tagNo >= event.tagsWhiteList.length) {
             tagView.setVisibility(View.GONE);
             return;
         }
 
+        final String tagText = event.tagsWhiteList[tagNo];
         tagView.setVisibility(View.VISIBLE);
-        tagView.setText(event.tagsWhiteList[tagNo]);
+        tagView.setText(tagText);
+        tagView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.showSearchView(tagText);
+            }
+        });
     }
 }
