@@ -49,6 +49,8 @@ dependencies {
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.github.amlcurran.showcaseview:library:5.0.0'
     compile 'com.amplitude:android-sdk:1.4.3'
+
+    compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
 //    compile('com.twitter.sdk.android:twitter:1.1.1@aar') {
 //        transitive = true;
 //    }

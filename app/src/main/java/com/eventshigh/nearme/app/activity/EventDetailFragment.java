@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -18,6 +19,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,8 +30,8 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.ui.DaySelector;
 import com.eventshigh.nearme.app.task.DownloadImageTask;
+import com.eventshigh.nearme.app.ui.DaySelector;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -37,6 +40,8 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
+
+import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
 /**
  * A {@link Fragment} which shows the event details.
@@ -301,7 +306,7 @@ public class EventDetailFragment extends Fragment {
         }
 
         // Set Image
-        DisplayMetrics metrics = new DisplayMetrics();
+        final DisplayMetrics metrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int maxHeight = (int) (0.4 * metrics.heightPixels);
         int infographResId = mEvent.category.getInfographResourceId();
@@ -311,6 +316,33 @@ public class EventDetailFragment extends Fragment {
         } else {
             DownloadImageTask.setImage(mEventCard.bgView, getResources(),
                     mEvent.imgUrl, infographResId, metrics.widthPixels, maxHeight);
+        }
+
+        if (mEvent.imgUrl != null) {
+            mEventCard.bgView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.reportActionToAnalytics("imagePreview");
+                    final Dialog nagDialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+                    nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    nagDialog.setCancelable(true);
+                    nagDialog.setContentView(R.layout.dialog_image_preview);
+
+                    ImageViewTouch preview = (ImageViewTouch) nagDialog.findViewById(R.id.image_preview);
+                    DownloadImageTask.setImageNoCache(preview, mEvent.imgUrl,
+                            metrics.widthPixels * 2, metrics.heightPixels * 2);
+
+                    Button btnClose = (Button) nagDialog.findViewById(R.id.btn_close);
+                    btnClose.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View arg0) {
+                            nagDialog.dismiss();
+                        }
+                    });
+
+                    nagDialog.show();
+                }
+            });
         }
 
         // Set title

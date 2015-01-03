@@ -75,6 +75,12 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
         task.execute();
     }
 
+    public static void setImageNoCache(ImageView imageView, String urlStr, int width, int height) {
+        DownloadImageTask task = new DownloadImageTask(imageView, null,
+                new ImageSrc(urlStr, -1), width, height);
+        task.execute();
+    }
+
     // Class used to store the image src. Image source can have URL from the web
     // as source and a placeholder image resource in case there is no URL or if
     // it is temporary unavailable.
@@ -226,8 +232,9 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 
     protected void onPostExecute(@Nullable Bitmap result) {
         ImageView imageView = imageViewReference.get();
+        DownloadImageTask task = getDownloadImageTask(imageView);
         if (isCancelled() || imageView == null || result == null ||
-                getDownloadImageTask(imageView) != this) {
+                (task != null && task != this)) {
             return;
         }
 
