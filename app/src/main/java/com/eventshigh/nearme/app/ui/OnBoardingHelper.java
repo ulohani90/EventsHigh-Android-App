@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.app.ActionBar;
+import android.app.backup.BackupManager;
 import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -104,6 +105,8 @@ public class OnBoardingHelper {
             targetsIndex ++;
             if (targetsIndex >= targets.size()) {
                 showcaseView.hide();
+                BackupManager bm = new BackupManager(activity);
+                bm.dataChanged();
                 return;
             }
 

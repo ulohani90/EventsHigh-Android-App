@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.eventshigh.nearme.app"
     android:installLocation="auto"
+    android:backupAgent="utils.EhBackupAgent"
 >
 
     <!-- Ask for permissions, we need internet access and Google Maps access -->
@@ -63,7 +64,11 @@
             android:name="com.crashlytics.ApiKey"
             android:value="88e38bba3d2788a9338644aa2f1a2b9f0ee92991"
         />
-
+        <!-- Setup the backup service -->
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAIEdZtnBx5rU5FsV-ObsnqwWWHfPLhczoBadGY9g"
+        />
 
         <!--
          Enable the file provider which will be used when we share the image
