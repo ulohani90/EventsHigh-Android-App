@@ -29,12 +29,15 @@ public class Utils {
 
         StringBuilder sb = new StringBuilder();
         for(String part : original.split(" ")) {
+            if (part.isEmpty()) {
+                continue;
+            }
             sb.append(" ");
             sb.append(part.substring(0, 1).toUpperCase());
             sb.append(part.substring(1).toLowerCase());
         }
 
-        return sb.toString().substring(1);
+        return sb.toString().trim();
     }
 
     public static <T> T[] mergeArray(T[] first, T[] second) {
