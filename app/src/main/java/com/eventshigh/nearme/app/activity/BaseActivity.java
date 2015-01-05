@@ -1,9 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -114,40 +112,6 @@ public abstract class BaseActivity extends FragmentActivity {
         // Check if this is first activity by user, if yes report special event.
         // See if this is first action by user. If yes, report it.
         pref = new Preferences(this);
-        int numActivities = pref.reportActivityStart();
-        if (numActivities == 1) {
-            reportActionToAnalytics("firstActivity");
-        }
-
-        if (numActivities == 10) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setIcon(R.drawable.ic_launcher);
-            builder.setTitle(R.string.action_share_app);
-            builder.setMessage(R.string.message_share_app);
-
-            // Set up the buttons
-            builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, String.format(
-                            getResources().getString(R.string.share_app_text),
-                            new Account(BaseActivity.this).getUserReferrerCode())
-                    );
-                    sendIntent.setType("text/plain");
-                    startActivity(sendIntent);
-                }
-            });
-            builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-
-            builder.show();
-        }
     }
 
     protected void onStop() {
@@ -209,6 +173,21 @@ public abstract class BaseActivity extends FragmentActivity {
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.putExtra(EventDetailFragment.ARG_EVENT_INFO, event);
         startActivity(detailIntent);
+    }
+
+    /**
+     * Helper method to start activity which lets user share the app.
+     */
+    public void shareApp() {
+        reportActionToAnalytics("shareApp");
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, String.format(
+                        getResources().getString(R.string.share_app_text),
+                        new Account(BaseActivity.this).getUserReferrerCode())
+        );
+        sendIntent.setType("text/plain");
+        startActivity(sendIntent);
     }
 
     /**

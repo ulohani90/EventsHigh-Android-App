@@ -38,7 +38,7 @@
     <string name="zoom">Please zoom in to see interesting events!</string>
     <string name="num_people_interested">number of people interested</string>
     <string name="ask_locality">Enter the locality, city</string>
-    <string name="message_share_app">Would you like to share this app with your friends and help them find amazing events?</string>
+    <string name="message_share_app">Share this app with your friends?</string>
 
     <!-- Failed messages -->
     <string name="failed_login">Failed to login! You can retry or skip.</string>

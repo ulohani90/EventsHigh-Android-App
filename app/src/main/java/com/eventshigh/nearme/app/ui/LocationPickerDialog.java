@@ -23,7 +23,6 @@ import com.google.android.gms.maps.model.LatLng;
  * Shows a dialog box with text box to let user enter location.
  */
 public class LocationPickerDialog {
-    private static final String LOG_TAG = LocationPickerDialog.class.getSimpleName();
 
     public static interface OnLocationSelection {
         public void onLocationSelection(String locationString, LatLng locationPoint);

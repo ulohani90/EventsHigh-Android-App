@@ -14,6 +14,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.util.Pair;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
@@ -44,6 +46,10 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Collections;
 import java.util.List;
+
+import fr.nicolaspomepuy.discreetapprate.AppRate;
+import fr.nicolaspomepuy.discreetapprate.AppRate.OnShowListener;
+import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
 
 /**
  * Base activity for location aware events listing. This class implements
@@ -163,6 +169,12 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         }
 
         lastStartedAt = System.currentTimeMillis();
+
+        // Show the rate this app in non intrusive way.
+        AppRate.with(this)
+                .delay(3000).initialLaunchCount(5).retryPolicy(RetryPolicy.INCREMENTAL)
+                .text(R.string.action_share_app).listener(mOnShowListener)
+                .checkAndShow();
     }
 
     @Override
@@ -515,6 +527,29 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
         @Override
         public void onTabReselected(Tab tab, FragmentTransaction ft) {
+        }
+    };
+
+    private OnShowListener mOnShowListener = new OnShowListener() {
+        @Override
+        public void onRateAppShowing(AppRate appRate, final View view) {
+            reportActionToAnalytics("shareAppShown");
+            view.findViewById(R.id.dar_rate_element).setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    shareApp();
+                    view.setVisibility(View.GONE);
+                }
+            });
+        }
+
+        @Override
+        public void onRateAppDismissed() {
+            reportActionToAnalytics("shareAppDismissed");
+        }
+
+        @Override
+        public void onRateAppClicked() {
         }
     };
 }
