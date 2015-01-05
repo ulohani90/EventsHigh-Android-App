@@ -54,6 +54,17 @@ public class DateTimeUtils {
         return FULL_DATE_TIME_FORMAT.parse(date.split(":")[0] + " " + time + " " + timeZone);
     }
 
+    public static Date getEventDate(Event event, int occurrenceNo) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeZone(TimeZone.getTimeZone(event.city.timeZone));
+        cal.setTime(new Date(event.eventTimings[occurrenceNo]));
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("MMM d");
     private static final SimpleDateFormat SIMPLE_TIME_FORMAT = new SimpleDateFormat("h:mm a");
     private static final Pattern ZEROS = Pattern.compile(":00");

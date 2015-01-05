@@ -22,6 +22,22 @@ public class EventComparator implements Comparator<Event> {
 
     @Override
     public int compare(Event lhs, Event rhs) {
+        if (lhs.eventTimings.length != 0 || rhs.eventTimings.length != 0) {
+            int result = DateTimeUtils.getEventDate(lhs, 0).compareTo(
+                    DateTimeUtils.getEventDate(rhs, 0));
+            if (result != 0) {
+                return result;
+            }
+        }
+
+        if (lhs.eventTimings.length == 0) {
+            return 1;
+        }
+
+        if (rhs.eventTimings.length == 0) {
+            return -1;
+        }
+
         return Double.compare(
                 weightedDistance(lhs, userLocation, eventToDistanceMap),
                 weightedDistance(rhs, userLocation, eventToDistanceMap)
