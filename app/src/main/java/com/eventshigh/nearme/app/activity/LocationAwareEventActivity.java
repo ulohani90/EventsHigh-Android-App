@@ -232,7 +232,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         }
 
         if (id == R.id.action_change_location) {
-            askUserForLocation(null);
+            askUserForLocation(false);
             return true;
         }
 
@@ -267,6 +267,11 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
      */
     protected abstract void updateUserLocation(LatLng userLocation);
 
+    /**
+     * @return true if location should be shown in action bar as subtitle.
+     */
+    protected abstract boolean showLocationInActionBar();
+
 
     // ***********************
     // Helper methods
@@ -291,17 +296,24 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         fetcher.execute(lastEventFetcherParam);
     }
 
-    protected void askUserForLocation(@Nullable final ActionBar actionBar) {
+    protected void askUserForLocation(final boolean setLastCity) {
         reportActionToAnalytics("askUserForLocation");
         String countryCode = lastEventFetcherParam.city == null ?
                 null : lastEventFetcherParam.city.countryCode;
         new LocationPickerDialog().show(this, countryCode, new OnLocationSelection() {
             @Override
             public void onLocationSelection(String locationString, LatLng locationPoint) {
-                if (actionBar != null) {
-                    actionBar.setSubtitle(locationString);
+                if (showLocationInActionBar()) {
+                    ActionBar actionBar = getActionBar();
+                    if (actionBar != null) {
+                        actionBar.setSubtitle(locationString);
+                    }
                 }
                 updateUserLocation(locationPoint);
+
+                if (setLastCity) {
+                    gcmRegistration.setLastCity(City.getCity(locationPoint));
+                }
             }
         });
     }
@@ -418,7 +430,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             reportActionToAnalytics("locationFailed");
             Toast.makeText(LocationAwareEventActivity.this,
                     R.string.failed_location, Toast.LENGTH_SHORT).show();
-            askUserForLocation(null);
+            askUserForLocation(true);
         }
     };
 

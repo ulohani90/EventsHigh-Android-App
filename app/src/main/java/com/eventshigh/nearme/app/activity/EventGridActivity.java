@@ -5,7 +5,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -78,16 +77,6 @@ public class EventGridActivity extends LocationAwareEventActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_change_location) {
-            askUserForLocation(getActionBar());
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     // ***********************
     // Helper Methods
@@ -119,6 +108,9 @@ public class EventGridActivity extends LocationAwareEventActivity {
         mEventsListAdapter.sort(new EventComparator(userLocation));
     }
 
+    protected boolean showLocationInActionBar() {
+        return true;
+    }
 
     // ***********************
     // Callbacks

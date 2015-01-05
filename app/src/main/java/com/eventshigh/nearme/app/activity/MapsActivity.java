@@ -128,6 +128,10 @@ public class MapsActivity extends LocationAwareEventActivity {
         return true;
     }
 
+    protected boolean showLocationInActionBar() {
+        return false;
+    }
+
 
     // ***********************
     // Setup Helper Methods
