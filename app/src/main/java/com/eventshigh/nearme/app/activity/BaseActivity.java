@@ -22,7 +22,6 @@ import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
@@ -44,7 +43,6 @@ public abstract class BaseActivity extends FragmentActivity {
     // Google Analytics
     protected GAHelper gaHelper;
     protected Preferences pref;
-    protected GcmRegistration gcmRegistration;
     protected boolean isDebug;
 
     @Override
@@ -82,10 +80,6 @@ public abstract class BaseActivity extends FragmentActivity {
 
         // Google Analytics reporting.
         gaHelper.reportActivityStart(this);
-
-        // Register with GCM if needed. GCM is used for notifications messages.
-        gcmRegistration = new GcmRegistration(this);
-        gcmRegistration.updateGcmRegistrationIdIfNeeded();
 
         // Check if this is first activity by user, if yes report special event.
         // See if this is first action by user. If yes, report it.

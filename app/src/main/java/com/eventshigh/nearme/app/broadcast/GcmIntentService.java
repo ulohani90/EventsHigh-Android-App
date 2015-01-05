@@ -75,7 +75,7 @@ public class GcmIntentService extends IntentService {
             return;
         }
 
-        GcmRegistration gcmRegistration = new GcmRegistration(this);
+        GcmRegistration gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
         City city = gcmRegistration.getLastCity();
         if (city == null) {
             // placeholder for city.

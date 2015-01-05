@@ -4,11 +4,7 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.Intent;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
@@ -34,14 +30,6 @@ import com.eventshigh.nearme.app.ui.OnBoardingHelper;
 import com.eventshigh.nearme.app.utils.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.EventsCollection;
 import com.eventshigh.nearme.app.utils.EventsCollection.Builder;
-import com.eventshigh.nearme.app.utils.LocationUtils;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Collections;
@@ -76,8 +64,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     // MEMBERS
     // ***********************
 
-    // GoogleApiClient used to determine user current location.
-    private GoogleApiClient googleApiClient;
     // Day selector widget which is shown to user to
     // select any day from upcoming week.
     private DaySelector daySelector;
@@ -106,13 +92,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         lastStartedAt = 0;
-
-        // Setup GoogleApiClient to fetch location.
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(mConnectionCallbacks)
-                .addOnConnectionFailedListener(mOnConnectionFailedListener)
-                .build();
 
         // Setup DaySelector.
         daySelector = new DaySelector(this);
@@ -160,7 +139,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             // If location is passed in param, use it. Otherwise ask GoogleApiClient for
             // user location.
             if (lastEventFetcherParam.location == null) {
-                googleApiClient.connect();
+                askUserForLocation();
             } else {
                 LatLng location = lastEventFetcherParam.location;
                 lastEventFetcherParam.changeLocation(null);
@@ -175,16 +154,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                 .delay(3000).initialLaunchCount(5).retryPolicy(RetryPolicy.EXPONENTIAL)
                 .text(R.string.action_share_app).listener(mOnShowListener)
                 .checkAndShow();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        // Avoid battery drain by turning of location client.
-        if (googleApiClient != null && googleApiClient.isConnected()) {
-            googleApiClient.disconnect();
-        }
     }
 
     @Override
@@ -232,7 +201,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         }
 
         if (id == R.id.action_change_location) {
-            askUserForLocation(false);
+            askUserForLocation();
             return true;
         }
 
@@ -296,7 +265,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         fetcher.execute(lastEventFetcherParam);
     }
 
-    protected void askUserForLocation(final boolean setLastCity) {
+    protected void askUserForLocation() {
         reportActionToAnalytics("askUserForLocation");
         String countryCode = lastEventFetcherParam.city == null ?
                 null : lastEventFetcherParam.city.countryCode;
@@ -310,10 +279,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                     }
                 }
                 updateUserLocation(locationPoint);
-
-                if (setLastCity) {
-                    gcmRegistration.setLastCity(City.getCity(locationPoint));
-                }
             }
         });
     }
@@ -386,64 +351,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     // ***********************
     // Callbacks
     // ***********************
-
-    // Callback for GoogleClientApi. This is called when googleClientApi is
-    // ready to accept requests. We move map's camera position to last
-    // known location if available or send the request to fetch the user location.
-    private ConnectionCallbacks mConnectionCallbacks = new ConnectionCallbacks() {
-        @Override
-        public void onConnected(Bundle bundle) {
-            Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            if (location != null) {
-                LatLng userLatLng = LocationUtils.locationToLatLng(location);
-                gcmRegistration.setLastCity(City.getCity(userLatLng));
-                updateUserLocation(userLatLng);
-                googleApiClient.disconnect();
-            } else {
-                // Check if location access is enabled or not. If not we ask user for the location.
-                LocationManager locationManager =
-                        (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                Criteria criteria = new Criteria();
-                criteria.setHorizontalAccuracy(Criteria.ACCURACY_MEDIUM);
-                if (locationManager.getProviders(criteria, true).isEmpty()) {
-                    mOnConnectionFailedListener.onConnectionFailed(null);
-                } else {
-                    LocationRequest REQUEST = LocationRequest.create()
-                            .setInterval(5000)          // 5 sec
-                            .setFastestInterval(1600)   // 16ms = 60fps, 1600ms = 0.6 fps
-                            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                    LocationServices.FusedLocationApi.requestLocationUpdates(
-                            googleApiClient, REQUEST, mLocationListener);
-                }
-            }
-        }
-
-        @Override
-        public void onConnectionSuspended(int i) {
-            // do nothing.
-        }
-    };
-
-    private OnConnectionFailedListener mOnConnectionFailedListener = new OnConnectionFailedListener() {
-        @Override
-        public void onConnectionFailed(ConnectionResult connectionResult) {
-            reportActionToAnalytics("locationFailed");
-            Toast.makeText(LocationAwareEventActivity.this,
-                    R.string.failed_location, Toast.LENGTH_SHORT).show();
-            askUserForLocation(true);
-        }
-    };
-
-    // Callback for LocationClient which user location is available. We move the
-    // map's camera to user location and disable the future updates for user location
-    // change. User can still click on map to move the map's camera to new location.
-    private LocationListener mLocationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            updateUserLocation(LocationUtils.locationToLatLng(location));
-            googleApiClient.disconnect();
-        }
-    };
 
     // This is called when user changes the day for events are shown.
     // We refresh the maps listing.
