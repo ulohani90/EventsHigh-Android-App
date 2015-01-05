@@ -67,10 +67,9 @@ public class Utils {
             public void run() {
                 if (view.getWidth() < 10) {
                     waitForViewVisible(view, callback, nTimes - 1);
-                    return;
+                } else {
+                    callback.run();
                 }
-
-                callback.run();
             }
         }, 100);
     }

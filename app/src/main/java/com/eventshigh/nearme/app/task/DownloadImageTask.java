@@ -79,7 +79,9 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
         Utils.waitForViewVisible(imageView, new Runnable() {
             @Override
             public void run() {
-                task.execute();
+                if (!task.isCancelled()) {
+                    task.execute();
+                }
             }
         }, 10);
     }
