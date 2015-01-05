@@ -17,7 +17,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.amplitude.api.Amplitude;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
@@ -27,7 +26,6 @@ import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
-import com.flurry.android.FlurryAgent;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -75,19 +73,8 @@ public abstract class BaseActivity extends FragmentActivity {
         }
 
         // Setup Google Analytics.
-        gaHelper = new GAHelper(this);
+        gaHelper = GAHelper.getInstance(getApplicationContext());
         isDebug = gaHelper.getAppOptOut();
-
-        if (!BuildConfig.DEBUG) {
-            // Setup Flurry.
-            FlurryAgent.setVersionName(BuildConfig.VERSION_NAME);
-            FlurryAgent.init(this, "2MD4D4TP7WQZH6Q6257T");
-            FlurryAgent.setLogEnabled(false);
-            FlurryAgent.setReportLocation(false);
-
-            // Setup Amplitude
-            Amplitude.initialize(this, "41ed6c5c945d7f1c2f2d829b90288562");
-        }
     }
 
     protected void onStart() {
@@ -95,15 +82,6 @@ public abstract class BaseActivity extends FragmentActivity {
 
         // Google Analytics reporting.
         gaHelper.reportActivityStart(this);
-
-        // Flurry, Amplitude reporting
-        if (!BuildConfig.DEBUG) {
-            FlurryAgent.onStartSession(this);
-            FlurryAgent.logEvent(getClass().getSimpleName());
-
-            Amplitude.startSession();
-            Amplitude.logEvent(getClass().getSimpleName());
-        }
 
         // Register with GCM if needed. GCM is used for notifications messages.
         gcmRegistration = new GcmRegistration(this);
@@ -119,12 +97,6 @@ public abstract class BaseActivity extends FragmentActivity {
 
         // Google Analytics reporting.
         gaHelper.reportActivityStop(this);
-
-        // Flurry, Amplitude reporting
-        if (!BuildConfig.DEBUG) {
-            FlurryAgent.onEndSession(this);
-            Amplitude.endSession();
-        }
 
         // Save the Http cache.
         HttpResponseCache cache = HttpResponseCache.getInstalled();
@@ -148,11 +120,6 @@ public abstract class BaseActivity extends FragmentActivity {
     public void reportActionToAnalytics(String actionName, String label, long value) {
         if (gaHelper != null) {
             gaHelper.reportActionToAnalytics(getClass().getSimpleName(), actionName, label, value);
-
-            if (!BuildConfig.DEBUG) {
-                FlurryAgent.logEvent(actionName);
-                Amplitude.logEvent(actionName);
-            }
         }
     }
 

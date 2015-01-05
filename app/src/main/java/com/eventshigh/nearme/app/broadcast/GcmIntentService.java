@@ -63,7 +63,7 @@ public class GcmIntentService extends IntentService {
         String title = msg.getString("t");
         String message = msg.getString("m");
 
-        GAHelper gaHelper = new GAHelper(this);
+        GAHelper gaHelper = GAHelper.getInstance(getApplicationContext());
         if (eventId == null || message == null || title == null) {
             // Invalid notification. Ignore.
             gaHelper.reportActionToAnalytics(
@@ -102,6 +102,6 @@ public class GcmIntentService extends IntentService {
 
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
         gaHelper.reportActionToAnalytics(
-                getClass().getSimpleName(), "notificationShown", eventId, 1);
+                getClass().getSimpleName(), "notificationShown", eventId, 1)    ;
     }
 }

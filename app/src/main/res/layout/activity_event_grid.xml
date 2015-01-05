@@ -14,7 +14,7 @@
         android:layout_weight="1"
         android:padding="@dimen/abc_control_padding_material"
         android:columnWidth="@dimen/event_card_width"
-        android:horizontalSpacing="@dimen/abc_dropdownitem_text_padding_left"
+        android:horizontalSpacing="@dimen/abc_control_padding_material"
         android:verticalSpacing="@dimen/abc_control_padding_material"
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"

@@ -115,7 +115,7 @@ public class LaunchActivity extends Activity {
     private void processIntent(Intent inIntent) {
         EventFetcherParam param = null;
 
-        GAHelper gaHelper =  new GAHelper(this);
+        GAHelper gaHelper = GAHelper.getInstance(getApplicationContext());
         if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
             param = processSearchIntent(inIntent, gaHelper);
         } else if (Intent.ACTION_VIEW.equals(inIntent.getAction())) {

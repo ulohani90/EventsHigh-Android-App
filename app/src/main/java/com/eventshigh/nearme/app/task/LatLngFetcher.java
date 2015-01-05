@@ -55,7 +55,7 @@ public class LatLngFetcher extends AsyncTask<String, Void, Pair<String, LatLng>>
         if (locality != null) {
             onLocationSelection.onLocationSelection(locality.first, locality.second);
         } else {
-            new GAHelper(context).reportActionToAnalytics(LOG_TAG, "failedGeoCoding", "", 0);
+            GAHelper.getInstance(context).reportActionToAnalytics(LOG_TAG, "failedGeoCoding", "", 0);
             Toast.makeText(context, R.string.failed_locality, Toast.LENGTH_SHORT).show();
         }
     }
