@@ -1,6 +1,11 @@
 package com.eventshigh.nearme.app.utils;
 
 import android.net.Uri;
+import android.os.Handler;
+import android.util.DisplayMetrics;
+import android.util.Pair;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,5 +56,45 @@ public class Utils {
         }
 
         return builder.build();
+    }
+
+    public static void waitForViewVisible(final View view, final Runnable callback, final int nTimes) {
+        if (nTimes < 0) {
+            return;
+        }
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                if (view.getWidth() < 10) {
+                    waitForViewVisible(view, callback, nTimes - 1);
+                    return;
+                }
+
+                callback.run();
+            }
+        }, 100);
+    }
+
+    public static Pair<Integer, Integer> findDimensions(View view, DisplayMetrics metrics) {
+        int width = view.getWidth();
+        int height = view.getHeight();
+
+        if (width <= 0 || height <= 0) {
+            int parentWidth = getDimen(((ViewGroup) view.getParent()).getWidth(), metrics.widthPixels);
+            int parentHeight = getDimen(((ViewGroup) view.getParent()).getHeight(), metrics.heightPixels);
+            width = getDimen(width, parentWidth);
+            height = getDimen(height, parentHeight);
+
+            view.measure(parentWidth, parentHeight);
+            width = getDimen(width, view.getMeasuredWidth());
+            height = getDimen(height, view.getMeasuredHeight());
+        }
+
+        return Pair.create(width, height);
+    }
+
+    private static int getDimen(int dimen1, int dimen2) {
+        return  dimen1 <= 0 ? dimen2 :
+                (dimen2 <= 0 ? dimen1 : Math.min(dimen1, dimen2));
     }
 }

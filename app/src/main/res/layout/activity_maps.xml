@@ -21,7 +21,7 @@
         <FrameLayout
             android:id="@+id/event_card_container"
             android:layout_width="@dimen/event_card_width"
-            android:layout_height="@dimen/event_card_height"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom|start"
         />
     </FrameLayout>

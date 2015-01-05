@@ -49,7 +49,6 @@
 
     <!-- Theme used for Events Cards -->
     <style name="EventCardText" parent="android:style/TextAppearance.Small">
-        <item name="android:textColor">@android:color/white</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
         <item name="android:gravity">center_vertical</item>
@@ -58,6 +57,7 @@
     </style>
 
     <style name="EventTagText" parent="EventCardText">
+        <item name="android:textColor">@android:color/white</item>
         <item name="android:background">@drawable/selector_event_tag_rounded</item>
         <item name="android:paddingLeft">@dimen/abc_control_padding_material</item>
         <item name="android:paddingRight">@dimen/abc_control_padding_material</item>

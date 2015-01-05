@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -10,21 +10,13 @@
 
     <ImageView
         android:id="@+id/event_bg"
-        android:layout_width="match_parent"
+        android:layout_width="?android:attr/listPreferredItemHeightLarge"
         android:layout_height="?android:attr/listPreferredItemHeightLarge"
-        android:src="@drawable/eh_default"
         android:scaleType="centerCrop"
-        tools:ignore="ContentDescription"
-        tools:layout_height="200dp"
-    />
-
-    <ImageView
-        android:id="@+id/event_share"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_share"
-        android:background="@drawable/selector_event_card_share"
-        android:layout_gravity="end|top"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        tools:src="@drawable/eh_default"
         tools:ignore="ContentDescription"
     />
 
@@ -33,106 +25,117 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/eh_recommend_icon"
-        android:layout_gravity="start|top"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         tools:ignore="ContentDescription"
     />
 
+    <ImageView
+        android:id="@+id/event_share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_share"
+        android:background="@drawable/selector_event_card_share"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        tools:ignore="ContentDescription"
+    />
+
+    <TextView
+        style="@style/EventCardText"
+        android:id="@+id/event_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/event_bg"
+        android:layout_toEndOf="@+id/event_bg"
+        android:layout_toLeftOf="@+id/event_share"
+        android:layout_toStartOf="@+id/event_share"
+        android:textSize="@dimen/abc_text_size_body_2_material"
+        android:textStyle="bold"
+        android:maxLines="2"
+        android:layout_margin="@dimen/abc_control_padding_material"
+        tools:text="My Awesome Event with a long title!"
+    />
+    <TextView
+        style="@style/EventCardText"
+        android:id="@+id/event_venue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/event_title"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/event_bg"
+        android:layout_toEndOf="@+id/event_bg"
+        android:layout_marginLeft="0dp"
+        android:layout_marginStart="0dp"
+        android:drawableStart="@drawable/ic_action_place_dark"
+        android:drawableLeft="@drawable/ic_action_place_dark"
+        tools:text="Jagriti theatre, Whitefield"
+    />
+
+    <TextView
+        style="@style/EventCardText"
+        android:id="@+id/event_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/event_venue"
+        android:layout_toRightOf="@+id/event_bg"
+        android:layout_toEndOf="@+id/event_bg"
+        android:layout_marginLeft="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_toLeftOf="@+id/num_people_interested"
+        android:layout_toStartOf="@+id/num_people_interested"
+        android:drawableStart="@drawable/ic_action_time_dark"
+        android:drawableLeft="@drawable/ic_action_time_dark"
+        tools:text="8 pm"
+    />
+
+    <TextView
+        style="@style/EventCardText"
+        android:id="@+id/num_people_interested"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_below="@id/event_venue"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:drawableStart="@drawable/ic_action_person_dark"
+        android:drawableLeft="@drawable/ic_action_person_dark"
+        tools:text="32"
+    />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="bottom"
+        android:layout_below="@id/event_time"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/event_bg"
+        android:layout_toEndOf="@+id/event_bg"
+        android:orientation="horizontal"
     >
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/event_tag0"
+            style="@style/EventTagText"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@android:color/transparent"
-        >
-            <TextView
-                android:id="@+id/event_tag0"
-                style="@style/EventTagText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Comedy"
-            />
-            <TextView
-                android:id="@+id/event_tag1"
-                style="@style/EventTagText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Drama"
-            />
-            <TextView
-                android:id="@+id/event_tag2"
-                style="@style/EventTagText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Kids"
-            />
-        </LinearLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
+            tools:text="Comedy"
+        />
+        <TextView
+            android:id="@+id/event_tag1"
+            style="@style/EventTagText"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/event_card_text_bg"
-        >
-            <TextView
-                style="@style/EventCardText"
-                android:id="@+id/event_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/abc_text_size_body_2_material"
-                android:textStyle="bold"
-                android:layout_margin="@dimen/abc_control_padding_material"
-                tools:text="My Awesome Event"
-            />
-
-            <TextView
-                style="@style/EventCardText"
-                android:id="@+id/event_venue"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_action_place"
-                android:drawableLeft="@drawable/ic_action_place"
-                android:layout_below="@id/event_title"
-                android:layout_marginLeft="0dp"
-                android:layout_marginStart="0dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_toLeftOf="@+id/event_time"
-                android:layout_toStartOf="@+id/event_time"
-                android:background="?android:attr/selectableItemBackground"
-                tools:text="Jagriti theatre, Whitefield"
-            />
-
-            <TextView
-                style="@style/EventCardText"
-                android:id="@+id/event_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_action_time"
-                android:drawableLeft="@drawable/ic_action_time"
-                android:layout_below="@id/event_title"
-                android:layout_toLeftOf="@+id/num_people_interested"
-                android:layout_toStartOf="@+id/num_people_interested"
-                android:background="?android:attr/selectableItemBackground"
-                tools:text="8 pm"
-            />
-
-            <TextView
-                style="@style/EventCardText"
-                android:id="@+id/num_people_interested"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:drawableStart="@drawable/ic_action_person"
-                android:drawableLeft="@drawable/ic_action_person"
-                android:layout_below="@id/event_title"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                tools:text="32"
-            />
-        </RelativeLayout>
+            tools:text="Drama"
+        />
+        <TextView
+            android:id="@+id/event_tag2"
+            style="@style/EventTagText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Kids"
+        />
     </LinearLayout>
-</FrameLayout>
+</RelativeLayout>
 

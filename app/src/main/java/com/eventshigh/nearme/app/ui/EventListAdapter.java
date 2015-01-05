@@ -5,9 +5,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
-import android.widget.FrameLayout.LayoutParams;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -50,11 +47,8 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         EventCard eventCard = new EventCard(view);
 
         // Set the background image.
-        int height = findOptimalHeight(parent);
-        eventCard.bgView.setLayoutParams(new FrameLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, height));
         DownloadImageTask.setImage(eventCard.bgView, activity.getResources(),
-                event.imgUrl, event.category.getInfographResourceId(), parent.getMeasuredWidth(), height);
+                event.imgUrl, event.category.getInfographResourceId());
 
         // Set the title, time etc.
         eventCard.titleView.setText(event.title);
@@ -101,18 +95,6 @@ public class EventListAdapter extends ArrayAdapter<Event> {
                 shareView.setVisibility(View.VISIBLE);
             }
         });
-        eventCard.timeView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.addToCalendar(event, null);
-            }
-        });
-        eventCard.venueView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.showDirections(event);
-            }
-        });
 
         return view;
     }
@@ -141,22 +123,6 @@ public class EventListAdapter extends ArrayAdapter<Event> {
             tag1View = (TextView) cardView.findViewById(R.id.event_tag1);
             tag2View = (TextView) cardView.findViewById(R.id.event_tag2);
         }
-    }
-
-    // What would be optimal height for event card? Width of event card is same as
-    // width of parent. In landscape mode, we want event card height to match the parent
-    // height so that one event card is fully visible. In portrait mode, we want event cards
-    // to be 9:16 shape.
-    private static int findOptimalHeight(ViewGroup parent) {
-        int parentWidth = parent.getMeasuredWidth();
-        int parentHeight = parent.getMeasuredHeight();
-
-        int cardWidth = parentWidth;
-        if (parent instanceof GridView) {
-            cardWidth = parentWidth / ((GridView) parent).getNumColumns();
-        }
-
-        return Math.min(9 * cardWidth / 16, parentHeight);
     }
 
     private static void showTag(TextView tagView, Event event, int tagNo,

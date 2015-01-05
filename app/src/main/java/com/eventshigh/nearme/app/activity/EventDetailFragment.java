@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -315,7 +314,7 @@ public class EventDetailFragment extends Fragment {
             mEventCard.bgView.setVisibility(View.GONE);
         } else {
             DownloadImageTask.setImage(mEventCard.bgView, getResources(),
-                    mEvent.imgUrl, infographResId, metrics.widthPixels, maxHeight);
+                    mEvent.imgUrl, infographResId);
         }
 
         if (mEvent.imgUrl != null) {
@@ -329,8 +328,7 @@ public class EventDetailFragment extends Fragment {
                     nagDialog.setContentView(R.layout.dialog_image_preview);
 
                     ImageViewTouch preview = (ImageViewTouch) nagDialog.findViewById(R.id.image_preview);
-                    DownloadImageTask.setImageNoCache(preview, mEvent.imgUrl,
-                            metrics.widthPixels * 2, metrics.heightPixels * 2);
+                    DownloadImageTask.setImageNoCache(preview, mEvent.imgUrl, getResources());
 
                     Button btnClose = (Button) nagDialog.findViewById(R.id.btn_close);
                     btnClose.setOnClickListener(new OnClickListener() {
@@ -507,14 +505,8 @@ public class EventDetailFragment extends Fragment {
     }
 
     private void showTags() {
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        Utils.waitForViewVisible(mEventCard.tagsView, new Runnable() {
             public void run() {
-                if (mEventCard.tagsView.getWidth() < 10) {
-                    showTags();
-                    return;
-                }
-
                 LayoutParams layoutParams = getLayoutParam();
                 int maxWidth = mEventCard.tagsView.getWidth()
                         - layoutParams.leftMargin - layoutParams.rightMargin;
