@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsCollection;
@@ -195,7 +196,7 @@ public class Event implements Parcelable {
     public static Event fromJSON(City city, JSONObject eventJson) throws JSONException, ParseException {
         String id = eventJson.getString("id");
         String title = eventJson.getString("title");
-        String description = eventJson.getString("description")
+        String description = eventJson.optString("description", "")
                 .replaceAll("\\s+\n", "\n\n");
 
         JSONObject mashup = eventJson.optJSONObject("mashup");
@@ -244,7 +245,9 @@ public class Event implements Parcelable {
         ArrayList<String> tagsWhiteList = new ArrayList<>(tagsJsonArr.length());
         ArrayList<String> otherTags = new ArrayList<>(tagsJsonArr.length());
         for (int j = 0; j < tagsJsonArr.length(); j++) {
-            String tag = tagsJsonArr.getJSONObject(j).getString("tag");
+            Object currentTag = tagsJsonArr.get(j);
+            String tag = currentTag instanceof JSONObject ?
+                    tagsJsonArr.getJSONObject(j).getString("tag") : String.valueOf(currentTag);
             String tagU = toCategoryParsableString(tag);
             String tagToShow = Utils.capitalize(tag);
 
@@ -339,7 +342,7 @@ public class Event implements Parcelable {
                     events.add(event);
                 }
             } catch (JSONException | ParseException e) {
-                // Log.w(Event.class.getSimpleName(), "malformed JSON", e);
+                Log.w(Event.class.getSimpleName(), "malformed JSON", e);
             }
         }
         return events;

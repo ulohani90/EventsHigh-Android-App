@@ -35,13 +35,6 @@ public class EventDetailActivity extends BaseActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        // Get the event from Intent.
-        Event event = getIntent().getParcelableExtra(EventDetailFragment.ARG_EVENT_INFO);
-        if (event != null) {
-            showEventFragment(event);
-            return;
-        }
-
         onNewIntent(getIntent());
     }
 
@@ -76,6 +69,13 @@ public class EventDetailActivity extends BaseActivity {
         if (NOTIFICATION_ACTION.equals(action)) {
             reportActionToAnalytics("openNotification");
             showEvent = true;
+        }
+
+        // Get the event from Intent.
+        Event event = getIntent().getParcelableExtra(EventDetailFragment.ARG_EVENT_INFO);
+        if (event != null) {
+            showEvent = true;
+            intent.setData(event.getEventDetailsURI());
         }
 
         if (showEvent) {
