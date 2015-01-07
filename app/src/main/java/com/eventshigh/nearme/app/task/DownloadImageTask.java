@@ -234,16 +234,20 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
                 options, Utils.findDimensions(imageView, resources.getDisplayMetrics()));
 
         // Load Bitmap.
+        ImageSrc key;
         Bitmap bitmap;
         options.inJustDecodeBounds = false;
         if (imageData != null) {
             bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length, options);
-            bitmapCache.put(new ImageSrc(src.imgUrl, -1), bitmap);
+            key = new ImageSrc(src.imgUrl, -1);
         } else {
             bitmap = BitmapFactory.decodeResource(resources, src.placeHolderImageId, options);
-            bitmapCache.put(new ImageSrc(null, src.placeHolderImageId), bitmap);
+            key = new ImageSrc(null, src.placeHolderImageId);
         }
 
+        if (bitmap != null) {
+            bitmapCache.put(key, bitmap);
+        }
         return bitmap;
     }
 
