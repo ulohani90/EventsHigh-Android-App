@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.TimeZone;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -223,15 +224,15 @@ public abstract class BaseActivity extends FragmentActivity {
                 .putExtra(Events.DESCRIPTION,
                         event.getEventDetailsURI().toString() + "?src=ehm \n\n" + event.description);
 
-        long eventTime = date != null ? date.getTime() :
-                (event.eventTimings.length > 0 ? event.eventTimings[0] : 0);
-        if (eventTime > 0) {
-            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, eventTime);
+        if (date == null && event.eventTimings.length > 0) {
+            date = new Date(event.eventTimings[0]);
         }
 
-        String time = DateTimeUtils.getEventTime(event, false);
-        if (time == null) {
-            intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
+        if (date != null) {
+            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, date.getTime());
+            if (DateTimeUtils.getTimeString(date, TimeZone.getTimeZone(event.city.timeZone)) == null) {
+                intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
+            }
         }
 
         try {

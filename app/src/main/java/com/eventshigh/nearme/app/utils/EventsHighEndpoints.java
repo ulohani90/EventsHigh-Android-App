@@ -8,12 +8,11 @@ import com.eventshigh.nearme.app.data.Event;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Date;
 
 public class EventsHighEndpoints {
     public static final String WEB_URI_BASE = "http://www.eventshigh.com/";
     private static final String API_ENDPOINT_DATE_FORMAT =
-            "http://apiserver.eventshigh.com:8888/api/date/%s/%s?sortby=popularity&limit=200&mobile=%d";
+            "http://apiserver.eventshigh.com:8888/api/date/%s/this%%20week?sortby=popularity&limit=500&mobile=%d";
     private static final String API_ENDPOINT_QUERY_FORMAT =
             "http://apiserver.eventshigh.com:8888/api/events/%s/%s?sortby=popularity&limit=200&mobile=%d";
     private static final String API_ENDPOINT_EVENT_UBER_FORMAT =
@@ -54,9 +53,9 @@ public class EventsHighEndpoints {
         return builder.appendQueryParameter("interest", param.query).build();
     }
 
-    public static String getApiEndpointDate(City city, Date date) {
+    public static String getApiEndpointDate(City city) {
         return String.format(API_ENDPOINT_DATE_FORMAT,
-                city.toString().toLowerCase(), DateTimeUtils.getDateString(date), BuildConfig.VERSION_CODE);
+                city.toString().toLowerCase(), BuildConfig.VERSION_CODE);
     }
     public static String getApiEndpointQuery(City city, String query) throws UnsupportedEncodingException {
         return String.format(API_ENDPOINT_QUERY_FORMAT,

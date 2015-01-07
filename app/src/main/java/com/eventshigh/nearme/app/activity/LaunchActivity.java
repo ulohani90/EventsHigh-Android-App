@@ -206,7 +206,7 @@ public class LaunchActivity extends Activity {
     }
 
     private void processIntent(Intent inIntent) {
-        param = new EventFetcherParam(null, 0, "");
+        param = new EventFetcherParam(null, "");
 
         if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
             processSearchIntent(inIntent);

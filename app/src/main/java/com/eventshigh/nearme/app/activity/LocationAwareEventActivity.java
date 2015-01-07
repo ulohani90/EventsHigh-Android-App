@@ -12,7 +12,6 @@ import android.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
@@ -21,8 +20,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.task.EventsFetcherTask;
 import com.eventshigh.nearme.app.task.EventsFetcherTask.EventsFetcherCallBack;
-import com.eventshigh.nearme.app.ui.DaySelector;
-import com.eventshigh.nearme.app.ui.DaySelector.DaySelectionListener;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
@@ -64,9 +61,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     // MEMBERS
     // ***********************
 
-    // Day selector widget which is shown to user to
-    // select any day from upcoming week.
-    private DaySelector daySelector;
     // Last city,day for which events are shown.
     protected EventFetcherParam lastEventFetcherParam;
     // Last fetched events collection.
@@ -93,13 +87,9 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         lastStartedAt = 0;
 
-        // Setup DaySelector.
-        daySelector = new DaySelector(this);
-        daySelector.setDaySelectionListener(mDaySelectionListener);
-
         // Set the context in term of lastEventFetcherParam. Use Inent
         // to restore the context.
-        lastEventFetcherParam = new EventFetcherParam(null, 0, "");
+        lastEventFetcherParam = new EventFetcherParam(null, "");
 
         // See if we have context passed to us within intent.
         Intent intent = getIntent();
@@ -130,12 +120,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         // We do not refresh the app if user is in same session or has returned
         // within {@code SECONDS_FOR_REFRESH} seconds.
         if (lastStartedAt < System.currentTimeMillis() - SECONDS_FOR_REFRESH * 1000) {
-            // Populate the Day selection bar.
-            if (lastEventFetcherParam.query.isEmpty()) {
-                daySelector.populate((ViewGroup) findViewById(R.id.daySelector));
-                daySelector.setSelected(lastEventFetcherParam.day);
-            }
-
             // If location is passed in param, use it. Otherwise ask GoogleApiClient for
             // user location.
             if (lastEventFetcherParam.location == null) {
@@ -352,17 +336,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     // Callbacks
     // ***********************
 
-    // This is called when user changes the day for events are shown.
-    // We refresh the maps listing.
-    private DaySelectionListener mDaySelectionListener = new DaySelectionListener() {
-        @Override
-        public void onDaySelection(int dayNo) {
-            reportActionToAnalytics("onDaySelection");
-            lastEventFetcherParam.day = dayNo;
-            fetchNewListing();
-        }
-    };
-
     // This callback is called by EventsFetcher when new set of events are available. We build the
     // markers for all events and then call method to show selected markers.
     private EventsFetcherCallBack mEventsFetcherCallBack = new EventsFetcherCallBack() {
@@ -433,7 +406,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             if (events != null) {
                 lastSelectedTag = tab.getTag().toString();
                 List<Event> eventsForTag = events.getEvents(tab.getPosition());
-                if (!eventsForTag.isEmpty()) {
+                if (!eventsForTag.isEmpty() && getActionBar().getNavigationItemCount() > 1) {
                     reportActionToAnalytics("filterByCategory", lastSelectedTag);
                 }
                 updateListingAndShowHelpIfNeeded(eventsForTag);

@@ -30,14 +30,14 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.task.DownloadImageTask;
-import com.eventshigh.nearme.app.ui.DaySelector;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
@@ -418,10 +418,10 @@ public class EventDetailFragment extends Fragment {
                     activity.addToCalendar(mEvent, null);
                 }
             });
-            for (long time : mEvent.eventTimings) {
-                final Date date = new Date(time);
-                LinearLayout daySelectorItem = DaySelector.getDaySelectorItem(
-                        activity, mEventCard.timeView, date, TimeZone.getTimeZone(mEvent.city.timeZone));
+            for (int i = 0; i < mEvent.eventTimings.length; i++) {
+                final Date date = new Date(mEvent.eventTimings[i]);
+                LinearLayout daySelectorItem = getEventTimeItem(
+                        mEventCard.timeView, DateTimeUtils.getEventTime(mEvent, i));
                 mEventCard.timeView.addView(daySelectorItem, getLayoutParam());
                 daySelectorItem.setOnClickListener(new OnClickListener() {
                     @Override
@@ -554,5 +554,23 @@ public class EventDetailFragment extends Fragment {
                 TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
         layoutParams.setMargins(0, 0 , margin, 0);
         return layoutParams;
+    }
+
+    public LinearLayout getEventTimeItem(ViewGroup parent, EventTime eventTime) {
+        LinearLayout daySelectorItem =
+                (LinearLayout) activity.getLayoutInflater().inflate(
+                        R.layout.day_selector_item, parent, false);
+        ((TextView)daySelectorItem.findViewById(R.id.day_of_week)).setText(eventTime.day);
+        ((TextView)daySelectorItem.findViewById(R.id.date)).setText(eventTime.date);
+
+        TextView timeView = ((TextView)daySelectorItem.findViewById(R.id.event_time));
+        if (eventTime.time == null) {
+            timeView.setVisibility(View.GONE);
+        } else {
+            timeView.setText(eventTime.time);
+        }
+
+        daySelectorItem.setClickable(true);
+        return daySelectorItem;
     }
 }

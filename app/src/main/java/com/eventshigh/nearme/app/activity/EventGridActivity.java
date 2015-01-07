@@ -86,7 +86,6 @@ public class EventGridActivity extends LocationAwareEventActivity {
     protected void updateNewEvents(List<Event> events) {
         mEventsListAdapter.clear();
         mEventsListAdapter.addAll(events);
-        mEventsListAdapter.setShowDate(!lastEventFetcherParam.query.isEmpty());
         updateListingForUserLocation(
                 lastEventFetcherParam.location == null ? null : lastEventFetcherParam.location);
     }

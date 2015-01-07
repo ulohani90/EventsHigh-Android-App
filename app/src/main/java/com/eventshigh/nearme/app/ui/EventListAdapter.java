@@ -13,6 +13,7 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.task.DownloadImageTask;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
 
 /**
@@ -21,25 +22,20 @@ import com.eventshigh.nearme.app.utils.Utils;
  */
 public class EventListAdapter extends ArrayAdapter<Event> {
     private final BaseActivity mBaseActivity;
-    private boolean showDate = false;
 
     public EventListAdapter(BaseActivity activity) {
         super(activity, R.layout.event_card, R.id.event_title);
         mBaseActivity = activity;
     }
 
-    public void setShowDate(boolean showDate) {
-        this.showDate = showDate;
-    }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return getView(getItem(position), mBaseActivity, convertView, parent, showDate);
+        return getView(getItem(position), mBaseActivity, convertView, parent);
     }
 
     // Build the view, reuse existing if possible.
     public static View getView(final Event event, final BaseActivity activity,
-                               @Nullable View reuseView, ViewGroup parent, boolean showDate) {
+                               @Nullable View reuseView, ViewGroup parent) {
         // Build the view, reuse existing if possible.
         final View view = reuseView == null ?
                 activity.getLayoutInflater().inflate(R.layout.event_card, parent, false) :
@@ -52,12 +48,12 @@ public class EventListAdapter extends ArrayAdapter<Event> {
 
         // Set the title, time etc.
         eventCard.titleView.setText(event.title);
-        String eventTime = DateTimeUtils.getEventTime(event, showDate);
+        EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
         if (eventTime == null) {
             eventCard.timeView.setVisibility(View.GONE);
         } else {
             eventCard.timeView.setVisibility(View.VISIBLE);
-            eventCard.timeView.setText(eventTime);
+            eventCard.timeView.setText(eventTime.toString());
         }
 
         if (event.numPeopleInterested <= 0) {

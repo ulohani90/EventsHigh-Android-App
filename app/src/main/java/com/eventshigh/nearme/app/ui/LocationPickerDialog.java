@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.task.LatLngFetcher;
+import com.eventshigh.nearme.app.task.LatLngFetcherTask;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -90,7 +90,7 @@ public class LocationPickerDialog {
     }
 
     private void close(String selectedPlace) {
-        new LatLngFetcher(context, onLocationSelection).execute(selectedPlace);
+        new LatLngFetcherTask(context, onLocationSelection).execute(selectedPlace);
         if(dialog != null && dialog.isShowing()) {
             dialog.cancel();
         }

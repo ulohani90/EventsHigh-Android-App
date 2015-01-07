@@ -9,7 +9,6 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.EventsCollection;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -76,8 +75,7 @@ public class EventsFetcherTask extends AsyncTask<EventFetcherParam, Void, Events
 
         String url;
         if (param.query.isEmpty()) {
-            url = EventsHighEndpoints.getApiEndpointDate(
-                    param.city, DateTimeUtils.getDate(param.day));
+            url = EventsHighEndpoints.getApiEndpointDate(param.city);
         } else {
             try {
                 url = EventsHighEndpoints.getApiEndpointQuery(param.city, param.query);

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TimeZone;
 
 /**
  * Collection for events which has tags based filtering in built.
@@ -23,6 +24,7 @@ public class EventsCollection {
     public static final String ALL_EVENTS_CATEGORY = "All";
     public static final String RECOMMENDED_EVENTS_CATEGORY = "Recommended";
     public static final String NOW_EVENTS_CATEGORY = "Starting Soon";
+    public static final String WEEKEND_EVENTS_CATEGORY = "This Weekend";
 
     private static final Set<String> TAGS_BLACKLIST = new HashSet<>();
     static {
@@ -31,7 +33,7 @@ public class EventsCollection {
 
     // In NOW_EVENTS_CATEGORY, we show events which are starting in
     // SOON_THRESHOLD_SEC seconds.
-    private static final int SOON_THRESHOLD_SEC = 2 * 3600;
+    private static final int SOON_THRESHOLD_SEC = 4 * 3600;
 
     public static class Builder {
         private final Set<String> whiteListedTagCategories;
@@ -56,7 +58,9 @@ public class EventsCollection {
                 if (eventTime < nowTimestamp) {
                     continue;
                 }
-                if (eventTime <= latestByTimestamp) {
+                if (eventTime <= latestByTimestamp &&
+                    DateTimeUtils.dateToEventTime(new Date(eventTime),
+                        TimeZone.getTimeZone(event.city.timeZone)).time != null) {
                     addEvent(NOW_EVENTS_CATEGORY, event);
                 }
                 break;

@@ -15,24 +15,20 @@ import java.util.regex.Pattern;
  * Helper methods for managing date and time.
  */
 public class DateTimeUtils {
-    /**
-     * Get the date for give dayItemNo.
-     *   dayItemNo 0: Today
-     *   dayItemNo 1: Tomorrow
-     *   and so on.
-     */
-    public static Date getDate(int dayItemNo) {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.add(Calendar.DAY_OF_MONTH, dayItemNo);
-        return cal.getTime();
-    }
+    public static class EventTime {
+        public final String day;
+        public final String date;
+        public final @Nullable String time;
 
-    private static final SimpleDateFormat FULL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    public static String getDateString(Date date) {
-        return FULL_DATE_FORMAT.format(date);
+        public EventTime(String day, String date, @Nullable String time) {
+            this.day = day;
+            this.date = date;
+            this.time = time;
+        }
+
+        public String toString() {
+            return day + " " + date + (time == null ? "" : ", " + time);
+        }
     }
 
     private static final SimpleDateFormat FULL_DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
@@ -65,27 +61,30 @@ public class DateTimeUtils {
         return cal.getTime();
     }
 
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("MMM d");
+    private static final SimpleDateFormat SIMPLE_DAY_FORMAT = new SimpleDateFormat("EE");
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("d MMM");
     private static final SimpleDateFormat SIMPLE_TIME_FORMAT = new SimpleDateFormat("h:mm a");
-    private static final Pattern ZEROS = Pattern.compile(":00");
-    public static @Nullable String getEventTime(Event event, boolean includeDate) {
-        if (event.eventTimings.length == 0) {
+
+    public static @Nullable EventTime getEventTime(Event event, int index) {
+        if (event.eventTimings.length < index) {
             return null;
         }
 
-        TimeZone timeZone =  TimeZone.getTimeZone(event.city.timeZone);
-        Date eventTime = new Date(event.eventTimings[0]);
-        String timeString = getTimeString(eventTime, timeZone);
-        if (!includeDate) {
-            return timeString;
-        }
+        return dateToEventTime(new Date(event.eventTimings[index]),
+                TimeZone.getTimeZone(event.city.timeZone));
+    }
 
+    public static EventTime dateToEventTime(Date date, TimeZone timeZone) {
         synchronized (SIMPLE_DATE_FORMAT) {
+            SIMPLE_DAY_FORMAT.setTimeZone(timeZone);
             SIMPLE_DATE_FORMAT.setTimeZone(timeZone);
-            return SIMPLE_DATE_FORMAT.format(eventTime) + (timeString == null ? "" : ", " + timeString);
+            return new EventTime(SIMPLE_DAY_FORMAT.format(date),
+                    SIMPLE_DATE_FORMAT.format(date),
+                    getTimeString(date, timeZone));
         }
     }
 
+    private static final Pattern ZEROS = Pattern.compile(":00");
     public static @Nullable String getTimeString(Date date, TimeZone timeZone) {
         synchronized (SIMPLE_TIME_FORMAT) {
             SIMPLE_TIME_FORMAT.setTimeZone(timeZone);

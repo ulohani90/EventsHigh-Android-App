@@ -17,16 +17,13 @@ import com.google.android.gms.maps.model.LatLng;
 import java.io.IOException;
 import java.util.List;
 
-/**
-* Created by paragsarda on 02/01/15.
-*/
-public class LatLngFetcher extends AsyncTask<String, Void, Pair<String, LatLng>> {
-    private static final String LOG_TAG = LatLngFetcher.class.getSimpleName();
+public class LatLngFetcherTask extends AsyncTask<String, Void, Pair<String, LatLng>> {
+    private static final String LOG_TAG = LatLngFetcherTask.class.getSimpleName();
 
     private final Context context;
     private final OnLocationSelection onLocationSelection;
 
-    public LatLngFetcher(Context context, OnLocationSelection onLocationSelection) {
+    public LatLngFetcherTask(Context context, OnLocationSelection onLocationSelection) {
         this.context = context;
         this.onLocationSelection = onLocationSelection;
     }

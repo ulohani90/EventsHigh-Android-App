@@ -277,8 +277,7 @@ public class MapsActivity extends LocationAwareEventActivity {
             lastSelectedMarker = marker;
             View eventView = eventCardContainer.getChildAt(0);
             Event event = markerManager.getEvent(marker);
-            eventView = EventListAdapter.getView(event, MapsActivity.this, eventView,
-                    eventCardContainer, !lastEventFetcherParam.query.isEmpty());
+            eventView = EventListAdapter.getView(event, MapsActivity.this, eventView, eventCardContainer);
             eventView.setOnTouchListener(new OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
