@@ -308,7 +308,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     }
 
     private void basicTabs() {
-        events = new Builder(Collections.EMPTY_SET).build();
+        events = new Builder(City.BANGALORE, Collections.EMPTY_SET).build();
 
         ActionBar actionBar = getActionBar();
         if (actionBar != null && actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS) {

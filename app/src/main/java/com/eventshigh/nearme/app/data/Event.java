@@ -359,7 +359,7 @@ public class Event implements Parcelable {
             }
         }
 
-        EventsCollection.Builder builder = new EventsCollection.Builder(whitelistCategories);
+        EventsCollection.Builder builder = new EventsCollection.Builder(city, whitelistCategories);
         return builder.addAllEvent(fromJSON(city, upcomingEvents)).build();
     }
 

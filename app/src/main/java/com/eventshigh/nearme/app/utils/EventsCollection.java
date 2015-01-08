@@ -2,9 +2,11 @@ package com.eventshigh.nearme.app.utils;
 
 import android.util.Pair;
 
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,7 +26,7 @@ public class EventsCollection {
     public static final String ALL_EVENTS_CATEGORY = "All";
     public static final String RECOMMENDED_EVENTS_CATEGORY = "Recommended";
     public static final String NOW_EVENTS_CATEGORY = "Starting Soon";
-    public static final String WEEKEND_EVENTS_CATEGORY = "This Weekend";
+    public static final String TODAY_EVENTS_CATEGORY = "Today";
 
     private static final Set<String> TAGS_BLACKLIST = new HashSet<>();
     static {
@@ -39,12 +41,18 @@ public class EventsCollection {
         private final Set<String> whiteListedTagCategories;
         private final long nowTimestamp;
         private final long latestByTimestamp;
+        private final boolean showStartingSoon;
         private final Map<String, List<Event>> events = new HashMap<>();
 
-        public Builder(Set<String> whiteListedTagCategories) {
+        public Builder(City city, Set<String> whiteListedTagCategories) {
             this.whiteListedTagCategories = whiteListedTagCategories;
             this.nowTimestamp = new Date().getTime();
             latestByTimestamp = nowTimestamp + SOON_THRESHOLD_SEC * 1000L;
+
+            // Show the starting Soon Section after 4pm.
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeZone(TimeZone.getTimeZone(city.timeZone));
+            showStartingSoon = cal.get(Calendar.HOUR_OF_DAY) > 16;
         }
 
         public Builder addEvent(Event event) {
@@ -53,17 +61,25 @@ public class EventsCollection {
                 addEvent(RECOMMENDED_EVENTS_CATEGORY, event);
             }
 
-            // See if this events is starting soon.
-            for (long eventTime : event.eventTimings) {
-                if (eventTime < nowTimestamp) {
-                    continue;
+            if (showStartingSoon) {
+                // See if this events is starting soon.
+                for (long eventTime : event.eventTimings) {
+                    if (eventTime < nowTimestamp) {
+                        continue;
+                    }
+
+                    if (eventTime <= latestByTimestamp &&
+                            DateTimeUtils.dateToEventTime(new Date(eventTime),
+                                    TimeZone.getTimeZone(event.city.timeZone)).time != null) {
+                        addEvent(NOW_EVENTS_CATEGORY, event);
+                    }
+                    break;
                 }
-                if (eventTime <= latestByTimestamp &&
-                    DateTimeUtils.dateToEventTime(new Date(eventTime),
-                        TimeZone.getTimeZone(event.city.timeZone)).time != null) {
-                    addEvent(NOW_EVENTS_CATEGORY, event);
+            } else {
+                // See if this events is happening today.
+                if (nowTimestamp > DateTimeUtils.getEventDate(event, 0).getTime()) {
+                    addEvent(TODAY_EVENTS_CATEGORY, event);
                 }
-                break;
             }
 
             if (!whiteListedTagCategories.isEmpty()) {
@@ -91,6 +107,7 @@ public class EventsCollection {
             List<Event> allEvents = events.remove(ALL_EVENTS_CATEGORY);
             List<Event> recommendedEvents = events.remove(RECOMMENDED_EVENTS_CATEGORY);
             List<Event> nowEvents = events.remove(NOW_EVENTS_CATEGORY);
+            List<Event> todayEvents = events.remove(TODAY_EVENTS_CATEGORY);
             for (Entry<String, List<Event>> tagEvents : events.entrySet()) {
                 if (tagEvents.getValue().size() > 1) {
                     tagEventsPairs.add(Pair.create(
@@ -105,17 +122,25 @@ public class EventsCollection {
                 }
             });
 
+            int index = 0;
             if (allEvents != null) {
-                tagEventsPairs.add(0, Pair.create(
+                tagEventsPairs.add(index, Pair.create(
                         ALL_EVENTS_CATEGORY, Collections.unmodifiableList(allEvents)));
+                index ++;
             }
             if (recommendedEvents != null) {
-                tagEventsPairs.add(1, Pair.create(
+                tagEventsPairs.add(index, Pair.create(
                         RECOMMENDED_EVENTS_CATEGORY, Collections.unmodifiableList(recommendedEvents)));
+                index ++;
             }
             if (nowEvents != null) {
-                tagEventsPairs.add(2, Pair.create(
+                tagEventsPairs.add(index, Pair.create(
                         NOW_EVENTS_CATEGORY, Collections.unmodifiableList(nowEvents)));
+                index ++;
+            }
+            if (todayEvents != null) {
+                tagEventsPairs.add(index, Pair.create(
+                        TODAY_EVENTS_CATEGORY, Collections.unmodifiableList(nowEvents)));
             }
 
             return new EventsCollection(tagEventsPairs);
