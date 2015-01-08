@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.EventComparator;
+import com.eventshigh.nearme.app.utils.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.EventsCollection;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -18,6 +20,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -348,7 +351,8 @@ public class Event implements Parcelable {
         return events;
     }
 
-    public static EventsCollection parseUpcomingEvents(City city, JSONObject eventsJSON) throws JSONException {
+    public static EventsCollection parseUpcomingEvents(
+            EventFetcherParam param, JSONObject eventsJSON) throws JSONException {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
         JSONArray whitelistCategoriesJSON = eventsJSON.optJSONArray("categories");
 
@@ -359,8 +363,12 @@ public class Event implements Parcelable {
             }
         }
 
-        EventsCollection.Builder builder = new EventsCollection.Builder(city, whitelistCategories);
-        return builder.addAllEvent(fromJSON(city, upcomingEvents)).build();
+        EventsCollection.Builder builder = new EventsCollection.Builder(param.city, whitelistCategories);
+        List<Event> events = fromJSON(param.city, upcomingEvents);
+        if (param.location != null) {
+            Collections.sort(events, new EventComparator(param.location));
+        }
+        return builder.addAllEvent(events).build();
     }
 
     public static @Nullable EventCategory getCategoryFromTag(String tag) {

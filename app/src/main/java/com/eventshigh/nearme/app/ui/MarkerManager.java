@@ -7,7 +7,6 @@ import android.util.Pair;
 import com.eventshigh.nearme.app.activity.MapsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.utils.EventComparator;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,10 +20,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
 
 /**
  * Manages the markers on {@link com.google.android.gms.maps.GoogleMap} for events.
@@ -75,8 +72,7 @@ public class MarkerManager {
 
     // Markers currently created on Maps. Each marker represents one event.
     // Note that all markers may not be visible to user.
-    private final Map<Marker, MarkerInfo> markers = new HashMap<>();
-    private final OrderedMarkerCollection orderedMarkerCollection = new OrderedMarkerCollection();
+    private final LinkedHashMap<Marker, MarkerInfo> markers = new LinkedHashMap<>();
 
     // ***********************
     // Public methods which are used to manage markers.
@@ -89,8 +85,8 @@ public class MarkerManager {
     public void setEvents(GoogleMap map, List<Event> events) {
         map.clear();
         markers.clear();
-        orderedMarkerCollection.clear();
 
+        int index = 1;
         for(Event event : events) {
             MarkerInfo markerInfo = new MarkerInfo(event);
             Marker marker = map.addMarker(
@@ -112,19 +108,41 @@ public class MarkerManager {
 
     // Gets the next marker, which are ordered based on user location and event popularity.
     public Marker getNextMarker(Marker marker) {
-        return orderedMarkerCollection.getNextMarker(marker);
+        Marker first = null;
+        boolean found = false;
+        for (Marker m : markers.keySet()) {
+            if (first == null) {
+                first = m;
+            }
+            if (found) {
+                return m;
+            }
+            if (m.equals(marker)) {
+                found = true;
+            }
+        }
+
+        return first;
     }
 
     public Marker getPrevMarker(Marker marker) {
-        return orderedMarkerCollection.getPrevMarker(marker);
+        Marker last = null;
+        for (Marker m : markers.keySet()) {
+            if (m.equals(marker)) {
+                if (last != null) {
+                    return last;
+                }
+            }
+            last = m;
+        }
+
+        return last;
     }
 
     // Updates the listing for current maps projection. This method decides which markers should
     // be visible and which one should not be visible. Also few markers are highlighted to
     // give relevance information.
     public boolean updateListingForProjection(@Nullable LatLng center, Projection projection) {
-        // Order the markers if needed for new map center.
-        orderedMarkerCollection.orderListingForLocation(center);
 
         // First find the markers which are withing visible region bound. All other
         // markers are marked invisible.
@@ -200,10 +218,19 @@ public class MarkerManager {
         if (markers.isEmpty()) {
             return;
         }
+
+        Marker marker = null;
         int numMinMarkers = Math.min(MIN_EVENTS_TO_SHOW, markers.size());
-        Marker marker = orderedMarkerCollection.getFirstMarker();
-        for (int i = 1; i < numMinMarkers; i++) {
-            marker = getNextMarker(marker);
+        for (Marker m : markers.keySet()) {
+            numMinMarkers --;
+            if (numMinMarkers <= 0) {
+                marker = m;
+                break;
+            }
+        }
+
+        if (marker == null) {
+            return;
         }
 
         float minDiagonalDistance = DIAGONAL_DISTANCE_MULTIPLIER *  LocationUtils.distanceInMeters(
@@ -215,66 +242,6 @@ public class MarkerManager {
             float zoomOutNeeded = (float) (Math.log(minDiagonalDistance/currentDiagonalDistance) / Math.log(2));
             float zoom = Math.max(map.getCameraPosition().zoom - zoomOutNeeded, MapsActivity.MIN_ZOOM_LEVEL);
             map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
-        }
-    }
-
-    // This class is responsible for keeping the order between all markers. This Order is then
-    // used when user swipes the event card to go to next event.
-    private class OrderedMarkerCollection {
-        // Minimum distance in meters before we reorder the events.
-        private static final int MIN_DISTANCE_FOR_REORDER = 2000;   // 2KM
-
-        // location for which the ordered marker information is maintained.
-        private LatLng location;
-
-        // ordered collection of markers.
-        private TreeSet<Marker> orderedMarkersSet = new TreeSet<>();
-
-        public void orderListingForLocation(@Nullable final LatLng location) {
-            if (location == null ||
-                (this.location != null &&
-                 this.orderedMarkersSet.size() > 0 &&
-                LocationUtils.distanceInMeters(this.location, location) < MIN_DISTANCE_FOR_REORDER)) {
-                return;
-            }
-
-            this.location = location;
-            orderedMarkersSet = new TreeSet<>(new Comparator<Marker>() {
-                EventComparator eventComparator = new EventComparator(location);
-
-                @Override
-                public int compare(Marker lhs, Marker rhs) {
-                    return eventComparator.compare(markers.get(lhs).event, markers.get(rhs).event);
-                }
-            });
-            orderedMarkersSet.addAll(markers.keySet());
-        }
-
-        public void clear() {
-            orderedMarkersSet.clear();
-            location = null;
-        }
-
-        Marker getFirstMarker() {
-            return orderedMarkersSet.first();
-        }
-
-        public Marker getNextMarker(Marker marker) {
-            Marker next = orderedMarkersSet.higher(marker);
-            if (next ==  null) {
-                next = orderedMarkersSet.first();
-            }
-
-            return next;
-        }
-
-        public Marker getPrevMarker(Marker marker) {
-            Marker prev = orderedMarkersSet.lower(marker);
-            if (prev ==  null) {
-                prev = orderedMarkersSet.last();
-            }
-
-            return prev;
         }
     }
 }

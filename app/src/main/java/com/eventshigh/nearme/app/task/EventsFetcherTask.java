@@ -93,7 +93,7 @@ public class EventsFetcherTask extends AsyncTask<EventFetcherParam, Void, Events
             Date startedAt = new Date();
             JSONObject eventsJSON = StreamUtils.fetchJSON(url);
             activity.reportActionToAnalytics("fetchTime", "ms", new Date().getTime() - startedAt.getTime());
-            return Event.parseUpcomingEvents(param.city, eventsJSON);
+            return Event.parseUpcomingEvents(param, eventsJSON);
         } catch (JSONException|IOException e) {
             Log.e(LOG_TAG, "Failed to fetch events!", e);
             return null;
