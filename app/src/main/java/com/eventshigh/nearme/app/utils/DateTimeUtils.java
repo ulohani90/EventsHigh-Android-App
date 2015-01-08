@@ -47,18 +47,24 @@ public class DateTimeUtils {
             time = time + ":00";
         }
 
-        return FULL_DATE_TIME_FORMAT.parse(date.split(":")[0] + " " + time + " " + timeZone);
+        Date todayMidnight = toMidnight(Calendar.getInstance(), timeZone).getTime();
+        Date mergedDate = FULL_DATE_TIME_FORMAT.parse(date.split(":")[0] + " " + time + " " + timeZone);
+        return mergedDate.after(todayMidnight) ? mergedDate : null;
     }
 
     public static Date getEventDate(Event event, int occurrenceNo) {
         Calendar cal = Calendar.getInstance();
-        cal.setTimeZone(TimeZone.getTimeZone(event.city.timeZone));
         cal.setTime(new Date(event.eventTimings[occurrenceNo]));
+        return toMidnight(cal, event.city.timeZone).getTime();
+    }
+
+    public static Calendar toMidnight(Calendar cal, String timeZone) {
+        cal.setTimeZone(TimeZone.getTimeZone(timeZone));
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTime();
+        return cal;
     }
 
     private static final SimpleDateFormat SIMPLE_DAY_FORMAT = new SimpleDateFormat("EE");

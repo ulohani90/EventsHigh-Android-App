@@ -338,7 +338,7 @@ public class Event implements Parcelable {
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 Event event = fromJSON(city, jsonArray.getJSONObject(i));
-                if (event.location != null) {
+                if (event.location != null && event.eventTimings.length > 0) {
                     events.add(event);
                 }
             } catch (JSONException | ParseException e) {
