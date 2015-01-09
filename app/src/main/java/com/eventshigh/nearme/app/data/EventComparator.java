@@ -1,6 +1,7 @@
-package com.eventshigh.nearme.app.utils;
+package com.eventshigh.nearme.app.data;
 
-import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Comparator;

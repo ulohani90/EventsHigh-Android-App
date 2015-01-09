@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.utils;
+package com.eventshigh.nearme.app.user;
 
 import android.content.Context;
 import android.net.Uri;
@@ -10,6 +10,7 @@ import android.util.Log;
 import com.eventshigh.nearme.app.broadcast.InstallReferrer;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.security.Signer;
+import com.eventshigh.nearme.app.utils.StreamUtils;
 
 import org.json.JSONException;
 

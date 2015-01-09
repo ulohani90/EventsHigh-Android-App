@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.utils.AccountStateReporter;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;

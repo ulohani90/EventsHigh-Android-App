@@ -1,9 +1,9 @@
-package com.eventshigh.nearme.app.utils;
+package com.eventshigh.nearme.app.data;
 
 import android.util.Pair;
 
-import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;

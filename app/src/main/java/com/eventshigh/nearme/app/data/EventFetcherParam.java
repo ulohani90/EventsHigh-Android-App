@@ -1,10 +1,9 @@
-package com.eventshigh.nearme.app.utils;
+package com.eventshigh.nearme.app.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
-import com.eventshigh.nearme.app.data.City;
 import com.google.android.gms.maps.model.LatLng;
 
 /**

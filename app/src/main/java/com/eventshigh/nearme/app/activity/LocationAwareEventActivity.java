@@ -35,9 +35,9 @@ import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.ui.OnBoardingHelper;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
-import com.eventshigh.nearme.app.utils.EventFetcherParam;
-import com.eventshigh.nearme.app.utils.EventsCollection;
-import com.eventshigh.nearme.app.utils.EventsCollection.Builder;
+import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.data.EventsCollection;
+import com.eventshigh.nearme.app.data.EventsCollection.Builder;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.google.android.gms.maps.model.LatLng;
 

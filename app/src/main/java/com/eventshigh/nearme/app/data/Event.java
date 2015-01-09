@@ -7,9 +7,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
-import com.eventshigh.nearme.app.utils.EventComparator;
-import com.eventshigh.nearme.app.utils.EventFetcherParam;
-import com.eventshigh.nearme.app.utils.EventsCollection;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
