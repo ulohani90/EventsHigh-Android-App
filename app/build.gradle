@@ -36,6 +36,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(':volley')
 
     // Ideally, we should change the dependency to following but its not working
     // as expected. We need to revisit at later point.
