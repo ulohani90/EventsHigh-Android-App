@@ -5,7 +5,6 @@ import android.app.backup.BackupManager;
 import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.LinearLayout;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
@@ -40,13 +39,7 @@ public class OnBoardingHelper {
         this.activity = activity;
 
         targets = new ArrayList<>();
-        LinearLayout daySelector = (LinearLayout) activity.findViewById(R.id.daySelector);
-        if (daySelector != null && daySelector.getChildCount() > 1) {
-            addTarget(new ViewTarget(daySelector.getChildAt(1)),
-                    R.string.onboarding_change_date);
-        }
-
-        addTarget(new ActionItemTarget(activity, R.id.action_change_location),
+        addTarget(new ActionItemTarget(activity, R.id.action_filter),
                 R.string.onboarding_action);
 
         try {
