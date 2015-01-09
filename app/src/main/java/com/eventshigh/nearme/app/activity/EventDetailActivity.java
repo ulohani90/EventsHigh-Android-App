@@ -6,10 +6,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.android.volley.Request.Priority;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.task.SingleEventFetcherTask;
-import com.eventshigh.nearme.app.task.SingleEventFetcherTask.OnEventFetchHandler;
+import com.eventshigh.nearme.app.network.EventRequest;
 
 /**
  * An activity representing a single Event detail screen.
@@ -60,26 +63,32 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         if (showEvent) {
-            new SingleEventFetcherTask(this, new OnEventFetchHandler() {
-                @Override
-                public void onEventFetch(Event event) {
-                    showEventFragment(event);
-                }
-            }).execute(intent.getData());
+            EventRequest.submit(getApplicationContext(), intent.getData(), Priority.IMMEDIATE,
+                    mEventListener, mErrorListener);
         } else {
             Toast.makeText(this, "No event to show!", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
 
-    private void showEventFragment(Event event) {
-        if (actionBar != null) {
-            actionBar.setTitle(event.title);
+    private Listener<Event> mEventListener = new Listener<Event>() {
+        @Override
+        public void onResponse(Event event) {
+            if (actionBar != null) {
+                actionBar.setTitle(event.title);
+            }
+
+            FragmentTransaction tx = getFragmentManager().beginTransaction();
+            tx.replace(R.id.container, EventDetailFragment.newInstance(event));
+            tx.commit();
         }
+    };
 
-        FragmentTransaction tx = getFragmentManager().beginTransaction();
-        tx.replace(R.id.container, EventDetailFragment.newInstance(event));
-        tx.commit();
-    }
-
+    private ErrorListener mErrorListener = new ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError volleyError) {
+            Toast.makeText(EventDetailActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    };
 }
