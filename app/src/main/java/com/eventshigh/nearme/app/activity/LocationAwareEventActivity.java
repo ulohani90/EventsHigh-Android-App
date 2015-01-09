@@ -23,21 +23,22 @@ import android.widget.DatePicker;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.android.volley.Request.Priority;
+import com.android.volley.Response.Listener;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.task.EventsFetcherTask;
-import com.eventshigh.nearme.app.task.EventsFetcherTask.EventsFetcherCallBack;
+import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.data.EventsCollection;
+import com.eventshigh.nearme.app.data.EventsCollection.Builder;
+import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.ui.OnBoardingHelper;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
-import com.eventshigh.nearme.app.data.EventFetcherParam;
-import com.eventshigh.nearme.app.data.EventsCollection;
-import com.eventshigh.nearme.app.data.EventsCollection.Builder;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -83,8 +84,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     private EventsCollection events;
     // Tag selected from tab bar for which events are shown.
     private String lastSelectedTag;
-    // last fetcher used to fetch events.
-    private EventsFetcherTask fetcher;
     // On boarding helper.
     private OnBoardingHelper onBoardingHelper;
     // when was this activity last started on.
@@ -168,16 +167,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                 .delay(3000).initialLaunchCount(5).retryPolicy(RetryPolicy.EXPONENTIAL)
                 .text(R.string.action_share_app).listener(mOnShowListener)
                 .checkAndShow();
-    }
-
-    @Override
-    protected void onDestroy() {
-        // See http://stackoverflow.com/questions/22924825/view-not-attached-to-window-manager-crash.
-        if (fetcher != null) {
-            fetcher.destroy();
-        }
-
-        super.onDestroy();
     }
 
     @Override
@@ -316,9 +305,8 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
     private void fetchNewListing() {
         reportActionToAnalytics("fetchNewListing");
-        fetcher = new EventsFetcherTask(
-                LocationAwareEventActivity.this, shouldOverrideCache, mEventsFetcherCallBack);
-        fetcher.execute(lastEventFetcherParam);
+        EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam, shouldOverrideCache,
+                Priority.IMMEDIATE, mEventsFetcherCallBack, mErrorListener);
     }
 
     protected void askUserForLocation() {
@@ -410,10 +398,15 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
     // This callback is called by EventsFetcher when new set of events are available. We build the
     // markers for all events and then call method to show selected markers.
-    private EventsFetcherCallBack mEventsFetcherCallBack = new EventsFetcherCallBack() {
+    private Listener<EventsCollection> mEventsFetcherCallBack = new Listener<EventsCollection>() {
         @Override
-        public void OnEventsAvailable(EventFetcherParam param, EventsCollection events) {
-            lastEventFetcherParam = param;
+        public void onResponse(EventsCollection events) {
+            if (events.getTags().isEmpty()) {
+                // Failed. Show toast and return empty list.
+                Toast.makeText(LocationAwareEventActivity.this, R.string.no_events, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             LocationAwareEventActivity.this.events = events;
 
             // Update tabs if needed.
@@ -458,9 +451,9 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
                 actionBar.setSelectedNavigationItem(selectedItem);
             } else {
-                if (!param.query.isEmpty()) {
+                if (!lastEventFetcherParam.query.isEmpty()) {
                     int numEvents = tags.isEmpty() ? 0 : events.getEvents(0).size();
-                    actionBar.setTitle(DateTimeUtils.dateQueryToTitle(param.query) + " (" + numEvents + ")");
+                    actionBar.setTitle(DateTimeUtils.dateQueryToTitle(lastEventFetcherParam.query) + " (" + numEvents + ")");
                 }
 
                 updateListingAndShowHelpIfNeeded(events.getEvents(0));

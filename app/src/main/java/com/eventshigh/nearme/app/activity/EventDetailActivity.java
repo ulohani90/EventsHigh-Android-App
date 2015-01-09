@@ -7,9 +7,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.android.volley.Request.Priority;
-import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
-import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.EventRequest;
@@ -81,14 +79,6 @@ public class EventDetailActivity extends BaseActivity {
             FragmentTransaction tx = getFragmentManager().beginTransaction();
             tx.replace(R.id.container, EventDetailFragment.newInstance(event));
             tx.commit();
-        }
-    };
-
-    private ErrorListener mErrorListener = new ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError volleyError) {
-            Toast.makeText(EventDetailActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
-            finish();
         }
     };
 }

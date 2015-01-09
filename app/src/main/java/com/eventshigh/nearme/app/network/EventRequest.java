@@ -26,10 +26,8 @@ import java.util.List;
  * Volley Request to fetch the a single event data.
  */
 public class EventRequest extends JsonRequest<Event> {
-    private static final String LOG_TAG = EventRequest.class.getSimpleName();
-
     /**
-     * Helper method to create a volley request to fetch Event information from its Uri.
+     * Helper method to submit a volley request to fetch Event information from its Uri.
      *
      * @param context an application context to initiate the volley.
      * @param eventUri Uri representing the event.

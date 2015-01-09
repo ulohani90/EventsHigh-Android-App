@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
-import android.net.http.HttpResponseCache;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
@@ -19,6 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.VolleyError;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
@@ -52,17 +53,6 @@ public abstract class BaseActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Setup Http cache.
-        if (HttpResponseCache.getInstalled() == null) {
-            try {
-                File httpCacheDir = new File(getCacheDir(), "http");
-                long httpCacheSize = 20 * 1024 * 1024; // 20 MB
-                HttpResponseCache.install(httpCacheDir, httpCacheSize);
-            } catch (IOException e) {
-                Log.w(LOG_TAG, "HTTP response cache installation failed!", e);
-            }
-        }
-
         // Animation.
         overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_translate);
 
@@ -94,12 +84,6 @@ public abstract class BaseActivity extends FragmentActivity {
 
         // Google Analytics reporting.
         gaHelper.reportActivityStop(this);
-
-        // Save the Http cache.
-        HttpResponseCache cache = HttpResponseCache.getInstalled();
-        if (cache != null) {
-            cache.flush();
-        }
     }
 
     @Override
@@ -263,4 +247,13 @@ public abstract class BaseActivity extends FragmentActivity {
             Toast.makeText(this, R.string.no_cal_app, Toast.LENGTH_SHORT).show();
         }
     }
+
+    protected ErrorListener mErrorListener = new ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError volleyError) {
+            Log.w(LOG_TAG, volleyError.getMessage(), volleyError.getCause());
+            Toast.makeText(BaseActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    };
 }
