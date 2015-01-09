@@ -52,7 +52,7 @@ public class EventsCollection {
             // Show the starting Soon Section after 4pm.
             Calendar cal = Calendar.getInstance();
             cal.setTimeZone(TimeZone.getTimeZone(city.timeZone));
-            showStartingSoon = cal.get(Calendar.HOUR_OF_DAY) > 16;
+            showStartingSoon = cal.get(Calendar.HOUR_OF_DAY) >= 16;
         }
 
         public Builder addEvent(Event event) {
