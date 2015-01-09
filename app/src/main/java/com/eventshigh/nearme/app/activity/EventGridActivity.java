@@ -1,22 +1,17 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.ActionBar;
-import android.app.SearchManager;
-import android.content.Context;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
-import android.widget.SearchView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.task.UpdateLocationTask;
 import com.eventshigh.nearme.app.ui.EventListAdapter;
 import com.eventshigh.nearme.app.utils.EventComparator;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
@@ -44,44 +39,6 @@ public class EventGridActivity extends LocationAwareEventActivity {
         mEventsListAdapter = new EventListAdapter(this);
         eventGridView.setAdapter(mEventsListAdapter);
         eventGridView.setOnItemClickListener(mOnItemClickListener);
-    }
-
-    protected void onStart() {
-        super.onStart();
-
-        // Show the Up button in the action bar.
-        ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(!lastEventFetcherParam.query.isEmpty() || pref.isMapsViewDefault());
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_grid, menu);
-
-        // Search View.
-        if (!pref.isMapsViewDefault()) {
-            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-            SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        } else {
-            menu.findItem(R.id.action_search).setVisible(false);
-        }
-
-        // Do not show filterByDate for search.
-        if (!lastEventFetcherParam.query.isEmpty() &&
-            !EventsHighEndpoints.isDateQuery(lastEventFetcherParam.query)) {
-            menu.findItem(R.id.action_filter).setVisible(false);
-        }
-
-        // Debug Views.
-        if (isDebug) {
-            menu.findItem(R.id.debug_cache_override).setVisible(true);
-        }
-
-        return true;
     }
 
 
@@ -115,6 +72,17 @@ public class EventGridActivity extends LocationAwareEventActivity {
     protected boolean showLocationInActionBar() {
         return true;
     }
+
+    @Override
+    protected boolean isDefaultView() {
+        return !pref.isMapsViewDefault();
+    }
+
+    @Override
+    protected int getDisabledMenuId() {
+        return R.id.action_list;
+    }
+
 
     // ***********************
     // Callbacks

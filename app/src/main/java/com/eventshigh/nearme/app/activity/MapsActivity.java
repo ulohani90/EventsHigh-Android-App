@@ -1,12 +1,8 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.ActionBar;
-import android.app.SearchManager;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -14,14 +10,12 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.ui.EventListAdapter;
 import com.eventshigh.nearme.app.ui.MarkerManager;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.ShowcaseView.Builder;
@@ -97,46 +91,18 @@ public class MapsActivity extends LocationAwareEventActivity {
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
     }
 
-    protected void onStart() {
-        super.onStart();
-
-        // Show the Up button in the action bar.
-        ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(!lastEventFetcherParam.query.isEmpty() || pref.isMapsViewDefault());
-        }
+    protected boolean showLocationInActionBar() {
+        return false;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_map, menu);
-
-        // Search View.
-        if (pref.isMapsViewDefault()) {
-            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-            SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        } else {
-            menu.findItem(R.id.action_search).setVisible(false);
-        }
-
-        // Do not show filterByDate for search.
-        if (!lastEventFetcherParam.query.isEmpty() &&
-            !EventsHighEndpoints.isDateQuery(lastEventFetcherParam.query)) {
-            menu.findItem(R.id.action_filter).setVisible(false);
-        }
-
-        // Debug Views.
-        if (isDebug) {
-            menu.findItem(R.id.debug_cache_override).setVisible(true);
-        }
-
-        return true;
+    protected boolean isDefaultView() {
+        return pref.isMapsViewDefault();
     }
 
-    protected boolean showLocationInActionBar() {
-        return false;
+    @Override
+    protected int getDisabledMenuId() {
+        return R.id.action_map;
     }
 
 

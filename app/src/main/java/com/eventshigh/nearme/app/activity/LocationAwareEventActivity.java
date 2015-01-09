@@ -7,17 +7,20 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.util.Pair;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.DatePicker;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
@@ -129,6 +132,13 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
 
+        // Show the Up button in the action bar.
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(
+                    !lastEventFetcherParam.query.isEmpty() || !isDefaultView());
+        }
+
         // The activity could have started either for first time or when user
         // launches the sleeping app or when he returns from details pane.
         // We do not refresh the app if user is in same session or has returned
@@ -180,20 +190,41 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            // This ID represents the Home or Up button. In the case of this
-            // activity, the Up button is shown. Use NavUtils to allow users
-            // to navigate up one level in the application structure. For
-            // more details, see the Navigation pattern on Android Design:
-            //
-            // http://developer.android.com/design/patterns/navigation.html#up-vs-back
-            //
-            NavUtils.navigateUpFromSameTask(this);
-            return true;
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.activity_event, menu);
+
+        // Search View.
+        if (isDefaultView()) {
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        } else {
+            menu.findItem(R.id.action_search).setVisible(false);
         }
 
+        // Do not show filterByDate for search.
+        if (!lastEventFetcherParam.query.isEmpty() &&
+            !EventsHighEndpoints.isDateQuery(lastEventFetcherParam.query)) {
+            menu.findItem(R.id.action_filter).setVisible(false);
+        }
+
+        // Debug Views.
+        if (isDebug) {
+            menu.findItem(R.id.debug_cache_override).setVisible(true);
+        }
+
+        int disabledMenuId = getDisabledMenuId();
+        if (disabledMenuId > 0) {
+            menu.findItem(disabledMenuId).setVisible(false);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
         if (id == R.id.action_list) {
             switchTo(EventGridActivity.class);
             return true;
@@ -255,6 +286,16 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
      * @return true if location should be shown in action bar as subtitle.
      */
     protected abstract boolean showLocationInActionBar();
+
+    /**
+     * @return true if the view represented by this activity is default view.
+     */
+    protected abstract boolean isDefaultView();
+
+    /**
+     * @return true if the view represented by this activity is default view.
+     */
+    protected abstract int getDisabledMenuId();
 
 
     // ***********************

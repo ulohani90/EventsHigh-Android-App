@@ -24,13 +24,18 @@
           android:orderInCategory="30"
           tools:ignore="AppCompatResource"
     />
+    <item android:id="@+id/action_list"
+          android:title="@string/action_list"
+          android:icon="@drawable/ic_action_view_as_list"
+          android:orderInCategory="40"
+          tools:ignore="AppCompatResource"
+    />
     <item android:id="@+id/action_map"
           android:title="@string/action_map"
           android:icon="@android:drawable/ic_dialog_map"
           android:orderInCategory="40"
           tools:ignore="AppCompatResource"
     />
-
     <item android:id="@+id/debug_cache_override"
           android:title="Override Cache"
           android:icon="@android:drawable/ic_menu_preferences"
