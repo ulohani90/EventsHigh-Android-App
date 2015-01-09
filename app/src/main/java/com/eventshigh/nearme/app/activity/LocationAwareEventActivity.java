@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
@@ -475,10 +476,8 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             implements DatePickerDialog.OnDateSetListener, DialogInterface.OnClickListener {
         private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-        private Date selectedDate = null;
-        private boolean filterRequested = false;
-        private long numDaysAhead = -1;
         private Date today;
+        private DatePickerDialog datePicker;
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -501,7 +500,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             int day = cal.get(Calendar.DAY_OF_MONTH);
             today = new Date(year - 1900, month, day);
 
-            DatePickerDialog datePicker = new DatePickerDialog(getActivity(), this, year, month, day);
+            datePicker = new DatePickerDialog(getActivity(), this, year, month, day);
             datePicker.setCancelable(true);
             datePicker.setCanceledOnTouchOutside(true);
             datePicker.getDatePicker().setMinDate(today.getTime());
@@ -512,25 +511,20 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             return datePicker;
         }
 
-        public synchronized void onDateSet(DatePicker view, int year, int month, int day) {
-            selectedDate = new Date(year - 1900, month, day);
-            numDaysAhead = (selectedDate.getTime() - today.getTime()) / (24*3600*1000L);
-            if (filterRequested) {
-                filterByDate();
-            }
+        public void onDateSet(DatePicker view, int year, int month, int day) {
         }
 
         @Override
-        public synchronized void onClick(DialogInterface dialog, int which) {
-            filterRequested = true;
-            if (selectedDate != null) {
-                filterByDate();
-            }
-        }
+        public void onClick(DialogInterface dialog, int which) {
+            Log.w("TEXT", "onClick");
+            Date selectedDate = new Date(datePicker.getDatePicker().getYear() - 1900,
+                    datePicker.getDatePicker().getMonth(),
+                    datePicker.getDatePicker().getDayOfMonth());
+            long numDaysAhead = (selectedDate.getTime() - today.getTime()) / (24 * 3600 * 1000L);
 
-        private void filterByDate() {
             LocationAwareEventActivity activity = (LocationAwareEventActivity) getActivity();
             activity.reportActionToAnalytics("filterByDate", Long.toString(numDaysAhead) + "days later");
+
             EventFetcherParam param = new EventFetcherParam(activity.lastEventFetcherParam.location,
                     DATE_FORMAT.format(selectedDate));
             Intent intent = new Intent(getActivity(), activity.getClass())
