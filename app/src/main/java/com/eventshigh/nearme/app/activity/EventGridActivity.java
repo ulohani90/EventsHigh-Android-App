@@ -22,7 +22,8 @@ import java.util.List;
  * On Tablet, we try to put more columns as per the width offered.
  */
 public class EventGridActivity extends LocationAwareEventActivity {
-    private EventListAdapter mEventsListAdapter;
+    private EventListAdapter eventListAdapter;
+    private GridView eventGridView;
 
     // ***********************
     // Activity lifecycle  Methods
@@ -35,9 +36,9 @@ public class EventGridActivity extends LocationAwareEventActivity {
         setContentView(R.layout.activity_event_grid);
 
         // Setup adapter.
-        GridView eventGridView = (GridView) findViewById(R.id.event_grid);
-        mEventsListAdapter = new EventListAdapter(this);
-        eventGridView.setAdapter(mEventsListAdapter);
+        eventGridView = (GridView) findViewById(R.id.event_grid);
+        eventListAdapter = new EventListAdapter(this);
+        eventGridView.setAdapter(eventListAdapter);
         eventGridView.setOnItemClickListener(mOnItemClickListener);
     }
 
@@ -48,8 +49,9 @@ public class EventGridActivity extends LocationAwareEventActivity {
 
     @Override
     protected void updateNewEvents(List<Event> events) {
-        mEventsListAdapter.clear();
-        mEventsListAdapter.addAll(events);
+        eventListAdapter.clear();
+        eventListAdapter.addAll(events);
+        eventGridView.smoothScrollToPosition(0);
     }
 
     protected void updateUserLocation(LatLng userLocation) {
@@ -66,7 +68,8 @@ public class EventGridActivity extends LocationAwareEventActivity {
 
     private void updateListingForUserLocation(final LatLng userLocation) {
         // Sort the events based on popularity and distance from user location.
-        mEventsListAdapter.sort(new EventComparator(userLocation));
+        eventListAdapter.sort(new EventComparator(userLocation));
+        eventGridView.smoothScrollToPosition(0);
     }
 
     protected boolean showLocationInActionBar() {
@@ -91,7 +94,7 @@ public class EventGridActivity extends LocationAwareEventActivity {
     private final OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            showEventDetails(mEventsListAdapter.getItem(position));
+            showEventDetails(eventListAdapter.getItem(position));
         }
     };
 }

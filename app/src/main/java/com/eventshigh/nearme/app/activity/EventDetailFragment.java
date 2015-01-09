@@ -27,9 +27,11 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.task.DownloadImageTask;
+import com.eventshigh.nearme.app.network.Helper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -82,9 +84,9 @@ public class EventDetailFragment extends Fragment {
      **********************************/
 
     // Event shown through this fragment.
-    private Event mEvent;
+    private Event event;
     // Event card which holds the UI elements.
-    private EventCard mEventCard;
+    private EventCard eventCard;
     // Activity to which this fragment is attached
     private BaseActivity activity;
     // Hidden trick to disable a device from GA reporting is to tap on
@@ -102,9 +104,9 @@ public class EventDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mEvent = getArguments().getParcelable(ARG_EVENT_INFO);
+            event = getArguments().getParcelable(ARG_EVENT_INFO);
         }
-        setHasOptionsMenu(mEvent != null);
+        setHasOptionsMenu(event != null);
     }
 
     @Override
@@ -116,7 +118,7 @@ public class EventDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_event_detail, container, false);
 
         // Populate View.
-        mEventCard = new EventCard(rootView);
+        eventCard = new EventCard(rootView);
         populateView();
         return rootView;
     }
@@ -160,9 +162,9 @@ public class EventDetailFragment extends Fragment {
         client.registerConnectionCallbacks(new ConnectionCallbacks() {
             @Override
             public void onConnected(Bundle bundle) {
-                Uri webUri = mEvent.getEventDetailsURI();
+                Uri webUri = event.getEventDetailsURI();
                 AppIndex.AppIndexApi.view(client, activity, Utils.getAppUri(webUri),
-                        mEvent.title, webUri, null);
+                        event.title, webUri, null);
             }
 
             @Override
@@ -171,7 +173,7 @@ public class EventDetailFragment extends Fragment {
             }
         });
 
-        if (mEvent != null) {
+        if (event != null) {
             client.connect();
         }
     }
@@ -181,7 +183,7 @@ public class EventDetailFragment extends Fragment {
         super.onStop();
 
         if (client.isConnected()) {
-            Uri webUri = mEvent.getEventDetailsURI();
+            Uri webUri = event.getEventDetailsURI();
             AppIndex.AppIndexApi.viewEnd(client, activity, Utils.getAppUri(webUri));
             client.disconnect();
         }
@@ -194,7 +196,7 @@ public class EventDetailFragment extends Fragment {
 
     private void openSourceSite() {
         activity.reportActionToAnalytics("openSource");
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mEvent.sourceUrl));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.sourceUrl));
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
@@ -205,7 +207,7 @@ public class EventDetailFragment extends Fragment {
     private void call() {
         activity.reportActionToAnalytics("callOrganizer");
         Intent intent = new Intent(Intent.ACTION_DIAL)
-                .setData(Uri.parse("tel:" + mEvent.organizerPhone));
+                .setData(Uri.parse("tel:" + event.organizerPhone));
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
@@ -215,7 +217,7 @@ public class EventDetailFragment extends Fragment {
 
     private void openOrganizerWebsite() {
         activity.reportActionToAnalytics("openOrganizerWebsite");
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mEvent.organizerWebsite));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerWebsite));
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
@@ -224,12 +226,12 @@ public class EventDetailFragment extends Fragment {
     }
 
     private void shareEvent() {
-        activity.shareEvent(mEventCard.shareView, mEvent);
+        activity.shareEvent(eventCard.shareView, event);
     }
 
     private void openBookingSite() {
         activity.reportActionToAnalytics("bookTicket");
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mEvent.bookingUrl));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.bookingUrl));
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
@@ -246,7 +248,7 @@ public class EventDetailFragment extends Fragment {
         private final View rootView;
         private final View shareView;
         private final ImageView recommendedImageView;
-        private final ImageView bgView;
+        private final NetworkImageView bgView;
         private final TextView titleView;
         private final LinearLayout timeView;
         private final TextView numPeopleInterestedView;
@@ -273,7 +275,7 @@ public class EventDetailFragment extends Fragment {
             this.rootView = rootView;
             shareView = rootView.findViewById(R.id.share_view);
             recommendedImageView = (ImageView) rootView.findViewById(R.id.eh_recommend_banner);
-            bgView = (ImageView) rootView.findViewById(R.id.event_bg);
+            bgView = (NetworkImageView) rootView.findViewById(R.id.event_bg);
             titleView = (TextView) rootView.findViewById(R.id.event_title);
             timeView = (LinearLayout) rootView.findViewById(R.id.event_time);
             numPeopleInterestedView = (TextView) rootView.findViewById(R.id.num_people_interested);
@@ -299,8 +301,8 @@ public class EventDetailFragment extends Fragment {
     }
 
     private void populateView() {
-        if (mEvent == null) {
-            mEventCard.rootView.setVisibility(View.INVISIBLE);
+        if (event == null) {
+            eventCard.rootView.setVisibility(View.INVISIBLE);
             return;
         }
 
@@ -308,17 +310,16 @@ public class EventDetailFragment extends Fragment {
         final DisplayMetrics metrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int maxHeight = (int) (0.4 * metrics.heightPixels);
-        int infographResId = mEvent.category.getInfographResourceId();
-        mEventCard.bgView.setMaxHeight(maxHeight);
-        if (mEvent.imgUrl == null && infographResId == R.drawable.eh_default) {
-            mEventCard.bgView.setVisibility(View.GONE);
+        eventCard.bgView.setMaxHeight(maxHeight);
+        if (event.imgUrl == null) {
+            eventCard.bgView.setVisibility(View.GONE);
         } else {
-            DownloadImageTask.setImage(mEventCard.bgView, getResources(),
-                    mEvent.imgUrl, infographResId);
+            eventCard.bgView.setImageUrl(event.imgUrl,
+                    Helper.getImageLoader(activity.getApplicationContext()));
         }
 
-        if (mEvent.imgUrl != null) {
-            mEventCard.bgView.setOnClickListener(new OnClickListener() {
+        if (event.imgUrl != null) {
+            eventCard.bgView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     activity.reportActionToAnalytics("imagePreview");
@@ -328,7 +329,8 @@ public class EventDetailFragment extends Fragment {
                     nagDialog.setContentView(R.layout.dialog_image_preview);
 
                     ImageViewTouch preview = (ImageViewTouch) nagDialog.findViewById(R.id.image_preview);
-                    DownloadImageTask.setImageNoCache(preview, mEvent.imgUrl, getResources());
+                    Helper.getImageLoader(getActivity().getApplicationContext()).get(
+                            event.imgUrl, ImageLoader.getImageListener(preview, 0, 0));
 
                     Button btnClose = (Button) nagDialog.findViewById(R.id.btn_close);
                     btnClose.setOnClickListener(new OnClickListener() {
@@ -344,20 +346,20 @@ public class EventDetailFragment extends Fragment {
         }
 
         // Set title
-        mEventCard.titleView.setText(mEvent.title);
+        eventCard.titleView.setText(event.title);
 
         // Set EH recommendation banner
-        mEventCard.recommendedImageView.setVisibility(mEvent.ehRecommended ? View.VISIBLE : View.GONE);
+        eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
 
         // Set Num people Interested
-        if (mEvent.numPeopleInterested <= 0) {
-            mEventCard.numPeopleInterestedView.setVisibility(View.GONE);
+        if (event.numPeopleInterested <= 0) {
+            eventCard.numPeopleInterestedView.setVisibility(View.GONE);
         } else {
             Resources res = getResources();
             String text = res.getQuantityString(R.plurals.people_interested,
-                    mEvent.numPeopleInterested, mEvent.numPeopleInterested);
-            mEventCard.numPeopleInterestedView.setText(text);
-            mEventCard.numPeopleInterestedView.setOnClickListener(new OnClickListener() {
+                    event.numPeopleInterested, event.numPeopleInterested);
+            eventCard.numPeopleInterestedView.setText(text);
+            eventCard.numPeopleInterestedView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     gaOptOutCounter ++;
@@ -370,25 +372,25 @@ public class EventDetailFragment extends Fragment {
         }
 
         // Set Venue and address.
-        if (mEvent.venue == null) {
-            mEventCard.venueView.setVisibility(View.GONE);
+        if (event.venue == null) {
+            eventCard.venueView.setVisibility(View.GONE);
         } else {
-            mEventCard.venueView.setText(Utils.capitalize(mEvent.venue));
+            eventCard.venueView.setText(Utils.capitalize(event.venue));
         }
-        mEventCard.addressView.setText(
-                mEvent.address == null ? Utils.capitalize(mEvent.city.toString()) : mEvent.address);
-        mEventCard.directionView.setOnClickListener(new OnClickListener() {
+        eventCard.addressView.setText(
+                event.address == null ? Utils.capitalize(event.city.toString()) : event.address);
+        eventCard.directionView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.showDirections(mEvent);
+                activity.showDirections(event);
             }
         });
 
         // Set action buttons.
-        if (mEvent.bookingUrl == null) {
-            mEventCard.bookView.setVisibility(View.GONE);
+        if (event.bookingUrl == null) {
+            eventCard.bookView.setVisibility(View.GONE);
         } else {
-            mEventCard.bookView.setOnClickListener(new OnClickListener() {
+            eventCard.bookView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     openBookingSite();
@@ -396,10 +398,10 @@ public class EventDetailFragment extends Fragment {
             });
         }
 
-        if (mEvent.organizerPhone == null) {
-            mEventCard.callView.setVisibility(View.GONE);
+        if (event.organizerPhone == null) {
+            eventCard.callView.setVisibility(View.GONE);
         } else {
-            mEventCard.callView.setOnClickListener(new OnClickListener() {
+            eventCard.callView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     call();
@@ -408,47 +410,47 @@ public class EventDetailFragment extends Fragment {
         }
 
         // Set time.
-        if (mEvent.eventTimings.length == 0) {
-            mEventCard.timeView.setVisibility(View.GONE);
-            mEventCard.saveView.setVisibility(View.GONE);
+        if (event.eventTimings.length == 0) {
+            eventCard.timeView.setVisibility(View.GONE);
+            eventCard.saveView.setVisibility(View.GONE);
         } else {
-            mEventCard.saveView.setOnClickListener(new OnClickListener() {
+            eventCard.saveView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.addToCalendar(mEvent, null);
+                    activity.addToCalendar(event, null);
                 }
             });
-            for (int i = 0; i < mEvent.eventTimings.length; i++) {
-                final Date date = new Date(mEvent.eventTimings[i]);
+            for (int i = 0; i < event.eventTimings.length; i++) {
+                final Date date = new Date(event.eventTimings[i]);
                 LinearLayout daySelectorItem = getEventTimeItem(
-                        mEventCard.timeView, DateTimeUtils.getEventTime(mEvent, i));
-                mEventCard.timeView.addView(daySelectorItem, getLayoutParam());
+                        eventCard.timeView, DateTimeUtils.getEventTime(event, i));
+                eventCard.timeView.addView(daySelectorItem, getLayoutParam());
                 daySelectorItem.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        activity.addToCalendar(mEvent, date);
+                        activity.addToCalendar(event, date);
                     }
                 });
             }
         }
 
         // Set description.
-        if (htmlCheckPattern.matcher(mEvent.description).find()) {
-            mEventCard.descriptionView.setText(Html.fromHtml(mEvent.description));
+        if (htmlCheckPattern.matcher(event.description).find()) {
+            eventCard.descriptionView.setText(Html.fromHtml(event.description));
         } else {
-            mEventCard.descriptionView.setText(mEvent.description);
+            eventCard.descriptionView.setText(event.description);
         }
 
         // Add attribution.
-        if (mEvent.sourceUrl == null) {
-            mEventCard.fromView.setVisibility(View.INVISIBLE);
+        if (event.sourceUrl == null) {
+            eventCard.fromView.setVisibility(View.INVISIBLE);
         } else {
-            final Uri fromUri =  Uri.parse(mEvent.sourceUrl);
+            final Uri fromUri =  Uri.parse(event.sourceUrl);
             String eventFrom = String.format(
                     getResources().getString(R.string.event_detail_from),
                     fromUri.getHost());
-            mEventCard.fromView.setText(eventFrom);
-            mEventCard.fromView.setOnClickListener(new OnClickListener() {
+            eventCard.fromView.setText(eventFrom);
+            eventCard.fromView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     openSourceSite();
@@ -458,19 +460,19 @@ public class EventDetailFragment extends Fragment {
 
         // Organizer Info.
         boolean organizerInfoShown = false;
-        if (mEvent.organizerName == null) {
-            mEventCard.organizerNameRow.setVisibility(View.GONE);
+        if (event.organizerName == null) {
+            eventCard.organizerNameRow.setVisibility(View.GONE);
         } else {
             organizerInfoShown = true;
-            mEventCard.organizerNameView.setText(mEvent.organizerName);
+            eventCard.organizerNameView.setText(event.organizerName);
         }
 
-        if (mEvent.organizerPhone == null) {
-            mEventCard.organizerPhoneRow.setVisibility(View.GONE);
+        if (event.organizerPhone == null) {
+            eventCard.organizerPhoneRow.setVisibility(View.GONE);
         } else {
             organizerInfoShown = true;
-            mEventCard.organizerPhoneView.setText(mEvent.organizerPhone);
-            mEventCard.organizerPhoneView.setOnClickListener(new OnClickListener() {
+            eventCard.organizerPhoneView.setText(event.organizerPhone);
+            eventCard.organizerPhoneView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     call();
@@ -478,12 +480,12 @@ public class EventDetailFragment extends Fragment {
             });
         }
 
-        if (mEvent.organizerWebsite == null) {
-            mEventCard.organizerWebsiteRow.setVisibility(View.GONE);
+        if (event.organizerWebsite == null) {
+            eventCard.organizerWebsiteRow.setVisibility(View.GONE);
         } else {
             organizerInfoShown = true;
-            mEventCard.organizerWebsiteView.setText(mEvent.organizerWebsite);
-            mEventCard.organizerWebsiteView.setOnClickListener(new OnClickListener() {
+            eventCard.organizerWebsiteView.setText(event.organizerWebsite);
+            eventCard.organizerWebsiteView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     openOrganizerWebsite();
@@ -492,26 +494,26 @@ public class EventDetailFragment extends Fragment {
         }
 
         if (!organizerInfoShown) {
-            mEventCard.organizerHeader.setVisibility(View.GONE);
+            eventCard.organizerHeader.setVisibility(View.GONE);
         }
 
         // Show tags.
-        if (mEvent.getAllTags().length > 0) {
+        if (event.getAllTags().length > 0) {
             showTags();
         } else {
-            mEventCard.tagsSeparatorView.setVisibility(View.GONE);
-            mEventCard.tagsHeaderView.setVisibility(View.GONE);
+            eventCard.tagsSeparatorView.setVisibility(View.GONE);
+            eventCard.tagsHeaderView.setVisibility(View.GONE);
         }
     }
 
     private void showTags() {
-        Utils.waitForViewVisible(mEventCard.tagsView, new Runnable() {
+        Utils.waitForViewVisible(eventCard.tagsView, new Runnable() {
             public void run() {
                 LayoutParams layoutParams = getLayoutParam();
-                int maxWidth = mEventCard.tagsView.getWidth()
+                int maxWidth = eventCard.tagsView.getWidth()
                         - layoutParams.leftMargin - layoutParams.rightMargin;
                 LinearLayout ll = getLL(layoutParams);
-                for (String tag : mEvent.getAllTags()) {
+                for (String tag : event.getAllTags()) {
                     TextView tagView = addTag(ll, tag);
                     ll.measure(0, 0);
                     if (ll.getMeasuredWidth() < maxWidth) {
@@ -543,7 +545,7 @@ public class EventDetailFragment extends Fragment {
         LinearLayout ll = new LinearLayout(activity);
         ll.setLayoutParams(layoutParams);
         ll.setOrientation(LinearLayout.HORIZONTAL);
-        mEventCard.tagsView.addView(ll);
+        eventCard.tagsView.addView(ll);
         return  ll;
     }
 

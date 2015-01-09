@@ -24,11 +24,11 @@ public class UpdateLocationTask extends AsyncTask<LatLng, Void, String> {
     private static final String LOG_TAG = UpdateLocationTask.class.getSimpleName();
     private static final Pattern INVALID_LOCALITY_PATTERN = Pattern.compile("[^a-zA-Z]+[a-zA-Z]?");
 
-    private final Context mContext;
+    private final Context context;
     private final ActionBar actionBar;
 
     public UpdateLocationTask(Context context, ActionBar actionBar) {
-        this.mContext = context;
+        this.context = context;
         this.actionBar = actionBar;
     }
 
@@ -37,7 +37,7 @@ public class UpdateLocationTask extends AsyncTask<LatLng, Void, String> {
         String locality = null;
         List<Address> addresses = null;
         try {
-            addresses = new Geocoder(mContext)
+            addresses = new Geocoder(context)
                     .getFromLocation(params[0].latitude, params[0].longitude, 1);
         } catch (IOException e) {
             Log.w(LOG_TAG, "failed to get address", e);

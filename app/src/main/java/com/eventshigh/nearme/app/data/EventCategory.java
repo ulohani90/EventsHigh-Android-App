@@ -60,17 +60,6 @@ public enum EventCategory {
         return resId;
     }
 
-    public int getInfographResourceId() {
-        int resId = R.drawable.eh_default;
-        try {
-            resId = R.drawable.class.getField("infograph_" + toString().toLowerCase()).getInt(null);
-        } catch (IllegalAccessException| NoSuchFieldException e) {
-            // Ignore
-        }
-
-        return resId;
-    }
-
     public static BitmapDescriptor circleIcon() {
         if (CIRCLE_ICON == null) {
             CIRCLE_ICON = BitmapDescriptorFactory.fromResource(R.drawable.dot0);

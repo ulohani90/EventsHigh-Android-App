@@ -8,10 +8,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.task.DownloadImageTask;
+import com.eventshigh.nearme.app.network.Helper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -21,16 +22,16 @@ import com.eventshigh.nearme.app.utils.Utils;
  * Event card.
  */
 public class EventListAdapter extends ArrayAdapter<Event> {
-    private final BaseActivity mBaseActivity;
+    private final BaseActivity activity;
 
     public EventListAdapter(BaseActivity activity) {
         super(activity, R.layout.event_card, R.id.event_title);
-        mBaseActivity = activity;
+        this.activity = activity;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return getView(getItem(position), mBaseActivity, convertView, parent);
+        return getView(getItem(position), activity, convertView, parent);
     }
 
     // Build the view, reuse existing if possible.
@@ -43,8 +44,10 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         EventCard eventCard = new EventCard(view);
 
         // Set the background image.
-        DownloadImageTask.setImage(eventCard.bgView, activity.getResources(),
-                event.imgUrl, event.category.getInfographResourceId());
+        if (event.imgUrl != null) {
+            eventCard.bgView.setImageUrl(event.imgUrl,
+                    Helper.getImageLoader(activity.getApplicationContext()));
+        }
 
         // Set the title, time etc.
         eventCard.titleView.setText(event.title);
@@ -96,7 +99,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
     }
 
     public static class EventCard {
-        private final ImageView bgView;
+        private final NetworkImageView bgView;
         private final ImageView shareView;
         private final ImageView recommendedImageView;
         private final TextView titleView;
@@ -108,7 +111,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         private final TextView tag2View;
 
         private EventCard(View cardView) {
-            bgView = (ImageView) cardView.findViewById(R.id.event_bg);
+            bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
             shareView = (ImageView) cardView.findViewById(R.id.event_share);
             recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
             titleView = (TextView) cardView.findViewById(R.id.event_title);

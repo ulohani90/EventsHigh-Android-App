@@ -56,9 +56,6 @@ public class GcmIntentService extends IntentService {
 
     // Put the message into a notification and post it.
     private void sendNotification(Bundle msg) {
-        NotificationManager mNotificationManager = (NotificationManager)
-                this.getSystemService(Context.NOTIFICATION_SERVICE);
-
         String eventId = msg.getString("id");
         String title = msg.getString("t");
         String message = msg.getString("m");
@@ -100,7 +97,9 @@ public class GcmIntentService extends IntentService {
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                         .setContentIntent(contentIntent);
 
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        NotificationManager notificationManager = (NotificationManager)
+                this.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
         gaHelper.reportActionToAnalytics(
                 getClass().getSimpleName(), "notificationShown", eventId, 1)    ;
     }
