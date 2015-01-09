@@ -27,7 +27,6 @@ public class EventDetailActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event_detail);
 
         // Show the Up button in the action bar.
         actionBar = getActionBar();
@@ -58,6 +57,8 @@ public class EventDetailActivity extends BaseActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
+        setContentView(R.layout.activity_event_detail);
+
         String action = intent.getAction();
 
         boolean showEvent = false;
@@ -72,7 +73,7 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         // Get the event from Intent.
-        Event event = getIntent().getParcelableExtra(EventDetailFragment.ARG_EVENT_INFO);
+        Event event = intent.getParcelableExtra(EventDetailFragment.ARG_EVENT_INFO);
         if (event != null) {
             showEvent = true;
             intent.setData(event.getEventDetailsURI());

@@ -138,9 +138,9 @@ public class EventsCollection {
                         NOW_EVENTS_CATEGORY, Collections.unmodifiableList(nowEvents)));
                 index ++;
             }
-            if (todayEvents != null) {
+            if (todayEvents != null && allEvents != null && allEvents.size() > todayEvents.size()) {
                 tagEventsPairs.add(index, Pair.create(
-                        TODAY_EVENTS_CATEGORY, Collections.unmodifiableList(nowEvents)));
+                        TODAY_EVENTS_CATEGORY, Collections.unmodifiableList(todayEvents)));
             }
 
             return new EventsCollection(tagEventsPairs);

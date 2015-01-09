@@ -3,7 +3,11 @@ package com.eventshigh.nearme.app.activity;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +16,7 @@ import android.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.DatePicker;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
@@ -24,13 +29,20 @@ import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.ui.OnBoardingHelper;
+import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventFetcherParam;
 import com.eventshigh.nearme.app.utils.EventsCollection;
 import com.eventshigh.nearme.app.utils.EventsCollection.Builder;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import fr.nicolaspomepuy.discreetapprate.AppRate;
 import fr.nicolaspomepuy.discreetapprate.AppRate.OnShowListener;
@@ -100,12 +112,13 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         lastSelectedTag = intent.getStringExtra(EXTRA_TAG_NAME_PARAM);
 
         // Show query as title.
-        if (!lastEventFetcherParam.query.isEmpty()) {
-            reportActionToAnalytics("search", lastEventFetcherParam.query);
-            EventSearchSuggestionsProvider.saveRecentQuery(this, lastEventFetcherParam.query);
-
-            ActionBar actionBar = getActionBar();
-            if (actionBar != null) {
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null && !lastEventFetcherParam.query.isEmpty()) {
+            if (EventsHighEndpoints.isDateQuery(lastEventFetcherParam.query)) {
+                actionBar.setTitle(DateTimeUtils.dateQueryToTitle(lastEventFetcherParam.query));
+            } else {
+                reportActionToAnalytics("search", lastEventFetcherParam.query);
+                EventSearchSuggestionsProvider.saveRecentQuery(this, lastEventFetcherParam.query);
                 actionBar.setTitle(lastEventFetcherParam.query);
             }
         }
@@ -120,12 +133,18 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         // We do not refresh the app if user is in same session or has returned
         // within {@code SECONDS_FOR_REFRESH} seconds.
         if (lastStartedAt < System.currentTimeMillis() - SECONDS_FOR_REFRESH * 1000) {
-            // If location is passed in param, use it. Otherwise ask GoogleApiClient for
-            // user location.
-            if (lastEventFetcherParam.location == null) {
+            // If location is passed in param, use it.
+            LatLng location = lastEventFetcherParam.location;
+            if (location == null) {
+                City lastCity = GcmRegistration.getInstance(getApplicationContext()).getLastCity();
+                if (lastCity != null) {
+                    location = lastCity.cityBounds.getCenter();
+                }
+            }
+
+            if (location == null) {
                 askUserForLocation();
             } else {
-                LatLng location = lastEventFetcherParam.location;
                 lastEventFetcherParam.changeLocation(null);
                 updateUserLocation(location);
             }
@@ -186,6 +205,17 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
         if (id == R.id.action_change_location) {
             askUserForLocation();
+            return true;
+        }
+
+        if (id == R.id.action_filter) {
+            DialogFragment selectDateFragment = new DatePickerFragment();
+            if (lastEventFetcherParam.city != null) {
+                Bundle args = new Bundle();
+                args.putString(City.class.getName(), lastEventFetcherParam.city.toString());
+                selectDateFragment.setArguments(args);
+            }
+            selectDateFragment.show(getFragmentManager(), "selectDate");
             return true;
         }
 
@@ -356,10 +386,6 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             }
 
             if (actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS || tags.size() > 1) {
-                if (!param.query.isEmpty()) {
-                    actionBar.setTitle(param.query);
-                }
-
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
                 actionBar.removeAllTabs();
 
@@ -392,7 +418,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
             } else {
                 if (!param.query.isEmpty()) {
                     int numEvents = tags.isEmpty() ? 0 : events.getEvents(0).size();
-                    actionBar.setTitle(param.query + " (" + numEvents + ")");
+                    actionBar.setTitle(DateTimeUtils.dateQueryToTitle(param.query) + " (" + numEvents + ")");
                 }
 
                 updateListingAndShowHelpIfNeeded(events.getEvents(0));
@@ -444,4 +470,72 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         public void onRateAppClicked() {
         }
     };
+
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener, DialogInterface.OnClickListener {
+        private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private Date selectedDate = null;
+        private boolean filterRequested = false;
+        private long numDaysAhead = -1;
+        private Date today;
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            City city = null;
+            Bundle args = getArguments();
+            if (args != null) {
+                String cityStr = args.getString(City.class.getName());
+                if (cityStr != null) {
+                    city = City.valueOf(cityStr);
+                }
+            }
+
+            Calendar cal = Calendar.getInstance();
+            if (city != null) {
+                cal.setTimeZone(TimeZone.getTimeZone(city.timeZone));
+            }
+
+            int year = cal.get(Calendar.YEAR);
+            int month = cal.get(Calendar.MONTH);
+            int day = cal.get(Calendar.DAY_OF_MONTH);
+            today = new Date(year - 1900, month, day);
+
+            DatePickerDialog datePicker = new DatePickerDialog(getActivity(), this, year, month, day);
+            datePicker.setCancelable(true);
+            datePicker.setCanceledOnTouchOutside(true);
+            datePicker.getDatePicker().setMinDate(today.getTime());
+            datePicker.getDatePicker().setMaxDate(today.getTime() + 7 * 24 * 3600 * 1000L);
+
+            datePicker.setButton(DialogInterface.BUTTON_POSITIVE,
+                    getActivity().getString(R.string.action_filter), this);
+            return datePicker;
+        }
+
+        public synchronized void onDateSet(DatePicker view, int year, int month, int day) {
+            selectedDate = new Date(year - 1900, month, day);
+            numDaysAhead = (selectedDate.getTime() - today.getTime()) / (24*3600*1000L);
+            if (filterRequested) {
+                filterByDate();
+            }
+        }
+
+        @Override
+        public synchronized void onClick(DialogInterface dialog, int which) {
+            filterRequested = true;
+            if (selectedDate != null) {
+                filterByDate();
+            }
+        }
+
+        private void filterByDate() {
+            LocationAwareEventActivity activity = (LocationAwareEventActivity) getActivity();
+            activity.reportActionToAnalytics("filterByDate", Long.toString(numDaysAhead) + "days later");
+            EventFetcherParam param = new EventFetcherParam(activity.lastEventFetcherParam.location,
+                    DATE_FORMAT.format(selectedDate));
+            Intent intent = new Intent(getActivity(), activity.getClass())
+                    .putExtra(EXTRA_EVENT_FETCHER_PARAM, param);
+            startActivity(intent);
+        }
+    }
 }

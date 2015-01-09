@@ -16,6 +16,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.task.UpdateLocationTask;
 import com.eventshigh.nearme.app.ui.EventListAdapter;
 import com.eventshigh.nearme.app.utils.EventComparator;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
@@ -51,7 +52,7 @@ public class EventGridActivity extends LocationAwareEventActivity {
         // Show the Up button in the action bar.
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(pref.isMapsViewDefault());
+            actionBar.setDisplayHomeAsUpEnabled(!lastEventFetcherParam.query.isEmpty() || pref.isMapsViewDefault());
         }
     }
 
@@ -67,6 +68,12 @@ public class EventGridActivity extends LocationAwareEventActivity {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         } else {
             menu.findItem(R.id.action_search).setVisible(false);
+        }
+
+        // Do not show filterByDate for search.
+        if (!lastEventFetcherParam.query.isEmpty() &&
+            !EventsHighEndpoints.isDateQuery(lastEventFetcherParam.query)) {
+            menu.findItem(R.id.action_filter).setVisible(false);
         }
 
         // Debug Views.
