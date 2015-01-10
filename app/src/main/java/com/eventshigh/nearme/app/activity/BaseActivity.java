@@ -24,6 +24,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.network.Helper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -80,10 +81,13 @@ public abstract class BaseActivity extends FragmentActivity {
     }
 
     protected void onStop() {
-        super.onStop();
+        // Stop all requests associated with this activity.
+        Helper.getRequestQueue(getApplicationContext()).cancelAll(this);
 
         // Google Analytics reporting.
         gaHelper.reportActivityStop(this);
+
+        super.onStop();
     }
 
     @Override

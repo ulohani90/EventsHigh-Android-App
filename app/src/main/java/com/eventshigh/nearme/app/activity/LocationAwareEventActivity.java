@@ -255,12 +255,10 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     // ***********************
 
     /**
-     * Sets new events data. This is called when we get new events from
-     * {@link com.eventshigh.nearme.app.task.EventsFetcherTask}.
+     * Sets new events data. This is called when we get new events data from server or when
+     * user applies some filter through tab.
      *
-     * EventFetcher could be asked to fetch events when user changes the city or day.
-     *
-     * @param events a list of events as returned by {@link com.eventshigh.nearme.app.task.EventsFetcherTask}
+     * @param events a list of events to show to user.
      */
     protected abstract void updateNewEvents(List<Event> events);
 
@@ -306,7 +304,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     private void fetchNewListing() {
         reportActionToAnalytics("fetchNewListing");
         EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam, shouldOverrideCache,
-                Priority.IMMEDIATE, mEventsFetcherCallBack, mErrorListener);
+                Priority.IMMEDIATE, this, mEventsFetcherCallBack, mErrorListener);
     }
 
     protected void askUserForLocation() {

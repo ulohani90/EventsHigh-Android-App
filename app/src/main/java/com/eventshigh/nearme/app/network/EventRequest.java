@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -34,7 +35,7 @@ public class EventRequest extends JsonRequest<Event> {
      * @param listener callback on success.
      * @param errorListener callback on failures.
      */
-    public static void submit(Context context, Uri eventUri, Priority priority,
+    public static void submit(Context context, Uri eventUri, Priority priority, @Nullable Object tag,
                               Listener<Event> listener, ErrorListener errorListener) {
         List<String> eventUriPathSegments = eventUri.getPathSegments();
         if (eventUriPathSegments.size() < 2) {
@@ -53,8 +54,12 @@ public class EventRequest extends JsonRequest<Event> {
 
         String eventId = eventUriPathSegments.get(eventUriPathSegments.size() - 1).split("-", 2)[0];
         String url = EventsHighEndpoints.getApiEndpointEventUber(eventId);
-        Helper.addToRequestQueue(context, new EventRequest(url, city, priority,
-                listener, errorListener));
+        EventRequest request = new EventRequest(url, city, priority,
+                listener, errorListener);
+        if (tag != null) {
+            request.setTag(tag);
+        }
+        Helper.addToRequestQueue(context, request);
     }
 
     private final City city;

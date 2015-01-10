@@ -33,7 +33,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, EventFetcherParam param, boolean shouldOverrideCache,
-                              Priority priority,
+                              Priority priority, Object tag,
                               Listener<EventsCollection> listener, ErrorListener errorListener) {
         if (param.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + param.toString()));
@@ -56,8 +56,12 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             url = url + "?cmode=bypass";
         }
 
-        Helper.addToRequestQueue(context, new EventCollectionRequest(url, param, priority,
-                listener, errorListener));
+        EventCollectionRequest request = new EventCollectionRequest(url, param, priority,
+                listener, errorListener);
+        if (tag != null) {
+            request.setTag(tag);
+        }
+        Helper.addToRequestQueue(context, request);
     }
 
     private final EventFetcherParam param;

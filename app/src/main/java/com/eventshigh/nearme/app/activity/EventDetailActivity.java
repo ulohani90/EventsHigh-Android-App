@@ -61,7 +61,7 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         if (showEvent) {
-            EventRequest.submit(getApplicationContext(), intent.getData(), Priority.IMMEDIATE,
+            EventRequest.submit(getApplicationContext(), intent.getData(), Priority.IMMEDIATE, this,
                     mEventListener, mErrorListener);
         } else {
             Toast.makeText(this, "No event to show!", Toast.LENGTH_SHORT).show();
