@@ -52,11 +52,11 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
                 FilterResults filterResults = new FilterResults();
                 if (constraint != null) {
                     // Retrieve the auto complete results.
-                    resultList = autoComplete(constraint.toString(), countryCode);
+                    ArrayList<String> results = autoComplete(constraint.toString(), countryCode);
 
                     // Assign the data to the FilterResults
-                    filterResults.values = resultList;
-                    filterResults.count = resultList.size();
+                    filterResults.values = results;
+                    filterResults.count = results.size();
                 }
                 return filterResults;
             }
@@ -64,8 +64,10 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 if (results != null && results.count > 0) {
+                    resultList = (ArrayList<String>) results.values;
                     notifyDataSetChanged();
                 } else {
+                    resultList = new ArrayList<>();
                     notifyDataSetInvalidated();
                 }
             }};
