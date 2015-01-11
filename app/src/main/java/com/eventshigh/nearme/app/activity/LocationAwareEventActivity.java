@@ -22,9 +22,12 @@ import android.view.View.OnClickListener;
 import android.widget.DatePicker;
 import android.widget.SearchView;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import com.android.volley.Request.Priority;
+import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
@@ -78,6 +81,8 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     // MEMBERS
     // ***********************
 
+    // root view for showing loading dialog and event contents.
+    private ViewSwitcher viewSwitcher;
     // Last city,day for which events are shown.
     protected EventFetcherParam lastEventFetcherParam;
     // Last fetched events collection.
@@ -100,10 +105,15 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        lastStartedAt = 0;
+
+        viewSwitcher = new ViewSwitcher(this);
+        getLayoutInflater().inflate(getActivityView(), viewSwitcher);
+        getLayoutInflater().inflate(R.layout.activity_event_detail, viewSwitcher);
+        setContentView(viewSwitcher);
 
         // Set the context in term of lastEventFetcherParam. Use Inent
         // to restore the context.
+        lastStartedAt = 0;
         lastEventFetcherParam = new EventFetcherParam(null, "");
 
         // See if we have context passed to us within intent.
@@ -284,6 +294,11 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
      */
     protected abstract int getDisabledMenuId();
 
+    /**
+     * @return the resource id for the activity view.
+     */
+    protected abstract int getActivityView();
+
 
     // ***********************
     // Helper methods
@@ -303,8 +318,15 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
     private void fetchNewListing() {
         reportActionToAnalytics("fetchNewListing");
+        viewSwitcher.setDisplayedChild(1);
         EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam, shouldOverrideCache,
-                Priority.IMMEDIATE, this, mEventsFetcherCallBack, mErrorListener);
+                Priority.IMMEDIATE, this, mEventsFetcherCallBack, new ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        viewSwitcher.setDisplayedChild(0);
+                        mErrorListener.onErrorResponse(volleyError);
+                    }
+                });
     }
 
     protected void askUserForLocation() {
@@ -399,6 +421,8 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     private Listener<EventsCollection> mEventsFetcherCallBack = new Listener<EventsCollection>() {
         @Override
         public void onResponse(EventsCollection events) {
+            viewSwitcher.setDisplayedChild(0);
+
             if (events.getTags().isEmpty()) {
                 // Failed. Show toast and return empty list.
                 Toast.makeText(LocationAwareEventActivity.this, R.string.no_events, Toast.LENGTH_SHORT).show();

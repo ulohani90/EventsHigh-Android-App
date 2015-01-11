@@ -83,7 +83,6 @@ public class MapsActivity extends LocationAwareEventActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
 
         // Setup the local member variables.
         setUpMapIfNeeded();
@@ -103,6 +102,11 @@ public class MapsActivity extends LocationAwareEventActivity {
     @Override
     protected int getDisabledMenuId() {
         return R.id.action_map;
+    }
+
+    @Override
+    protected int getActivityView() {
+        return R.layout.activity_maps;
     }
 
 

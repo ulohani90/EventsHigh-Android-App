@@ -9,9 +9,9 @@ import android.widget.GridView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.task.UpdateLocationTask;
 import com.eventshigh.nearme.app.ui.EventListAdapter;
-import com.eventshigh.nearme.app.data.EventComparator;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
@@ -33,7 +33,6 @@ public class EventGridActivity extends LocationAwareEventActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event_grid);
 
         // Setup adapter.
         eventGridView = (GridView) findViewById(R.id.event_grid);
@@ -84,6 +83,11 @@ public class EventGridActivity extends LocationAwareEventActivity {
     @Override
     protected int getDisabledMenuId() {
         return R.id.action_list;
+    }
+
+    @Override
+    protected int getActivityView() {
+        return R.layout.activity_event_grid;
     }
 
 
