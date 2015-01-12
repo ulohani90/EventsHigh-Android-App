@@ -82,7 +82,7 @@ public class LoginActivity extends BaseActivity {
         }
 
         Class target = pref.isMapsViewDefault()
-                ? MapsActivity.class : EventGridActivity.class;
+                ? EventsMapsActivity.class : EventsGridActivity.class;
         startActivity(new Intent(this, target));
     }
 }

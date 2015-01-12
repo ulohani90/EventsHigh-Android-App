@@ -35,8 +35,8 @@ import com.google.android.gms.location.LocationServices;
 
 /**
  * A placeholder {@link android.app.Activity} which is responsible for launching
- * either {@link com.eventshigh.nearme.app.activity.MapsActivity} or
- * {@link com.eventshigh.nearme.app.activity.EventGridActivity} based on user preference.
+ * either {@link EventsMapsActivity} or
+ * {@link EventsGridActivity} based on user preference.
  *
  * For now, this activity sets the preference 50%-50% for first time and then use this
  * preference in future.
@@ -67,7 +67,7 @@ public class LaunchActivity extends Activity {
 
         // Set defaults when there is no incoming intent.
         Class target = new Preferences(this).isMapsViewDefault() ?
-                MapsActivity.class : EventGridActivity.class;
+                EventsMapsActivity.class : EventsGridActivity.class;
         outIntent = new Intent(this, target);
         webUri = Uri.parse(EventsHighEndpoints.WEB_URI_BASE);
         title = "amazing events near you";
@@ -201,7 +201,7 @@ public class LaunchActivity extends Activity {
     // ***********************
 
     private void startNextActivity() {
-        outIntent.putExtra(LocationAwareEventActivity.EXTRA_EVENT_FETCHER_PARAM, param);
+        outIntent.putExtra(BaseEventsActivity.EXTRA_EVENT_FETCHER_PARAM, param);
         startActivity(outIntent);
     }
 
@@ -225,7 +225,7 @@ public class LaunchActivity extends Activity {
         Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
         if (appData != null) {
             EventFetcherParam param1 =
-                    appData.getParcelable(LocationAwareEventActivity.EXTRA_EVENT_FETCHER_PARAM);
+                    appData.getParcelable(BaseEventsActivity.EXTRA_EVENT_FETCHER_PARAM);
             if (param1 != null) {
                 param = param1;
             }

@@ -42,7 +42,7 @@ import java.util.List;
  * days from upcoming week and user can select perticular date. By default, today's events are
  * shown.
  */
-public class MapsActivity extends LocationAwareEventActivity {
+public class EventsMapsActivity extends BaseEventsActivity {
 
     // ***********************
     // CONSTANTS
@@ -211,7 +211,7 @@ public class MapsActivity extends LocationAwareEventActivity {
             // We also show helper toast once per application runtime.
             if (cameraPosition.zoom < MIN_ZOOM_LEVEL) {
                 if (!isAppMovement && showZoomToast) {
-                    Toast.makeText(MapsActivity.this, R.string.zoom, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EventsMapsActivity.this, R.string.zoom, Toast.LENGTH_SHORT).show();
                     showZoomToast = false;
                 }
 
@@ -254,7 +254,7 @@ public class MapsActivity extends LocationAwareEventActivity {
             lastSelectedMarker = marker;
             View eventView = eventCardContainer.getChildAt(0);
             Event event = markerManager.getEvent(marker);
-            eventView = EventListAdapter.getView(event, MapsActivity.this, eventView, eventCardContainer);
+            eventView = EventListAdapter.getView(event, EventsMapsActivity.this, eventView, eventCardContainer);
             eventView.setOnTouchListener(new OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
@@ -270,7 +270,7 @@ public class MapsActivity extends LocationAwareEventActivity {
                 }
             } else {
                 // Show Helper with swipe information.
-                showcaseView = new Builder(MapsActivity.this, true)
+                showcaseView = new Builder(EventsMapsActivity.this, true)
                     .setTarget(new ViewTarget(eventView))
                     .setContentText(R.string.onboarding_swipe)
                     .setStyle(R.style.ShowcaseTheme)
@@ -294,7 +294,7 @@ public class MapsActivity extends LocationAwareEventActivity {
                         public void onShowcaseViewShow(ShowcaseView showcaseView) {
                             reportActionToAnalytics("startOnboardingSwipe");
                             isVisible = true;
-                            swipeImage = new ImageView(MapsActivity.this);
+                            swipeImage = new ImageView(EventsMapsActivity.this);
                             swipeImage.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                             swipeImage.setImageResource(R.drawable.gestures_flick);
                             swipeImage.setScaleType(ScaleType.CENTER_INSIDE);

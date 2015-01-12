@@ -66,7 +66,7 @@ import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
  * The parent activity view should have {@link android.widget.LinearLayout}
  * to hold day picker.
  */
-public abstract class LocationAwareEventActivity extends BaseActivity {
+public abstract class BaseEventsActivity extends BaseActivity {
 
     // ***********************
     // CONSTANTS
@@ -225,12 +225,12 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_list) {
-            switchTo(EventGridActivity.class);
+            switchTo(EventsGridActivity.class);
             return true;
         }
 
         if (id == R.id.action_map) {
-            switchTo(MapsActivity.class);
+            switchTo(EventsMapsActivity.class);
             return true;
         }
 
@@ -312,7 +312,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                 @Override
                 public void run() {
                     if (onBoardingHelper == null) {
-                        onBoardingHelper = new OnBoardingHelper(LocationAwareEventActivity.this);
+                        onBoardingHelper = new OnBoardingHelper(BaseEventsActivity.this);
                     }
 
                     onBoardingHelper.next();
@@ -430,11 +430,11 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
 
             if (events.getTags().isEmpty()) {
                 // Failed. Show toast and return empty list.
-                Toast.makeText(LocationAwareEventActivity.this, R.string.no_events, Toast.LENGTH_SHORT).show();
+                Toast.makeText(BaseEventsActivity.this, R.string.no_events, Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            LocationAwareEventActivity.this.events = events;
+            BaseEventsActivity.this.events = events;
 
             // Update tabs if needed.
             ActionBar actionBar = getActionBar();
@@ -583,7 +583,7 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
                     datePicker.getDatePicker().getDayOfMonth());
             long numDaysAhead = (selectedDate.getTime() - today.getTime()) / (24 * 3600 * 1000L);
 
-            LocationAwareEventActivity activity = (LocationAwareEventActivity) getActivity();
+            BaseEventsActivity activity = (BaseEventsActivity) getActivity();
             activity.reportActionToAnalytics("filterByDate", Long.toString(numDaysAhead) + "days later");
 
             EventFetcherParam param = new EventFetcherParam(activity.lastEventFetcherParam.location,

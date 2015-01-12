@@ -4,7 +4,7 @@ import android.graphics.Point;
 import android.support.annotation.Nullable;
 import android.util.Pair;
 
-import com.eventshigh.nearme.app.activity.MapsActivity;
+import com.eventshigh.nearme.app.activity.EventsMapsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.utils.LocationUtils;
@@ -240,7 +240,7 @@ public class MarkerManager {
                 map.getProjection().getVisibleRegion().nearRight);
         if (currentDiagonalDistance < minDiagonalDistance) {
             float zoomOutNeeded = (float) (Math.log(minDiagonalDistance/currentDiagonalDistance) / Math.log(2));
-            float zoom = Math.max(map.getCameraPosition().zoom - zoomOutNeeded, MapsActivity.MIN_ZOOM_LEVEL);
+            float zoom = Math.max(map.getCameraPosition().zoom - zoomOutNeeded, EventsMapsActivity.MIN_ZOOM_LEVEL);
             map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
         }
     }

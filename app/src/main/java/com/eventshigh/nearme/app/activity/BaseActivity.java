@@ -102,7 +102,7 @@ public abstract class BaseActivity extends FragmentActivity {
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
             NavUtils.navigateUpTo(this,
-                    new Intent(this, pref.isMapsViewDefault() ? MapsActivity.class : EventGridActivity.class));
+                    new Intent(this, pref.isMapsViewDefault() ? EventsMapsActivity.class : EventsGridActivity.class));
             return true;
         }
 

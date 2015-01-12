@@ -6,7 +6,7 @@
 
     <screenName name="com.eventshigh.nearme.app.activity.LaunchActivity">Launch</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.LoginActivity">Login</screenName>
-    <screenName name="com.eventshigh.nearme.app.activity.MapsActivity">Maps</screenName>
-    <screenName name="com.eventshigh.nearme.app.activity.EventGridActivity">Grid</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.EventsMapsActivity">Maps</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.EventsGridActivity">Grid</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.EventDetailActivity">Details</screenName>
 </resources>

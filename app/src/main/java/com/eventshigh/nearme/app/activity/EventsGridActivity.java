@@ -21,7 +21,7 @@ import java.util.List;
  * we have one column in portrait mode and two columns in landscape mode.
  * On Tablet, we try to put more columns as per the width offered.
  */
-public class EventGridActivity extends LocationAwareEventActivity {
+public class EventsGridActivity extends BaseEventsActivity {
     private EventListAdapter eventListAdapter;
     private GridView eventGridView;
 
