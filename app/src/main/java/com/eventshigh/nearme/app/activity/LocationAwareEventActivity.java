@@ -308,11 +308,16 @@ public abstract class LocationAwareEventActivity extends BaseActivity {
         updateNewEvents(events);
 
         if (!events.isEmpty()) {
-            if (onBoardingHelper == null) {
-                onBoardingHelper = new OnBoardingHelper(this);
-            }
+            viewSwitcher.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (onBoardingHelper == null) {
+                        onBoardingHelper = new OnBoardingHelper(LocationAwareEventActivity.this);
+                    }
 
-            onBoardingHelper.next();
+                    onBoardingHelper.next();
+                }
+            }, 1000);
         }
     }
 
