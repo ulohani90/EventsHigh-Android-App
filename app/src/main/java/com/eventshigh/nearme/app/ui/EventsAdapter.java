@@ -21,10 +21,10 @@ import com.eventshigh.nearme.app.utils.Utils;
  * An {@link android.widget.ListAdapter} which can be used to populate the
  * Event card.
  */
-public class EventListAdapter extends ArrayAdapter<Event> {
+public class EventsAdapter extends ArrayAdapter<Event> {
     private final BaseActivity activity;
 
-    public EventListAdapter(BaseActivity activity) {
+    public EventsAdapter(BaseActivity activity) {
         super(activity, R.layout.event_card, R.id.event_title);
         this.activity = activity;
     }
