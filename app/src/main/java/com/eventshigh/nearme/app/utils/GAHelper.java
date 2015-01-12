@@ -6,7 +6,6 @@ import android.content.Context;
 import com.amplitude.api.Amplitude;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
-import com.flurry.android.FlurryAgent;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -28,12 +27,6 @@ public class GAHelper {
         }
 
         if (!BuildConfig.DEBUG) {
-            // Setup Flurry.
-            FlurryAgent.setVersionName(BuildConfig.VERSION_NAME);
-            FlurryAgent.init(context, "2MD4D4TP7WQZH6Q6257T");
-            FlurryAgent.setLogEnabled(false);
-            FlurryAgent.setReportLocation(false);
-
             // Setup Amplitude
             Amplitude.initialize(context, "41ed6c5c945d7f1c2f2d829b90288562");
         }
@@ -52,9 +45,6 @@ public class GAHelper {
 
         // Flurry, Amplitude reporting
         if (!BuildConfig.DEBUG) {
-            FlurryAgent.onStartSession(activity);
-            FlurryAgent.logEvent(getClass().getSimpleName());
-
             Amplitude.startSession();
             Amplitude.logEvent(getClass().getSimpleName());
         }
@@ -65,7 +55,6 @@ public class GAHelper {
 
         // Flurry, Amplitude reporting
         if (!BuildConfig.DEBUG) {
-            FlurryAgent.onEndSession(activity);
             Amplitude.endSession();
         }
     }
@@ -87,7 +76,6 @@ public class GAHelper {
                 .build());
 
         if (!BuildConfig.DEBUG) {
-            FlurryAgent.logEvent(actionName);
             Amplitude.logEvent(actionName);
         }
     }
