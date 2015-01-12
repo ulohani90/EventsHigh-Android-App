@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * This class describes one Event. Event have few attributes like title, category, location etc.
@@ -274,7 +273,7 @@ public class Event implements Parcelable {
         }
 
         // Event timings.
-        TreeSet<Long> eventTimings = new TreeSet<>();
+        List<Long> eventTimings = new ArrayList<>();
         Date eventTiming =  DateTimeUtils.mergeDateTime(eventJson.optString("date"),
                 eventJson.optString("start_time"), city.timeZone);
         if (eventTiming != null) {
@@ -287,10 +286,14 @@ public class Event implements Parcelable {
                 eventTiming =  DateTimeUtils.mergeDateTime(
                         upcoming_occurrences.getJSONObject(i).optString("date"),
                         upcoming_occurrences.getJSONObject(i).optString("start_time"), city.timeZone);
-                if (eventTiming != null) {
+                if (eventTiming != null && !eventTimings.contains(eventTiming.getTime())) {
                     eventTimings.add(eventTiming.getTime());
                 }
             }
+        }
+
+        if (eventTimings.size() > 2) {
+            Collections.sort(eventTimings.subList(1, eventTimings.size()));
         }
 
         long[] eventTimingsArr = new long[eventTimings.size()];

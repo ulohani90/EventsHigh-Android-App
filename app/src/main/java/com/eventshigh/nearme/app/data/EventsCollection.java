@@ -28,6 +28,16 @@ public class EventsCollection {
     public static final String NOW_EVENTS_CATEGORY = "Starting Soon";
     public static final String TODAY_EVENTS_CATEGORY = "Today";
 
+    public static class TaggedEvents {
+        public final String tag;
+        public final List<Event> events;
+
+        public TaggedEvents(String tag, List<Event> events) {
+            this.tag = tag;
+            this.events = events;
+        }
+    }
+
     private static final Set<String> TAGS_BLACKLIST = new HashSet<>();
     static {
         TAGS_BLACKLIST.add("courses");
@@ -102,7 +112,7 @@ public class EventsCollection {
         }
 
         public EventsCollection build() {
-            List<Pair<String, List<Event>>> tagEventsPairs = new ArrayList<>(events.keySet().size());
+            List<TaggedEvents> taggedEventsList = new ArrayList<>(events.keySet().size());
 
             List<Event> allEvents = events.remove(ALL_EVENTS_CATEGORY);
             List<Event> recommendedEvents = events.remove(RECOMMENDED_EVENTS_CATEGORY);
@@ -110,40 +120,40 @@ public class EventsCollection {
             List<Event> todayEvents = events.remove(TODAY_EVENTS_CATEGORY);
             for (Entry<String, List<Event>> tagEvents : events.entrySet()) {
                 if (tagEvents.getValue().size() > 1) {
-                    tagEventsPairs.add(Pair.create(
+                    taggedEventsList.add(new TaggedEvents(
                             tagEvents.getKey(), Collections.unmodifiableList(tagEvents.getValue())));
                 }
             }
 
-            Collections.sort(tagEventsPairs, new Comparator<Pair<String, List<Event>>>() {
+            Collections.sort(taggedEventsList, new Comparator<TaggedEvents>() {
                 @Override
-                public int compare(Pair<String, List<Event>> lhs, Pair<String, List<Event>> rhs) {
-                    return Integer.valueOf(rhs.second.size()).compareTo(lhs.second.size());
+                public int compare(TaggedEvents lhs, TaggedEvents rhs) {
+                    return Integer.valueOf(rhs.events.size()).compareTo(lhs.events.size());
                 }
             });
 
             int index = 0;
             if (allEvents != null) {
-                tagEventsPairs.add(index, Pair.create(
+                taggedEventsList.add(index, new TaggedEvents(
                         ALL_EVENTS_CATEGORY, Collections.unmodifiableList(allEvents)));
                 index ++;
             }
             if (recommendedEvents != null) {
-                tagEventsPairs.add(index, Pair.create(
+                taggedEventsList.add(index, new TaggedEvents(
                         RECOMMENDED_EVENTS_CATEGORY, Collections.unmodifiableList(recommendedEvents)));
                 index ++;
             }
             if (nowEvents != null) {
-                tagEventsPairs.add(index, Pair.create(
+                taggedEventsList.add(index, new TaggedEvents(
                         NOW_EVENTS_CATEGORY, Collections.unmodifiableList(nowEvents)));
                 index ++;
             }
             if (todayEvents != null && allEvents != null && allEvents.size() > todayEvents.size()) {
-                tagEventsPairs.add(index, Pair.create(
+                taggedEventsList.add(index, new TaggedEvents(
                         TODAY_EVENTS_CATEGORY, Collections.unmodifiableList(todayEvents)));
             }
 
-            return new EventsCollection(tagEventsPairs);
+            return new EventsCollection(taggedEventsList);
         }
 
         private void addEvent(String tag, Event event) {
@@ -157,23 +167,23 @@ public class EventsCollection {
     }
 
     // A list containing a pair of tag name and list of events associated with that tag..
-    private final List<Pair<String, List<Event>>> tagEventsPairs;
+    private final List<TaggedEvents> taggedEventsList;
 
-    private EventsCollection(List<Pair<String, List<Event>>> tagEventsPairs) {
-        this.tagEventsPairs = tagEventsPairs;
+    private EventsCollection(List<TaggedEvents> taggedEventsList) {
+        this.taggedEventsList = taggedEventsList;
     }
 
     public List<Pair<String, Integer>> getTags() {
-        List<Pair<String, Integer>> results = new ArrayList<>(tagEventsPairs.size());
-        for (Pair<String, List<Event>> categoryEvents : tagEventsPairs) {
-            results.add(Pair.create(categoryEvents.first, categoryEvents.second.size()));
+        List<Pair<String, Integer>> results = new ArrayList<>(taggedEventsList.size());
+        for (TaggedEvents categoryEvents : taggedEventsList) {
+            results.add(Pair.create(categoryEvents.tag, categoryEvents.events.size()));
         }
         return results;
     }
 
     public List<Event> getEvents(int tagPosition) {
-        if (tagPosition < tagEventsPairs.size()) {
-            return tagEventsPairs.get(tagPosition).second;
+        if (tagPosition < taggedEventsList.size()) {
+            return taggedEventsList.get(tagPosition).events;
         } else {
             return new ArrayList<>();
         }
