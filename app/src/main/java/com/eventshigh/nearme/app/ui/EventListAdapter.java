@@ -137,7 +137,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         tagView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.showSearchView(tagText);
+                activity.showSearchView(tagText.toLowerCase());
             }
         });
     }
