@@ -116,7 +116,7 @@ public class LaunchActivity extends Activity {
     public void onStop() {
         super.onStop();
 
-        if (client.isConnected()) {
+        if (client != null && client.isConnected()) {
             AppIndex.AppIndexApi.viewEnd(client, this, Utils.getAppUri(webUri));
             client.disconnect();
         }
