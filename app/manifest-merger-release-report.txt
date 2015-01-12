@@ -279,7 +279,7 @@ category#andrsoid.intent.category.BROWSABLE
 ADDED from AndroidManifest.xml:139:17
 	android:name
 		ADDED from AndroidManifest.xml:139:27
-activity#com.eventshigh.nearme.app.activity.MapsActivity
+activity#com.eventshigh.nearme.app.activity.EventsMapsActivity
 ADDED from AndroidManifest.xml:177:9
 	android:label
 		ADDED from AndroidManifest.xml:179:13
@@ -293,7 +293,7 @@ ADDED from AndroidManifest.xml:182:13
 		ADDED from AndroidManifest.xml:183:17
 	android:value
 		ADDED from AndroidManifest.xml:184:17
-activity#com.eventshigh.nearme.app.activity.EventGridActivity
+activity#com.eventshigh.nearme.app.activity.EventsGridActivity
 ADDED from AndroidManifest.xml:187:9
 	android:label
 		ADDED from AndroidManifest.xml:189:13
