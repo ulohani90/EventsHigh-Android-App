@@ -178,7 +178,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
     // ***********************
 
     @Override
-    protected void updateNewEvents(List<Event> events) {
+    protected void updateEventListing(List<Event> events) {
         mOnMapClickListener.onMapClick(null);
         markerManager.setEvents(map, events);
     }

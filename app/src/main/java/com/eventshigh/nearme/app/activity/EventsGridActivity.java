@@ -47,7 +47,7 @@ public class EventsGridActivity extends BaseEventsActivity {
     // ***********************
 
     @Override
-    protected void updateNewEvents(List<Event> events) {
+    protected void updateEventListing(List<Event> events) {
         eventsAdapter.clear();
         eventsAdapter.addAll(events);
         eventGridView.smoothScrollToPosition(0);

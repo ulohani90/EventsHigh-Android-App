@@ -36,6 +36,7 @@ import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsCollection.Builder;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
+import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
@@ -59,12 +60,8 @@ import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
 /**
  * Base activity for location aware events listing. This class implements
  * common methods to get user location and fetch listings when needed.
- * This is an abstract activity and the event UI is left to implementing
- * class.
- * <p/>
- *
- * The parent activity view should have {@link android.widget.LinearLayout}
- * to hold day picker.
+ * This is an abstract activity and the listing the event in UI is left
+ * to implementing class.
  */
 public abstract class BaseEventsActivity extends BaseActivity {
 
@@ -74,6 +71,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     public static final String EXTRA_EVENT_FETCHER_PARAM = EventFetcherParam.class.getSimpleName();
     public static final String EXTRA_TAG_NAME_PARAM = "extra.event.tag.name";
     public static final int NUM_MAX_TABS = 10;
+    public static final int NUM_PREFETCH = 10;
     public static final int SECONDS_FOR_REFRESH = 600;
 
 
@@ -270,7 +268,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
      *
      * @param events a list of events to show to user.
      */
-    protected abstract void updateNewEvents(List<Event> events);
+    protected abstract void updateEventListing(List<Event> events);
 
     /**
      * Updates the user location as reported by LocationClient.
@@ -304,21 +302,29 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // Helper methods
     // ***********************
 
-    private void updateListingAndShowHelpIfNeeded(List<Event> events) {
-        updateNewEvents(events);
-
-        if (!events.isEmpty()) {
-            viewSwitcher.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (onBoardingHelper == null) {
-                        onBoardingHelper = new OnBoardingHelper(BaseEventsActivity.this);
-                    }
-
-                    onBoardingHelper.next();
-                }
-            }, 1000);
+    private void updateListingAndMore(List<Event> events) {
+        updateEventListing(events);
+        if (events.isEmpty()) {
+            return;
         }
+
+        // Prefetch first 10 events.
+        for (Event event : events.subList(0, Math.min(events.size(), NUM_PREFETCH))) {
+            EventUberPrefetcher.getInstance(getApplicationContext()).prefetch(event.id);
+        }
+
+        // Show on boarding if first time.
+        viewSwitcher.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (onBoardingHelper == null) {
+                    onBoardingHelper = new OnBoardingHelper(BaseEventsActivity.this);
+                }
+
+                onBoardingHelper.next();
+            }
+        }, 1000);
+
     }
 
     private void fetchNewListing() {
@@ -482,7 +488,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
                     actionBar.setTitle(DateTimeUtils.dateQueryToTitle(lastEventFetcherParam.query) + " (" + numEvents + ")");
                 }
 
-                updateListingAndShowHelpIfNeeded(events.getEvents(0));
+                updateListingAndMore(events.getEvents(0));
             }
         }
     };
@@ -496,7 +502,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 if (!eventsForTag.isEmpty() && getActionBar().getNavigationItemCount() > 1) {
                     reportActionToAnalytics("filterByCategory", lastSelectedTag);
                 }
-                updateListingAndShowHelpIfNeeded(eventsForTag);
+                updateListingAndMore(eventsForTag);
             }
         }
 
