@@ -16,8 +16,6 @@ import com.eventshigh.nearme.app.network.EventRequest;
  * An activity representing a single Event detail screen.
  */
 public class EventDetailActivity extends BaseActivity {
-    public static final String NOTIFICATION_ACTION = "com.eventshigh.nearme.app.notification";
-
     private ActionBar actionBar;
 
     /**********************************

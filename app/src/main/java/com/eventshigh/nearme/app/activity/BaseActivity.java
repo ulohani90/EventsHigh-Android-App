@@ -45,6 +45,8 @@ import io.fabric.sdk.android.Fabric;
 public abstract class BaseActivity extends FragmentActivity {
     private static final String LOG_TAG = BaseActivity.class.getSimpleName();
 
+    public static final String NOTIFICATION_ACTION = "com.eventshigh.nearme.app.notification";
+
     // Google Analytics
     protected GAHelper gaHelper;
     protected Preferences pref;
@@ -101,8 +103,8 @@ public abstract class BaseActivity extends FragmentActivity {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-            NavUtils.navigateUpTo(this,
-                    new Intent(this, pref.isMapsViewDefault() ? EventsMapsActivity.class : EventsGridActivity.class));
+            NavUtils.navigateUpTo(this, new Intent(this,
+                pref.isMapsViewDefault() ? EventsMapsActivity.class : EventsGridActivity.class));
             return true;
         }
 

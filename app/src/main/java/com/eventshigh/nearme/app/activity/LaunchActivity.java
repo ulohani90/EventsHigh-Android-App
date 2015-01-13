@@ -48,7 +48,7 @@ public class LaunchActivity extends Activity {
     private Uri webUri;
     private String title;
 
-    // Client to Google api so that we can reprot the deep links.
+    // Client to Google api so that we can report the deep links.
     private GoogleApiClient client;
 
     // GCM registration helper.
@@ -211,6 +211,9 @@ public class LaunchActivity extends Activity {
         if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
             processSearchIntent(inIntent);
         } else if (Intent.ACTION_VIEW.equals(inIntent.getAction())) {
+            processViewIntent(inIntent);
+        } else if (BaseActivity.NOTIFICATION_ACTION.equals(inIntent.getAction())) {
+            reportToAnalytics("openNotification");
             processViewIntent(inIntent);
         }
 

@@ -72,9 +72,9 @@ public class Event implements Parcelable {
         this.tagsWhiteList = tagsWhiteList;
         this.tagsOther = tagsOther;
 
-        this.imgUrl = checkIfUnknown(imgUrl);
-        this.sourceUrl = checkIfUnknown(sourceUrl);
-        this.bookingUrl = checkIfUnknown(bookingUrl);
+        this.imgUrl = Utils.checkIfUnknown(imgUrl);
+        this.sourceUrl = Utils.checkIfUnknown(sourceUrl);
+        this.bookingUrl = Utils.checkIfUnknown(bookingUrl);
 
         this.numPeopleInterested = numPeopleInterested;
         this.ehRecommended = ehRecommended;
@@ -82,12 +82,12 @@ public class Event implements Parcelable {
         this.eventTimings = eventTimings;
 
         this.location = location != null && city.cityBounds.contains(location) ? location : null;
-        this.venue = checkIfUnknown(venue);
-        this.address = checkIfUnknown(address);
+        this.venue = Utils.checkIfUnknown(venue);
+        this.address = Utils.checkIfUnknown(address);
 
-        this.organizerName = checkIfUnknown(organizerName);
-        this.organizerPhone = checkIfUnknown(organizerPhone);
-        this.organizerWebsite = checkIfUnknown(organizerWebsite);
+        this.organizerName = Utils.checkIfUnknown(organizerName);
+        this.organizerPhone = Utils.checkIfUnknown(organizerPhone);
+        this.organizerWebsite = Utils.checkIfUnknown(organizerWebsite);
     }
 
     public Uri getEventDetailsURI() {
@@ -232,7 +232,7 @@ public class Event implements Parcelable {
 
         String venue = null;
         if (mashup != null) {
-            venue = checkIfUnknown(mashup.optString("venue_name"));
+            venue = Utils.checkIfUnknown(mashup.optString("venue_name"));
         }
         if (venue == null && localityJson != null) {
             venue = localityJson.optString("locality");
@@ -386,15 +386,6 @@ public class Event implements Parcelable {
 
     private static String toCategoryParsableString(String tag) {
         return tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "");
-    }
-
-    private static String checkIfUnknown(@Nullable String string) {
-        return (string == null ||
-                string.isEmpty() ||
-                string.equalsIgnoreCase("null") ||
-                string.equalsIgnoreCase("unknown")
-                ? null
-                : string);
     }
 
     private static String emptyIfNull(@Nullable String string) {
