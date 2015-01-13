@@ -43,7 +43,7 @@ public class LocationPickerDialog {
         final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.localityName);
 
         // Set up the AutoCompleteTextView with adapter and callbacks.
-        input.setAdapter(new PlacesAutoCompleteAdapter(context,
+        input.setAdapter(new PlacesAdapter(context,
                 android.R.layout.simple_dropdown_item_1line, countryCode));
         input.setOnEditorActionListener(new OnEditorActionListener() {
             @Override

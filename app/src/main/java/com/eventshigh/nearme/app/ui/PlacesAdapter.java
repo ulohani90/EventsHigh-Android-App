@@ -21,15 +21,15 @@ import java.util.ArrayList;
 /**
 * See https://developers.google.com/places/training/autocomplete-android.
 */
-public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements Filterable {
-    private static final String LOG_TAG = PlacesAutoCompleteAdapter.class.getSimpleName();
+public class PlacesAdapter extends ArrayAdapter<String> implements Filterable {
+    private static final String LOG_TAG = PlacesAdapter.class.getSimpleName();
     private static final String PLACES_API_BASE =
             "https://maps.googleapis.com/maps/api/place/autocomplete/json?key=AIzaSyB1O1j8ffmWWwxl8nZ1VenkjzBhJagXzBA";
 
     private ArrayList<String> resultList;
     private final String countryCode;
 
-    public PlacesAutoCompleteAdapter(Context context, int textViewResourceId, String countryCode) {
+    public PlacesAdapter(Context context, int textViewResourceId, String countryCode) {
         super(context, textViewResourceId);
         this.countryCode = countryCode;
     }
