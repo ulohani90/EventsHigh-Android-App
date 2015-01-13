@@ -13,6 +13,7 @@ import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.data.EventsCollection;
+import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONException;
@@ -56,7 +57,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             url = url + "?cmode=bypass";
         }
 
-        EventCollectionRequest request = new EventCollectionRequest(url, param, priority,
+        EventCollectionRequest request = new EventCollectionRequest(context, url, param, priority,
                 listener, errorListener);
         if (tag != null) {
             request.setTag(tag);
@@ -64,19 +65,23 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         Helper.addToRequestQueue(context, request);
     }
 
+    private final Context context;
     private final EventFetcherParam param;
     private final Priority priority;
 
     /**
      * Creates a new request.
-     * @param url URL to fetch the JSON from
+     *
+     * @param context application context.
+     * @param url URL to fetch the JSON from.
      * @param priority priority of request.
      * @param listener Listener to receive the JSON response
      * @param errorListener Error listener, or null to ignore errors.
      */
-    public EventCollectionRequest(String url, EventFetcherParam param, Priority priority,
+    public EventCollectionRequest(Context context, String url, EventFetcherParam param, Priority priority,
                                   Listener<EventsCollection> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
+        this.context = context;
         this.param = param;
         this.priority = priority;
     }
@@ -88,6 +93,8 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
     @Override
     protected Response<EventsCollection> parseNetworkResponse(NetworkResponse response) {
+        new ReportTimingTask(context, getUrl()).execute(response.networkTimeMs);
+
         try {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));

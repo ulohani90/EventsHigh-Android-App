@@ -14,6 +14,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONException;
@@ -54,7 +55,7 @@ public class EventRequest extends JsonRequest<Event> {
 
         String eventId = eventUriPathSegments.get(eventUriPathSegments.size() - 1).split("-", 2)[0];
         String url = EventsHighEndpoints.getApiEndpointEventUber(eventId);
-        EventRequest request = new EventRequest(url, city, priority,
+        EventRequest request = new EventRequest(context, url, city, priority,
                 listener, errorListener);
         if (tag != null) {
             request.setTag(tag);
@@ -62,6 +63,7 @@ public class EventRequest extends JsonRequest<Event> {
         Helper.addToRequestQueue(context, request);
     }
 
+    private final Context context;
     private final City city;
     private final Priority priority;
 
@@ -72,9 +74,10 @@ public class EventRequest extends JsonRequest<Event> {
      * @param listener Listener to receive the JSON response
      * @param errorListener Error listener, or null to ignore errors.
      */
-    public EventRequest(String url, City city, Priority priority,
+    public EventRequest(Context context, String url, City city, Priority priority,
                         Listener<Event> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
+        this.context = context;
         this.city = city;
         this.priority = priority;
     }
@@ -86,6 +89,8 @@ public class EventRequest extends JsonRequest<Event> {
 
     @Override
     protected Response<Event> parseNetworkResponse(NetworkResponse response) {
+        new ReportTimingTask(context, getUrl()).execute(response.networkTimeMs);
+
         try {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));

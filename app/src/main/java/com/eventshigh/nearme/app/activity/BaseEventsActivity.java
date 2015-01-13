@@ -322,7 +322,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     private void fetchNewListing() {
-        reportActionToAnalytics("fetchNewListing");
         viewSwitcher.setDisplayedChild(1);
         EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam, shouldOverrideCache,
                 Priority.IMMEDIATE, this, mEventsFetcherCallBack, new ErrorListener() {

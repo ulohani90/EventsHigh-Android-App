@@ -34,7 +34,7 @@ public class GAHelper {
 
     public static synchronized GAHelper getInstance(Context context) {
         if (instance == null) {
-            instance = new GAHelper(context);
+            instance = new GAHelper(context.getApplicationContext());
         }
 
         return instance;

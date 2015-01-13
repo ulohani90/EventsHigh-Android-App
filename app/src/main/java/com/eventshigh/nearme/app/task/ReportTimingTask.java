@@ -1,0 +1,80 @@
+package com.eventshigh.nearme.app.task;
+
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.support.annotation.Nullable;
+
+import com.eventshigh.nearme.app.utils.GAHelper;
+
+public class ReportTimingTask extends AsyncTask<Long, Void, Void> {
+    private final Context context;
+    private final GAHelper gaHelper;
+    private final String requestResource;
+
+    public ReportTimingTask(Context context, String requestEndPoint) {
+        this.context = context;
+        this.gaHelper = GAHelper.getInstance(context);
+        this.requestResource = getRequestResource(requestEndPoint);
+    }
+
+    @Override
+    protected Void doInBackground(Long... params) {
+        long timeTaken = params[0];
+
+        String network;
+        if (timeTaken <= 0) {
+            network = "cache";
+        } else {
+            ConnectivityManager connectivityManager =
+                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            network = getNetworkName(networkInfo);
+        }
+
+        report(network, timeTaken);
+        return null;
+    }
+
+    private void report(String action, long time) {
+        gaHelper.reportActionToAnalytics("fetch", action, requestResource, time);
+    }
+
+    private String getRequestResource(String requestEndPoint) {
+        try {
+            return Uri.parse(requestEndPoint).getPathSegments().get(2);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private String getNetworkName(@Nullable NetworkInfo networkInfo) {
+        if (networkInfo == null || !networkInfo.isConnected()) {
+            return "unknown";
+        }
+
+        return isNetworkTypeMobile(networkInfo.getType()) ?
+                networkInfo.getSubtypeName() : networkInfo.getTypeName();
+    }
+
+    /**
+     * Checks if a given type uses the cellular data connection.
+     *
+     * @param networkType the type to check
+     * @return a boolean - {@code true} if uses cellular network, else {@code false}
+     */
+    public static boolean isNetworkTypeMobile(int networkType) {
+        switch (networkType) {
+            case ConnectivityManager.TYPE_MOBILE:
+            case ConnectivityManager.TYPE_MOBILE_MMS:
+            case ConnectivityManager.TYPE_MOBILE_SUPL:
+            case ConnectivityManager.TYPE_MOBILE_DUN:
+            case ConnectivityManager.TYPE_MOBILE_HIPRI:
+                return true;
+            default:
+                return false;
+        }
+    }
+}
