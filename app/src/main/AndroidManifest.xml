@@ -231,6 +231,16 @@
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
         />
+        <activity
+            android:name=".settings.AboutUsActivity"
+            android:label="@string/title_about_us"
+            android:parentActivityName="settings.SettingsActivity"
+        >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="settings.SettingsActivity"
+            />
+        </activity>
 
         <!-- Receivers within our application -->
         <!-- Receives the Install referrer from play store -->

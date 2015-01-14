@@ -1,0 +1,63 @@
+<resources>
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_about_us">About EventsHigh</string>
+
+    <!-- General settings -->
+    <string name="pref_header_general">General</string>
+    <string name="pref_title_default_activity">Default View</string>
+    <string-array name="pref_default_activity_titles">
+        <item>List</item>
+        <item>Maps</item>
+    </string-array>
+    <string-array name="pref_default_activity_values">
+        <item>list</item>
+        <item>maps</item>
+    </string-array>
+
+    <!-- Notifications settings -->
+    <string name="pref_header_notifications">Notifications</string>
+    <string name="pref_title_weekend_notifications">Weekend Events</string>
+    <string name="pref_title_nearby_notifications">Nearby Events</string>
+
+
+    <!-- About US text -->
+    <string name="eh_desc">
+        At EventsHigh, our mission is to be the go to destination for finding best local events.
+        We crawl the web for event related information and bring them all at one place.
+        Our users can explore the gamut of events by using navigation tools that allow them to
+        discover events by their interests, their locality or just see the best events to go to
+        for any given day. We also notify our users whenever any event for their interest comes
+        up so that they don\'t have to worry about missing an event again!
+
+        \n\n
+        As a good citizen, we always provide the attribute to the source from whom we got the
+        event data.
+    </string>
+    <string name="privacy">Privacy</string>
+    <string name="privacy_details">
+        We do not collect any user identifiable information like mobile no, address or email address
+        unless users gives us consent explicitly.
+
+        \n\n
+        We might share user information with third parties only if user agrees to it. e.g. We might
+        share user email address with event organizer so that he can get updates on events from organizer.
+
+        \n\n
+        We do collect the user interactions at aggregate level so that we can understand user behaviour
+        and provide them with better service.
+    </string>
+
+    <string name="credits">Credits</string>
+    <string name="credit_details">
+        We have used the following tools to build few icons in our app.
+        \n
+        Icons8
+        \n
+        Iconion
+
+        \n\n
+        We have used the Google Places API and Google Geocoding API for identifying places
+        and showing user location.
+    </string>
+
+</resources>
