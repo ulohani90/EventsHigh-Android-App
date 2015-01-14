@@ -49,8 +49,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -403,8 +403,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
         startActivity(intent);
     }
 
+    @SuppressWarnings("deprecation")
     private void basicTabs() {
-        events = new Builder(City.BANGALORE, Collections.EMPTY_SET).build();
+        events = new Builder(City.BANGALORE, new HashSet<String>()).build();
 
         ActionBar actionBar = getActionBar();
         if (actionBar != null && actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS) {
@@ -434,6 +435,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     // This callback is called by EventsFetcher when new set of events are available. We build the
     // markers for all events and then call method to show selected markers.
+    @SuppressWarnings("deprecation")
     private Listener<EventsCollection> mEventsFetcherCallBack = new Listener<EventsCollection>() {
         @Override
         public void onResponse(EventsCollection events) {
@@ -501,6 +503,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     private TabListener mTabListener = new TabListener() {
         @Override
+        @SuppressWarnings({"deprecation", "ConstantConditions"})
         public void onTabSelected(Tab tab, FragmentTransaction ft) {
             if (events != null) {
                 lastSelectedTag = tab.getTag().toString();
@@ -552,6 +555,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         private DatePickerDialog datePicker;
 
         @Override
+        @SuppressWarnings("deprecation")
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             City city = null;
             Bundle args = getArguments();
@@ -587,6 +591,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         @Override
+        @SuppressWarnings("deprecation")
         public void onClick(DialogInterface dialog, int which) {
             Log.w("TEXT", "onClick");
             Date selectedDate = new Date(datePicker.getDatePicker().getYear() - 1900,

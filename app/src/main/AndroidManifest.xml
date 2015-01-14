@@ -16,7 +16,8 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <permission android:name="com.eventshigh.nearme.app.permission.C2D_MESSAGE"
+    <permission
+        android:name="com.eventshigh.nearme.app.permission.C2D_MESSAGE"
         android:protectionLevel="signature"
     />
     <uses-permission android:name="com.eventshigh.nearme.app.permission.C2D_MESSAGE" />
@@ -102,8 +103,10 @@
             android:readPermission="com.eventshigh.nearme.app.provider.READ_MY_DATA"
             android:writePermission="com.eventshigh.nearme.app.provider.WRITE_MY_DATA"
         >
-            <path-permission android:pathPrefix="/search_suggest_query"
-                android:readPermission="android.permission.GLOBAL_SEARCH" />
+            <path-permission
+                android:pathPrefix="/search_suggest_query"
+                android:readPermission="android.permission.GLOBAL_SEARCH"
+            />
         </provider>
 
         <!-- Activities within our application -->

@@ -10,7 +10,7 @@ import android.preference.PreferenceManager;
  * User Preferences.
  */
 public class Preferences implements OnSharedPreferenceChangeListener {
-    public static final String PREF_DEFAULT_ACTIVITY_MAPS = "default_activity";
+    public static final String PREF_DEFAULT_ACTIVITY = "default_activity";
 
     private final Context context;
     private final SharedPreferences sharedPreferences;
@@ -30,7 +30,7 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     }
 
     public boolean isMapsViewDefault() {
-        return "maps".equals(sharedPreferences.getString(PREF_DEFAULT_ACTIVITY_MAPS, ""));
+        return "maps".equals(sharedPreferences.getString(PREF_DEFAULT_ACTIVITY, ""));
     }
 
     @Override

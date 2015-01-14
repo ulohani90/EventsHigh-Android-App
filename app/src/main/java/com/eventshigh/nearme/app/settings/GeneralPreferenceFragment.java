@@ -20,6 +20,7 @@ public class GeneralPreferenceFragment extends PreferenceFragment {
         // to their values. When their values change, their summaries are
         // updated to reflect the new value, per the Android Design
         // guidelines.
-        SettingsActivity.bindPreferenceSummaryToValue(findPreference("default_activity"));
+        SettingsActivity.bindPreferenceSummaryToValue(
+                findPreference(Preferences.PREF_DEFAULT_ACTIVITY));
     }
 }

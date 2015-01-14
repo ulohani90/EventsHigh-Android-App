@@ -15,7 +15,7 @@
 
     <!-- Notifications settings -->
     <string name="pref_header_notifications">Notifications</string>
-    <string name="pref_title_weekend_notifications">Weekend Event notifications</string>
-    <string name="pref_title_nearby_notifications">Nearby Event notifications</string>
+    <string name="pref_title_weekend_notifications">Weekend Events</string>
+    <string name="pref_title_nearby_notifications">Nearby Events</string>
 
 </resources>

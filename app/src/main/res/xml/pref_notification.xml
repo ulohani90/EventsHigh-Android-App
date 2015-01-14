@@ -3,11 +3,13 @@
     <CheckBoxPreference
         android:key="notifications_weekend"
         android:title="@string/pref_title_weekend_notifications"
+        android:summary="Generally shown once per week"
         android:defaultValue="true"
     />
     <CheckBoxPreference
-        android:key="notifications_nearby_event"
+        android:key="notifications_nearby"
         android:title="@string/pref_title_nearby_notifications"
+        android:summary="Generally shown twice per week"
         android:defaultValue="true"
     />
 
