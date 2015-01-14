@@ -16,6 +16,7 @@ import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.GAHelper;
@@ -82,6 +83,15 @@ public class GcmIntentService extends IntentService {
             return;
         }
 
+        final GAHelper gaHelper = GAHelper.getInstance(getApplicationContext());
+        Preferences preferences = Preferences.getInstance(getApplicationContext());
+        if ((eventId != null && !preferences.notifyNearBy()) ||
+            (query != null && !preferences.notifyWeekend())) {
+            Log.w(LOG_TAG, "notification skipped as per user preference");
+            gaHelper.reportActionToAnalytics(LOG_TAG, "notificationSkipped", "userPreference", 1);
+            return;
+        }
+
         double lat = 0 , lon = 0, distance = 0;
         boolean bounded = false;
         String boundsCombinedStr = msg.getString("bounds");
@@ -128,7 +138,6 @@ public class GcmIntentService extends IntentService {
                 .setContentIntent(contentIntent)
                 .build();
 
-        final GAHelper gaHelper = GAHelper.getInstance(getApplicationContext());
         if (!bounded) {
             showNotification(notification, gaHelper);
         } else {
@@ -144,7 +153,7 @@ public class GcmIntentService extends IntentService {
                             LocationUtils.distanceInMeters(
                                     LocationUtils.locationToLatLng(location), center) > radius) {
                             Log.w(LOG_TAG, "notification skipped, user location: " + location);
-                            gaHelper.reportActionToAnalytics(LOG_TAG, "notificationSkipped", "", 1);
+                            gaHelper.reportActionToAnalytics(LOG_TAG, "notificationSkipped", "userLocation", 1);
                         } else {
                             showNotification(notification, gaHelper);
                         }

@@ -11,6 +11,8 @@ import android.preference.PreferenceManager;
  */
 public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_DEFAULT_ACTIVITY = "default_activity";
+    public static final String PREF_NOTIFY_WEEKEND = "notifications_weekend";
+    public static final String PREF_NOTIFY_NEARBY = "notifications_nearby";
 
     private final Context context;
     private final SharedPreferences sharedPreferences;
@@ -31,6 +33,14 @@ public class Preferences implements OnSharedPreferenceChangeListener {
 
     public boolean isMapsViewDefault() {
         return "maps".equals(sharedPreferences.getString(PREF_DEFAULT_ACTIVITY, ""));
+    }
+
+    public boolean notifyWeekend() {
+        return sharedPreferences.getBoolean(PREF_NOTIFY_WEEKEND, true);
+    }
+
+    public boolean notifyNearBy() {
+        return sharedPreferences.getBoolean(PREF_NOTIFY_NEARBY, true);
     }
 
     @Override
