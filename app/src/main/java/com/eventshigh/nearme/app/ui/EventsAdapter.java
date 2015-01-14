@@ -60,7 +60,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         }
 
         if (event.numPeopleInterested <= 0) {
-            eventCard.numPeopleInterestedView.setVisibility(View.INVISIBLE);
+            eventCard.numPeopleInterestedView.setVisibility(View.GONE);
         } else {
             eventCard.numPeopleInterestedView.setVisibility(View.VISIBLE);
             eventCard.numPeopleInterestedView.setText(

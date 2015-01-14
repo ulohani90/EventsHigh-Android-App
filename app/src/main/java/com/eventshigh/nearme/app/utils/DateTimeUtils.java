@@ -101,14 +101,14 @@ public class DateTimeUtils {
     }
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    public static String dateQueryToTitle(String dateStr) {
+    public static String queryToTitle(String dateStr) {
         try {
             Date date = DATE_FORMAT.parse(dateStr);
             synchronized (SIMPLE_DATE_FORMAT) {
                 return SIMPLE_DAY_FORMAT.format(date) + " " + SIMPLE_DATE_FORMAT.format(date);
             }
         } catch (ParseException e) {
-            return  dateStr;
+            return Utils.capitalize(dateStr);
         }
     }
 }

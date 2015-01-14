@@ -126,12 +126,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
         // Show query as title.
         ActionBar actionBar = getActionBar();
         if (actionBar != null && !lastEventFetcherParam.query.isEmpty()) {
-            if (EventsHighEndpoints.isDateQuery(lastEventFetcherParam.query)) {
-                actionBar.setTitle(DateTimeUtils.dateQueryToTitle(lastEventFetcherParam.query));
-            } else {
+            actionBar.setTitle(DateTimeUtils.queryToTitle(lastEventFetcherParam.query));
+            if (!EventsHighEndpoints.isDateQuery(lastEventFetcherParam.query)) {
                 reportActionToAnalytics("search", lastEventFetcherParam.query);
                 EventSearchSuggestionsProvider.saveRecentQuery(this, lastEventFetcherParam.query);
-                actionBar.setTitle(lastEventFetcherParam.query);
             }
         }
     }
@@ -493,7 +491,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             } else {
                 if (!lastEventFetcherParam.query.isEmpty()) {
                     int numEvents = tags.isEmpty() ? 0 : events.getEvents(0).size();
-                    actionBar.setTitle(DateTimeUtils.dateQueryToTitle(lastEventFetcherParam.query) + " (" + numEvents + ")");
+                    actionBar.setTitle(DateTimeUtils.queryToTitle(lastEventFetcherParam.query) + " (" + numEvents + ")");
                 }
 
                 updateListingAndMore(events.getEvents(0));
