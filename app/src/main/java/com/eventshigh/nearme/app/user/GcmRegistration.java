@@ -31,16 +31,16 @@ public class GcmRegistration {
     // Member variables used to store the user account details in preferences.
     private final Context context;
     private final SharedPreferences gcmRegistrationInfo;
-    private static GcmRegistration instance;
 
     private GcmRegistration(Context context) {
         this.context = context;
         gcmRegistrationInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
     }
 
+    private static GcmRegistration instance;
     public static synchronized GcmRegistration getInstance(Context context) {
         if (instance == null) {
-            instance = new GcmRegistration(context);
+            instance = new GcmRegistration(context.getApplicationContext());
         }
         return  instance;
     }

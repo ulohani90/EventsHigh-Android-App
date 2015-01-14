@@ -98,8 +98,7 @@ public class OnBoardingHelper {
             targetsIndex ++;
             if (targetsIndex >= targets.size()) {
                 showcaseView.hide();
-                BackupManager bm = new BackupManager(activity);
-                bm.dataChanged();
+                new BackupManager(activity).dataChanged();
                 return;
             }
 

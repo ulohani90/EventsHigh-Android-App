@@ -4,7 +4,7 @@ import android.app.backup.BackupAgentHelper;
 import android.app.backup.FileBackupHelper;
 
 /**
- * See http://developer.android.com/training/cloudsync/backupapi.html.
+ * See http://developer.android.com/training/cloudsync/backupapi.html
  */
 public class EhBackupAgent extends BackupAgentHelper {
     // The name of the SharedPreferences file
@@ -16,7 +16,12 @@ public class EhBackupAgent extends BackupAgentHelper {
     // Allocate a helper and add it to the backup agent
     @Override
     public void onCreate() {
-        FileBackupHelper helper = new FileBackupHelper(this, SHOWCASE_FILENAME);
+        FileBackupHelper helper = new FileBackupHelper(
+                this, SHOWCASE_FILENAME, getDefaultSharedPreferencesName());
         addHelper(FILES_BACKUP_KEY, helper);
+    }
+
+    private String getDefaultSharedPreferencesName() {
+        return getPackageName() + "_preferences";
     }
 }

@@ -1,0 +1,14 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="notifications_weekend"
+        android:title="@string/pref_title_weekend_notifications"
+        android:defaultValue="true"
+    />
+    <CheckBoxPreference
+        android:key="notifications_nearby_event"
+        android:title="@string/pref_title_nearby_notifications"
+        android:defaultValue="true"
+    />
+
+</PreferenceScreen>

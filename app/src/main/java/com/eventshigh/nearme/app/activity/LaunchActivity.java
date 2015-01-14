@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -18,9 +19,9 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.user.GcmRegistration;
-import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.LocationUtils;
@@ -65,8 +66,12 @@ public class LaunchActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail);
 
+        // Set defaults for preferences.
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
+
         // Set defaults when there is no incoming intent.
-        Class target = new Preferences(this).isMapsViewDefault() ?
+        Class target = Preferences.getInstance(getApplicationContext()).isMapsViewDefault() ?
                 EventsMapsActivity.class : EventsGridActivity.class;
         outIntent = new Intent(this, target);
         webUri = Uri.parse(EventsHighEndpoints.WEB_URI_BASE);

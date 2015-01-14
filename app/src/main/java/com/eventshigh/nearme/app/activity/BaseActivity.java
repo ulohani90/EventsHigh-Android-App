@@ -26,7 +26,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.Helper;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.Preferences;
+import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
 
@@ -66,6 +66,9 @@ public abstract class BaseActivity extends FragmentActivity {
             Fabric.with(this, new Crashlytics());
         }
 
+        // Read Preferences
+        pref = Preferences.getInstance(getApplicationContext());
+
         // Setup Google Analytics.
         gaHelper = GAHelper.getInstance(getApplicationContext());
         isDebug = gaHelper.getAppOptOut();
@@ -76,10 +79,6 @@ public abstract class BaseActivity extends FragmentActivity {
 
         // Google Analytics reporting.
         gaHelper.reportActivityStart(this);
-
-        // Check if this is first activity by user, if yes report special event.
-        // See if this is first action by user. If yes, report it.
-        pref = new Preferences(this);
     }
 
     protected void onStop() {

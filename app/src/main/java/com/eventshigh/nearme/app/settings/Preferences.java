@@ -1,0 +1,40 @@
+package com.eventshigh.nearme.app.settings;
+
+import android.app.backup.BackupManager;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.preference.PreferenceManager;
+
+/**
+ * User Preferences.
+ */
+public class Preferences implements OnSharedPreferenceChangeListener {
+    public static final String PREF_DEFAULT_ACTIVITY_MAPS = "default_activity";
+
+    private final Context context;
+    private final SharedPreferences sharedPreferences;
+
+    private Preferences(Context context) {
+        this.context = context;
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    private static Preferences instance;
+    public static synchronized Preferences getInstance(Context context) {
+        if (instance == null) {
+            instance = new Preferences(context.getApplicationContext());
+        }
+        return instance;
+    }
+
+    public boolean isMapsViewDefault() {
+        return "maps".equals(sharedPreferences.getString(PREF_DEFAULT_ACTIVITY_MAPS, ""));
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        new BackupManager(context).dataChanged();
+    }
+}

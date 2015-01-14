@@ -37,6 +37,7 @@ import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsCollection.Builder;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
+import com.eventshigh.nearme.app.settings.SettingsActivity;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
@@ -245,6 +246,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 selectDateFragment.setArguments(args);
             }
             selectDateFragment.show(getFragmentManager(), "selectDate");
+            return true;
+        }
+
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 
