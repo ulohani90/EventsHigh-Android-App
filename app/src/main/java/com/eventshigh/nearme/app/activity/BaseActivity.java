@@ -140,8 +140,8 @@ public abstract class BaseActivity extends FragmentActivity {
      * Open events details page.
      * @param event event for which to show details page.
      */
-    public void showEventDetails(Event event) {
-        reportActionToAnalytics("showEventDetails");
+    public void showEventDetails(Event event, @Nullable String label) {
+        reportActionToAnalytics("showEventDetails", label == null ? "" : label);
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.putExtra(EventDetailFragment.ARG_EVENT_INFO, event);
         startActivity(detailIntent);

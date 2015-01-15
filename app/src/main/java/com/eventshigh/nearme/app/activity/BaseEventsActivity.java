@@ -298,6 +298,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // Helper methods
     // ***********************
 
+    public void showEventDetails(Event event) {
+        showEventDetails(event, lastSelectedTag);
+    }
+
     private void updateListingAndMore(List<Event> events) {
         updateEventListing(events);
         if (events.isEmpty()) {
