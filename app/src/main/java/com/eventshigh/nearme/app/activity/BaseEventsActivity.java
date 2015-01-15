@@ -45,6 +45,7 @@ import com.eventshigh.nearme.app.ui.OnBoardingHelper;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.text.SimpleDateFormat;
@@ -113,15 +114,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
         // Set the context in term of lastEventFetcherParam. Use Inent
         // to restore the context.
         lastStartedAt = 0;
-        lastEventFetcherParam = new EventFetcherParam(null, "");
 
         // See if we have context passed to us within intent.
-        Intent intent = getIntent();
-        EventFetcherParam param = intent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
-        if (param != null) {
-            lastEventFetcherParam = param;
-        }
-        lastSelectedTag = intent.getStringExtra(EXTRA_TAG_NAME_PARAM);
+        lastEventFetcherParam = IntentUtils.processIntent(this, getIntent());
+        lastSelectedTag = getIntent().getStringExtra(EXTRA_TAG_NAME_PARAM);
 
         // Show query as title.
         ActionBar actionBar = getActionBar();
@@ -191,13 +187,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.activity_event, menu);
 
         // Search View.
-        if (isDefaultView()) {
-            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-            SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        } else {
-            menu.findItem(R.id.action_search).setVisible(false);
-        }
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         // Do not show filterByDate for search.
         if (!lastEventFetcherParam.query.isEmpty() &&

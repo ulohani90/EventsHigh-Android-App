@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
@@ -20,9 +19,10 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
-import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.settings.Preferences;
+import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -211,74 +211,9 @@ public class LaunchActivity extends Activity {
     }
 
     private void processIntent(Intent inIntent) {
-        param = new EventFetcherParam(null, "");
-
-        if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
-            processSearchIntent(inIntent);
-        } else if (Intent.ACTION_VIEW.equals(inIntent.getAction())) {
-            processViewIntent(inIntent);
-        } else if (BaseActivity.NOTIFICATION_ACTION.equals(inIntent.getAction())) {
-            reportToAnalytics("openNotification");
-            processViewIntent(inIntent);
-        }
-
+        param = IntentUtils.processIntent(this, inIntent);
         webUri = EventsHighEndpoints.getWebUri(param);
         title = getTitle(param);
-    }
-
-    private void processSearchIntent(Intent inIntent) {
-        String query = inIntent.getStringExtra(SearchManager.QUERY);
-        reportToAnalytics("search", query);
-
-        Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
-        if (appData != null) {
-            EventFetcherParam param1 =
-                    appData.getParcelable(BaseEventsActivity.EXTRA_EVENT_FETCHER_PARAM);
-            if (param1 != null) {
-                param = param1;
-            }
-        }
-
-        param.query = query;
-    }
-
-    private void processViewIntent(Intent inIntent) {
-        Uri inUri = inIntent.getData();
-
-        if (inUri.getPath().startsWith("/city")) {
-            processCityViewIntent(inUri);
-        } else if (inUri.getPath().startsWith("/search")) {
-            processSearchViewIntent(inUri);
-        }
-
-        reportToAnalytics("deepLink", "homepage");
-    }
-
-    private void processCityViewIntent(Uri webUri) {
-        reportToAnalytics("deepLink", "city");
-
-        try {
-            City city = City.valueOf(webUri.getLastPathSegment().toUpperCase());
-            param.changeLocation(city.cityBounds.getCenter());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            // Invalid city in URI. Ignore.
-        }
-    }
-
-    private void processSearchViewIntent(Uri webUri) {
-        reportToAnalytics("deepLink", "search");
-
-        try {
-            City city = City.valueOf(webUri.getQueryParameter("city").toUpperCase());
-            param.changeLocation(city.cityBounds.getCenter());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            // Invalid city in URI. Ignore.
-        }
-
-        String query = webUri.getQueryParameter("interest");
-        if (query != null) {
-            param.query = query;
-        }
     }
 
     private static String getTitle(EventFetcherParam param) {

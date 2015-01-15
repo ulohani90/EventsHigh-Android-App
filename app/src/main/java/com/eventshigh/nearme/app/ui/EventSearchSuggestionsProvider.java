@@ -19,7 +19,7 @@ import java.io.IOException;
  * See http://developer.android.com/guide/topics/search/adding-recent-query-suggestions.html.
  */
 public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvider {
-    private final static String AUTHORITY = "com.eventshigh.nearme.app.EventSearchRecentSuggestionsProvider";
+    private final static String AUTHORITY = "com.eventshigh.nearme.app.EventSearchSuggestions";
     private final static int MODE = DATABASE_MODE_QUERIES;
     private final static int SUGGESTION_ID_START = 10000;
 
