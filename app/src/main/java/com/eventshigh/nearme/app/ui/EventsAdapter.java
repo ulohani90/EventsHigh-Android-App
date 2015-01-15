@@ -45,8 +45,11 @@ public class EventsAdapter extends ArrayAdapter<Event> {
 
         // Set the background image.
         if (event.imgUrl != null) {
+            eventCard.bgView.setVisibility(View.VISIBLE);
             eventCard.bgView.setImageUrl(event.imgUrl,
                     Helper.getImageLoader(activity.getApplicationContext()));
+        } else {
+            eventCard.bgView.setVisibility(View.INVISIBLE);
         }
 
         // Set the title, time etc.
