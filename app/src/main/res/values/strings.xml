@@ -16,6 +16,7 @@
     <string name="action_call">Call</string>
     <string name="action_direction">Show Directions</string>
     <string name="action_share_app">Share This App?</string>
+    <string name="action_shortcut">Add to homescreen</string>
 
     <!-- Other Strings used in UI -->
     <string name="ui_event_timings">Timings</string>

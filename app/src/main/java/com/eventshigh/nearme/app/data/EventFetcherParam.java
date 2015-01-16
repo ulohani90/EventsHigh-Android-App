@@ -30,9 +30,8 @@ public class EventFetcherParam implements Parcelable {
 
     @Override
     public String toString() {
-        return EventFetcherParam.class.getSimpleName() +
-                " (City: " + city +
-                ", query: '" + query + "')";
+        return (query.isEmpty() ? "amazing" : query) + " events " +
+                (city == null ? "near you" : "in " + city.toString().toLowerCase());
     }
 
     @Override

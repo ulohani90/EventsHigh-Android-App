@@ -206,19 +206,14 @@ public class LaunchActivity extends Activity {
     // ***********************
 
     private void startNextActivity() {
-        outIntent.putExtra(BaseEventsActivity.EXTRA_EVENT_FETCHER_PARAM, param);
+        outIntent.putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, param);
         startActivity(outIntent);
     }
 
     private void processIntent(Intent inIntent) {
         param = IntentUtils.processIntent(this, inIntent);
         webUri = EventsHighEndpoints.getWebUri(param);
-        title = getTitle(param);
-    }
-
-    private static String getTitle(EventFetcherParam param) {
-        return (param.query.isEmpty() ? "amazing" : param.query) + " events " +
-                (param.city == null ? "near you" : "in " + param.city.toString().toLowerCase());
+        title = param.toString();
     }
 
     private void reportToAnalytics(String action) {

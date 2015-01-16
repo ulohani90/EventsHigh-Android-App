@@ -70,7 +70,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // ***********************
     // CONSTANTS
     // ***********************
-    public static final String EXTRA_EVENT_FETCHER_PARAM = EventFetcherParam.class.getSimpleName();
     public static final String EXTRA_TAG_NAME_PARAM = "extra.event.tag.name";
     public static final int NUM_MAX_TABS = 10;
     public static final int NUM_PREFETCH = 10;
@@ -176,7 +175,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     public boolean onSearchRequested() {
         reportActionToAnalytics("onSearchRequested");
         Bundle appData = new Bundle();
-        appData.putParcelable(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam);
+        appData.putParcelable(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam);
         startSearch(null, false, appData, false);
         return true;
     }
@@ -237,6 +236,37 @@ public abstract class BaseEventsActivity extends BaseActivity {
             }
             selectDateFragment.show(getFragmentManager(), "selectDate");
             return true;
+        }
+
+        if (id == R.id.action_shortcut) {
+            reportActionToAnalytics("createShortcut");
+
+            // Create an intent the shortcut could launch.
+            Intent shortcutIntent = new Intent(getApplicationContext(), getClass());
+            shortcutIntent.putExtra(SearchManager.QUERY, lastEventFetcherParam.query);
+            if (lastEventFetcherParam.location != null) {
+                shortcutIntent.putExtra(IntentUtils.EXTRA_LATITUDE_PARAM,
+                       lastEventFetcherParam.location.latitude);
+                shortcutIntent.putExtra(IntentUtils.EXTRA_LONGITUDE_PARAM,
+                        lastEventFetcherParam.location.longitude);
+            }
+            shortcutIntent.setAction(Intent.ACTION_SEARCH);
+
+            // Create an intent for creating shortcut and broadcast it.
+            Intent addIntent = new Intent();
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, lastEventFetcherParam.toString());
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
+                    Intent.ShortcutIconResource.fromContext(getApplicationContext(),
+                            R.drawable.ic_launcher));
+            addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+            getApplicationContext().sendBroadcast(addIntent);
+
+            // Go to home screen so that user can see the new icon.
+            Intent startMain = new Intent(Intent.ACTION_MAIN);
+            startMain.addCategory(Intent.CATEGORY_HOME);
+            startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(startMain);
         }
 
         if (id == R.id.action_settings) {
@@ -390,7 +420,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         reportActionToAnalytics("switchView");
         Intent intent = new Intent(this, cls)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .putExtra(EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam);
+                .putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam);
         if (lastSelectedTag != null) {
             intent.putExtra(EXTRA_TAG_NAME_PARAM, lastSelectedTag);
         }
@@ -599,7 +629,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             EventFetcherParam param = new EventFetcherParam(activity.lastEventFetcherParam.location,
                     DATE_FORMAT.format(selectedDate));
             Intent intent = new Intent(getActivity(), activity.getClass())
-                    .putExtra(EXTRA_EVENT_FETCHER_PARAM, param);
+                    .putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, param);
             startActivity(intent);
         }
     }

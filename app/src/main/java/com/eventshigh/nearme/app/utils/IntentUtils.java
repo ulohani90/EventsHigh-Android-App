@@ -7,20 +7,28 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Helper to process the intent in EventsHigh app.
  */
 public class IntentUtils {
+    public static final String EXTRA_EVENT_FETCHER_PARAM = IntentUtils.class.getCanonicalName() + "_PARAM";
+    public static final String EXTRA_LATITUDE_PARAM = IntentUtils.class.getCanonicalName() + "_LAT";
+    public static final String EXTRA_LONGITUDE_PARAM = IntentUtils.class.getCanonicalName() + "_LON";
 
     public static EventFetcherParam processIntent(Activity activity, Intent inIntent) {
-        EventFetcherParam param =
-                inIntent.getParcelableExtra(BaseEventsActivity.EXTRA_EVENT_FETCHER_PARAM);
+        EventFetcherParam param = inIntent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
         if (param == null) {
             param = new EventFetcherParam(null, "");
+        }
+
+        if (inIntent.hasExtra(EXTRA_LATITUDE_PARAM) && inIntent.hasExtra(EXTRA_LONGITUDE_PARAM)) {
+            param.changeLocation(new LatLng(
+                    inIntent.getDoubleExtra(EXTRA_LATITUDE_PARAM, 0),
+                    inIntent.getDoubleExtra(EXTRA_LONGITUDE_PARAM, 0)));
         }
 
         IntentUtils utils = new IntentUtils(activity, param);
@@ -51,7 +59,7 @@ public class IntentUtils {
         Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
         if (appData != null) {
             EventFetcherParam appDataParam =
-                    appData.getParcelable(BaseEventsActivity.EXTRA_EVENT_FETCHER_PARAM);
+                    appData.getParcelable(EXTRA_EVENT_FETCHER_PARAM);
             if (appDataParam != null) {
                 param = appDataParam;
             }
