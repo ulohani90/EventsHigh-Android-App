@@ -7,12 +7,15 @@ import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
+import com.android.volley.Request.Method;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.eventshigh.nearme.app.broadcast.InstallReferrer;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.network.Helper;
 import com.eventshigh.nearme.app.security.Signer;
-import com.eventshigh.nearme.app.utils.StreamUtils;
-
-import org.json.JSONException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -20,34 +23,49 @@ import java.security.GeneralSecurityException;
 public class AccountStateReporter {
 
     public static boolean reportReferrer(Context context, String referrer) {
-        return sendSignedRequest(getBaseUri(context, "reportReferrer")
+        return sendSignedRequest(context, getBaseUri(context, "reportReferrer")
             .appendQueryParameter("referrer", referrer)
             .build());
     }
 
     public static boolean reportReferrerCode(Context context, String referrerCode) {
-        return sendSignedRequest(getBaseUri(context, "reportReferrerId")
+        return sendSignedRequest(context, getBaseUri(context, "reportReferrerId")
                 .appendQueryParameter("referrer_id", referrerCode)
                 .build());
     }
 
     public static boolean reportGcmRegistrationId(Context context, String gcmRegistationId) {
-        return sendSignedRequest(getBaseUri(context, "reportGcmRegistationId")
+        return sendSignedRequest(context, getBaseUri(context, "reportGcmRegistationId")
                 .appendQueryParameter("gcm_registration_id", gcmRegistationId)
                 .build());
     }
 
     public static boolean reportLastCity(Context context, City city) {
-        return sendSignedRequest(getBaseUri(context, "reportLastCity")
+        return sendSignedRequest(context, getBaseUri(context, "reportLastCity")
                 .appendQueryParameter("last_city", city.toString())
                 .build());
     }
 
-    private static boolean sendSignedRequest(Uri uri) {
+    private static boolean sendSignedRequest(Context context, Uri uri) {
         try {
-            StreamUtils.fetchJSON(Signer.sign(uri).toString());
+            Helper.addToRequestQueue(context,
+                new StringRequest(Method.GET, Signer.sign(uri).toString(),
+                    new Listener<String>() {
+                        @Override
+                        public void onResponse(String s) {
+                            // do nothing.
+                        }
+                    },
+                    new ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            // do nothing.
+                        }
+                    }
+                )
+            );
             return true;
-        } catch (IOException | JSONException | GeneralSecurityException e) {
+        } catch (IOException | GeneralSecurityException e) {
             Log.w(InstallReferrer.class.getSimpleName(), "Failed to report referrerId", e);
             return false;
         }

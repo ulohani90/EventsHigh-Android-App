@@ -25,6 +25,8 @@ import java.io.UnsupportedEncodingException;
  * Volley Request to fetch Events collections.
  */
 public class EventCollectionRequest extends JsonRequest<EventsCollection> {
+    public static boolean shouldBypassCache = false;
+
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
@@ -33,7 +35,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
      * @param listener callback on success.
      * @param errorListener callback on failures.
      */
-    public static void submit(Context context, EventFetcherParam param, boolean shouldOverrideCache,
+    public static void submit(Context context, EventFetcherParam param,
                               Priority priority, Object tag,
                               Listener<EventsCollection> listener, ErrorListener errorListener) {
         if (param.city == null) {
@@ -53,8 +55,8 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             }
         }
 
-        if (shouldOverrideCache) {
-            url = url + "?cmode=bypass";
+        if (shouldBypassCache) {
+            url = url + "&cmode=bypass";
         }
 
         EventCollectionRequest request = new EventCollectionRequest(context, url, param, priority,

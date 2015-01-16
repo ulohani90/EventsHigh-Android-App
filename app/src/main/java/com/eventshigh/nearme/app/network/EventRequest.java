@@ -55,8 +55,11 @@ public class EventRequest extends JsonRequest<Event> {
 
         String eventId = eventUriPathSegments.get(eventUriPathSegments.size() - 1).split("-", 2)[0];
         String url = EventsHighEndpoints.getApiEndpointEventUber(eventId);
-        EventRequest request = new EventRequest(context, url, city, priority,
-                listener, errorListener);
+        if (EventCollectionRequest.shouldBypassCache) {
+            url = url + "&cmode=bypass";
+        }
+
+        EventRequest request = new EventRequest(context, url, city, priority, listener, errorListener);
         if (tag != null) {
             request.setTag(tag);
         }

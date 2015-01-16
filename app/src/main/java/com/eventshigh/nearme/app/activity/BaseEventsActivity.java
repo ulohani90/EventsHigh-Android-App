@@ -92,8 +92,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private OnBoardingHelper onBoardingHelper;
     // when was this activity last started on.
     private long lastStartedAt;
-    // override the cache?
-    private boolean shouldOverrideCache = false;
 
 
     // ***********************
@@ -198,7 +196,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Debug Views.
         if (isDebug) {
-            menu.findItem(R.id.debug_cache_override).setVisible(true);
+            MenuItem item = menu.findItem(R.id.debug_cache_override);
+            item.setVisible(true);
+            item.setChecked(EventCollectionRequest.shouldBypassCache);
         }
 
         int disabledMenuId = getDisabledMenuId();
@@ -275,8 +275,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         if (id == R.id.debug_cache_override) {
-            shouldOverrideCache = !item.isChecked();
-            item.setChecked(shouldOverrideCache);
+            EventCollectionRequest.shouldBypassCache = !item.isChecked();
+            item.setChecked(EventCollectionRequest.shouldBypassCache);
+            if (item.isChecked()) {
+                fetchNewListing();
+            }
             return true;
         }
 
@@ -359,7 +362,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     private void fetchNewListing() {
         viewSwitcher.setDisplayedChild(1);
-        EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam, shouldOverrideCache,
+        EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam,
                 Priority.IMMEDIATE, this, mEventsFetcherCallBack, new ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
