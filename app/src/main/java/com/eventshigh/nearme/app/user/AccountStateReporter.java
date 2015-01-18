@@ -14,12 +14,15 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.eventshigh.nearme.app.broadcast.InstallReferrer;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.network.Helper;
+import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+/**
+ * Helper class to report the account state to EH site so that it is updated in db.
+ */
 public class AccountStateReporter {
 
     public static boolean reportReferrer(Context context, String referrer) {
@@ -48,21 +51,21 @@ public class AccountStateReporter {
 
     private static boolean sendSignedRequest(Context context, Uri uri) {
         try {
-            Helper.addToRequestQueue(context,
-                new StringRequest(Method.GET, Signer.sign(uri).toString(),
-                    new Listener<String>() {
-                        @Override
-                        public void onResponse(String s) {
-                            // do nothing.
-                        }
-                    },
-                    new ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            // do nothing.
-                        }
-                    }
-                )
+            VolleyHelper.addToRequestQueue(context,
+                    new StringRequest(Method.GET, Signer.sign(uri).toString(),
+                            new Listener<String>() {
+                                @Override
+                                public void onResponse(String s) {
+                                    // do nothing.
+                                }
+                            },
+                            new ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError volleyError) {
+                                    // do nothing.
+                                }
+                            }
+                    )
             );
             return true;
         } catch (IOException | GeneralSecurityException e) {

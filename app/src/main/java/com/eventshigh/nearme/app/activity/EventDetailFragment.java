@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.activity;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
+import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -31,7 +32,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.network.Helper;
+import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -315,7 +316,7 @@ public class EventDetailFragment extends Fragment {
             eventCard.bgView.setVisibility(View.GONE);
         } else {
             eventCard.bgView.setImageUrl(event.imgUrl,
-                    Helper.getImageLoader(activity.getApplicationContext()));
+                    VolleyHelper.getImageLoader(activity.getApplicationContext()));
         }
 
         if (event.imgUrl != null) {
@@ -329,7 +330,7 @@ public class EventDetailFragment extends Fragment {
                     nagDialog.setContentView(R.layout.dialog_image_preview);
 
                     ImageViewTouch preview = (ImageViewTouch) nagDialog.findViewById(R.id.image_preview);
-                    Helper.getImageLoader(getActivity().getApplicationContext()).get(
+                    VolleyHelper.getImageLoader(getActivity().getApplicationContext()).get(
                             event.imgUrl, ImageLoader.getImageListener(preview, 0, 0));
 
                     Button btnClose = (Button) nagDialog.findViewById(R.id.btn_close);
@@ -535,7 +536,11 @@ public class EventDetailFragment extends Fragment {
         tagView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.showSearchView(tag);
+                activity.reportActionToAnalytics("tagClick");
+                Intent searchIntent = new Intent(activity, LaunchActivity.class);
+                searchIntent.setAction(Intent.ACTION_SEARCH);
+                searchIntent.putExtra(SearchManager.QUERY, tag);
+                startActivity(searchIntent);
             }
         });
         return  tagView;

@@ -14,7 +14,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Helper class to cache the
+ * Helper class to pre fetch the event data. This class send the request to fetch
+ * event data and discards the result. The Volley cache should help in getting the
+ * event data next time when user needs it.
  */
 public class EventUberPrefetcher {
     private static final int CACHE_SIZE = 100;
@@ -49,7 +51,7 @@ public class EventUberPrefetcher {
 
         String url = EventsHighEndpoints.getApiEndpointEventUber(eventId);
         StringRequest request = new StringRequest(url, NULL_LISTENER, NULL_ERROR_LISTENER);
-        Helper.addToRequestQueue(context, request);
+        VolleyHelper.addToRequestQueue(context, request);
     }
 
     private static final Listener<String> NULL_LISTENER = new Listener<String>() {

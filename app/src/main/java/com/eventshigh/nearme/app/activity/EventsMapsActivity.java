@@ -6,20 +6,13 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.MarkerManager;
-import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.ShowcaseView.Builder;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
@@ -37,10 +30,6 @@ import java.util.List;
 /**
  * Maps activity which shows users events happening in given locality. The events are marked
  * across Map and user can zoom in, zoom out or move around the map to discover more events.
- *
- * In additions to location, an date filter is also provided. The date filter is filled with
- * days from upcoming week and user can select perticular date. By default, today's events are
- * shown.
  */
 public class EventsMapsActivity extends BaseEventsActivity {
 
@@ -244,9 +233,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
     };
 
     private OnMarkerClickListener mOnMarkerClickListener = new OnMarkerClickListener() {
-        ShowcaseView showcaseView;
-        boolean isVisible = false;
-
         @Override
         public boolean onMarkerClick(Marker marker) {
             reportActionToAnalytics("onMarkerClick");
@@ -263,46 +249,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
             });
             eventCardContainer.removeAllViews();
             eventCardContainer.addView(eventView);
-
-            if (showcaseView != null) {
-                if (isVisible) {
-                    showcaseView.hide();
-                }
-            } else {
-                // Show Helper with swipe information.
-                showcaseView = new Builder(EventsMapsActivity.this, true)
-                    .setTarget(new ViewTarget(eventView))
-                    .setContentText(R.string.onboarding_swipe)
-                    .setStyle(R.style.ShowcaseTheme)
-                    .singleShot(2)
-                    .hideOnTouchOutside()
-                    .setShowcaseEventListener(new OnShowcaseEventListener() {
-                        ImageView swipeImage;
-
-                        @Override
-                        public void onShowcaseViewHide(ShowcaseView showcaseView) {
-                            reportActionToAnalytics("endOnboardingSwipe");
-                            isVisible = false;
-                            swipeImage.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
-                        }
-
-                        @Override
-                        public void onShowcaseViewShow(ShowcaseView showcaseView) {
-                            reportActionToAnalytics("startOnboardingSwipe");
-                            isVisible = true;
-                            swipeImage = new ImageView(EventsMapsActivity.this);
-                            swipeImage.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-                            swipeImage.setImageResource(R.drawable.gestures_flick);
-                            swipeImage.setScaleType(ScaleType.CENTER_INSIDE);
-                            eventCardContainer.addView(swipeImage);
-                        }
-                    }).build();
-            }
-
             return false;
         }
     };

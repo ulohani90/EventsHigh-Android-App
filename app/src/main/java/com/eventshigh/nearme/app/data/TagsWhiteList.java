@@ -2,8 +2,8 @@ package com.eventshigh.nearme.app.data;
 
 /**
  * Whitelist for the tags selection. This is an extension to
- * {@link com.eventshigh.nearme.app.data.EventCategory} list. We show
- * only whitelisted tags in UI.
+ * {@link com.eventshigh.nearme.app.data.EventCategory} list. We show only whitelisted tags in
+ * event card.
  */
 public enum  TagsWhiteList {
     BOLLYWOOD,

@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
-* Various Category for Events. The category defines the event type and has associated Icon.
+ * Various Category for Events. The category defines the event type and has associated Icon.
  * This Icon is used in event marker on Map or on Event Info card.
-*/
+ */
 public enum EventCategory {
     ART,
     COMEDY,

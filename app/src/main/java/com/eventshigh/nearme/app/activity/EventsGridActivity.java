@@ -10,16 +10,16 @@ import android.widget.GridView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
-import com.eventshigh.nearme.app.task.UpdateLocationTask;
+import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
 /**
- * An {@link android.app.Activity} which shows the events in Grid. On Phone,
- * we have one column in portrait mode and two columns in landscape mode.
- * On Tablet, we try to put more columns as per the width offered.
+ * An {@link com.eventshigh.nearme.app.activity.BaseEventsActivity} which shows the events in Grid.
+ * On Phone, we have one column in portrait mode and two columns in landscape mode. On Tablet,
+ * we try to put more columns as per the width offered.
  */
 public class EventsGridActivity extends BaseEventsActivity {
     private EventsAdapter eventsAdapter;
@@ -57,7 +57,7 @@ public class EventsGridActivity extends BaseEventsActivity {
         ActionBar actionBar = getActionBar();
         if (actionBar != null &&
                 (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0)) {
-            new UpdateLocationTask(this, actionBar).execute(userLocation);
+            new ShowLocalityTask(this, actionBar).execute(userLocation);
         }
 
         if (!refreshListingsIfNeeded(userLocation)) {

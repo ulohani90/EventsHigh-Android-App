@@ -17,6 +17,10 @@ import com.google.android.gms.maps.model.LatLng;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * An {@link android.os.AsyncTask} which is used to fetch the LatLng for a location using
+ * {@link android.location.Geocoder}.
+ */
 public class LatLngFetcherTask extends AsyncTask<String, Void, Pair<String, LatLng>> {
     private static final String LOG_TAG = LatLngFetcherTask.class.getSimpleName();
 

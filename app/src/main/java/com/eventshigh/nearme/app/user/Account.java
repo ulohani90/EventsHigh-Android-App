@@ -10,8 +10,8 @@ import java.net.URLEncoder;
 import java.util.UUID;
 
 /**
- * Manages the user account on this device. The account information is stored in
- * SharedPreferences.
+ * Manages the user account on this device. The account information is stored using
+ * SharedPreferences in {@code PREFS_FILE_NAME}.
  */
 public class Account {
     // Constants used for SharedPreferences.

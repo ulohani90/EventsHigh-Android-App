@@ -29,6 +29,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
+ * See {@link com.eventshigh.nearme.app.broadcast.GcmBroadcastReceiver} for details.
+ *
  * See https://developer.android.com/google/gcm/client.html.
  */
 public class GcmIntentService extends IntentService {
@@ -157,6 +159,8 @@ public class GcmIntentService extends IntentService {
                         } else {
                             showNotification(notification, gaHelper);
                         }
+
+						client.disconnect();
                     }
 
                     @Override

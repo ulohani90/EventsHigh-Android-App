@@ -19,7 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class helps showing on boarding messages to users.
+ * This class helps showing on boarding messages to users. This is a wrapper around
+ * {@link com.github.amlcurran.showcaseview.ShowcaseView}.
  */
 public class OnBoardingHelper {
     // ShowcaseView used for on boarding

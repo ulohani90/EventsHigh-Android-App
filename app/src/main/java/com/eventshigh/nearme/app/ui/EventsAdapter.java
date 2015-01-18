@@ -10,21 +10,20 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.network.Helper;
+import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
 
 /**
- * An {@link android.widget.ListAdapter} which can be used to populate the
- * Event card.
+ * An {@link android.widget.ListAdapter} which can be used to populate the Event card.
  */
 public class EventsAdapter extends ArrayAdapter<Event> {
-    private final BaseActivity activity;
+    private final BaseEventsActivity activity;
 
-    public EventsAdapter(BaseActivity activity) {
+    public EventsAdapter(BaseEventsActivity activity) {
         super(activity, R.layout.event_card, R.id.event_title);
         this.activity = activity;
     }
@@ -35,7 +34,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
     }
 
     // Build the view, reuse existing if possible.
-    public static View getView(final Event event, final BaseActivity activity,
+    public static View getView(final Event event, final BaseEventsActivity activity,
                                @Nullable View reuseView, ViewGroup parent) {
         // Build the view, reuse existing if possible.
         final View view = reuseView == null ?
@@ -47,7 +46,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         if (event.imgUrl != null) {
             eventCard.bgView.setVisibility(View.VISIBLE);
             eventCard.bgView.setImageUrl(event.imgUrl,
-                    Helper.getImageLoader(activity.getApplicationContext()));
+                    VolleyHelper.getImageLoader(activity.getApplicationContext()));
         } else {
             eventCard.bgView.setVisibility(View.INVISIBLE);
         }
@@ -128,7 +127,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
     }
 
     private static void showTag(TextView tagView, Event event, int tagNo,
-                                final BaseActivity activity) {
+                                final BaseEventsActivity activity) {
         if (tagNo >= event.tagsWhiteList.length) {
             tagView.setVisibility(View.GONE);
             return;

@@ -31,7 +31,6 @@
     <!-- Onbaording message -->
     <string name="onboarding_filter">Filter events by selecting a category!</string>
     <string name="onboarding_action">Use these action buttons to search, filter, change location or see events in list view!</string>
-    <string name="onboarding_swipe">\nSwipe right to go to next event!</string>
 
     <!-- Helper messages -->
     <string name="register_message">Get the most out of this app by registering with EventsHigh</string>
@@ -45,7 +44,7 @@
     <string name="failed_login">Failed to login! You can retry or skip.</string>
     <string name="failed_load">Failed to load events information!</string>
     <string name="no_event">Sorry, we are not in your city, yet!</string>
-    <string name="failed_locality">Could not find locality, did you enter cityname ?</string>
+    <string name="failed_locality">Sorry, we could not find locality, try again later?</string>
     <string name="failed_save">Sharing failed as we could not save image</string>
     <string name="failed_share">Sharing failed as there is no application installed</string>
     <string name="failed_location">Could not determine your location</string>

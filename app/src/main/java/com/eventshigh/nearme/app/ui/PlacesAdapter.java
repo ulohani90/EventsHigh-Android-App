@@ -19,8 +19,9 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 
 /**
-* See https://developers.google.com/places/training/autocomplete-android.
-*/
+ * Used in {@link com.eventshigh.nearme.app.ui.LocationPickerDialog}. See
+ * https://developers.google.com/places/training/autocomplete-android.
+ */
 public class PlacesAdapter extends ArrayAdapter<String> implements Filterable {
     private static final String LOG_TAG = PlacesAdapter.class.getSimpleName();
     private static final String PLACES_API_BASE =

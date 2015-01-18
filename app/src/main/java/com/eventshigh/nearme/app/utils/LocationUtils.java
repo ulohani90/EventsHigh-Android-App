@@ -6,7 +6,7 @@ import android.location.Location;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Helper methods for managing location and latlng
+ * Helper methods for managing location and latlng.
  */
 public class LocationUtils {
     public static LatLng locationToLatLng(Location location) {

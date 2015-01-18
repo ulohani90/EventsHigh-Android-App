@@ -11,8 +11,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.regex.Pattern;
 
+/**
+ * Defines various end points for EH api.
+ */
 public class EventsHighEndpoints {
-    public static final String WEB_URI_BASE = "http://www.eventshigh.com/";
+    private static final String WEB_URI_BASE = "http://www.eventshigh.com/";
     private static final String API_ENDPOINT_DATE_FORMAT =
             "http://apiserver.eventshigh.com:8888/api/date/%s/%s?sortby=popularity&limit=500&mobile=%d";
     private static final String API_ENDPOINT_QUERY_FORMAT =

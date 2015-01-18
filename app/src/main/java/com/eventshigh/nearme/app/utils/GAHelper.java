@@ -10,6 +10,10 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
+/**
+ * Helper around analytics which maintains the singleton instance and reports the
+ * events to both Google Analytics and Amplitude.
+ */
 public class GAHelper {
     private static GAHelper instance;
 

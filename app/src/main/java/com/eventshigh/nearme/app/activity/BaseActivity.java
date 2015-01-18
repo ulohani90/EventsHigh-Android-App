@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -24,9 +23,9 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.network.Helper;
-import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.settings.Preferences;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
 
@@ -39,18 +38,27 @@ import java.util.TimeZone;
 import io.fabric.sdk.android.Fabric;
 
 /**
- * Base activity class which does the common things like
- * initialization of Google Analytics.
+ * Base activity class which does the common things like initialization of Google Analytics.
+ * This class also provides some useful functions to be used across other activities.
  */
 public abstract class BaseActivity extends FragmentActivity {
     private static final String LOG_TAG = BaseActivity.class.getSimpleName();
 
+    // This constant defines the app specific intent action for notification.
     public static final String NOTIFICATION_ACTION = "com.eventshigh.nearme.app.notification";
 
     // Google Analytics
     protected GAHelper gaHelper;
+
+    // User preferences.
     protected Preferences pref;
     protected boolean isDebug;
+
+
+    // ***********************
+    // Activity lifecycle  Methods
+    // See http://developer.android.com/training/basics/activity-lifecycle/starting.html
+    // ***********************
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +91,7 @@ public abstract class BaseActivity extends FragmentActivity {
 
     protected void onStop() {
         // Stop all requests associated with this activity.
-        Helper.getRequestQueue(getApplicationContext()).cancelAll(this);
+        VolleyHelper.getRequestQueue(getApplicationContext()).cancelAll(this);
 
         // Google Analytics reporting.
         gaHelper.reportActivityStop(this);
@@ -111,7 +119,7 @@ public abstract class BaseActivity extends FragmentActivity {
     }
 
     /**
-     * Helper method which can be used to report any action.
+     * Helper method which can be used to report any action in analytics.
      * @param actionName name of action to be reported.
      */
     public void reportActionToAnalytics(String actionName) {
@@ -126,14 +134,6 @@ public abstract class BaseActivity extends FragmentActivity {
         if (gaHelper != null) {
             gaHelper.reportActionToAnalytics(getClass().getSimpleName(), actionName, label, value);
         }
-    }
-
-    public void showSearchView(String query) {
-        reportActionToAnalytics("showSearch");
-        Intent searchIntent = new Intent(this, LaunchActivity.class);
-        searchIntent.setAction(Intent.ACTION_SEARCH);
-        searchIntent.putExtra(SearchManager.QUERY, query);
-        startActivity(searchIntent);
     }
 
     /**
@@ -154,9 +154,10 @@ public abstract class BaseActivity extends FragmentActivity {
         reportActionToAnalytics("shareApp");
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, String.format(
-                        getResources().getString(R.string.share_app_text),
-                        new Account(BaseActivity.this).getUserReferrerCode())
+        sendIntent.putExtra(
+            Intent.EXTRA_TEXT, String.format(
+                getResources().getString(R.string.share_app_text),
+                new Account(this).getUserReferrerCode())
         );
         sendIntent.setType("text/plain");
         startActivity(sendIntent);
@@ -256,7 +257,15 @@ public abstract class BaseActivity extends FragmentActivity {
     protected ErrorListener mErrorListener = new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
-            Log.w(LOG_TAG, volleyError.getMessage(), volleyError.getCause());
+            Throwable cause = volleyError.getCause();
+            if (cause != null) {
+                Log.w(LOG_TAG, volleyError.getMessage(), cause);
+                reportActionToAnalytics("failedRequest", cause.getClass().getSimpleName());
+            } else {
+                Log.w(LOG_TAG, volleyError.getMessage());
+                reportActionToAnalytics("failedRequest");
+            }
+
             Toast.makeText(BaseActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
             finish();
         }

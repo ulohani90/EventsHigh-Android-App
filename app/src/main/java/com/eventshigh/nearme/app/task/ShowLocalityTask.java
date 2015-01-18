@@ -15,19 +15,18 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * {@link android.os.AsyncTask} which can be used to update the location in a
- * {@link android.widget.TextView} based on lat-long co-ordinated.
+ * {@link android.os.AsyncTask} which can be used to fetch the locality from LatLng and then
+ * update the {@link android.app.ActionBar} subtitle with locality.
 */
-public class UpdateLocationTask extends AsyncTask<LatLng, Void, String> {
-
+public class ShowLocalityTask extends AsyncTask<LatLng, Void, String> {
     // Constants
-    private static final String LOG_TAG = UpdateLocationTask.class.getSimpleName();
+    private static final String LOG_TAG = ShowLocalityTask.class.getSimpleName();
     private static final Pattern INVALID_LOCALITY_PATTERN = Pattern.compile("[^a-zA-Z]+[a-zA-Z]?");
 
     private final Context context;
     private final ActionBar actionBar;
 
-    public UpdateLocationTask(Context context, ActionBar actionBar) {
+    public ShowLocalityTask(Context context, ActionBar actionBar) {
         this.context = context;
         this.actionBar = actionBar;
     }

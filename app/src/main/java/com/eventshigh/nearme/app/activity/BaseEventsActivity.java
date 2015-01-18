@@ -3,23 +3,18 @@ package com.eventshigh.nearme.app.activity;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.DatePicker;
 import android.widget.SearchView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -38,6 +33,7 @@ import com.eventshigh.nearme.app.data.EventsCollection.Builder;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.settings.SettingsActivity;
+import com.eventshigh.nearme.app.ui.DatePickerFragment;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
@@ -48,22 +44,19 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.TimeZone;
 
 import fr.nicolaspomepuy.discreetapprate.AppRate;
 import fr.nicolaspomepuy.discreetapprate.AppRate.OnShowListener;
 import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
 
 /**
- * Base activity for location aware events listing. This class implements
- * common methods to get user location and fetch listings when needed.
- * This is an abstract activity and the listing the event in UI is left
- * to implementing class.
+ * Base activity for location aware events listing. This class implements common methods to fetch
+ * fetch event listings when needed and asking the parent activity to show events as per user
+ * interactions.
+ *
+ * This class also implements base user interactions like tabs, filters etc.
  */
 public abstract class BaseEventsActivity extends BaseActivity {
 
@@ -165,7 +158,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         // Show the rate this app in non intrusive way.
         AppRate.with(this)
                 .delay(3000).initialLaunchCount(5).retryPolicy(RetryPolicy.EXPONENTIAL)
-                .text(R.string.action_share_app).listener(mOnShowListener)
+                .text(R.string.action_share_app).listener(mAppRateOnShowListener)
                 .checkAndShow();
     }
 
@@ -239,34 +232,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         if (id == R.id.action_shortcut) {
-            reportActionToAnalytics("createShortcut");
-
-            // Create an intent the shortcut could launch.
-            Intent shortcutIntent = new Intent(getApplicationContext(), getClass());
-            shortcutIntent.putExtra(SearchManager.QUERY, lastEventFetcherParam.query);
-            if (lastEventFetcherParam.location != null) {
-                shortcutIntent.putExtra(IntentUtils.EXTRA_LATITUDE_PARAM,
-                       lastEventFetcherParam.location.latitude);
-                shortcutIntent.putExtra(IntentUtils.EXTRA_LONGITUDE_PARAM,
-                        lastEventFetcherParam.location.longitude);
-            }
-            shortcutIntent.setAction(Intent.ACTION_SEARCH);
-
-            // Create an intent for creating shortcut and broadcast it.
-            Intent addIntent = new Intent();
-            addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-            addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, lastEventFetcherParam.toString());
-            addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
-                    Intent.ShortcutIconResource.fromContext(getApplicationContext(),
-                            R.drawable.ic_launcher));
-            addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-            getApplicationContext().sendBroadcast(addIntent);
-
-            // Go to home screen so that user can see the new icon.
-            Intent startMain = new Intent(Intent.ACTION_MAIN);
-            startMain.addCategory(Intent.CATEGORY_HOME);
-            startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(startMain);
+            createShortcut();
+            return true;
         }
 
         if (id == R.id.action_settings) {
@@ -335,6 +302,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
         showEventDetails(event, lastSelectedTag);
     }
 
+    public void showSearchView(String query) {
+        EventFetcherParam param = new EventFetcherParam(lastEventFetcherParam.location, query);
+        Intent intent = new Intent(this, this.getClass())
+                .putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, param);
+        startActivity(intent);
+    }
+
     private void updateListingAndMore(List<Event> events) {
         updateEventListing(events);
         if (events.isEmpty()) {
@@ -357,7 +331,61 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 onBoardingHelper.next();
             }
         }, 1000);
+    }
 
+    @SuppressWarnings("deprecation")
+    private void updateEventsCollection(EventsCollection events) {
+        this.events = events;
+
+        // Update tabs if needed.
+        ActionBar actionBar = getActionBar();
+        if (actionBar == null) {
+            return;
+        }
+
+        List<Pair<String, Integer>> tags = events.getTags();
+        if (tags.size() > NUM_MAX_TABS) {
+            tags = tags.subList(0, NUM_MAX_TABS);
+        }
+
+        if (actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS || tags.size() > 1) {
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+            actionBar.removeAllTabs();
+
+            int selectedItem = 0;
+            if (lastSelectedTag != null) {
+                for (int i = 0; i < tags.size(); i++) {
+                    if (tags.get(i).first.equalsIgnoreCase(lastSelectedTag)) {
+                        selectedItem = i;
+                        break;
+                    }
+                }
+            }
+
+            for (Pair<String, Integer> tag : tags) {
+                Tab tab = actionBar.newTab()
+                        .setText("  " + tag.first + "  \n  (" + tag.second + ")  ")
+                        .setTag(tag.first)
+                        .setTabListener(mTabListener);
+                EventCategory category = Event.getCategoryFromTag(tag.first);
+                if (category != null) {
+                    int iconRes = category.getIconResourceId();
+                    if (iconRes != R.drawable.icon_other) {
+                        tab.setIcon(iconRes);
+                    }
+                }
+                actionBar.addTab(tab, false);
+            }
+
+            actionBar.setSelectedNavigationItem(selectedItem);
+        } else {
+            if (!lastEventFetcherParam.query.isEmpty()) {
+                int numEvents = tags.isEmpty() ? 0 : events.getEvents(0).size();
+                actionBar.setTitle(DateTimeUtils.queryToTitle(lastEventFetcherParam.query) + " (" + numEvents + ")");
+            }
+
+            updateListingAndMore(events.getEvents(0));
+        }
     }
 
     private void fetchNewListing() {
@@ -430,6 +458,37 @@ public abstract class BaseEventsActivity extends BaseActivity {
         startActivity(intent);
     }
 
+    private void createShortcut() {
+        reportActionToAnalytics("createShortcut");
+
+        // Create an intent the shortcut could launch.
+        Intent shortcutIntent = new Intent(getApplicationContext(), getClass());
+        shortcutIntent.putExtra(SearchManager.QUERY, lastEventFetcherParam.query);
+        if (lastEventFetcherParam.location != null) {
+            shortcutIntent.putExtra(IntentUtils.EXTRA_LATITUDE_PARAM,
+                    lastEventFetcherParam.location.latitude);
+            shortcutIntent.putExtra(IntentUtils.EXTRA_LONGITUDE_PARAM,
+                    lastEventFetcherParam.location.longitude);
+        }
+        shortcutIntent.setAction(Intent.ACTION_SEARCH);
+
+        // Create an intent for creating shortcut and broadcast it.
+        Intent addIntent = new Intent();
+        addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+        addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, lastEventFetcherParam.toString());
+        addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
+                Intent.ShortcutIconResource.fromContext(getApplicationContext(),
+                        R.drawable.ic_launcher));
+        addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+        getApplicationContext().sendBroadcast(addIntent);
+
+        // Go to home screen so that user can see the new icon.
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
+    }
+
     @SuppressWarnings("deprecation")
     private void basicTabs() {
         events = new Builder(City.BANGALORE, new HashSet<String>()).build();
@@ -462,7 +521,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     // This callback is called by EventsFetcher when new set of events are available. We build the
     // markers for all events and then call method to show selected markers.
-    @SuppressWarnings("deprecation")
     private Listener<EventsCollection> mEventsFetcherCallBack = new Listener<EventsCollection>() {
         @Override
         public void onResponse(EventsCollection events) {
@@ -474,57 +532,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 return;
             }
 
-            BaseEventsActivity.this.events = events;
-
-            // Update tabs if needed.
-            ActionBar actionBar = getActionBar();
-            if (actionBar == null) {
-                return;
-            }
-
-            List<Pair<String, Integer>> tags = events.getTags();
-            if (tags.size() > NUM_MAX_TABS) {
-                tags = tags.subList(0, NUM_MAX_TABS);
-            }
-
-            if (actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS || tags.size() > 1) {
-                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-                actionBar.removeAllTabs();
-
-                int selectedItem = 0;
-                if (lastSelectedTag != null) {
-                    for (int i = 0; i < tags.size(); i++) {
-                        if (tags.get(i).first.equalsIgnoreCase(lastSelectedTag)) {
-                            selectedItem = i;
-                            break;
-                        }
-                    }
-                }
-
-                for (Pair<String, Integer> tag : tags) {
-                    Tab tab = actionBar.newTab()
-                            .setText("  " + tag.first + "  \n  (" + tag.second + ")  ")
-                            .setTag(tag.first)
-                            .setTabListener(mTabListener);
-                    EventCategory category = Event.getCategoryFromTag(tag.first);
-                    if (category != null) {
-                        int iconRes = category.getIconResourceId();
-                        if (iconRes != R.drawable.icon_other) {
-                            tab.setIcon(iconRes);
-                        }
-                    }
-                    actionBar.addTab(tab, false);
-                }
-
-                actionBar.setSelectedNavigationItem(selectedItem);
-            } else {
-                if (!lastEventFetcherParam.query.isEmpty()) {
-                    int numEvents = tags.isEmpty() ? 0 : events.getEvents(0).size();
-                    actionBar.setTitle(DateTimeUtils.queryToTitle(lastEventFetcherParam.query) + " (" + numEvents + ")");
-                }
-
-                updateListingAndMore(events.getEvents(0));
-            }
+            updateEventsCollection(events);
         }
     };
 
@@ -551,7 +559,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
     };
 
-    private OnShowListener mOnShowListener = new OnShowListener() {
+    private OnShowListener mAppRateOnShowListener = new OnShowListener() {
         @Override
         public void onRateAppShowing(AppRate appRate, final View view) {
             reportActionToAnalytics("shareAppShown");
@@ -573,67 +581,4 @@ public abstract class BaseEventsActivity extends BaseActivity {
         public void onRateAppClicked() {
         }
     };
-
-    public static class DatePickerFragment extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener, DialogInterface.OnClickListener {
-        private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
-        private Date today;
-        private DatePickerDialog datePicker;
-
-        @Override
-        @SuppressWarnings("deprecation")
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            City city = null;
-            Bundle args = getArguments();
-            if (args != null) {
-                String cityStr = args.getString(City.class.getName());
-                if (cityStr != null) {
-                    city = City.valueOf(cityStr);
-                }
-            }
-
-            Calendar cal = Calendar.getInstance();
-            if (city != null) {
-                cal.setTimeZone(TimeZone.getTimeZone(city.timeZone));
-            }
-
-            int year = cal.get(Calendar.YEAR);
-            int month = cal.get(Calendar.MONTH);
-            int day = cal.get(Calendar.DAY_OF_MONTH);
-            today = new Date(year - 1900, month, day);
-
-            datePicker = new DatePickerDialog(getActivity(), this, year, month, day);
-            datePicker.setCancelable(true);
-            datePicker.setCanceledOnTouchOutside(true);
-            datePicker.getDatePicker().setMinDate(today.getTime());
-            datePicker.getDatePicker().setMaxDate(today.getTime() + 7 * 24 * 3600 * 1000L);
-
-            datePicker.setButton(DialogInterface.BUTTON_POSITIVE,
-                    getActivity().getString(R.string.action_filter), this);
-            return datePicker;
-        }
-
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-        }
-
-        @Override
-        @SuppressWarnings("deprecation")
-        public void onClick(DialogInterface dialog, int which) {
-            Log.w("TEXT", "onClick");
-            Date selectedDate = new Date(datePicker.getDatePicker().getYear() - 1900,
-                    datePicker.getDatePicker().getMonth(),
-                    datePicker.getDatePicker().getDayOfMonth());
-            long numDaysAhead = (selectedDate.getTime() - today.getTime()) / (24 * 3600 * 1000L);
-
-            BaseEventsActivity activity = (BaseEventsActivity) getActivity();
-            activity.reportActionToAnalytics("filterByDate", Long.toString(numDaysAhead) + "days later");
-
-            EventFetcherParam param = new EventFetcherParam(activity.lastEventFetcherParam.location,
-                    DATE_FORMAT.format(selectedDate));
-            Intent intent = new Intent(getActivity(), activity.getClass())
-                    .putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, param);
-            startActivity(intent);
-        }
-    }
 }

@@ -9,12 +9,16 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
-public class Helper {
+/**
+ * Volley Helper which provide the simple methods to manage VolleyRequestQueue
+ * and submit requests in queue for parallel processing.
+ */
+public class VolleyHelper {
 
-    private static Helper instance;
-    public static synchronized Helper getInstance(Context context) {
+    private static VolleyHelper instance;
+    public static synchronized VolleyHelper getInstance(Context context) {
         if (instance == null) {
-            instance = new Helper(context);
+            instance = new VolleyHelper(context);
         }
         return instance;
     }
@@ -22,7 +26,7 @@ public class Helper {
     private final RequestQueue requestQueue;
     private final ImageLoader imageLoader;
 
-    private Helper(Context context) {
+    private VolleyHelper(Context context) {
         requestQueue = Volley.newRequestQueue(context.getApplicationContext());
 
         // In memory cache for recent bitmap. This cache can use upto 16% of available
