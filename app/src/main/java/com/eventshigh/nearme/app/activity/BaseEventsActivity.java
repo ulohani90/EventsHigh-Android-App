@@ -1,15 +1,17 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.ActionBar;
-import android.app.ActionBar.Tab;
-import android.app.ActionBar.TabListener;
 import android.app.DialogFragment;
-import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,10 +28,9 @@ import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.data.EventsCollection;
-import com.eventshigh.nearme.app.data.EventsCollection.Builder;
+import com.eventshigh.nearme.app.data.EventsCollection.TaggedEvents;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.settings.SettingsActivity;
@@ -42,9 +43,10 @@ import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
+import com.example.android.common.view.SlidingTabLayout;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.nicolaspomepuy.discreetapprate.AppRate;
@@ -65,7 +67,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // ***********************
     public static final String EXTRA_TAG_NAME_PARAM = "extra.event.tag.name";
     public static final int NUM_MAX_TABS = 10;
-    public static final int NUM_PREFETCH = 10;
+    public static final int NUM_MAX_PREFETCH = 10;
     public static final int SECONDS_FOR_REFRESH = 600;
 
 
@@ -73,12 +75,12 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // MEMBERS
     // ***********************
 
-    // root view for showing loading dialog and event contents.
+    // UI elements for showing loading dialog and event contents through ViewPager.
     private ViewSwitcher viewSwitcher;
-    // Last city,day for which events are shown.
+    private ViewPager viewPager;
+    private SlidingTabLayout slidingTab;
+    // Last city and query for which events are shown.
     protected EventFetcherParam lastEventFetcherParam;
-    // Last fetched events collection.
-    private EventsCollection events;
     // Tag selected from tab bar for which events are shown.
     private String lastSelectedTag;
     // On boarding helper.
@@ -96,10 +98,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Setup the UI.
         viewSwitcher = new ViewSwitcher(this);
-        getLayoutInflater().inflate(getActivityView(), viewSwitcher);
+        getLayoutInflater().inflate(R.layout.activity_events, viewSwitcher);
         getLayoutInflater().inflate(R.layout.activity_event_detail, viewSwitcher);
         setContentView(viewSwitcher);
+        slidingTab = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        viewPager = (ViewPager) findViewById(R.id.pager);
 
         // Set the context in term of lastEventFetcherParam. Use Inent
         // to restore the context.
@@ -259,19 +264,30 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // ***********************
 
     /**
-     * Sets new events data. This is called when we get new events data from server or when
-     * user applies some filter through tab.
-     *
-     * @param events a list of events to show to user.
-     */
-    protected abstract void updateEventListing(List<Event> events);
-
-    /**
      * Updates the user location as reported by LocationClient.
      *
      * @param userLocation user location as reported by location client.
      */
-    protected abstract void updateUserLocation(LatLng userLocation);
+    protected void updateUserLocation(@Nullable LatLng userLocation) {
+        lastEventFetcherParam.changeLocation(userLocation);
+        if (lastEventFetcherParam.city == null) {
+            if (userLocation != null) {
+                reportActionToAnalytics("unsupportedCity");
+                Toast.makeText(this, R.string.unsupported_city, Toast.LENGTH_SHORT).show();
+            }
+            updateEventsCollection(new EventsCollection(new ArrayList<TaggedEvents>()));
+            updateEventListing(new ArrayList<Event>());
+        } else {
+            fetchNewListing();
+        }
+    }
+
+    protected void updateEventListing(List<Event> events) {
+        // Prefetch first 10 events.
+        for (Event event : events.subList(0, Math.min(events.size(), NUM_MAX_PREFETCH))) {
+            EventUberPrefetcher.getInstance(getApplicationContext()).prefetch(event.id);
+        }
+    }
 
     /**
      * @return true if location should be shown in action bar as subtitle.
@@ -289,10 +305,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
     protected abstract int getDisabledMenuId();
 
     /**
-     * @return the resource id for the activity view.
+     * @return a new Fragment which will be used to show events list.
      */
-    protected abstract int getActivityView();
-
+    protected abstract Fragment getNewFragment();
 
     // ***********************
     // Helper methods
@@ -307,97 +322,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         Intent intent = new Intent(this, this.getClass())
                 .putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, param);
         startActivity(intent);
-    }
-
-    private void updateListingAndMore(List<Event> events) {
-        updateEventListing(events);
-        if (events.isEmpty()) {
-            return;
-        }
-
-        // Prefetch first 10 events.
-        for (Event event : events.subList(0, Math.min(events.size(), NUM_PREFETCH))) {
-            EventUberPrefetcher.getInstance(getApplicationContext()).prefetch(event.id);
-        }
-
-        // Show on boarding if first time.
-        viewSwitcher.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (onBoardingHelper == null) {
-                    onBoardingHelper = new OnBoardingHelper(BaseEventsActivity.this);
-                }
-
-                onBoardingHelper.next();
-            }
-        }, 1000);
-    }
-
-    @SuppressWarnings("deprecation")
-    private void updateEventsCollection(EventsCollection events) {
-        this.events = events;
-
-        // Update tabs if needed.
-        ActionBar actionBar = getActionBar();
-        if (actionBar == null) {
-            return;
-        }
-
-        List<Pair<String, Integer>> tags = events.getTags();
-        if (tags.size() > NUM_MAX_TABS) {
-            tags = tags.subList(0, NUM_MAX_TABS);
-        }
-
-        if (actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS || tags.size() > 1) {
-            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-            actionBar.removeAllTabs();
-
-            int selectedItem = 0;
-            if (lastSelectedTag != null) {
-                for (int i = 0; i < tags.size(); i++) {
-                    if (tags.get(i).first.equalsIgnoreCase(lastSelectedTag)) {
-                        selectedItem = i;
-                        break;
-                    }
-                }
-            }
-
-            for (Pair<String, Integer> tag : tags) {
-                Tab tab = actionBar.newTab()
-                        .setText("  " + tag.first + "  \n  (" + tag.second + ")  ")
-                        .setTag(tag.first)
-                        .setTabListener(mTabListener);
-                EventCategory category = Event.getCategoryFromTag(tag.first);
-                if (category != null) {
-                    int iconRes = category.getIconResourceId();
-                    if (iconRes != R.drawable.icon_other) {
-                        tab.setIcon(iconRes);
-                    }
-                }
-                actionBar.addTab(tab, false);
-            }
-
-            actionBar.setSelectedNavigationItem(selectedItem);
-        } else {
-            if (!lastEventFetcherParam.query.isEmpty()) {
-                int numEvents = tags.isEmpty() ? 0 : events.getEvents(0).size();
-                actionBar.setTitle(DateTimeUtils.queryToTitle(lastEventFetcherParam.query) + " (" + numEvents + ")");
-            }
-
-            updateListingAndMore(events.getEvents(0));
-        }
-    }
-
-    private void fetchNewListing() {
-        viewSwitcher.setDisplayedChild(1);
-        EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam,
-                Priority.IMMEDIATE, this, mEventsFetcherCallBack, new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        viewSwitcher.setDisplayedChild(0);
-                        mErrorListener.onErrorResponse(volleyError);
-                    }
-                });
     }
 
     protected void askUserForLocation() {
@@ -418,35 +342,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         });
     }
 
-    /**
-     * Refresh the event listings if user city has changed as per new location.
-     * Parent activity can pass {@code NULL} to cleanup any state like {@code lastCity}.
-     *
-     * @param userLocation location of user.
-     * @return true if city was updated as per new location and request for
-     * fetching new events was submitted.
-     */
-    protected boolean refreshListingsIfNeeded(@Nullable LatLng userLocation) {
-        City userCity = City.getCity(userLocation);
-        if (userCity == null) {
-            if (userLocation != null) {
-                reportActionToAnalytics("unsupportedCity");
-                Toast.makeText(this, R.string.no_event, Toast.LENGTH_SHORT).show();
-            }
-            lastEventFetcherParam.changeLocation(null);
-            basicTabs();
-            return true;
-        }
-
-        if (!lastEventFetcherParam.changeLocation(userLocation)) {
-            basicTabs();
-            fetchNewListing();
-            return true;
-        }
-
-        return false;
-    }
-
     protected void switchTo(Class<?> cls) {
         reportActionToAnalytics("switchView");
         Intent intent = new Intent(this, cls)
@@ -456,6 +351,62 @@ public abstract class BaseEventsActivity extends BaseActivity {
             intent.putExtra(EXTRA_TAG_NAME_PARAM, lastSelectedTag);
         }
         startActivity(intent);
+    }
+
+    private void updateEventsCollection(EventsCollection events) {
+        String tagToSearch = lastSelectedTag;
+
+        EventCollectionPagerAdapter adapter =
+                new EventCollectionPagerAdapter(getSupportFragmentManager(), events);
+        viewPager.setAdapter(adapter);
+        slidingTab.setViewPager(viewPager);
+        slidingTab.setOnPageChangeListener(adapter);
+
+        if (events.getTags().isEmpty()) {
+            // nothing to show.
+            return;
+        }
+
+        int currentItem = 0;
+        if (tagToSearch != null) {
+            List<Pair<String, Integer>> tags = events.getTags();
+            for (int i = 0; i < tags.size(); i++) {
+                if (tags.get(i).first.equals(tagToSearch)) {
+                    currentItem = i;
+                    break;
+                }
+            }
+        }
+
+        if (currentItem == 0) {
+            updateEventListing(events.getEvents(0));
+        } else {
+            viewPager.setCurrentItem(currentItem);
+        }
+
+        // Show on boarding if first time.
+        viewPager.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (onBoardingHelper == null) {
+                    onBoardingHelper = new OnBoardingHelper(BaseEventsActivity.this);
+                }
+
+                onBoardingHelper.next();
+            }
+        }, 1000);
+    }
+
+    private void fetchNewListing() {
+        viewSwitcher.setDisplayedChild(1);
+        EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam,
+                Priority.IMMEDIATE, this, mEventsFetcherCallBack, new ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        viewSwitcher.setDisplayedChild(0);
+                        mErrorListener.onErrorResponse(volleyError);
+                    }
+                });
     }
 
     private void createShortcut() {
@@ -489,31 +440,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         startActivity(startMain);
     }
 
-    @SuppressWarnings("deprecation")
-    private void basicTabs() {
-        events = new Builder(City.BANGALORE, new HashSet<String>()).build();
-
-        ActionBar actionBar = getActionBar();
-        if (actionBar != null && actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS) {
-            String lastSelectedTagSave = lastSelectedTag;
-            actionBar.removeAllTabs();
-            actionBar.addTab(
-                    actionBar.newTab()
-                            .setText(EventsCollection.ALL_EVENTS_CATEGORY + " (" + 0 + " )")
-                            .setTag(EventsCollection.ALL_EVENTS_CATEGORY)
-                            .setTabListener(mTabListener));
-            actionBar.addTab(
-                    actionBar.newTab()
-                            .setText(EventsCollection.RECOMMENDED_EVENTS_CATEGORY + " (" + 0 + " )")
-                            .setTag(EventsCollection.RECOMMENDED_EVENTS_CATEGORY)
-                            .setTabListener(mTabListener));
-
-            if (lastSelectedTagSave != null) {
-                lastSelectedTag = lastSelectedTagSave;
-            }
-        }
-    }
-
 
     // ***********************
     // Callbacks
@@ -529,33 +455,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
             if (events.getTags().isEmpty()) {
                 // Failed. Show toast and return empty list.
                 Toast.makeText(BaseEventsActivity.this, R.string.no_events, Toast.LENGTH_SHORT).show();
-                return;
             }
 
             updateEventsCollection(events);
-        }
-    };
-
-    private TabListener mTabListener = new TabListener() {
-        @Override
-        @SuppressWarnings({"deprecation", "ConstantConditions"})
-        public void onTabSelected(Tab tab, FragmentTransaction ft) {
-            if (events != null) {
-                lastSelectedTag = tab.getTag().toString();
-                List<Event> eventsForTag = events.getEvents(tab.getPosition());
-                if (!eventsForTag.isEmpty() && getActionBar().getNavigationItemCount() > 1) {
-                    reportActionToAnalytics("filterByCategory", lastSelectedTag);
-                }
-                updateListingAndMore(eventsForTag);
-            }
-        }
-
-        @Override
-        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-        }
-
-        @Override
-        public void onTabReselected(Tab tab, FragmentTransaction ft) {
         }
     };
 
@@ -581,4 +483,52 @@ public abstract class BaseEventsActivity extends BaseActivity {
         public void onRateAppClicked() {
         }
     };
+
+    private class EventCollectionPagerAdapter extends FragmentStatePagerAdapter implements OnPageChangeListener {
+        private final EventsCollection events;
+        private final List<Pair<String, Integer>> tags;
+
+        public EventCollectionPagerAdapter(FragmentManager fm, EventsCollection events) {
+            super(fm);
+            this.events = events;
+            this.tags = events.getTags();
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            Fragment fragment = getNewFragment();
+            Bundle args = new Bundle();
+            ArrayList<Event> eventsToShow = new ArrayList<>();
+            eventsToShow.addAll(events.getEvents(i));
+            args.putParcelableArrayList("events", eventsToShow);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public int getCount() {
+            return Math.min(tags.size(), NUM_MAX_TABS);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return tags.get(position).first;
+        }
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            // do nothing
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            lastSelectedTag = tags.get(position).first;
+            updateEventListing(events.getEvents(position));
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+            // do nothing
+        }
+    }
 }

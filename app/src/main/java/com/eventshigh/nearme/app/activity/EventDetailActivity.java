@@ -40,9 +40,8 @@ public class EventDetailActivity extends BaseActivity {
     protected void onNewIntent(Intent intent) {
         setContentView(R.layout.activity_event_detail);
 
-        String action = intent.getAction();
-
         boolean showEvent = false;
+        String action = intent.getAction();
         if (Intent.ACTION_VIEW.equals(action)) {
             reportActionToAnalytics("deepLink", "detail");
             showEvent = true;

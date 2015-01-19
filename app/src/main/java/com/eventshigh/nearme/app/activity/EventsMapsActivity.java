@@ -1,12 +1,14 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
@@ -25,6 +27,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,8 +68,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
 
 
     // ***********************
-    // Activity lifecycle  Methods
-    // See http://developer.android.com/training/basics/activity-lifecycle/starting.html
+    // Delegated Methods from {@link BaseEventsActivity}
     // ***********************
 
     @Override
@@ -74,6 +76,11 @@ public class EventsMapsActivity extends BaseEventsActivity {
         super.onCreate(savedInstanceState);
 
         // Setup the local member variables.
+        View pager = findViewById(R.id.pager);
+        LinearLayout parent = (LinearLayout) pager.getParent();
+        View mapsView = getLayoutInflater().inflate(R.layout.activity_maps, parent, false);
+        pager.setVisibility(View.GONE);
+        parent.addView(mapsView, pager.getLayoutParams());
         setUpMapIfNeeded();
         setupGestureDetectorIfNeeded();
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
@@ -94,8 +101,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
     }
 
     @Override
-    protected int getActivityView() {
-        return R.layout.activity_maps;
+    protected Fragment getNewFragment() {
+        return new Fragment();
     }
 
 
@@ -167,9 +174,10 @@ public class EventsMapsActivity extends BaseEventsActivity {
     // ***********************
 
     @Override
-    protected void updateEventListing(List<Event> events) {
+    protected void updateEventListing(final List<Event> events) {
         mOnMapClickListener.onMapClick(null);
         markerManager.setEvents(map, events);
+        super.updateEventListing(events);
     }
 
     @Override
@@ -183,6 +191,23 @@ public class EventsMapsActivity extends BaseEventsActivity {
                     .build()
             )
         );
+    }
+
+    /**
+     * Refresh the event listings if user city has changed as per new location.
+     * Parent activity can pass {@code NULL} to cleanup any state like {@code lastCity}.
+     *
+     * @param userLocation location of user.
+     * @return true if city was updated as per new location and request for
+     * fetching new events was submitted.
+     */
+    private boolean refreshListingsIfNeeded(LatLng userLocation) {
+        if (!lastEventFetcherParam.changeLocation(userLocation)) {
+            super.updateUserLocation(userLocation);
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -204,15 +229,13 @@ public class EventsMapsActivity extends BaseEventsActivity {
                     showZoomToast = false;
                 }
 
-                refreshListingsIfNeeded(null);
+                updateEventListing(new ArrayList<Event>());
             } else if (!refreshListingsIfNeeded(cameraPosition.target)) {
                 if (!isAppMovement && lastSelectedMarker == null) {
                     reportActionToAnalytics("onCameraChange");
                 }
-                boolean listingShown = markerManager.updateListingForProjection(
-                    isAppMovement ? null : map.getCameraPosition().target,
-                    map.getProjection());
-                if (!listingShown) {
+                boolean isInfoWindowShown = markerManager.updateListingForProjection(map.getProjection());
+                if (!isInfoWindowShown) {
                     mOnMapClickListener.onMapClick(null);
                 }
             }
