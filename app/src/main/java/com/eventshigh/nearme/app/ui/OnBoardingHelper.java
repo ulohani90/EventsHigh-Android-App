@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.ui;
 
-import android.app.ActionBar;
 import android.app.backup.BackupManager;
 import android.util.Pair;
 import android.view.View;
@@ -14,7 +13,6 @@ import com.github.amlcurran.showcaseview.targets.ActionItemTarget;
 import com.github.amlcurran.showcaseview.targets.Target;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,20 +40,8 @@ public class OnBoardingHelper {
         targets = new ArrayList<>();
         addTarget(new ActionItemTarget(activity, R.id.action_filter),
                 R.string.onboarding_action);
-
-        try {
-            ActionBar actionBar = activity.getActionBar();
-            if (actionBar != null) {
-                Field mTabScrollViewField = actionBar.getClass().getDeclaredField("mTabScrollView");
-                mTabScrollViewField.setAccessible(true);
-                View view = (View) mTabScrollViewField.get(actionBar);
-                if (view != null) {
-                    addTarget(new ViewTarget(view), R.string.onboarding_filter);
-                }
-            }
-        } catch (Exception e) {
-            // Ignore.
-        }
+        addTarget(new ViewTarget(R.id.sliding_tabs, activity),
+                R.string.onboarding_filter);
     }
 
     public void next() {
