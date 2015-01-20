@@ -9,6 +9,8 @@
     android:numColumns="auto_fit"
     android:stretchMode="columnWidth"
     android:gravity="center"
+    android:horizontalSpacing="@dimen/abc_control_padding_material"
+    android:verticalSpacing="@dimen/abc_control_padding_material"
     tools:context=".activity.EventGridActivity"
     tools:listitem="@layout/event_card"
 />

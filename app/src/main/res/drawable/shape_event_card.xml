@@ -25,7 +25,7 @@
     <!-- Background -->
     <item>
         <shape>
-            <solid android:color="@android:color/white" />
+            <solid android:color="#F2F2F2" />
             <corners android:radius="0dp" />
         </shape>
     </item>

@@ -27,7 +27,7 @@ public class DateTimeUtils {
         }
 
         public String toString() {
-            return day + " " + date + (time == null ? "" : ", " + time);
+            return day + ", " + date + (time == null ? "" : " at " + time);
         }
     }
 
