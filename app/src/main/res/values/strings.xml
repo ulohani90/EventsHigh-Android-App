@@ -10,16 +10,13 @@
     <string name="action_map">Show on Map</string>
     <string name="action_filter">Filter by date</string>
     <string name="action_edit_location">Change Location</string>
-    <string name="action_share">Share With Friends</string>
-    <string name="action_save">Save</string>
+    <string name="action_share">Share</string>
     <string name="action_book">Book</string>
     <string name="action_call">Call</string>
-    <string name="action_direction">Show Directions</string>
     <string name="action_share_app">Share This App?</string>
     <string name="action_shortcut">Add to homescreen</string>
 
     <!-- Other Strings used in UI -->
-    <string name="ui_event_timings">Timings</string>
     <string name="ui_event_tags">Categories</string>
     <string name="ui_event_description">Description</string>
     <string name="ui_organizer">Organizer Info</string>
@@ -36,7 +33,6 @@
     <string name="register_message">Get the most out of this app by registering with EventsHigh</string>
     <string name="loading">Loading …</string>
     <string name="zoom">Please zoom in to see interesting events!</string>
-    <string name="num_people_interested">number of people interested</string>
     <string name="ask_locality">Enter the locality, city</string>
     <string name="message_share_app">Share this app with your friends?</string>
 
@@ -58,6 +54,7 @@
         <item quantity="one">One person interested.</item>
         <item quantity="other">%,d people interested.</item>
     </plurals>
+    <string name="event_time_details">{0,choice,0#Happening Today|1#Happening Tomorrow|1&lt;{0} days from now}</string>
     <string name="event_detail_from">Event details from: %s</string>
     <string name="share_app_text">Hey, Check out this app to find amazing events! https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&amp;referrer=%s</string>
     <string name="share_event_text">Hey, Check out this amazing event! What say? %s?src=ehm</string>

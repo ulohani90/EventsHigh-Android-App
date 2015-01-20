@@ -2,12 +2,11 @@
 
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-    style="@style/EventTagText"
+    style="?android:attr/textAppearanceSmall"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginRight="@dimen/abc_dropdownitem_text_padding_left"
-    android:layout_marginEnd="@dimen/abc_dropdownitem_text_padding_left"
-    android:layout_marginTop="@dimen/abc_control_padding_material"
-    android:background="@drawable/selector_event_tag"
+    android:padding="@dimen/abc_dropdownitem_text_padding_left"
+    android:background="?android:attr/selectableItemBackground"
+    android:textColor="#0071B8"
     tools:text="Comedy"
 />

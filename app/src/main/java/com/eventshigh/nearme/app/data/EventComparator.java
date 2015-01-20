@@ -23,7 +23,7 @@ public class EventComparator implements Comparator<Event> {
 
     @Override
     public int compare(Event lhs, Event rhs) {
-        if (lhs.eventTimings.length != 0 || rhs.eventTimings.length != 0) {
+        if (lhs.eventTimings.length > 0 && rhs.eventTimings.length > 0) {
             int result = DateTimeUtils.getEventDate(lhs, 0).compareTo(
                     DateTimeUtils.getEventDate(rhs, 0));
             if (result != 0) {

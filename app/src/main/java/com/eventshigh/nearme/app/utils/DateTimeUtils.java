@@ -72,7 +72,7 @@ public class DateTimeUtils {
     private static final SimpleDateFormat SIMPLE_TIME_FORMAT = new SimpleDateFormat("h:mm a");
 
     public static @Nullable EventTime getEventTime(Event event, int index) {
-        if (event.eventTimings.length < index) {
+        if (index >= event.eventTimings.length) {
             return null;
         }
 

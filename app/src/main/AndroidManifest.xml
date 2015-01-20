@@ -226,7 +226,6 @@
         <activity
             android:name=".activity.EventDetailActivity"
             android:label="@string/app_name"
-            android:uiOptions="splitActionBarWhenNarrow"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
             android:exported="true"

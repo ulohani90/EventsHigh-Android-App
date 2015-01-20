@@ -238,6 +238,10 @@ public class Event implements Parcelable {
             venue = localityJson.optString("locality");
         }
 
+        if (address != null && venue != null && address.startsWith(venue)) {
+            address = address.substring(venue.length()).trim();
+        }
+
         // Tags.
         EventCategory category = EventCategory.OTHER;
         JSONArray tagsJsonArr = eventJson.getJSONArray("tags");

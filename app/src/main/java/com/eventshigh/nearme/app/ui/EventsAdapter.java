@@ -43,6 +43,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         final EventCard eventCard = new EventCard(view);
 
         // Set the background image.
+        eventCard.bgView.setVisibility(View.VISIBLE);
         Utils.waitForViewVisible(eventCard.bgView, new Runnable() {
             @Override
             public void run() {
@@ -54,6 +55,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
                     eventCard.bgView.setImageUrl(event.imgUrl,
                             VolleyHelper.getImageLoader(activity.getApplicationContext()));
                 } else {
+                    eventCard.bgView.setVisibility(View.INVISIBLE);
                     eventCard.bgView.setImageBitmap(null);
                 }
             }
