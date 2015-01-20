@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -43,6 +44,7 @@ import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.example.android.common.view.SlidingTabLayout;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -382,6 +384,16 @@ public abstract class BaseEventsActivity extends BaseActivity {
             updateEventListing(events.getEvents(0));
         } else {
             viewPager.setCurrentItem(currentItem);
+            final View selectedItem =
+                    ((LinearLayout) slidingTab.getChildAt(0)).getChildAt(currentItem);
+            Utils.waitForViewVisible(selectedItem, new Runnable() {
+                @Override
+                public void run() {
+                   if (selectedItem.getLeft() > 100) {
+                       slidingTab.scrollTo(selectedItem.getLeft() - 100, 0);
+                   }
+                }
+            }, 100);
         }
 
         // Show on boarding if first time.
