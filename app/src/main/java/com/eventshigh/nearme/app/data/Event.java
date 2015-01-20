@@ -196,6 +196,7 @@ public class Event implements Parcelable {
         String id = eventJson.getString("id");
         String title = eventJson.getString("title");
         String description = eventJson.optString("description", "")
+                .replaceAll("Â", "")
                 .replaceAll("\\s+\n", "\n\n");
 
         JSONObject mashup = eventJson.optJSONObject("mashup");

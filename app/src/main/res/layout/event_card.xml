@@ -89,7 +89,7 @@
         android:layout_alignBottom="@+id/event_bg"
         android:layout_toLeftOf="@+id/event_venue"
         android:layout_toStartOf="@+id/event_venue"
-        android:background="@color/event_card_text_bg"
+        android:background="#66000000"
         android:textColor="@android:color/white"
         android:drawableStart="@drawable/event_card_person"
         android:drawableLeft="@drawable/event_card_person"

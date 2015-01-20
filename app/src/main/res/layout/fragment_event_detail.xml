@@ -106,6 +106,8 @@
                     android:layout_alignParentRight="true"
                     android:layout_toRightOf="@+id/event_venue_icon"
                     android:layout_toEndOf="@+id/event_venue_icon"
+                    android:typeface="serif"
+                    android:textSize="@dimen/abc_text_size_caption_material"
                     tools:text="Near Hoodi circle, Whitefield, Bangalore, 560037."
                 />
             </RelativeLayout>
@@ -113,8 +115,8 @@
             <!-- Event Time -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/event_detail_gray"
+                android:layout_height="1dp"
+                android:background="#1a4d4d4d"
             />
             <RelativeLayout
                 android:id="@+id/event_time_group"
@@ -156,6 +158,8 @@
                     android:layout_alignParentRight="true"
                     android:layout_toRightOf="@+id/event_time_icon"
                     android:layout_toEndOf="@+id/event_time_icon"
+                    android:typeface="serif"
+                    android:textSize="@dimen/abc_text_size_caption_material"
                     tools:text="2 days from now"
                 />
             </RelativeLayout>
@@ -164,8 +168,8 @@
         <!-- Action Items -->
         <View
             android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/event_detail_gray"
+            android:layout_height="1dp"
+            android:background="#1a4d4d4d"
         />
         <LinearLayout
             android:layout_width="match_parent"
@@ -244,13 +248,6 @@
             android:layout_height="wrap_content"
             android:textIsSelectable="true"
             tools:text="...\n,,,\n---"
-        />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginTop="@dimen/abc_dropdownitem_text_padding_left"
-            android:background="@color/event_detail_gray"
         />
 
         <!-- Organizer Info -->

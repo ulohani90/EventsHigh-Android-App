@@ -2,13 +2,6 @@
 <resources>
 
     <color name="app_color">#0b6fb8</color>
-
-    <color name="day_selector_day_week_text">#86cbf0</color>
-    <color name="event_detail_gray">#fff5f5f5</color>
-
-    <color name="event_card_text_bg">#66000000</color>
-    <color name="event_tag_bg">#444444</color>
-
     <color name="highlight_color">#ff35b5e5</color>
     <color name="button_gray">#fafafa</color>
 </resources>

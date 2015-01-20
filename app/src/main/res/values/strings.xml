@@ -17,8 +17,6 @@
     <string name="action_shortcut">Add to homescreen</string>
 
     <!-- Other Strings used in UI -->
-    <string name="ui_event_tags">Categories</string>
-    <string name="ui_event_description">Description</string>
     <string name="ui_organizer">Organizer Info</string>
     <string name="ui_name">Name</string>
     <string name="ui_address">Address</string>

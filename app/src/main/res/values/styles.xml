@@ -32,18 +32,6 @@
         <item name="android:layout_gravity">center</item>
     </style>
 
-    <!-- Theme used for Events Details Action Icons -->
-    <style name="EventActionMenuItem" parent="android:style/TextAppearance.Widget.IconMenu.Item">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:gravity">center</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:textSize">@dimen/abc_text_size_body_1_material</item>
-        <item name="android:padding">@dimen/abc_control_padding_material</item>
-        <item name="android:background">@android:color/transparent</item>
-        <item name="android:clickable">true</item>
-    </style>
-
     <!-- Theme used for Events Cards -->
     <style name="EventCardText" parent="android:style/TextAppearance.Small">
         <item name="android:maxLines">1</item>
@@ -54,10 +42,10 @@
     <!-- Themes used by Onboarding widgets powered by showcase library -->
     <style name="ShowcaseTheme" parent="ShowcaseView">
         <item name="sv_backgroundColor">#99000000</item>
-        <item name="sv_detailTextAppearance">@style/CustomTitle</item>
+        <item name="sv_detailTextAppearance">@style/ShowcaseCustomTitle</item>
     </style>
 
-    <style name="CustomTitle" parent="TextAppearance.ShowcaseView.Title">
+    <style name="ShowcaseCustomTitle" parent="TextAppearance.ShowcaseView.Title">
         <item name="android:textColor">@android:color/white</item>
     </style>
 
