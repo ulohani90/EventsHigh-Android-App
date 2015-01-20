@@ -7,6 +7,6 @@
     android:layout_height="wrap_content"
     android:padding="@dimen/abc_dropdownitem_text_padding_left"
     android:background="?android:attr/selectableItemBackground"
-    android:textColor="#0071B8"
+    android:textColor="@color/link_color"
     tools:text="Comedy"
 />

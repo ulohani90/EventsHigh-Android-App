@@ -17,11 +17,11 @@
     <string name="action_shortcut">Add to homescreen</string>
 
     <!-- Other Strings used in UI -->
-    <string name="ui_organizer">Organizer Info</string>
-    <string name="ui_name">Name</string>
-    <string name="ui_address">Address</string>
-    <string name="ui_phone">Phone</string>
-    <string name="ui_website">Website</string>
+    <string name="ui_organizer">ORGANIZER DETAILS</string>
+    <string name="ui_name">Name - </string>
+    <string name="ui_address">Address - </string>
+    <string name="ui_phone">Phone - </string>
+    <string name="ui_website">Website - </string>
 
     <!-- Onbaording message -->
     <string name="onboarding_filter">Filter events by selecting a category!</string>

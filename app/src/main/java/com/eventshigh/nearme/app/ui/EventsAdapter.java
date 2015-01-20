@@ -80,12 +80,8 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         }
 
         // Set the venue.
-        if (event.venue == null) {
-            eventCard.venueView.setVisibility(View.INVISIBLE);
-        } else {
-            eventCard.venueView.setVisibility(View.VISIBLE);
-            eventCard.venueView.setText(Utils.capitalize(event.venue));
-        }
+        eventCard.venueView.setText(Utils.capitalize(
+                event.venue == null ? event.city.toString() : event.venue));
 
         // Check if its recommended event.
         eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE :

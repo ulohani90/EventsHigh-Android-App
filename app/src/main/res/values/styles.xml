@@ -17,10 +17,9 @@
         <item name="android:textSize">@dimen/abc_text_size_caption_material</item>
     </style>
 
-    <style name="EventDetailHeader" parent="android:style/TextAppearance.Medium">
-        <item name="android:padding">@dimen/abc_dropdownitem_text_padding_left</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:textSize">@dimen/abc_text_size_body_1_material</item>
+    <style name="EventDetailHeader" parent="EventDetailText">
+        <item name="android:layout_marginTop">@dimen/abc_action_bar_icon_vertical_padding_material</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:typeface">sans</item>
     </style>
 

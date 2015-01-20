@@ -25,10 +25,11 @@
         android:id="@+id/event_recommended"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/eh_recommend_icon"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@+id/event_bg"
+        android:padding="@dimen/abc_control_padding_material"
+        android:src="@drawable/eh_recommend"
         tools:ignore="ContentDescription"
     />
 

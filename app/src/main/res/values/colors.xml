@@ -4,4 +4,5 @@
     <color name="app_color">#0b6fb8</color>
     <color name="highlight_color">#ff35b5e5</color>
     <color name="button_gray">#fafafa</color>
+    <color name="link_color">#0071B8</color>
 </resources>

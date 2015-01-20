@@ -36,8 +36,10 @@
                     android:id="@+id/eh_recommend_banner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/eh_recommends_banner"
+                    android:src="@drawable/eh_recommend"
                     android:adjustViewBounds="true"
+                    android:layout_gravity="bottom"
+                    android:layout_margin="@dimen/abc_action_bar_icon_vertical_padding_material"
                     tools:ignore="ContentDescription"
                 />
             </FrameLayout>
@@ -48,7 +50,7 @@
                 style="?android:attr/textAppearanceMedium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/abc_dropdownitem_text_padding_left"
+                android:layout_margin="@dimen/abc_dropdownitem_text_padding_left"
                 android:textIsSelectable="true"
                 tools:text="The Awesome Event"
             />
@@ -175,6 +177,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:showDividers="middle"
+            android:divider="@drawable/vertical_divider"
         >
             <FrameLayout
                 android:id="@+id/book_ticket"
@@ -269,23 +273,15 @@
             <TextView
                 style="@style/EventDetailText"
                 android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:text="@string/ui_name"
-            />
-            <TextView
-                style="@style/EventDetailText"
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:text=":"
-                tools:ignore="HardcodedText"
+                android:text="@string/ui_name"
             />
             <TextView
                 android:id="@+id/organizer_name"
                 style="@style/EventDetailText"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
-                android:layout_weight="2"
+                android:layout_weight="1"
                 tools:text="Counter Culture"
             />
         </LinearLayout>
@@ -300,23 +296,16 @@
             <TextView
                 style="@style/EventDetailText"
                 android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:text="@string/ui_phone"
-            />
-            <TextView
-                style="@style/EventDetailText"
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:text=":"
-                tools:ignore="HardcodedText"
+                android:text="@string/ui_phone"
             />
             <TextView
                 android:id="@+id/organizer_phone"
                 style="@style/EventDetailText"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
-                android:layout_weight="2"
+                android:layout_weight="1"
+                android:textColor="@color/link_color"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 tools:text="+91-9900439770"
@@ -333,23 +322,16 @@
             <TextView
                 style="@style/EventDetailText"
                 android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:text="@string/ui_website"
-            />
-            <TextView
-                style="@style/EventDetailText"
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:text=":"
-                tools:ignore="HardcodedText"
+                android:text="@string/ui_website"
             />
             <TextView
                 android:id="@+id/organizer_website"
                 style="@style/EventDetailText"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
-                android:layout_weight="2"
+                android:layout_weight="1"
+                android:textColor="@color/link_color"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 tools:text="www.eventshigh.com"
