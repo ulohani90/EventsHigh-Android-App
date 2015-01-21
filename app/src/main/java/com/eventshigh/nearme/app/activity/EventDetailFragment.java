@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -223,21 +224,31 @@ public class EventDetailFragment extends Fragment {
     private static class EventCard {
         private final View rootView;
         private final View shareContentsView;
+
         private final ImageView recommendedImageView;
         private final NetworkImageView bgView;
         private final TextView titleView;
+        private final TextView fromView;
+
         private final RelativeLayout venueGroupView;
         private final TextView venueView;
         private final TextView addressView;
-        private final RelativeLayout timeGroupView;
+
+        private final LinearLayout timeGroupView;
+        private final LinearLayout eventTimeFirstView;
         private final TextView timeView;
         private final TextView timeDetailView;
+        private final TextView alsoOnView;
+        private final HorizontalScrollView futureTimesViewGroup;
+        private final LinearLayout futureTimesView;
+
         private final FrameLayout bookView;
         private final FrameLayout callView;
         private final FrameLayout shareView;
+
         private final LinearLayout tagsView;
         private final TextView descriptionView;
-        private final TextView fromView;
+
         private final TextView organizerHeader;
         private final LinearLayout organizerNameRow;
         private final TextView organizerNameView;
@@ -249,21 +260,32 @@ public class EventDetailFragment extends Fragment {
         private EventCard(View rootView) {
             this.rootView = rootView;
             shareContentsView = rootView.findViewById(R.id.share_view);
+
             recommendedImageView = (ImageView) rootView.findViewById(R.id.eh_recommend_banner);
             bgView = (NetworkImageView) rootView.findViewById(R.id.event_bg);
+
             titleView = (TextView) rootView.findViewById(R.id.event_title);
+            fromView = (TextView) rootView.findViewById(R.id.event_from);
+
             venueGroupView = (RelativeLayout) rootView.findViewById(R.id.event_venue_group);
             venueView = (TextView) rootView.findViewById(R.id.event_venue);
             addressView = (TextView) rootView.findViewById(R.id.event_address);
-            timeGroupView = (RelativeLayout) rootView.findViewById(R.id.event_time_group);
+
+            timeGroupView = (LinearLayout) rootView.findViewById(R.id.event_time_group);
+            eventTimeFirstView = (LinearLayout) rootView.findViewById(R.id.event_time_first);
             timeView = (TextView) rootView.findViewById(R.id.event_time);
             timeDetailView = (TextView) rootView.findViewById(R.id.event_time_details);
+            alsoOnView = (TextView) rootView.findViewById(R.id.also_on);
+            futureTimesViewGroup = (HorizontalScrollView) rootView.findViewById(R.id.event_future_times_hs);
+            futureTimesView = (LinearLayout) rootView.findViewById(R.id.event_future_times);
+
             bookView = (FrameLayout) rootView.findViewById(R.id.book_ticket);
             callView = (FrameLayout) rootView.findViewById(R.id.call);
             shareView = (FrameLayout) rootView.findViewById(R.id.share);
+
             tagsView = (LinearLayout) rootView.findViewById(R.id.event_tags);
             descriptionView = (TextView) rootView.findViewById(R.id.event_description);
-            fromView = (TextView) rootView.findViewById(R.id.event_from);
+
             organizerHeader = (TextView) rootView.findViewById(R.id.organizer_header);
             organizerNameRow = (LinearLayout) rootView.findViewById(R.id.organizer_name_row);
             organizerNameView = (TextView) rootView.findViewById(R.id.organizer_name);
@@ -334,7 +356,7 @@ public class EventDetailFragment extends Fragment {
         eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
 
         // Set Num people Interested
-        ActionBar actionBar = getActivity().getActionBar();
+        final ActionBar actionBar = getActivity().getActionBar();
         if (actionBar != null) {
             if (event.numPeopleInterested <= 0) {
                 actionBar.setSubtitle("");
@@ -413,6 +435,44 @@ public class EventDetailFragment extends Fragment {
             if (numDays >= 0) {
                 eventCard.timeDetailView.setText(
                     MessageFormat.format(getResources().getString(R.string.event_time_details), numDays));
+            }
+
+            if (event.eventTimings.length > 1) {
+                for (int i = 1; i < event.eventTimings.length; i++) {
+                    eventTime = DateTimeUtils.getEventTime(event, i);
+                    if (eventTime == null) {
+                        break;
+                    }
+
+                    final Date eventDateCurr = new Date(event.eventTimings[i]);
+                    View timeView = getActivity().getLayoutInflater().inflate(
+                            R.layout.event_time, eventCard.futureTimesView, false);
+                    ((TextView)timeView.findViewById(R.id.event_day)).setText(
+                            eventTime.day + ", " + eventTime.date);
+                    ((TextView)timeView.findViewById(R.id.event_time)).setText(eventTime.time);
+                    eventCard.futureTimesView.addView(timeView);
+                    timeView.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            activity.addToCalendar(event, eventDateCurr);
+                        }
+                    });
+                }
+
+                eventCard.alsoOnView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (eventCard.futureTimesViewGroup.getVisibility() == View.GONE) {
+                            eventCard.eventTimeFirstView.setVisibility(View.GONE);
+                            eventCard.futureTimesViewGroup.setVisibility(View.VISIBLE);
+                        } else {
+                            eventCard.eventTimeFirstView.setVisibility(View.VISIBLE);
+                            eventCard.futureTimesViewGroup.setVisibility(View.GONE);
+                        }
+                    }
+                });
+            } else {
+                eventCard.alsoOnView.setVisibility(View.GONE);
             }
         }
 

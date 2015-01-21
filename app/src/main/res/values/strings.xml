@@ -22,6 +22,7 @@
     <string name="ui_address">Address - </string>
     <string name="ui_phone">Phone - </string>
     <string name="ui_website">Website - </string>
+    <string name="ui_also_on">Also on\n…</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_filter">Filter events by selecting a category!</string>

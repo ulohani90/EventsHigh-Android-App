@@ -68,6 +68,11 @@
             />
 
             <!-- Event Venue -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#1a4d4d4d"
+            />
             <RelativeLayout
                 android:id="@+id/event_venue_group"
                 style="@style/EventDetailButton"
@@ -120,51 +125,73 @@
                 android:layout_height="1dp"
                 android:background="#1a4d4d4d"
             />
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/event_time_group"
                 style="@style/EventDetailButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@color/button_gray"
             >
                 <ImageView
                     android:id="@+id/event_time_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:src="@drawable/ic_action_time_dark"
-                    android:layout_centerVertical="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentBottom="true"
                     tools:ignore="ContentDescription"
                 />
-                <TextView
-                    android:id="@+id/event_time"
-                    style="@style/EventDetailText"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:id="@+id/event_time_first"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_toRightOf="@+id/event_time_icon"
-                    android:layout_toEndOf="@+id/event_time_icon"
-                    tools:text="Wed, 14 Jan at 9:30 AM"
-                />
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:background="@drawable/selector_button"
+                >
+                    <TextView
+                        android:id="@+id/event_time"
+                        style="@style/EventDetailText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:text="Wed, 14 Jan at 9:30 AM"
+                    />
+                    <TextView
+                        android:id="@+id/event_time_details"
+                        style="@style/EventDetailText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:typeface="serif"
+                        android:textSize="@dimen/abc_text_size_caption_material"
+                        tools:text="2 days from now"
+                    />
+                </LinearLayout>
                 <TextView
-                    android:id="@+id/event_time_details"
+                    android:id="@+id/also_on"
                     style="@style/EventDetailText"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/event_time"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_toRightOf="@+id/event_time_icon"
-                    android:layout_toEndOf="@+id/event_time_icon"
-                    android:typeface="serif"
-                    android:textSize="@dimen/abc_text_size_caption_material"
-                    tools:text="2 days from now"
+                    android:layout_gravity="center"
+                    android:background="@drawable/selector_button"
+                    android:text="@string/ui_also_on"
                 />
-            </RelativeLayout>
+                <HorizontalScrollView
+                    android:id="@+id/event_future_times_hs"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                >
+                    <LinearLayout
+                        android:id="@+id/event_future_times"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:showDividers="middle"
+                        android:divider="@drawable/vertical_divider"
+                        android:orientation="horizontal"
+                    />
+                </HorizontalScrollView>
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Action Items -->
@@ -234,6 +261,11 @@
                 />
             </FrameLayout>
         </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#1a4d4d4d"
+        />
 
         <!-- Event tags -->
         <LinearLayout
