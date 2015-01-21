@@ -262,7 +262,7 @@ public abstract class BaseActivity extends FragmentActivity {
                 Log.w(LOG_TAG, volleyError.getMessage(), cause);
                 reportActionToAnalytics("failedRequest", cause.getClass().getSimpleName());
             } else {
-                Log.w(LOG_TAG, volleyError.getMessage());
+                Log.w(LOG_TAG, "Volley Error: " + volleyError.getMessage());
                 reportActionToAnalytics("failedRequest");
             }
 

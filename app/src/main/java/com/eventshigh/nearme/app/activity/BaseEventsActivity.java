@@ -311,6 +311,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
      */
     protected abstract Fragment getNewFragment();
 
+
     // ***********************
     // Helper methods
     // ***********************

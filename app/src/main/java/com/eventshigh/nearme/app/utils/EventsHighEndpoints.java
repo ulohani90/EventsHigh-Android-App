@@ -66,7 +66,7 @@ public class EventsHighEndpoints {
     public static String getApiEndpointQuery(City city, String query) throws UnsupportedEncodingException {
         if (isDateQuery(query)) {
             return String.format(API_ENDPOINT_DATE_FORMAT,
-                    city.toString().toLowerCase(), query, BuildConfig.VERSION_CODE);
+                    city.toString().toLowerCase(), URLEncoder.encode(query, "UTF-8"), BuildConfig.VERSION_CODE);
         } else {
             return String.format(API_ENDPOINT_QUERY_FORMAT,
                     city.toString().toLowerCase(), URLEncoder.encode(query, "UTF-8"), BuildConfig.VERSION_CODE);
@@ -79,6 +79,7 @@ public class EventsHighEndpoints {
 
     private static final Pattern DATE_PATTERN = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
     public static boolean isDateQuery(String query) {
-        return DATE_PATTERN.matcher(query).matches();
+        // this week, this weekend are valid date queries
+        return query.toLowerCase().startsWith("this") ||  DATE_PATTERN.matcher(query).matches();
     }
 }
