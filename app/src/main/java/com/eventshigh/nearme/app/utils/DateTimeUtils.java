@@ -96,7 +96,7 @@ public class DateTimeUtils {
             SIMPLE_TIME_FORMAT.setTimeZone(timeZone);
             String time = SIMPLE_TIME_FORMAT.format(date);
             time = ZEROS.matcher(time).replaceAll("");
-            return time.equals("0") || time.equals("12 AM") ? null : time;
+            return time.equals("0") || time.equals("12 am") ? null : time;
         }
     }
 

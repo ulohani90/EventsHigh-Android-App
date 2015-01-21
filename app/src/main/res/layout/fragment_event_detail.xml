@@ -50,7 +50,12 @@
                 style="?android:attr/textAppearanceMedium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/abc_dropdownitem_text_padding_left"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
                 android:textIsSelectable="true"
                 tools:text="The Awesome Event"
             />
@@ -59,7 +64,10 @@
                 style="@style/EventDetailText"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_margin="@dimen/abc_control_padding_material"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 android:layout_gravity="end"
@@ -173,6 +181,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:background="@drawable/selector_button"
+                    android:textColor="#b3000000"
                     android:text="@string/ui_also_on"
                 />
                 <HorizontalScrollView
@@ -206,6 +215,7 @@
             android:orientation="horizontal"
             android:showDividers="middle"
             android:divider="@drawable/vertical_divider"
+            android:baselineAligned="false"
         >
             <FrameLayout
                 android:id="@+id/book_ticket"
@@ -272,7 +282,7 @@
             android:id="@+id/event_tags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/abc_dropdownitem_text_padding_left"
+            android:layout_margin="8dp"
             android:orientation="vertical"
             tools:listitem="@layout/event_tag"
         />
@@ -283,6 +293,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textIsSelectable="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
             tools:text="...\n,,,\n---"
         />
 
@@ -293,14 +306,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/ui_organizer"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
         />
         <LinearLayout
             android:id="@+id/organizer_name_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/abc_control_padding_material"
-            android:paddingBottom="@dimen/abc_control_padding_material"
             android:orientation="horizontal"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
         >
             <TextView
                 style="@style/EventDetailText"
@@ -321,9 +337,9 @@
             android:id="@+id/organizer_phone_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/abc_control_padding_material"
-            android:paddingBottom="@dimen/abc_control_padding_material"
             android:orientation="horizontal"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
         >
             <TextView
                 style="@style/EventDetailText"
@@ -347,9 +363,9 @@
             android:id="@+id/organizer_website_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/abc_control_padding_material"
-            android:paddingBottom="@dimen/abc_control_padding_material"
             android:orientation="horizontal"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
         >
             <TextView
                 style="@style/EventDetailText"

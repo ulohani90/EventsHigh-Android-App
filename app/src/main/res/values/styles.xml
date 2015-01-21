@@ -12,20 +12,20 @@
 
     <!-- Theme used for Events Details Pane -->
     <style name="EventDetailText" parent="android:style/TextAppearance.Small">
-        <item name="android:paddingLeft">@dimen/abc_dropdownitem_text_padding_left</item>
+        <item name="android:paddingLeft">8dp</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:textSize">@dimen/abc_text_size_caption_material</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="EventDetailHeader" parent="EventDetailText">
-        <item name="android:layout_marginTop">@dimen/abc_action_bar_icon_vertical_padding_material</item>
+        <item name="android:layout_marginTop">16dp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:typeface">sans</item>
     </style>
 
     <style name="EventDetailButton" parent="android:style/TextAppearance.Small">
         <item name="android:clickable">true</item>
-        <item name="android:padding">@dimen/abc_action_bar_icon_vertical_padding_material</item>
+        <item name="android:padding">18dp</item>
         <item name="android:background">@drawable/selector_button</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center</item>
@@ -36,6 +36,7 @@
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
         <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">11sp</item>
     </style>
 
     <!-- Themes used by Onboarding widgets powered by showcase library -->

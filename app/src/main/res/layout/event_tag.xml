@@ -5,7 +5,7 @@
     style="?android:attr/textAppearanceSmall"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="@dimen/abc_dropdownitem_text_padding_left"
+    android:padding="8dp"
     android:background="?android:attr/selectableItemBackground"
     android:textColor="@color/link_color"
     tools:text="Comedy"
