@@ -244,7 +244,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         if (id == R.id.action_refer) {
-            startActivity(new Intent(this, FacebookLoginActivity.class));
+            shareApp();
         }
 
         if (id == R.id.action_settings) {

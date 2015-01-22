@@ -247,19 +247,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.facebook.LoginActivity"
-            android:label="@string/app_name"
-        />
-        <activity
-            android:name=".activity.FacebookLoginActivity"
-            android:label="@string/app_name"
-            android:noHistory="true"
-        />
-        <activity
             android:name=".activity.ShareAppActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
         />
+        <activity
+            android:name="com.facebook.LoginActivity"
+            android:label="@string/app_name"
+            />
+        <activity
+            android:name=".activity.FacebookLoginActivity"
+            android:label="@string/app_name"
+            android:noHistory="true"
+            android:parentActivityName=".activity.ShareAppActivity"
+        >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.ShareAppActivity"
+            />
+        </activity>
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -267,11 +273,11 @@
         <activity
             android:name=".settings.AboutUsActivity"
             android:label="@string/title_about_us"
-            android:parentActivityName="settings.SettingsActivity"
+            android:parentActivityName=".settings.SettingsActivity"
         >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="settings.SettingsActivity"
+                android:value=".settings.SettingsActivity"
             />
         </activity>
 

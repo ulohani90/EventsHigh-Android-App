@@ -42,6 +42,10 @@ public class ShareAppActivity extends BaseActivity {
         tv.setText(R.string.loading);
 
         account = new Account(this);
+        if (account.getFacebookEmail() == null && account.shouldAskForLogin()) {
+            startActivity(new Intent(this, FacebookLoginActivity.class));
+        }
+
         account.getNumReferrerInstalls(this,
                 new Listener<Integer>() {
                     @Override
