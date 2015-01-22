@@ -287,6 +287,7 @@
             tools:listitem="@layout/event_tag"
         />
 
+        <!-- Event Description -->
         <TextView
             android:id="@+id/event_description"
             style="@style/EventDetailText"
@@ -296,7 +297,20 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
+            android:ellipsize="end"
             tools:text="...\n,,,\n---"
+        />
+        <TextView
+            android:id="@+id/read_more"
+            style="@style/EventDetailText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="-4dp"
+            android:layout_marginBottom="8dp"
+            android:textColor="#9a000000"
+            android:text="@string/ui_read_more"
+            android:visibility="gone"
         />
 
         <!-- Organizer Info -->
@@ -306,7 +320,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/ui_organizer"
-            android:layout_marginBottom="4dp"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
         />
@@ -388,7 +401,7 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="@dimen/abc_dropdownitem_icon_width"
+            android:layout_height="32dp"
             android:background="@android:color/transparent"
         />
     </LinearLayout>

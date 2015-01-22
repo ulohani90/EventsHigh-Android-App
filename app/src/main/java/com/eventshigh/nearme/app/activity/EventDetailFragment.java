@@ -248,6 +248,7 @@ public class EventDetailFragment extends Fragment {
 
         private final LinearLayout tagsView;
         private final TextView descriptionView;
+        private final TextView readMoreView;
 
         private final TextView organizerHeader;
         private final LinearLayout organizerNameRow;
@@ -285,6 +286,7 @@ public class EventDetailFragment extends Fragment {
 
             tagsView = (LinearLayout) rootView.findViewById(R.id.event_tags);
             descriptionView = (TextView) rootView.findViewById(R.id.event_description);
+            readMoreView = (TextView) rootView.findViewById(R.id.read_more);
 
             organizerHeader = (TextView) rootView.findViewById(R.id.organizer_header);
             organizerNameRow = (LinearLayout) rootView.findViewById(R.id.organizer_name_row);
@@ -482,6 +484,22 @@ public class EventDetailFragment extends Fragment {
         } else {
             eventCard.descriptionView.setText(event.description);
         }
+        Utils.waitForViewVisible(eventCard.descriptionView, new Runnable() {
+            @Override
+            public void run() {
+                if (eventCard.descriptionView.getLineCount() > 5) {
+                    eventCard.descriptionView.setMaxLines(3);
+                    eventCard.readMoreView.setVisibility(View.VISIBLE);
+                }
+            }
+        }, 100);
+        eventCard.readMoreView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                eventCard.descriptionView.setMaxLines(Integer.MAX_VALUE);
+                eventCard.readMoreView.setVisibility(View.GONE);
+            }
+        });
 
         // Add attribution.
         if (event.sourceUrl == null) {
