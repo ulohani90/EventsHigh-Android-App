@@ -196,6 +196,7 @@ public class Event implements Parcelable {
         String id = eventJson.getString("id");
         String title = eventJson.getString("title");
         String description = eventJson.optString("description", "")
+                .replaceAll("Â", "")
                 .replaceAll("\\s+\n", "\n\n");
 
         JSONObject mashup = eventJson.optJSONObject("mashup");
@@ -236,6 +237,10 @@ public class Event implements Parcelable {
         }
         if (venue == null && localityJson != null) {
             venue = localityJson.optString("locality");
+        }
+
+        if (address != null && venue != null && address.startsWith(venue)) {
+            address = address.substring(venue.length()).trim();
         }
 
         // Tags.

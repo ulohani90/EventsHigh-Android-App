@@ -18,14 +18,14 @@ repositories {
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "com.eventshigh.nearme.app"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 37
-        versionName "0.3.3"
+        versionCode 40
+        versionName "0.4"
     }
     buildTypes {
         release {

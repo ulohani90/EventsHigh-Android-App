@@ -12,39 +12,23 @@
 
     <!-- Theme used for Events Details Pane -->
     <style name="EventDetailText" parent="android:style/TextAppearance.Small">
-        <item name="android:paddingLeft">@dimen/abc_dropdownitem_text_padding_left</item>
+        <item name="android:paddingLeft">8dp</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:textSize">@dimen/abc_text_size_caption_material</item>
-        <item name="android:typeface">serif</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="EventDetailHeader" parent="android:style/TextAppearance.Medium">
-        <item name="android:padding">@dimen/abc_dropdownitem_text_padding_left</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:textSize">@dimen/abc_text_size_body_1_material</item>
+    <style name="EventDetailHeader" parent="EventDetailText">
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:typeface">sans</item>
     </style>
 
-    <style name="EventDetailButton" parent="EventDetailText">
-        <item name="android:textColor">@android:color/white</item>
+    <style name="EventDetailButton" parent="android:style/TextAppearance.Small">
         <item name="android:clickable">true</item>
-        <item name="android:padding">@dimen/abc_control_padding_material</item>
+        <item name="android:padding">18dp</item>
         <item name="android:background">@drawable/selector_button</item>
-        <item name="android:typeface">normal</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center</item>
-    </style>
-
-    <!-- Theme used for Events Details Action Icons -->
-    <style name="EventActionMenuItem" parent="android:style/TextAppearance.Widget.IconMenu.Item">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:gravity">center</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:textSize">@dimen/abc_text_size_body_1_material</item>
-        <item name="android:padding">@dimen/abc_control_padding_material</item>
-        <item name="android:background">@android:color/transparent</item>
-        <item name="android:clickable">true</item>
     </style>
 
     <!-- Theme used for Events Cards -->
@@ -52,25 +36,16 @@
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:layout_marginLeft">@dimen/abc_dropdownitem_text_padding_right</item>
-        <item name="android:layout_marginRight">@dimen/abc_dropdownitem_text_padding_right</item>
+        <item name="android:textSize">11sp</item>
     </style>
-
-    <style name="EventTagText" parent="EventCardText">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:background">@drawable/selector_event_tag_rounded</item>
-        <item name="android:paddingLeft">@dimen/abc_control_padding_material</item>
-        <item name="android:paddingRight">@dimen/abc_control_padding_material</item>
-    </style>
-
 
     <!-- Themes used by Onboarding widgets powered by showcase library -->
     <style name="ShowcaseTheme" parent="ShowcaseView">
         <item name="sv_backgroundColor">#99000000</item>
-        <item name="sv_detailTextAppearance">@style/CustomTitle</item>
+        <item name="sv_detailTextAppearance">@style/ShowcaseCustomTitle</item>
     </style>
 
-    <style name="CustomTitle" parent="TextAppearance.ShowcaseView.Title">
+    <style name="ShowcaseCustomTitle" parent="TextAppearance.ShowcaseView.Title">
         <item name="android:textColor">@android:color/white</item>
     </style>
 

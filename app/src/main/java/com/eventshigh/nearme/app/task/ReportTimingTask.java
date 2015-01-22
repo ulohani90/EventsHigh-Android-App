@@ -9,6 +9,10 @@ import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.utils.GAHelper;
 
+/**
+ * An {@link android.os.AsyncTask} which is used to report the network time in GA. This class also
+ * reports the user connection type as event label.
+ */
 public class ReportTimingTask extends AsyncTask<Long, Void, Void> {
     private final Context context;
     private final GAHelper gaHelper;

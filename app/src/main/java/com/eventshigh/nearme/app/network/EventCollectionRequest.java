@@ -64,7 +64,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         if (tag != null) {
             request.setTag(tag);
         }
-        Helper.addToRequestQueue(context, request);
+        VolleyHelper.addToRequestQueue(context, request);
     }
 
     private final Context context;

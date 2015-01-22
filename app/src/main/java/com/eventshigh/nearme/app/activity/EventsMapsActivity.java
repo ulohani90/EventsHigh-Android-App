@@ -1,25 +1,20 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.MarkerManager;
-import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.ShowcaseView.Builder;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
@@ -32,15 +27,12 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Maps activity which shows users events happening in given locality. The events are marked
  * across Map and user can zoom in, zoom out or move around the map to discover more events.
- *
- * In additions to location, an date filter is also provided. The date filter is filled with
- * days from upcoming week and user can select perticular date. By default, today's events are
- * shown.
  */
 public class EventsMapsActivity extends BaseEventsActivity {
 
@@ -76,8 +68,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
 
 
     // ***********************
-    // Activity lifecycle  Methods
-    // See http://developer.android.com/training/basics/activity-lifecycle/starting.html
+    // Delegated Methods from {@link BaseEventsActivity}
     // ***********************
 
     @Override
@@ -85,6 +76,11 @@ public class EventsMapsActivity extends BaseEventsActivity {
         super.onCreate(savedInstanceState);
 
         // Setup the local member variables.
+        View pager = findViewById(R.id.pager);
+        LinearLayout parent = (LinearLayout) pager.getParent();
+        View mapsView = getLayoutInflater().inflate(R.layout.activity_maps, parent, false);
+        pager.setVisibility(View.GONE);
+        parent.addView(mapsView, pager.getLayoutParams());
         setUpMapIfNeeded();
         setupGestureDetectorIfNeeded();
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
@@ -105,8 +101,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
     }
 
     @Override
-    protected int getActivityView() {
-        return R.layout.activity_maps;
+    protected Fragment getNewFragment() {
+        return new Fragment();
     }
 
 
@@ -178,9 +174,10 @@ public class EventsMapsActivity extends BaseEventsActivity {
     // ***********************
 
     @Override
-    protected void updateEventListing(List<Event> events) {
+    protected void updateEventListing(final List<Event> events) {
         mOnMapClickListener.onMapClick(null);
         markerManager.setEvents(map, events);
+        super.updateEventListing(events);
     }
 
     @Override
@@ -194,6 +191,23 @@ public class EventsMapsActivity extends BaseEventsActivity {
                     .build()
             )
         );
+    }
+
+    /**
+     * Refresh the event listings if user city has changed as per new location.
+     * Parent activity can pass {@code NULL} to cleanup any state like {@code lastCity}.
+     *
+     * @param userLocation location of user.
+     * @return true if city was updated as per new location and request for
+     * fetching new events was submitted.
+     */
+    private boolean refreshListingsIfNeeded(LatLng userLocation) {
+        if (!lastEventFetcherParam.changeLocation(userLocation)) {
+            super.updateUserLocation(userLocation);
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -215,15 +229,13 @@ public class EventsMapsActivity extends BaseEventsActivity {
                     showZoomToast = false;
                 }
 
-                refreshListingsIfNeeded(null);
+                updateEventListing(new ArrayList<Event>());
             } else if (!refreshListingsIfNeeded(cameraPosition.target)) {
                 if (!isAppMovement && lastSelectedMarker == null) {
                     reportActionToAnalytics("onCameraChange");
                 }
-                boolean listingShown = markerManager.updateListingForProjection(
-                    isAppMovement ? null : map.getCameraPosition().target,
-                    map.getProjection());
-                if (!listingShown) {
+                boolean isInfoWindowShown = markerManager.updateListingForProjection(map.getProjection());
+                if (!isInfoWindowShown) {
                     mOnMapClickListener.onMapClick(null);
                 }
             }
@@ -244,9 +256,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
     };
 
     private OnMarkerClickListener mOnMarkerClickListener = new OnMarkerClickListener() {
-        ShowcaseView showcaseView;
-        boolean isVisible = false;
-
         @Override
         public boolean onMarkerClick(Marker marker) {
             reportActionToAnalytics("onMarkerClick");
@@ -263,46 +272,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
             });
             eventCardContainer.removeAllViews();
             eventCardContainer.addView(eventView);
-
-            if (showcaseView != null) {
-                if (isVisible) {
-                    showcaseView.hide();
-                }
-            } else {
-                // Show Helper with swipe information.
-                showcaseView = new Builder(EventsMapsActivity.this, true)
-                    .setTarget(new ViewTarget(eventView))
-                    .setContentText(R.string.onboarding_swipe)
-                    .setStyle(R.style.ShowcaseTheme)
-                    .singleShot(2)
-                    .hideOnTouchOutside()
-                    .setShowcaseEventListener(new OnShowcaseEventListener() {
-                        ImageView swipeImage;
-
-                        @Override
-                        public void onShowcaseViewHide(ShowcaseView showcaseView) {
-                            reportActionToAnalytics("endOnboardingSwipe");
-                            isVisible = false;
-                            swipeImage.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
-                        }
-
-                        @Override
-                        public void onShowcaseViewShow(ShowcaseView showcaseView) {
-                            reportActionToAnalytics("startOnboardingSwipe");
-                            isVisible = true;
-                            swipeImage = new ImageView(EventsMapsActivity.this);
-                            swipeImage.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-                            swipeImage.setImageResource(R.drawable.gestures_flick);
-                            swipeImage.setScaleType(ScaleType.CENTER_INSIDE);
-                            eventCardContainer.addView(swipeImage);
-                        }
-                    }).build();
-            }
-
             return false;
         }
     };

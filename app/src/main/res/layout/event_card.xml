@@ -10,139 +10,115 @@
 
     <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/event_bg"
-        android:layout_width="?android:attr/listPreferredItemHeightLarge"
-        android:layout_height="?android:attr/listPreferredItemHeightLarge"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
         android:scaleType="centerCrop"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@+id/event_time"
         android:layout_centerVertical="true"
-        tools:src="@drawable/eh_default"
-        tools:ignore="ContentDescription"
+        android:background="#4b000000"
+    />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignLeft="@+id/event_bg"
+        android:layout_alignStart="@+id/event_bg"
+        android:layout_alignRight="@+id/event_bg"
+        android:layout_alignEnd="@+id/event_bg"
+        android:layout_alignTop="@+id/event_bg"
+        android:layout_alignBottom="@+id/event_bg"
+        android:background="#4b000000"
     />
 
     <ImageView
         android:id="@+id/event_recommended"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/eh_recommend_icon"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        tools:ignore="ContentDescription"
-    />
-
-    <ImageView
-        android:id="@+id/event_share"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:src="@android:drawable/ic_menu_share"
-        android:background="@drawable/selector_event_card_share"
-        android:padding="@dimen/abc_control_padding_material"
+        android:layout_alignBottom="@+id/event_bg"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="4dp"
+        android:src="@drawable/eh_recommend"
         tools:ignore="ContentDescription"
     />
 
     <TextView
+        android:id="@+id/num_people_interested"
         style="@style/EventCardText"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignBottom="@+id/event_bg"
+        android:layout_alignRight="@+id/event_bg"
+        android:layout_alignEnd="@+id/event_bg"
+        android:textColor="@android:color/white"
+        android:drawableStart="@drawable/event_card_person"
+        android:drawableLeft="@drawable/event_card_person"
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        tools:text="32"
+    />
+
+    <TextView
         android:id="@+id/event_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_toRightOf="@+id/event_bg"
         android:layout_toEndOf="@+id/event_bg"
-        android:layout_toLeftOf="@+id/event_share"
-        android:layout_toStartOf="@+id/event_share"
-        android:textSize="@dimen/abc_text_size_small_material"
-        android:textStyle="bold"
-        android:maxLines="1"
-        android:layout_margin="@dimen/abc_control_padding_material"
-        tools:text="My Awesome Event with a long title!"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="16dp"
+        android:maxLines="2"
+        android:minLines="2"
+        android:ellipsize="end"
+        android:textSize="14sp"
+        tools:text="My Awesome Event with a long long title!"
     />
+
     <TextView
         style="@style/EventCardText"
         android:id="@+id/event_venue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/event_title"
-        android:layout_toLeftOf="@+id/event_share"
-        android:layout_toStartOf="@+id/event_share"
-        android:layout_toRightOf="@+id/event_bg"
-        android:layout_toEndOf="@+id/event_bg"
-        android:layout_marginLeft="0dp"
-        android:layout_marginStart="0dp"
-        android:drawableStart="@drawable/ic_action_place_dark"
-        android:drawableLeft="@drawable/ic_action_place_dark"
-        tools:text="Jagriti theatre, Whitefield"
-    />
-
-    <TextView
-        style="@style/EventCardText"
-        android:id="@+id/event_time"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/event_venue"
-        android:layout_toRightOf="@+id/event_bg"
-        android:layout_toEndOf="@+id/event_bg"
-        android:layout_marginLeft="0dp"
-        android:layout_marginStart="0dp"
-        android:layout_toLeftOf="@+id/num_people_interested"
-        android:layout_toStartOf="@+id/num_people_interested"
-        android:drawableStart="@drawable/ic_action_time_dark"
-        android:drawableLeft="@drawable/ic_action_time_dark"
-        tools:text="Sun 29 Mar, 8:30 pm"
-    />
-
-    <TextView
-        style="@style/EventCardText"
-        android:id="@+id/num_people_interested"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_below="@id/event_venue"
-        android:layout_toLeftOf="@+id/event_share"
-        android:layout_toStartOf="@+id/event_share"
-        android:drawableStart="@drawable/ic_action_person_dark"
-        android:drawableLeft="@drawable/ic_action_person_dark"
-        tools:text="32"
-    />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/event_time"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_toRightOf="@+id/event_bg"
         android:layout_toEndOf="@+id/event_bg"
-        android:orientation="horizontal"
-        android:layout_marginBottom="@dimen/abc_control_padding_material"
-    >
-        <TextView
-            android:id="@+id/event_tag0"
-            style="@style/EventTagText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Comedy"
-        />
-        <TextView
-            android:id="@+id/event_tag1"
-            style="@style/EventTagText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Drama"
-        />
-        <TextView
-            android:id="@+id/event_tag2"
-            style="@style/EventTagText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Kids"
-        />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text=" "
-        />
-    </LinearLayout>
-</RelativeLayout>
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:drawableStart="@drawable/event_card_place"
+        android:drawableLeft="@drawable/event_card_place"
+        android:fontFamily="sans-serif-medium"
+        tools:text="Jagriti theatre, Whitefield"
+    />
 
+    <TextView
+        android:id="@+id/event_time"
+        style="@style/EventCardText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/event_venue"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/event_bg"
+        android:layout_toEndOf="@+id/event_bg"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="2dp"
+        android:paddingBottom="8dp"
+        android:drawableStart="@drawable/event_card_time"
+        android:drawableLeft="@drawable/event_card_time"
+        android:fontFamily="sans-serif-medium"
+        tools:text="Sun, 29 Mar at 8:30 pm"
+    />
+</RelativeLayout>

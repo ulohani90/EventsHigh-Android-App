@@ -7,11 +7,10 @@ import android.support.annotation.Nullable;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Simplified Parameter for fetching events. The current Fetcher supports fetching
- * events for a day and give city.
+ * Simplified parameters for fetching events. The current Fetcher supports fetching
+ * events for a city and optionally filtered by query. Query can also be a date.
  */
 public class EventFetcherParam implements Parcelable {
-
     @Nullable public City city;
     @Nullable public LatLng location;
     public String query;

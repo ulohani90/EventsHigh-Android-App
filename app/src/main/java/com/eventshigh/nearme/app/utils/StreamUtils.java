@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
- * Helper methods for reading stream or asserts file.
+ * Helper methods for reading stream or assets file.
  */
 public class StreamUtils {
     public static String[] readAssetFile(Context context, String filename) throws IOException {

@@ -13,7 +13,9 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.EventRequest;
 
 /**
- * An activity representing a single Event detail screen.
+ * An activity representing a single Event detail screen. This activity can be called from deep
+ * link or from Events{Grid,Maps}Activity. In both cases, event data is not available so
+ * this activity fetches the event data and shows it using the EventDetailFragment.
  */
 public class EventDetailActivity extends BaseActivity {
     private ActionBar actionBar;
@@ -38,9 +40,8 @@ public class EventDetailActivity extends BaseActivity {
     protected void onNewIntent(Intent intent) {
         setContentView(R.layout.activity_event_detail);
 
-        String action = intent.getAction();
-
         boolean showEvent = false;
+        String action = intent.getAction();
         if (Intent.ACTION_VIEW.equals(action)) {
             reportActionToAnalytics("deepLink", "detail");
             showEvent = true;

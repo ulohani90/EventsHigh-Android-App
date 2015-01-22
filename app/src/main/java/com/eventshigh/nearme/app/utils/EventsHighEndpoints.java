@@ -11,8 +11,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.regex.Pattern;
 
+/**
+ * Defines various end points for EH api.
+ */
 public class EventsHighEndpoints {
-    public static final String WEB_URI_BASE = "http://www.eventshigh.com/";
+    private static final String WEB_URI_BASE = "http://www.eventshigh.com/";
     private static final String API_ENDPOINT_DATE_FORMAT =
             "http://apiserver.eventshigh.com:8888/api/date/%s/%s?sortby=popularity&limit=500&mobile=%d";
     private static final String API_ENDPOINT_QUERY_FORMAT =
@@ -63,7 +66,7 @@ public class EventsHighEndpoints {
     public static String getApiEndpointQuery(City city, String query) throws UnsupportedEncodingException {
         if (isDateQuery(query)) {
             return String.format(API_ENDPOINT_DATE_FORMAT,
-                    city.toString().toLowerCase(), query, BuildConfig.VERSION_CODE);
+                    city.toString().toLowerCase(), URLEncoder.encode(query, "UTF-8"), BuildConfig.VERSION_CODE);
         } else {
             return String.format(API_ENDPOINT_QUERY_FORMAT,
                     city.toString().toLowerCase(), URLEncoder.encode(query, "UTF-8"), BuildConfig.VERSION_CODE);
@@ -76,6 +79,7 @@ public class EventsHighEndpoints {
 
     private static final Pattern DATE_PATTERN = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
     public static boolean isDateQuery(String query) {
-        return DATE_PATTERN.matcher(query).matches();
+        // this week, this weekend are valid date queries
+        return query.toLowerCase().startsWith("this") ||  DATE_PATTERN.matcher(query).matches();
     }
 }

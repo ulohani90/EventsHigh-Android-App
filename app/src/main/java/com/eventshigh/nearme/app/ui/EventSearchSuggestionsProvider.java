@@ -16,6 +16,8 @@ import com.eventshigh.nearme.app.utils.StreamUtils;
 import java.io.IOException;
 
 /**
+ * This class provides the search suggestions from recent queries and static event tags.
+ *
  * See http://developer.android.com/guide/topics/search/adding-recent-query-suggestions.html.
  */
 public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvider {

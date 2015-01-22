@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
@@ -19,11 +18,9 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
-import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
-import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.AppIndex;
@@ -42,24 +39,16 @@ import com.google.android.gms.location.LocationServices;
  * For now, this activity sets the preference 50%-50% for first time and then use this
  * preference in future.
  */
-public class LaunchActivity extends Activity {
-
-    // Web URI associated with this activity, it is used to
-    // report the URI in as deep link to Google App Indexing.
-    private Uri webUri;
-    private String title;
-
-    // Client to Google api so that we can report the deep links.
+public class LaunchActivity extends BaseActivity {
+    // Client to Google api so that we can report the deep links
+    // and fetch the user location if its not passed in intent.
     private GoogleApiClient client;
 
     // GCM registration helper.
     private GcmRegistration gcmRegistration;
-    // Analytics helper.
-    private GAHelper gaHelper;
 
     // Intent to launch the target
-    EventFetcherParam param = null;
-    private Intent outIntent;
+    private EventFetcherParam param = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,18 +59,8 @@ public class LaunchActivity extends Activity {
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
 
-        // Set defaults when there is no incoming intent.
-        Class target = Preferences.getInstance(getApplicationContext()).isMapsViewDefault() ?
-                EventsMapsActivity.class : EventsGridActivity.class;
-        outIntent = new Intent(this, target);
-        webUri = Uri.parse(EventsHighEndpoints.WEB_URI_BASE);
-        title = "amazing events near you";
-
-        // Setup the Analytic helper so that we can report events.
-        gaHelper = GAHelper.getInstance(getApplicationContext());
-
         // Process the incoming intent.
-        processIntent(getIntent());
+        param = IntentUtils.processIntent(this, getIntent());
     }
 
     public void onStart() {
@@ -122,6 +101,7 @@ public class LaunchActivity extends Activity {
         super.onStop();
 
         if (client != null && client.isConnected()) {
+            Uri webUri = EventsHighEndpoints.getWebUri(param);
             AppIndex.AppIndexApi.viewEnd(client, this, Utils.getAppUri(webUri));
             client.disconnect();
         }
@@ -139,6 +119,8 @@ public class LaunchActivity extends Activity {
         @Override
         public void onConnected(Bundle bundle) {
             // Report the start of deep index view.
+            Uri webUri = EventsHighEndpoints.getWebUri(param);
+            String title = param.toString();
             AppIndex.AppIndexApi.view(client, LaunchActivity.this, Utils.getAppUri(webUri),
                     title, webUri, null);
 
@@ -150,7 +132,7 @@ public class LaunchActivity extends Activity {
                     if (param.city != null) {
                         gcmRegistration.setLastCity(param.city);
                     } else {
-                        reportToAnalytics("unsupportedCity");
+                        reportActionToAnalytics("unsupportedCity");
                     }
                 }
             }
@@ -172,7 +154,7 @@ public class LaunchActivity extends Activity {
             if (param.city == null) {
                 City lastCity = gcmRegistration.getLastCity();
                 if (lastCity != null) {
-                    reportToAnalytics("usedLastCity");
+                    reportActionToAnalytics("usedLastCity");
                     param.changeLocation(lastCity.cityBounds.getCenter());
                 }
             }
@@ -185,7 +167,7 @@ public class LaunchActivity extends Activity {
 
             // We do not have user location. Lets populate the City chooser and let user
             // select the city.
-            reportToAnalytics("locationFailed");
+            reportActionToAnalytics("locationFailed");
             if (connectionResult != null) {
                 Toast.makeText(LaunchActivity.this, R.string.failed_location, Toast.LENGTH_SHORT).show();
             }
@@ -206,22 +188,11 @@ public class LaunchActivity extends Activity {
     // ***********************
 
     private void startNextActivity() {
+        // Set defaults when there is no incoming intent.
+        Class target = pref.isMapsViewDefault() ? EventsMapsActivity.class : EventsGridActivity.class;
+        Intent outIntent = new Intent(this, target);
         outIntent.putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, param);
         startActivity(outIntent);
-    }
-
-    private void processIntent(Intent inIntent) {
-        param = IntentUtils.processIntent(this, inIntent);
-        webUri = EventsHighEndpoints.getWebUri(param);
-        title = param.toString();
-    }
-
-    private void reportToAnalytics(String action) {
-        reportToAnalytics(action, "");
-    }
-
-    private void reportToAnalytics(String action, String label) {
-        gaHelper.reportActionToAnalytics(LaunchActivity.class.getSimpleName(), action, label, 1);
     }
 
     public class CityListAdapter extends ArrayAdapter<City> {

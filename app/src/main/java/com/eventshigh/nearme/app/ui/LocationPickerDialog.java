@@ -20,7 +20,8 @@ import com.eventshigh.nearme.app.task.LatLngFetcherTask;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Shows a dialog box with text box to let user enter location.
+ * Shows a dialog box with text box to let user enter location. The location supports auto complete
+ * using Google API.
  */
 public class LocationPickerDialog {
 

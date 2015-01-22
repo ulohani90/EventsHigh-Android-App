@@ -7,6 +7,9 @@ import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
 /**
+ * An Google Cloud messaging client which receives the messages through broadcast. These
+ * messages are used for notification which are server controlled.
+ *
  * See See https://developer.android.com/google/gcm/client.html.
  */
 public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {

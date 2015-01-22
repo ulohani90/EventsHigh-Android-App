@@ -1,7 +1,7 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.graphics.Point;
-import android.support.annotation.Nullable;
+import android.os.AsyncTask;
 import android.util.Pair;
 
 import com.eventshigh.nearme.app.activity.EventsMapsActivity;
@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -86,8 +87,11 @@ public class MarkerManager {
         map.clear();
         markers.clear();
 
-        int index = 1;
         for(Event event : events) {
+            if (event.location == null) {
+                continue;
+            }
+
             MarkerInfo markerInfo = new MarkerInfo(event);
             Marker marker = map.addMarker(
                 new MarkerOptions()
@@ -96,14 +100,13 @@ public class MarkerManager {
                     .visible(false)
                     .icon(markerInfo.canShowAsDot ? EventCategory.circleIcon() : event.category.icon())
             );
-
             markers.put(marker, markerInfo);
         }
 
-        updateListingForProjection(map.getCameraPosition().target, map.getProjection());
+        updateListingForProjection(map.getProjection());
 
         // If the user has zoomed in too much, zoom out a bit.
-        zoomOutIfNeeded(map);
+        new MapZoomChecker(map, markers.keySet()).execute();
     }
 
     // Gets the next marker, which are ordered based on user location and event popularity.
@@ -142,8 +145,7 @@ public class MarkerManager {
     // Updates the listing for current maps projection. This method decides which markers should
     // be visible and which one should not be visible. Also few markers are highlighted to
     // give relevance information.
-    public boolean updateListingForProjection(@Nullable LatLng center, Projection projection) {
-
+    public boolean updateListingForProjection(Projection projection) {
         // First find the markers which are withing visible region bound. All other
         // markers are marked invisible.
         LatLngBounds bounds = projection.getVisibleRegion().latLngBounds;
@@ -214,34 +216,68 @@ public class MarkerManager {
         return !markersInProjection.isEmpty() && markersInProjection.get(0).isInfoWindowShown();
     }
 
-    private void zoomOutIfNeeded(GoogleMap map) {
-        if (markers.isEmpty()) {
-            return;
-        }
+    private static class MapZoomChecker extends AsyncTask<Void, Void, Float> {
+        private final List<LatLng> markerPositions;
+        private final GoogleMap map;
 
-        Marker marker = null;
-        int numMinMarkers = Math.min(MIN_EVENTS_TO_SHOW, markers.size());
-        for (Marker m : markers.keySet()) {
-            numMinMarkers --;
-            if (numMinMarkers <= 0) {
-                marker = m;
-                break;
+        private final LatLng userLocation;
+        private final float currentDiagonalDistance;
+        private final float currentZoom;
+
+        private MapZoomChecker(GoogleMap map, Collection<Marker> markers) {
+            this.map = map;
+
+            markerPositions = new ArrayList<>(markers.size());
+            for (Marker marker : markers) {
+                markerPositions.add(marker.getPosition());
             }
+
+            userLocation = map.getCameraPosition().target;
+            currentZoom = map.getCameraPosition().zoom;
+            currentDiagonalDistance = LocationUtils.distanceInMeters(
+                    map.getProjection().getVisibleRegion().farLeft,
+                    map.getProjection().getVisibleRegion().nearRight);
         }
 
-        if (marker == null) {
-            return;
+        @Override
+        protected Float doInBackground(Void... params) {
+            Collections.sort(markerPositions, new Comparator<LatLng>() {
+                @Override
+                public int compare(LatLng lhs, LatLng rhs) {
+                    return Float.compare(
+                            LocationUtils.distanceInMeters(lhs, userLocation),
+                            LocationUtils.distanceInMeters(rhs, userLocation)
+                    );
+                }
+            });
+
+            LatLng marker = null;
+            int numMinMarkers = Math.min(MIN_EVENTS_TO_SHOW, markerPositions.size());
+            for (LatLng m : markerPositions) {
+                numMinMarkers --;
+                if (numMinMarkers <= 0) {
+                    marker = m;
+                    break;
+                }
+            }
+
+            if (marker != null) {
+                float minDiagonalDistance = DIAGONAL_DISTANCE_MULTIPLIER *
+                        LocationUtils.distanceInMeters(marker, userLocation);
+                if (currentDiagonalDistance < minDiagonalDistance) {
+                    float zoomOutNeeded = (float) (Math.log(minDiagonalDistance / currentDiagonalDistance) / Math.log(2));
+                    return Math.max(currentZoom - zoomOutNeeded, EventsMapsActivity.MIN_ZOOM_LEVEL);
+                }
+            }
+
+            return -1f;
         }
 
-        float minDiagonalDistance = DIAGONAL_DISTANCE_MULTIPLIER *  LocationUtils.distanceInMeters(
-               marker.getPosition(), map.getCameraPosition().target);
-        float currentDiagonalDistance =  LocationUtils.distanceInMeters(
-                map.getProjection().getVisibleRegion().farLeft,
-                map.getProjection().getVisibleRegion().nearRight);
-        if (currentDiagonalDistance < minDiagonalDistance) {
-            float zoomOutNeeded = (float) (Math.log(minDiagonalDistance/currentDiagonalDistance) / Math.log(2));
-            float zoom = Math.max(map.getCameraPosition().zoom - zoomOutNeeded, EventsMapsActivity.MIN_ZOOM_LEVEL);
-            map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
+        @Override
+        protected void onPostExecute(Float zoom) {
+            if (zoom > 0) {
+                map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
+            }
         }
     }
 }

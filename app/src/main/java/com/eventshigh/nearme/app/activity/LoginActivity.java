@@ -10,6 +10,12 @@ import com.eventshigh.nearme.app.user.Account;
 
 import java.util.Date;
 
+/**
+ * An {@link android.app.Activity} which shows user login screen and asks for user credentials.
+ *
+ * Currently this usage digits from Twitter to verify user phone number and users number becomes
+ * his identity.
+ */
 public class LoginActivity extends BaseActivity {
     private boolean isGoingToEvents = false;
     private long activityStartTime = 0;

@@ -133,14 +133,14 @@ public class EventsCollection {
             });
 
             int index = 0;
-            if (allEvents != null) {
-                taggedEventsList.add(index, new TaggedEvents(
-                        ALL_EVENTS_CATEGORY, Collections.unmodifiableList(allEvents)));
-                index ++;
-            }
             if (recommendedEvents != null) {
                 taggedEventsList.add(index, new TaggedEvents(
                         RECOMMENDED_EVENTS_CATEGORY, Collections.unmodifiableList(recommendedEvents)));
+                index ++;
+            }
+            if (allEvents != null) {
+                taggedEventsList.add(index, new TaggedEvents(
+                        ALL_EVENTS_CATEGORY, Collections.unmodifiableList(allEvents)));
                 index ++;
             }
             if (nowEvents != null) {
@@ -166,10 +166,10 @@ public class EventsCollection {
         }
     }
 
-    // A list containing a pair of tag name and list of events associated with that tag..
+    // A list containing a pair of tag name and list of events associated with that tag.
     private final List<TaggedEvents> taggedEventsList;
 
-    private EventsCollection(List<TaggedEvents> taggedEventsList) {
+    public EventsCollection(List<TaggedEvents> taggedEventsList) {
         this.taggedEventsList = taggedEventsList;
     }
 

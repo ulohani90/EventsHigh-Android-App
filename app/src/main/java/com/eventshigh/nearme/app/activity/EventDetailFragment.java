@@ -1,29 +1,29 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
+import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +31,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.network.Helper;
+import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -39,7 +39,10 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 
+import java.text.MessageFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
@@ -123,32 +126,6 @@ public class EventDetailFragment extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.fragment_detail, menu);
-
-        menu.findItem(R.id.action_share).getActionView().setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                shareEvent();
-            }
-        });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_share) {
-            shareEvent();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
         this.activity = (BaseActivity) activity;
@@ -226,7 +203,7 @@ public class EventDetailFragment extends Fragment {
     }
 
     private void shareEvent() {
-        activity.shareEvent(eventCard.shareView, event);
+        activity.shareEvent(eventCard.shareContentsView, event);
     }
 
     private void openBookingSite() {
@@ -246,23 +223,33 @@ public class EventDetailFragment extends Fragment {
 
     private static class EventCard {
         private final View rootView;
-        private final View shareView;
+        private final View shareContentsView;
+
         private final ImageView recommendedImageView;
         private final NetworkImageView bgView;
         private final TextView titleView;
-        private final LinearLayout timeView;
-        private final TextView numPeopleInterestedView;
+        private final TextView fromView;
+
+        private final RelativeLayout venueGroupView;
         private final TextView venueView;
         private final TextView addressView;
+
+        private final LinearLayout timeGroupView;
+        private final LinearLayout eventTimeFirstView;
+        private final TextView timeView;
+        private final TextView timeDetailView;
+        private final TextView alsoOnView;
+        private final HorizontalScrollView futureTimesViewGroup;
+        private final LinearLayout futureTimesView;
+
         private final FrameLayout bookView;
         private final FrameLayout callView;
-        private final FrameLayout saveView;
-        private final TextView directionView;
-        private final TextView tagsHeaderView;
+        private final FrameLayout shareView;
+
         private final LinearLayout tagsView;
-        private final View tagsSeparatorView;
         private final TextView descriptionView;
-        private final TextView fromView;
+        private final TextView readMoreView;
+
         private final TextView organizerHeader;
         private final LinearLayout organizerNameRow;
         private final TextView organizerNameView;
@@ -273,23 +260,34 @@ public class EventDetailFragment extends Fragment {
 
         private EventCard(View rootView) {
             this.rootView = rootView;
-            shareView = rootView.findViewById(R.id.share_view);
+            shareContentsView = rootView.findViewById(R.id.share_view);
+
             recommendedImageView = (ImageView) rootView.findViewById(R.id.eh_recommend_banner);
             bgView = (NetworkImageView) rootView.findViewById(R.id.event_bg);
+
             titleView = (TextView) rootView.findViewById(R.id.event_title);
-            timeView = (LinearLayout) rootView.findViewById(R.id.event_time);
-            numPeopleInterestedView = (TextView) rootView.findViewById(R.id.num_people_interested);
+            fromView = (TextView) rootView.findViewById(R.id.event_from);
+
+            venueGroupView = (RelativeLayout) rootView.findViewById(R.id.event_venue_group);
             venueView = (TextView) rootView.findViewById(R.id.event_venue);
             addressView = (TextView) rootView.findViewById(R.id.event_address);
+
+            timeGroupView = (LinearLayout) rootView.findViewById(R.id.event_time_group);
+            eventTimeFirstView = (LinearLayout) rootView.findViewById(R.id.event_time_first);
+            timeView = (TextView) rootView.findViewById(R.id.event_time);
+            timeDetailView = (TextView) rootView.findViewById(R.id.event_time_details);
+            alsoOnView = (TextView) rootView.findViewById(R.id.also_on);
+            futureTimesViewGroup = (HorizontalScrollView) rootView.findViewById(R.id.event_future_times_hs);
+            futureTimesView = (LinearLayout) rootView.findViewById(R.id.event_future_times);
+
             bookView = (FrameLayout) rootView.findViewById(R.id.book_ticket);
             callView = (FrameLayout) rootView.findViewById(R.id.call);
-            saveView = (FrameLayout) rootView.findViewById(R.id.save);
-            directionView = (TextView) rootView.findViewById(R.id.show_directions);
-            tagsHeaderView = (TextView) rootView.findViewById(R.id.event_tags_header);
+            shareView = (FrameLayout) rootView.findViewById(R.id.share);
+
             tagsView = (LinearLayout) rootView.findViewById(R.id.event_tags);
-            tagsSeparatorView = rootView.findViewById(R.id.event_tags_separator);
             descriptionView = (TextView) rootView.findViewById(R.id.event_description);
-            fromView = (TextView) rootView.findViewById(R.id.event_from);
+            readMoreView = (TextView) rootView.findViewById(R.id.read_more);
+
             organizerHeader = (TextView) rootView.findViewById(R.id.organizer_header);
             organizerNameRow = (LinearLayout) rootView.findViewById(R.id.organizer_name_row);
             organizerNameView = (TextView) rootView.findViewById(R.id.organizer_name);
@@ -309,16 +307,14 @@ public class EventDetailFragment extends Fragment {
         // Set Image
         final DisplayMetrics metrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int maxHeight = (int) (0.4 * metrics.heightPixels);
-        eventCard.bgView.setMaxHeight(maxHeight);
+        ViewGroup.LayoutParams params = eventCard.bgView.getLayoutParams();
+        params.height = (int) (0.2 * metrics.heightPixels);
+        eventCard.bgView.setLayoutParams(params);
         if (event.imgUrl == null) {
             eventCard.bgView.setVisibility(View.GONE);
         } else {
             eventCard.bgView.setImageUrl(event.imgUrl,
-                    Helper.getImageLoader(activity.getApplicationContext()));
-        }
-
-        if (event.imgUrl != null) {
+                    VolleyHelper.getImageLoader(activity.getApplicationContext()));
             eventCard.bgView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -329,7 +325,7 @@ public class EventDetailFragment extends Fragment {
                     nagDialog.setContentView(R.layout.dialog_image_preview);
 
                     ImageViewTouch preview = (ImageViewTouch) nagDialog.findViewById(R.id.image_preview);
-                    Helper.getImageLoader(getActivity().getApplicationContext()).get(
+                    VolleyHelper.getImageLoader(getActivity().getApplicationContext()).get(
                             event.imgUrl, ImageLoader.getImageListener(preview, 0, 0));
 
                     Button btnClose = (Button) nagDialog.findViewById(R.id.btn_close);
@@ -347,44 +343,50 @@ public class EventDetailFragment extends Fragment {
 
         // Set title
         eventCard.titleView.setText(event.title);
+        eventCard.titleView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gaOptOutCounter++;
+                if (gaOptOutCounter == NUM_TAPS_FOR_GA_OPT_OUT) {
+                    Toast.makeText(activity, "GA reporting disabled on this device", Toast.LENGTH_SHORT).show();
+                    activity.gaHelper.setAppOptOut(true);
+                }
+            }
+        });
 
         // Set EH recommendation banner
         eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
 
         // Set Num people Interested
-        if (event.numPeopleInterested <= 0) {
-            eventCard.numPeopleInterestedView.setVisibility(View.GONE);
-        } else {
-            Resources res = getResources();
-            String text = res.getQuantityString(R.plurals.people_interested,
-                    event.numPeopleInterested, event.numPeopleInterested);
-            eventCard.numPeopleInterestedView.setText(text);
-            eventCard.numPeopleInterestedView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    gaOptOutCounter ++;
-                    if (gaOptOutCounter == NUM_TAPS_FOR_GA_OPT_OUT) {
-                        Toast.makeText(activity, "GA reporting disabled on this device", Toast.LENGTH_SHORT).show();
-                        activity.gaHelper.setAppOptOut(true);
-                    }
-                }
-            });
+        final ActionBar actionBar = getActivity().getActionBar();
+        if (actionBar != null) {
+            if (event.numPeopleInterested <= 0) {
+                actionBar.setSubtitle("");
+            } else {
+                String text = getResources().getQuantityString(R.plurals.people_interested,
+                        event.numPeopleInterested, event.numPeopleInterested);
+                actionBar.setSubtitle(text);
+            }
         }
 
         // Set Venue and address.
-        if (event.venue == null) {
-            eventCard.venueView.setVisibility(View.GONE);
+        if (event.venue == null && event.address == null) {
+            eventCard.venueGroupView.setVisibility(View.GONE);
         } else {
-            eventCard.venueView.setText(Utils.capitalize(event.venue));
-        }
-        eventCard.addressView.setText(
-                event.address == null ? Utils.capitalize(event.city.toString()) : event.address);
-        eventCard.directionView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.showDirections(event);
+            if (event.venue == null) {
+                eventCard.venueView.setVisibility(View.GONE);
+            } else {
+                eventCard.venueView.setText(Utils.capitalize(event.venue));
             }
-        });
+            eventCard.addressView.setText(
+                    event.address == null ? Utils.capitalize(event.city.toString()) : event.address);
+            eventCard.venueGroupView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.showDirections(event);
+                }
+            });
+        }
 
         // Set action buttons.
         if (event.bookingUrl == null) {
@@ -409,28 +411,70 @@ public class EventDetailFragment extends Fragment {
             });
         }
 
+        eventCard.shareView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shareEvent();
+            }
+        });
+
         // Set time.
-        if (event.eventTimings.length == 0) {
-            eventCard.timeView.setVisibility(View.GONE);
-            eventCard.saveView.setVisibility(View.GONE);
+        EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
+        if (eventTime == null) {
+            eventCard.timeGroupView.setVisibility(View.GONE);
         } else {
-            eventCard.saveView.setOnClickListener(new OnClickListener() {
+            eventCard.timeView.setText(eventTime.toString());
+            eventCard.timeGroupView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     activity.addToCalendar(event, null);
                 }
             });
-            for (int i = 0; i < event.eventTimings.length; i++) {
-                final Date date = new Date(event.eventTimings[i]);
-                LinearLayout daySelectorItem = getEventTimeItem(
-                        eventCard.timeView, DateTimeUtils.getEventTime(event, i));
-                eventCard.timeView.addView(daySelectorItem, getLayoutParam());
-                daySelectorItem.setOnClickListener(new OnClickListener() {
+
+            Date eventDate = DateTimeUtils.getEventDate(event, 0);
+            Date today = DateTimeUtils.toMidnight(Calendar.getInstance(), event.city.timeZone).getTime();
+            int numDays = (int) TimeUnit.MILLISECONDS.toDays(eventDate.getTime() - today.getTime());
+            if (numDays >= 0) {
+                eventCard.timeDetailView.setText(
+                    MessageFormat.format(getResources().getString(R.string.event_time_details), numDays));
+            }
+
+            if (event.eventTimings.length > 1) {
+                for (int i = 1; i < event.eventTimings.length; i++) {
+                    eventTime = DateTimeUtils.getEventTime(event, i);
+                    if (eventTime == null) {
+                        break;
+                    }
+
+                    final Date eventDateCurr = new Date(event.eventTimings[i]);
+                    View timeView = getActivity().getLayoutInflater().inflate(
+                            R.layout.event_time, eventCard.futureTimesView, false);
+                    ((TextView)timeView.findViewById(R.id.event_day)).setText(
+                            eventTime.day + ", " + eventTime.date);
+                    ((TextView)timeView.findViewById(R.id.event_time)).setText(eventTime.time);
+                    eventCard.futureTimesView.addView(timeView);
+                    timeView.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            activity.addToCalendar(event, eventDateCurr);
+                        }
+                    });
+                }
+
+                eventCard.alsoOnView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        activity.addToCalendar(event, date);
+                        if (eventCard.futureTimesViewGroup.getVisibility() == View.GONE) {
+                            eventCard.eventTimeFirstView.setVisibility(View.GONE);
+                            eventCard.futureTimesViewGroup.setVisibility(View.VISIBLE);
+                        } else {
+                            eventCard.eventTimeFirstView.setVisibility(View.VISIBLE);
+                            eventCard.futureTimesViewGroup.setVisibility(View.GONE);
+                        }
                     }
                 });
+            } else {
+                eventCard.alsoOnView.setVisibility(View.GONE);
             }
         }
 
@@ -440,6 +484,22 @@ public class EventDetailFragment extends Fragment {
         } else {
             eventCard.descriptionView.setText(event.description);
         }
+        Utils.waitForViewVisible(eventCard.descriptionView, new Runnable() {
+            @Override
+            public void run() {
+                if (eventCard.descriptionView.getLineCount() > 5) {
+                    eventCard.descriptionView.setMaxLines(3);
+                    eventCard.readMoreView.setVisibility(View.VISIBLE);
+                }
+            }
+        }, 100);
+        eventCard.readMoreView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                eventCard.descriptionView.setMaxLines(Integer.MAX_VALUE);
+                eventCard.readMoreView.setVisibility(View.GONE);
+            }
+        });
 
         // Add attribution.
         if (event.sourceUrl == null) {
@@ -500,9 +560,6 @@ public class EventDetailFragment extends Fragment {
         // Show tags.
         if (event.getAllTags().length > 0) {
             showTags();
-        } else {
-            eventCard.tagsSeparatorView.setVisibility(View.GONE);
-            eventCard.tagsHeaderView.setVisibility(View.GONE);
         }
     }
 
@@ -535,7 +592,11 @@ public class EventDetailFragment extends Fragment {
         tagView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.showSearchView(tag);
+                activity.reportActionToAnalytics("tagClick");
+                Intent searchIntent = new Intent(activity, LaunchActivity.class);
+                searchIntent.setAction(Intent.ACTION_SEARCH);
+                searchIntent.putExtra(SearchManager.QUERY, tag);
+                startActivity(searchIntent);
             }
         });
         return  tagView;
@@ -556,23 +617,5 @@ public class EventDetailFragment extends Fragment {
                 TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
         layoutParams.setMargins(0, 0 , margin, 0);
         return layoutParams;
-    }
-
-    public LinearLayout getEventTimeItem(ViewGroup parent, EventTime eventTime) {
-        LinearLayout daySelectorItem =
-                (LinearLayout) activity.getLayoutInflater().inflate(
-                        R.layout.day_selector_item, parent, false);
-        ((TextView)daySelectorItem.findViewById(R.id.day_of_week)).setText(eventTime.day);
-        ((TextView)daySelectorItem.findViewById(R.id.date)).setText(eventTime.date);
-
-        TextView timeView = ((TextView)daySelectorItem.findViewById(R.id.event_time));
-        if (eventTime.time == null) {
-            timeView.setVisibility(View.GONE);
-        } else {
-            timeView.setText(eventTime.time);
-        }
-
-        daySelectorItem.setClickable(true);
-        return daySelectorItem;
     }
 }

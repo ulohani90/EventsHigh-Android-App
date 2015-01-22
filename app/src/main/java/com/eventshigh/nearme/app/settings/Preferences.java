@@ -7,7 +7,8 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 
 /**
- * User Preferences.
+ * User Preferences an simple wrapper across
+ * {@link android.preference.PreferenceManager#getDefaultSharedPreferences(android.content.Context)}
  */
 public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_DEFAULT_ACTIVITY = "default_activity";

@@ -10,7 +10,9 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Helper class which can be used to sign the URI.
+ * Helper class which can be used to sign the URI. The Signed URI have a timestamp and the
+ * signature for the URI path. This is used to avoid someone doing replay attach or
+ * change the data on the fly.
  */
 public class Signer {
     private static byte[] API_KEY = new byte[] {-7,91,-9,18,105,-84,102,67,-33,38,-38,-37,35,108,88,44};
