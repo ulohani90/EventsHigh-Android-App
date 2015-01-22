@@ -258,7 +258,6 @@
         <activity
             android:name=".activity.FacebookLoginActivity"
             android:label="@string/app_name"
-            android:noHistory="true"
             android:parentActivityName=".activity.ShareAppActivity"
         >
             <meta-data
