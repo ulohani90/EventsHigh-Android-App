@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -47,6 +48,16 @@ public class FacebookLoginActivity extends BaseActivity {
 
         LoginButton authButton = (LoginButton) findViewById(R.id.auth_button);
         authButton.setReadPermissions(Arrays.asList("public_profile"));
+    }
+
+    public void onStart() {
+        super.onStart();
+
+        // Show the Up button in the action bar.
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override

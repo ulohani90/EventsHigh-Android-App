@@ -80,7 +80,7 @@ public class AccountStateReporter {
         }
     }
 
-    private static Builder getBaseUri(Context context, String path) {
+    public static Builder getBaseUri(Context context, String path) {
         return Uri.parse("http://apiserver.eventshigh.com:8888/mobileapp")
             .buildUpon()
             .appendPath(path)

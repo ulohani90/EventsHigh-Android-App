@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
 >
-
     <ImageView
         android:id="@+id/eh_logo"
         android:layout_width="wrap_content"
@@ -18,7 +17,7 @@
     />
 
     <TextView
-        android:id="@+id/fb_connect_message"
+        android:id="@+id/share_app_message"
         style="?android:attr/textAppearanceLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,27 +25,18 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/eh_logo"
         android:gravity="center"
-        android:text="@string/ui_connect_facebook"
+        android:text="@string/loading"
     />
 
-    <com.facebook.widget.LoginButton
-        android:id="@+id/auth_button"
+    <TextView
+        android:id="@+id/share_app"
+        style="@style/EventDetailButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="32dp"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/fb_connect_message"
-    />
-
-    <TextView
-        android:id="@+id/skip"
-        style="@style/EventDetailButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:text="@string/action_skip_login"
+        android:layout_below="@+id/share_app_message"
+        android:text="@string/action_share_app2"
         android:textAllCaps="true"
     />
 </RelativeLayout>

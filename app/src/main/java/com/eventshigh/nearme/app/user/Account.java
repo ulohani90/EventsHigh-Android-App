@@ -1,9 +1,18 @@
 package com.eventshigh.nearme.app.user;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+
+import com.android.volley.Request;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.eventshigh.nearme.app.network.VolleyHelper;
+
+import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -113,6 +122,22 @@ public class Account {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void getNumReferrerInstalls(
+            Activity activity, final Listener<Integer> listener, ErrorListener errorListener) {
+        String url = AccountStateReporter.getBaseUri(context, "getReferrerCount")
+                .appendQueryParameter("referrer_id", getUserReferrerCode()).build().toString();
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+            new Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject jsonObject) {
+                    listener.onResponse(jsonObject.optInt("count"));
+                }
+             }, errorListener);
+        request.setTag(activity);
+        VolleyHelper.addToRequestQueue(context.getApplicationContext(), request);
     }
 
     public @Nullable String getFacebookEmail() {

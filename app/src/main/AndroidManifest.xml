@@ -256,6 +256,11 @@
             android:noHistory="true"
         />
         <activity
+            android:name=".activity.ShareAppActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+        />
+        <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
         />
