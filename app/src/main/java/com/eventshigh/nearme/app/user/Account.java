@@ -30,6 +30,9 @@ public class Account {
     private static final String PREF_REFERRER_CODE = "referrer_code";
     private static final String PREF_REFERRER_CODE_UPLOADED = "referrer_code_uploaded";
 
+    private static final String PREF_FACEBOOK_EMAIL = "facebook_email";
+    private static final String PREF_FACEBOOK_EMAIL_UPLOADED = "facebook_email_uploaded";
+
     // Constant used to skip the login screen if there are too many failed login attempts
     private static final int NUM_MAX_LOGIN_ATTEMPT = 3;
 
@@ -100,6 +103,22 @@ public class Account {
         }
     }
 
+    public void recordFacebookEmail(String facebookEmail) {
+        try {
+            facebookEmail = URLEncoder.encode(facebookEmail, "UTF-8");
+            accountInfo.edit()
+                    .putString(PREF_FACEBOOK_EMAIL, facebookEmail)
+                    .putBoolean(PREF_FACEBOOK_EMAIL_UPLOADED, false).apply();
+            new AccountStateRegistar().execute();
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public @Nullable String getFacebookEmail() {
+        return accountInfo.getString(PREF_FACEBOOK_EMAIL, null);
+    }
+
     private class AccountStateRegistar extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
@@ -108,6 +127,9 @@ public class Account {
             }
             if (!accountInfo.getBoolean(PREF_REFERRER_CODE_UPLOADED, false)) {
                 uploadReferrerCode(accountInfo.getString(PREF_REFERRER_CODE, null));
+            }
+            if (!accountInfo.getBoolean(PREF_FACEBOOK_EMAIL_UPLOADED, false)) {
+                uploadFacebookEmail(accountInfo.getString(PREF_FACEBOOK_EMAIL, null));
             }
 
             return null;
@@ -124,6 +146,14 @@ public class Account {
         private void uploadReferrerCode(@Nullable String referrerCode) {
             if (referrerCode != null) {
                 if (AccountStateReporter.reportReferrerCode(context, referrerCode)) {
+                    accountInfo.edit().putBoolean(PREF_REFERRER_CODE_UPLOADED, true).apply();
+                }
+            }
+        }
+
+        private void uploadFacebookEmail(@Nullable String facebookEmail) {
+            if (facebookEmail != null) {
+                if (AccountStateReporter.reportFacebookEmail(context, facebookEmail)) {
                     accountInfo.edit().putBoolean(PREF_REFERRER_CODE_UPLOADED, true).apply();
                 }
             }

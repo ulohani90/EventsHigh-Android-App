@@ -243,6 +243,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
             return true;
         }
 
+        if (id == R.id.action_refer) {
+            startActivity(new Intent(this, FacebookLoginActivity.class));
+        }
+
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;

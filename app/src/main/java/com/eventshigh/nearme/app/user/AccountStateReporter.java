@@ -37,6 +37,12 @@ public class AccountStateReporter {
                 .build());
     }
 
+    public static boolean reportFacebookEmail(Context context, String facebookEmail) {
+        return sendSignedRequest(context, getBaseUri(context, "reportFbEmailId")
+                .appendQueryParameter("fb_email_id", facebookEmail)
+                .build());
+    }
+
     public static boolean reportGcmRegistrationId(Context context, String gcmRegistationId) {
         return sendSignedRequest(context, getBaseUri(context, "reportGcmRegistationId")
                 .appendQueryParameter("gcm_registration_id", gcmRegistationId)

@@ -38,6 +38,11 @@
           android:icon="@drawable/ic_action_add_to_queue"
           android:orderInCategory="50"
     />
+    <item android:id="@+id/action_refer"
+          android:title="@string/action_refer"
+          android:icon="@android:drawable/ic_menu_share"
+          android:orderInCategory="50"
+    />
     <item android:id="@+id/action_settings"
           android:title="@string/title_activity_settings"
           android:icon="@drawable/ic_action_settings"

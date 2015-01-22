@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/eh_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/eh_logo_with_text"
+        tools:ignore="ContentDescription"
+    />
+
+    <TextView
+        android:id="@+id/fb_connect_message"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/eh_logo"
+        android:gravity="center"
+        android:text="@string/ui_connect_facebook"
+    />
+
+    <com.facebook.widget.LoginButton
+        android:id="@+id/auth_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/fb_connect_message"
+    />
+
+    <TextView
+        android:id="@+id/skip"
+        style="@style/EventDetailButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:text="@string/action_skip_login"
+        android:textAllCaps="true"
+    />
+</RelativeLayout>

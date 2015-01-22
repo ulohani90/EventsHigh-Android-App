@@ -9,6 +9,7 @@
     <screenName name="com.eventshigh.nearme.app.activity.EventsMapsActivity">Maps</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.EventsGridActivity">Grid</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.EventDetailActivity">Details</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.FacebookLoginActivity">FacebookLogin</screenName>
     <screenName name="com.eventshigh.nearme.app.settings.SettingsActivity">Settings</screenName>
     <screenName name="com.eventshigh.nearme.app.settings.AboutUsActivity">AboutUs</screenName>
 </resources>
