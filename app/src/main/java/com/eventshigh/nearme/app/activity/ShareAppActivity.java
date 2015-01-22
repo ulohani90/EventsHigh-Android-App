@@ -32,6 +32,17 @@ public class ShareAppActivity extends BaseActivity {
                 shareApp();
             }
         });
+        findViewById(R.id.not_logged_in).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ShareAppActivity.this, FacebookLoginActivity.class));
+            }
+        });
+
+        account = new Account(this);
+        if (account.getFacebookEmail() == null && account.shouldAskForLogin()) {
+            startActivity(new Intent(this, FacebookLoginActivity.class));
+        }
     }
 
     @Override
@@ -42,10 +53,7 @@ public class ShareAppActivity extends BaseActivity {
         tv.setText(R.string.loading);
 
         account = new Account(this);
-        if (account.getFacebookEmail() == null && account.shouldAskForLogin()) {
-            startActivity(new Intent(this, FacebookLoginActivity.class));
-        }
-
+        findViewById(R.id.not_logged_in).setVisibility(account.getFacebookEmail() != null ? View.GONE : View.VISIBLE);
         account.getNumReferrerInstalls(this,
                 new Listener<Integer>() {
                     @Override

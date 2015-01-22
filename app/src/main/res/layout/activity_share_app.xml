@@ -21,7 +21,7 @@
         style="?android:attr/textAppearanceLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="32dp"
+        android:layout_margin="16dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/eh_logo"
         android:gravity="center"
@@ -33,10 +33,25 @@
         style="@style/EventDetailButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="32dp"
+        android:layout_margin="16dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/share_app_message"
         android:text="@string/action_share_app2"
         android:textAllCaps="true"
+    />
+
+    <TextView
+        android:id="@+id/not_logged_in"
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:text="@string/ui_not_logged_in"
+        android:textColor="@color/link_color"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="16dp"
     />
 </RelativeLayout>

@@ -7,7 +7,6 @@ import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.user.Account;
@@ -50,10 +49,7 @@ public class FacebookLoginActivity extends BaseActivity {
         authButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                session = Session.getActiveSession();
-                if (session == null || session.isClosed()) {
-                    Session.openActiveSession(FacebookLoginActivity.this, true, callback);
-                }
+                Session.openActiveSession(FacebookLoginActivity.this, true, callback);
             }
         });
     }
@@ -104,12 +100,14 @@ public class FacebookLoginActivity extends BaseActivity {
             FacebookLoginActivity.this.session = session;
             authButton.setSession(session);
 
+            /*
             if (state == SessionState.CLOSED_LOGIN_FAILED) {
                 Account account = new Account(getApplicationContext());
                 account.recordLoginFailure();
                 Toast.makeText(FacebookLoginActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();
                 return;
             }
+            */
 
             if (state.isOpened()) {
                 Request.newMeRequest(session, new GraphUserCallback() {
