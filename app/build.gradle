@@ -12,6 +12,7 @@ apply plugin: 'io.fabric'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    mavenCentral()
 }
 
 
@@ -52,6 +53,8 @@ dependencies {
     compile 'com.amplitude:android-sdk:1.4.3'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
     compile 'fr.nicolaspomepuy:discreetapprate:2.0.3@aar'
+
+    compile 'com.facebook.android:facebook-android-sdk:3.21.1'
 
 //    compile('com.twitter.sdk.android:twitter:1.1.1@aar') {
 //        transitive = true;
