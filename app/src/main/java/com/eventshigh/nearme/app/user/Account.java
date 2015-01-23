@@ -113,15 +113,19 @@ public class Account {
     }
 
     public void recordFacebookEmail(String facebookEmail) {
-        try {
-            facebookEmail = URLEncoder.encode(facebookEmail, "UTF-8");
-            accountInfo.edit()
-                    .putString(PREF_FACEBOOK_EMAIL, facebookEmail)
-                    .putBoolean(PREF_FACEBOOK_EMAIL_UPLOADED, false).apply();
-            new AccountStateRegistar().execute();
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+        String oldFacebookMail = getFacebookEmail();
+        if (oldFacebookMail == null || !oldFacebookMail.equals(facebookEmail)) {
+            try {
+                facebookEmail = URLEncoder.encode(facebookEmail, "UTF-8");
+                accountInfo.edit()
+                        .putString(PREF_FACEBOOK_EMAIL, facebookEmail)
+                        .putBoolean(PREF_FACEBOOK_EMAIL_UPLOADED, false).apply();
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         }
+
+        new AccountStateRegistar().execute();
     }
 
     public void getNumReferrerInstalls(

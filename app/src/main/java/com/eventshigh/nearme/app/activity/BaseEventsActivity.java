@@ -243,10 +243,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
             return true;
         }
 
-        if (id == R.id.action_refer) {
-            shareApp();
-        }
-
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;

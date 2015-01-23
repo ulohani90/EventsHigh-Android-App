@@ -25,6 +25,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.settings.Preferences;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
 
@@ -153,7 +154,16 @@ public abstract class BaseActivity extends FragmentActivity {
      * Helper method to start activity which lets user share the app.
      */
     public void shareApp() {
-        startActivity(new Intent(this, ShareAppActivity.class));
+        reportActionToAnalytics("shareApp");
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT,
+                String.format(
+                    getResources().getString(R.string.share_app_text),
+                    new Account(this).getUserReferrerCode())
+        );
+        sendIntent.setType("text/plain");
+        startActivity(sendIntent);
     }
 
     /**

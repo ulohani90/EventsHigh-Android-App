@@ -4,10 +4,10 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.user.Account;
@@ -136,30 +136,21 @@ public class FacebookLoginActivity extends BaseActivity {
 
 
     private void up() {
-        NavUtils.navigateUpTo(this, new Intent(this, ShareAppActivity.class));
+        NavUtils.navigateUpFromSameTask(this);
     }
 
     private Session.StatusCallback callback = new Session.StatusCallback() {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             authButton.setSession(session);
-
-            /*
-            if (state == SessionState.CLOSED_LOGIN_FAILED) {
-                Account account = new Account(getApplicationContext());
-                account.recordLoginFailure();
-                Toast.makeText(FacebookLoginActivity.this, R.string.failed_login, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            */
-
             if (state.isOpened()) {
                 Request.newMeRequest(session, new GraphUserCallback() {
                     @Override
                     public void onCompleted(GraphUser user, Response response) {
                         Account account = new Account(getApplicationContext());
-                        account.recordFacebookEmail(user.getProperty("email").toString());
-                        up();
+                        String email = user.getProperty("email").toString();
+                        account.recordFacebookEmail(email);
+                        ((TextView)findViewById(R.id.fb_connect_message)).setText("Logged in as " + email);
                     }
                 }).executeAsync();
             }

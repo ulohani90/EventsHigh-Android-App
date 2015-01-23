@@ -17,6 +17,7 @@
     <string name="action_share_app2">Share App</string>
     <string name="action_shortcut">Add to homescreen</string>
     <string name="action_refer">Refer a friend</string>
+    <string name="action_connect_facebook">Facebook Connection</string>
 
     <!-- Other Strings used in UI -->
     <string name="ui_organizer">ORGANIZER DETAILS</string>
@@ -27,8 +28,8 @@
     <string name="ui_also_on">Also on\n…</string>
     <string name="ui_read_more">Read More …</string>
     <string name="ui_connect_facebook">Connect with your facebook account to earn referral rewards.</string>
-    <string name="ui_referrer">{0,choice,0#Share the joy of attending amazing events!|1#You have helped one friend in finding amazing events, thank you!|1&lt;You have helped {0} friends in finding amazing events, thank you!}</string>
-    <string name="ui_not_logged_in">Connect via Facebook</string>
+    <string name="ui_referrer_default">Share the joy of attending amazing events!</string>
+    <string name="ui_referrer">You have helped {0,choice,1#one friend|1&lt;{0} friends} in finding amazing events, thank you!</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_filter">Filter events by selecting a category!</string>
@@ -53,7 +54,6 @@
     <string name="no_map_app">Maps application not found!</string>
     <string name="no_cal_app">Calendar application not found!</string>
     <string name="no_events">No events found!</string>
-    <string name="failed_load_num_installs">Sorry, failed to load the number of referrer installs, try again later!</string>
 
     <!-- formatting -->
     <plurals name="people_interested">

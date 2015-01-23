@@ -9,6 +9,18 @@
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
     />
+    <Preference android:title="@string/action_refer">
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.activity.ShareAppActivity"
+        />
+    </Preference>
+    <Preference android:title="@string/action_connect_facebook">
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.activity.FacebookLoginActivity"
+        />
+    </Preference>
     <Preference android:title="@string/title_about_us">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
