@@ -21,12 +21,15 @@ import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Facebook login activity which asks users to login to facebook. If user is already logged in,
  * we directly go to next screen passed in parameter.
  */
 public class FacebookLoginActivity extends BaseActivity {
+    private static final List<String> PERMISSIONS = Arrays.asList("email", "public_profile");
+    private TextView connectMessageView;
     private LoginButton authButton;
     private UiLifecycleHelper uiHelper;
 
@@ -44,21 +47,9 @@ public class FacebookLoginActivity extends BaseActivity {
             }
         });
 
+        connectMessageView = ((TextView)findViewById(R.id.fb_connect_message));
         authButton = (LoginButton) findViewById(R.id.auth_button);
-        authButton.setReadPermissions(Arrays.asList("email", "public_profile"));
-        authButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Session session = Session.getActiveSession();
-                if (session != null && !session.isOpened() && !session.isClosed()) {
-                    session.openForRead(new Session.OpenRequest(FacebookLoginActivity.this)
-                            .setPermissions(Arrays.asList("email", "public_profile"))
-                            .setCallback(callback));
-                } else {
-                    Session.openActiveSession(FacebookLoginActivity.this, true, callback);
-                }
-            }
-        });
+        authButton.setReadPermissions(PERMISSIONS);
 
         uiHelper = new UiLifecycleHelper(this, callback);
         uiHelper.onCreate(savedInstanceState);
@@ -134,7 +125,6 @@ public class FacebookLoginActivity extends BaseActivity {
         uiHelper.onSaveInstanceState(outState);
     }
 
-
     private void up() {
         NavUtils.navigateUpFromSameTask(this);
     }
@@ -143,6 +133,7 @@ public class FacebookLoginActivity extends BaseActivity {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             authButton.setSession(session);
+
             if (state.isOpened()) {
                 Request.newMeRequest(session, new GraphUserCallback() {
                     @Override
@@ -150,9 +141,11 @@ public class FacebookLoginActivity extends BaseActivity {
                         Account account = new Account(getApplicationContext());
                         String email = user.getProperty("email").toString();
                         account.recordFacebookEmail(email);
-                        ((TextView)findViewById(R.id.fb_connect_message)).setText("Logged in as " + email);
+                        connectMessageView.setText("Logged in as " + email);
                     }
                 }).executeAsync();
+            } else {
+                connectMessageView.setText(R.string.ui_connect_facebook);
             }
         }
     };
