@@ -37,10 +37,10 @@ public class OnBoardingActivity extends FragmentActivity {
 
         // TODO: fix these resources with the actual on boarding resources
         private final ViewResources[] viewResourceses = new ViewResources[]{
-                new ViewResources(R.string.ui_connect_facebook, R.drawable.temp_onboard_image),
-                new ViewResources(R.string.ui_referrer_default, R.drawable.temp_onboard_image),
-                new ViewResources(R.string.register_message, R.drawable.temp_onboard_image),
-                new ViewResources(R.string.failed_login, R.drawable.temp_onboard_image),
+                new ViewResources(R.string.ui_connect_facebook, R.drawable.ic_onboarding_map),
+                new ViewResources(R.string.ui_referrer_default, R.drawable.ic_onboarding_city),
+                new ViewResources(R.string.register_message, R.drawable.ic_onboarding_follow),
+                new ViewResources(R.string.failed_login, R.drawable.ic_onboarding_share),
         };
 
         @Override
