@@ -32,6 +32,8 @@
     <string name="ui_referrer">You have helped {0,choice,1#one friend|1&lt;{0} friends} in finding amazing events, thank you!</string>
 
     <!-- Onbaording message -->
+    <string name="onboarding_title">Get Started</string>
+    <string name="onboarding_button_skip">Skip</string>
     <string name="onboarding_map">See events happening right next to you!</string>
     <string name="onboarding_city">Explore the biggest events inventory in your city</string>
     <string name="onboarding_follow">Follow your favorite interests, venues and performers. Never miss an event again.</string>

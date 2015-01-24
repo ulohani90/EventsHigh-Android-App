@@ -18,7 +18,7 @@ public class OnBoardingActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_on_boarding);
+        setContentView(R.layout.activity_onboarding);
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(new Adapter());
@@ -54,7 +54,7 @@ public class OnBoardingActivity extends FragmentActivity {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            View view = getLayoutInflater().inflate(R.layout.viewpager_onboard, container, false);
+            View view = getLayoutInflater().inflate(R.layout.viewpager_onboarding, container, false);
             container.addView(view);
             ImageView imageView = (ImageView) view.findViewById(R.id.image);
             imageView.setImageResource(viewResourceses[position].imageResId);
