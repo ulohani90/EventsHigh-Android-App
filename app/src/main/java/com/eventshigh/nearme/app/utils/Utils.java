@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.utils;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -112,5 +113,9 @@ public class Utils {
                 string.equalsIgnoreCase("unknown")
                 ? null
                 : string);
+    }
+
+    public static int dpToPx(Context context, float dp) {
+        return (int) (dp * context.getResources().getDisplayMetrics().density);
     }
 }
