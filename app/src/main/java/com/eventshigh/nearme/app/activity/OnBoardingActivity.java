@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
@@ -54,6 +55,11 @@ public class OnBoardingActivity extends FragmentActivity implements ViewPager.On
 
     @Override
     public void onPageScrollStateChanged(int state) {
+    }
+
+    public void onSkipClicked(View view) {
+        startActivity(new Intent(this, LaunchActivity.class));
+        finish();
     }
 
     private class Adapter extends PagerAdapter {
