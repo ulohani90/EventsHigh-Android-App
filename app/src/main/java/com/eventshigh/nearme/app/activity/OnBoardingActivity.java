@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.utils.Utils;
 
 public class OnBoardingActivity extends FragmentActivity implements ViewPager.OnPageChangeListener {
@@ -40,6 +41,15 @@ public class OnBoardingActivity extends FragmentActivity implements ViewPager.On
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(new Adapter());
         viewPager.setOnPageChangeListener(this);
+
+        if (!Preferences.getInstance(this).isFirstLaunch()) {
+            startLaunchActivity();
+        }
+    }
+
+    private void startLaunchActivity() {
+        startActivity(new Intent(this, LaunchActivity.class));
+        finish();
     }
 
     @Override
@@ -58,8 +68,8 @@ public class OnBoardingActivity extends FragmentActivity implements ViewPager.On
     }
 
     public void onSkipClicked(View view) {
-        startActivity(new Intent(this, LaunchActivity.class));
-        finish();
+        Preferences.getInstance(this).setPrefFirstLaunch(false);
+        startLaunchActivity();
     }
 
     private class Adapter extends PagerAdapter {

@@ -14,6 +14,7 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_DEFAULT_ACTIVITY = "default_activity";
     public static final String PREF_NOTIFY_WEEKEND = "notifications_weekend";
     public static final String PREF_NOTIFY_NEARBY = "notifications_nearby";
+    public static final String PREF_FIRST_LAUNCH = "first_launch";
 
     private final Context context;
     private final SharedPreferences sharedPreferences;
@@ -47,5 +48,13 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         new BackupManager(context).dataChanged();
+    }
+
+    public void setPrefFirstLaunch(boolean firstLaunch) {
+        sharedPreferences.edit().putBoolean(PREF_FIRST_LAUNCH, firstLaunch).apply();
+    }
+
+    public boolean isFirstLaunch() {
+        return sharedPreferences.getBoolean(PREF_FIRST_LAUNCH, true);
     }
 }
