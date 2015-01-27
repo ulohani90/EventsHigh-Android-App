@@ -387,14 +387,16 @@ public abstract class BaseEventsActivity extends BaseActivity {
             viewPager.setCurrentItem(currentItem);
             final View selectedItem =
                     ((LinearLayout) slidingTab.getChildAt(0)).getChildAt(currentItem);
-            Utils.waitForViewVisible(selectedItem, new Runnable() {
-                @Override
-                public void run() {
-                   if (selectedItem.getLeft() > 100) {
-                       slidingTab.scrollTo(selectedItem.getLeft() - 100, 0);
-                   }
-                }
-            }, 100);
+            if (selectedItem != null) {
+                Utils.waitForViewVisible(selectedItem, new Runnable() {
+                    @Override
+                    public void run() {
+                        if (selectedItem.getLeft() > 100) {
+                            slidingTab.scrollTo(selectedItem.getLeft() - 100, 0);
+                        }
+                    }
+                }, 100);
+            }
         }
 
         // Show on boarding if first time.
@@ -407,7 +409,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
                 onBoardingHelper.next();
             }
-        }, 1000);
+        }, 1500);
     }
 
     private void fetchNewListing() {
