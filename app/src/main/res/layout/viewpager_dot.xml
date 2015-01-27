@@ -3,4 +3,5 @@
     android:layout_margin="4dp"
     android:layout_width="8dp"
     android:src="@drawable/onboarding_viewpager_dot"
-    android:layout_height="8dp" />
+    android:layout_height="8dp"
+/>

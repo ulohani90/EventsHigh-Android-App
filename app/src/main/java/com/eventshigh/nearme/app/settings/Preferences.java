@@ -14,7 +14,7 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_DEFAULT_ACTIVITY = "default_activity";
     public static final String PREF_NOTIFY_WEEKEND = "notifications_weekend";
     public static final String PREF_NOTIFY_NEARBY = "notifications_nearby";
-    public static final String PREF_FIRST_LAUNCH = "first_launch";
+    public static final String PREF_SHOW_ONBOARDING = "show_onboarding";
 
     private final Context context;
     private final SharedPreferences sharedPreferences;
@@ -37,12 +37,20 @@ public class Preferences implements OnSharedPreferenceChangeListener {
         return "maps".equals(sharedPreferences.getString(PREF_DEFAULT_ACTIVITY, ""));
     }
 
-    public boolean notifyWeekend() {
+    public boolean shouldNotifyWeekend() {
         return sharedPreferences.getBoolean(PREF_NOTIFY_WEEKEND, true);
     }
 
-    public boolean notifyNearBy() {
+    public boolean shouldNotifyNearBy() {
         return sharedPreferences.getBoolean(PREF_NOTIFY_NEARBY, true);
+    }
+
+    public void setShowOnboarding(boolean shouldShowOnboarding) {
+        sharedPreferences.edit().putBoolean(PREF_SHOW_ONBOARDING, shouldShowOnboarding).apply();
+    }
+
+    public boolean shouldShowOnBoarding() {
+        return sharedPreferences.getBoolean(PREF_SHOW_ONBOARDING, true);
     }
 
     @Override
@@ -50,11 +58,4 @@ public class Preferences implements OnSharedPreferenceChangeListener {
         new BackupManager(context).dataChanged();
     }
 
-    public void setPrefFirstLaunch(boolean firstLaunch) {
-        sharedPreferences.edit().putBoolean(PREF_FIRST_LAUNCH, firstLaunch).apply();
-    }
-
-    public boolean isFirstLaunch() {
-        return sharedPreferences.getBoolean(PREF_FIRST_LAUNCH, true);
-    }
 }

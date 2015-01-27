@@ -68,7 +68,6 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
                 allTags = new String[]{};
             }
         }
-        Log.w("text", "allTags.size: " + allTags.length);
     }
 
     public static void saveRecentQuery(Context context, String query) {

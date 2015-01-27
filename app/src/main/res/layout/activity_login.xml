@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:gravity="center"
         android:background="?android:attr/selectableItemBackground"
-        android:text="@string/action_skip_login"
+        android:text="@string/action_skip"
         android:clickable="true"
         android:onClick="skip"
         android:padding="@dimen/abc_dropdownitem_text_padding_left"

@@ -26,16 +26,11 @@ android {
         targetSdkVersion 21
         versionCode 44
         versionName "0.4.2"
-
-        buildConfigField "boolean", "SHOW_ONBOARDING", "true"
     }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            // Disable onboarding for release until we are ready.
-            buildConfigField "boolean", "SHOW_ONBOARDING", "false"
         }
     }
 }

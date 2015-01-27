@@ -79,6 +79,13 @@ public class LaunchActivity extends BaseActivity {
             return;
         }
 
+        // We show the onboarding If this is first activity and there was no
+        // location/query passed through intent.
+        if (param.location == null && param.query.isEmpty() && pref.shouldShowOnBoarding()) {
+            startActivity(new Intent(this, OnBoardingActivity.class));
+            return;
+        }
+
         // Register with GCM if needed. GCM is used for notifications messages.
         gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
         gcmRegistration.updateGcmRegistrationIdIfNeeded();

@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.broadcast;
 
+import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -87,8 +88,8 @@ public class GcmIntentService extends IntentService {
 
         final GAHelper gaHelper = GAHelper.getInstance(getApplicationContext());
         Preferences preferences = Preferences.getInstance(getApplicationContext());
-        if ((eventId != null && !preferences.notifyNearBy()) ||
-            (query != null && !preferences.notifyWeekend())) {
+        if ((eventId != null && !preferences.shouldNotifyNearBy()) ||
+            (query != null && !preferences.shouldNotifyWeekend())) {
             Log.w(LOG_TAG, "notification skipped as per user preference");
             gaHelper.reportActionToAnalytics(LOG_TAG, "notificationSkipped", "userPreference", 1);
             return;
@@ -127,6 +128,7 @@ public class GcmIntentService extends IntentService {
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         }
 
+        @SuppressLint("InlinedApi")
         final Notification notification = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.notification)
                 .setContentTitle(title)

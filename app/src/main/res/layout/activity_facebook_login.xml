@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
 >
-
     <ImageView
         android:id="@+id/eh_logo"
         android:layout_width="wrap_content"
@@ -46,7 +45,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:text="@string/action_skip_login"
+        android:text="@string/action_skip"
         android:textAllCaps="true"
     />
 </RelativeLayout>

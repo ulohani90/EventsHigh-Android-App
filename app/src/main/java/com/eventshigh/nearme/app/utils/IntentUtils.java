@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.utils;
 
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.net.Uri;
@@ -19,7 +18,7 @@ public class IntentUtils {
     public static final String EXTRA_LATITUDE_PARAM = IntentUtils.class.getCanonicalName() + "_LAT";
     public static final String EXTRA_LONGITUDE_PARAM = IntentUtils.class.getCanonicalName() + "_LON";
 
-    public static EventFetcherParam processIntent(Activity activity, Intent inIntent) {
+    public static EventFetcherParam processIntent(BaseActivity activity, Intent inIntent) {
         EventFetcherParam param = inIntent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
         if (param == null) {
             param = new EventFetcherParam(null, "");
@@ -37,24 +36,24 @@ public class IntentUtils {
         } else if (Intent.ACTION_VIEW.equals(inIntent.getAction())) {
             utils.processViewIntent(inIntent);
         } else if (BaseActivity.NOTIFICATION_ACTION.equals(inIntent.getAction())) {
-            utils.reportToAnalytics("openNotification");
+            activity.reportActionToAnalytics("openNotification");
             utils.processViewIntent(inIntent);
         }
 
         return utils.param;
     }
 
-    private final Activity activity;
+    private final BaseActivity activity;
     private EventFetcherParam param;
 
-    private IntentUtils(Activity activity, EventFetcherParam param) {
+    private IntentUtils(BaseActivity activity, EventFetcherParam param) {
         this.activity = activity;
         this.param = param;
     }
 
     private void processSearchIntent(Intent inIntent) {
         String query = inIntent.getStringExtra(SearchManager.QUERY);
-        reportToAnalytics("search", query);
+        activity.reportActionToAnalytics("search", query);
 
         Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
         if (appData != null) {
@@ -77,11 +76,11 @@ public class IntentUtils {
             processSearchViewIntent(inUri);
         }
 
-        reportToAnalytics("deepLink", "homepage");
+        activity.reportActionToAnalytics("deepLink", "homepage");
     }
 
     private void processCityViewIntent(Uri webUri) {
-        reportToAnalytics("deepLink", "city");
+        activity.reportActionToAnalytics("deepLink", "city");
 
         try {
             City city = City.valueOf(webUri.getLastPathSegment().toUpperCase());
@@ -92,7 +91,7 @@ public class IntentUtils {
     }
 
     private void processSearchViewIntent(Uri webUri) {
-        reportToAnalytics("deepLink", "search");
+        activity.reportActionToAnalytics("deepLink", "search");
 
         try {
             City city = City.valueOf(webUri.getQueryParameter("city").toUpperCase());
@@ -105,18 +104,5 @@ public class IntentUtils {
         if (query != null) {
             param.query = query;
         }
-    }
-
-    private void reportToAnalytics(String action) {
-        reportToAnalytics(action, "");
-    }
-
-    private void reportToAnalytics(String action, String label) {
-        if (activity instanceof  BaseActivity) {
-            ((BaseActivity) activity).reportActionToAnalytics(action, label);
-        }
-
-        GAHelper.getInstance(activity.getApplicationContext())
-                .reportActionToAnalytics(activity.getClass().getSimpleName(), action, label, 1);
     }
 }
