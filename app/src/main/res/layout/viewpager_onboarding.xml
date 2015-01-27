@@ -23,5 +23,6 @@
         android:gravity="center_horizontal"
         android:layout_marginTop="16dp"
         tools:text="@string/onboarding_city"
+        android:textColor="#444444"
     />
 </LinearLayout>
