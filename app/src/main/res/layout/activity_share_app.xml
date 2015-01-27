@@ -25,7 +25,7 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/eh_logo"
         android:gravity="center"
-        android:text="@string/loading"
+        android:text="@string/ui_referrer_default"
     />
 
     <TextView
