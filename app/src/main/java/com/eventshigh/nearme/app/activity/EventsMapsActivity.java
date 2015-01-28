@@ -273,8 +273,10 @@ public class EventsMapsActivity extends BaseEventsActivity {
             View eventView = eventCardContainer.getChildAt(0);
             Event event = markerManager.getEvent(marker);
             lastSelectedMarker.setIcon(event.category.highlightedIcon());
-            eventView = EventsAdapter.getView(event, EventsMapsActivity.this, eventView, eventCardContainer);
-            eventView.setOnTouchListener(new OnTouchListener() {
+            eventView = EventsAdapter.getView(
+                    event, EventsMapsActivity.this, eventView, eventCardContainer);
+            eventView.setOnTouchListener(
+                    new OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     return gestureDetector.onTouchEvent(event);

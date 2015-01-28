@@ -14,6 +14,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
+import com.eventshigh.nearme.app.user.Personalization;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONException;
@@ -101,8 +102,9 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject eventsJson = new JSONObject(jsonString);
-            return Response.success(Event.parseUpcomingEvents(param, eventsJson),
-                    HttpHeaderParser.parseCacheHeaders(response));
+            return Response.success(
+                Event.parseUpcomingEvents(param, Personalization.getInstance(context), eventsJson),
+                HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JSONException e) {

@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.eventshigh.nearme.app.user.Personalization;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -357,7 +358,8 @@ public class Event implements Parcelable {
     }
 
     public static EventsCollection parseUpcomingEvents(
-            EventFetcherParam param, JSONObject eventsJSON) throws JSONException {
+            EventFetcherParam param, Personalization personalization, JSONObject eventsJSON)
+            throws JSONException {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
         JSONArray whitelistCategoriesJSON = eventsJSON.optJSONArray("categories");
 
@@ -368,16 +370,13 @@ public class Event implements Parcelable {
             }
         }
 
-        EventsCollection.Builder builder = new EventsCollection.Builder(param.city, whitelistCategories);
+        EventsCollection.Builder builder =
+                new EventsCollection.Builder(param.city, personalization, whitelistCategories);
         List<Event> events = fromJSON(param.city, upcomingEvents);
         if (param.location != null) {
-            Collections.sort(events, new EventComparator(param.location));
+            Collections.sort(events, new EventComparator(param.location, personalization));
         }
         return builder.addAllEvent(events).build();
-    }
-
-    public static @Nullable EventCategory getCategoryFromTag(String tag) {
-        return  getCategoryFromCategoryParsableString(toCategoryParsableString(tag));
     }
 
     private static @Nullable EventCategory getCategoryFromCategoryParsableString(String tagU) {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
+                xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -11,7 +11,7 @@
     <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/event_bg"
         android:layout_width="96dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -100,6 +100,7 @@
         android:drawableLeft="@drawable/event_card_place"
         android:fontFamily="sans-serif-medium"
         tools:text="Jagriti theatre, Whitefield"
+        tools:ignore="UnusedAttribute"
     />
 
     <TextView
@@ -120,5 +121,51 @@
         android:drawableLeft="@drawable/event_card_time"
         android:fontFamily="sans-serif-medium"
         tools:text="Sun, 29 Mar at 8:30 pm"
+        tools:ignore="UnusedAttribute"
     />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/event_time"
+        android:baselineAligned="false"
+        android:showDividers="middle"
+        android:divider="@drawable/vertical_divider"
+    >
+        <FrameLayout
+            android:id="@+id/action_favourite"
+            style="@style/EventDetailButton"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+        >
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:drawableLeft="@drawable/ic_favourite_normal"
+                android:drawableStart="@drawable/ic_favourite_normal"
+                android:drawablePadding="4dp"
+                android:text="Favourite"
+            />
+        </FrameLayout>
+        <FrameLayout
+            android:id="@+id/action_dismiss"
+            style="@style/EventDetailButton"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+        >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:drawableLeft="@drawable/ic_dismiss"
+                android:drawableStart="@drawable/ic_dismiss"
+                android:drawablePadding="4dp"
+                android:text="Dismiss"
+            />
+        </FrameLayout>
+    </LinearLayout>
 </RelativeLayout>

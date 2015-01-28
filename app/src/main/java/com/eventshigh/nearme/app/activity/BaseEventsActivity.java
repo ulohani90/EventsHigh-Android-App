@@ -515,7 +515,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             Bundle args = new Bundle();
             ArrayList<Event> eventsToShow = new ArrayList<>();
             eventsToShow.addAll(events.getEvents(i));
-            args.putParcelableArrayList("events", eventsToShow);
+            args.putParcelableArrayList(EventGridFragment.EVENTS_LIST_PARAMETER, eventsToShow);
             fragment.setArguments(args);
             return fragment;
         }
