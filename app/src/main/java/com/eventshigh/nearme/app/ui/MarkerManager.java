@@ -146,7 +146,7 @@ public class MarkerManager {
     // be visible and which one should not be visible. Also few markers are highlighted to
     // give relevance information.
     public boolean updateListingForProjection(Projection projection) {
-        // First find the markers which are withing visible region bound. All other
+        // First find the markers which are within visible region bound. All other
         // markers are marked invisible.
         LatLngBounds bounds = projection.getVisibleRegion().latLngBounds;
         List<Marker> markersInProjection = new ArrayList<>();
@@ -186,7 +186,7 @@ public class MarkerManager {
             // Is this marker too close to other marker? if yes then we do not show it.
             boolean toClose = false;
             for (Pair<Point, Boolean> shownPoint : shownPoints) {
-                // if we have shown the marker as dot, we can reduce the min distance constrain.
+                // if we have shown the marker as dot, we can reduce the min distance constraint.
                 int minDistSq = shownPoint.second ?
                         MIN_MARKER_DISTANCE_SQ :
                         MIN_MARKER_DISTANCE_SQ / 4;
