@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +14,14 @@ import android.widget.GridView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
+import com.eventshigh.nearme.app.user.Personalization;
+import com.eventshigh.nearme.app.user.Personalization.OnEventStateListener;
+import com.eventshigh.nearme.app.user.Personalization.UserEventPref;
 
 import java.util.ArrayList;
 
 public class EventGridFragment extends Fragment {
+    public static final String EVENTS_LIST_PARAMETER = "events";
 
     private EventsGridActivity activity;
     private EventsAdapter eventsAdapter;
@@ -38,7 +43,7 @@ public class EventGridFragment extends Fragment {
         eventGridView.setOnItemClickListener(mOnItemClickListener);
 
         if (getArguments() != null) {
-            ArrayList<Event> events = getArguments().getParcelableArrayList("events");
+            ArrayList<Event> events = getArguments().getParcelableArrayList(EVENTS_LIST_PARAMETER);
             eventsAdapter.clear();
             eventsAdapter.addAll(events);
         }
@@ -48,6 +53,14 @@ public class EventGridFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.activity = (EventsGridActivity) activity;
+
+        Personalization.getInstance(activity).addOnEventStateChangeListener(mOnEventStateListener);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Personalization.getInstance(activity).removeOnEventStateChangeListener(mOnEventStateListener);
     }
 
 
@@ -59,6 +72,24 @@ public class EventGridFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             activity.showEventDetails(eventsAdapter.getItem(position));
+        }
+    };
+
+    private final OnEventStateListener mOnEventStateListener = new OnEventStateListener() {
+        @Override
+        public void onEventStateChange(String eventId, @Nullable UserEventPref pref) {
+            boolean isDismissed = (pref != null && pref == UserEventPref.DISMISSED);
+            if (isDismissed) {
+                for(int i = 0; i < eventsAdapter.getCount(); i++) {
+                    Event event = eventsAdapter.getItem(i);
+                    if (event.id.equals(eventId)) {
+                        eventsAdapter.remove(event);
+                        break;
+                    }
+                }
+            } else {
+                eventsAdapter.notifyDataSetChanged();
+            }
         }
     };
 }

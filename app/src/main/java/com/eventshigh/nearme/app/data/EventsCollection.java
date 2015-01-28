@@ -2,6 +2,8 @@ package com.eventshigh.nearme.app.data;
 
 import android.util.Pair;
 
+import com.eventshigh.nearme.app.user.Personalization;
+import com.eventshigh.nearme.app.user.Personalization.UserEventPref;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
@@ -48,13 +50,15 @@ public class EventsCollection {
     private static final int SOON_THRESHOLD_SEC = 4 * 3600;
 
     public static class Builder {
+        private final Personalization personalization;
         private final Set<String> whiteListedTagCategories;
         private final long nowTimestamp;
         private final long latestByTimestamp;
         private final boolean showStartingSoon;
         private final Map<String, List<Event>> events = new HashMap<>();
 
-        public Builder(City city, Set<String> whiteListedTagCategories) {
+        public Builder(City city, Personalization personalization, Set<String> whiteListedTagCategories) {
+            this.personalization = personalization;
             this.whiteListedTagCategories = whiteListedTagCategories;
             this.nowTimestamp = new Date().getTime();
             latestByTimestamp = nowTimestamp + SOON_THRESHOLD_SEC * 1000L;
@@ -66,8 +70,13 @@ public class EventsCollection {
         }
 
         public Builder addEvent(Event event) {
+            UserEventPref pref = personalization.getPref(event.id);
+            if (Personalization.isDismissed(pref)) {
+                return this;
+            }
+
             addEvent(ALL_EVENTS_CATEGORY, event);
-            if (event.ehRecommended) {
+            if (event.ehRecommended || personalization.isFavourite(pref)) {
                 addEvent(RECOMMENDED_EVENTS_CATEGORY, event);
             }
 

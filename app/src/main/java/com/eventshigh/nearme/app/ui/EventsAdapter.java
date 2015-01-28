@@ -2,8 +2,10 @@ package com.eventshigh.nearme.app.ui;
 
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -13,6 +15,8 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.user.Personalization;
+import com.eventshigh.nearme.app.user.Personalization.UserEventPref;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -43,7 +47,6 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         final EventCard eventCard = new EventCard(view);
 
         // Set the background image.
-        eventCard.bgView.setVisibility(View.VISIBLE);
         Utils.waitForViewVisible(eventCard.bgView, new Runnable() {
             @Override
             public void run() {
@@ -61,6 +64,10 @@ public class EventsAdapter extends ArrayAdapter<Event> {
             }
         }, 100);
 
+        // Check if its a recommended event or not.
+        eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE :
+                View.INVISIBLE);
+
         // Set the title, time etc.
         eventCard.titleView.setText(event.title);
         EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
@@ -71,6 +78,11 @@ public class EventsAdapter extends ArrayAdapter<Event> {
             eventCard.timeView.setText(eventTime.toString());
         }
 
+        // Set the venue.
+        eventCard.venueView.setText(Utils.capitalize(
+                event.venue == null ? event.city.toString() : event.venue));
+
+        // Set num people interested.
         if (event.numPeopleInterested <= 0) {
             eventCard.numPeopleInterestedView.setVisibility(View.GONE);
         } else {
@@ -79,32 +91,56 @@ public class EventsAdapter extends ArrayAdapter<Event> {
                     Integer.toString(event.numPeopleInterested));
         }
 
-        // Set the venue.
-        eventCard.venueView.setText(Utils.capitalize(
-                event.venue == null ? event.city.toString() : event.venue));
+        // Set actions handlers.
+        final Personalization personalization = Personalization.getInstance(activity);
+        setFavouriteView(eventCard, personalization.getPref(event.id));
+        eventCard.favouriteView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UserEventPref pref = personalization.getPref(event.id);
+                UserEventPref newPref = Personalization.isFavourite(pref) ? null : UserEventPref.LIKED;
 
-        // Check if its recommended event.
-        eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE :
-                View.INVISIBLE);
+                personalization.recordPref(event.id, newPref);
+                setFavouriteView(eventCard, newPref);
+            }
+        });
+
+        eventCard.dismissView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                personalization.recordPref(event.id, UserEventPref.DISMISSED);
+            }
+        });
 
         return view;
     }
 
-    public static class EventCard {
+    private static class EventCard {
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
         private final TextView titleView;
-        private final TextView venueView;
         private final TextView timeView;
+        private final TextView venueView;
         private final TextView numPeopleInterestedView;
+        private final FrameLayout favouriteView;
+        private final FrameLayout dismissView;
 
         private EventCard(View cardView) {
             bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
             recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
             titleView = (TextView) cardView.findViewById(R.id.event_title);
-            venueView = (TextView) cardView.findViewById(R.id.event_venue);
             timeView = (TextView) cardView.findViewById(R.id.event_time);
+            venueView = (TextView) cardView.findViewById(R.id.event_venue);
             numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
+            favouriteView = (FrameLayout) cardView.findViewById(R.id.action_favourite);
+            dismissView = (FrameLayout) cardView.findViewById(R.id.action_dismiss);
         }
+    }
+
+    private static void setFavouriteView(EventCard eventCard, @Nullable UserEventPref pref) {
+        int resId = (pref != null && pref == UserEventPref.LIKED) ?
+                R.drawable.ic_favourite_active : R.drawable.ic_favourite_normal;
+        ((TextView) eventCard.favouriteView.getChildAt(0))
+                .setCompoundDrawablesWithIntrinsicBounds(resId, 0, 0, 0);
     }
 }
