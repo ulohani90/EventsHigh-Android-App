@@ -49,10 +49,37 @@ public enum EventCategory {
         return icon;
     }
 
+    /**
+     * Get the highlighted (when the user taps on the marker on the map to see details of the event)
+     * icon associated with this category.
+     *
+     * @return an BitmapDescriptor for Icon.
+     */
+    public BitmapDescriptor highlightedIcon() {
+        BitmapDescriptor icon = CATEGORY_HIGHLIGHTED_ICONS.get(this);
+        if (icon == null) {
+            icon = BitmapDescriptorFactory.fromResource(getHighlightedIconResourceId());
+            CATEGORY_HIGHLIGHTED_ICONS.put(this, icon);
+        }
+        return icon;
+    }
+
     public int getIconResourceId() {
         int resId = R.drawable.icon_other;
         try {
             resId = R.drawable.class.getField("icon_" + toString().toLowerCase()).getInt(null);
+        } catch (IllegalAccessException| NoSuchFieldException e) {
+            // Ignore
+        }
+
+        return resId;
+    }
+
+    public int getHighlightedIconResourceId() {
+        int resId = R.drawable.icon_other_rec;
+        try {
+            resId = R.drawable.class.getField("icon_" + toString().toLowerCase() + "_rec")
+                    .getInt(null);
         } catch (IllegalAccessException| NoSuchFieldException e) {
             // Ignore
         }
@@ -70,4 +97,6 @@ public enum EventCategory {
 
     private static BitmapDescriptor CIRCLE_ICON;
     private static final Map<EventCategory, BitmapDescriptor> CATEGORY_ICONS = new HashMap<>();
+    private static final Map<EventCategory, BitmapDescriptor> CATEGORY_HIGHLIGHTED_ICONS =
+            new HashMap<>();
 }

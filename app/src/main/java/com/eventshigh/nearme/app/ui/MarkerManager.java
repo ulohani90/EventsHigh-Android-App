@@ -45,7 +45,7 @@ public class MarkerManager {
     // To avoid cluttering, we do not show mark er for event if it happens to be within
     // small distance from other event. This parameter controls that distance as measured
     // in screen units.
-    private static final int MIN_MARKER_DISTANCE_SQ = 3000;
+    private static final int MIN_MARKER_DISTANCE_SQ = 5000;
 
     // When events are loaded, we zoom out if there are not enough events shown on map.
     private static final int MIN_EVENTS_TO_SHOW = 3;
