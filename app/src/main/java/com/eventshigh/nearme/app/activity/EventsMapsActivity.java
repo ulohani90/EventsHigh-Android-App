@@ -267,29 +267,19 @@ public class EventsMapsActivity extends BaseEventsActivity {
             if (latLng != null) {
                 reportActionToAnalytics("onMapClick");
             }
-            resetLastSelectedMarkerIcon();
             lastSelectedMarker = null;
             eventCardContainer.removeAllViews();
         }
     };
-
-    private void resetLastSelectedMarkerIcon() {
-        if (lastSelectedMarker != null) {
-            Event event = markerManager.getEvent(lastSelectedMarker);
-            lastSelectedMarker.setIcon(event.category.icon());
-        }
-    }
 
     private OnMarkerClickListener mOnMarkerClickListener = new OnMarkerClickListener() {
         @Override
         public boolean onMarkerClick(Marker marker) {
             reportActionToAnalytics("onMarkerClick");
 
-            resetLastSelectedMarkerIcon();
             lastSelectedMarker = marker;
             View eventView = eventCardContainer.getChildAt(0);
             Event event = markerManager.getEvent(marker);
-            lastSelectedMarker.setIcon(event.category.highlightedIcon());
             eventView = EventsAdapter.getView(
                     event, EventsMapsActivity.this, eventView, eventCardContainer);
             eventView.setOnTouchListener(

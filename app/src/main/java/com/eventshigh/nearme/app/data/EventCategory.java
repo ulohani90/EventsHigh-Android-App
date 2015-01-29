@@ -50,16 +50,16 @@ public enum EventCategory {
     }
 
     /**
-     * Get the highlighted (when the user taps on the marker on the map to see details of the event)
-     * icon associated with this category.
+     * Get the recommendation icon (used when showing recommended events on the map) associated
+     * with this category.
      *
      * @return an BitmapDescriptor for Icon.
      */
-    public BitmapDescriptor highlightedIcon() {
-        BitmapDescriptor icon = CATEGORY_HIGHLIGHTED_ICONS.get(this);
+    public BitmapDescriptor recommendationIcon() {
+        BitmapDescriptor icon = CATEGORY_RECOMMENDATION_ICONS.get(this);
         if (icon == null) {
             icon = BitmapDescriptorFactory.fromResource(getHighlightedIconResourceId());
-            CATEGORY_HIGHLIGHTED_ICONS.put(this, icon);
+            CATEGORY_RECOMMENDATION_ICONS.put(this, icon);
         }
         return icon;
     }
@@ -97,6 +97,6 @@ public enum EventCategory {
 
     private static BitmapDescriptor CIRCLE_ICON;
     private static final Map<EventCategory, BitmapDescriptor> CATEGORY_ICONS = new HashMap<>();
-    private static final Map<EventCategory, BitmapDescriptor> CATEGORY_HIGHLIGHTED_ICONS =
+    private static final Map<EventCategory, BitmapDescriptor> CATEGORY_RECOMMENDATION_ICONS =
             new HashMap<>();
 }
