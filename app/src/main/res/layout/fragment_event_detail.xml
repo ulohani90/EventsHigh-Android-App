@@ -42,11 +42,50 @@
                     android:id="@+id/eh_recommend_banner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_margin="16dp"
                     android:src="@drawable/eh_recommend"
                     android:adjustViewBounds="true"
-                    android:layout_gravity="bottom"
-                    android:layout_margin="@dimen/abc_action_bar_icon_vertical_padding_material"
                     tools:ignore="ContentDescription"
+                />
+                <TextView
+                    android:id="@+id/action_favourited"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center|bottom"
+                    android:layout_margin="16dp"
+                    android:drawableLeft="@drawable/ic_favourite_active"
+                    android:drawableStart="@drawable/ic_favourite_active"
+                    android:drawablePadding="4dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:text="@string/ui_favourited"
+                    android:textColor="@android:color/holo_red_dark"
+                />
+                <TextView
+                    android:id="@+id/action_favourite"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center|bottom"
+                    android:layout_margin="16dp"
+                    android:drawableLeft="@drawable/ic_favourite_normal_white"
+                    android:drawableStart="@drawable/ic_favourite_normal_white"
+                    android:drawablePadding="4dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:text="@string/ui_favourited"
+                    android:textColor="@android:color/white"
+                />
+                <TextView
+                    android:id="@+id/action_dismiss"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="end|bottom"
+                    android:layout_margin="16dp"
+                    android:drawableLeft="@drawable/ic_dismiss_white"
+                    android:drawableStart="@drawable/ic_dismiss_white"
+                    android:drawablePadding="4dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:text="@string/ui_dismiss"
+                    android:textColor="@android:color/white"
                 />
             </FrameLayout>
 

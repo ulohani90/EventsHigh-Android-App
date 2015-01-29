@@ -9,6 +9,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -32,6 +33,8 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.user.Personalization;
+import com.eventshigh.nearme.app.user.Personalization.UserEventPref;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -120,10 +123,14 @@ public class EventDetailFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_event_detail, container, false);
 
-        // Populate View.
+        // Populate View card.
         eventCard = new EventCard(rootView);
-        populateView();
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        populateView();
     }
 
     public void onAttach(final Activity activity) {
@@ -225,8 +232,12 @@ public class EventDetailFragment extends Fragment {
         private final View rootView;
         private final View shareContentsView;
 
-        private final ImageView recommendedImageView;
         private final NetworkImageView bgView;
+        private final ImageView recommendedImageView;
+        private final TextView favouriteView;
+        private final TextView favouritedView;
+        private final TextView dismissView;
+
         private final TextView titleView;
         private final TextView fromView;
 
@@ -264,6 +275,9 @@ public class EventDetailFragment extends Fragment {
 
             recommendedImageView = (ImageView) rootView.findViewById(R.id.eh_recommend_banner);
             bgView = (NetworkImageView) rootView.findViewById(R.id.event_bg);
+            favouriteView = (TextView) rootView.findViewById(R.id.action_favourite);
+            favouritedView = (TextView) rootView.findViewById(R.id.action_favourited);
+            dismissView = (TextView) rootView.findViewById(R.id.action_dismiss);
 
             titleView = (TextView) rootView.findViewById(R.id.event_title);
             fromView = (TextView) rootView.findViewById(R.id.event_from);
@@ -341,6 +355,34 @@ public class EventDetailFragment extends Fragment {
             });
         }
 
+        // Set EH recommendation and favourite views.
+        eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
+        final Personalization personalization = Personalization.getInstance(activity);
+        setFavouriteView(eventCard, personalization.getPref(event.id));
+        eventCard.favouriteView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                personalization.recordPref(event.id, UserEventPref.LIKED);
+                setFavouriteView(eventCard, UserEventPref.LIKED);
+            }
+        });
+        eventCard.favouritedView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                personalization.recordPref(event.id, null);
+                setFavouriteView(eventCard, null);
+            }
+        });
+
+        eventCard.dismissView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                personalization.recordPref(event.id, UserEventPref.DISMISSED);
+                activity.finish();
+                activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
+        });
+
         // Set title
         eventCard.titleView.setText(event.title);
         eventCard.titleView.setOnClickListener(new OnClickListener() {
@@ -353,9 +395,6 @@ public class EventDetailFragment extends Fragment {
                 }
             }
         });
-
-        // Set EH recommendation banner
-        eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
 
         // Set Num people Interested
         final ActionBar actionBar = getActivity().getActionBar();
@@ -618,4 +657,11 @@ public class EventDetailFragment extends Fragment {
         layoutParams.setMargins(0, 0 , margin, 0);
         return layoutParams;
     }
+
+    public static void setFavouriteView(EventCard eventCard, @Nullable UserEventPref pref) {
+        boolean isFavourite = UserEventPref.isFavourite(pref);
+        eventCard.favouritedView.setVisibility(isFavourite ? View.VISIBLE : View.GONE);
+        eventCard.favouriteView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
+    }
+
 }
