@@ -65,8 +65,8 @@
 
     <!-- formatting -->
     <plurals name="people_interested">
-        <item quantity="one">One person interested.</item>
-        <item quantity="other">%,d people interested.</item>
+        <item quantity="one">One person interested</item>
+        <item quantity="other">%,d people interested</item>
     </plurals>
     <string name="event_time_details">{0,choice,0#Happening Today|1#Happening Tomorrow|1&lt;{0} days from now}</string>
     <string name="event_detail_from">Event details from: %s</string>
