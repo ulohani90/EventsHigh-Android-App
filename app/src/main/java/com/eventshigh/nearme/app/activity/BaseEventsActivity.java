@@ -362,6 +362,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         EventCollectionPagerAdapter adapter =
                 new EventCollectionPagerAdapter(getSupportFragmentManager(), events);
         viewPager.setAdapter(adapter);
+        slidingTab.setCustomTabView(R.layout.tab_title, R.id.tab_title);
         slidingTab.setViewPager(viewPager);
         slidingTab.setOnPageChangeListener(adapter);
 
