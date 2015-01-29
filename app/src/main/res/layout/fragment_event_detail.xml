@@ -326,9 +326,10 @@
             style="@style/EventDetailHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/ui_organizer"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
+            android:text="@string/ui_organizer"
+            android:textAllCaps="true"
         />
         <LinearLayout
             android:id="@+id/organizer_name_row"

@@ -134,11 +134,31 @@
         android:divider="@drawable/vertical_divider"
     >
         <FrameLayout
+            android:id="@+id/action_favourited"
+            style="@style/EventDetailButton"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:padding="10dp"
+            >
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:drawableLeft="@drawable/ic_favourite_active"
+                android:drawableStart="@drawable/ic_favourite_active"
+                android:drawablePadding="4dp"
+                android:text="@string/ui_favourited"
+                android:textColor="@android:color/holo_red_dark"
+            />
+        </FrameLayout>
+        <FrameLayout
             android:id="@+id/action_favourite"
             style="@style/EventDetailButton"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="1"
+            android:padding="10dp"
         >
             <TextView
                 android:layout_height="wrap_content"
@@ -147,7 +167,7 @@
                 android:drawableLeft="@drawable/ic_favourite_normal"
                 android:drawableStart="@drawable/ic_favourite_normal"
                 android:drawablePadding="4dp"
-                android:text="Favourite"
+                android:text="@string/ui_favourite"
             />
         </FrameLayout>
         <FrameLayout
@@ -156,6 +176,7 @@
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="1"
+            android:padding="10dp"
         >
             <TextView
                 android:layout_width="wrap_content"
@@ -164,7 +185,7 @@
                 android:drawableLeft="@drawable/ic_dismiss"
                 android:drawableStart="@drawable/ic_dismiss"
                 android:drawablePadding="4dp"
-                android:text="Dismiss"
+                android:text="@string/ui_dismiss"
             />
         </FrameLayout>
     </LinearLayout>
