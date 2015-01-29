@@ -123,6 +123,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         private final TextView venueView;
         private final TextView numPeopleInterestedView;
         private final FrameLayout favouriteView;
+        private final FrameLayout favouritedView;
         private final FrameLayout dismissView;
 
         private EventCard(View cardView) {
@@ -133,14 +134,14 @@ public class EventsAdapter extends ArrayAdapter<Event> {
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
             favouriteView = (FrameLayout) cardView.findViewById(R.id.action_favourite);
+            favouritedView = (FrameLayout) cardView.findViewById(R.id.action_favourited);
             dismissView = (FrameLayout) cardView.findViewById(R.id.action_dismiss);
         }
     }
 
     private static void setFavouriteView(EventCard eventCard, @Nullable UserEventPref pref) {
-        int resId = (pref != null && pref == UserEventPref.LIKED) ?
-                R.drawable.ic_favourite_active : R.drawable.ic_favourite_normal;
-        ((TextView) eventCard.favouriteView.getChildAt(0))
-                .setCompoundDrawablesWithIntrinsicBounds(resId, 0, 0, 0);
+        boolean isFavourite = Personalization.isFavourite(pref);
+        eventCard.favouritedView.setVisibility(isFavourite ? View.VISIBLE : View.GONE);
+        eventCard.favouriteView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
     }
 }
