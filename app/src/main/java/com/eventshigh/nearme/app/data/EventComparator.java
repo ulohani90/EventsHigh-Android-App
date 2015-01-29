@@ -43,14 +43,14 @@ public class EventComparator implements Comparator<Event> {
         }
 
         return Double.compare(
-                weightedDistance(lhs, userLocation, eventToDistanceMap),
-                weightedDistance(rhs, userLocation, eventToDistanceMap)
+                weightedDistance(lhs, personalization.isFavourite(lhs.id), userLocation, eventToDistanceMap),
+                weightedDistance(rhs, personalization.isFavourite(rhs.id), userLocation, eventToDistanceMap)
         );
     }
 
     // Find the distance of events from user's position with weight for popular events.
     // If event has e**N users going, we reduce 500*N meters from its distance.
-    private static double weightedDistance(Event event, LatLng userLocation,
+    private static double weightedDistance(Event event, boolean isFavourite, LatLng userLocation,
                                            Map<String, Double> eventToDistanceMap) {
         Double result = eventToDistanceMap.get(event.id);
         if (result != null) {
@@ -59,7 +59,7 @@ public class EventComparator implements Comparator<Event> {
 
         float distance = LocationUtils.distanceInMeters(event.location, userLocation);
         double weight = (event.numPeopleInterested > 0 ? Math.log(event.numPeopleInterested) * 500 : 0)
-                + (event.ehRecommended ? 1000 : 0) ;
+                + (event.ehRecommended || isFavourite ? 1000 : 0) ;
         double weightedDistance = distance - weight;
         eventToDistanceMap.put(event.id, weightedDistance);
         return weightedDistance;

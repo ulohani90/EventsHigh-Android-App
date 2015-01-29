@@ -71,12 +71,12 @@ public class EventsCollection {
 
         public Builder addEvent(Event event) {
             UserEventPref pref = personalization.getPref(event.id);
-            if (Personalization.isDismissed(pref)) {
+            if (UserEventPref.isDismissed(pref)) {
                 return this;
             }
 
             addEvent(ALL_EVENTS_CATEGORY, event);
-            if (event.ehRecommended || personalization.isFavourite(pref)) {
+            if (event.ehRecommended || UserEventPref.isFavourite(pref)) {
                 addEvent(RECOMMENDED_EVENTS_CATEGORY, event);
             }
 

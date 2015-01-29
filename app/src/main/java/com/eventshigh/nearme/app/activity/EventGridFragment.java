@@ -15,7 +15,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.user.Personalization;
-import com.eventshigh.nearme.app.user.Personalization.OnEventStateListener;
+import com.eventshigh.nearme.app.user.Personalization.OnEventStateChangeListener;
 import com.eventshigh.nearme.app.user.Personalization.UserEventPref;
 
 import java.util.ArrayList;
@@ -38,29 +38,31 @@ public class EventGridFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         GridView eventGridView = (GridView) view.findViewById(R.id.event_grid);
-        eventsAdapter = new EventsAdapter(activity);
         eventGridView.setAdapter(eventsAdapter);
         eventGridView.setOnItemClickListener(mOnItemClickListener);
-
-        if (getArguments() != null) {
-            ArrayList<Event> events = getArguments().getParcelableArrayList(EVENTS_LIST_PARAMETER);
-            eventsAdapter.clear();
-            eventsAdapter.addAll(events);
-        }
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.activity = (EventsGridActivity) activity;
 
-        Personalization.getInstance(activity).addOnEventStateChangeListener(mOnEventStateListener);
+        this.activity = (EventsGridActivity) activity;
+        eventsAdapter = new EventsAdapter(this.activity);
+        if (getArguments() != null) {
+            ArrayList<Event> events = getArguments().getParcelableArrayList(EVENTS_LIST_PARAMETER);
+            eventsAdapter.addAll(events);
+        }
+
+        // Add listener to remove dismissed events.
+        Personalization.getInstance(activity)
+                .addOnEventStateChangeListener(mOnEventStateChangeListener);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        Personalization.getInstance(activity).removeOnEventStateChangeListener(mOnEventStateListener);
+        Personalization.getInstance(activity)
+                .removeOnEventStateChangeListener(mOnEventStateChangeListener);
     }
 
 
@@ -75,11 +77,10 @@ public class EventGridFragment extends Fragment {
         }
     };
 
-    private final OnEventStateListener mOnEventStateListener = new OnEventStateListener() {
+    private final OnEventStateChangeListener mOnEventStateChangeListener = new OnEventStateChangeListener() {
         @Override
         public void onEventStateChange(String eventId, @Nullable UserEventPref pref) {
-            boolean isDismissed = (pref != null && pref == UserEventPref.DISMISSED);
-            if (isDismissed) {
+            if (UserEventPref.isDismissed(pref)) {
                 for(int i = 0; i < eventsAdapter.getCount(); i++) {
                     Event event = eventsAdapter.getItem(i);
                     if (event.id.equals(eventId)) {

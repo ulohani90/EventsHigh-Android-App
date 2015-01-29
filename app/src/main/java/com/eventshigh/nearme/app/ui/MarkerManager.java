@@ -7,6 +7,7 @@ import android.util.Pair;
 import com.eventshigh.nearme.app.activity.EventsMapsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
+import com.eventshigh.nearme.app.user.Personalization;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,8 +22,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Manages the markers on {@link com.google.android.gms.maps.GoogleMap} for events.
@@ -83,12 +87,33 @@ public class MarkerManager {
         return markers.get(marker).event;
     }
 
-    public void setEvents(GoogleMap map, List<Event> events) {
+    public void removeEvent(String eventId) {
+        for (Map.Entry<Marker, MarkerInfo> entry : markers.entrySet()) {
+            if (entry.getValue().event.id.equals(eventId)) {
+                entry.getKey().setVisible(false);
+                entry.getKey().remove();
+                markers.remove(entry.getKey());
+                break;
+            }
+        }
+    }
+
+    // Remove dismissed events.
+    public void removeDismissedEvents(Personalization personalization) {
+        for(Iterator<Entry<Marker, MarkerInfo>> it = markers.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<Marker, MarkerInfo> entry = it.next();
+            if (personalization.isDismissed(entry.getValue().event.id)) {
+                it.remove();
+            }
+        }
+    }
+
+    public void setEvents(GoogleMap map, Personalization personalization, List<Event> events) {
         map.clear();
         markers.clear();
 
         for(Event event : events) {
-            if (event.location == null) {
+            if (event.location == null || personalization.isDismissed(event.id)) {
                 continue;
             }
 

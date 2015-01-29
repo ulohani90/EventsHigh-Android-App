@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
@@ -15,6 +16,9 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.MarkerManager;
+import com.eventshigh.nearme.app.user.Personalization;
+import com.eventshigh.nearme.app.user.Personalization.OnEventStateChangeListener;
+import com.eventshigh.nearme.app.user.Personalization.UserEventPref;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
@@ -81,10 +85,30 @@ public class EventsMapsActivity extends BaseEventsActivity {
         View mapsView = getLayoutInflater().inflate(R.layout.activity_maps, parent, false);
         pager.setVisibility(View.GONE);
         parent.addView(mapsView, pager.getLayoutParams());
-        setUpMapIfNeeded();
+        setUpMap();
         setupGestureDetectorIfNeeded();
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Personalization.getInstance(this)
+                .removeOnEventStateChangeListener(mOnEventStateChangeListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Personalization personalization = Personalization.getInstance(this);
+        markerManager.removeDismissedEvents(personalization);
+        personalization.addOnEventStateChangeListener(mOnEventStateChangeListener);
+    }
+
+
+    // ***********************
+    // Delegated Methods from {@link BaseEventsActivity}
+    // ***********************
 
     protected boolean showLocationInActionBar() {
         return false;
@@ -105,27 +129,44 @@ public class EventsMapsActivity extends BaseEventsActivity {
         return new Fragment();
     }
 
+    @Override
+    protected void updateEventListing(final List<Event> events) {
+        mOnMapClickListener.onMapClick(null);
+        markerManager.setEvents(map, Personalization.getInstance(this), events);
+        super.updateEventListing(events);
+    }
+
+    @Override
+    protected void updateUserLocation(LatLng userLocation) {
+        isAppMovement = true;
+        map.animateCamera(
+                CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.builder()
+                                .target(userLocation)
+                                .zoom(Math.max(map.getCameraPosition().zoom, DEFAULT_ZOOM_LEVEL))
+                                .build()
+                )
+        );
+    }
+
 
     // ***********************
     // Setup Helper Methods
     // ***********************
 
-    private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (map == null) {
-            // Try to obtain the map from the SupportMapFragment.
-            map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+    private void setUpMap() {
+        // Try to obtain the map from the SupportMapFragment.
+        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 
-            // Check if we were successful in obtaining the map.
-            if (map != null) {
-                map.setMyLocationEnabled(true);
-                map.setOnCameraChangeListener(mOnCameraChangeListener);
-                map.setOnMarkerClickListener(mOnMarkerClickListener);
-                map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
-                map.setOnMapClickListener(mOnMapClickListener);
+        // Check if we were successful in obtaining the map.
+        if (map != null) {
+            map.setMyLocationEnabled(true);
+            map.setOnCameraChangeListener(mOnCameraChangeListener);
+            map.setOnMarkerClickListener(mOnMarkerClickListener);
+            map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
+            map.setOnMapClickListener(mOnMapClickListener);
 
-                MapsInitializer.initialize(this);
-            }
+            MapsInitializer.initialize(this);
         }
     }
 
@@ -167,30 +208,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
                 }
             });
         }
-    }
-
-    // ***********************
-    // Other Helper Methods
-    // ***********************
-
-    @Override
-    protected void updateEventListing(final List<Event> events) {
-        mOnMapClickListener.onMapClick(null);
-        markerManager.setEvents(map, events);
-        super.updateEventListing(events);
-    }
-
-    @Override
-    protected void updateUserLocation(LatLng userLocation) {
-        isAppMovement = true;
-        map.animateCamera(
-            CameraUpdateFactory.newCameraPosition(
-                CameraPosition.builder()
-                    .target(userLocation)
-                    .zoom(Math.max(map.getCameraPosition().zoom, DEFAULT_ZOOM_LEVEL))
-                    .build()
-            )
-        );
     }
 
     /**
@@ -293,6 +310,20 @@ public class EventsMapsActivity extends BaseEventsActivity {
         @Override
         public void onInfoWindowClick(Marker marker) {
             showEventDetails(markerManager.getEvent(marker));
+        }
+    };
+
+    private OnEventStateChangeListener mOnEventStateChangeListener = new OnEventStateChangeListener() {
+        @Override
+        public void onEventStateChange(String eventId, @Nullable UserEventPref pref) {
+            if (UserEventPref.isDismissed(pref)) {
+                if (lastSelectedMarker != null &&
+                        markerManager.getEvent(lastSelectedMarker).id.equals(eventId)) {
+                    mOnMapClickListener.onMapClick(null);
+                }
+
+                markerManager.removeEvent(eventId);
+            }
         }
     };
 }

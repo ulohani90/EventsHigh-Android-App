@@ -21,6 +21,8 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
 
+import java.util.Collection;
+
 /**
  * An {@link android.widget.ListAdapter} which can be used to populate the Event card.
  */
@@ -35,6 +37,12 @@ public class EventsAdapter extends ArrayAdapter<Event> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         return getView(getItem(position), activity, convertView, parent);
+    }
+
+    @Override
+    public void addAll(Collection<? extends Event> collection) {
+        Personalization.getInstance(activity).filterDismissed(collection);
+        super.addAll(collection);
     }
 
     // Build the view, reuse existing if possible.
@@ -97,11 +105,16 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         eventCard.favouriteView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                UserEventPref pref = personalization.getPref(event.id);
-                UserEventPref newPref = Personalization.isFavourite(pref) ? null : UserEventPref.LIKED;
+                personalization.recordPref(event.id, UserEventPref.LIKED);
+                setFavouriteView(eventCard, UserEventPref.LIKED);
+            }
+        });
 
-                personalization.recordPref(event.id, newPref);
-                setFavouriteView(eventCard, newPref);
+        eventCard.favouritedView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                personalization.recordPref(event.id, null);
+                setFavouriteView(eventCard, null);
             }
         });
 
@@ -139,8 +152,8 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         }
     }
 
-    private static void setFavouriteView(EventCard eventCard, @Nullable UserEventPref pref) {
-        boolean isFavourite = Personalization.isFavourite(pref);
+    public static void setFavouriteView(EventCard eventCard, @Nullable UserEventPref pref) {
+        boolean isFavourite = UserEventPref.isFavourite(pref);
         eventCard.favouritedView.setVisibility(isFavourite ? View.VISIBLE : View.GONE);
         eventCard.favouriteView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
     }
