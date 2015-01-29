@@ -20,7 +20,6 @@
         style="@style/EventDetailText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:typeface="serif"
         android:textSize="@dimen/abc_text_size_caption_material"
         tools:text="9:30 am"
     />

@@ -131,6 +131,7 @@
         android:layout_below="@id/event_time"
         android:baselineAligned="false"
         android:showDividers="middle"
+        android:background="#F2F2F2"
         android:divider="@drawable/vertical_divider"
     >
         <FrameLayout

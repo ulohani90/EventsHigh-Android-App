@@ -128,7 +128,6 @@
                     android:layout_alignParentRight="true"
                     android:layout_toRightOf="@+id/event_venue_icon"
                     android:layout_toEndOf="@+id/event_venue_icon"
-                    android:typeface="serif"
                     android:textSize="@dimen/abc_text_size_caption_material"
                     tools:text="Near Hoodi circle, Whitefield, Bangalore, 560037."
                 />
@@ -176,7 +175,6 @@
                         style="@style/EventDetailText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:typeface="serif"
                         android:textSize="@dimen/abc_text_size_caption_material"
                         tools:text="2 days from now"
                     />
