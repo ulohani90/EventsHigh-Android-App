@@ -4,6 +4,9 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -22,12 +25,18 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * An {@link android.widget.ListAdapter} which can be used to populate the Event card.
  */
 public class EventsAdapter extends ArrayAdapter<Event> {
     private final BaseEventsActivity activity;
+    private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
+    private final Set<Integer> usedItemIds = new HashSet<>();
 
     public EventsAdapter(BaseEventsActivity activity) {
         super(activity, R.layout.event_card, R.id.event_title);
@@ -43,6 +52,28 @@ public class EventsAdapter extends ArrayAdapter<Event> {
     public void addAll(Collection<? extends Event> collection) {
         Personalization.getInstance(activity).filterDismissed(collection);
         super.addAll(collection);
+    }
+
+    public boolean hasStableIds() {
+        return true;
+    }
+
+    public long getItemId(int position) {
+        return getItemId(getItem(position).id);
+    }
+
+    private int getItemId(String eventId) {
+        Integer itemID = eventIdToItemIdMap.get(eventId);
+        if (itemID != null) {
+            return itemID;
+        }
+
+        for (int id = eventId.hashCode(); ; id++) {
+            if (usedItemIds.add(id)) {
+                eventIdToItemIdMap.put(eventId, id);
+                return id;
+            }
+        }
     }
 
     // Build the view, reuse existing if possible.
@@ -121,7 +152,26 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         eventCard.dismissView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                personalization.recordPref(event.id, UserEventPref.DISMISSED);
+                Animation anim = AnimationUtils.loadAnimation(activity, android.R.anim.fade_out);
+                anim.setDuration(1000);
+                anim.setAnimationListener(new AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                        // do nothing.
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        // Report the dismiss and let list refresh.
+                        personalization.recordPref(event.id, UserEventPref.DISMISSED);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+                        // do nothing.
+                    }
+                });
+                view.startAnimation(anim);
             }
         });
 
