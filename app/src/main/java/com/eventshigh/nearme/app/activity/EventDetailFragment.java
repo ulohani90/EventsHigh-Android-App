@@ -256,7 +256,7 @@ public class EventDetailFragment extends Fragment {
         private final TextView addressView;
 
         private final LinearLayout timeGroupView;
-        private final LinearLayout eventTimeFirstView;
+        private final RelativeLayout eventTimeFirstView;
         private final TextView timeView;
         private final TextView timeDetailView;
         private final TextView alsoOnView;
@@ -297,7 +297,7 @@ public class EventDetailFragment extends Fragment {
             addressView = (TextView) rootView.findViewById(R.id.event_address);
 
             timeGroupView = (LinearLayout) rootView.findViewById(R.id.event_time_group);
-            eventTimeFirstView = (LinearLayout) rootView.findViewById(R.id.event_time_first);
+            eventTimeFirstView = (RelativeLayout) rootView.findViewById(R.id.event_time_first);
             timeView = (TextView) rootView.findViewById(R.id.event_time);
             timeDetailView = (TextView) rootView.findViewById(R.id.event_time_details);
             alsoOnView = (TextView) rootView.findViewById(R.id.also_on);
