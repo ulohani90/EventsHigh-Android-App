@@ -12,15 +12,16 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -140,6 +141,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         eventCard.favouriteView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                activity.reportActionToAnalytics("addFavourite");
                 eventsMarkerEditor.recordPref(event.id, EventMark.FAVOURITE);
                 setFavouriteView(eventCard, EventMark.FAVOURITE);
             }
@@ -148,6 +150,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         eventCard.favouritedView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                activity.reportActionToAnalytics("removeFavourite");
                 eventsMarkerEditor.recordPref(event.id, null);
                 setFavouriteView(eventCard, null);
             }
@@ -156,6 +159,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         eventCard.dismissView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                activity.reportActionToAnalytics("dismiss");
                 Animation anim = AnimationUtils.loadAnimation(activity, android.R.anim.fade_out);
                 anim.setDuration(500);
                 anim.setAnimationListener(new AnimationListener() {
@@ -168,6 +172,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
                     public void onAnimationEnd(Animation animation) {
                         // Report the dismiss and let list refresh.
                         eventsMarkerEditor.recordPref(event.id, EventMark.DISMISSED);
+                        Toast.makeText(activity, R.string.message_dismiss, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override

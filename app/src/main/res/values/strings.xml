@@ -49,6 +49,7 @@
     <string name="zoom">Please zoom in to see interesting events!</string>
     <string name="ask_locality">Enter the locality, city</string>
     <string name="message_share_app">Share this app with your friends?</string>
+    <string name="message_dismiss">Event removed. This will improve your recommendations.</string>
 
     <!-- Failed messages -->
     <string name="failed_login">Failed to login! You can retry or skip.</string>
