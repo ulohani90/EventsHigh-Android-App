@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Pair;
@@ -46,6 +45,7 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.example.android.common.view.SlidingTabLayout;
+import com.example.android.common.view.SlidingTabPagerAdapter;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -362,7 +362,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         EventCollectionPagerAdapter adapter =
                 new EventCollectionPagerAdapter(getSupportFragmentManager(), events);
         viewPager.setAdapter(adapter);
-        slidingTab.setCustomTabView(R.layout.tab_title, R.id.tab_title);
+        slidingTab.setCustomTabView(R.layout.tab_title, R.id.tab_title, R.id.num_events);
         slidingTab.setViewPager(viewPager);
         slidingTab.setOnPageChangeListener(adapter);
 
@@ -500,7 +500,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
     };
 
-    private class EventCollectionPagerAdapter extends FragmentStatePagerAdapter implements OnPageChangeListener {
+    private class EventCollectionPagerAdapter extends SlidingTabPagerAdapter
+            implements OnPageChangeListener {
         private final EventsCollection events;
         private final List<Pair<String, Integer>> tags;
 
@@ -545,6 +546,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
         @Override
         public void onPageScrollStateChanged(int state) {
             // do nothing
+        }
+
+        @Override
+        public String getNumEvents(int position) {
+            return Integer.toString(events.getEvents(position).size());
         }
     }
 }

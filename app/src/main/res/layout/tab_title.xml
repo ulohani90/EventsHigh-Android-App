@@ -6,7 +6,8 @@
     <TextView
         android:padding="8dp"
         android:id="@+id/tab_title"
-        android:layout_width="120dp"
+        android:layout_width="wrap_content"
+        android:minWidth="120dp"
         android:textColor="@android:color/white"
         android:textStyle="bold"
         android:gravity="center"
@@ -20,7 +21,6 @@
         android:layout_width="wrap_content"
         android:textColor="@android:color/darker_gray"
         android:layout_gravity="bottom|right"
-        android:text="425"
         android:layout_height="wrap_content"/>
 
 </FrameLayout>
