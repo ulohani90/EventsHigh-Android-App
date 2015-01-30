@@ -3,8 +3,8 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- finger down -->
-    <item android:state_pressed="true" android:drawable="@color/highlight_color" />
+    <item android:state_pressed="true" android:drawable="@drawable/shape_event_card_selected" />
 
     <!-- Default, "just hanging' out" state. -->
-    <item android:drawable="@drawable/shape_event_card" />
+    <item android:drawable="@drawable/shape_event_card_normal" />
 </selector>
