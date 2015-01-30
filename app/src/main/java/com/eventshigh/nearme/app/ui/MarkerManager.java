@@ -123,7 +123,9 @@ public class MarkerManager {
                     .position(new LatLng(event.location.latitude, event.location.longitude))
                     .title(Utils.shortenIfNeeded(event.title))
                     .visible(false)
-                    .icon(markerInfo.canShowAsDot ? EventCategory.circleIcon() : event.category.icon())
+                    .icon(event.ehRecommended ? event.category.recommendationIcon()
+                            : markerInfo.canShowAsDot ? EventCategory.circleIcon()
+                            : event.category.icon())
             );
             markers.put(marker, markerInfo);
         }
