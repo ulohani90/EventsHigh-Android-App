@@ -7,7 +7,7 @@ import android.util.Pair;
 import com.eventshigh.nearme.app.activity.EventsMapsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.user.Personalization;
+import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -99,21 +99,21 @@ public class MarkerManager {
     }
 
     // Remove dismissed events.
-    public void removeDismissedEvents(Personalization personalization) {
+    public void removeDismissedEvents(EventsMarkerManager eventsMarkerManager) {
         for(Iterator<Entry<Marker, MarkerInfo>> it = markers.entrySet().iterator(); it.hasNext();) {
             Map.Entry<Marker, MarkerInfo> entry = it.next();
-            if (personalization.isDismissed(entry.getValue().event.id)) {
+            if (eventsMarkerManager.isDismissed(entry.getValue().event.id)) {
                 it.remove();
             }
         }
     }
 
-    public void setEvents(GoogleMap map, Personalization personalization, List<Event> events) {
+    public void setEvents(GoogleMap map, EventsMarkerManager eventsMarkerManager, List<Event> events) {
         map.clear();
         markers.clear();
 
         for(Event event : events) {
-            if (event.location == null || personalization.isDismissed(event.id)) {
+            if (event.location == null || eventsMarkerManager.isDismissed(event.id)) {
                 continue;
             }
 

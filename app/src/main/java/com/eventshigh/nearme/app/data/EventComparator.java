@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.data;
 
-import com.eventshigh.nearme.app.user.Personalization;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.google.android.gms.maps.model.LatLng;
@@ -15,13 +14,13 @@ import java.util.Map;
  * we reduce 500*N meters from its distance.
  */
 public class EventComparator implements Comparator<Event> {
-    private final Personalization personalization;
+    private final EventsMarkerManager eventsMarkerManager;
     private final LatLng userLocation;
     private final Map<String, Double> eventToDistanceMap = new HashMap<>();
 
-    public EventComparator(LatLng userLocation, Personalization personalization) {
+    public EventComparator(LatLng userLocation, EventsMarkerManager eventsMarkerManager) {
         this.userLocation = userLocation;
-        this.personalization = personalization;
+        this.eventsMarkerManager = eventsMarkerManager;
     }
 
     @Override
@@ -43,8 +42,8 @@ public class EventComparator implements Comparator<Event> {
         }
 
         return Double.compare(
-                weightedDistance(lhs, personalization.isFavourite(lhs.id), userLocation, eventToDistanceMap),
-                weightedDistance(rhs, personalization.isFavourite(rhs.id), userLocation, eventToDistanceMap)
+                weightedDistance(lhs, eventsMarkerManager.isFavourite(lhs.id), userLocation, eventToDistanceMap),
+                weightedDistance(rhs, eventsMarkerManager.isFavourite(rhs.id), userLocation, eventToDistanceMap)
         );
     }
 

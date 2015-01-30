@@ -6,7 +6,6 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.eventshigh.nearme.app.user.Personalization;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -358,7 +357,7 @@ public class Event implements Parcelable {
     }
 
     public static EventsCollection parseUpcomingEvents(
-            EventFetcherParam param, Personalization personalization, JSONObject eventsJSON)
+            EventFetcherParam param, EventsMarkerManager eventsMarkerManager, JSONObject eventsJSON)
             throws JSONException {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
         JSONArray whitelistCategoriesJSON = eventsJSON.optJSONArray("categories");
@@ -370,11 +369,12 @@ public class Event implements Parcelable {
             }
         }
 
+        eventsMarkerManager.waitForLoading();
         EventsCollection.Builder builder =
-                new EventsCollection.Builder(param.city, personalization, whitelistCategories);
+                new EventsCollection.Builder(param.city, eventsMarkerManager, whitelistCategories);
         List<Event> events = fromJSON(param.city, upcomingEvents);
         if (param.location != null) {
-            Collections.sort(events, new EventComparator(param.location, personalization));
+            Collections.sort(events, new EventComparator(param.location, eventsMarkerManager));
         }
         return builder.addAllEvent(events).build();
     }

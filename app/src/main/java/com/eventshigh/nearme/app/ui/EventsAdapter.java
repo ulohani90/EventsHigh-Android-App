@@ -18,8 +18,9 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.user.Personalization;
-import com.eventshigh.nearme.app.user.Personalization.UserEventPref;
+import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -34,23 +35,27 @@ import java.util.Set;
  * An {@link android.widget.ListAdapter} which can be used to populate the Event card.
  */
 public class EventsAdapter extends ArrayAdapter<Event> {
+
     private final BaseEventsActivity activity;
+    private final Editor eventsMarkerEditor;
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
     private final Set<Integer> usedItemIds = new HashSet<>();
 
-    public EventsAdapter(BaseEventsActivity activity) {
+    public EventsAdapter(BaseEventsActivity activity, Editor eventsMarkerEditor) {
         super(activity, R.layout.event_card, R.id.event_title);
+
         this.activity = activity;
+        this.eventsMarkerEditor = eventsMarkerEditor;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return getView(getItem(position), activity, convertView, parent);
+        return getView(getItem(position), activity, convertView, parent, eventsMarkerEditor);
     }
 
     @Override
     public void addAll(Collection<? extends Event> collection) {
-        Personalization.getInstance(activity).filterDismissed(collection);
+        EventsMarkerManager.getInstance(activity).filterDismissed(collection);
         super.addAll(collection);
     }
 
@@ -78,7 +83,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
 
     // Build the view, reuse existing if possible.
     public static View getView(final Event event, final BaseEventsActivity activity,
-                               @Nullable View reuseView, ViewGroup parent) {
+                               @Nullable View reuseView, ViewGroup parent, final Editor eventsMarkerEditor) {
         // Build the view, reuse existing if possible.
         final View view = reuseView == null ?
                 activity.getLayoutInflater().inflate(R.layout.event_card, parent, false) :
@@ -131,20 +136,19 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         }
 
         // Set actions handlers.
-        final Personalization personalization = Personalization.getInstance(activity);
-        setFavouriteView(eventCard, personalization.getPref(event.id));
+        setFavouriteView(eventCard, eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id));
         eventCard.favouriteView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                personalization.recordPref(event.id, UserEventPref.LIKED);
-                setFavouriteView(eventCard, UserEventPref.LIKED);
+                eventsMarkerEditor.recordPref(event.id, EventMark.FAVOURITE);
+                setFavouriteView(eventCard, EventMark.FAVOURITE);
             }
         });
 
         eventCard.favouritedView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                personalization.recordPref(event.id, null);
+                eventsMarkerEditor.recordPref(event.id, null);
                 setFavouriteView(eventCard, null);
             }
         });
@@ -153,7 +157,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
             @Override
             public void onClick(View v) {
                 Animation anim = AnimationUtils.loadAnimation(activity, android.R.anim.fade_out);
-                anim.setDuration(1000);
+                anim.setDuration(500);
                 anim.setAnimationListener(new AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
@@ -163,7 +167,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         // Report the dismiss and let list refresh.
-                        personalization.recordPref(event.id, UserEventPref.DISMISSED);
+                        eventsMarkerEditor.recordPref(event.id, EventMark.DISMISSED);
                     }
 
                     @Override
@@ -202,8 +206,8 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         }
     }
 
-    public static void setFavouriteView(EventCard eventCard, @Nullable UserEventPref pref) {
-        boolean isFavourite = UserEventPref.isFavourite(pref);
+    public static void setFavouriteView(EventCard eventCard, @Nullable EventMark pref) {
+        boolean isFavourite = EventMark.isFavourite(pref);
         eventCard.favouritedView.setVisibility(isFavourite ? View.VISIBLE : View.GONE);
         eventCard.favouriteView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
     }

@@ -33,8 +33,9 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.user.Personalization;
-import com.eventshigh.nearme.app.user.Personalization.UserEventPref;
+import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -100,6 +101,8 @@ public class EventDetailFragment extends Fragment {
     private int gaOptOutCounter = 0;
     // GoogleApiClient to report the page view.
     private GoogleApiClient client;
+    // Editor to edit the event mark in case user favourite or dismiss this event.
+    private Editor eventsMarkerEditor;
 
     public EventDetailFragment() {
         // Required empty public constructor
@@ -136,6 +139,13 @@ public class EventDetailFragment extends Fragment {
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
         this.activity = (BaseActivity) activity;
+
+        eventsMarkerEditor =  EventsMarkerManager.getInstance(activity).getEditor();
+    }
+
+    public void onDetach() {
+        super.onDetach();
+        eventsMarkerEditor.close();
     }
 
     public void onStart() {
@@ -357,19 +367,18 @@ public class EventDetailFragment extends Fragment {
 
         // Set EH recommendation and favourite views.
         eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
-        final Personalization personalization = Personalization.getInstance(activity);
-        setFavouriteView(eventCard, personalization.getPref(event.id));
+        setFavouriteView(eventCard, eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id));
         eventCard.favouriteView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                personalization.recordPref(event.id, UserEventPref.LIKED);
-                setFavouriteView(eventCard, UserEventPref.LIKED);
+                eventsMarkerEditor.recordPref(event.id, EventMark.FAVOURITE);
+                setFavouriteView(eventCard, EventMark.FAVOURITE);
             }
         });
         eventCard.favouritedView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                personalization.recordPref(event.id, null);
+                eventsMarkerEditor.recordPref(event.id, null);
                 setFavouriteView(eventCard, null);
             }
         });
@@ -377,7 +386,7 @@ public class EventDetailFragment extends Fragment {
         eventCard.dismissView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                personalization.recordPref(event.id, UserEventPref.DISMISSED);
+                eventsMarkerEditor.recordPref(event.id, EventMark.DISMISSED);
                 activity.finish();
                 activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
@@ -658,8 +667,8 @@ public class EventDetailFragment extends Fragment {
         return layoutParams;
     }
 
-    public static void setFavouriteView(EventCard eventCard, @Nullable UserEventPref pref) {
-        boolean isFavourite = UserEventPref.isFavourite(pref);
+    public static void setFavouriteView(EventCard eventCard, @Nullable EventMark pref) {
+        boolean isFavourite = EventMark.isFavourite(pref);
         eventCard.favouritedView.setVisibility(isFavourite ? View.VISIBLE : View.GONE);
         eventCard.favouriteView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
     }

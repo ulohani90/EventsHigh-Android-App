@@ -14,9 +14,10 @@ import android.widget.GridView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
-import com.eventshigh.nearme.app.user.Personalization;
-import com.eventshigh.nearme.app.user.Personalization.OnEventStateChangeListener;
-import com.eventshigh.nearme.app.user.Personalization.UserEventPref;
+import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.OnEventMarkChangeListener;
 
 import java.util.ArrayList;
 
@@ -25,6 +26,7 @@ public class EventGridFragment extends Fragment {
 
     private EventsGridActivity activity;
     private EventsAdapter eventsAdapter;
+    private Editor eventsMarkerEditor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,22 +49,25 @@ public class EventGridFragment extends Fragment {
         super.onAttach(activity);
 
         this.activity = (EventsGridActivity) activity;
-        eventsAdapter = new EventsAdapter(this.activity);
+        eventsMarkerEditor = EventsMarkerManager.getInstance(activity).getEditor();
+        eventsAdapter = new EventsAdapter(this.activity, eventsMarkerEditor);
         if (getArguments() != null) {
             ArrayList<Event> events = getArguments().getParcelableArrayList(EVENTS_LIST_PARAMETER);
             eventsAdapter.addAll(events);
         }
 
         // Add listener to remove dismissed events.
-        Personalization.getInstance(activity)
-                .addOnEventStateChangeListener(mOnEventStateChangeListener);
+        eventsMarkerEditor.getEventsMarkerManager()
+                .addOnEventMarkChangeListener(mOnEventMarkChangeListener);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        Personalization.getInstance(activity)
-                .removeOnEventStateChangeListener(mOnEventStateChangeListener);
+
+        eventsMarkerEditor.close();
+        eventsMarkerEditor.getEventsMarkerManager()
+                .removeOnEventMarkChangeListener(mOnEventMarkChangeListener);
     }
 
 
@@ -77,10 +82,10 @@ public class EventGridFragment extends Fragment {
         }
     };
 
-    private final OnEventStateChangeListener mOnEventStateChangeListener = new OnEventStateChangeListener() {
+    private final OnEventMarkChangeListener mOnEventMarkChangeListener = new OnEventMarkChangeListener() {
         @Override
-        public void onEventStateChange(String eventId, @Nullable UserEventPref pref) {
-            if (UserEventPref.isDismissed(pref)) {
+        public void onEventStateChange(String eventId, @Nullable EventMark eventMark) {
+            if (EventMark.isDismissed(eventMark)) {
                 for(int i = 0; i < eventsAdapter.getCount(); i++) {
                     Event event = eventsAdapter.getItem(i);
                     if (event.id.equals(eventId)) {

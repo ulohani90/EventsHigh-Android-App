@@ -16,9 +16,10 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.MarkerManager;
-import com.eventshigh.nearme.app.user.Personalization;
-import com.eventshigh.nearme.app.user.Personalization.OnEventStateChangeListener;
-import com.eventshigh.nearme.app.user.Personalization.UserEventPref;
+import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.OnEventMarkChangeListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
@@ -69,7 +70,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
     // We show the helper toast asking user to zoom in to see events.
     // We show them only once application lifetime.
     private boolean showZoomToast = true;
-
+    // Editor to modify the event marks when user favourite or dismiss an event.
+    private Editor eventsMarkerEditor;
 
     // ***********************
     // Delegated Methods from {@link BaseEventsActivity}
@@ -91,18 +93,22 @@ public class EventsMapsActivity extends BaseEventsActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        Personalization.getInstance(this)
-                .removeOnEventStateChangeListener(mOnEventStateChangeListener);
+    protected void onResume() {
+        super.onResume();
+
+        eventsMarkerEditor = EventsMarkerManager.getInstance(this).getEditor();
+        markerManager.removeDismissedEvents(eventsMarkerEditor.getEventsMarkerManager());
+        eventsMarkerEditor.getEventsMarkerManager()
+                .addOnEventMarkChangeListener(mOnEventMarkChangeListener);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Personalization personalization = Personalization.getInstance(this);
-        markerManager.removeDismissedEvents(personalization);
-        personalization.addOnEventStateChangeListener(mOnEventStateChangeListener);
+    protected void onPause() {
+        super.onPause();
+
+        eventsMarkerEditor.close();
+        eventsMarkerEditor.getEventsMarkerManager()
+                .removeOnEventMarkChangeListener(mOnEventMarkChangeListener);
     }
 
 
@@ -132,7 +138,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
     @Override
     protected void updateEventListing(final List<Event> events) {
         mOnMapClickListener.onMapClick(null);
-        markerManager.setEvents(map, Personalization.getInstance(this), events);
+        markerManager.setEvents(map, EventsMarkerManager.getInstance(this), events);
         super.updateEventListing(events);
     }
 
@@ -291,7 +297,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
             Event event = markerManager.getEvent(marker);
             lastSelectedMarker.setIcon(event.category.highlightedIcon());
             eventView = EventsAdapter.getView(
-                    event, EventsMapsActivity.this, eventView, eventCardContainer);
+                    event, EventsMapsActivity.this, eventView, eventCardContainer, eventsMarkerEditor);
             eventView.setOnTouchListener(
                     new OnTouchListener() {
                 @Override
@@ -313,10 +319,10 @@ public class EventsMapsActivity extends BaseEventsActivity {
         }
     };
 
-    private OnEventStateChangeListener mOnEventStateChangeListener = new OnEventStateChangeListener() {
+    private OnEventMarkChangeListener mOnEventMarkChangeListener = new OnEventMarkChangeListener() {
         @Override
-        public void onEventStateChange(String eventId, @Nullable UserEventPref pref) {
-            if (UserEventPref.isDismissed(pref)) {
+        public void onEventStateChange(String eventId, @Nullable EventMark eventMark) {
+            if (EventMark.isDismissed(eventMark)) {
                 if (lastSelectedMarker != null &&
                         markerManager.getEvent(lastSelectedMarker).id.equals(eventId)) {
                     mOnMapClickListener.onMapClick(null);
