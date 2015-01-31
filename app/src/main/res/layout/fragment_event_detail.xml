@@ -29,13 +29,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:scaleType="centerCrop"
+                    android:background="@drawable/shape_film"
                     tools:layout_height="200dp"
                 />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#4b000000"
+                    android:background="@drawable/shape_film"
                 />
 
                 <ImageView
@@ -252,7 +253,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:showDividers="middle"
-                        android:divider="@drawable/vertical_divider"
+                        android:divider="@drawable/shape_vertical_divider"
                         android:orientation="horizontal"
                     />
                 </HorizontalScrollView>
@@ -270,7 +271,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:showDividers="middle"
-            android:divider="@drawable/vertical_divider"
+            android:divider="@drawable/shape_vertical_divider"
             android:baselineAligned="false"
         >
             <FrameLayout

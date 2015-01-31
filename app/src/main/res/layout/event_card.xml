@@ -18,7 +18,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignBottom="@+id/event_time"
         android:layout_centerVertical="true"
-        android:background="#4b000000"
+        android:background="@drawable/shape_film"
     />
 
     <View
@@ -30,7 +30,7 @@
         android:layout_alignEnd="@+id/event_bg"
         android:layout_alignTop="@+id/event_bg"
         android:layout_alignBottom="@+id/event_bg"
-        android:background="#4b000000"
+        android:background="@drawable/shape_film"
     />
 
     <ImageView
@@ -132,7 +132,7 @@
         android:baselineAligned="false"
         android:showDividers="middle"
         android:background="#F2F2F2"
-        android:divider="@drawable/vertical_divider"
+        android:divider="@drawable/shape_vertical_divider"
     >
         <FrameLayout
             android:id="@+id/action_favourited"
