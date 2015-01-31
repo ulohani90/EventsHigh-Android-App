@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="app_color">#0b6fb8</color>
-    <color name="highlight_color">#ff35b5e5</color>
-    <color name="button_gray">#fafafa</color>
-    <color name="link_color">#0071B8</color>
+    <color name="app_color">#FF0071B8</color>
+
+    <color name="highlight_color">#FF35B5E5</color>
+
+    <color name="button_gray">#FAFAFA</color>
+    <color name="link_color">#990071B8</color>
 </resources>

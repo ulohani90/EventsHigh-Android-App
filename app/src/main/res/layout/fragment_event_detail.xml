@@ -60,7 +60,7 @@
                     android:drawablePadding="4dp"
                     android:background="?android:attr/selectableItemBackground"
                     android:text="@string/ui_favourited"
-                    android:textColor="@android:color/holo_red_dark"
+                    android:textColor="#FFD0021B"
                 />
                 <TextView
                     android:id="@+id/action_favourite"
@@ -104,6 +104,7 @@
                 android:layout_marginEnd="16dp"
                 android:textIsSelectable="true"
                 android:background="@android:color/white"
+                android:textColor="#CC000000"
                 tools:text="The Awesome Event"
             />
             <TextView
@@ -118,7 +119,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 android:layout_gravity="end"
-                android:textColor="#A7A9AC"
+                android:textColor="#99A7A9AC"
                 tools:text="Event details from: www.eventshigh.com"
             />
 
@@ -156,6 +157,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_toRightOf="@+id/event_venue_icon"
                     android:layout_toEndOf="@+id/event_venue_icon"
+                    android:textColor="#CC000000"
                     tools:text="Counter Culture"
                 />
                 <TextView
@@ -169,6 +171,7 @@
                     android:layout_toRightOf="@+id/event_venue_icon"
                     android:layout_toEndOf="@+id/event_venue_icon"
                     android:textSize="@dimen/abc_text_size_caption_material"
+                    android:textColor="#999197A3"
                     tools:text="Near Hoodi circle, Whitefield, Bangalore, 560037."
                 />
             </RelativeLayout>
@@ -185,7 +188,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@color/button_gray"
             >
                 <RelativeLayout
                     android:id="@+id/event_time_first"
@@ -215,6 +217,7 @@
                         android:layout_alignParentTop="true"
                         android:layout_toRightOf="@+id/event_time_icon"
                         android:layout_toEndOf="@+id/event_time_icon"
+                        android:textColor="#CC000000"
                         tools:text="Wed, 14 Jan at 9:30 AM"
                     />
                     <TextView
@@ -226,6 +229,7 @@
                         android:layout_toEndOf="@+id/event_time_icon"
                         android:layout_below="@+id/event_time"
                         android:textSize="@dimen/abc_text_size_caption_material"
+                        android:textColor="#999197A3"
                         tools:text="2 days from now"
                     />
                 </RelativeLayout>
@@ -237,7 +241,7 @@
                     android:layout_gravity="center"
                     android:background="@drawable/selector_button"
                     android:padding="6dp"
-                    android:textColor="#b3000000"
+                    android:textColor="#80000000"
                     android:text="@string/ui_also_on"
                 />
                 <HorizontalScrollView
@@ -286,9 +290,10 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:text="@string/action_book"
                     android:drawableLeft="@drawable/action_book"
                     android:drawableStart="@drawable/action_book"
+                    android:textColor="#CC000000"
+                    android:text="@string/action_book"
                 />
             </FrameLayout>
 
@@ -304,9 +309,10 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:text="@string/action_call"
                     android:drawableLeft="@drawable/action_call"
                     android:drawableStart="@drawable/action_call"
+                    android:textColor="#CC000000"
+                    android:text="@string/action_call"
                 />
             </FrameLayout>
 
@@ -322,9 +328,10 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:text="@string/action_share"
                     android:drawableLeft="@drawable/ic_action_share_dark"
                     android:drawableStart="@drawable/ic_action_share_dark"
+                    android:textColor="#CC000000"
+                    android:text="@string/action_share"
                 />
             </FrameLayout>
         </LinearLayout>
@@ -355,6 +362,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
             android:ellipsize="end"
+            android:textColor="#CC383F3F"
             tools:text="...\n,,,\n---"
         />
         <TextView
@@ -366,7 +374,7 @@
             android:layout_gravity="center"
             android:padding="6dp"
             android:layout_marginBottom="4dp"
-            android:textColor="#9a000000"
+            android:textColor="#99000000"
             android:text="@string/ui_read_more"
             android:visibility="gone"
         />
@@ -379,8 +387,11 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            android:text="@string/ui_organizer"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:textAllCaps="true"
+            android:textColor="#CC383F3F"
+            android:text="@string/ui_organizer"
         />
         <LinearLayout
             android:id="@+id/organizer_name_row"
@@ -394,6 +405,7 @@
                 style="@style/EventDetailText"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:textColor="#CC222222"
                 android:text="@string/ui_name"
             />
             <TextView
@@ -402,6 +414,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
                 android:layout_weight="1"
+                android:textColor="#CC222222"
                 tools:text="Counter Culture"
             />
         </LinearLayout>
@@ -417,6 +430,7 @@
                 style="@style/EventDetailText"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:textColor="#CC222222"
                 android:text="@string/ui_phone"
             />
             <TextView
@@ -443,6 +457,7 @@
                 style="@style/EventDetailText"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:textColor="#CC222222"
                 android:text="@string/ui_website"
             />
             <TextView

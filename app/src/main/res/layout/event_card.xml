@@ -81,6 +81,7 @@
         android:minLines="2"
         android:ellipsize="end"
         android:textSize="14sp"
+        android:textColor="#CC000000"
         tools:text="My Awesome Event with a long long title!"
     />
 
@@ -99,6 +100,7 @@
         android:drawableStart="@drawable/event_card_place"
         android:drawableLeft="@drawable/event_card_place"
         android:fontFamily="sans-serif-medium"
+        android:textColor="#7A212121"
         tools:text="Jagriti theatre, Whitefield"
         tools:ignore="UnusedAttribute"
     />
@@ -120,6 +122,7 @@
         android:drawableStart="@drawable/event_card_time"
         android:drawableLeft="@drawable/event_card_time"
         android:fontFamily="sans-serif-medium"
+        android:textColor="#7A212121"
         tools:text="Sun, 29 Mar at 8:30 pm"
         tools:ignore="UnusedAttribute"
     />
@@ -131,7 +134,7 @@
         android:layout_below="@id/event_time"
         android:baselineAligned="false"
         android:showDividers="middle"
-        android:background="#F2F2F2"
+        android:background="#FAFAFA"
         android:divider="@drawable/shape_vertical_divider"
     >
         <FrameLayout
@@ -150,7 +153,7 @@
                 android:drawableStart="@drawable/ic_favourite_active"
                 android:drawablePadding="4dp"
                 android:text="@string/ui_favourited"
-                android:textColor="@android:color/holo_red_dark"
+                android:textColor="#FFD0021B"
             />
         </FrameLayout>
         <FrameLayout
@@ -169,6 +172,7 @@
                 android:drawableStart="@drawable/ic_favourite_normal"
                 android:drawablePadding="4dp"
                 android:text="@string/ui_favourite"
+                android:textColor="#66000000"
             />
         </FrameLayout>
         <FrameLayout
@@ -187,6 +191,7 @@
                 android:drawableStart="@drawable/ic_dismiss"
                 android:drawablePadding="4dp"
                 android:text="@string/ui_dismiss"
+                android:textColor="#66000000"
             />
         </FrameLayout>
     </LinearLayout>
