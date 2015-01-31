@@ -257,6 +257,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
             return true;
         }
 
+        if (id == R.id.action_refresh) {
+            fetchNewListing(true);
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

@@ -36,6 +36,11 @@
           android:icon="@drawable/ic_action_place"
           android:orderInCategory="40"
     />
+    <item android:id="@+id/action_refresh"
+          android:title="@string/action_refresh"
+          android:icon="@drawable/ic_refresh_white_48dp"
+          android:orderInCategory="45"
+        />
     <item android:id="@+id/action_shortcut"
           android:title="@string/action_shortcut"
           android:icon="@drawable/ic_action_add_to_queue"
