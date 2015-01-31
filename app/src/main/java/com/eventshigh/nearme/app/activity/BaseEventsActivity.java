@@ -252,7 +252,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             EventCollectionRequest.shouldBypassCache = !item.isChecked();
             item.setChecked(EventCollectionRequest.shouldBypassCache);
             if (item.isChecked()) {
-                fetchNewListing();
+                fetchNewListing(true);
             }
             return true;
         }
@@ -280,7 +280,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             updateEventsCollection(new EventsCollection(new ArrayList<TaggedEvents>()));
             updateEventListing(new ArrayList<Event>());
         } else {
-            fetchNewListing();
+            fetchNewListing(true);
         }
     }
 
@@ -413,8 +413,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }, 1500);
     }
 
-    private void fetchNewListing() {
-        viewSwitcher.setDisplayedChild(1);
+    public void fetchNewListing(boolean showFullscreenLoadingView) {
+        if (showFullscreenLoadingView) {
+            viewSwitcher.setDisplayedChild(1);
+        }
         EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam,
                 Priority.IMMEDIATE, this, mEventsFetcherCallBack, new ErrorListener() {
                     @Override
