@@ -38,7 +38,7 @@ public class OnBoardingHelper {
         this.activity = activity;
 
         targets = new ArrayList<>();
-        addTarget(new ActionItemTarget(activity, R.id.action_filter),
+        addTarget(new ActionItemTarget(activity, R.id.action_map),
                 R.string.onboarding_action);
         addTarget(new ViewTarget(R.id.sliding_tabs, activity),
                 R.string.onboarding_filter);
