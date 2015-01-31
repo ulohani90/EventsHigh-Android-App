@@ -332,7 +332,7 @@ public class EventDetailFragment extends Fragment {
         final DisplayMetrics metrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
         ViewGroup.LayoutParams params = eventCard.bgView.getLayoutParams();
-        params.height = (int) (0.2 * metrics.heightPixels);
+        params.height = (int) (0.3 * metrics.heightPixels);
         eventCard.bgView.setLayoutParams(params);
         if (event.imgUrl == null) {
             eventCard.bgView.setVisibility(View.GONE);
