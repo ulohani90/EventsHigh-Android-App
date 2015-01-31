@@ -47,6 +47,7 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
         SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(
                 R.id.swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setColorSchemeResources(R.color.app_color);
     }
 
     @Override
