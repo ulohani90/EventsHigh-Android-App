@@ -111,13 +111,13 @@ public class OnBoardingActivity extends BaseActivity {
         findViewById(R.id.get_started).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                startLaunchActivity();
+                getStarted();
             }
         });
         findViewById(R.id.skip).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                startLaunchActivity();
+                getStarted();
             }
         });
     }
@@ -133,10 +133,12 @@ public class OnBoardingActivity extends BaseActivity {
     }
 
     /**
-     * Starts the {@link LaunchActivity} and finishes this activity.
+     * Starts the {@link com.eventshigh.nearme.app.activity.FacebookLoginActivity} and finishes this activity.
      */
-    private void startLaunchActivity() {
-        startActivity(new Intent(this, LaunchActivity.class));
+    private void getStarted() {
+        startActivity(new Intent(this, FacebookLoginActivity.class)
+                .putExtra(FacebookLoginActivity.PARAM_ONBOARDING, true));
+        finish();
     }
 
 
@@ -167,6 +169,7 @@ public class OnBoardingActivity extends BaseActivity {
                             }
                         }
                     }, 5000);
+                showCoachMark = false;
             }
 
             // Change the last active dot to small dot

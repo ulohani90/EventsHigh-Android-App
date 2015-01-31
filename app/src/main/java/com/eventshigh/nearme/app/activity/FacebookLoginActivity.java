@@ -29,13 +29,18 @@ import java.util.List;
  */
 public class FacebookLoginActivity extends BaseActivity {
     private static final List<String> PERMISSIONS = Arrays.asList("email", "public_profile");
+    public static final String PARAM_ONBOARDING = "onboarding";
+
     private TextView connectMessageView;
     private LoginButton authButton;
     private UiLifecycleHelper uiHelper;
+    private boolean isOnBoarding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        onNewIntent(getIntent());
 
         setContentView(R.layout.activity_facebook_login);
         findViewById(R.id.skip).setOnClickListener(new OnClickListener() {
@@ -102,6 +107,12 @@ public class FacebookLoginActivity extends BaseActivity {
     }
 
     @Override
+    public void onNewIntent(Intent intent) {
+        isOnBoarding = intent.hasExtra(PARAM_ONBOARDING);
+        setTheme(isOnBoarding ? android.R.style.Theme_NoTitleBar : R.style.AppTheme);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         uiHelper.onActivityResult(requestCode, resultCode, data);
@@ -126,7 +137,11 @@ public class FacebookLoginActivity extends BaseActivity {
     }
 
     private void up() {
-        NavUtils.navigateUpFromSameTask(this);
+        if (isOnBoarding) {
+            startActivity(new Intent(FacebookLoginActivity.this, LaunchActivity.class));
+        } else {
+            NavUtils.navigateUpFromSameTask(this);
+        }
     }
 
     private Session.StatusCallback callback = new Session.StatusCallback() {
@@ -142,6 +157,9 @@ public class FacebookLoginActivity extends BaseActivity {
                         String email = user.getProperty("email").toString();
                         account.recordFacebookEmail(email);
                         connectMessageView.setText("Logged in as " + email);
+                        if (isOnBoarding) {
+                            up();
+                        }
                     }
                 }).executeAsync();
             } else {

@@ -9,7 +9,7 @@
         android:id="@+id/eh_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="32dp"
+        android:layout_margin="24dp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"
         android:src="@drawable/eh_logo_with_text"
@@ -21,10 +21,11 @@
         style="?android:attr/textAppearanceLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="32dp"
+        android:layout_margin="24dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/eh_logo"
         android:gravity="center"
+        android:minLines="4"
         android:text="@string/ui_connect_facebook"
     />
 
@@ -32,9 +33,25 @@
         android:id="@+id/auth_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="32dp"
+        android:layout_margin="24dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/fb_connect_message"
+    />
+
+    <TextView
+        style="?android:attr/textAppearanceSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/auth_button"
+        android:drawableLeft="@drawable/ic_signup_info"
+        android:drawableStart="@drawable/ic_signup_info"
+        android:drawablePadding="4dp"
+        android:textSize="10sp"
+        android:gravity="center"
+        android:text="@string/ui_fb_promiss"
+        tools:ignore="SmallSp"
     />
 
     <TextView
