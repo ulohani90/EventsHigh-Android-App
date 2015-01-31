@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
 /**
  * Onboarding activity for first time users. This activity is shown to a user when the app is
@@ -58,6 +60,9 @@ public class OnBoardingActivity extends BaseActivity {
 
     // The last view pager position from which the user navigated.
     private int lastPosition = 0;
+
+    // show the coach mark for first time user has reached last step.
+    private boolean showCoachMark = true;
 
     /**
      * The layout param that makes the view pager dot look big indicating the current page the user
@@ -147,6 +152,23 @@ public class OnBoardingActivity extends BaseActivity {
 
         @Override
         public void onPageSelected(int position) {
+            if (position == NUM_ON_BOARDING_STEPS - 1 && showCoachMark) {
+                dotsView.postDelayed(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!isFinishing()) {
+                                new ShowcaseView.Builder(OnBoardingActivity.this, true)
+                                        .setTarget(new ViewTarget(findViewById(R.id.get_started)))
+                                        .setContentText(R.string.onboarding_get_started)
+                                        .setStyle(R.style.ShowcaseTheme)
+                                        .hideOnTouchOutside()
+                                        .build();
+                            }
+                        }
+                    }, 5000);
+            }
+
             // Change the last active dot to small dot
             dotsView.getChildAt(lastPosition).setLayoutParams(smallDotLayoutParams);
             // Change the currently active dot to big dot

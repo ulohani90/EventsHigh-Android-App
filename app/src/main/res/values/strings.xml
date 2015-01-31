@@ -42,6 +42,7 @@
     <string name="onboarding_share">Share and plan your favorite events with friends</string>
     <string name="onboarding_filter">Filter events by selecting a category!</string>
     <string name="onboarding_action">Use these action buttons to search, filter, change location or see events in map view!</string>
+    <string name="onboarding_get_started">Click on Get Started to start seeing events!</string>
 
     <!-- Helper messages -->
     <string name="register_message">Get the most out of this app by registering with EventsHigh</string>
