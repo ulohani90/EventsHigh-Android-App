@@ -513,11 +513,11 @@ public class EventDetailFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         if (eventCard.futureTimesViewGroup.getVisibility() == View.GONE) {
-                            eventCard.eventTimeFirstView.setVisibility(View.GONE);
                             eventCard.futureTimesViewGroup.setVisibility(View.VISIBLE);
+                            eventCard.eventTimeFirstView.setVisibility(View.GONE);
                         } else {
-                            eventCard.eventTimeFirstView.setVisibility(View.VISIBLE);
                             eventCard.futureTimesViewGroup.setVisibility(View.GONE);
+                            eventCard.eventTimeFirstView.setVisibility(View.VISIBLE);
                         }
                     }
                 });

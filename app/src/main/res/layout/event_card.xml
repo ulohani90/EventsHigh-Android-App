@@ -152,6 +152,7 @@
                 android:drawableLeft="@drawable/ic_favourite_active"
                 android:drawableStart="@drawable/ic_favourite_active"
                 android:drawablePadding="4dp"
+                android:textSize="12sp"
                 android:text="@string/ui_favourited"
                 android:textColor="#FFD0021B"
             />
@@ -171,6 +172,7 @@
                 android:drawableLeft="@drawable/ic_favourite_normal"
                 android:drawableStart="@drawable/ic_favourite_normal"
                 android:drawablePadding="4dp"
+                android:textSize="12sp"
                 android:text="@string/ui_favourite"
                 android:textColor="#66000000"
             />
@@ -190,6 +192,7 @@
                 android:drawableLeft="@drawable/ic_dismiss"
                 android:drawableStart="@drawable/ic_dismiss"
                 android:drawablePadding="4dp"
+                android:textSize="12sp"
                 android:text="@string/ui_dismiss"
                 android:textColor="#66000000"
             />

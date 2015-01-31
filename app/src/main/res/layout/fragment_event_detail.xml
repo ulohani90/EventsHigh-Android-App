@@ -59,6 +59,7 @@
                     android:drawableStart="@drawable/ic_favourite_active"
                     android:drawablePadding="4dp"
                     android:background="?android:attr/selectableItemBackground"
+                    android:textSize="12sp"
                     android:text="@string/ui_favourited"
                     android:textColor="#FFD0021B"
                 />
@@ -72,6 +73,7 @@
                     android:drawableStart="@drawable/ic_favourite_normal_white"
                     android:drawablePadding="4dp"
                     android:background="?android:attr/selectableItemBackground"
+                    android:textSize="12sp"
                     android:text="@string/ui_favourited"
                     android:textColor="@android:color/white"
                 />
@@ -85,6 +87,7 @@
                     android:drawableStart="@drawable/ic_dismiss_white"
                     android:drawablePadding="4dp"
                     android:background="?android:attr/selectableItemBackground"
+                    android:textSize="12sp"
                     android:text="@string/ui_dismiss"
                     android:textColor="@android:color/white"
                 />
@@ -188,6 +191,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:animateLayoutChanges="true"
             >
                 <RelativeLayout
                     android:id="@+id/event_time_first"
