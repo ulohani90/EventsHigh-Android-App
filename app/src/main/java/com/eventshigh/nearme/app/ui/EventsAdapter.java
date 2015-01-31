@@ -36,6 +36,8 @@ import java.util.Set;
  * An {@link android.widget.ListAdapter} which can be used to populate the Event card.
  */
 public class EventsAdapter extends ArrayAdapter<Event> {
+    // We show the dismiss toast once per session.
+    private static boolean showDismissToast = true;
 
     private final BaseEventsActivity activity;
     private final Editor eventsMarkerEditor;
@@ -172,7 +174,10 @@ public class EventsAdapter extends ArrayAdapter<Event> {
                     public void onAnimationEnd(Animation animation) {
                         // Report the dismiss and let list refresh.
                         eventsMarkerEditor.recordPref(event.id, EventMark.DISMISSED);
-                        Toast.makeText(activity, R.string.message_dismiss, Toast.LENGTH_SHORT).show();
+                        if (showDismissToast) {
+                            Toast.makeText(activity, R.string.message_dismiss, Toast.LENGTH_SHORT).show();
+                            showDismissToast = false;
+                        }
                     }
 
                     @Override
