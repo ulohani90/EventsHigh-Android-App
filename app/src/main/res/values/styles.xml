@@ -2,11 +2,15 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="EventsActionBar" parent="android:Widget.Holo.Light.ActionBar.Solid.Inverse">
+    <style name="EHActionBarSubtitle" parent="android:TextAppearance.Holo.Widget.ActionBar.Subtitle.Inverse">
+        <item name="android:textColor">#80FFFFFF</item>
+    </style>
+    <style name="EHActionBar" parent="android:Widget.Holo.Light.ActionBar.Solid.Inverse">
         <item name="android:background">@color/app_color</item>
+        <item name="subtitleTextStyle">@style/EHActionBarSubtitle</item>
     </style>
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/EventsActionBar</item>
+        <item name="android:actionBarStyle">@style/EHActionBar</item>
     </style>
 
     <!-- Theme used for Events Details Pane -->
