@@ -67,7 +67,7 @@ public class LocationPickerDialog {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setView(view);
         builder.setTitle(R.string.ask_locality);
-        builder.setIcon(R.drawable.ic_action_place_dark);
+        builder.setIcon(R.drawable.ic_location_on_black_36dp);
 
         // Set up the buttons
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {

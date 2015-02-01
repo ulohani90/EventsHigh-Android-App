@@ -41,6 +41,9 @@
         <item name="android:ellipsize">end</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:textSize">11sp</item>
+        <item name="android:drawablePadding">2dp</item>
+        <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-medium</item>
+        <item name="android:textColor">#7A212121</item>
     </style>
 
     <!-- Themes used by Onboarding widgets powered by showcase library -->

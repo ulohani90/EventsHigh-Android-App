@@ -89,7 +89,7 @@ public enum EventCategory {
 
     public static BitmapDescriptor circleIcon() {
         if (CIRCLE_ICON == null) {
-            CIRCLE_ICON = BitmapDescriptorFactory.fromResource(R.drawable.dot0);
+            CIRCLE_ICON = BitmapDescriptorFactory.fromResource(R.drawable.icon_dot);
         }
 
         return CIRCLE_ICON;
