@@ -10,7 +10,6 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AbsListView.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -53,7 +52,10 @@ public class LaunchActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event_detail);
+
+        // Set View.
+        setContentView(R.layout.activity_launch);
+        ((ListView) findViewById(R.id.city_selector)).setAdapter(new CityListAdapter());
 
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
@@ -178,14 +180,6 @@ public class LaunchActivity extends BaseActivity {
             if (connectionResult != null) {
                 Toast.makeText(LaunchActivity.this, R.string.failed_location, Toast.LENGTH_SHORT).show();
             }
-
-            ViewGroup container = (ViewGroup) findViewById(R.id.container);
-            container.removeAllViews();
-
-            ListView cityChooser = new ListView(LaunchActivity.this);
-            cityChooser.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-            cityChooser.setAdapter(new CityListAdapter());
-            container.addView(cityChooser);
         }
     };
 

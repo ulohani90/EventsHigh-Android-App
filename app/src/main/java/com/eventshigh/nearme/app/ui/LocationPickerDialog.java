@@ -40,7 +40,7 @@ public class LocationPickerDialog {
 
         // Set up the input
         @SuppressLint("InflateParams")
-        View view = LayoutInflater.from(context).inflate(R.layout.location_picker, null);
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_location_picker, null);
         final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.localityName);
 
         // Set up the AutoCompleteTextView with adapter and callbacks.
@@ -67,7 +67,7 @@ public class LocationPickerDialog {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setView(view);
         builder.setTitle(R.string.ask_locality);
-        builder.setIcon(R.drawable.ic_action_place_dark);
+        builder.setIcon(R.drawable.ic_location_on_black_36dp);
 
         // Set up the buttons
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {

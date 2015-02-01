@@ -44,10 +44,10 @@ public class OnBoardingActivity extends BaseActivity {
     // ***********************
 
     private final OnBoardingStepResource[] ON_BOARDING_STEP_RESOURCES = new OnBoardingStepResource[]{
-            new OnBoardingStepResource(R.string.onboarding_city, R.drawable.ic_onboarding_city),
-            new OnBoardingStepResource(R.string.onboarding_map, R.drawable.ic_onboarding_map),
-            new OnBoardingStepResource(R.string.onboarding_follow, R.drawable.ic_onboarding_follow),
-            new OnBoardingStepResource(R.string.onboarding_share, R.drawable.ic_onboarding_share),
+            new OnBoardingStepResource(R.string.onboarding_city, R.drawable.onboarding_city),
+            new OnBoardingStepResource(R.string.onboarding_map, R.drawable.onboarding_map),
+            new OnBoardingStepResource(R.string.onboarding_follow, R.drawable.onboarding_follow),
+            new OnBoardingStepResource(R.string.onboarding_share, R.drawable.onboarding_share),
     };
 
     private final int NUM_ON_BOARDING_STEPS = ON_BOARDING_STEP_RESOURCES.length;

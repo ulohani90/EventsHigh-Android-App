@@ -13,6 +13,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
@@ -118,12 +119,12 @@ public class GcmIntentService extends IntentService {
             }
 
             Intent intent = new Intent(this, EventDetailActivity.class);
-            intent.setAction(EventDetailActivity.NOTIFICATION_ACTION);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else {
             Intent intent = new Intent(this, LaunchActivity.class);
-            intent.setAction(EventDetailActivity.NOTIFICATION_ACTION);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             intent.setData(EventsHighEndpoints.getWebUri(new EventFetcherParam(null, query)));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         }

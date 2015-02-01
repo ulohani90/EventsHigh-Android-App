@@ -84,7 +84,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
         // Setup the local member variables.
         View pager = findViewById(R.id.pager);
         LinearLayout parent = (LinearLayout) pager.getParent();
-        View mapsView = getLayoutInflater().inflate(R.layout.activity_maps, parent, false);
+        View mapsView = getLayoutInflater().inflate(R.layout.view_maps, parent, false);
         pager.setVisibility(View.GONE);
         parent.addView(mapsView, pager.getLayoutParams());
         setUpMap();
