@@ -37,7 +37,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, EventFetcherParam param,
-                              Priority priority, Object tag,
+                              Priority priority, Object tag, boolean shouldBypassCache,
                               Listener<EventsCollection> listener, ErrorListener errorListener) {
         if (param.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + param.toString()));
