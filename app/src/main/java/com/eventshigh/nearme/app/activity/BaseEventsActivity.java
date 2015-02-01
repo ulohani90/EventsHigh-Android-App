@@ -103,7 +103,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         // Setup the UI.
         viewSwitcher = new ViewSwitcher(this);
         getLayoutInflater().inflate(R.layout.activity_events, viewSwitcher);
-        getLayoutInflater().inflate(R.layout.activity_event_detail, viewSwitcher);
+        getLayoutInflater().inflate(R.layout.view_loading, viewSwitcher);
         setContentView(viewSwitcher);
         slidingTab = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         viewPager = (ViewPager) findViewById(R.id.pager);

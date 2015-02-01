@@ -38,7 +38,7 @@ public class EventDetailActivity extends BaseActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
-        setContentView(R.layout.activity_event_detail);
+        setContentView(R.layout.view_loading);
 
         boolean showEvent = false;
         String action = intent.getAction();

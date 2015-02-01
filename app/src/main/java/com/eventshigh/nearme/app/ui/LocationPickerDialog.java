@@ -40,7 +40,7 @@ public class LocationPickerDialog {
 
         // Set up the input
         @SuppressLint("InflateParams")
-        View view = LayoutInflater.from(context).inflate(R.layout.location_picker, null);
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_location_picker, null);
         final AutoCompleteTextView input = (AutoCompleteTextView) view.findViewById(R.id.localityName);
 
         // Set up the AutoCompleteTextView with adapter and callbacks.
