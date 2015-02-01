@@ -5,6 +5,17 @@
     android:orientation="vertical"
     android:background="@android:color/white"
 >
+    <ProgressBar
+        style="@android:style/Widget.Holo.Light.ProgressBar.Horizontal"
+        android:id="@+id/top_progress_bar"
+        android:indeterminate="true"
+        android:layout_marginTop="-4dp"
+        android:layout_marginBottom="-4dp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
     <com.example.android.common.view.SlidingTabLayout
         android:id="@+id/sliding_tabs"
         android:layout_width="match_parent"

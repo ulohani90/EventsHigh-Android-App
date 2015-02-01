@@ -86,6 +86,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private View loadingMessageView;
     // The view that shows an error message to the user when the events fetch request fails
     private View errorMessageView;
+    // The progress bar just below action bar that is visible when there is a pending event fetch
+    // request
+    private View topProgressBar;
 
     // Last city and query for which events are shown.
     protected EventFetcherParam lastEventFetcherParam;
@@ -115,6 +118,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         setContentView(viewSwitcher);
         slidingTab = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         viewPager = (ViewPager) findViewById(R.id.pager);
+        topProgressBar = findViewById(R.id.top_progress_bar);
 
         // Set the context in term of lastEventFetcherParam. Use Inent
         // to restore the context.
@@ -260,13 +264,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
             EventCollectionRequest.shouldBypassCache = !item.isChecked();
             item.setChecked(EventCollectionRequest.shouldBypassCache);
             if (item.isChecked()) {
-                fetchNewListing(true /* bypass cache */);
+                fetchNewListing(true /** show loading view */, true /* bypass cache */);
             }
             return true;
         }
 
         if (id == R.id.action_refresh) {
-            fetchNewListing(true /* bypass cache */);
+            fetchNewListing(false /** show loading view */, true /* bypass cache */);
         }
 
         return super.onOptionsItemSelected(item);
@@ -292,7 +296,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             updateEventsCollection(new EventsCollection(new ArrayList<TaggedEvents>()));
             updateEventListing(new ArrayList<Event>());
         } else {
-            fetchNewListing(false /* bypass cache */);
+            fetchNewListing(true /** show loading view */, false /* bypass cache */);
         }
     }
 
@@ -425,26 +429,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }, 1500);
     }
 
-    private void fetchNewListing(boolean shouldBypassCache) {
-        viewSwitcher.setDisplayedChild(1);
-        loadingMessageView.setVisibility(View.VISIBLE);
-        errorMessageView.setVisibility(View.GONE);
+    private void fetchNewListing(boolean shouldBypassCache,
+                                 final ErrorListener errorListener) {
         EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam,
                 Priority.IMMEDIATE, this, shouldBypassCache, mEventsFetcherCallBack,
-                new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        viewSwitcher.setDisplayedChild(1);
-                        loadingMessageView.setVisibility(View.GONE);
-                        errorMessageView.setVisibility(View.VISIBLE);
-                        mErrorListener.onErrorResponse(volleyError);
-                    }
-                });
-    }
-
-    public void fetchNewListing(final ErrorListener errorListener) {
-        EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam,
-                Priority.IMMEDIATE, this, true /* bypass cache */, mEventsFetcherCallBack,
                 new ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
@@ -452,6 +440,33 @@ public abstract class BaseEventsActivity extends BaseActivity {
                         mErrorListener.onErrorResponse(volleyError);
                     }
                 });
+    }
+
+    private void fetchNewListing(final boolean showLoadingView, boolean shouldBypassCache) {
+        if (showLoadingView) {
+            viewSwitcher.setDisplayedChild(1);
+            loadingMessageView.setVisibility(View.VISIBLE);
+            errorMessageView.setVisibility(View.GONE);
+        } else {
+            topProgressBar.setVisibility(View.VISIBLE);
+        }
+        fetchNewListing(shouldBypassCache,
+                new ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        if (showLoadingView) {
+                            viewSwitcher.setDisplayedChild(1);
+                            loadingMessageView.setVisibility(View.GONE);
+                            errorMessageView.setVisibility(View.VISIBLE);
+                        } else {
+                            topProgressBar.setVisibility(View.GONE);
+                        }
+                    }
+                });
+    }
+
+    public void fetchNewListing(final ErrorListener errorListener) {
+        fetchNewListing(true /* bypass cache */, errorListener);
     }
 
     private void createShortcut() {
@@ -496,6 +511,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         @Override
         public void onResponse(EventsCollection events) {
             viewSwitcher.setDisplayedChild(0);
+            topProgressBar.setVisibility(View.GONE);
 
             if (events.getTags().isEmpty()) {
                 // Failed. Show toast and return empty list.
@@ -530,7 +546,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     };
 
     public void onRetryButtonClicked(View view) {
-        fetchNewListing(true /* bypass cache */);
+        fetchNewListing(false /** show loading view */, true /* bypass cache */);
     }
 
     private class EventCollectionPagerAdapter extends SlidingTabPagerAdapter
