@@ -81,6 +81,12 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private ViewSwitcher viewSwitcher;
     private ViewPager viewPager;
     private SlidingTabLayout slidingTab;
+
+    // The view that shows a loading message to the user when events are being fetched
+    private View loadingMessageView;
+    // The view that shows an error message to the user when the events fetch request fails
+    private View errorMessageView;
+
     // Last city and query for which events are shown.
     protected EventFetcherParam lastEventFetcherParam;
     // Tag selected from tab bar for which events are shown.
@@ -103,7 +109,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
         // Setup the UI.
         viewSwitcher = new ViewSwitcher(this);
         getLayoutInflater().inflate(R.layout.activity_events, viewSwitcher);
-        getLayoutInflater().inflate(R.layout.activity_event_detail, viewSwitcher);
+        View messageView = getLayoutInflater().inflate(R.layout.layout_loading_retry, viewSwitcher);
+        loadingMessageView = messageView.findViewById(R.id.loading_message);
+        errorMessageView = messageView.findViewById(R.id.error_message);
         setContentView(viewSwitcher);
         slidingTab = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         viewPager = (ViewPager) findViewById(R.id.pager);
@@ -420,12 +428,16 @@ public abstract class BaseEventsActivity extends BaseActivity {
     public void fetchNewListing(boolean showFullscreenLoadingView) {
         if (showFullscreenLoadingView) {
             viewSwitcher.setDisplayedChild(1);
+            loadingMessageView.setVisibility(View.VISIBLE);
+            errorMessageView.setVisibility(View.GONE);
         }
         EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam,
                 Priority.IMMEDIATE, this, mEventsFetcherCallBack, new ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        viewSwitcher.setDisplayedChild(0);
+                        viewSwitcher.setDisplayedChild(1);
+                        loadingMessageView.setVisibility(View.GONE);
+                        errorMessageView.setVisibility(View.VISIBLE);
                         mErrorListener.onErrorResponse(volleyError);
                     }
                 });
@@ -505,6 +517,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
         public void onRateAppClicked() {
         }
     };
+
+    public void onRetryButtonClicked(View view) {
+        fetchNewListing(true);
+    }
 
     private class EventCollectionPagerAdapter extends SlidingTabPagerAdapter
             implements OnPageChangeListener {

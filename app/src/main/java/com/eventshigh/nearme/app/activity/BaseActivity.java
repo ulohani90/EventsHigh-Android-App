@@ -273,7 +273,6 @@ public abstract class BaseActivity extends FragmentActivity {
             }
 
             Toast.makeText(BaseActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
-            finish();
         }
     };
 }
