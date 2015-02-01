@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,7 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.OnEventMarkChangeListe
 
 import java.util.ArrayList;
 
-public class EventGridFragment extends Fragment {
+public class EventGridFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     public static final String EVENTS_LIST_PARAMETER = "events";
 
     private EventsGridActivity activity;
@@ -42,6 +43,11 @@ public class EventGridFragment extends Fragment {
         GridView eventGridView = (GridView) view.findViewById(R.id.event_grid);
         eventGridView.setAdapter(eventsAdapter);
         eventGridView.setOnItemClickListener(mOnItemClickListener);
+
+        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(
+                R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setColorSchemeResources(R.color.app_color);
     }
 
     @Override
@@ -98,4 +104,9 @@ public class EventGridFragment extends Fragment {
             }
         }
     };
+
+    @Override
+    public void onRefresh() {
+        activity.fetchNewListing(false);
+    }
 }
