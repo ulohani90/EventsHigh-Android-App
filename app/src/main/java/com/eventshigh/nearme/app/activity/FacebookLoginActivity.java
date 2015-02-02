@@ -142,6 +142,7 @@ public class FacebookLoginActivity extends BaseActivity {
         } else {
             NavUtils.navigateUpFromSameTask(this);
         }
+        finish();
     }
 
     private Session.StatusCallback callback = new Session.StatusCallback() {

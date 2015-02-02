@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="16dp"
+    android:background="@color/background_color"
+>
+    <include
+        android:id="@+id/loading_message"
+        android:visibility="gone"
+        layout="@layout/view_loading"
+    />
+
+    <LinearLayout
+        android:id="@+id/error_message"
+        android:visibility="gone"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+    >
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/failed_load"
+            android:gravity="center"
+            android:padding="8dp"
+        />
+
+        <include layout="@layout/utils_vertical_line" />
+
+        <Button
+            style="@style/ButtonTransparentDark"
+            android:id="@+id/retry_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawableLeft="@drawable/ic_refresh_grey600_48dp"
+            android:drawableStart="@drawable/ic_refresh_grey600_48dp"
+            android:padding="8dp"
+            android:drawablePadding="8dp"
+            android:onClick="onRetryButtonClicked"
+            android:text="@string/action_retry"
+        />
+    </LinearLayout>
+</FrameLayout>

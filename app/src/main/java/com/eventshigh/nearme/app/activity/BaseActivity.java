@@ -113,15 +113,19 @@ public abstract class BaseActivity extends FragmentActivity {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-            Class parentClass = pref.isMapsViewDefault()
-                    ? EventsMapsActivity.class
-                    : EventsGridActivity.class;
-            NavUtils.navigateUpTo(this, new Intent(this, parentClass).setFlags(
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
+            navigateUp();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void navigateUp() {
+        Class parentClass = pref.isMapsViewDefault()
+                ? EventsMapsActivity.class
+                : EventsGridActivity.class;
+        NavUtils.navigateUpTo(this, new Intent(this, parentClass).setFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     /**

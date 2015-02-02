@@ -114,7 +114,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         // Setup the UI.
         viewSwitcher = new ViewSwitcher(this);
         getLayoutInflater().inflate(R.layout.activity_events, viewSwitcher);
-        View messageView = getLayoutInflater().inflate(R.layout.layout_loading_retry, viewSwitcher);
+        View messageView = getLayoutInflater().inflate(R.layout.view_loading_retry, viewSwitcher);
         loadingMessageView = messageView.findViewById(R.id.loading_message);
         errorMessageView = messageView.findViewById(R.id.error_message);
         setContentView(viewSwitcher);
@@ -565,7 +565,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     };
 
     public void onRetryButtonClicked(View view) {
-        fetchNewListing(false /** show loading view */, true /* bypass cache */);
+        fetchNewListing(true /** show loading view */, true /* bypass cache */);
     }
 
     private class EventCollectionPagerAdapter extends SlidingTabPagerAdapter

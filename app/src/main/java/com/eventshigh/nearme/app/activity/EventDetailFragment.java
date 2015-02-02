@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver.OnScrollChangedListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -25,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +60,10 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
  * create an instance of this fragment.
  */
 public class EventDetailFragment extends Fragment {
+
+    public static interface MyScrollListener {
+        void setScroll(int scrollValue);
+    }
 
     /**********************************
      CONSTANTS
@@ -127,13 +133,22 @@ public class EventDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_event_detail, container, false);
 
         // Populate View card.
-        eventCard = new EventCard(rootView);
+        eventCard = new EventCard((ScrollView) rootView);
+        eventCard.rootView.getChildAt(0).setMinimumHeight(
+                (int) (1.33 * activity.getResources().getDisplayMetrics().heightPixels));
+
         return rootView;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         populateView();
+        eventCard.rootView.getViewTreeObserver().addOnScrollChangedListener(new OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                ((MyScrollListener)activity).setScroll(eventCard.rootView.getScrollY());
+            }
+        });
     }
 
     public void onAttach(final Activity activity) {
@@ -239,7 +254,7 @@ public class EventDetailFragment extends Fragment {
      **********************************/
 
     private static class EventCard {
-        private final View rootView;
+        private final ScrollView rootView;
         private final View shareContentsView;
 
         private final NetworkImageView bgView;
@@ -279,7 +294,9 @@ public class EventDetailFragment extends Fragment {
         private final LinearLayout organizerWebsiteRow;
         private final TextView organizerWebsiteView;
 
-        private EventCard(View rootView) {
+        private final View bottomPaddingView;
+
+        private EventCard(ScrollView rootView) {
             this.rootView = rootView;
             shareContentsView = rootView.findViewById(R.id.share_view);
 
@@ -319,6 +336,8 @@ public class EventDetailFragment extends Fragment {
             organizerPhoneView = (TextView) rootView.findViewById(R.id.organizer_phone);
             organizerWebsiteRow = (LinearLayout) rootView.findViewById(R.id.organizer_website_row);
             organizerWebsiteView = (TextView) rootView.findViewById(R.id.organizer_website);
+
+            bottomPaddingView = rootView.findViewById(R.id.bottom_padding);
         }
     }
 
@@ -535,8 +554,8 @@ public class EventDetailFragment extends Fragment {
         Utils.waitForViewVisible(eventCard.descriptionView, new Runnable() {
             @Override
             public void run() {
-                if (eventCard.descriptionView.getLineCount() > 5) {
-                    eventCard.descriptionView.setMaxLines(3);
+                if (eventCard.descriptionView.getLineCount() > 8) {
+                    eventCard.descriptionView.setMaxLines(5);
                     eventCard.readMoreView.setVisibility(View.VISIBLE);
                 }
             }

@@ -225,6 +225,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
             android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         >
             <!-- Accepts URIs that begin with "http://www.eventshigh.com/detail/" -->
             <intent-filter>
@@ -271,7 +272,6 @@
             android:label="@string/app_name"
             android:parentActivityName=".settings.SettingsActivity"
             android:launchMode="singleTask"
-            android:noHistory="true"
         >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
