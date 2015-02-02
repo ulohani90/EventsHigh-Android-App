@@ -12,6 +12,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
@@ -28,6 +30,7 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
     private EventsGridActivity activity;
     private EventsAdapter eventsAdapter;
     private Editor eventsMarkerEditor;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,8 +47,7 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
         eventGridView.setAdapter(eventsAdapter);
         eventGridView.setOnItemClickListener(mOnItemClickListener);
 
-        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(
-                R.id.swipe_refresh);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeResources(R.color.app_color);
     }
@@ -107,6 +109,11 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
 
     @Override
     public void onRefresh() {
-        activity.fetchNewListing(false);
+        activity.fetchNewListing(new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
     }
 }

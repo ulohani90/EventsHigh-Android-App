@@ -15,6 +15,7 @@
     <string name="action_call">Call</string>
     <string name="action_shortcut">Add to homescreen</string>
     <string name="action_refresh">Refresh</string>
+    <string name="action_retry">Retry</string>
     <string name="action_refer">Refer a friend</string>
     <string name="action_connect_facebook">Facebook Connection</string>
 

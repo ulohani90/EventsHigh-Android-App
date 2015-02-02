@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Material design colors (gray) -->
+    <color name="gray800">#424242</color>
+    <color name="gray700">#616161</color>
+    <color name="gray600">#757575</color>
+    <color name="gray500">#9e9e9e</color>
+    <color name="gray400">#bdbdbd</color>
+    <color name="gray300">#e0e0e0</color>
+    <color name="gray200">#eeeeee</color>
 
     <color name="app_color">#15A9D1</color>
+    <color name="background_color">#e0e0e0</color>
 
     <color name="highlight_color">#EAEAEA</color>
 
     <color name="button_gray">#FAFAFA</color>
     <color name="link_color">#990071B8</color>
+
+    <color name="divider_dark_gray">@color/gray400</color>
+
 </resources>
