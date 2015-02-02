@@ -279,175 +279,177 @@ ADDED from AndroidManifest.xml:119:13
 	android:pathPrefix
 		ADDED from AndroidManifest.xml:120:17
 activity#com.eventshigh.nearme.app.activity.LaunchActivity
-ADDED from AndroidManifest.xml:134:9
+ADDED from AndroidManifest.xml:126:9
 	android:noHistory
-		ADDED from AndroidManifest.xml:137:13
+		ADDED from AndroidManifest.xml:129:13
 	android:label
-		ADDED from AndroidManifest.xml:136:13
+		ADDED from AndroidManifest.xml:128:13
 	android:exported
-		ADDED from AndroidManifest.xml:138:13
+		ADDED from AndroidManifest.xml:130:13
 	android:name
-		ADDED from AndroidManifest.xml:135:13
+		ADDED from AndroidManifest.xml:127:13
 intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:140:13
+ADDED from AndroidManifest.xml:132:13
 action#android.intent.action.MAIN
-ADDED from AndroidManifest.xml:141:17
+ADDED from AndroidManifest.xml:133:17
 	android:name
-		ADDED from AndroidManifest.xml:141:25
+		ADDED from AndroidManifest.xml:133:25
 category#android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:142:17
+ADDED from AndroidManifest.xml:134:17
 	android:name
-		ADDED from AndroidManifest.xml:142:27
+		ADDED from AndroidManifest.xml:134:27
 intent-filter#android.intent.action.SEARCH
-ADDED from AndroidManifest.xml:146:13
+ADDED from AndroidManifest.xml:138:13
 action#android.intent.action.SEARCH
-ADDED from AndroidManifest.xml:147:17
+ADDED from AndroidManifest.xml:139:17
 	android:name
-		ADDED from AndroidManifest.xml:147:25
+		ADDED from AndroidManifest.xml:139:25
 intent-filter#android.intent.action.VIEW+android.intent.category.DEFAULT+andrsoid.intent.category.BROWSABLE
-ADDED from AndroidManifest.xml:155:13
+ADDED from AndroidManifest.xml:147:13
 action#android.intent.action.VIEW
-ADDED from AndroidManifest.xml:156:17
+ADDED from AndroidManifest.xml:148:17
 	android:name
-		ADDED from AndroidManifest.xml:156:25
+		ADDED from AndroidManifest.xml:148:25
 data
-ADDED from AndroidManifest.xml:157:17
+ADDED from AndroidManifest.xml:149:17
 	android:host
-		ADDED from AndroidManifest.xml:159:21
+		ADDED from AndroidManifest.xml:151:21
 	android:path
-		ADDED from AndroidManifest.xml:160:21
+		ADDED from AndroidManifest.xml:152:21
 	android:scheme
-		ADDED from AndroidManifest.xml:158:21
+		ADDED from AndroidManifest.xml:150:21
 category#android.intent.category.DEFAULT
-ADDED from AndroidManifest.xml:162:17
+ADDED from AndroidManifest.xml:154:17
 	android:name
-		ADDED from AndroidManifest.xml:162:27
+		ADDED from AndroidManifest.xml:154:27
 category#andrsoid.intent.category.BROWSABLE
-ADDED from AndroidManifest.xml:163:17
+ADDED from AndroidManifest.xml:155:17
 	android:name
-		ADDED from AndroidManifest.xml:163:27
+		ADDED from AndroidManifest.xml:155:27
 activity#com.eventshigh.nearme.app.activity.EventsMapsActivity
-ADDED from AndroidManifest.xml:201:9
+ADDED from AndroidManifest.xml:193:9
 	android:label
-		ADDED from AndroidManifest.xml:203:13
+		ADDED from AndroidManifest.xml:195:13
 	android:configChanges
-		ADDED from AndroidManifest.xml:204:13
+		ADDED from AndroidManifest.xml:196:13
 	android:name
-		ADDED from AndroidManifest.xml:202:13
+		ADDED from AndroidManifest.xml:194:13
 activity#com.eventshigh.nearme.app.activity.EventsGridActivity
-ADDED from AndroidManifest.xml:215:9
+ADDED from AndroidManifest.xml:207:9
 	android:label
-		ADDED from AndroidManifest.xml:217:13
+		ADDED from AndroidManifest.xml:209:13
 	android:configChanges
-		ADDED from AndroidManifest.xml:218:13
+		ADDED from AndroidManifest.xml:210:13
 	android:name
-		ADDED from AndroidManifest.xml:216:13
+		ADDED from AndroidManifest.xml:208:13
 activity#com.eventshigh.nearme.app.activity.EventDetailActivity
-ADDED from AndroidManifest.xml:230:9
+ADDED from AndroidManifest.xml:222:9
 	android:label
-		ADDED from AndroidManifest.xml:232:13
+		ADDED from AndroidManifest.xml:224:13
 	android:configChanges
-		ADDED from AndroidManifest.xml:233:13
-	android:exported
-		ADDED from AndroidManifest.xml:235:13
-	android:name
-		ADDED from AndroidManifest.xml:231:13
-	android:launchMode
-		ADDED from AndroidManifest.xml:234:13
-activity#com.eventshigh.nearme.app.activity.OnBoardingActivity
-ADDED from AndroidManifest.xml:250:9
-	android:noHistory
-		ADDED from AndroidManifest.xml:255:13
-	android:label
-		ADDED from AndroidManifest.xml:253:13
+		ADDED from AndroidManifest.xml:225:13
 	android:theme
+		ADDED from AndroidManifest.xml:228:13
+	android:exported
+		ADDED from AndroidManifest.xml:227:13
+	android:name
+		ADDED from AndroidManifest.xml:223:13
+	android:launchMode
+		ADDED from AndroidManifest.xml:226:13
+activity#com.eventshigh.nearme.app.activity.OnBoardingActivity
+ADDED from AndroidManifest.xml:243:9
+	android:noHistory
+		ADDED from AndroidManifest.xml:248:13
+	android:label
+		ADDED from AndroidManifest.xml:246:13
+	android:theme
+		ADDED from AndroidManifest.xml:245:13
+	android:name
+		ADDED from AndroidManifest.xml:244:13
+	android:launchMode
+		ADDED from AndroidManifest.xml:247:13
+activity#com.eventshigh.nearme.app.settings.SettingsActivity
+ADDED from AndroidManifest.xml:250:9
+	android:label
 		ADDED from AndroidManifest.xml:252:13
 	android:name
 		ADDED from AndroidManifest.xml:251:13
 	android:launchMode
-		ADDED from AndroidManifest.xml:254:13
-activity#com.eventshigh.nearme.app.settings.SettingsActivity
-ADDED from AndroidManifest.xml:257:9
+		ADDED from AndroidManifest.xml:253:13
+activity#com.eventshigh.nearme.app.activity.ShareAppActivity
+ADDED from AndroidManifest.xml:255:9
 	android:label
+		ADDED from AndroidManifest.xml:257:13
+	android:parentActivityName
 		ADDED from AndroidManifest.xml:259:13
 	android:name
+		ADDED from AndroidManifest.xml:256:13
+	android:launchMode
 		ADDED from AndroidManifest.xml:258:13
-	android:launchMode
-		ADDED from AndroidManifest.xml:260:13
-activity#com.eventshigh.nearme.app.activity.ShareAppActivity
-ADDED from AndroidManifest.xml:262:9
-	android:label
-		ADDED from AndroidManifest.xml:264:13
-	android:parentActivityName
-		ADDED from AndroidManifest.xml:266:13
-	android:name
-		ADDED from AndroidManifest.xml:263:13
-	android:launchMode
-		ADDED from AndroidManifest.xml:265:13
 meta-data#android.support.PARENT_ACTIVITY
-ADDED from AndroidManifest.xml:268:13
+ADDED from AndroidManifest.xml:261:13
 	android:name
-		ADDED from AndroidManifest.xml:269:17
+		ADDED from AndroidManifest.xml:262:17
 	android:value
-		ADDED from AndroidManifest.xml:270:17
+		ADDED from AndroidManifest.xml:263:17
 activity#com.facebook.LoginActivity
-ADDED from AndroidManifest.xml:273:9
+ADDED from AndroidManifest.xml:266:9
 	android:label
-		ADDED from AndroidManifest.xml:275:13
+		ADDED from AndroidManifest.xml:268:13
 	android:name
-		ADDED from AndroidManifest.xml:274:13
+		ADDED from AndroidManifest.xml:267:13
 activity#com.eventshigh.nearme.app.activity.FacebookLoginActivity
-ADDED from AndroidManifest.xml:277:9
+ADDED from AndroidManifest.xml:270:9
 	android:label
-		ADDED from AndroidManifest.xml:279:13
+		ADDED from AndroidManifest.xml:272:13
 	android:parentActivityName
-		ADDED from AndroidManifest.xml:280:13
+		ADDED from AndroidManifest.xml:273:13
 	android:name
-		ADDED from AndroidManifest.xml:278:13
+		ADDED from AndroidManifest.xml:271:13
 	android:launchMode
-		ADDED from AndroidManifest.xml:281:13
+		ADDED from AndroidManifest.xml:274:13
 activity#com.eventshigh.nearme.app.settings.AboutUsActivity
-ADDED from AndroidManifest.xml:288:9
+ADDED from AndroidManifest.xml:281:9
 	android:label
-		ADDED from AndroidManifest.xml:290:13
+		ADDED from AndroidManifest.xml:283:13
 	android:parentActivityName
-		ADDED from AndroidManifest.xml:291:13
+		ADDED from AndroidManifest.xml:284:13
 	android:name
-		ADDED from AndroidManifest.xml:289:13
+		ADDED from AndroidManifest.xml:282:13
 	android:launchMode
-		ADDED from AndroidManifest.xml:292:13
+		ADDED from AndroidManifest.xml:285:13
 receiver#com.eventshigh.nearme.app.broadcast.InstallReferrer
-ADDED from AndroidManifest.xml:302:9
+ADDED from AndroidManifest.xml:295:9
 	android:exported
-		ADDED from AndroidManifest.xml:304:13
+		ADDED from AndroidManifest.xml:297:13
 	android:name
-		ADDED from AndroidManifest.xml:303:13
+		ADDED from AndroidManifest.xml:296:13
 intent-filter#com.android.vending.INSTALL_REFERRER
-ADDED from AndroidManifest.xml:306:13
+ADDED from AndroidManifest.xml:299:13
 action#com.android.vending.INSTALL_REFERRER
-ADDED from AndroidManifest.xml:307:17
+ADDED from AndroidManifest.xml:300:17
 	android:name
-		ADDED from AndroidManifest.xml:307:25
+		ADDED from AndroidManifest.xml:300:25
 receiver#com.eventshigh.nearme.app.broadcast.GcmBroadcastReceiver
-ADDED from AndroidManifest.xml:312:9
+ADDED from AndroidManifest.xml:305:9
 	android:permission
-		ADDED from AndroidManifest.xml:314:13
+		ADDED from AndroidManifest.xml:307:13
 	android:name
-		ADDED from AndroidManifest.xml:313:13
+		ADDED from AndroidManifest.xml:306:13
 intent-filter#com.example.gcm+com.google.android.c2dm.intent.RECEIVE
-ADDED from AndroidManifest.xml:315:13
+ADDED from AndroidManifest.xml:308:13
 action#com.google.android.c2dm.intent.RECEIVE
-ADDED from AndroidManifest.xml:316:17
+ADDED from AndroidManifest.xml:309:17
 	android:name
-		ADDED from AndroidManifest.xml:316:25
+		ADDED from AndroidManifest.xml:309:25
 category#com.example.gcm
-ADDED from AndroidManifest.xml:317:17
+ADDED from AndroidManifest.xml:310:17
 	android:name
-		ADDED from AndroidManifest.xml:317:27
+		ADDED from AndroidManifest.xml:310:27
 service#com.eventshigh.nearme.app.broadcast.GcmIntentService
-ADDED from AndroidManifest.xml:320:9
+ADDED from AndroidManifest.xml:313:9
 	android:name
-		ADDED from AndroidManifest.xml:320:18
+		ADDED from AndroidManifest.xml:313:18
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from NearMe:volley:unspecified:7:5
