@@ -240,12 +240,16 @@ public class EventDetailFragment extends Fragment {
 
     private void openBookingSite() {
         activity.reportActionToAnalytics("bookTicket");
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.bookingUrl));
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            // No activity to open url. ignore.
-        }
+        Intent intent = new Intent(activity, BookTicketActivity.class);
+        intent.putExtra(BookTicketActivity.EVENT_BOOKING_URL_INTENT_KEY, event.bookingUrl);
+        startActivity(intent);
+
+//        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.bookingUrl));
+//        try {
+//            startActivity(intent);
+//        } catch (ActivityNotFoundException e) {
+//            // No activity to open url. ignore.
+//        }
     }
 
 
