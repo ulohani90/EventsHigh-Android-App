@@ -56,7 +56,7 @@ public class EventUberPrefetcher {
 
     private static final Listener<String> NULL_LISTENER = new Listener<String>() {
         @Override
-        public void onResponse(String s) {
+        public void onResponse(String s, boolean isIntermediate) {
             // do nothing.
         }
     };

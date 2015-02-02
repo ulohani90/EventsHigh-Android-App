@@ -61,7 +61,7 @@ public class AccountStateReporter {
                     new StringRequest(Method.GET, Signer.sign(uri).toString(),
                             new Listener<String>() {
                                 @Override
-                                public void onResponse(String s) {
+                                public void onResponse(String s, boolean isIntermediate) {
                                     // do nothing.
                                 }
                             },

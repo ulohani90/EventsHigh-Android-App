@@ -99,7 +99,7 @@ public class EventDetailActivity extends BaseActivity implements MyScrollListene
 
     private Listener<Event> mEventListener = new Listener<Event>() {
         @Override
-        public void onResponse(Event event) {
+        public void onResponse(Event event, boolean isIntermediate) {
             toolbar.setTitle(event.title);
             toolbar.setAlpha(0f);
 

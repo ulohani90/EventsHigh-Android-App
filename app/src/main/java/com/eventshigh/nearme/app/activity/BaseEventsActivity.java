@@ -206,13 +206,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
             menu.findItem(R.id.action_filter).setVisible(false);
         }
 
-        // Debug Views.
-        if (isDebug) {
-            MenuItem item = menu.findItem(R.id.debug_cache_override);
-            item.setVisible(true);
-            item.setChecked(EventCollectionRequest.shouldBypassCache);
-        }
-
         int disabledMenuId = getDisabledMenuId();
         if (disabledMenuId > 0) {
             menu.findItem(disabledMenuId).setVisible(false);
@@ -257,15 +250,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
-            return true;
-        }
-
-        if (id == R.id.debug_cache_override) {
-            EventCollectionRequest.shouldBypassCache = !item.isChecked();
-            item.setChecked(EventCollectionRequest.shouldBypassCache);
-            if (item.isChecked()) {
-                fetchNewListing(true /** show loading view */, true /* bypass cache */);
-            }
             return true;
         }
 
@@ -509,9 +493,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // markers for all events and then call method to show selected markers.
     private Listener<EventsCollection> mEventsFetcherCallBack = new Listener<EventsCollection>() {
         @Override
-        public void onResponse(EventsCollection events) {
+        public void onResponse(EventsCollection events, boolean isIntermediate) {
             viewSwitcher.setDisplayedChild(0);
-            topProgressBar.setVisibility(View.GONE);
+            if (!isIntermediate) {
+                topProgressBar.setVisibility(View.GONE);
+            }
 
             if (events.getTags().isEmpty()) {
                 // Failed. Show toast and return empty list.

@@ -136,8 +136,8 @@ public class Account {
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
             new Listener<JSONObject>() {
                 @Override
-                public void onResponse(JSONObject jsonObject) {
-                    listener.onResponse(jsonObject.optInt("count"));
+                public void onResponse(JSONObject jsonObject, boolean isIntermediate) {
+                    listener.onResponse(jsonObject.optInt("count"), isIntermediate);
                 }
              }, errorListener);
         request.setTag(activity);
