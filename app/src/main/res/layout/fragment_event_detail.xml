@@ -478,6 +478,7 @@
         </LinearLayout>
 
         <View
+            android:id="@+id/bottom_padding"
             android:layout_width="match_parent"
             android:layout_height="32dp"
             android:background="@android:color/transparent"
