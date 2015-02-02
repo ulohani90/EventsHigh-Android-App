@@ -101,6 +101,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
                         (RelativeLayout.LayoutParams) eventCard.bgView.getLayoutParams();
                 params.width = eventCard.bgView.getHeight();
                 eventCard.bgView.setLayoutParams(params);
+                eventCard.bgView.setDefaultImageResId(R.drawable.eh_default_event_list);
                 if (event.imgUrl != null) {
                     eventCard.bgView.setImageUrl(event.imgUrl,
                             VolleyHelper.getImageLoader(activity.getApplicationContext()));
