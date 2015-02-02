@@ -45,19 +45,17 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         }
 
         String url;
-        if (param.query.isEmpty()) {
-            url = EventsHighEndpoints.getApiEndpointDate(param.city);
-        } else {
-            try {
-                url = EventsHighEndpoints.getApiEndpointQuery(param.city, param.query);
-            } catch (UnsupportedEncodingException e) {
-                errorListener.onErrorResponse(new VolleyError("Invalid Query", e));
-                return;
-            }
+        try {
+            url = getUrl(param);
+        } catch (UnsupportedEncodingException e) {
+            errorListener.onErrorResponse(new VolleyError("Invalid Query", e));
+            return;
         }
 
         if (shouldBypassCache) {
             url = url + "&cmode=bypass";
+            // Remove the url from cache
+            VolleyHelper.getRequestQueue(context).getCache().remove(url);
         }
 
         EventCollectionRequest request = new EventCollectionRequest(context, url, param, priority,
@@ -66,6 +64,16 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             request.setTag(tag);
         }
         VolleyHelper.addToRequestQueue(context, request);
+    }
+
+    public static String getUrl(EventFetcherParam param) throws UnsupportedEncodingException {
+        String url;
+        if (param.query.isEmpty()) {
+            url = EventsHighEndpoints.getApiEndpointDate(param.city);
+        } else {
+            url = EventsHighEndpoints.getApiEndpointQuery(param.city, param.query);
+        }
+        return url;
     }
 
     private final Context context;
