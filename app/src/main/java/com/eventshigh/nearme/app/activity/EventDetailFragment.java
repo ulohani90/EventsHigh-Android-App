@@ -353,9 +353,8 @@ public class EventDetailFragment extends Fragment {
         ViewGroup.LayoutParams params = eventCard.bgView.getLayoutParams();
         params.height = (int) (0.3 * metrics.heightPixels);
         eventCard.bgView.setLayoutParams(params);
-        if (event.imgUrl == null) {
-            eventCard.bgView.setVisibility(View.GONE);
-        } else {
+        eventCard.bgView.setDefaultImageResId(R.drawable.eh_default_event_detail);
+        if (event.imgUrl != null) {
             eventCard.bgView.setImageUrl(event.imgUrl,
                     VolleyHelper.getImageLoader(activity.getApplicationContext()));
             eventCard.bgView.setOnClickListener(new OnClickListener() {

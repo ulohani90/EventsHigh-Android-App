@@ -55,12 +55,4 @@
           android:icon="@drawable/ic_settings_white_36dp"
           android:orderInCategory="60"
     />
-    <item android:id="@+id/debug_cache_override"
-          android:title="Bypass Cache"
-          android:icon="@android:drawable/ic_menu_manage"
-          android:orderInCategory="70"
-          android:checkable="true"
-          android:visible="false"
-          tools:ignore="HardcodedText"
-    />
 </menu>

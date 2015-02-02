@@ -45,7 +45,7 @@ public class ShareAppActivity extends BaseActivity {
         account.getNumReferrerInstalls(this,
                 new Listener<Integer>() {
                     @Override
-                    public void onResponse(Integer numInstalls) {
+                    public void onResponse(Integer numInstalls, boolean isIntermediate) {
                         if (numInstalls > 0) {
                             tv.setText(MessageFormat.format(getString(R.string.ui_referrer), numInstalls));
                         }

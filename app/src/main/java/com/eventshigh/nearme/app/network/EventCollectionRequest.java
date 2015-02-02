@@ -13,8 +13,8 @@ import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.data.EventsCollection;
-import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONException;
@@ -26,8 +26,6 @@ import java.io.UnsupportedEncodingException;
  * Volley Request to fetch Events collections.
  */
 public class EventCollectionRequest extends JsonRequest<EventsCollection> {
-    public static boolean shouldBypassCache = false;
-
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
@@ -52,14 +50,8 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             return;
         }
 
-        if (shouldBypassCache) {
-            url = url + "&cmode=bypass";
-            // Remove the url from cache
-            VolleyHelper.getRequestQueue(context).getCache().remove(url);
-        }
-
-        EventCollectionRequest request = new EventCollectionRequest(context, url, param, priority,
-                listener, errorListener);
+        EventCollectionRequest request = new EventCollectionRequest(
+                context, url, param, shouldBypassCache, priority, listener, errorListener);
         if (tag != null) {
             request.setTag(tag);
         }
@@ -83,16 +75,20 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
     /**
      * Creates a new request.
-     *
-     * @param context application context.
+     *  @param context application context.
      * @param url URL to fetch the JSON from.
+     * @param shouldBypassCache true if local cache should be bypassed
      * @param priority priority of request.
      * @param listener Listener to receive the JSON response
      * @param errorListener Error listener, or null to ignore errors.
      */
-    public EventCollectionRequest(Context context, String url, EventFetcherParam param, Priority priority,
+    public EventCollectionRequest(Context context, String url, EventFetcherParam param,
+                                  boolean shouldBypassCache, Priority priority,
                                   Listener<EventsCollection> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
+        setShouldBypassCache(shouldBypassCache);
+        setShouldAllowStaleResponse(true);
+
         this.context = context;
         this.param = param;
         this.priority = priority;
