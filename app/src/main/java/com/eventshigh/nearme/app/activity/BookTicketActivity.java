@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.ClientCertRequest;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -33,10 +35,22 @@ public class BookTicketActivity extends BaseActivity {
         // Enable Javascript
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        webSettings.setSupportMultipleWindows(true);
+
+        webSettings.setAllowContentAccess(true);
+        webSettings.setAllowFileAccess(true);
+        webSettings.setAppCacheEnabled(true);
+        webSettings.setBlockNetworkImage(false);
+        webSettings.setBlockNetworkLoads(false);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setLoadsImagesAutomatically(true);
 
         // Setup a new web view client so we can listen in on events and also customize web view
         // behavior.
         webView.setWebViewClient(new BookTicketWebViewClient());
+        webView.setWebChromeClient(new BookTicketWebChromeClient());
 
         // Load the url in the web view
         url = getIntent().getExtras().getString(EVENT_BOOKING_URL_INTENT_KEY);
@@ -108,5 +122,9 @@ public class BookTicketActivity extends BaseActivity {
             //   }
             return false;
         }
+    }
+
+    private class BookTicketWebChromeClient extends WebChromeClient {
+
     }
 }
