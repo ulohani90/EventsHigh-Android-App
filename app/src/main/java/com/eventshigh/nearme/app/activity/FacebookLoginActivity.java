@@ -46,6 +46,7 @@ public class FacebookLoginActivity extends BaseActivity {
         findViewById(R.id.skip).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                reportActionToAnalytics("skipLogin");
                 Account account = new Account(getApplicationContext());
                 account.recordSkipLogin();
                 up();
@@ -151,9 +152,11 @@ public class FacebookLoginActivity extends BaseActivity {
             authButton.setSession(session);
 
             if (state.isOpened()) {
+                reportActionToAnalytics("loginSuccessFull");
                 Request.newMeRequest(session, new GraphUserCallback() {
                     @Override
                     public void onCompleted(GraphUser user, Response response) {
+                        reportActionToAnalytics("gotFBEmail");
                         Account account = new Account(getApplicationContext());
                         String email = user.getProperty("email").toString();
                         account.recordFacebookEmail(email);

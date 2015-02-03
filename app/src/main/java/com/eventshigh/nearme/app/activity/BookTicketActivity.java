@@ -54,6 +54,7 @@ public class BookTicketActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_open_in_browser) {
+            reportActionToAnalytics("openInBrowser");
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             try {
                 startActivity(intent);
@@ -79,11 +80,13 @@ public class BookTicketActivity extends BaseActivity {
     private class BookTicketWebViewClient extends WebViewClient {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            reportActionToAnalytics("startLoading");
             progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
+            reportActionToAnalytics("finishLoading");
             progressBar.setVisibility(View.GONE);
         }
 

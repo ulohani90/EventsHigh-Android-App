@@ -109,6 +109,7 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
 
     @Override
     public void onRefresh() {
+        activity.reportActionToAnalytics("swipeRefresh");
         activity.fetchNewListing(new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {

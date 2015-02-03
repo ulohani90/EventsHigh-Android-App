@@ -136,6 +136,7 @@ public class OnBoardingActivity extends BaseActivity {
      * Starts the {@link com.eventshigh.nearme.app.activity.FacebookLoginActivity} and finishes this activity.
      */
     private void getStarted() {
+        reportActionToAnalytics("endOnboarding", Integer.toString(lastPosition));
         startActivity(new Intent(this, FacebookLoginActivity.class)
                 .putExtra(FacebookLoginActivity.PARAM_ONBOARDING, true));
         finish();
@@ -160,6 +161,7 @@ public class OnBoardingActivity extends BaseActivity {
                         @Override
                         public void run() {
                             if (!isFinishing()) {
+                                reportActionToAnalytics("onBoardingCoachHelp");
                                 new ShowcaseView.Builder(OnBoardingActivity.this, true)
                                         .setTarget(new ViewTarget(findViewById(R.id.get_started)))
                                         .setContentText(R.string.onboarding_get_started)

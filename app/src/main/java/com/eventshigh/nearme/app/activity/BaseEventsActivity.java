@@ -254,6 +254,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         if (id == R.id.action_refresh) {
+            reportActionToAnalytics("menuRefresh");
             fetchNewListing(false /** show loading view */, true /* bypass cache */);
         }
 
@@ -532,6 +533,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     };
 
     public void onRetryButtonClicked(View view) {
+        reportActionToAnalytics("retryFetch");
         fetchNewListing(true /** show loading view */, true /* bypass cache */);
     }
 
