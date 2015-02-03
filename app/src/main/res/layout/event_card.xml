@@ -132,6 +132,7 @@
         android:showDividers="middle"
         android:background="#FAFAFA"
         android:divider="@drawable/shape_vertical_divider"
+        android:visibility="gone"
     >
         <FrameLayout
             android:id="@+id/action_favourited"

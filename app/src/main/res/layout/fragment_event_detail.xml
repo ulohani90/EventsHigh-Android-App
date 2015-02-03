@@ -62,6 +62,7 @@
                     android:textSize="12sp"
                     android:text="@string/ui_favourited"
                     android:textColor="#FFD0021B"
+                    android:visibility="gone"
                 />
                 <TextView
                     android:id="@+id/action_favourite"
@@ -76,6 +77,7 @@
                     android:textSize="12sp"
                     android:text="@string/ui_favourite"
                     android:textColor="@android:color/white"
+                    android:visibility="gone"
                 />
                 <TextView
                     android:id="@+id/action_dismiss"
@@ -90,6 +92,7 @@
                     android:textSize="12sp"
                     android:text="@string/ui_dismiss"
                     android:textColor="@android:color/white"
+                    android:visibility="gone"
                 />
             </FrameLayout>
 
