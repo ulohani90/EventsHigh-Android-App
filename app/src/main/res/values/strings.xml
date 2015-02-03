@@ -13,6 +13,7 @@
     <string name="action_share">Share</string>
     <string name="action_book">Book</string>
     <string name="action_book_ticket">Book Ticket</string>
+    <string name="action_open_in_browser">Open In Browser</string>
     <string name="action_call">Call</string>
     <string name="action_shortcut">Add to homescreen</string>
     <string name="action_refresh">Refresh</string>

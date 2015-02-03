@@ -3,7 +3,6 @@
       xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activity.EventsGridActivity"
 >
-
     <item android:id="@+id/action_search"
           android:title="@string/abc_searchview_description_search"
           android:icon="@drawable/ic_search_white_36dp"

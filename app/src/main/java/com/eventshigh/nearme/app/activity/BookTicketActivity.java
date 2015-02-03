@@ -1,8 +1,13 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -13,6 +18,7 @@ import com.eventshigh.nearme.app.R;
 public class BookTicketActivity extends BaseActivity {
     public static final String EVENT_BOOKING_URL_INTENT_KEY = "EVENT_BOOKING_URL_INTENT_KEY";
 
+    private String url;
     private WebView webView;
     private View progressBar;
 
@@ -33,7 +39,31 @@ public class BookTicketActivity extends BaseActivity {
         webView.setWebViewClient(new BookTicketWebViewClient());
 
         // Load the url in the web view
-        webView.loadUrl(getIntent().getExtras().getString(EVENT_BOOKING_URL_INTENT_KEY));
+        url = getIntent().getExtras().getString(EVENT_BOOKING_URL_INTENT_KEY);
+        webView.loadUrl(url);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.activity_book, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_open_in_browser) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            try {
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                // No application to open url. ignore.
+            }
+            return  true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
