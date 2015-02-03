@@ -378,7 +378,7 @@ public class EventDetailFragment extends Fragment {
 
         // Set EH recommendation and favourite views.
         eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
-        setFavouriteView(eventCard, eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id));
+        // setFavouriteView(eventCard, eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id));
         eventCard.favouriteView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
