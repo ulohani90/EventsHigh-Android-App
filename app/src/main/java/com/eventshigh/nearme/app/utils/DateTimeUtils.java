@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -50,6 +51,12 @@ public class DateTimeUtils {
         Date todayMidnight = toMidnight(Calendar.getInstance(), timeZone).getTime();
         Date mergedDate = FULL_DATE_TIME_FORMAT.parse(date.split(":")[0] + " " + time + " " + timeZone);
         return mergedDate.after(todayMidnight) ? mergedDate : null;
+    }
+
+    public static int getDaysLater(Event event) {
+        Date eventDate = DateTimeUtils.getEventDate(event, 0);
+        Date today = DateTimeUtils.toMidnight(Calendar.getInstance(), event.city.timeZone).getTime();
+        return (int) TimeUnit.MILLISECONDS.toDays(eventDate.getTime() - today.getTime());
     }
 
     public static Date getEventDate(Event event, int occurrenceNo) {

@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
@@ -34,10 +33,10 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -46,9 +45,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 
 import java.text.MessageFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
@@ -416,18 +413,6 @@ public class EventDetailFragment extends Fragment {
             }
         });
 
-        // Set Num people Interested
-        final ActionBar actionBar = getActivity().getActionBar();
-        if (actionBar != null) {
-            if (event.numPeopleInterested <= 0) {
-                actionBar.setSubtitle("");
-            } else {
-                String text = getResources().getQuantityString(R.plurals.people_interested,
-                        event.numPeopleInterested, event.numPeopleInterested);
-                actionBar.setSubtitle(text);
-            }
-        }
-
         // Set Venue and address.
         if (event.venue == null && event.address == null) {
             eventCard.venueGroupView.setVisibility(View.GONE);
@@ -490,9 +475,7 @@ public class EventDetailFragment extends Fragment {
                 }
             });
 
-            Date eventDate = DateTimeUtils.getEventDate(event, 0);
-            Date today = DateTimeUtils.toMidnight(Calendar.getInstance(), event.city.timeZone).getTime();
-            int numDays = (int) TimeUnit.MILLISECONDS.toDays(eventDate.getTime() - today.getTime());
+            int numDays = DateTimeUtils.getDaysLater(event);
             if (numDays >= 0) {
                 eventCard.timeDetailView.setText(
                     MessageFormat.format(getResources().getString(R.string.event_time_details), numDays));

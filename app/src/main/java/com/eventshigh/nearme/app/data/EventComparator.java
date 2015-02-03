@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.data;
 
-import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -25,22 +24,6 @@ public class EventComparator implements Comparator<Event> {
 
     @Override
     public int compare(Event lhs, Event rhs) {
-        if (lhs.eventTimings.length > 0 && rhs.eventTimings.length > 0) {
-            int result = DateTimeUtils.getEventDate(lhs, 0).compareTo(
-                    DateTimeUtils.getEventDate(rhs, 0));
-            if (result != 0) {
-                return result;
-            }
-        }
-
-        if (lhs.eventTimings.length == 0) {
-            return 1;
-        }
-
-        if (rhs.eventTimings.length == 0) {
-            return -1;
-        }
-
         return Double.compare(
                 weightedDistance(lhs, eventsMarkerManager.isFavourite(lhs.id), userLocation, eventToDistanceMap),
                 weightedDistance(rhs, eventsMarkerManager.isFavourite(rhs.id), userLocation, eventToDistanceMap)
@@ -57,9 +40,17 @@ public class EventComparator implements Comparator<Event> {
         }
 
         float distance = LocationUtils.distanceInMeters(event.location, userLocation);
-        double weight = (event.numPeopleInterested > 0 ? Math.log(event.numPeopleInterested) * 500 : 0)
-                + (event.ehRecommended || isFavourite ? 1000 : 0) ;
-        double weightedDistance = distance - weight;
+        float timeWeight = event.eventTimings.length > 0 ? 2000 : 10000;
+        for (long eventTime : event.eventTimings) {
+            if (eventTime > System.currentTimeMillis()) {
+                timeWeight = 0.000025f * (eventTime - System.currentTimeMillis());
+                break;
+            }
+        }
+
+        double recommendedDiscount = (event.numPeopleInterested > 0 ? Math.log(event.numPeopleInterested) * 500 : 0)
+                + (event.ehRecommended || isFavourite ? 2000 : 0);
+        double weightedDistance = distance + timeWeight - recommendedDiscount;
         eventToDistanceMap.put(event.id, weightedDistance);
         return weightedDistance;
     }

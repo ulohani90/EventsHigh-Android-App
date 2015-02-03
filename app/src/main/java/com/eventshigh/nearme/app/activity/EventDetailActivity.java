@@ -101,6 +101,13 @@ public class EventDetailActivity extends BaseActivity implements MyScrollListene
         @Override
         public void onResponse(Event event, boolean isIntermediate) {
             toolbar.setTitle(event.title);
+            if (event.numPeopleInterested <= 0) {
+                toolbar.setSubtitle("");
+            } else {
+                String text = getResources().getQuantityString(R.plurals.people_interested,
+                        event.numPeopleInterested, event.numPeopleInterested);
+                toolbar.setSubtitle(text);
+            }
             toolbar.setAlpha(0f);
 
             FragmentTransaction tx = getFragmentManager().beginTransaction();
