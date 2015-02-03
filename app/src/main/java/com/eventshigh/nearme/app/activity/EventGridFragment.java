@@ -12,15 +12,13 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.OnEventMarkChangeListener;
+import com.eventshigh.nearme.app.ui.EventsAdapter;
 
 import java.util.ArrayList;
 
@@ -110,11 +108,7 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
     @Override
     public void onRefresh() {
         activity.reportActionToAnalytics("swipeRefresh");
-        activity.fetchNewListing(new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
+        swipeRefreshLayout.setRefreshing(false);
+        activity.fetchNewListing(true /* bypass cache*/);
     }
 }

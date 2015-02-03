@@ -17,8 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.VolleyError;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
@@ -259,20 +257,4 @@ public abstract class BaseActivity extends FragmentActivity {
             Toast.makeText(this, R.string.no_cal_app, Toast.LENGTH_SHORT).show();
         }
     }
-
-    protected ErrorListener mErrorListener = new ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError volleyError) {
-            Throwable cause = volleyError.getCause();
-            if (cause != null) {
-                Log.w(LOG_TAG, volleyError.getMessage(), cause);
-                reportActionToAnalytics("failedRequest", cause.getClass().getSimpleName());
-            } else {
-                Log.w(LOG_TAG, "Volley Error: " + volleyError.getMessage());
-                reportActionToAnalytics("failedRequest");
-            }
-
-            Toast.makeText(BaseActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
-        }
-    };
 }

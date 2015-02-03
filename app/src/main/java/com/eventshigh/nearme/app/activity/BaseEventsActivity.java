@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -63,6 +64,7 @@ import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
  * This class also implements base user interactions like tabs, filters etc.
  */
 public abstract class BaseEventsActivity extends BaseActivity {
+    private static final String LOG_TAG = BaseEventsActivity.class.getSimpleName();
 
     // ***********************
     // CONSTANTS
@@ -255,7 +257,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         if (id == R.id.action_refresh) {
             reportActionToAnalytics("menuRefresh");
-            fetchNewListing(false /** show loading view */, true /* bypass cache */);
+            fetchNewListing(true /* bypass cache*/);
         }
 
         return super.onOptionsItemSelected(item);
@@ -281,7 +283,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             updateEventsCollection(new EventsCollection(new ArrayList<TaggedEvents>()));
             updateEventListing(new ArrayList<Event>());
         } else {
-                fetchNewListing(true /** show loading view */, false /* bypass cache */);
+            fetchNewListing(false /* bypass cache*/);
         }
     }
 
@@ -414,44 +416,16 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }, 1500);
     }
 
-    private void fetchNewListing(boolean shouldBypassCache,
-                                 final ErrorListener errorListener) {
-        EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam,
-                Priority.IMMEDIATE, this, shouldBypassCache, mEventsFetcherCallBack,
-                new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        errorListener.onErrorResponse(volleyError);
-                        mErrorListener.onErrorResponse(volleyError);
-                    }
-                });
-    }
-
-    private void fetchNewListing(final boolean showLoadingView, boolean shouldBypassCache) {
-        if (showLoadingView) {
+    public void fetchNewListing(boolean shouldBypassCache) {
+        if (viewPager.getAdapter() == null || viewPager.getAdapter().getCount() <= 0) {
             viewSwitcher.setDisplayedChild(1);
-            loadingMessageView.setVisibility(View.VISIBLE);
-            errorMessageView.setVisibility(View.GONE);
-        } else {
-            topProgressBar.setVisibility(View.VISIBLE);
         }
-        fetchNewListing(shouldBypassCache,
-                new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        if (showLoadingView) {
-                            viewSwitcher.setDisplayedChild(1);
-                            loadingMessageView.setVisibility(View.GONE);
-                            errorMessageView.setVisibility(View.VISIBLE);
-                        } else {
-                            topProgressBar.setVisibility(View.GONE);
-                        }
-                    }
-                });
-    }
+        loadingMessageView.setVisibility(View.VISIBLE);
+        errorMessageView.setVisibility(View.GONE);
+        topProgressBar.setVisibility(View.VISIBLE);
 
-    public void fetchNewListing(final ErrorListener errorListener) {
-        fetchNewListing(true /* bypass cache */, errorListener);
+        EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam,
+                Priority.IMMEDIATE, this, shouldBypassCache, mEventsFetcherCallBack, mErrorListener);
     }
 
     private void createShortcut() {
@@ -534,7 +508,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     public void onRetryButtonClicked(View view) {
         reportActionToAnalytics("retryFetch");
-        fetchNewListing(true /** show loading view */, true /* bypass cache */);
+        fetchNewListing(false /* bypass cache*/);
     }
 
     private class EventCollectionPagerAdapter extends SlidingTabPagerAdapter
@@ -590,4 +564,24 @@ public abstract class BaseEventsActivity extends BaseActivity {
             return Integer.toString(events.getEvents(position).size());
         }
     }
+
+    protected ErrorListener mErrorListener = new ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError volleyError) {
+            loadingMessageView.setVisibility(View.GONE);
+            errorMessageView.setVisibility(View.VISIBLE);
+            topProgressBar.setVisibility(View.GONE);
+
+            Throwable cause = volleyError.getCause();
+            if (cause != null) {
+                Log.w(LOG_TAG, "Volley Error: " + volleyError.getMessage(), cause);
+                reportActionToAnalytics("failedRequest", cause.getClass().getSimpleName());
+            } else {
+                Log.w(LOG_TAG, "Volley Error: " + volleyError.getMessage());
+                reportActionToAnalytics("failedRequest");
+            }
+
+            Toast.makeText(BaseEventsActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
+        }
+    };
 }
