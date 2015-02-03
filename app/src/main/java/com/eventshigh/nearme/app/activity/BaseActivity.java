@@ -52,7 +52,6 @@ public abstract class BaseActivity extends FragmentActivity {
 
     // User preferences.
     protected Preferences pref;
-    protected boolean isDebug;
 
 
     // ***********************
@@ -67,9 +66,7 @@ public abstract class BaseActivity extends FragmentActivity {
         // Animation.
         overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_translate);
 
-        // Twitter Digits and CrashAnalytics
-        // TwitterAuthConfig authConfig = TwitterUtils.getAuthConfig();
-        // Fabric.with(this, new Twitter(authConfig), new Crashlytics());
+        // Twitter CrashAnalytics
         if (!BuildConfig.DEBUG) {
             Fabric.with(this, new Crashlytics());
         }
@@ -79,7 +76,6 @@ public abstract class BaseActivity extends FragmentActivity {
 
         // Setup Google Analytics.
         gaHelper = GAHelper.getInstance(getApplicationContext());
-        isDebug = gaHelper.getAppOptOut();
     }
 
     protected void onStart() {

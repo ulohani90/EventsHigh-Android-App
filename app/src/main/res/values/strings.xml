@@ -12,6 +12,7 @@
     <string name="action_edit_location">Change Location</string>
     <string name="action_share">Share</string>
     <string name="action_book">Book</string>
+    <string name="action_book_ticket">Book Ticket</string>
     <string name="action_call">Call</string>
     <string name="action_shortcut">Add to homescreen</string>
     <string name="action_refresh">Refresh</string>

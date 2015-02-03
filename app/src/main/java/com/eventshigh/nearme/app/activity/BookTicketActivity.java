@@ -1,27 +1,22 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Intent;
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.net.http.SslError;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.webkit.SslErrorHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.eventshigh.nearme.app.R;
 
-public class BookTicketActivity extends Activity {
+public class BookTicketActivity extends BaseActivity {
     public static final String EVENT_BOOKING_URL_INTENT_KEY = "EVENT_BOOKING_URL_INTENT_KEY";
 
     private WebView webView;
     private View progressBar;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

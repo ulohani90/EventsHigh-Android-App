@@ -33,7 +33,6 @@ import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsCollection.TaggedEvents;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
-import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.settings.SettingsActivity;
 import com.eventshigh.nearme.app.ui.DatePickerFragment;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
@@ -49,7 +48,6 @@ import com.example.android.common.view.SlidingTabLayout;
 import com.example.android.common.view.SlidingTabPagerAdapter;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -282,24 +280,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             updateEventsCollection(new EventsCollection(new ArrayList<TaggedEvents>()));
             updateEventListing(new ArrayList<Event>());
         } else {
-            // Get the url that we are about to fetch and check if the content is already available
-            // in Volley cache
-            String url = null;
-            try {
-                url = EventCollectionRequest.getUrl(lastEventFetcherParam);
-            } catch (UnsupportedEncodingException e) {
-                // Nothing to do
-            }
-
-            if (url != null && VolleyHelper.getRequestQueue(this).getCache().get(url) != null) {
-                // The url is already cached in Volley so load that first
                 fetchNewListing(true /** show loading view */, false /* bypass cache */);
-                // Silently get the latest data without using cache
-                fetchNewListing(false /** show loading view */, true /* bypass cache */);
-            } else {
-                // Get the latest data without using cache but show loading view
-                fetchNewListing(true /** show loading view */, true /* bypass cache */);
-            }
         }
     }
 

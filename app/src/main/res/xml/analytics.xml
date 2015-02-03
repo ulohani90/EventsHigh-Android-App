@@ -5,11 +5,14 @@
     <bool name="ga_reportUncaughtExceptions">false</bool>
 
     <screenName name="com.eventshigh.nearme.app.activity.LaunchActivity">Launch</screenName>
-    <screenName name="com.eventshigh.nearme.app.activity.LoginActivity">Login</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.EventsMapsActivity">Maps</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.EventsGridActivity">Grid</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.EventDetailActivity">Details</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.FacebookLoginActivity">FacebookLogin</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.BookTicketActivity">BookTicket</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.OnBoardingActivity">OnBoarding</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.ShareAppActivity">ShareApp</screenName>
     <screenName name="com.eventshigh.nearme.app.settings.SettingsActivity">Settings</screenName>
     <screenName name="com.eventshigh.nearme.app.settings.AboutUsActivity">AboutUs</screenName>
+
 </resources>

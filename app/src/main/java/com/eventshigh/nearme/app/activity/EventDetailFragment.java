@@ -243,13 +243,6 @@ public class EventDetailFragment extends Fragment {
         Intent intent = new Intent(activity, BookTicketActivity.class);
         intent.putExtra(BookTicketActivity.EVENT_BOOKING_URL_INTENT_KEY, event.bookingUrl);
         startActivity(intent);
-
-//        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.bookingUrl));
-//        try {
-//            startActivity(intent);
-//        } catch (ActivityNotFoundException e) {
-//            // No activity to open url. ignore.
-//        }
     }
 
 
@@ -298,8 +291,6 @@ public class EventDetailFragment extends Fragment {
         private final LinearLayout organizerWebsiteRow;
         private final TextView organizerWebsiteView;
 
-        private final View bottomPaddingView;
-
         private EventCard(ScrollView rootView) {
             this.rootView = rootView;
             shareContentsView = rootView.findViewById(R.id.share_view);
@@ -340,8 +331,6 @@ public class EventDetailFragment extends Fragment {
             organizerPhoneView = (TextView) rootView.findViewById(R.id.organizer_phone);
             organizerWebsiteRow = (LinearLayout) rootView.findViewById(R.id.organizer_website_row);
             organizerWebsiteView = (TextView) rootView.findViewById(R.id.organizer_website);
-
-            bottomPaddingView = rootView.findViewById(R.id.bottom_padding);
         }
     }
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
     package="com.eventshigh.nearme.app"
     android:installLocation="auto"
     android:backupAgent="utils.EhBackupAgent"
@@ -242,9 +243,15 @@
 
         <activity
             android:name=".activity.BookTicketActivity"
-            android:label="@string/app_name"
+            android:label="@string/action_book_ticket"
             android:launchMode="singleTask"
-            >
+            android:parentActivityName=".activity.EventDetailActivity"
+            tools:ignore="UnusedAttribute"
+        >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.EventDetailActivity"
+            />
         </activity>
 
         <activity
@@ -264,6 +271,7 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:parentActivityName=".settings.SettingsActivity"
+            tools:ignore="UnusedAttribute"
         >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -277,8 +285,9 @@
         <activity
             android:name=".activity.FacebookLoginActivity"
             android:label="@string/app_name"
-            android:parentActivityName=".settings.SettingsActivity"
             android:launchMode="singleTask"
+            android:parentActivityName=".settings.SettingsActivity"
+            tools:ignore="UnusedAttribute"
         >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -288,8 +297,9 @@
         <activity
             android:name=".settings.AboutUsActivity"
             android:label="@string/title_about_us"
-            android:parentActivityName=".settings.SettingsActivity"
             android:launchMode="singleTask"
+            android:parentActivityName=".settings.SettingsActivity"
+            tools:ignore="UnusedAttribute"
         >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -302,6 +312,7 @@
         <receiver
             android:name=".broadcast.InstallReferrer"
             android:exported="true"
+            tools:ignore="ExportedReceiver"
         >
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
