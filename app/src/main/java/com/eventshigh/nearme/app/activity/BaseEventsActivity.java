@@ -310,13 +310,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 Toast.makeText(this, R.string.unsupported_city, Toast.LENGTH_SHORT).show();
             }
             updateEventsCollection(new EventsCollection(new ArrayList<TaggedEvents>()));
-            updateEventListing(new ArrayList<Event>());
+            updateEventListing(new ArrayList<Event>(), false);
         } else {
             fetchNewListing(false /* bypass cache*/);
         }
     }
 
-    protected void updateEventListing(List<Event> events) {
+    protected void updateEventListing(List<Event> events, boolean isFavouriteView) {
         // Prefetch first 10 events.
         for (Event event : events.subList(0, Math.min(events.size(), NUM_MAX_PREFETCH))) {
             EventUberPrefetcher.getInstance(getApplicationContext()).prefetch(event.id);
@@ -415,7 +415,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         if (currentItem == 0) {
-            updateEventListing(events.getEvents(0));
+            updateEventListing(events.getEvents(0), false);
         } else {
             viewPager.setCurrentItem(currentItem);
             final View selectedItem =
@@ -547,11 +547,12 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         @Override
-        public Fragment getItem(int i) {
+        public Fragment getItem(int position) {
             Fragment fragment = getNewFragment();
             Bundle args = new Bundle();
             ArrayList<Event> eventsToShow = new ArrayList<>();
-            eventsToShow.addAll(events.getEvents(i));
+            eventsToShow.addAll(events.getEvents(position));
+            args.putBoolean(EventGridFragment.IS_FAVOURITE_VIEW_PARAMETER, isFavouriteView(position));
             args.putParcelableArrayList(EventGridFragment.EVENTS_LIST_PARAMETER, eventsToShow);
             fragment.setArguments(args);
             return fragment;
@@ -575,7 +576,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         @Override
         public void onPageSelected(int position) {
             lastSelectedTag = tags.get(position).first;
-            updateEventListing(events.getEvents(position));
+            updateEventListing(events.getEvents(position), isFavouriteView(position));
         }
 
         @Override
@@ -585,7 +586,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         @Override
         public String getNumEvents(int position) {
-            return Integer.toString(events.getEvents(position).size());
+            return isFavouriteView(position) ? "" : Integer.toString(events.getEvents(position).size());
+        }
+
+        private boolean isFavouriteView(int position) {
+            return tags.get(position).first.equals(EventsCollection.FAVOURITE_EVENTS_CATEGORY);
         }
     }
 

@@ -136,10 +136,13 @@ public class EventsMapsActivity extends BaseEventsActivity {
     }
 
     @Override
-    protected void updateEventListing(final List<Event> events) {
+    protected void updateEventListing(List<Event> events, boolean isFavouriteView) {
         mOnMapClickListener.onMapClick(null);
+        if (isFavouriteView) {
+            events = eventsMarkerEditor.getEventsMarkerManager().filterFavouriteEvents(events);
+        }
         markerManager.setEvents(map, EventsMarkerManager.getInstance(this), events);
-        super.updateEventListing(events);
+        super.updateEventListing(events, isFavouriteView);
     }
 
     @Override
@@ -252,7 +255,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
                     showZoomToast = false;
                 }
 
-                updateEventListing(new ArrayList<Event>());
+                updateEventListing(new ArrayList<Event>(), false);
             } else if (!refreshListingsIfNeeded(cameraPosition.target)) {
                 if (!isAppMovement && lastSelectedMarker == null) {
                     reportActionToAnalytics("onCameraChange");

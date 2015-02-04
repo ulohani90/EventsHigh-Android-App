@@ -176,13 +176,23 @@ public class EventsMarkerManager {
         return EventMark.isDismissed(getEventMark(eventId));
     }
 
-    public void filterDismissed(Collection<? extends Event> events) {
+    public void removeDismissed(Collection<? extends Event> events) {
         for(Iterator<? extends Event> it = events.iterator(); it.hasNext();) {
             Event event = it.next();
             if (isDismissed(event.id)) {
                 it.remove();
             }
         }
+    }
+
+    public List<Event> filterFavouriteEvents(Collection<? extends Event> events) {
+        List<Event> favEvents = new ArrayList<>();
+        for (Event event : events) {
+            if (isFavourite(event.id)) {
+                favEvents.add(event);
+            }
+        }
+        return  favEvents;
     }
 
     private void callListeners(String eventId, @Nullable EventMark pref) {

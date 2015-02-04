@@ -20,15 +20,19 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.OnEventMarkChangeListener;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class EventGridFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     public static final String EVENTS_LIST_PARAMETER = "events";
+    public static final String IS_FAVOURITE_VIEW_PARAMETER = "is.favourite.view";
 
     private EventsGridActivity activity;
     private EventsAdapter eventsAdapter;
     private Editor eventsMarkerEditor;
     private SwipeRefreshLayout swipeRefreshLayout;
+
+    private boolean isFavouriteView;
+    private List<Event> events;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,8 +62,10 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
         eventsMarkerEditor = EventsMarkerManager.getInstance(activity).getEditor();
         eventsAdapter = new EventsAdapter(this.activity, eventsMarkerEditor);
         if (getArguments() != null) {
-            ArrayList<Event> events = getArguments().getParcelableArrayList(EVENTS_LIST_PARAMETER);
-            eventsAdapter.addAll(events);
+            isFavouriteView = getArguments().getBoolean(IS_FAVOURITE_VIEW_PARAMETER, false);
+            events = getArguments().getParcelableArrayList(EVENTS_LIST_PARAMETER);
+            eventsMarkerEditor.getEventsMarkerManager().removeDismissed(events);
+            eventsAdapter.addAll(isFavouriteView ? getFavouriteEvents() : events);
         }
 
         // Add listener to remove dismissed events.
@@ -100,7 +106,12 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
                     }
                 }
             } else {
-                eventsAdapter.notifyDataSetChanged();
+                if (isFavouriteView) {
+                    eventsAdapter.clear();
+                    eventsAdapter.addAll(getFavouriteEvents());
+                } else {
+                    eventsAdapter.notifyDataSetChanged();
+                }
             }
         }
     };
@@ -110,5 +121,9 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
         activity.reportActionToAnalytics("swipeRefresh");
         swipeRefreshLayout.setRefreshing(false);
         activity.fetchNewListing(true /* bypass cache*/);
+    }
+
+    private List<Event> getFavouriteEvents() {
+        return eventsMarkerEditor.getEventsMarkerManager().filterFavouriteEvents(events);
     }
 }

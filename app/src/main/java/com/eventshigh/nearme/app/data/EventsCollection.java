@@ -24,6 +24,7 @@ import java.util.Set;
 public class EventsCollection {
     public static final String ALL_EVENTS_CATEGORY = "All";
     public static final String RECOMMENDED_EVENTS_CATEGORY = "Recommended";
+    public static final String FAVOURITE_EVENTS_CATEGORY = "Favourite";
     public static final String TODAY_EVENTS_CATEGORY = "Today";
 
     public static class TaggedEvents {
@@ -125,6 +126,11 @@ public class EventsCollection {
             if (recommendedEvents != null) {
                 taggedEventsList.add(index, new TaggedEvents(
                         RECOMMENDED_EVENTS_CATEGORY, Collections.unmodifiableList(recommendedEvents)));
+                index ++;
+            }
+            if (allEvents != null) {
+                taggedEventsList.add(index, new TaggedEvents(
+                        FAVOURITE_EVENTS_CATEGORY, Collections.unmodifiableList(allEvents)));
                 index ++;
             }
             if (todayEvents != null && allEvents != null && allEvents.size() > todayEvents.size()) {
