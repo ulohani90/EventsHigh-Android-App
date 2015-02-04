@@ -403,6 +403,23 @@ public class EventDetailFragment extends Fragment {
             }
         });
 
+        // Add attribution.
+        if (event.sourceUrl == null) {
+            eventCard.fromView.setVisibility(View.INVISIBLE);
+        } else {
+            final Uri fromUri =  Uri.parse(event.sourceUrl);
+            String eventFrom = String.format(
+                    getResources().getString(R.string.event_detail_from),
+                    fromUri.getHost());
+            eventCard.fromView.setText(eventFrom);
+            eventCard.fromView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openSourceSite();
+                }
+            });
+        }
+
         // Set Venue and address.
         if (event.venue == null && event.address == null) {
             eventCard.venueGroupView.setVisibility(View.GONE);
@@ -516,15 +533,6 @@ public class EventDetailFragment extends Fragment {
         } else {
             eventCard.descriptionView.setText(event.description);
         }
-        Utils.waitForViewVisible(eventCard.descriptionView, new Runnable() {
-            @Override
-            public void run() {
-                if (eventCard.descriptionView.getLineCount() > 8) {
-                    eventCard.descriptionView.setMaxLines(5);
-                    eventCard.readMoreView.setVisibility(View.VISIBLE);
-                }
-            }
-        }, 100);
         eventCard.readMoreView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -532,23 +540,6 @@ public class EventDetailFragment extends Fragment {
                 eventCard.readMoreView.setVisibility(View.GONE);
             }
         });
-
-        // Add attribution.
-        if (event.sourceUrl == null) {
-            eventCard.fromView.setVisibility(View.INVISIBLE);
-        } else {
-            final Uri fromUri =  Uri.parse(event.sourceUrl);
-            String eventFrom = String.format(
-                    getResources().getString(R.string.event_detail_from),
-                    fromUri.getHost());
-            eventCard.fromView.setText(eventFrom);
-            eventCard.fromView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    openSourceSite();
-                }
-            });
-        }
 
         // Organizer Info.
         boolean organizerInfoShown = false;
@@ -587,6 +578,16 @@ public class EventDetailFragment extends Fragment {
 
         if (!organizerInfoShown) {
             eventCard.organizerHeader.setVisibility(View.GONE);
+        } else {
+            Utils.waitForViewVisible(eventCard.descriptionView, new Runnable() {
+                @Override
+                public void run() {
+                    if (eventCard.descriptionView.getLineCount() > 8) {
+                        eventCard.descriptionView.setMaxLines(5);
+                        eventCard.readMoreView.setVisibility(View.VISIBLE);
+                    }
+                }
+            }, 100);
         }
 
         // Show tags.
