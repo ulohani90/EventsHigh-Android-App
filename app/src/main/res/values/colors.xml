@@ -17,6 +17,7 @@
     <color name="button_gray">#FAFAFA</color>
     <color name="link_color">#990071B8</color>
 
+    <color name="divider_light_gray">@color/gray300</color>
     <color name="divider_dark_gray">@color/gray400</color>
 
 </resources>
