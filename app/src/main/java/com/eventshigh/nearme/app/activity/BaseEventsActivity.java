@@ -184,6 +184,12 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     @Override
+    protected void onStop() {
+        topProgressBar.setVisibility(View.GONE);
+        super.onStop();
+    }
+
+    @Override
     public boolean onSearchRequested() {
         reportActionToAnalytics("onSearchRequested");
         Bundle appData = new Bundle();

@@ -76,6 +76,7 @@ public abstract class BaseActivity extends FragmentActivity {
         gaHelper = GAHelper.getInstance(getApplicationContext());
     }
 
+    @Override
     protected void onStart() {
         super.onStart();
 
@@ -86,6 +87,7 @@ public abstract class BaseActivity extends FragmentActivity {
         com.facebook.AppEventsLogger.activateApp(this, "196111897251952");
     }
 
+    @Override
     protected void onStop() {
         // Stop all requests associated with this activity.
         VolleyHelper.getRequestQueue(getApplicationContext()).cancelAll(this);

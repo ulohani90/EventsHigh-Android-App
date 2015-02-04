@@ -245,6 +245,7 @@
             android:name=".activity.BookTicketActivity"
             android:label="@string/action_book_ticket"
             android:launchMode="singleTask"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:parentActivityName=".activity.EventDetailActivity"
             tools:ignore="UnusedAttribute"
         >
@@ -258,17 +259,21 @@
             android:name=".activity.OnBoardingActivity"
             android:theme="@android:style/Theme.NoTitleBar"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
             android:noHistory="true"
         />
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
         />
         <activity
             android:name=".activity.ShareAppActivity"
             android:label="@string/app_name"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
             android:parentActivityName=".settings.SettingsActivity"
             tools:ignore="UnusedAttribute"
@@ -285,6 +290,8 @@
         <activity
             android:name=".activity.FacebookLoginActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
             android:parentActivityName=".settings.SettingsActivity"
             tools:ignore="UnusedAttribute"
@@ -297,6 +304,7 @@
         <activity
             android:name=".settings.AboutUsActivity"
             android:label="@string/title_about_us"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
             android:parentActivityName=".settings.SettingsActivity"
             tools:ignore="UnusedAttribute"

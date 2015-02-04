@@ -153,15 +153,6 @@ public class EventDetailFragment extends Fragment {
         this.activity = (BaseActivity) activity;
 
         eventsMarkerEditor =  EventsMarkerManager.getInstance(activity).getEditor();
-    }
-
-    public void onDetach() {
-        super.onDetach();
-        eventsMarkerEditor.close();
-    }
-
-    public void onStart() {
-        super.onStart();
 
         // Setup GoogleApiClient
         client = new GoogleApiClient.Builder(activity).addApi(AppIndex.APP_INDEX_API).build();
@@ -184,17 +175,16 @@ public class EventDetailFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
+    public void onDetach() {
+        super.onDetach();
+        eventsMarkerEditor.close();
 
-        if (client.isConnected()) {
+        if (client != null && client.isConnected()) {
             Uri webUri = event.getEventDetailsURI();
             AppIndex.AppIndexApi.viewEnd(client, activity, Utils.getAppUri(webUri));
             client.disconnect();
         }
     }
-
 
     /**********************************
      Callbacks, action handlers

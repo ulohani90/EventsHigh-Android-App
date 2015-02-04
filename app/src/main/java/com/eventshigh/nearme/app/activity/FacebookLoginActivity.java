@@ -32,9 +32,11 @@ public class FacebookLoginActivity extends BaseActivity {
     public static final String PARAM_ONBOARDING = "onboarding";
 
     private TextView connectMessageView;
+    private TextView skipView;
     private LoginButton authButton;
     private UiLifecycleHelper uiHelper;
     private boolean isOnBoarding;
+    private boolean isConnected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +45,15 @@ public class FacebookLoginActivity extends BaseActivity {
         onNewIntent(getIntent());
 
         setContentView(R.layout.activity_facebook_login);
-        findViewById(R.id.skip).setOnClickListener(new OnClickListener() {
+        skipView = (TextView) findViewById(R.id.skip);
+        skipView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                reportActionToAnalytics("skipLogin");
-                Account account = new Account(getApplicationContext());
-                account.recordSkipLogin();
+                if (!isConnected) {
+                    reportActionToAnalytics("skipLogin");
+                    Account account = new Account(getApplicationContext());
+                    account.recordSkipLogin();
+                }
                 up();
             }
         });
@@ -150,16 +155,33 @@ public class FacebookLoginActivity extends BaseActivity {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             authButton.setSession(session);
+            isConnected = false;
 
             if (state.isOpened()) {
                 reportActionToAnalytics("loginSuccessFull");
+                connectMessageView.setText(R.string.loading);
+
                 Request.newMeRequest(session, new GraphUserCallback() {
                     @Override
                     public void onCompleted(GraphUser user, Response response) {
+                        if (response.getError() != null) {
+                            reportActionToAnalytics("failFBEmail");
+                            connectMessageView.setText(
+                                response.getError().getErrorUserMessage() + ". " +
+                                    getResources().getString(R.string.action_retry));
+                            return;
+                        }
+
                         reportActionToAnalytics("gotFBEmail");
                         Account account = new Account(getApplicationContext());
-                        String email = user.getProperty("email").toString();
-                        account.recordFacebookEmail(email);
+                        Object email = user.getProperty("email");
+                        if (email == null) {
+                            email = user.getUsername() + "@fb.com";
+                        }
+                        account.recordFacebookEmail(email.toString());
+
+                        isConnected = true;
+                        skipView.setText(R.string.action_done);
                         connectMessageView.setText("Logged in as " + email);
                         if (isOnBoarding) {
                             up();
