@@ -40,12 +40,12 @@ public class EventsMarkerManager {
             this.value = value;
         }
 
-        public static boolean isDismissed(@Nullable EventMark pref) {
-            return pref != null && pref == DISMISSED;
+        public static boolean isDismissed(@Nullable EventMark eventMark) {
+            return eventMark != null && eventMark == DISMISSED;
         }
 
-        public static boolean isFavourite(@Nullable EventMark pref) {
-            return pref != null && pref == FAVOURITE;
+        public static boolean isFavourite(@Nullable EventMark eventMark) {
+            return eventMark != null && eventMark == FAVOURITE;
         }
 
         public static @Nullable EventMark getPrefFromValue(int value) {

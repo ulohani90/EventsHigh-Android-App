@@ -105,13 +105,31 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
                         break;
                     }
                 }
-            } else {
-                if (isFavouriteView) {
-                    eventsAdapter.clear();
-                    eventsAdapter.addAll(getFavouriteEvents());
-                } else {
-                    eventsAdapter.notifyDataSetChanged();
+                return;
+            }
+
+            // Event is either favourited or un-favourited. In case of favourite tab view, when
+            // new event is marked as favourite we add it into list. Note that, we do not remove
+            // an event from favourite tab even when user has un-favourited it. This is to make
+            // sure, user do not confuse with un-favourite and dismiss (not interested)
+            if (isFavouriteView && EventMark.isFavourite(eventMark)) {
+                int insertAt = 0;
+                for (Event event : events) {
+                    boolean eventFound = insertAt < eventsAdapter.getCount() &&
+                            eventsAdapter.getItem(insertAt).equals(event);
+                    if (eventFound) {
+                        insertAt ++;
+                    }
+
+                    if (event.id.equals(eventId)) {
+                        if (!eventFound) {
+                            eventsAdapter.insert(event, insertAt);
+                        }
+                        break;
+                    }
                 }
+            } else {
+                eventsAdapter.notifyDataSetChanged();
             }
         }
     };
