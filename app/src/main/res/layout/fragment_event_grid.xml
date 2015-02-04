@@ -21,6 +21,6 @@
         android:clipToPadding="false"
         tools:context=".activity.EventGridActivity"
         tools:listitem="@layout/event_card"
-        />
+    />
 
 </android.support.v4.widget.SwipeRefreshLayout>

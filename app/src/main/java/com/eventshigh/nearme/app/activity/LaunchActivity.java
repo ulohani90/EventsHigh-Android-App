@@ -39,6 +39,9 @@ import com.google.android.gms.location.LocationServices;
  * preference in future.
  */
 public class LaunchActivity extends BaseActivity {
+    // View for this activity.
+    private ListView citySelector;
+
     // Client to Google api so that we can report the deep links
     // and fetch the user location if its not passed in intent.
     private GoogleApiClient client;
@@ -55,7 +58,8 @@ public class LaunchActivity extends BaseActivity {
 
         // Set View.
         setContentView(R.layout.activity_launch);
-        ((ListView) findViewById(R.id.city_selector)).setAdapter(new CityListAdapter());
+        citySelector = ((ListView) findViewById(R.id.city_selector));
+        citySelector.setAdapter(new CityListAdapter());
 
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
@@ -177,6 +181,7 @@ public class LaunchActivity extends BaseActivity {
             // We do not have user location. Lets populate the City chooser and let user
             // select the city.
             reportActionToAnalytics("locationFailed");
+            citySelector.setVisibility(View.VISIBLE);
             if (connectionResult != null) {
                 Toast.makeText(LaunchActivity.this, R.string.failed_location, Toast.LENGTH_SHORT).show();
             }

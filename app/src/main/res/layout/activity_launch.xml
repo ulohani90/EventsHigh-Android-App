@@ -4,5 +4,8 @@
     android:id="@+id/city_selector"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:visibility="gone"
     tools:context=".activity.LaunchActivity"
+    tools:visibility="visible"
+    tools:listitem="@android:layout/simple_list_item_1"
 />
