@@ -5,6 +5,7 @@ import android.app.DialogFragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -47,6 +48,9 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.example.android.common.view.SlidingTabLayout;
 import com.example.android.common.view.SlidingTabPagerAdapter;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -79,18 +83,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // MEMBERS
     // ***********************
 
-    // UI elements for showing loading dialog and event contents through ViewPager.
+    // UI elements.
     private ViewSwitcher viewSwitcher;
-    private ViewPager viewPager;
-    private SlidingTabLayout slidingTab;
-
-    // The view that shows a loading message to the user when events are being fetched
-    private View loadingMessageView;
-    // The view that shows an error message to the user when the events fetch request fails
-    private View errorMessageView;
-    // The progress bar just below action bar that is visible when there is a pending event fetch
-    // request
     private View topProgressBar;
+    private SlidingTabLayout slidingTab;
+    private ViewPager viewPager;
 
     // Last city and query for which events are shown.
     protected EventFetcherParam lastEventFetcherParam;
@@ -100,6 +97,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private OnBoardingHelper onBoardingHelper;
     // when was this activity last started on.
     private long lastStartedAt;
+    // GoogleApiClient to report the page view.
+    private GoogleApiClient client;
 
 
     // ***********************
@@ -112,17 +111,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         // Setup the UI.
-        viewSwitcher = new ViewSwitcher(this);
-        getLayoutInflater().inflate(R.layout.activity_events, viewSwitcher);
-        View messageView = getLayoutInflater().inflate(R.layout.view_loading_retry, viewSwitcher);
-        loadingMessageView = messageView.findViewById(R.id.loading_message);
-        errorMessageView = messageView.findViewById(R.id.error_message);
-        setContentView(viewSwitcher);
+        setContentView(R.layout.activity_events);
+        viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
         slidingTab = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         viewPager = (ViewPager) findViewById(R.id.pager);
         topProgressBar = findViewById(R.id.top_progress_bar);
 
-        // Set the context in term of lastEventFetcherParam. Use Inent
+        // Set the context in term of lastEventFetcherParam. Use Intent
         // to restore the context.
         lastStartedAt = 0;
 
@@ -151,6 +146,25 @@ public abstract class BaseEventsActivity extends BaseActivity {
             actionBar.setDisplayHomeAsUpEnabled(
                     !lastEventFetcherParam.query.isEmpty() || !isDefaultView());
         }
+
+        // Setup GoogleApiClient
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.APP_INDEX_API).build();
+        client.registerConnectionCallbacks(new ConnectionCallbacks() {
+            @Override
+            public void onConnected(Bundle bundle) {
+                if (lastEventFetcherParam != null) {
+                    Uri webUri = EventsHighEndpoints.getWebUri(lastEventFetcherParam);
+                    String title = lastEventFetcherParam.toString();
+                    AppIndex.AppIndexApi.view(client, BaseEventsActivity.this, Utils.getAppUri(webUri),
+                            title, webUri, null);
+                }
+            }
+
+            @Override
+            public void onConnectionSuspended(int i) {
+                // do nothing.
+            }
+        });
 
         // The activity could have started either for first time or when user
         // launches the sleeping app or when he returns from details pane.
@@ -186,6 +200,15 @@ public abstract class BaseEventsActivity extends BaseActivity {
     @Override
     protected void onStop() {
         topProgressBar.setVisibility(View.GONE);
+
+        if (client != null && client.isConnected()) {
+            if (lastEventFetcherParam != null) {
+                Uri webUri = EventsHighEndpoints.getWebUri(lastEventFetcherParam);
+                AppIndex.AppIndexApi.viewEnd(client, BaseEventsActivity.this, Utils.getAppUri(webUri));
+            }
+            client.disconnect();
+        }
+
         super.onStop();
     }
 
@@ -423,11 +446,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     public void fetchNewListing(boolean shouldBypassCache) {
-        if (viewPager.getAdapter() == null || viewPager.getAdapter().getCount() <= 0) {
-            viewSwitcher.setDisplayedChild(1);
-        }
-        loadingMessageView.setVisibility(View.VISIBLE);
-        errorMessageView.setVisibility(View.GONE);
+        viewSwitcher.setDisplayedChild(0);
         topProgressBar.setVisibility(View.VISIBLE);
 
         EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam,
@@ -475,7 +494,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private Listener<EventsCollection> mEventsFetcherCallBack = new Listener<EventsCollection>() {
         @Override
         public void onResponse(EventsCollection events, boolean isIntermediate) {
-            viewSwitcher.setDisplayedChild(0);
             if (!isIntermediate) {
                 topProgressBar.setVisibility(View.GONE);
             }
@@ -574,9 +592,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
     protected ErrorListener mErrorListener = new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
-            loadingMessageView.setVisibility(View.GONE);
-            errorMessageView.setVisibility(View.VISIBLE);
             topProgressBar.setVisibility(View.GONE);
+            if (viewPager.getAdapter() == null || viewPager.getAdapter().getCount() <= 0) {
+                viewSwitcher.setDisplayedChild(1);
+            }
 
             Throwable cause = volleyError.getCause();
             if (cause != null) {
