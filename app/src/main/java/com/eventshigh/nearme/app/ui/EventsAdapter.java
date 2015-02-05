@@ -10,7 +10,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -86,23 +85,11 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         final EventCard eventCard = new EventCard(view);
 
         // Set the background image.
-        Utils.waitForViewVisible(eventCard.bgView, new Runnable() {
-            @Override
-            public void run() {
-                RelativeLayout.LayoutParams params =
-                        (RelativeLayout.LayoutParams) eventCard.bgView.getLayoutParams();
-                params.width = eventCard.bgView.getHeight();
-                eventCard.bgView.setLayoutParams(params);
-                eventCard.bgView.setDefaultImageResId(R.drawable.eh_default_event_list);
-                if (event.imgUrl != null) {
-                    eventCard.bgView.setImageUrl(event.imgUrl,
-                            VolleyHelper.getImageLoader(activity.getApplicationContext()));
-                } else {
-                    eventCard.bgView.setVisibility(View.INVISIBLE);
-                    eventCard.bgView.setImageBitmap(null);
-                }
-            }
-        }, 100);
+        eventCard.bgView.setDefaultImageResId(R.drawable.eh_default_event_list);
+        if (event.imgUrl != null) {
+            eventCard.bgView.setImageUrl(event.imgUrl,
+                    VolleyHelper.getImageLoader(activity.getApplicationContext()));
+        }
 
         // Check if its a recommended event or not.
         eventCard.recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE :
@@ -112,7 +99,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         eventCard.titleView.setText(event.title);
         EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
         if (eventTime == null) {
-            eventCard.timeView.setVisibility(View.GONE);
+            eventCard.timeView.setVisibility(View.INVISIBLE);
         } else {
             eventCard.timeView.setVisibility(View.VISIBLE);
             eventCard.timeView.setText(eventTime.toString());
@@ -124,7 +111,7 @@ public class EventsAdapter extends ArrayAdapter<Event> {
 
         // Set num people interested.
         if (event.numPeopleInterested <= 0) {
-            eventCard.numPeopleInterestedView.setVisibility(View.GONE);
+            eventCard.numPeopleInterestedView.setVisibility(View.INVISIBLE);
         } else {
             eventCard.numPeopleInterestedView.setVisibility(View.VISIBLE);
             eventCard.numPeopleInterestedView.setText(

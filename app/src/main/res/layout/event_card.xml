@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
                                     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_margin="16dp"
-                                    card_view:cardCornerRadius="2dp">
+                                    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="2dp"
+>
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:tools="http://schemas.android.com/tools"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/selector_event_card"
-                    android:descendantFocusability="blocksDescendants"
-        >
-
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_event_card"
+        android:descendantFocusability="blocksDescendants"
+    >
         <com.android.volley.toolbox.NetworkImageView
             android:id="@+id/event_bg"
             android:layout_width="96dp"
@@ -25,8 +23,9 @@
             android:layout_alignParentTop="true"
             android:layout_alignBottom="@+id/event_time"
             android:layout_centerVertical="true"
+            android:adjustViewBounds="false"
             android:background="@drawable/shape_film"
-            />
+        />
 
         <View
             android:layout_width="match_parent"
@@ -38,7 +37,7 @@
             android:layout_alignTop="@+id/event_bg"
             android:layout_alignBottom="@+id/event_bg"
             android:background="@drawable/shape_film"
-            />
+        />
 
         <ImageView
             android:id="@+id/event_recommended"
@@ -52,7 +51,7 @@
             android:layout_marginBottom="4dp"
             android:src="@drawable/eh_recommend"
             tools:ignore="ContentDescription"
-            />
+        />
 
         <TextView
             android:id="@+id/num_people_interested"
@@ -71,7 +70,7 @@
             android:fontFamily="sans-serif"
             tools:text="32"
             tools:ignore="UnusedAttribute"
-            />
+        />
 
         <TextView
             android:id="@+id/event_title"
@@ -91,7 +90,7 @@
             android:minLines="2"
             android:ellipsize="end"
             tools:text="My Awesome Event with a long long title!"
-            />
+        />
 
         <TextView
             style="@style/EventCardText"
@@ -108,7 +107,7 @@
             android:drawableStart="@drawable/ic_location_on_grey600_12dp"
             android:drawableLeft="@drawable/ic_location_on_grey600_12dp"
             tools:text="Jagriti theatre, Whitefield"
-            />
+        />
 
         <TextView
             android:id="@+id/event_time"
@@ -127,18 +126,26 @@
             android:drawableStart="@drawable/ic_access_time_grey600_12dp"
             android:drawableLeft="@drawable/ic_access_time_grey600_12dp"
             tools:text="Sun, 29 Mar at 8:30 pm"
-            />
+        />
+
+        <include
+            android:id="@+id/divider_line"
+            layout="@layout/utils_horizontal_line"
+            android:layout_below="@id/event_time"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider_dark_gray"
+        />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_below="@id/event_time"
+            android:layout_below="@id/divider_line"
             android:baselineAligned="false"
             android:showDividers="middle"
-            android:background="#FAFAFA"
             android:divider="@drawable/shape_vertical_divider"
-            >
+        >
 
             <FrameLayout
                 android:id="@+id/action_favourited"
@@ -147,7 +154,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:padding="10dp"
-                >
+            >
 
                 <TextView
                     android:layout_height="wrap_content"
@@ -159,7 +166,7 @@
                     android:textSize="12sp"
                     android:text="@string/ui_favourited"
                     android:textColor="#FFD0021B"
-                    />
+                />
             </FrameLayout>
 
             <FrameLayout
@@ -169,7 +176,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:padding="10dp"
-                >
+            >
 
                 <TextView
                     android:layout_height="wrap_content"
@@ -181,7 +188,7 @@
                     android:textSize="12sp"
                     android:text="@string/ui_favourite"
                     android:textColor="#66000000"
-                    />
+                />
             </FrameLayout>
 
             <FrameLayout
@@ -191,7 +198,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:padding="10dp"
-                >
+            >
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -203,16 +210,9 @@
                     android:textSize="12sp"
                     android:text="@string/ui_dismiss"
                     android:textColor="#66000000"
-                    />
+                />
             </FrameLayout>
+
         </LinearLayout>
-
-        <include layout="@layout/utils_horizontal_line"
-              android:layout_below="@id/event_time"
-              android:layout_width="match_parent"
-              android:layout_height="1dp"
-              android:background="@color/divider_dark_gray" />
-
     </RelativeLayout>
-
 </android.support.v7.widget.CardView>
