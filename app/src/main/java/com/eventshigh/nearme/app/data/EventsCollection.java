@@ -66,7 +66,7 @@ public class EventsCollection {
             }
 
             addEvent(ALL_EVENTS_CATEGORY, event);
-            if (event.ehRecommended || EventMark.isFavourite(pref)) {
+            if (event.ehRecommended) {
                 addEvent(RECOMMENDED_EVENTS_CATEGORY, event);
             }
 
