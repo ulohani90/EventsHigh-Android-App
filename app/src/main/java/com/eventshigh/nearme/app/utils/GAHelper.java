@@ -50,7 +50,7 @@ public class GAHelper {
         // Flurry, Amplitude reporting
         if (!BuildConfig.DEBUG) {
             Amplitude.startSession();
-            Amplitude.logEvent(getClass().getSimpleName());
+            Amplitude.logEvent(activity.getClass().getSimpleName());
         }
     }
 
