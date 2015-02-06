@@ -591,7 +591,7 @@ public class EventDetailFragment extends Fragment {
         }
 
         // Show tags.
-        if (event.getAllTags().length > 0) {
+        if (event.tags.length > 0) {
             showTags();
         }
     }
@@ -603,7 +603,7 @@ public class EventDetailFragment extends Fragment {
                 int maxWidth = eventCard.tagsView.getWidth()
                         - layoutParams.leftMargin - layoutParams.rightMargin;
                 LinearLayout ll = getLL(layoutParams);
-                for (String tag : event.getAllTags()) {
+                for (String tag : event.tags) {
                     TextView tagView = addTag(ll, tag);
                     ll.measure(0, 0);
                     if (ll.getMeasuredWidth() < maxWidth) {

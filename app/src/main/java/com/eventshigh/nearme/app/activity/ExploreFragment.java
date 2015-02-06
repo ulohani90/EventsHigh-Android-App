@@ -53,15 +53,8 @@ public class ExploreFragment extends Fragment {
                 getActivity().getLayoutInflater().inflate(R.layout.explore_card, parent, false);
             final TagInfo tagInfo = getItem(position);
             ((TextView) view.findViewById(R.id.explore_name)).setText(tagInfo.toString());
-
-
-            ImageView imageView = (ImageView) view.findViewById(R.id.explore_image);
-            EventCategory category = EventCategory.parseCategory(tagInfo.tagName);
-            int infographId = category != null ? category.getInfographIconId() : -1;
-            if (infographId < 0) {
-                infographId = R.drawable.eh_default_event_list;
-            }
-            imageView.setImageResource(infographId);
+            ((ImageView) view.findViewById(R.id.explore_image)).setImageResource(
+                    getInfoGraphId(tagInfo.tagName));
 
             view.setOnClickListener(new OnClickListener() {
                 @Override
@@ -71,5 +64,16 @@ public class ExploreFragment extends Fragment {
             });
             return view;
         }
+    }
+
+    private int getInfoGraphId(String tag) {
+        try {
+            return R.drawable.class.getField("infograph_" +
+                    EventCategory.toCategoryParsableString(tag).toLowerCase()).getInt(null);
+        } catch (IllegalAccessException| NoSuchFieldException e) {
+            // Ignore
+        }
+
+        return R.drawable.eh_default_event_list;
     }
 }

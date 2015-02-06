@@ -89,16 +89,6 @@ public enum EventCategory {
         return resId;
     }
 
-    public int getInfographIconId() {
-        try {
-            return R.drawable.class.getField("infograph_" + toString().toLowerCase()).getInt(null);
-        } catch (IllegalAccessException| NoSuchFieldException e) {
-            // Ignore
-        }
-
-        return -1;
-    }
-
     public static String toCategoryParsableString(String tag) {
         return tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "");
     }

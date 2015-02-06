@@ -139,7 +139,7 @@ public class EventsCollection {
             }
 
             if (! whiteListedTagCategories.isEmpty()) {
-                for (String tag : event.getAllTags()) {
+                for (String tag : event.tags) {
                     if (whiteListedTagCategories.contains(tag.toLowerCase()) &&
                         !TAGS_BLACKLIST.contains(tag.toLowerCase())) {
                         incrementCounter(Utils.capitalize(tag));
