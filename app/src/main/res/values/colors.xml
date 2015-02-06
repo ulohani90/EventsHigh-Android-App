@@ -10,6 +10,11 @@
     <color name="gray200">#eeeeee</color>
 
     <color name="app_color">#15A9D1</color>
+    <color name="primary">#15A9D1</color>
+    <color name="primary_dark">#0599C1</color>
+    <color name="accent">#15A9D1</color>
+    <color name="ripple">#d0d9ff</color>
+    <color name="ripple_dark">#2a36b1</color>
     <color name="background_color">#e0e0e0</color>
 
     <color name="highlight_color">#EAEAEA</color>
