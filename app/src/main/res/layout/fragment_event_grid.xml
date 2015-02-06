@@ -5,8 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipe_refresh"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="match_parent"
+    tools:context=".activity.EventGridActivity"
+>
     <GridView
         android:id="@+id/event_grid"
         android:layout_width="match_parent"
@@ -19,7 +20,6 @@
         android:verticalSpacing="8dp"
         android:padding="8dp"
         android:clipToPadding="false"
-        tools:context=".activity.EventGridActivity"
         tools:listitem="@layout/event_card"
     />
 

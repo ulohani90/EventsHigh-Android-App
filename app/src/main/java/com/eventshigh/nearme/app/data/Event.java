@@ -253,10 +253,10 @@ public class Event implements Parcelable {
             Object currentTag = tagsJsonArr.get(j);
             String tag = currentTag instanceof JSONObject ?
                     tagsJsonArr.getJSONObject(j).getString("tag") : String.valueOf(currentTag);
-            String tagU = toCategoryParsableString(tag);
+            String tagU = EventCategory.toCategoryParsableString(tag);
             String tagToShow = Utils.capitalize(tag);
 
-            EventCategory tagCategory = getCategoryFromCategoryParsableString(tagU);
+            EventCategory tagCategory = EventCategory.getCategoryFromCategoryParsableString(tagU);
             if (tagCategory != null) {
                 if (category == EventCategory.OTHER) {
                     category = tagCategory;
@@ -381,19 +381,6 @@ public class Event implements Parcelable {
             Collections.sort(events, new EventComparator(param.location, eventsMarkerManager));
         }
         return builder.addAllEvent(events).build();
-    }
-
-    private static @Nullable EventCategory getCategoryFromCategoryParsableString(String tagU) {
-        try {
-            return EventCategory.valueOf(tagU);
-        } catch (IllegalArgumentException e) {
-            // Ignore. Unsupported category.
-        }
-        return  null;
-    }
-
-    private static String toCategoryParsableString(String tag) {
-        return tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "");
     }
 
     private static String emptyIfNull(@Nullable String string) {
