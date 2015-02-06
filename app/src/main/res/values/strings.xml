@@ -23,6 +23,7 @@
     <string name="action_connect_facebook">Facebook Connection</string>
 
     <!-- Other Strings used in UI -->
+    <string name="ui_explore">Explore</string>
     <string name="ui_favourite">Favourite</string>
     <string name="ui_favourited">Favourited</string>
     <string name="ui_dismiss">Not Interested</string>

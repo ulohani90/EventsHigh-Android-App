@@ -1,5 +1,7 @@
 package com.eventshigh.nearme.app.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Pair;
 
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
@@ -13,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,6 +29,8 @@ public class EventsCollection {
     public static final String RECOMMENDED_EVENTS_CATEGORY = "Recommended";
     public static final String FAVOURITE_EVENTS_CATEGORY = "Favourite";
     public static final String TODAY_EVENTS_CATEGORY = "Today";
+    public static final EventsCollection EMPTY =
+            new EventsCollection(new ArrayList<TaggedEvents>(), new ArrayList<TagInfo>());
 
     public static class TaggedEvents {
         public final String tag;
@@ -37,9 +42,60 @@ public class EventsCollection {
         }
     }
 
+    public static class TagInfo implements Parcelable  {
+        public final String tagName;
+        public final int numEvents;
+
+        public TagInfo(String tagName, int numEvents) {
+            this.tagName = tagName;
+            this.numEvents = numEvents;
+        }
+
+        public String toString() {
+            return tagName + " (" + numEvents + ")";
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(tagName);
+            dest.writeInt(numEvents);
+        }
+
+        public static final Parcelable.Creator<TagInfo> CREATOR =
+            new Parcelable.Creator<TagInfo>() {
+                public TagInfo createFromParcel(Parcel in) {
+                    return new TagInfo(in.readString(), in.readInt());
+                }
+
+                public TagInfo[] newArray(int size) {
+                    return new TagInfo[size];
+                }
+            };
+    }
+
     private static final Set<String> TAGS_BLACKLIST = new HashSet<>();
     static {
         TAGS_BLACKLIST.add("courses");
+        TAGS_BLACKLIST.add("workshops");
+        TAGS_BLACKLIST.add("misc");
+    }
+
+    private static class Counter {
+        private int count = 0;
+
+        public int increment() {
+            count ++;
+            return count;
+        }
+
+        public int toInt() {
+            return count;
+        }
     }
 
     public static class Builder {
@@ -47,7 +103,8 @@ public class EventsCollection {
         private final boolean showToday;
         private final Set<String> whiteListedTagCategories;
         private final long tomorrowMidnightTimestamp;
-        private final Map<String, List<Event>> events = new HashMap<>();
+        private final Map<String, List<Event>> events = new LinkedHashMap<>();
+        private final Map<String, Counter> categories = new HashMap<>();
 
         public Builder(City city, EventsMarkerManager eventsMarkerManager, boolean showToday, Set<String> whiteListedTagCategories) {
             this.eventsMarkerManager = eventsMarkerManager;
@@ -57,6 +114,10 @@ public class EventsCollection {
             Calendar midnight = DateTimeUtils.toMidnight(Calendar.getInstance(), city.timeZone);
             midnight.add(Calendar.DAY_OF_MONTH, 1);
             tomorrowMidnightTimestamp = midnight.getTime().getTime();
+
+            events.put(ALL_EVENTS_CATEGORY, new ArrayList<Event>());
+            events.put(RECOMMENDED_EVENTS_CATEGORY, new ArrayList<Event>());
+            events.put(TODAY_EVENTS_CATEGORY, new ArrayList<Event>());
         }
 
         public Builder addEvent(Event event) {
@@ -81,7 +142,7 @@ public class EventsCollection {
                 for (String tag : event.getAllTags()) {
                     if (whiteListedTagCategories.contains(tag.toLowerCase()) &&
                         !TAGS_BLACKLIST.contains(tag.toLowerCase())) {
-                        addEvent(Utils.capitalize(tag), event);
+                        incrementCounter(Utils.capitalize(tag));
                     }
                 }
             }
@@ -99,46 +160,34 @@ public class EventsCollection {
 
         public EventsCollection build() {
             List<TaggedEvents> taggedEventsList = new ArrayList<>(events.keySet().size());
-
-            List<Event> allEvents = events.remove(ALL_EVENTS_CATEGORY);
-            List<Event> recommendedEvents = events.remove(RECOMMENDED_EVENTS_CATEGORY);
-            List<Event> todayEvents = events.remove(TODAY_EVENTS_CATEGORY);
             for (Entry<String, List<Event>> tagEvents : events.entrySet()) {
                 if (tagEvents.getValue().size() > 1) {
                     taggedEventsList.add(new TaggedEvents(
                             tagEvents.getKey(), Collections.unmodifiableList(tagEvents.getValue())));
                 }
             }
+            if (taggedEventsList.size() > 0) {
+                boolean isRecommededShown = taggedEventsList.size() > 1 &&
+                        taggedEventsList.get(1).tag.equals(RECOMMENDED_EVENTS_CATEGORY);
+                taggedEventsList.add(isRecommededShown ? 2 : 1, new TaggedEvents(
+                        FAVOURITE_EVENTS_CATEGORY, taggedEventsList.get(0).events));
+            }
 
-            Collections.sort(taggedEventsList, new Comparator<TaggedEvents>() {
+            List<TagInfo> tagInfos = new ArrayList<>(categories.size());
+            for (Entry<String, Counter> category : categories.entrySet()) {
+                if (category.getValue().toInt() > 1) {
+                    tagInfos.add(new TagInfo(category.getKey(), category.getValue().toInt()));
+                }
+            }
+            Collections.sort(tagInfos, new Comparator<TagInfo>() {
                 @Override
-                public int compare(TaggedEvents lhs, TaggedEvents rhs) {
-                    return Integer.valueOf(rhs.events.size()).compareTo(lhs.events.size());
+                public int compare(TagInfo lhs, TagInfo rhs) {
+                    return Integer.valueOf(rhs.numEvents).compareTo(lhs.numEvents);
                 }
             });
 
-            int index = 0;
-            if (allEvents != null) {
-                taggedEventsList.add(index, new TaggedEvents(
-                        ALL_EVENTS_CATEGORY, Collections.unmodifiableList(allEvents)));
-                index ++;
-            }
-            if (recommendedEvents != null) {
-                taggedEventsList.add(index, new TaggedEvents(
-                        RECOMMENDED_EVENTS_CATEGORY, Collections.unmodifiableList(recommendedEvents)));
-                index ++;
-            }
-            if (allEvents != null) {
-                taggedEventsList.add(index, new TaggedEvents(
-                        FAVOURITE_EVENTS_CATEGORY, Collections.unmodifiableList(allEvents)));
-                index ++;
-            }
-            if (todayEvents != null && allEvents != null && allEvents.size() > todayEvents.size()) {
-                taggedEventsList.add(index, new TaggedEvents(
-                        TODAY_EVENTS_CATEGORY, Collections.unmodifiableList(todayEvents)));
-            }
 
-            return new EventsCollection(taggedEventsList);
+            return new EventsCollection(taggedEventsList, tagInfos);
         }
 
         private void addEvent(String tag, Event event) {
@@ -149,13 +198,25 @@ public class EventsCollection {
             }
             eventList.add(event);
         }
+
+        private void incrementCounter(String tag) {
+            Counter counter = categories.get(tag);
+            if (counter == null) {
+                counter = new Counter();
+                categories.put(tag, counter);
+            }
+            counter.increment();
+        }
     }
+
 
     // A list containing a pair of tag name and list of events associated with that tag.
     private final List<TaggedEvents> taggedEventsList;
+    private final List<TagInfo> tagInfos;
 
-    public EventsCollection(List<TaggedEvents> taggedEventsList) {
-        this.taggedEventsList = taggedEventsList;
+    public EventsCollection(List<TaggedEvents> taggedEventsList, List<TagInfo> tagInfos) {
+        this.taggedEventsList = Collections.unmodifiableList(taggedEventsList);
+        this.tagInfos = Collections.unmodifiableList(tagInfos);
     }
 
     public List<Pair<String, Integer>> getTags() {
@@ -172,5 +233,9 @@ public class EventsCollection {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    public List<TagInfo> getTagInfos() {
+        return tagInfos;
     }
 }

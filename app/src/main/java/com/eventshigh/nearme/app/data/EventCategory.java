@@ -1,5 +1,7 @@
 package com.eventshigh.nearme.app.data;
 
+import android.support.annotation.Nullable;
+
 import com.eventshigh.nearme.app.R;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -85,6 +87,33 @@ public enum EventCategory {
         }
 
         return resId;
+    }
+
+    public int getInfographIconId() {
+        try {
+            return R.drawable.class.getField("infograph_" + toString().toLowerCase()).getInt(null);
+        } catch (IllegalAccessException| NoSuchFieldException e) {
+            // Ignore
+        }
+
+        return -1;
+    }
+
+    public static String toCategoryParsableString(String tag) {
+        return tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "");
+    }
+
+    public static @Nullable EventCategory getCategoryFromCategoryParsableString(String tagU) {
+        try {
+            return valueOf(tagU);
+        } catch (IllegalArgumentException e) {
+            // Ignore. Unsupported category.
+        }
+        return  null;
+    }
+
+    public static @Nullable EventCategory parseCategory(String tag) {
+        return getCategoryFromCategoryParsableString(toCategoryParsableString(tag));
     }
 
     public static BitmapDescriptor circleIcon() {

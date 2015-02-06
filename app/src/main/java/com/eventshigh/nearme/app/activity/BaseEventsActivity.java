@@ -32,7 +32,7 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.data.EventsCollection;
-import com.eventshigh.nearme.app.data.EventsCollection.TaggedEvents;
+import com.eventshigh.nearme.app.data.EventsCollection.TagInfo;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.settings.SettingsActivity;
@@ -88,6 +88,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private View topProgressBar;
     private SlidingTabLayout slidingTab;
     private ViewPager viewPager;
+    private MenuItem showMapMenu;
 
     // Last city and query for which events are shown.
     protected EventFetcherParam lastEventFetcherParam;
@@ -242,6 +243,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             menu.findItem(disabledMenuId).setVisible(false);
         }
 
+        showMapMenu = menu.findItem(R.id.action_map);
         return true;
     }
 
@@ -309,7 +311,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 reportActionToAnalytics("unsupportedCity");
                 Toast.makeText(this, R.string.unsupported_city, Toast.LENGTH_SHORT).show();
             }
-            updateEventsCollection(new EventsCollection(new ArrayList<TaggedEvents>()));
+            updateEventsCollection(EventsCollection.EMPTY);
             updateEventListing(new ArrayList<Event>(), false);
         } else {
             fetchNewListing(false /* bypass cache*/);
@@ -327,6 +329,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
      * @return true if location should be shown in action bar as subtitle.
      */
     protected abstract boolean showLocationInActionBar();
+
+    /**
+     * @return true if explore tab should shown.
+     */
+    protected abstract boolean showExploreTab();
 
     /**
      * @return true if the view represented by this activity is default view.
@@ -391,8 +398,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private void updateEventsCollection(EventsCollection events) {
         String tagToSearch = lastSelectedTag;
 
-        EventCollectionPagerAdapter adapter =
-                new EventCollectionPagerAdapter(getSupportFragmentManager(), events);
+        EventsPagerAdapter adapter = showExploreTab() && lastEventFetcherParam.query.isEmpty() ?
+                new ExploreAndEventsPagerAdapter(getSupportFragmentManager(), events) :
+                new EventsPagerAdapter(getSupportFragmentManager(), events);
         viewPager.setAdapter(adapter);
         slidingTab.setCustomTabView(R.layout.tab_title, R.id.tab_title, R.id.num_events);
         slidingTab.setViewPager(viewPager);
@@ -415,7 +423,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         if (currentItem == 0) {
-            updateEventListing(events.getEvents(0), false);
+            adapter.onPageSelected(0);
         } else {
             viewPager.setCurrentItem(currentItem);
             final View selectedItem =
@@ -535,12 +543,66 @@ public abstract class BaseEventsActivity extends BaseActivity {
         fetchNewListing(false /* bypass cache*/);
     }
 
-    private class EventCollectionPagerAdapter extends SlidingTabPagerAdapter
+    private class ExploreAndEventsPagerAdapter extends EventsPagerAdapter {
+        private final String exploreTabName;
+        private final ArrayList<TagInfo> tagInfos;
+
+        private ExploreAndEventsPagerAdapter(FragmentManager fm, EventsCollection events) {
+            super(fm, events);
+
+            exploreTabName = getResources().getString(R.string.ui_explore);
+            tagInfos = new ArrayList<>();
+            tagInfos.addAll(events.getTagInfos());
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            if (position == 0) {
+                ExploreFragment fragment = new ExploreFragment();
+                Bundle args = new Bundle();
+                args.putParcelableArrayList(ExploreFragment.TAGS_LIST_PARAMETER, tagInfos);
+                fragment.setArguments(args);
+                return fragment;
+            }
+
+            return super.getItem(position - 1);
+        }
+
+        @Override
+        public int getCount() {
+            return 1 + super.getCount();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return position == 0 ? exploreTabName : super.getPageTitle(position - 1);
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            if (position == 0) {
+                showMapMenu.setIcon(R.drawable.ic_map_grey600_36dp);
+                showMapMenu.setEnabled(false);
+                lastSelectedTag = exploreTabName;
+            } else {
+                showMapMenu.setIcon(R.drawable.ic_map_white_36dp);
+                showMapMenu.setEnabled(true);
+                super.onPageSelected(position - 1);
+            }
+        }
+
+        @Override
+        public String getNumEvents(int position) {
+            return position == 0 ? "" : super.getNumEvents(position - 1);
+        }
+    }
+
+    private class EventsPagerAdapter extends SlidingTabPagerAdapter
             implements OnPageChangeListener {
         private final EventsCollection events;
         private final List<Pair<String, Integer>> tags;
 
-        public EventCollectionPagerAdapter(FragmentManager fm, EventsCollection events) {
+        public EventsPagerAdapter(FragmentManager fm, EventsCollection events) {
             super(fm);
             this.events = events;
             this.tags = events.getTags();

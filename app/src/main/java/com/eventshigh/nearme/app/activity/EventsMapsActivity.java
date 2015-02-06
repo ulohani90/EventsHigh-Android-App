@@ -116,7 +116,13 @@ public class EventsMapsActivity extends BaseEventsActivity {
     // Delegated Methods from {@link BaseEventsActivity}
     // ***********************
 
+    @Override
     protected boolean showLocationInActionBar() {
+        return false;
+    }
+
+    @Override
+    protected boolean showExploreTab() {
         return false;
     }
 
