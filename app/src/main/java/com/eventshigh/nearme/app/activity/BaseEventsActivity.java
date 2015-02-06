@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.ActionBar;
 import android.app.DialogFragment;
 import android.app.SearchManager;
 import android.content.Context;
@@ -12,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.util.Pair;
@@ -19,7 +19,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -128,7 +127,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         lastSelectedTag = getIntent().getStringExtra(EXTRA_TAG_NAME_PARAM);
 
         // Show query as title.
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null && !lastEventFetcherParam.query.isEmpty()) {
             actionBar.setTitle(DateTimeUtils.queryToTitle(lastEventFetcherParam.query));
             if (!EventsHighEndpoints.isDateQuery(lastEventFetcherParam.query)) {
@@ -143,7 +142,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         super.onStart();
 
         // Show the Up button in the action bar.
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(
                     !lastEventFetcherParam.query.isEmpty() || !isDefaultView());
@@ -375,7 +374,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             @Override
             public void onLocationSelection(String locationString, LatLng locationPoint) {
                 if (showLocationInActionBar()) {
-                    ActionBar actionBar = getActionBar();
+                    ActionBar actionBar = getSupportActionBar();
                     if (actionBar != null) {
                         actionBar.setSubtitle(locationString);
                     }

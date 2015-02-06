@@ -1,9 +1,9 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -88,7 +88,7 @@ public class FacebookLoginActivity extends BaseActivity {
         super.onStart();
 
         // Show the Up button in the action bar.
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }

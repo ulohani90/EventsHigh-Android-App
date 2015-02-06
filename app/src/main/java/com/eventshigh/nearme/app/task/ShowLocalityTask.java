@@ -1,11 +1,11 @@
 package com.eventshigh.nearme.app.task;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 /**
  * {@link android.os.AsyncTask} which can be used to fetch the locality from LatLng and then
- * update the {@link android.app.ActionBar} subtitle with locality.
+ * update the {@link android.support.v7.app.ActionBar} subtitle with locality.
 */
 public class ShowLocalityTask extends AsyncTask<LatLng, Void, String> {
     // Constants
