@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -279,9 +280,10 @@ public class Event implements Parcelable {
 
         // Event timings.
         List<Long> eventTimings = new ArrayList<>();
-        Date eventTiming =  DateTimeUtils.mergeDateTime(eventJson.optString("date"),
+        Date todayMidnight = DateTimeUtils.toMidnight(Calendar.getInstance(), city.timeZone).getTime();
+        Date eventTiming = DateTimeUtils.mergeDateTime(eventJson.optString("date"),
                 eventJson.optString("start_time"), city.timeZone);
-        if (eventTiming != null) {
+        if (eventTiming != null && eventTiming.after(todayMidnight)) {
             eventTimings.add(eventTiming.getTime());
         }
 
@@ -291,7 +293,8 @@ public class Event implements Parcelable {
                 eventTiming =  DateTimeUtils.mergeDateTime(
                         upcoming_occurrences.getJSONObject(i).optString("date"),
                         upcoming_occurrences.getJSONObject(i).optString("start_time"), city.timeZone);
-                if (eventTiming != null && !eventTimings.contains(eventTiming.getTime())) {
+                if (eventTiming != null && eventTiming.after(todayMidnight) &&
+                        !eventTimings.contains(eventTiming.getTime())) {
                     eventTimings.add(eventTiming.getTime());
                 }
             }

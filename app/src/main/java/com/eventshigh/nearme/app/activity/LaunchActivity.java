@@ -215,7 +215,7 @@ public class LaunchActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     City city = getItem(position);
-                    param.changeLocation(getItem(position).cityBounds.getCenter());
+                    param.changeLocation(city.cityBounds.getCenter());
                     gcmRegistration.setLastCity(city);
                     startNextActivity();
                 }

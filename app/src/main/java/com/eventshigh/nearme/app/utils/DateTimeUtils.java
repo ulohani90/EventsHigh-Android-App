@@ -48,9 +48,7 @@ public class DateTimeUtils {
             time = time + ":00";
         }
 
-        Date todayMidnight = toMidnight(Calendar.getInstance(), timeZone).getTime();
-        Date mergedDate = FULL_DATE_TIME_FORMAT.parse(date.split(":")[0] + " " + time + " " + timeZone);
-        return mergedDate.after(todayMidnight) ? mergedDate : null;
+        return FULL_DATE_TIME_FORMAT.parse(date.split(":")[0] + " " + time + " " + timeZone);
     }
 
     public static int getDaysLater(Event event) {
