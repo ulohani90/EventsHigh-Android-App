@@ -11,7 +11,7 @@
         android:orientation="vertical"
     >
         <ProgressBar
-            style="@android:style/Widget.Holo.Light.ProgressBar.Horizontal"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:id="@+id/top_progress_bar"
             android:indeterminate="true"
             android:layout_marginTop="-4dp"
@@ -25,6 +25,7 @@
             android:id="@+id/sliding_tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:elevation="8dp"
             android:background="@android:color/black"
         />
 
