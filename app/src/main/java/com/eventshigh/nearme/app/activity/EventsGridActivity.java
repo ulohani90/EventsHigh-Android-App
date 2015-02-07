@@ -1,7 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.ActionBar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.task.ShowLocalityTask;
@@ -45,7 +45,7 @@ public class EventsGridActivity extends BaseEventsActivity {
 
     @Override
     protected void updateUserLocation(LatLng userLocation) {
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null &&
                 (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0)) {
             new ShowLocalityTask(this, actionBar).execute(userLocation);

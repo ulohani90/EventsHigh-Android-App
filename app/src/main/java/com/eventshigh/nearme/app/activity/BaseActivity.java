@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NavUtils;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -117,11 +116,7 @@ public abstract class BaseActivity extends ActionBarActivity {
     }
 
     public void navigateUp() {
-        Class parentClass = pref.isMapsViewDefault()
-                ? EventsMapsActivity.class
-                : EventsGridActivity.class;
-        NavUtils.navigateUpTo(this, new Intent(this, parentClass).setFlags(
-                Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
+        finish();
     }
 
     /**

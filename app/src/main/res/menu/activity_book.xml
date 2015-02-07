@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:myApp="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activity.BookTicketActivity"
 >
@@ -7,7 +8,6 @@
           android:title="@string/action_open_in_browser"
           android:icon="@drawable/ic_open_in_browser_white_36dp"
           android:orderInCategory="10"
-          android:showAsAction="ifRoom"
-          tools:ignore="AppCompatResource"
+          myApp:showAsAction="ifRoom"
     />
 </menu>

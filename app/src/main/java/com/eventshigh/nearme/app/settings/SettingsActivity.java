@@ -10,7 +10,11 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.EventsGridActivity;
@@ -51,6 +55,7 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         setupSimplePreferencesScreen();
+        setupActionBar();
     }
 
     @Override
@@ -163,4 +168,17 @@ public class SettingsActivity extends PreferenceActivity {
                 return true;
             }
         };
+
+    private void setupActionBar() {
+        LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
+        Toolbar toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.toolbar, root, false);
+        toolbar.setTitle(R.string.title_activity_settings);
+        root.addView(toolbar, 0); // insert at top
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
 }

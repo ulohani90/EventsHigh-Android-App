@@ -38,7 +38,6 @@ public class EventDetailActivity extends BaseActivity implements MyScrollListene
         setContentView(R.layout.activity_event_detail);
         container = (FrameLayout) findViewById(R.id.container);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
         toolbar.setNavigationOnClickListener(new OnClickListener() {
             @Override
