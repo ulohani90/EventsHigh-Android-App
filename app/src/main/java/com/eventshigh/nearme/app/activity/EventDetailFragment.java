@@ -222,7 +222,17 @@ public class EventDetailFragment extends Fragment {
     }
 
     private void shareEvent() {
+        int favouriteViewVisibility = eventCard.favouriteView.getVisibility();
+        int favouritedViewVisibility = eventCard.favouritedView.getVisibility();
+        eventCard.favouriteView.setVisibility(View.GONE);
+        eventCard.favouritedView.setVisibility(View.GONE);
+        eventCard.dismissView.setVisibility(View.GONE);
+
         activity.shareEvent(eventCard.shareContentsView, event);
+
+        eventCard.dismissView.setVisibility(View.VISIBLE);
+        eventCard.favouriteView.setVisibility(favouriteViewVisibility);
+        eventCard.favouritedView.setVisibility(favouritedViewVisibility);
     }
 
     private void openBookingSite() {
