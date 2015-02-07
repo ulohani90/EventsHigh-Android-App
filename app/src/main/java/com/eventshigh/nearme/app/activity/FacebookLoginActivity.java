@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.view.View;
@@ -115,7 +114,7 @@ public class FacebookLoginActivity extends BaseActivity {
     @Override
     public void onNewIntent(Intent intent) {
         isOnBoarding = intent.hasExtra(PARAM_ONBOARDING);
-        setTheme(isOnBoarding ? android.R.style.Theme_NoTitleBar : R.style.AppTheme);
+        setTheme(isOnBoarding ? R.style.NoActionBar : R.style.AppTheme);
     }
 
     @Override
@@ -145,8 +144,6 @@ public class FacebookLoginActivity extends BaseActivity {
     private void up() {
         if (isOnBoarding) {
             startActivity(new Intent(FacebookLoginActivity.this, LaunchActivity.class));
-        } else {
-            NavUtils.navigateUpFromSameTask(this);
         }
         finish();
     }
