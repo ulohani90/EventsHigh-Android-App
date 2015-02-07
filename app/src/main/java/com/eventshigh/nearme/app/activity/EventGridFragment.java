@@ -52,13 +52,6 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
         eventGridView.setAdapter(eventsAdapter);
         eventsAdapter.setOnItemClickListener(mOnItemClickListener);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        eventGridView.setHasFixedSize(true);
-
-        // use a grid layout manager
-        eventGridView.setLayoutManager(new GridLayoutManager(getActivity(), 1));
-
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeResources(R.color.app_color);

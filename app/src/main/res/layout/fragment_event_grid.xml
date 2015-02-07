@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     tools:context=".activity.EventGridActivity"
 >
-    <android.support.v7.widget.RecyclerView
+    <com.eventshigh.nearme.app.view.AutofitRecyclerView
         android:id="@+id/event_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
