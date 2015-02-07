@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,9 +48,16 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        GridView eventGridView = (GridView) view.findViewById(R.id.event_grid);
+        RecyclerView eventGridView = (RecyclerView) view.findViewById(R.id.event_grid);
         eventGridView.setAdapter(eventsAdapter);
-        eventGridView.setOnItemClickListener(mOnItemClickListener);
+        eventsAdapter.setOnItemClickListener(mOnItemClickListener);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        eventGridView.setHasFixedSize(true);
+
+        // use a grid layout manager
+        eventGridView.setLayoutManager(new GridLayoutManager(getActivity(), 1));
 
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -61,6 +71,7 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
         this.activity = (EventsGridActivity) activity;
         eventsMarkerEditor = EventsMarkerManager.getInstance(activity).getEditor();
         eventsAdapter = new EventsAdapter(this.activity, eventsMarkerEditor);
+
         if (getArguments() != null) {
             isFavouriteView = getArguments().getBoolean(IS_FAVOURITE_VIEW_PARAMETER, false);
             events = getArguments().getParcelableArrayList(EVENTS_LIST_PARAMETER);
@@ -98,7 +109,7 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
         @Override
         public void onEventStateChange(String eventId, @Nullable EventMark eventMark) {
             if (EventMark.isDismissed(eventMark)) {
-                for(int i = 0; i < eventsAdapter.getCount(); i++) {
+                for(int i = 0; i < eventsAdapter.getItemCount(); i++) {
                     Event event = eventsAdapter.getItem(i);
                     if (event.id.equals(eventId)) {
                         eventsAdapter.remove(event);
@@ -115,7 +126,7 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
             if (isFavouriteView && EventMark.isFavourite(eventMark)) {
                 int insertAt = 0;
                 for (Event event : events) {
-                    boolean eventFound = insertAt < eventsAdapter.getCount() &&
+                    boolean eventFound = insertAt < eventsAdapter.getItemCount() &&
                             eventsAdapter.getItem(insertAt).equals(event);
                     if (eventFound) {
                         insertAt ++;
