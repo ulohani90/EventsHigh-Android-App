@@ -76,6 +76,10 @@ public class SettingsActivity extends PreferenceActivity {
 
     @Override
     public void onNewIntent(Intent intent) {
+        if (intent == null || intent.getAction() == null) {
+            return;
+        }
+
         if (intent.getAction().equals("com.eventshigh.delete_query_history")) {
             gaHelper.reportActionToAnalytics(SettingsActivity.class.getSimpleName(), "deleteQueryHistory", "", 0);
 
