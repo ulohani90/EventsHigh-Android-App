@@ -19,7 +19,7 @@
 -include ../proguard-com.twitter.sdk.android.twitter.txt
 
 # Amplitude
--keep public class com.google.android.gms.ads.** { public protected *; } 
+-keep public class com.google.android.gms.ads.** { public protected *; }
 
 # Google Play Services
 -keep class * extends java.util.ListResourceBundle {
@@ -32,6 +32,12 @@
 }
 -keepattributes Signature
 
+
+# v7 support library
+-keep public class android.support.v7.widget.SearchView { *; }
+
+
+# Default
 -keep public class com.google.android.gms.common.internal.safeparcel.SafeParcelable {
     public static final *** NULL;
 }
