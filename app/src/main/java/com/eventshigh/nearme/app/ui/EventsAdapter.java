@@ -122,6 +122,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
 
     private static void bindView(final EventCard eventCard, final Event event,
                           final BaseEventsActivity activity, final Editor eventsMarkerEditor) {
+        eventCard.cardView.setVisibility(View.VISIBLE);
         // Set the background image.
         eventCard.bgView.setDefaultImageResId(R.drawable.eh_default_event_list);
         if (event.imgUrl != null) {
@@ -197,6 +198,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
                             Toast.makeText(activity, R.string.message_dismiss, Toast.LENGTH_SHORT).show();
                             showDismissToast = false;
                         }
+                        eventCard.cardView.setVisibility(View.GONE);
                     }
 
                     @Override
