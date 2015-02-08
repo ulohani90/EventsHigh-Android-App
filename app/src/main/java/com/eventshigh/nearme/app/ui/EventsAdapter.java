@@ -1,7 +1,9 @@
 package com.eventshigh.nearme.app.ui;
 
+import android.graphics.Point;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,6 +27,7 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.view.GridViewAnimator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +42,7 @@ import java.util.Set;
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard> {
     // We show the dismiss toast once per session.
     private static boolean showDismissToast = true;
+    private static boolean enableAnimation = true;
 
     private final BaseEventsActivity activity;
     private final Editor eventsMarkerEditor;
@@ -46,6 +50,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
     private final Set<Integer> usedItemIds = new HashSet<>();
     private final List<Event> events;
     private AdapterView.OnItemClickListener onItemClickListener;
+
+    private int lastPosition = -1;
 
     public EventsAdapter(BaseEventsActivity activity, Editor eventsMarkerEditor) {
         this.activity = activity;
@@ -77,6 +83,16 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
     @Override
     public void onBindViewHolder(EventCard eventCard, int i) {
         bindView(eventCard, events.get(i), activity, eventsMarkerEditor);
+
+        if (enableAnimation) {
+            Display display = activity.getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            int displayHeight = size.y;
+            eventCard.cardView.setTranslationY(i > lastPosition ? displayHeight : -displayHeight);
+            lastPosition = i;
+            eventCard.cardView.animate().translationY(0).setDuration(500).start();
+        }
     }
 
     @Override
@@ -181,6 +197,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
         eventCard.dismissView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                enableAnimation = false;
                 activity.reportActionToAnalytics("dismiss");
                 Animation anim = AnimationUtils.loadAnimation(activity, android.R.anim.fade_out);
                 anim.setDuration(500);
@@ -213,6 +230,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
 
     public void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
+    }
+
+    public void onRemove() {
+        enableAnimation = true;
     }
 
     public static class EventCard extends RecyclerView.ViewHolder implements OnClickListener {
