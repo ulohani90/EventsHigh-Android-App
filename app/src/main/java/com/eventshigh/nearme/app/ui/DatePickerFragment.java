@@ -14,6 +14,7 @@ import com.eventshigh.nearme.app.data.City;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -22,7 +23,7 @@ import java.util.TimeZone;
  */
 public class DatePickerFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener, DialogInterface.OnClickListener {
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     private Date today;
     private DatePickerDialog datePicker;
@@ -57,6 +58,7 @@ public class DatePickerFragment extends DialogFragment
 
         datePicker.setButton(DialogInterface.BUTTON_POSITIVE,
                 getActivity().getString(R.string.menu_filter), this);
+        datePicker.getDatePicker().setCalendarViewShown(false);
         return datePicker;
     }
 
