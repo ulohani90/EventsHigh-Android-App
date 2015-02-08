@@ -243,7 +243,7 @@
 
         <activity
             android:name=".activity.BookTicketActivity"
-            android:label="@string/action_book_ticket"
+            android:label="@string/title_book"
             android:launchMode="singleTask"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:parentActivityName=".activity.EventDetailActivity"
@@ -272,7 +272,7 @@
         />
         <activity
             android:name=".activity.ShareAppActivity"
-            android:label="@string/action_refer"
+            android:label="@string/pref_title_refer"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
             android:parentActivityName=".settings.SettingsActivity"
@@ -289,7 +289,7 @@
         />
         <activity
             android:name=".activity.FacebookLoginActivity"
-            android:label="@string/action_connect_facebook"
+            android:label="@string/pref_title_facebook"
             android:screenOrientation="portrait"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
@@ -303,7 +303,7 @@
         </activity>
         <activity
             android:name=".settings.AboutUsActivity"
-            android:label="@string/title_about_us"
+            android:label="@string/pref_title_about_us"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"
             android:parentActivityName=".settings.SettingsActivity"

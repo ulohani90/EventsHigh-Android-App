@@ -9,19 +9,33 @@
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
     />
-    <Preference android:title="@string/action_refer">
+    <Preference android:title="@string/pref_title_refer">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.ShareAppActivity"
         />
     </Preference>
-    <Preference android:title="@string/action_connect_facebook">
+    <Preference android:title="@string/pref_title_facebook">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.FacebookLoginActivity"
         />
     </Preference>
-    <Preference android:title="@string/title_about_us">
+    <Preference android:title="@string/pref_title_delete_query_history">
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.settings.SettingsActivity"
+            android:action="com.eventshigh.delete_query_history"
+        />
+    </Preference>
+    <Preference android:title="@string/pref_title_restore_event">
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.settings.SettingsActivity"
+            android:action="com.eventshigh.restore_events"
+        />
+    </Preference>
+    <Preference android:title="@string/pref_title_about_us">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.settings.AboutUsActivity"

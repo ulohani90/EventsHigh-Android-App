@@ -1,10 +1,15 @@
 <resources>
     <string name="title_activity_settings">Settings</string>
-    <string name="title_about_us">About EventsHigh</string>
 
     <!-- General settings -->
     <string name="pref_header_general">General</string>
     <string name="pref_title_default_activity">Default View</string>
+    <string name="pref_title_refer">Refer a friend</string>
+    <string name="pref_title_facebook">Facebook Connection</string>
+    <string name="pref_title_delete_query_history">Delete Query History</string>
+    <string name="pref_title_restore_event">Restore All Events</string>
+    <string name="pref_title_about_us">About EventsHigh</string>
+
     <string-array name="pref_default_activity_titles">
         <item>List</item>
         <item>Maps</item>
@@ -13,6 +18,9 @@
         <item>list</item>
         <item>maps</item>
     </string-array>
+
+    <string name="message_delete_query_history">Query history was cleared successfully!</string>
+    <string name="message_restore_event">Events marked as non interested will be restored!</string>
 
     <!-- Notifications settings -->
     <string name="pref_header_notifications">Notifications</string>

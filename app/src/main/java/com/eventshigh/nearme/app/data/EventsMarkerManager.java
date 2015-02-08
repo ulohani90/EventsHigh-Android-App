@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -174,6 +175,18 @@ public class EventsMarkerManager {
 
     public boolean isDismissed(String eventId) {
         return EventMark.isDismissed(getEventMark(eventId));
+    }
+
+    public void restoreAll() {
+        SQLiteDatabase database = new EventMarkDbHelper(context).getWritableDatabase();
+        EventMarkDbHelper.restoreAll(database);
+
+        Iterator<Entry<String, EventMark>> it = eventMarkMap.entrySet().iterator();
+        while (it.hasNext()) {
+            if (it.next().getValue() == EventMark.DISMISSED) {
+                it.remove();
+            }
+        }
     }
 
     public void removeDismissed(Collection<? extends Event> events) {

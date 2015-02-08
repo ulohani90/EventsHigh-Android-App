@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,13 +77,6 @@ public class EventsCollection {
             };
     }
 
-    private static final Set<String> TAGS_BLACKLIST = new HashSet<>();
-    static {
-        TAGS_BLACKLIST.add("courses");
-        TAGS_BLACKLIST.add("workshops");
-        TAGS_BLACKLIST.add("misc");
-    }
-
     private static class Counter {
         private int count = 0;
 
@@ -140,8 +132,7 @@ public class EventsCollection {
 
             if (! whiteListedTagCategories.isEmpty()) {
                 for (String tag : event.tags) {
-                    if (whiteListedTagCategories.contains(tag.toLowerCase()) &&
-                        !TAGS_BLACKLIST.contains(tag.toLowerCase())) {
+                    if (whiteListedTagCategories.contains(tag.toLowerCase())) {
                         incrementCounter(Utils.capitalize(tag));
                     }
                 }
@@ -161,7 +152,7 @@ public class EventsCollection {
         public EventsCollection build() {
             List<TaggedEvents> taggedEventsList = new ArrayList<>(events.keySet().size());
             for (Entry<String, List<Event>> tagEvents : events.entrySet()) {
-                if (tagEvents.getValue().size() > 1) {
+                if (!tagEvents.getValue().isEmpty()) {
                     taggedEventsList.add(new TaggedEvents(
                             tagEvents.getKey(), Collections.unmodifiableList(tagEvents.getValue())));
                 }

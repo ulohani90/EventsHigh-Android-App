@@ -56,7 +56,7 @@ public class DatePickerFragment extends DialogFragment
         datePicker.getDatePicker().setMaxDate(today.getTime() + 7 * 24 * 3600 * 1000L);
 
         datePicker.setButton(DialogInterface.BUTTON_POSITIVE,
-                getActivity().getString(R.string.action_filter), this);
+                getActivity().getString(R.string.menu_filter), this);
         return datePicker;
     }
 

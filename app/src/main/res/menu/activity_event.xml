@@ -12,36 +12,36 @@
           myApp:actionViewClass="android.support.v7.widget.SearchView"
     />
     <item android:id="@+id/action_list"
-          android:title="@string/action_list"
+          android:title="@string/menu_list"
           android:icon="@drawable/ic_list_white_36dp"
           android:orderInCategory="20"
           myApp:showAsAction="ifRoom"
     />
     <item android:id="@+id/action_map"
-          android:title="@string/action_map"
+          android:title="@string/menu_map"
           android:icon="@drawable/ic_map_white_36dp"
           android:orderInCategory="20"
           myApp:showAsAction="ifRoom"
     />
     <item android:id="@+id/action_filter"
-          android:title="@string/action_filter"
+          android:title="@string/menu_filter"
           android:icon="@drawable/ic_today_white_36dp"
           android:orderInCategory="30"
           myApp:showAsAction="ifRoom"
     />
     <item android:id="@+id/action_change_location"
-          android:title="@string/action_edit_location"
+          android:title="@string/menu_edit_location"
           android:icon="@drawable/ic_location_on_white_36dp"
           android:orderInCategory="40"
           myApp:showAsAction="ifRoom"
     />
     <item android:id="@+id/action_refresh"
-          android:title="@string/action_refresh"
+          android:title="@string/menu_refresh"
           android:icon="@drawable/ic_refresh_white_36dp"
           android:orderInCategory="45"
     />
     <item android:id="@+id/action_shortcut"
-          android:title="@string/action_shortcut"
+          android:title="@string/menu_shortcut"
           android:icon="@drawable/ic_link_white_36dp"
           android:orderInCategory="50"
     />

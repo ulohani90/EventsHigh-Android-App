@@ -70,6 +70,16 @@ public class EventMarkDbHelper extends SQLiteOpenHelper {
         }).start();
     }
 
+    static void restoreAll(final SQLiteDatabase database) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                database.delete(EVENT_PREFS_TABLE_NAME,
+                        EVENT_PREFS_COLUMN_EVENT_MARK + " = " + EventMark.DISMISSED.value, null);
+            }
+        }).start();
+    }
+
     static Iterable<Pair<String, EventMark>> fetchAllEntries(final SQLiteDatabase database) {
         return new Iterable<Pair<String, EventMark>>() {
             @Override
