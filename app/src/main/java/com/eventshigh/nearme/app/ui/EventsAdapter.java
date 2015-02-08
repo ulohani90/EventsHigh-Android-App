@@ -1,13 +1,15 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,15 +26,17 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * An {@link android.widget.ListAdapter} which can be used to populate the Event card.
  */
-public class EventsAdapter extends ArrayAdapter<Event> {
+public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard> {
     // We show the dismiss toast once per session.
     private static boolean showDismissToast = true;
 
@@ -40,25 +44,53 @@ public class EventsAdapter extends ArrayAdapter<Event> {
     private final Editor eventsMarkerEditor;
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
     private final Set<Integer> usedItemIds = new HashSet<>();
+    private final List<Event> events;
+    private AdapterView.OnItemClickListener onItemClickListener;
 
     public EventsAdapter(BaseEventsActivity activity, Editor eventsMarkerEditor) {
-        super(activity, R.layout.event_card, R.id.event_title);
-
         this.activity = activity;
         this.eventsMarkerEditor = eventsMarkerEditor;
+        events = new ArrayList<>();
+        setHasStableIds(true);
+    }
+
+    public void addAll(List<Event> events) {
+        this.events.addAll(events);
+    }
+
+    public void remove(Event event) {
+        this.events.remove(event);
+        notifyDataSetChanged();
+    }
+
+    public void insert(Event event, int insertAt) {
+        this.events.add(insertAt, event);
+        notifyDataSetChanged();
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        return getView(getItem(position), activity, convertView, parent, eventsMarkerEditor);
+    public EventCard onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View view = LayoutInflater.from(activity).inflate(R.layout.event_card, viewGroup, false);
+        return new EventCard(view, onItemClickListener);
     }
 
-    public boolean hasStableIds() {
-        return true;
+    @Override
+    public void onBindViewHolder(EventCard eventCard, int i) {
+        bindView(eventCard, events.get(i), activity, eventsMarkerEditor);
     }
 
+    @Override
+    public int getItemCount() {
+        return events.size();
+    }
+
+    @Override
     public long getItemId(int position) {
         return getItemId(getItem(position).id);
+    }
+
+    public Event getItem(int i) {
+        return events.get(i);
     }
 
     private int getItemId(String eventId) {
@@ -77,13 +109,19 @@ public class EventsAdapter extends ArrayAdapter<Event> {
 
     // Build the view, reuse existing if possible.
     public static View getView(final Event event, final BaseEventsActivity activity,
-                               @Nullable View reuseView, ViewGroup parent, final Editor eventsMarkerEditor) {
+                               @Nullable View reuseView, ViewGroup parent,
+                               final Editor eventsMarkerEditor) {
         // Build the view, reuse existing if possible.
         final View view = reuseView == null ?
                 activity.getLayoutInflater().inflate(R.layout.event_card, parent, false) :
                 reuseView;
-        final EventCard eventCard = new EventCard(view);
+        final EventCard eventCard = new EventCard(view, null);
+        bindView(eventCard, event, activity, eventsMarkerEditor);
+        return view;
+    }
 
+    private static void bindView(final EventCard eventCard, final Event event,
+                          final BaseEventsActivity activity, final Editor eventsMarkerEditor) {
         // Set the background image.
         eventCard.bgView.setDefaultImageResId(R.drawable.eh_default_event_list);
         if (event.imgUrl != null) {
@@ -119,7 +157,8 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         }
 
         // Set actions handlers.
-        setFavouriteView(eventCard, eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id));
+        setFavouriteView(eventCard, eventsMarkerEditor.getEventsMarkerManager().getEventMark(
+                event.id));
         eventCard.favouriteView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,14 +204,17 @@ public class EventsAdapter extends ArrayAdapter<Event> {
                         // do nothing.
                     }
                 });
-                view.startAnimation(anim);
+                eventCard.cardView.startAnimation(anim);
             }
         });
-
-        return view;
     }
 
-    private static class EventCard {
+    public void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    public static class EventCard extends RecyclerView.ViewHolder implements OnClickListener {
+        private final View cardView;
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
         private final TextView titleView;
@@ -182,8 +224,12 @@ public class EventsAdapter extends ArrayAdapter<Event> {
         private final FrameLayout favouriteView;
         private final FrameLayout favouritedView;
         private final FrameLayout dismissView;
+        private final AdapterView.OnItemClickListener onItemClickListener;
 
-        private EventCard(View cardView) {
+        public EventCard(View cardView, AdapterView.OnItemClickListener onItemClickListener) {
+            super(cardView);
+            this.cardView = cardView;
+            this.onItemClickListener = onItemClickListener;
             bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
             recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
             titleView = (TextView) cardView.findViewById(R.id.event_title);
@@ -193,6 +239,14 @@ public class EventsAdapter extends ArrayAdapter<Event> {
             favouriteView = (FrameLayout) cardView.findViewById(R.id.action_favourite);
             favouritedView = (FrameLayout) cardView.findViewById(R.id.action_favourited);
             dismissView = (FrameLayout) cardView.findViewById(R.id.action_dismiss);
+            cardView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (onItemClickListener != null) {
+                onItemClickListener.onItemClick(null, cardView, getPosition(), getItemId());
+            }
         }
     }
 
