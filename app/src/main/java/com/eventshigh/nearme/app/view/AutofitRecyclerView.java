@@ -13,14 +13,14 @@ public class AutofitRecyclerView extends RecyclerView {
     public AutofitRecyclerView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        int horizontalSpacing = 0;
+        int verticalSpacing = 0;
         if (attrs != null) {
-            int[] attrsArray = {
-                android.R.attr.columnWidth
-            };
-            TypedArray array = context.obtainStyledAttributes(
-                attrs, attrsArray);
-            columnWidth = array.getDimensionPixelSize(0, -1);
-            array.recycle();
+            columnWidth = getDimensionPixelSize(context, attrs, android.R.attr.columnWidth, -1);
+            horizontalSpacing = getDimensionPixelSize(context, attrs,
+                    android.R.attr.horizontalSpacing, -1);
+            verticalSpacing = getDimensionPixelSize(context, attrs,
+                    android.R.attr.verticalSpacing, -1);
         }
 
         // use this setting to improve performance if you know that changes
@@ -30,6 +30,7 @@ public class AutofitRecyclerView extends RecyclerView {
         // use a grid layout manager
         gridLayoutManager = new GridLayoutManager(context, 1);
         setLayoutManager(gridLayoutManager);
+        addItemDecoration(new SpacesItemDecoration(horizontalSpacing, verticalSpacing));
     }
 
     protected void onMeasure(int widthSpec, int heightSpec) {
@@ -38,5 +39,14 @@ public class AutofitRecyclerView extends RecyclerView {
             int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
             gridLayoutManager.setSpanCount(spanCount);
         }
+    }
+
+    private int getDimensionPixelSize(Context context, AttributeSet attributeSet, int attr,
+                                      int defaultValue) {
+        int[] attrsArray = { attr };
+        TypedArray array = context.obtainStyledAttributes(attributeSet, attrsArray);
+        int value = array.getDimensionPixelSize(0, defaultValue);
+        array.recycle();
+        return value;
     }
 }
