@@ -103,6 +103,8 @@ public class MarkerManager {
         for(Iterator<Entry<Marker, MarkerInfo>> it = markers.entrySet().iterator(); it.hasNext();) {
             Map.Entry<Marker, MarkerInfo> entry = it.next();
             if (eventsMarkerManager.isDismissed(entry.getValue().event.id)) {
+                entry.getKey().setVisible(false);
+                entry.getKey().remove();
                 it.remove();
             }
         }

@@ -60,7 +60,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private GestureDetectorCompat gestureDetector;
     // Manager for all markers drawn on map. Manager is responsible for hiding/showing markers
     // on map.
-    private MarkerManager markerManager = new MarkerManager();
+    private MarkerManager mapMarkerManager = new MarkerManager();
     // FrameLayout holding the Event Card.
     private FrameLayout eventCardContainer;
     // Last marker for which the event info card is shown.
@@ -97,9 +97,17 @@ public class EventsMapsActivity extends BaseEventsActivity {
         super.onResume();
 
         eventsMarkerEditor = EventsMarkerManager.getInstance(this).getEditor();
-        markerManager.removeDismissedEvents(eventsMarkerEditor.getEventsMarkerManager());
+        mapMarkerManager.removeDismissedEvents(eventsMarkerEditor.getEventsMarkerManager());
         eventsMarkerEditor.getEventsMarkerManager()
                 .addOnEventMarkChangeListener(mOnEventMarkChangeListener);
+
+        if (lastSelectedMarker != null) {
+            if (lastSelectedMarker.isVisible()) {
+                showEventCard();
+            } else {
+                mOnMapClickListener.onMapClick(null);
+            }
+        }
     }
 
     @Override
@@ -147,7 +155,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
         if (isFavouriteView) {
             events = eventsMarkerEditor.getEventsMarkerManager().filterFavouriteEvents(events);
         }
-        markerManager.setEvents(map, EventsMarkerManager.getInstance(this), events);
+        mapMarkerManager.setEvents(map, EventsMarkerManager.getInstance(this), events);
         super.updateEventListing(events, isFavouriteView);
     }
 
@@ -195,7 +203,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
 
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
-                    showEventDetails(markerManager.getEvent(lastSelectedMarker));
+                    showEventDetails(mapMarkerManager.getEvent(lastSelectedMarker));
                     return true;
                 }
 
@@ -210,8 +218,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
 
                     reportActionToAnalytics("swipe");
                     Marker nextMarker = velocityX > 0 ?
-                            markerManager.getPrevMarker(lastSelectedMarker) :
-                            markerManager.getNextMarker(lastSelectedMarker);
+                            mapMarkerManager.getPrevMarker(lastSelectedMarker) :
+                            mapMarkerManager.getNextMarker(lastSelectedMarker);
                     if (nextMarker != null) {
                         lastSelectedMarker.hideInfoWindow();
                         nextMarker.setVisible(true);
@@ -242,6 +250,21 @@ public class EventsMapsActivity extends BaseEventsActivity {
         return false;
     }
 
+    private void showEventCard() {
+        View eventView = eventCardContainer.getChildAt(0);
+        Event event = mapMarkerManager.getEvent(lastSelectedMarker);
+        eventView = EventsAdapter.getView(
+                event, EventsMapsActivity.this, eventView, eventCardContainer, eventsMarkerEditor);
+        eventView.setOnTouchListener(
+                new OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return gestureDetector.onTouchEvent(event);
+                    }
+                });
+        eventCardContainer.removeAllViews();
+        eventCardContainer.addView(eventView);
+    }
 
     // ***********************
     // Callbacks
@@ -266,7 +289,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
                 if (!isAppMovement && lastSelectedMarker == null) {
                     reportActionToAnalytics("onCameraChange");
                 }
-                boolean isInfoWindowShown = markerManager.updateListingForProjection(map.getProjection());
+                boolean isInfoWindowShown = mapMarkerManager.updateListingForProjection(map.getProjection());
                 if (!isInfoWindowShown) {
                     mOnMapClickListener.onMapClick(null);
                 }
@@ -291,21 +314,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
         @Override
         public boolean onMarkerClick(Marker marker) {
             reportActionToAnalytics("onMarkerClick");
-
             lastSelectedMarker = marker;
-            View eventView = eventCardContainer.getChildAt(0);
-            Event event = markerManager.getEvent(marker);
-            eventView = EventsAdapter.getView(
-                    event, EventsMapsActivity.this, eventView, eventCardContainer, eventsMarkerEditor);
-            eventView.setOnTouchListener(
-                    new OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    return gestureDetector.onTouchEvent(event);
-                }
-            });
-            eventCardContainer.removeAllViews();
-            eventCardContainer.addView(eventView);
+            showEventCard();
             return false;
         }
     };
@@ -314,7 +324,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private OnInfoWindowClickListener mOnInfoWindowClickListener = new OnInfoWindowClickListener() {
         @Override
         public void onInfoWindowClick(Marker marker) {
-            showEventDetails(markerManager.getEvent(marker));
+            showEventDetails(mapMarkerManager.getEvent(marker));
         }
     };
 
@@ -323,11 +333,11 @@ public class EventsMapsActivity extends BaseEventsActivity {
         public void onEventStateChange(String eventId, @Nullable EventMark eventMark) {
             if (EventMark.isDismissed(eventMark)) {
                 if (lastSelectedMarker != null &&
-                        markerManager.getEvent(lastSelectedMarker).id.equals(eventId)) {
+                        mapMarkerManager.getEvent(lastSelectedMarker).id.equals(eventId)) {
                     mOnMapClickListener.onMapClick(null);
                 }
 
-                markerManager.removeEvent(eventId);
+                mapMarkerManager.removeEvent(eventId);
             }
         }
     };

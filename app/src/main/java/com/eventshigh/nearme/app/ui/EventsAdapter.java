@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -46,7 +45,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
     private final Set<Integer> usedItemIds = new HashSet<>();
     private final List<Event> events;
-    private AdapterView.OnItemClickListener onItemClickListener;
 
     private int lastPosition = -1;
 
@@ -74,7 +72,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
     @Override
     public EventCard onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(activity).inflate(R.layout.event_card, viewGroup, false);
-        return new EventCard(view, onItemClickListener);
+        return new EventCard(view);
     }
 
     @Override
@@ -125,7 +123,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
         final View view = reuseView == null ?
                 activity.getLayoutInflater().inflate(R.layout.event_card, parent, false) :
                 reuseView;
-        final EventCard eventCard = new EventCard(view, null);
+        final EventCard eventCard = new EventCard(view);
         bindView(eventCard, event, activity, eventsMarkerEditor);
         return view;
     }
@@ -133,6 +131,13 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
     private static void bindView(final EventCard eventCard, final Event event,
                           final BaseEventsActivity activity, final Editor eventsMarkerEditor) {
         eventCard.cardView.setVisibility(View.VISIBLE);
+        eventCard.cardView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.showEventDetails(event);
+            }
+        });
+
         // Set the background image.
         eventCard.bgView.setDefaultImageResId(R.drawable.eh_default_event_list);
         if (event.imgUrl != null) {
@@ -222,15 +227,11 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
         });
     }
 
-    public void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
-    }
-
     public void onRemove() {
         enableAnimation = true;
     }
 
-    public static class EventCard extends RecyclerView.ViewHolder implements OnClickListener {
+    public static class EventCard extends RecyclerView.ViewHolder {
         private final View cardView;
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
@@ -241,12 +242,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
         private final FrameLayout favouriteView;
         private final FrameLayout favouritedView;
         private final FrameLayout dismissView;
-        private final AdapterView.OnItemClickListener onItemClickListener;
 
-        public EventCard(View cardView, AdapterView.OnItemClickListener onItemClickListener) {
+        public EventCard(View cardView) {
             super(cardView);
             this.cardView = cardView;
-            this.onItemClickListener = onItemClickListener;
             bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
             recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
             titleView = (TextView) cardView.findViewById(R.id.event_title);
@@ -256,14 +255,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
             favouriteView = (FrameLayout) cardView.findViewById(R.id.action_favourite);
             favouritedView = (FrameLayout) cardView.findViewById(R.id.action_favourited);
             dismissView = (FrameLayout) cardView.findViewById(R.id.action_dismiss);
-            cardView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (onItemClickListener != null) {
-                onItemClickListener.onItemClick(null, cardView, getPosition(), getItemId());
-            }
         }
     }
 

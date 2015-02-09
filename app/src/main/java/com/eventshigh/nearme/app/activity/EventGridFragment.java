@@ -5,15 +5,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.GridView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
@@ -51,7 +46,6 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
 
         RecyclerView eventGridView = (RecyclerView) view.findViewById(R.id.event_grid);
         eventGridView.setAdapter(eventsAdapter);
-        eventsAdapter.setOnItemClickListener(mOnItemClickListener);
         eventGridView.setItemAnimator(new GridViewAnimator(eventsAdapter));
 
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
@@ -92,13 +86,6 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
     // ***********************
     // Callbacks
     // ***********************
-
-    private final OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            activity.showEventDetails(eventsAdapter.getItem(position));
-        }
-    };
 
     private final OnEventMarkChangeListener mOnEventMarkChangeListener = new OnEventMarkChangeListener() {
         @Override
