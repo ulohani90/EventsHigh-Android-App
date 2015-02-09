@@ -134,8 +134,6 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
                         break;
                     }
                 }
-            } else {
-                eventsAdapter.notifyDataSetChanged();
             }
         }
     };
