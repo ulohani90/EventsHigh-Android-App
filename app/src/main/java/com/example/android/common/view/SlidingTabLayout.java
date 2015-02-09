@@ -202,6 +202,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
         final SlidingTabPagerAdapter adapter = (SlidingTabPagerAdapter) mViewPager.getAdapter();
         final View.OnClickListener tabClickListener = new TabClickListener();
 
+        int minWidth = getContext().getResources().getDisplayMetrics().widthPixels / adapter.getCount();
         for (int i = 0; i < adapter.getCount(); i++) {
             View tabView = null;
             TextView tabTitleView = null;
@@ -210,6 +211,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 // If there is a custom tab view layout id set, try and inflate it
                 tabView = LayoutInflater.from(getContext()).inflate(mTabViewLayoutId, mTabStrip,
                         false);
+                tabView.setMinimumWidth(minWidth);
                 tabTitleView = (TextView) tabView.findViewById(mTabViewTextViewId);
                 TextView tabNumEventsView = (TextView) tabView.findViewById(
                         mTabEventCountTextViewId);
@@ -224,7 +226,9 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 tabTitleView = (TextView) tabView;
             }
 
-            tabTitleView.setText(adapter.getPageTitle(i));
+            if (tabTitleView != null) {
+                tabTitleView.setText(adapter.getPageTitle(i));
+            }
             tabView.setOnClickListener(tabClickListener);
 
             mTabStrip.addView(tabView);
