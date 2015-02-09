@@ -4,6 +4,7 @@ import android.app.DialogFragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -290,6 +291,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (isDataShown()) {
+            slidingTab.setViewPager(viewPager);
+        }
+    }
 
     // ***********************
     // Delegated methods
@@ -391,6 +399,18 @@ public abstract class BaseEventsActivity extends BaseActivity {
         startActivity(intent);
     }
 
+    protected void fetchNewListing(boolean shouldBypassCache) {
+        viewSwitcher.setDisplayedChild(0);
+        topProgressBar.setVisibility(View.VISIBLE);
+
+        EventCollectionRequest.submit(getApplicationContext(), eventFetcherParam,
+                Priority.IMMEDIATE, this, shouldBypassCache, mEventsFetcherCallBack, mErrorListener);
+    }
+
+    private boolean isDataShown() {
+        return viewPager.getAdapter() != null && viewPager.getAdapter().getCount() > 0;
+    }
+
     private static boolean showExploreTabForQuery(String query) {
         return query.isEmpty() || EventsHighEndpoints.isDateQuery(query);
     }
@@ -438,14 +458,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 }, 100);
             }
         }
-    }
-
-    public void fetchNewListing(boolean shouldBypassCache) {
-        viewSwitcher.setDisplayedChild(0);
-        topProgressBar.setVisibility(View.VISIBLE);
-
-        EventCollectionRequest.submit(getApplicationContext(), eventFetcherParam,
-                Priority.IMMEDIATE, this, shouldBypassCache, mEventsFetcherCallBack, mErrorListener);
     }
 
     private void createShortcut() {
@@ -649,10 +661,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
             topProgressBar.setVisibility(View.GONE);
-            if (viewPager.getAdapter() == null || viewPager.getAdapter().getCount() <= 0) {
-                viewSwitcher.setDisplayedChild(1);
-            } else {
+            if (isDataShown()) {
                 Toast.makeText(BaseEventsActivity.this, R.string.failed_refresh, Toast.LENGTH_SHORT).show();
+            } else {
+                viewSwitcher.setDisplayedChild(1);
             }
 
             Throwable cause = volleyError.getCause();
