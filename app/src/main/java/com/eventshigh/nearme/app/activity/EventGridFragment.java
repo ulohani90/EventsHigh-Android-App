@@ -19,6 +19,7 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.OnEventMarkChangeListe
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.view.GridViewAnimator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventGridFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -59,14 +60,18 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
 
         this.activity = (EventsGridActivity) activity;
         eventsMarkerEditor = EventsMarkerManager.getInstance(activity).getEditor();
-        eventsAdapter = new EventsAdapter(this.activity, eventsMarkerEditor);
 
         if (getArguments() != null) {
             isFavouriteView = getArguments().getBoolean(IS_FAVOURITE_VIEW_PARAMETER, false);
             events = getArguments().getParcelableArrayList(EVENTS_LIST_PARAMETER);
             eventsMarkerEditor.getEventsMarkerManager().removeDismissed(events);
-            eventsAdapter.addAll(isFavouriteView ? getFavouriteEvents() : events);
+        } else {
+            isFavouriteView = false;
+            events = new ArrayList<>();
         }
+
+        eventsAdapter = new EventsAdapter(this.activity,
+                isFavouriteView ? getFavouriteEvents() : events, eventsMarkerEditor);
 
         // Add listener to remove dismissed events.
         eventsMarkerEditor.getEventsMarkerManager()
@@ -124,7 +129,7 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
             } else {
                 // An event can be present in multiple tabs and we need to redraw the event cards
                 // so that favourite status is shown correctly in all tabs.
-                eventsAdapter.notifyDataSetChanged();
+                eventsAdapter.notifyDataSetChanged(eventId);
             }
         }
     };
