@@ -6,9 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -198,31 +195,11 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
             public void onClick(View v) {
                 enableAnimation = false;
                 activity.reportActionToAnalytics("dismiss");
-                Animation anim = AnimationUtils.loadAnimation(activity, android.R.anim.fade_out);
-                anim.setDuration(500);
-                anim.setAnimationListener(new AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-                        // do nothing.
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        // Report the dismiss and let list refresh.
-                        eventsMarkerEditor.recordPref(event.id, EventMark.DISMISSED);
-                        if (showDismissToast) {
-                            Toast.makeText(activity, R.string.message_dismiss, Toast.LENGTH_SHORT).show();
-                            showDismissToast = false;
-                        }
-                        eventCard.cardView.setVisibility(View.GONE);
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-                        // do nothing.
-                    }
-                });
-                eventCard.cardView.startAnimation(anim);
+                eventsMarkerEditor.recordPref(event.id, EventMark.DISMISSED);
+                if (showDismissToast) {
+                    Toast.makeText(activity, R.string.message_dismiss, Toast.LENGTH_SHORT).show();
+                    showDismissToast = false;
+                }
             }
         });
     }
