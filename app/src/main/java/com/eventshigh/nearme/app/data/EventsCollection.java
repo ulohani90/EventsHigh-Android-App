@@ -210,6 +210,10 @@ public class EventsCollection {
         this.tagInfos = Collections.unmodifiableList(tagInfos);
     }
 
+    public boolean isEmpty() {
+        return taggedEventsList.isEmpty();
+    }
+
     public List<Pair<String, Integer>> getTags() {
         List<Pair<String, Integer>> results = new ArrayList<>(taggedEventsList.size());
         for (TaggedEvents categoryEvents : taggedEventsList) {

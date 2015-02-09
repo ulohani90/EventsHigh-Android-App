@@ -74,7 +74,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // CONSTANTS
     // ***********************
     public static final String EXTRA_TAG_NAME_PARAM = "extra.event.tag.name";
-    public static final int NUM_MAX_TABS = 10;
     public static final int NUM_MAX_PREFETCH = 10;
     public static final int SECONDS_FOR_REFRESH = 600;
 
@@ -91,7 +90,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private MenuItem showMapMenu;
 
     // Last city and query for which events are shown.
-    protected EventFetcherParam lastEventFetcherParam;
+    protected EventFetcherParam eventFetcherParam;
     // Tag selected from tab bar for which events are shown.
     private String lastSelectedTag;
     // On boarding helper.
@@ -118,21 +117,21 @@ public abstract class BaseEventsActivity extends BaseActivity {
         viewPager = (ViewPager) findViewById(R.id.pager);
         topProgressBar = findViewById(R.id.top_progress_bar);
 
-        // Set the context in term of lastEventFetcherParam. Use Intent
+        // Set the context in term of eventFetcherParam. Use Intent
         // to restore the context.
         lastStartedAt = 0;
 
         // See if we have context passed to us within intent.
-        lastEventFetcherParam = IntentUtils.processIntent(this, getIntent());
+        eventFetcherParam = IntentUtils.processIntent(this, getIntent());
         lastSelectedTag = getIntent().getStringExtra(EXTRA_TAG_NAME_PARAM);
 
         // Show query as title.
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null && !lastEventFetcherParam.query.isEmpty()) {
-            actionBar.setTitle(DateTimeUtils.queryToTitle(lastEventFetcherParam.query));
-            if (!EventsHighEndpoints.isDateQuery(lastEventFetcherParam.query)) {
-                reportActionToAnalytics("search", lastEventFetcherParam.query);
-                EventSearchSuggestionsProvider.saveRecentQuery(this, lastEventFetcherParam.query);
+        if (actionBar != null && !eventFetcherParam.query.isEmpty()) {
+            actionBar.setTitle(DateTimeUtils.queryToTitle(eventFetcherParam.query));
+            if (!EventsHighEndpoints.isDateQuery(eventFetcherParam.query)) {
+                reportActionToAnalytics("search", eventFetcherParam.query);
+                EventSearchSuggestionsProvider.saveRecentQuery(this, eventFetcherParam.query);
             }
         }
     }
@@ -145,7 +144,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(
-                    !lastEventFetcherParam.query.isEmpty() || !isDefaultView());
+                    !eventFetcherParam.query.isEmpty() || !isDefaultView());
         }
 
         // Setup GoogleApiClient
@@ -153,9 +152,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
         client.registerConnectionCallbacks(new ConnectionCallbacks() {
             @Override
             public void onConnected(Bundle bundle) {
-                if (lastEventFetcherParam != null) {
-                    Uri webUri = EventsHighEndpoints.getWebUri(lastEventFetcherParam);
-                    String title = lastEventFetcherParam.toString();
+                if (eventFetcherParam != null) {
+                    Uri webUri = EventsHighEndpoints.getWebUri(eventFetcherParam);
+                    String title = eventFetcherParam.toString();
                     AppIndex.AppIndexApi.view(client, BaseEventsActivity.this, Utils.getAppUri(webUri),
                             title, webUri, null);
                 }
@@ -173,7 +172,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         // within {@code SECONDS_FOR_REFRESH} seconds.
         if (lastStartedAt < System.currentTimeMillis() - SECONDS_FOR_REFRESH * 1000) {
             // If location is passed in param, use it.
-            LatLng location = lastEventFetcherParam.location;
+            LatLng location = eventFetcherParam.location;
             if (location == null) {
                 City lastCity = GcmRegistration.getInstance(getApplicationContext()).getLastCity();
                 if (lastCity != null) {
@@ -184,7 +183,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             if (location == null) {
                 askUserForLocation();
             } else {
-                lastEventFetcherParam.changeLocation(null);
+                eventFetcherParam.changeLocation(null);
                 updateUserLocation(location);
             }
         }
@@ -203,8 +202,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         topProgressBar.setVisibility(View.GONE);
 
         if (client != null && client.isConnected()) {
-            if (lastEventFetcherParam != null) {
-                Uri webUri = EventsHighEndpoints.getWebUri(lastEventFetcherParam);
+            if (eventFetcherParam != null) {
+                Uri webUri = EventsHighEndpoints.getWebUri(eventFetcherParam);
                 AppIndex.AppIndexApi.viewEnd(client, BaseEventsActivity.this, Utils.getAppUri(webUri));
             }
             client.disconnect();
@@ -217,7 +216,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     public boolean onSearchRequested() {
         reportActionToAnalytics("onSearchRequested");
         Bundle appData = new Bundle();
-        appData.putParcelable(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam);
+        appData.putParcelable(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, eventFetcherParam);
         startSearch(null, false, appData, false);
         return true;
     }
@@ -233,8 +232,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         // Do not show filterByDate for search.
-        if (!lastEventFetcherParam.query.isEmpty() &&
-            !EventsHighEndpoints.isDateQuery(lastEventFetcherParam.query)) {
+        if (!eventFetcherParam.query.isEmpty() &&
+            !EventsHighEndpoints.isDateQuery(eventFetcherParam.query)) {
             menu.findItem(R.id.action_filter).setVisible(false);
         }
 
@@ -267,9 +266,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         if (id == R.id.action_filter) {
             DialogFragment selectDateFragment = new DatePickerFragment();
-            if (lastEventFetcherParam.city != null) {
+            if (eventFetcherParam.city != null) {
                 Bundle args = new Bundle();
-                args.putString(City.class.getName(), lastEventFetcherParam.city.toString());
+                args.putString(City.class.getName(), eventFetcherParam.city.toString());
                 selectDateFragment.setArguments(args);
             }
             selectDateFragment.show(getFragmentManager(), "selectDate");
@@ -305,8 +304,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
      * @param userLocation user location as reported by location client.
      */
     protected void updateUserLocation(@Nullable LatLng userLocation) {
-        lastEventFetcherParam.changeLocation(userLocation);
-        if (lastEventFetcherParam.city == null) {
+        eventFetcherParam.changeLocation(userLocation);
+        if (eventFetcherParam.city == null) {
             if (userLocation != null) {
                 reportActionToAnalytics("unsupportedCity");
                 Toast.makeText(this, R.string.unsupported_city, Toast.LENGTH_SHORT).show();
@@ -360,7 +359,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     public void showSearchView(String query) {
-        EventFetcherParam param = new EventFetcherParam(lastEventFetcherParam.location, query);
+        EventFetcherParam param = new EventFetcherParam(eventFetcherParam.location, query);
         Intent intent = new Intent(this, this.getClass())
                 .putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, param);
         startActivity(intent);
@@ -368,8 +367,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     protected void askUserForLocation() {
         reportActionToAnalytics("askUserForLocation");
-        String countryCode = lastEventFetcherParam.city == null ?
-                null : lastEventFetcherParam.city.countryCode;
+        String countryCode = eventFetcherParam.city == null ?
+                null : eventFetcherParam.city.countryCode;
         new LocationPickerDialog().show(this, countryCode, new OnLocationSelection() {
             @Override
             public void onLocationSelection(String locationString, LatLng locationPoint) {
@@ -388,17 +387,21 @@ public abstract class BaseEventsActivity extends BaseActivity {
         reportActionToAnalytics("switchView");
         Intent intent = new Intent(this, cls)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, lastEventFetcherParam);
+                .putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, eventFetcherParam);
         if (lastSelectedTag != null) {
             intent.putExtra(EXTRA_TAG_NAME_PARAM, lastSelectedTag);
         }
         startActivity(intent);
     }
 
+    private static boolean showExploreTabForQuery(String query) {
+        return query.isEmpty() || EventsHighEndpoints.isDateQuery(query);
+    }
+
     private void updateEventsCollection(EventsCollection events) {
         String tagToSearch = lastSelectedTag;
 
-        EventsPagerAdapter adapter = showExploreTab() && lastEventFetcherParam.query.isEmpty() ?
+        EventsPagerAdapter adapter = showExploreTab() && showExploreTabForQuery(eventFetcherParam.query) ?
                 new ExploreAndEventsPagerAdapter(getSupportFragmentManager(), events) :
                 new EventsPagerAdapter(getSupportFragmentManager(), events);
         viewPager.setAdapter(adapter);
@@ -406,16 +409,15 @@ public abstract class BaseEventsActivity extends BaseActivity {
         slidingTab.setViewPager(viewPager);
         slidingTab.setOnPageChangeListener(adapter);
 
-        if (events.getTags().isEmpty()) {
+        if (events.isEmpty()) {
             // nothing to show.
             return;
         }
 
         int currentItem = 0;
         if (tagToSearch != null) {
-            List<Pair<String, Integer>> tags = events.getTags();
-            for (int i = 0; i < tags.size(); i++) {
-                if (tags.get(i).first.equals(tagToSearch)) {
+            for (int i = 0; i < adapter.getCount(); i++) {
+                if (adapter.getPageTitle(i).equals(tagToSearch)) {
                     currentItem = i;
                     break;
                 }
@@ -457,7 +459,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         viewSwitcher.setDisplayedChild(0);
         topProgressBar.setVisibility(View.VISIBLE);
 
-        EventCollectionRequest.submit(getApplicationContext(), lastEventFetcherParam,
+        EventCollectionRequest.submit(getApplicationContext(), eventFetcherParam,
                 Priority.IMMEDIATE, this, shouldBypassCache, mEventsFetcherCallBack, mErrorListener);
     }
 
@@ -466,19 +468,19 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Create an intent the shortcut could launch.
         Intent shortcutIntent = new Intent(getApplicationContext(), getClass());
-        shortcutIntent.putExtra(SearchManager.QUERY, lastEventFetcherParam.query);
-        if (lastEventFetcherParam.location != null) {
+        shortcutIntent.putExtra(SearchManager.QUERY, eventFetcherParam.query);
+        if (eventFetcherParam.location != null) {
             shortcutIntent.putExtra(IntentUtils.EXTRA_LATITUDE_PARAM,
-                    lastEventFetcherParam.location.latitude);
+                    eventFetcherParam.location.latitude);
             shortcutIntent.putExtra(IntentUtils.EXTRA_LONGITUDE_PARAM,
-                    lastEventFetcherParam.location.longitude);
+                    eventFetcherParam.location.longitude);
         }
         shortcutIntent.setAction(Intent.ACTION_SEARCH);
 
         // Create an intent for creating shortcut and broadcast it.
         Intent addIntent = new Intent();
         addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-        addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, lastEventFetcherParam.toString());
+        addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, eventFetcherParam.toString());
         addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                 Intent.ShortcutIconResource.fromContext(getApplicationContext(),
                         R.drawable.ic_launcher));
@@ -504,14 +506,16 @@ public abstract class BaseEventsActivity extends BaseActivity {
         public void onResponse(EventsCollection events, boolean isIntermediate) {
             if (!isIntermediate) {
                 topProgressBar.setVisibility(View.GONE);
+
+                if (events.isEmpty()) {
+                    // Failed. Show toast and return empty list.
+                    Toast.makeText(BaseEventsActivity.this, R.string.no_events, Toast.LENGTH_SHORT).show();
+                }
             }
 
-            if (events.getTags().isEmpty()) {
-                // Failed. Show toast and return empty list.
-                Toast.makeText(BaseEventsActivity.this, R.string.no_events, Toast.LENGTH_SHORT).show();
+            if (!isIntermediate || !events.isEmpty()) {
+                updateEventsCollection(events);
             }
-
-            updateEventsCollection(events);
         }
     };
 
@@ -622,7 +626,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         @Override
         public int getCount() {
-            return Math.min(tags.size(), NUM_MAX_TABS);
+            return tags.size();
         }
 
         @Override
