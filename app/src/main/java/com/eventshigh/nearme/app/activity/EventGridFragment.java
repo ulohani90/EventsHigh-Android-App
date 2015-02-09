@@ -121,6 +121,10 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
                         break;
                     }
                 }
+            } else {
+                // An event can be present in multiple tabs and we need to redraw the event cards
+                // so that favourite status is shown correctly in all tabs.
+                eventsAdapter.notifyDataSetChanged();
             }
         }
     };

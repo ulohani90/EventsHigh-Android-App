@@ -38,7 +38,7 @@ import java.util.Set;
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard> {
     // We show the dismiss toast once per session.
     private static boolean showDismissToast = true;
-    private static boolean enableAnimation = true;
+    private static boolean enableAnimation = false; // should be true but TEMPORARY DISABLED.
 
     private final BaseEventsActivity activity;
     private final Editor eventsMarkerEditor;
@@ -228,7 +228,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
     }
 
     public void onRemove() {
-        enableAnimation = true;
+        enableAnimation = false; // should be true but TEMPORARY DISABLED.
     }
 
     public static class EventCard extends RecyclerView.ViewHolder {
