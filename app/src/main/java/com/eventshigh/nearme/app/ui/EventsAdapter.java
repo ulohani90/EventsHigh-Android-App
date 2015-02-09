@@ -65,6 +65,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
 
     public void insert(Event event, int insertAt) {
         this.events.add(insertAt, event);
+        enableAnimation = false;
         notifyDataSetChanged();
     }
 
@@ -73,6 +74,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
             notifyDataSetChanged();
         }
         lastChangedEventId = null;
+    }
+
+    public void onResumeAnimation() {
+        enableAnimation = true;
     }
 
     @Override
@@ -219,10 +224,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
                 }
             }
         });
-    }
-
-    public void onRemove() {
-        enableAnimation = true;
     }
 
     public static class EventCard extends RecyclerView.ViewHolder {
