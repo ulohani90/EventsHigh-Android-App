@@ -202,6 +202,9 @@ public class SlidingTabLayout extends HorizontalScrollView {
         final SlidingTabPagerAdapter adapter = (SlidingTabPagerAdapter) mViewPager.getAdapter();
         final View.OnClickListener tabClickListener = new TabClickListener();
 
+        if (adapter.getCount() == 0) {
+            return;
+        }
         int minWidth = getContext().getResources().getDisplayMetrics().widthPixels / adapter.getCount();
         for (int i = 0; i < adapter.getCount(); i++) {
             View tabView = null;
