@@ -33,7 +33,7 @@ import java.util.Map.Entry;
  * This object is responsible for creating marker objects and managing the visibility
  * of the markers.
  */
-public class MarkerManager {
+public class MapMarkerManager {
 
     // ***********************
     // CONSTANTS

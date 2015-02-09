@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
-import com.eventshigh.nearme.app.ui.MarkerManager;
+import com.eventshigh.nearme.app.ui.MapMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
@@ -60,7 +60,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private GestureDetectorCompat gestureDetector;
     // Manager for all markers drawn on map. Manager is responsible for hiding/showing markers
     // on map.
-    private MarkerManager mapMarkerManager = new MarkerManager();
+    private MapMarkerManager mapMarkerManager = new MapMarkerManager();
     // FrameLayout holding the Event Card.
     private FrameLayout eventCardContainer;
     // Last marker for which the event info card is shown.
