@@ -1,9 +1,7 @@
 package com.eventshigh.nearme.app.ui;
 
-import android.graphics.Point;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,7 +25,6 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.eventshigh.nearme.app.view.GridViewAnimator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,11 +82,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventCard>
         bindView(eventCard, events.get(i), activity, eventsMarkerEditor);
 
         if (enableAnimation) {
-            Display display = activity.getWindowManager().getDefaultDisplay();
-            Point size = new Point();
-            display.getSize(size);
-            int displayHeight = size.y;
-            eventCard.cardView.setTranslationY(i > lastPosition ? displayHeight : -displayHeight);
+            int offset = Utils.dpToPx(activity, 100);
+            eventCard.cardView.setTranslationY(i > lastPosition ? offset : -offset);
             lastPosition = i;
             eventCard.cardView.animate().translationY(0).setDuration(500).start();
         }
