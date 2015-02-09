@@ -70,7 +70,8 @@ public class EventDetailFragment extends Fragment {
     public static final String ARG_EVENT_INFO = "event_info";
 
     // Regex to check if description is plane text or html.
-    private static final Pattern htmlCheckPattern = Pattern.compile("<[A-Za-z].*</[A-Za-z]");
+    private static final Pattern htmlCheckPattern = Pattern.compile(
+            "<[A-Za-z].*</[A-Za-z]|<[A-Za-z].*/>");
 
     // Number of taps needed for GA opt out.
     private static final int NUM_TAPS_FOR_GA_OPT_OUT = 7;
