@@ -64,6 +64,7 @@
     <!-- Failed messages -->
     <string name="failed_login">Failed to login! You can retry or skip.</string>
     <string name="failed_load">Failed to load events information!</string>
+    <string name="failed_refresh">Failed to refresh events information, showing stale data!</string>
     <string name="unsupported_city">Sorry, we are not in your city, yet!</string>
     <string name="failed_locality">Sorry, we could not find locality, try again later?</string>
     <string name="failed_save">Sharing failed as we could not save image</string>

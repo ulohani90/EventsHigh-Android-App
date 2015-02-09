@@ -662,6 +662,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
             topProgressBar.setVisibility(View.GONE);
             if (viewPager.getAdapter() == null || viewPager.getAdapter().getCount() <= 0) {
                 viewSwitcher.setDisplayedChild(1);
+            } else {
+                Toast.makeText(BaseEventsActivity.this, R.string.failed_refresh, Toast.LENGTH_SHORT).show();
             }
 
             Throwable cause = volleyError.getCause();
@@ -672,8 +674,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 Log.w(LOG_TAG, "Volley Error: " + volleyError.getMessage());
                 reportActionToAnalytics("failedRequest");
             }
-
-            Toast.makeText(BaseEventsActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
         }
     };
 }
