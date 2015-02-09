@@ -40,7 +40,6 @@ import com.eventshigh.nearme.app.ui.DatePickerFragment;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
-import com.eventshigh.nearme.app.ui.OnBoardingHelper;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -93,8 +92,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     protected EventFetcherParam eventFetcherParam;
     // Tag selected from tab bar for which events are shown.
     private String lastSelectedTag;
-    // On boarding helper.
-    private OnBoardingHelper onBoardingHelper;
     // when was this activity last started on.
     private long lastStartedAt;
     // GoogleApiClient to report the page view.
@@ -441,18 +438,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 }, 100);
             }
         }
-
-        // Show on boarding if first time.
-        viewPager.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (onBoardingHelper == null) {
-                    onBoardingHelper = new OnBoardingHelper(BaseEventsActivity.this);
-                }
-
-                onBoardingHelper.next();
-            }
-        }, 1500);
     }
 
     public void fetchNewListing(boolean shouldBypassCache) {

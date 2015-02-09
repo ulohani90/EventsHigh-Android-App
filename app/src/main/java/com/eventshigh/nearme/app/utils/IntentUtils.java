@@ -74,9 +74,9 @@ public class IntentUtils {
             processCityViewIntent(inUri);
         } else if (inUri.getPath().startsWith("/search")) {
             processSearchViewIntent(inUri);
+        } else {
+            activity.reportActionToAnalytics("deepLink", "homepage");
         }
-
-        activity.reportActionToAnalytics("deepLink", "homepage");
     }
 
     private void processCityViewIntent(Uri webUri) {
