@@ -52,7 +52,7 @@ public class ExploreFragment extends Fragment {
             View view = convertView != null ? convertView :
                 getActivity().getLayoutInflater().inflate(R.layout.explore_card, parent, false);
             final TagInfo tagInfo = getItem(position);
-            ((TextView) view.findViewById(R.id.explore_name)).setText(tagInfo.toString());
+            ((TextView) view.findViewById(R.id.explore_name)).setText(tagInfo.tagName);
             ((ImageView) view.findViewById(R.id.explore_image)).setImageResource(
                     getInfoGraphId(tagInfo.tagName));
 
