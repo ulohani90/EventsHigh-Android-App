@@ -233,13 +233,22 @@
             <!-- Accepts URIs that begin with "http://www.eventshigh.com/detail/" -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="andrsoid.intent.category.BROWSABLE" />
                 <data
                     android:scheme="http"
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/detail"
                 />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="andrsoid.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http"
+                    android:host="eventshigh.com"
+                    android:pathPrefix="/detail"
+                />
             </intent-filter>
         </activity>
 
