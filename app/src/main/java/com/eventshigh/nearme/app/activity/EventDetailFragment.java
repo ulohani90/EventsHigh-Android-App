@@ -69,10 +69,6 @@ public class EventDetailFragment extends Fragment {
     // The argument representing the event that this activity represents.
     public static final String ARG_EVENT_INFO = "event_info";
 
-    // Regex to check if description is plane text or html.
-    private static final Pattern htmlCheckPattern = Pattern.compile(
-            "<[A-Za-z].*</[A-Za-z]|<[A-Za-z].*/>");
-
     // Number of taps needed for GA opt out.
     private static final int NUM_TAPS_FOR_GA_OPT_OUT = 7;
 
@@ -539,11 +535,7 @@ public class EventDetailFragment extends Fragment {
         }
 
         // Set description.
-        if (htmlCheckPattern.matcher(event.description).find()) {
-            eventCard.descriptionView.setText(Html.fromHtml(event.description));
-        } else {
-            eventCard.descriptionView.setText(event.description);
-        }
+        eventCard.descriptionView.setText(Html.fromHtml(event.description));
         eventCard.readMoreView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
