@@ -33,6 +33,7 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.data.EventsCollection;
+import com.eventshigh.nearme.app.data.EventsCollection.EventTab;
 import com.eventshigh.nearme.app.data.EventsCollection.TagInfo;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
@@ -47,6 +48,7 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.example.android.common.view.SlidingTabLayout;
+import com.example.android.common.view.SlidingTabLayout.TabColorizer;
 import com.example.android.common.view.SlidingTabPagerAdapter;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -92,7 +94,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // Last city and query for which events are shown.
     protected EventFetcherParam eventFetcherParam;
     // Tag selected from tab bar for which events are shown.
-    private String lastSelectedTag;
+    private String lastSelectedTabName;
     // when was this activity last started on.
     private long lastStartedAt;
     // GoogleApiClient to report the page view.
@@ -121,7 +123,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // See if we have context passed to us within intent.
         eventFetcherParam = IntentUtils.processIntent(this, getIntent());
-        lastSelectedTag = getIntent().getStringExtra(EXTRA_TAG_NAME_PARAM);
+        lastSelectedTabName = getIntent().getStringExtra(EXTRA_TAG_NAME_PARAM);
 
         // Show query as title.
         ActionBar actionBar = getSupportActionBar();
@@ -360,7 +362,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // ***********************
 
     public void showEventDetails(Event event) {
-        showEventDetails(event, lastSelectedTag);
+        showEventDetails(event, lastSelectedTabName);
     }
 
     public void showSearchView(String query) {
@@ -393,8 +395,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         Intent intent = new Intent(this, cls)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 .putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, eventFetcherParam);
-        if (lastSelectedTag != null) {
-            intent.putExtra(EXTRA_TAG_NAME_PARAM, lastSelectedTag);
+        if (lastSelectedTabName != null) {
+            intent.putExtra(EXTRA_TAG_NAME_PARAM, lastSelectedTabName);
         }
         startActivity(intent);
     }
@@ -412,12 +414,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     private void updateEventsCollection(EventsCollection events) {
-        String tagToSearch = lastSelectedTag;
+        String tagToSearch = lastSelectedTabName;
 
         EventsPagerAdapter adapter = showExploreTab() && eventFetcherParam.query.isEmpty() ?
                 new ExploreAndEventsPagerAdapter(getSupportFragmentManager(), events) :
                 new EventsPagerAdapter(getSupportFragmentManager(), events);
         viewPager.setAdapter(adapter);
+        slidingTab.setCustomTabColorizer(adapter);
         slidingTab.setCustomTabView(R.layout.tab_title, R.id.tab_title, R.id.num_events);
         slidingTab.setViewPager(viewPager);
         slidingTab.setOnPageChangeListener(adapter);
@@ -580,7 +583,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             if (position == 0) {
                 showMapMenu.setIcon(R.drawable.ic_map_grey600_36dp);
                 showMapMenu.setEnabled(false);
-                lastSelectedTag = exploreTabName;
+                lastSelectedTabName = exploreTabName;
             } else {
                 showMapMenu.setIcon(R.drawable.ic_map_white_36dp);
                 showMapMenu.setEnabled(true);
@@ -592,17 +595,24 @@ public abstract class BaseEventsActivity extends BaseActivity {
         public String getNumEvents(int position) {
             return position == 0 ? "" : super.getNumEvents(position - 1);
         }
+
+        @Override
+        public int getIndicatorColor(int position) {
+            return position == 0 ?
+                    getResources().getColor(android.R.color.holo_purple) :
+                    super.getIndicatorColor(position - 1);
+        }
     }
 
     private class EventsPagerAdapter extends SlidingTabPagerAdapter
-            implements OnPageChangeListener {
+            implements OnPageChangeListener, TabColorizer {
         private final EventsCollection events;
-        private final List<Pair<String, Integer>> tags;
+        private final List<Pair<EventTab, Integer>> tabs;
 
         public EventsPagerAdapter(FragmentManager fm, EventsCollection events) {
             super(fm);
             this.events = events;
-            this.tags = events.getTags();
+            this.tabs = events.getTabs();
         }
 
         @Override
@@ -619,12 +629,12 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         @Override
         public int getCount() {
-            return tags.size();
+            return tabs.size();
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return tags.get(position).first;
+            return Utils.capitalize(tabs.get(position).first.toString());
         }
 
         @Override
@@ -634,7 +644,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         @Override
         public void onPageSelected(int position) {
-            lastSelectedTag = tags.get(position).first;
+            lastSelectedTabName = tabs.get(position).first.name();
             updateEventListing(events.getEvents(position), isFavouriteView(position));
         }
 
@@ -649,7 +659,17 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         private boolean isFavouriteView(int position) {
-            return tags.get(position).first.equals(EventsCollection.FAVOURITE_EVENTS_CATEGORY);
+            return tabs.get(position).first == EventTab.FAVOURITE;
+        }
+
+        @Override
+        public int getIndicatorColor(int position) {
+            return getResources().getColor(tabs.get(position).first.colorId);
+        }
+
+        @Override
+        public int getDividerColor(int position) {
+            return 0x26000000;
         }
     }
 

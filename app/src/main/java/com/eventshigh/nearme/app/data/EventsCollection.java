@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Pair;
 
+import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -24,19 +25,28 @@ import java.util.Set;
  * Collection for events which has tags based filtering in built.
  */
 public class EventsCollection {
-    public static final String ALL_EVENTS_CATEGORY = "All";
-    public static final String RECOMMENDED_EVENTS_CATEGORY = "Recommended";
-    public static final String FAVOURITE_EVENTS_CATEGORY = "Favourite";
-    public static final String TODAY_EVENTS_CATEGORY = "Today";
+    public static enum EventTab {
+        ALL(android.R.color.holo_green_dark),
+        RECOMMENDED(android.R.color.holo_orange_dark),
+        FAVOURITE(android.R.color.holo_red_dark),
+        TODAY(R.color.ripple_dark);
+
+        public final int colorId;
+
+        EventTab(int colorId) {
+            this.colorId = colorId;
+        }
+    }
+
     public static final EventsCollection EMPTY =
             new EventsCollection(new ArrayList<TaggedEvents>(), new ArrayList<TagInfo>());
 
     public static class TaggedEvents {
-        public final String tag;
+        public final EventTab tab;
         public final List<Event> events;
 
-        public TaggedEvents(String tag, List<Event> events) {
-            this.tag = tag;
+        public TaggedEvents(EventTab tab, List<Event> events) {
+            this.tab = tab;
             this.events = events;
         }
     }
@@ -95,7 +105,7 @@ public class EventsCollection {
         private final boolean showToday;
         private final Set<String> whiteListedTagCategories;
         private final long tomorrowMidnightTimestamp;
-        private final Map<String, List<Event>> events = new LinkedHashMap<>();
+        private final Map<EventTab, List<Event>> events = new LinkedHashMap<>();
         private final Map<String, Counter> categories = new HashMap<>();
 
         public Builder(City city, EventsMarkerManager eventsMarkerManager, boolean showToday, Set<String> whiteListedTagCategories) {
@@ -107,9 +117,9 @@ public class EventsCollection {
             midnight.add(Calendar.DAY_OF_MONTH, 1);
             tomorrowMidnightTimestamp = midnight.getTime().getTime();
 
-            events.put(ALL_EVENTS_CATEGORY, new ArrayList<Event>());
-            events.put(RECOMMENDED_EVENTS_CATEGORY, new ArrayList<Event>());
-            events.put(TODAY_EVENTS_CATEGORY, new ArrayList<Event>());
+            events.put(EventTab.ALL, new ArrayList<Event>());
+            events.put(EventTab.RECOMMENDED, new ArrayList<Event>());
+            events.put(EventTab.TODAY, new ArrayList<Event>());
         }
 
         public Builder addEvent(Event event) {
@@ -118,16 +128,16 @@ public class EventsCollection {
                 return this;
             }
 
-            addEvent(ALL_EVENTS_CATEGORY, event);
+            addEvent(EventTab.ALL, event);
             if (event.ehRecommended) {
-                addEvent(RECOMMENDED_EVENTS_CATEGORY, event);
+                addEvent(EventTab.RECOMMENDED, event);
             }
 
             // See if this events is happening today.
             if (showToday &&
                 event.eventTimings.length > 0 &&
                 event.eventTimings[0] < tomorrowMidnightTimestamp) {
-                addEvent(TODAY_EVENTS_CATEGORY, event);
+                addEvent(EventTab.TODAY, event);
             }
 
             if (! whiteListedTagCategories.isEmpty()) {
@@ -151,17 +161,17 @@ public class EventsCollection {
 
         public EventsCollection build() {
             List<TaggedEvents> taggedEventsList = new ArrayList<>(events.keySet().size());
-            for (Entry<String, List<Event>> tagEvents : events.entrySet()) {
+            for (Entry<EventTab, List<Event>> tagEvents : events.entrySet()) {
                 if (!tagEvents.getValue().isEmpty()) {
                     taggedEventsList.add(new TaggedEvents(
                             tagEvents.getKey(), Collections.unmodifiableList(tagEvents.getValue())));
                 }
             }
             if (taggedEventsList.size() > 0) {
-                boolean isRecommededShown = taggedEventsList.size() > 1 &&
-                        taggedEventsList.get(1).tag.equals(RECOMMENDED_EVENTS_CATEGORY);
-                taggedEventsList.add(isRecommededShown ? 2 : 1, new TaggedEvents(
-                        FAVOURITE_EVENTS_CATEGORY, taggedEventsList.get(0).events));
+                boolean isRecommendedShown = taggedEventsList.size() > 1 &&
+                        taggedEventsList.get(1).tab == EventTab.RECOMMENDED;
+                taggedEventsList.add(isRecommendedShown ? 2 : 1, new TaggedEvents(
+                        EventTab.FAVOURITE, taggedEventsList.get(0).events));
             }
 
             List<TagInfo> tagInfos = new ArrayList<>(categories.size());
@@ -181,11 +191,11 @@ public class EventsCollection {
             return new EventsCollection(taggedEventsList, tagInfos);
         }
 
-        private void addEvent(String tag, Event event) {
-            List<Event> eventList = events.get(tag);
+        private void addEvent(EventTab tab, Event event) {
+            List<Event> eventList = events.get(tab);
             if (eventList == null) {
                 eventList = new ArrayList<>();
-                events.put(tag, eventList);
+                events.put(tab, eventList);
             }
             eventList.add(event);
         }
@@ -214,17 +224,17 @@ public class EventsCollection {
         return taggedEventsList.isEmpty();
     }
 
-    public List<Pair<String, Integer>> getTags() {
-        List<Pair<String, Integer>> results = new ArrayList<>(taggedEventsList.size());
+    public List<Pair<EventTab, Integer>> getTabs() {
+        List<Pair<EventTab, Integer>> results = new ArrayList<>(taggedEventsList.size());
         for (TaggedEvents categoryEvents : taggedEventsList) {
-            results.add(Pair.create(categoryEvents.tag, categoryEvents.events.size()));
+            results.add(Pair.create(categoryEvents.tab, categoryEvents.events.size()));
         }
         return results;
     }
 
-    public List<Event> getEvents(int tagPosition) {
-        if (tagPosition < taggedEventsList.size()) {
-            return taggedEventsList.get(tagPosition).events;
+    public List<Event> getEvents(int tabPosition) {
+        if (tabPosition < taggedEventsList.size()) {
+            return taggedEventsList.get(tabPosition).events;
         } else {
             return new ArrayList<>();
         }
