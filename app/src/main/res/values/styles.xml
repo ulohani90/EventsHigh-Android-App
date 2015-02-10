@@ -9,11 +9,18 @@
         <item name="android:background">@color/app_color</item>
         <item name="subtitleTextStyle">@style/EHActionBarSubtitle</item>
     </style>
+    <style name="EHActionBarNoElevation" parent="EHActionBar">
+        <item name="elevation" tools:ignore="NewApi">0dp</item>
+    </style>
+
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
         <item name="actionBarStyle">@style/EHActionBar</item>
+    </style>
+    <style name="AppThemeNoElevation" parent="AppTheme">
+        <item name="actionBarStyle">@style/EHActionBarNoElevation</item>
     </style>
     <style name="NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/primary</item>

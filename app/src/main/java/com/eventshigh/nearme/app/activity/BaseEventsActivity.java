@@ -411,14 +411,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
         return viewPager.getAdapter() != null && viewPager.getAdapter().getCount() > 0;
     }
 
-    private static boolean showExploreTabForQuery(String query) {
-        return query.isEmpty() || EventsHighEndpoints.isDateQuery(query);
-    }
-
     private void updateEventsCollection(EventsCollection events) {
         String tagToSearch = lastSelectedTag;
 
-        EventsPagerAdapter adapter = showExploreTab() && showExploreTabForQuery(eventFetcherParam.query) ?
+        EventsPagerAdapter adapter = showExploreTab() && eventFetcherParam.query.isEmpty() ?
                 new ExploreAndEventsPagerAdapter(getSupportFragmentManager(), events) :
                 new EventsPagerAdapter(getSupportFragmentManager(), events);
         viewPager.setAdapter(adapter);

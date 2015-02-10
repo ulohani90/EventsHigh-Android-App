@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:elevation="8dp"
-            android:background="@android:color/black"
+            android:background="@color/app_color"
             tools:ignore="UnusedAttribute"
         />
 
