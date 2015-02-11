@@ -165,6 +165,26 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="andrsoid.intent.category.BROWSABLE" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data
+                    android:scheme="http"
+                    android:host="eventshigh.com"
+                    android:path="/"
+                />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="andrsoid.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data
+                    android:scheme="http"
+                    android:host="eventshigh.com"
+                    android:path=""
+                />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="andrsoid.intent.category.BROWSABLE" />
+            </intent-filter>
 
             <!-- Accepts URIs that begin with "http://www.eventshigh.com/city/" -->
             <intent-filter>
@@ -177,6 +197,16 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="andrsoid.intent.category.BROWSABLE" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data
+                    android:scheme="http"
+                    android:host="eventshigh.com"
+                    android:pathPrefix="/city"
+                />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="andrsoid.intent.category.BROWSABLE" />
+            </intent-filter>
 
             <!-- Accepts URIs that begin with "http://www.eventshigh.com/search" -->
             <intent-filter>
@@ -184,6 +214,16 @@
                 <data
                     android:scheme="http"
                     android:host="www.eventshigh.com"
+                    android:pathPrefix="/search"
+                />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="andrsoid.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data
+                    android:scheme="http"
+                    android:host="eventshigh.com"
                     android:pathPrefix="/search"
                 />
                 <category android:name="android.intent.category.DEFAULT" />
