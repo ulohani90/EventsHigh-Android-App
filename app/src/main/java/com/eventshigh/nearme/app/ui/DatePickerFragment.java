@@ -10,6 +10,7 @@ import android.widget.DatePicker;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.utils.GAHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -25,7 +26,6 @@ public class DatePickerFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener, DialogInterface.OnClickListener {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
-    private Date today;
     private DatePickerDialog datePicker;
 
     @Override
@@ -48,7 +48,7 @@ public class DatePickerFragment extends DialogFragment
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
         int day = cal.get(Calendar.DAY_OF_MONTH);
-        today = new Date(year - 1900, month, day);
+        Date today = new Date(year - 1900, month, day);
 
         datePicker = new DatePickerDialog(getActivity(), this, year, month, day);
         datePicker.setCancelable(true);
@@ -71,10 +71,9 @@ public class DatePickerFragment extends DialogFragment
         Date selectedDate = new Date(datePicker.getDatePicker().getYear() - 1900,
                 datePicker.getDatePicker().getMonth(),
                 datePicker.getDatePicker().getDayOfMonth());
-        long numDaysAhead = (selectedDate.getTime() - today.getTime()) / (24 * 3600 * 1000L);
 
         BaseEventsActivity activity = (BaseEventsActivity) getActivity();
-        activity.reportActionToAnalytics("filterByDate", Long.toString(numDaysAhead) + "days later");
+        activity.reportActionToAnalytics("filterByDate", GAHelper.getDateReportString(selectedDate));
         activity.showSearchView(DATE_FORMAT.format(selectedDate));
     }
 }

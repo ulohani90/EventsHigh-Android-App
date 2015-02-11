@@ -81,14 +81,14 @@ public class SettingsActivity extends PreferenceActivity {
         }
 
         if (intent.getAction().equals("com.eventshigh.delete_query_history")) {
-            gaHelper.reportActionToAnalytics(SettingsActivity.class.getSimpleName(), "deleteQueryHistory", "", 0);
+            gaHelper.reportActionToAnalytics(SettingsActivity.class.getSimpleName(), "deleteQueryHistory");
 
             EventSearchSuggestionsProvider.clearHistory(this);
             Toast.makeText(this, R.string.message_delete_query_history, Toast.LENGTH_SHORT).show();
         }
 
         if (intent.getAction().equals("com.eventshigh.restore_events")) {
-            gaHelper.reportActionToAnalytics(SettingsActivity.class.getSimpleName(), "restoreEvents", "", 0);
+            gaHelper.reportActionToAnalytics(SettingsActivity.class.getSimpleName(), "restoreEvents");
 
             EventsMarkerManager.getInstance(this).restoreAll();
             Toast.makeText(this, R.string.message_restore_event, Toast.LENGTH_SHORT).show();

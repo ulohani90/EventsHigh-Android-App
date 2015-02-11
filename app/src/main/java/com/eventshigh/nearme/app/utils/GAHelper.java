@@ -2,13 +2,18 @@ package com.eventshigh.nearme.app.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import com.amplitude.api.Amplitude;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.HitBuilders.EventBuilder;
 import com.google.android.gms.analytics.Tracker;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Helper around analytics which maintains the singleton instance and reports the
@@ -67,20 +72,37 @@ public class GAHelper {
         googleAnalytics.setAppOptOut(optOut);
     }
 
-    public boolean getAppOptOut() {
-        return googleAnalytics.getAppOptOut();
+    public void reportActionToAnalytics(String category, String actionName) {
+        reportActionToAnalytics(category, actionName, "");
     }
 
-    public void reportActionToAnalytics(String category, String actionName, String label, long value) {
-        tracker.send(new HitBuilders.EventBuilder()
+    public void reportActionToAnalytics(String category, String actionName, String label) {
+        reportActionToAnalytics(category, actionName, label, 1);
+    }
+
+    public void reportActionToAnalytics(String category, String actionName, String label, long value,
+                                        String... customValues) {
+        EventBuilder builder = new EventBuilder()
                 .setCategory(category)
                 .setAction(actionName)
                 .setLabel(label)
-                .setValue(value)
-                .build());
+                .setValue(value);
+        for (int i = 0; i < customValues.length; i++) {
+            builder.setCustomDimension(i, customValues[i]);
+        }
+        tracker.send(builder.build());
 
         if (!BuildConfig.DEBUG) {
             Amplitude.logEvent(actionName);
         }
+    }
+
+    public static String getDateReportString(@Nullable Date date) {
+        Date today = DateTimeUtils.toMidnight(Calendar.getInstance(),null).getTime();
+        if (date == null || today.after(date)) {
+            return "";
+        }
+        long numDaysAhead = TimeUnit.MILLISECONDS.toDays(date.getTime() - today.getTime());
+        return "" + numDaysAhead + " days later";
     }
 }

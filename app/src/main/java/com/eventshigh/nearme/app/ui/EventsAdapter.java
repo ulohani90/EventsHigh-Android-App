@@ -88,7 +88,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
 
     @Override
     public void onBindViewHolder(EventCard eventCard, int i) {
-        bindView(eventCard, events.get(i), activity, eventsMarkerEditor, this);
+        bindView(eventCard, events.get(i), activity, i, eventsMarkerEditor, this);
 
         if (enableAnimation) {
             eventCard.cardView.setTranslationY(i > lastPosition ? animationOffset : -animationOffset);
@@ -134,18 +134,19 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
                 activity.getLayoutInflater().inflate(R.layout.event_card, parent, false) :
                 reuseView;
         final EventCard eventCard = new EventCard(view);
-        bindView(eventCard, event, activity, eventsMarkerEditor, null);
+        bindView(eventCard, event, activity, 0, eventsMarkerEditor, null);
         return view;
     }
 
     private static void bindView(final EventCard eventCard, final Event event,
-                                 final BaseEventsActivity activity, final Editor eventsMarkerEditor,
+                                 final BaseEventsActivity activity, final int position,
+                                 final Editor eventsMarkerEditor,
                                  @Nullable final EventsAdapter adapter) {
         eventCard.cardView.setVisibility(View.VISIBLE);
         eventCard.cardView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.showEventDetails(event);
+                activity.showEventDetails(event, position);
             }
         });
 

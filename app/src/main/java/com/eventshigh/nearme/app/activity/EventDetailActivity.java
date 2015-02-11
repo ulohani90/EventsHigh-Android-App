@@ -76,7 +76,7 @@ public class EventDetailActivity extends BaseActivity implements MyScrollListene
         }
 
         if (showEvent) {
-            EventRequest.submit(getApplicationContext(), intent.getData(), Priority.IMMEDIATE, this,
+            EventRequest.submit(this, intent.getData(), Priority.IMMEDIATE,
                     mEventListener, new ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError volleyError) {

@@ -63,8 +63,10 @@ public class DateTimeUtils {
         return toMidnight(cal, event.city.timeZone).getTime();
     }
 
-    public static Calendar toMidnight(Calendar cal, String timeZone) {
-        cal.setTimeZone(TimeZone.getTimeZone(timeZone));
+    public static Calendar toMidnight(Calendar cal, @Nullable String timeZone) {
+        if (timeZone != null) {
+            cal.setTimeZone(TimeZone.getTimeZone(timeZone));
+        }
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);

@@ -3,25 +3,22 @@ package com.eventshigh.nearme.app.task;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
-import com.eventshigh.nearme.app.utils.GAHelper;
+import com.eventshigh.nearme.app.activity.BaseActivity;
 
 /**
  * An {@link android.os.AsyncTask} which is used to report the network time in GA. This class also
  * reports the user connection type as event label.
  */
 public class ReportTimingTask extends AsyncTask<Long, Void, Void> {
-    private final Context context;
-    private final GAHelper gaHelper;
-    private final String requestResource;
+    private final BaseActivity activity;
+    private final String resourceType;
 
-    public ReportTimingTask(Context context, String requestEndPoint) {
-        this.context = context;
-        this.gaHelper = GAHelper.getInstance(context);
-        this.requestResource = getRequestResource(requestEndPoint);
+    public ReportTimingTask(BaseActivity activity, String resourceType) {
+        this.activity = activity;
+        this.resourceType = resourceType;
     }
 
     @Override
@@ -33,7 +30,7 @@ public class ReportTimingTask extends AsyncTask<Long, Void, Void> {
             network = "cache";
         } else {
             ConnectivityManager connectivityManager =
-                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
             network = getNetworkName(networkInfo);
         }
@@ -42,16 +39,8 @@ public class ReportTimingTask extends AsyncTask<Long, Void, Void> {
         return null;
     }
 
-    private void report(String action, long time) {
-        gaHelper.reportActionToAnalytics("fetch", action, requestResource, time);
-    }
-
-    private String getRequestResource(String requestEndPoint) {
-        try {
-            return Uri.parse(requestEndPoint).getPathSegments().get(2);
-        } catch (Exception e) {
-            return "";
-        }
+    private void report(String nwType, long time) {
+        activity.reportActionToAnalytics("fetch_" + resourceType, nwType, time);
     }
 
     private String getNetworkName(@Nullable NetworkInfo networkInfo) {

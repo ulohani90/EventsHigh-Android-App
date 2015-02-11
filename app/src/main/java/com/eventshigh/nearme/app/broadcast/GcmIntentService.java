@@ -92,7 +92,7 @@ public class GcmIntentService extends IntentService {
         if ((eventId != null && !preferences.shouldNotifyNearBy()) ||
             (query != null && !preferences.shouldNotifyWeekend())) {
             Log.w(LOG_TAG, "notification skipped as per user preference");
-            gaHelper.reportActionToAnalytics(LOG_TAG, "notificationSkipped", "userPreference", 1);
+            gaHelper.reportActionToAnalytics(LOG_TAG, "notificationSkipped", "userPreference");
             return;
         }
 
@@ -158,7 +158,7 @@ public class GcmIntentService extends IntentService {
                             LocationUtils.distanceInMeters(
                                     LocationUtils.locationToLatLng(location), center) > radius) {
                             Log.w(LOG_TAG, "notification skipped, user location: " + location);
-                            gaHelper.reportActionToAnalytics(LOG_TAG, "notificationSkipped", "userLocation", 1);
+                            gaHelper.reportActionToAnalytics(LOG_TAG, "notificationSkipped", "userLocation");
                         } else {
                             showNotification(notification, gaHelper);
                         }
@@ -180,6 +180,6 @@ public class GcmIntentService extends IntentService {
         NotificationManager notificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID, notification);
-        gaHelper.reportActionToAnalytics(LOG_TAG, "notificationShown", "", 1);
+        gaHelper.reportActionToAnalytics(LOG_TAG, "notificationShown");
     }
 }

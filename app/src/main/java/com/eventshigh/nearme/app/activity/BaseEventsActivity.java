@@ -361,8 +361,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // Helper methods
     // ***********************
 
-    public void showEventDetails(Event event) {
-        showEventDetails(event, lastSelectedTabName);
+    public void showEventDetails(Event event, int position) {
+        showEventDetails(event, lastSelectedTabName, eventFetcherParam.query, position);
     }
 
     public void showSearchView(String query) {
@@ -405,8 +405,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         viewSwitcher.setDisplayedChild(0);
         topProgressBar.setVisibility(View.VISIBLE);
 
-        EventCollectionRequest.submit(getApplicationContext(), eventFetcherParam,
-                Priority.IMMEDIATE, this, shouldBypassCache, mEventsFetcherCallBack, mErrorListener);
+        EventCollectionRequest.submit(this, eventFetcherParam, Priority.IMMEDIATE,
+                shouldBypassCache, mEventsFetcherCallBack, mErrorListener);
     }
 
     private boolean isDataShown() {

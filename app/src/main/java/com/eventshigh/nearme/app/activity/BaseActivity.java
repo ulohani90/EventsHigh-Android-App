@@ -20,6 +20,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.user.Account;
@@ -131,21 +132,11 @@ public abstract class BaseActivity extends ActionBarActivity {
         reportActionToAnalytics(actionName, label, 1);
     }
 
-    public void reportActionToAnalytics(String actionName, String label, long value) {
+    public void reportActionToAnalytics(String actionName, String label, long value,
+                                        String... customValues) {
         if (gaHelper != null) {
-            gaHelper.reportActionToAnalytics(getClass().getSimpleName(), actionName, label, value);
+            gaHelper.reportActionToAnalytics(getClass().getSimpleName(), actionName, label, value, customValues);
         }
-    }
-
-    /**
-     * Open events details page.
-     * @param event event for which to show details page.
-     */
-    public void showEventDetails(Event event, @Nullable String label) {
-        reportActionToAnalytics("showEventDetails", label == null ? "" : label);
-        Intent detailIntent = new Intent(this, EventDetailActivity.class);
-        detailIntent.putExtra(EventDetailFragment.ARG_EVENT_INFO, event);
-        startActivity(detailIntent);
     }
 
     /**
@@ -157,11 +148,22 @@ public abstract class BaseActivity extends ActionBarActivity {
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT,
                 String.format(
-                    getResources().getString(R.string.share_app_text),
-                    new Account(this).getUserReferrerCode())
+                        getResources().getString(R.string.share_app_text),
+                        new Account(this).getUserReferrerCode())
         );
         sendIntent.setType("text/plain");
         startActivity(sendIntent);
+    }
+
+    /**
+     * Open events details page.
+     * @param event event for which to show details page.
+     */
+    public void showEventDetails(Event event, @Nullable String label, @Nullable String query, int position) {
+        reportEventAction(event, "showEventDetails", label, query, Integer.toString(position));
+        Intent detailIntent = new Intent(this, EventDetailActivity.class);
+        detailIntent.putExtra(EventDetailFragment.ARG_EVENT_INFO, event);
+        startActivity(detailIntent);
     }
 
     /**
@@ -169,7 +171,7 @@ public abstract class BaseActivity extends ActionBarActivity {
      * into jpeg image which is then shared with external tool.
      */
     public void shareEvent(View eventView, Event event) {
-        reportActionToAnalytics("shareEvent");
+        reportEventAction(event, "shareEvent");
 
         eventView.setDrawingCacheEnabled(true);
         Bitmap bitmap = eventView.getDrawingCache();
@@ -202,7 +204,7 @@ public abstract class BaseActivity extends ActionBarActivity {
     }
 
     public void showDirections(Event event) {
-        reportActionToAnalytics("showDirections");
+        reportEventAction(event, "showDirections");
 
         String query = event.address;
         if (query == null) {
@@ -226,7 +228,7 @@ public abstract class BaseActivity extends ActionBarActivity {
     }
 
     public void addToCalendar(Event event, @Nullable Date date) {
-        reportActionToAnalytics("addToCalendar");
+        reportEventAction(event, "addToCalendar", GAHelper.getDateReportString(date));
 
         String venue = event.address == null ? event.venue : event.address;
         Intent intent = new Intent(Intent.ACTION_INSERT)
@@ -253,5 +255,40 @@ public abstract class BaseActivity extends ActionBarActivity {
             // No activity to open cal.
             Toast.makeText(this, R.string.no_cal_app, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public boolean isFavourite(Event event) {
+        return EventsMarkerManager.getInstance(this).isFavourite(event.id);
+    }
+
+    public void reportEventAction(Event event, String actionName) {
+        reportEventAction(event, actionName, null);
+    }
+
+    public void reportEventAction(Event event, String actionName, @Nullable String label) {
+        reportActionToAnalytics(actionName,
+                label == null ? "" : label,
+                1,
+                isFavourite(event) ? "Favourite" : "No-Favourite",
+                event.ehRecommended ? "Recommended" : "Non-Recommended");
+    }
+
+    public void reportEventAction(Event event, String actionName, @Nullable String label, String param) {
+        reportActionToAnalytics(actionName,
+                label == null ? "" : label,
+                1,
+                isFavourite(event) ? "Favourite" : "No-Favourite",
+                event.ehRecommended ? "Recommended" : "Non-Recommended",
+                param);
+    }
+
+    public void reportEventAction(Event event, String actionName, @Nullable String label, String param1, String param2) {
+        reportActionToAnalytics(actionName,
+                label == null ? "" : label,
+                1,
+                isFavourite(event) ? "Favourite" : "No-Favourite",
+                event.ehRecommended ? "Recommended" : "Non-Recommended",
+                param1,
+                param2);
     }
 }
