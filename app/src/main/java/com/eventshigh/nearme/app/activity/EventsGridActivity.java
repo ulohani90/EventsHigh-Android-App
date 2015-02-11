@@ -24,11 +24,6 @@ public class EventsGridActivity extends BaseEventsActivity {
     }
 
     @Override
-    protected boolean showExploreTab() {
-        return true;
-    }
-
-    @Override
     protected boolean isDefaultView() {
         return !pref.isMapsViewDefault();
     }

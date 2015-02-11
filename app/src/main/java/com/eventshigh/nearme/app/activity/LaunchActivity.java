@@ -4,25 +4,26 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.user.GcmRegistration;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
-import com.eventshigh.nearme.app.utils.Utils;
-import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -39,17 +40,23 @@ import com.google.android.gms.location.LocationServices;
  * preference in future.
  */
 public class LaunchActivity extends BaseActivity {
-    // View for this activity.
-    private ListView citySelector;
 
-    // Client to Google api so that we can report the deep links
-    // and fetch the user location if its not passed in intent.
+    // Constants
+    private static String[] EXPLORE_TAGS = { "Parties", "Health & Wellness", "Tech",
+            "Education", "Theatre", "Outdoors", "Kids", "Dance", "Shopping", "Food", "Literature",
+            "Film", "Social Causes", "Environment", "Sports", "Spiritual", "Comedy", "Fashion"};
+
+    // UI Elements for this activity.
+    private ViewSwitcher viewSwitcher;
+
+    // Client to Google api so that we can fetch the user location if
+    // its not passed in intent.
     private GoogleApiClient client;
 
     // GCM registration helper.
     private GcmRegistration gcmRegistration;
 
-    // Intent to launch the target
+    // Context for next activity.
     private EventFetcherParam param = null;
 
     @Override
@@ -58,15 +65,25 @@ public class LaunchActivity extends BaseActivity {
 
         // Set View.
         setContentView(R.layout.activity_launch);
-        citySelector = ((ListView) findViewById(R.id.city_selector));
+        viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
+
+        ListView citySelector = (ListView) findViewById(R.id.city_selector);
         citySelector.setAdapter(new CityListAdapter());
+
+        CategoryAdapter categoryAdapter = new CategoryAdapter();
+        categoryAdapter.addAll(EXPLORE_TAGS);
+        GridView exploreGrid = (GridView) findViewById(R.id.explore_grid);
+        exploreGrid.setAdapter(categoryAdapter);
 
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
+    }
 
-        // Process the incoming intent.
-        param = IntentUtils.processIntent(this, getIntent());
+    @Override
+    public void onNewIntent(Intent intent) {
+        param = IntentUtils.processIntent(this, intent);
+        showNextScreen(true);
     }
 
     public void onStart() {
@@ -87,8 +104,10 @@ public class LaunchActivity extends BaseActivity {
 
         // We show the onboarding If this is first activity and there was no
         // location/query passed through intent.
+        param = IntentUtils.processIntent(this, getIntent());
         if (param.location == null && param.query.isEmpty() && pref.shouldShowOnBoarding()) {
             startActivity(new Intent(this, OnBoardingActivity.class));
+            finish();
             return;
         }
 
@@ -96,28 +115,8 @@ public class LaunchActivity extends BaseActivity {
         gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
         gcmRegistration.updateGcmRegistrationIdIfNeeded();
 
-        // Setup GoogleApiClient
-        GoogleApiClient.Builder clientBuilder =
-                new GoogleApiClient.Builder(this).addApi(AppIndex.APP_INDEX_API)
-                        .addConnectionCallbacks(mConnectionCallbacks)
-                        .addOnConnectionFailedListener(mOnConnectionFailedListener);
-        if (param == null || param.city == null) {
-            clientBuilder.addApi(LocationServices.API);
-        }
-
-        client = clientBuilder.build();
-        client.connect();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        if (client != null && client.isConnected()) {
-            Uri webUri = EventsHighEndpoints.getWebUri(param);
-            AppIndex.AppIndexApi.viewEnd(client, this, Utils.getAppUri(webUri));
-            client.disconnect();
-        }
+        // Show next screen.
+        showNextScreen(true);
     }
 
 
@@ -131,26 +130,18 @@ public class LaunchActivity extends BaseActivity {
     private ConnectionCallbacks mConnectionCallbacks = new ConnectionCallbacks() {
         @Override
         public void onConnected(Bundle bundle) {
-            // Report the start of deep index view.
-            Uri webUri = EventsHighEndpoints.getWebUri(param);
-            String title = param.toString();
-            AppIndex.AppIndexApi.view(client, LaunchActivity.this, Utils.getAppUri(webUri),
-                    title, webUri, null);
-
-            // Set the location from FusedLocation if needed.
-            if (param.city == null) {
-                Location location = LocationServices.FusedLocationApi.getLastLocation(client);
-                if (location != null) {
-                    param.changeLocation(LocationUtils.locationToLatLng(location));
-                    if (param.city != null) {
-                        gcmRegistration.setLastCity(param.city);
-                    } else {
-                        reportActionToAnalytics("unsupportedCity");
-                    }
+            Location location = LocationServices.FusedLocationApi.getLastLocation(client);
+            if (location != null) {
+                param.changeLocation(LocationUtils.locationToLatLng(location));
+                if (param.city != null) {
+                    gcmRegistration.setLastCity(param.city);
+                } else {
+                    reportActionToAnalytics("unsupportedCity");
                 }
             }
 
             // Start the next activity if possible or ask user for city.
+            client.disconnect();
             mOnConnectionFailedListener.onConnectionFailed(null);
         }
 
@@ -174,14 +165,14 @@ public class LaunchActivity extends BaseActivity {
 
             // If we have user location, start next activity.
             if (param.city != null) {
-                startNextActivity();
+                showNextScreen(true);
                 return;
             }
 
             // We do not have user location. Lets populate the City chooser and let user
             // select the city.
             reportActionToAnalytics("locationFailed");
-            citySelector.setVisibility(View.VISIBLE);
+            viewSwitcher.setDisplayedChild(1);
             if (connectionResult != null) {
                 Toast.makeText(LaunchActivity.this, R.string.failed_location, Toast.LENGTH_SHORT).show();
             }
@@ -193,15 +184,36 @@ public class LaunchActivity extends BaseActivity {
     // Helper methods
     // ***********************
 
-    private void startNextActivity() {
-        // Set defaults when there is no incoming intent.
+    private void showNextScreen(boolean shouldFinish) {
+        // If we do not have user city, use GoogleLocation api to get user location.
+        if (param.city == null) {
+            disconnectClient();
+            client = new GoogleApiClient.Builder(this)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(mConnectionCallbacks)
+                    .addOnConnectionFailedListener(mOnConnectionFailedListener)
+                    .build();
+            client.connect();
+            return;
+        }
+
+        // If we do not have query, show explore screen.
+        if (param.query.isEmpty()) {
+            viewSwitcher.setDisplayedChild(0);
+            return;
+        }
+
+        // Launch the target activity.
         Class target = pref.isMapsViewDefault() ? EventsMapsActivity.class : EventsGridActivity.class;
         Intent outIntent = new Intent(this, target);
         outIntent.putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, param);
         startActivity(outIntent);
+        if (shouldFinish) {
+            finish();
+        }
     }
 
-    public class CityListAdapter extends ArrayAdapter<City> {
+    private class CityListAdapter extends ArrayAdapter<City> {
 
         public CityListAdapter() {
             super(LaunchActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1);
@@ -217,11 +229,58 @@ public class LaunchActivity extends BaseActivity {
                     City city = getItem(position);
                     param.changeLocation(city.cityBounds.getCenter());
                     gcmRegistration.setLastCity(city);
-                    startNextActivity();
+                    showNextScreen(true);
                 }
             });
 
             return view;
         }
+    }
+
+    private class CategoryAdapter extends ArrayAdapter<String> {
+
+        public CategoryAdapter() {
+            super(LaunchActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView != null ? convertView :
+                    getLayoutInflater().inflate(R.layout.explore_card, parent, false);
+            final String tagName = getItem(position);
+            ((TextView) view.findViewById(R.id.explore_name)).setText(tagName);
+            ((ImageView) view.findViewById(R.id.explore_image)).setImageResource(
+                    getInfoGraphId(tagName));
+
+            view.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    param.query = tagName;
+                    showNextScreen(false);
+                }
+            });
+            return view;
+        }
+    }
+
+    private static int getInfoGraphId(String tag) {
+        try {
+            return R.drawable.class.getField("infograph_" +
+                    EventCategory.toCategoryParsableString(tag).toLowerCase()).getInt(null);
+        } catch (IllegalAccessException| NoSuchFieldException e) {
+            // Ignore
+        }
+
+        return R.drawable.eh_default_event_list;
+    }
+
+    private void disconnectClient() {
+        if (isClientConnecting()) {
+            client.disconnect();
+        }
+    }
+
+    private boolean isClientConnecting() {
+        return client != null && (client.isConnected() || client.isConnecting());
     }
 }

@@ -127,8 +127,8 @@
         <activity
             android:name=".activity.LaunchActivity"
             android:label="@string/app_name"
-            android:noHistory="true"
             android:exported="true"
+            android:launchMode="singleTask"
         >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -236,6 +236,8 @@
             android:label="@string/app_name"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/AppThemeNoElevation"
+            android:parentActivityName=".activity.LaunchActivity"
+            tools:ignore="UnusedAttribute"
         >
             <!-- Accept Search requests withing app -->
             <intent-filter>
@@ -245,12 +247,18 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"
             />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.LaunchActivity"
+            />
         </activity>
         <activity
             android:name=".activity.EventsGridActivity"
             android:label="@string/app_name"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/AppThemeNoElevation"
+            android:parentActivityName=".activity.LaunchActivity"
+            tools:ignore="UnusedAttribute"
         >
             <!-- Accept Search requests withing app -->
             <intent-filter>
@@ -259,6 +267,10 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"
+            />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.LaunchActivity"
             />
         </activity>
 
