@@ -16,7 +16,7 @@
         android:paddingTop="12dp"
         android:textColor="@android:color/white"
         android:fontFamily="sans-serif-medium"
-        android:textSize="14sp"
+        android:textSize="16sp"
         tools:text="Recommended"
         tools:ignore="UnusedAttribute"
     />
@@ -33,7 +33,7 @@
         android:paddingBottom="8dp"
         android:layout_marginTop="-4dp"
         android:textSize="9sp"
-        android:textColor="#80FFFFFF"
+        android:textColor="#80000000"
         tools:text="200"
         tools:ignore="SmallSp"
     />
