@@ -46,7 +46,6 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.regex.Pattern;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
@@ -376,6 +375,7 @@ public class EventDetailFragment extends Fragment {
         eventCard.favouriteView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                activity.reportEventAction(event, "addFavourite");
                 eventsMarkerEditor.recordPref(event.id, EventMark.FAVOURITE);
                 setFavouriteView(eventCard, EventMark.FAVOURITE);
             }
@@ -383,6 +383,7 @@ public class EventDetailFragment extends Fragment {
         eventCard.favouritedView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                activity.reportEventAction(event, "removeFavourite");
                 eventsMarkerEditor.recordPref(event.id, null);
                 setFavouriteView(eventCard, null);
             }
@@ -391,6 +392,7 @@ public class EventDetailFragment extends Fragment {
         eventCard.dismissView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                activity.reportEventAction(event, "dismiss");
                 eventsMarkerEditor.recordPref(event.id, EventMark.DISMISSED);
                 activity.finish();
                 activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
