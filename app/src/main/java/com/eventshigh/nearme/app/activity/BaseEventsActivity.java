@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -89,7 +90,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private View topProgressBar;
     private SlidingTabLayout slidingTab;
     private ViewPager viewPager;
-    private View fab;
+    protected ImageButton fab;
 
     // Last city and query for which events are shown.
     protected EventFetcherParam eventFetcherParam;
@@ -135,7 +136,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             }
         }
 
-        fab = findViewById(R.id.fab_switch_view);
+        fab = (ImageButton) findViewById(R.id.fab_switch_view);
     }
 
     @Override

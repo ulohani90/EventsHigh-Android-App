@@ -91,7 +91,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
         setUpMap();
         setupGestureDetectorIfNeeded();
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
-        ImageButton fab = (ImageButton) findViewById(R.id.fab_switch_view);
         fab.setImageResource(R.drawable.ic_list_white_36dp);
         fab.setScaleX(1);
         fab.setScaleY(1);
@@ -262,6 +261,14 @@ public class EventsMapsActivity extends BaseEventsActivity {
                         return gestureDetector.onTouchEvent(event);
                     }
                 });
+        eventView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                v.removeOnLayoutChangeListener(this);
+                fab.animate().translationY(-v.getHeight()).setDuration(300).start();
+            }
+        });
         eventCardContainer.removeAllViews();
         eventCardContainer.addView(eventView);
     }
@@ -307,6 +314,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
             }
             lastSelectedMarker = null;
             eventCardContainer.removeAllViews();
+            fab.animate().translationY(0).setDuration(300).start();
         }
     };
 
