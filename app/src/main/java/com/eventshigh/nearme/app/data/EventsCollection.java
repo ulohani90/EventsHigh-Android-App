@@ -28,7 +28,7 @@ public class EventsCollection {
     public static enum EventTab {
         ALL(android.R.color.holo_green_dark),
         RECOMMENDED(android.R.color.holo_orange_dark),
-        FAVOURITE(android.R.color.holo_red_dark),
+        FAVOURITES(android.R.color.holo_red_dark),
         TODAY(R.color.ripple_dark);
 
         public final int colorId;
@@ -171,7 +171,7 @@ public class EventsCollection {
                 boolean isRecommendedShown = taggedEventsList.size() > 1 &&
                         taggedEventsList.get(1).tab == EventTab.RECOMMENDED;
                 taggedEventsList.add(isRecommendedShown ? 2 : 1, new TaggedEvents(
-                        EventTab.FAVOURITE, taggedEventsList.get(0).events));
+                        EventTab.FAVOURITES, taggedEventsList.get(0).events));
             }
 
             List<TagInfo> tagInfos = new ArrayList<>(categories.size());

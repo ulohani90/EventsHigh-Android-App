@@ -640,7 +640,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         private boolean isFavouriteView(int position) {
-            return tabs.get(position).first == EventTab.FAVOURITE;
+            return tabs.get(position).first == EventTab.FAVOURITES;
         }
 
         @Override
