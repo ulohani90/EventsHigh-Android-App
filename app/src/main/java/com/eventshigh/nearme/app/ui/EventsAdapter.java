@@ -228,7 +228,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
     }
 
     public static class EventCard extends RecyclerView.ViewHolder {
-        private final View cardView;
+        public final View cardView;
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
         private final TextView titleView;
