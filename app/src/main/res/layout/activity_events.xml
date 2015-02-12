@@ -6,19 +6,6 @@
              android:background="@color/background_color"
     >
 
-    <ImageButton
-        android:id="@+id/fab_add"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:background="@drawable/fab"
-        android:elevation="4dp"
-        android:padding="16dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/ic_map_white_36dp"/>
-
     <ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
                   xmlns:tools="http://schemas.android.com/tools"
                   android:id="@+id/view_switcher"
@@ -94,6 +81,22 @@
         </LinearLayout>
 
     </ViewSwitcher>
+
+    <ImageButton
+        android:id="@+id/fab_switch_view"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/fab"
+        android:elevation="4dp"
+        android:padding="16dp"
+        android:scaleType="fitXY"
+        android:onClick="onSwitchView"
+        android:scaleX="0"
+        android:scaleY="0"
+        android:src="@drawable/ic_map_white_36dp"/>
 
 </FrameLayout>
 

@@ -89,7 +89,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private View topProgressBar;
     private SlidingTabLayout slidingTab;
     private ViewPager viewPager;
-    private MenuItem showMapMenu;
+    private View fab;
 
     // Last city and query for which events are shown.
     protected EventFetcherParam eventFetcherParam;
@@ -134,6 +134,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 EventSearchSuggestionsProvider.saveRecentQuery(this, eventFetcherParam.query);
             }
         }
+
+        fab = findViewById(R.id.fab_switch_view);
     }
 
     @Override
@@ -237,27 +239,12 @@ public abstract class BaseEventsActivity extends BaseActivity {
             menu.findItem(R.id.action_filter).setVisible(false);
         }
 
-        int disabledMenuId = getDisabledMenuId();
-        if (disabledMenuId > 0) {
-            menu.findItem(disabledMenuId).setVisible(false);
-        }
-
-        showMapMenu = menu.findItem(R.id.action_map);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_list) {
-            switchTo(EventsGridActivity.class);
-            return true;
-        }
-
-        if (id == R.id.action_map) {
-            switchTo(EventsMapsActivity.class);
-            return true;
-        }
 
         if (id == R.id.action_change_location) {
             askUserForLocation();
@@ -345,11 +332,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
      * @return true if the view represented by this activity is default view.
      */
     protected abstract boolean isDefaultView();
-
-    /**
-     * @return true if the view represented by this activity is default view.
-     */
-    protected abstract int getDisabledMenuId();
 
     /**
      * @return a new Fragment which will be used to show events list.
@@ -581,12 +563,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
         @Override
         public void onPageSelected(int position) {
             if (position == 0) {
-                showMapMenu.setIcon(R.drawable.ic_map_grey600_36dp);
-                showMapMenu.setEnabled(false);
+                fab.animate().scaleX(0).scaleY(0).setDuration(300).start();
                 lastSelectedTabName = exploreTabName;
             } else {
-                showMapMenu.setIcon(R.drawable.ic_map_white_36dp);
-                showMapMenu.setEnabled(true);
+                fab.animate().scaleX(1).scaleY(1).setDuration(300).start();
                 super.onPageSelected(position - 1);
             }
         }

@@ -9,6 +9,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -90,6 +91,10 @@ public class EventsMapsActivity extends BaseEventsActivity {
         setUpMap();
         setupGestureDetectorIfNeeded();
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
+        ImageButton fab = (ImageButton) findViewById(R.id.fab_switch_view);
+        fab.setImageResource(R.drawable.ic_list_white_36dp);
+        fab.setScaleX(1);
+        fab.setScaleY(1);
     }
 
     @Override
@@ -137,11 +142,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
     @Override
     protected boolean isDefaultView() {
         return pref.isMapsViewDefault();
-    }
-
-    @Override
-    protected int getDisabledMenuId() {
-        return R.id.action_map;
     }
 
     @Override
@@ -341,4 +341,9 @@ public class EventsMapsActivity extends BaseEventsActivity {
             }
         }
     };
+
+    // Called when fab icon is pressed
+    public void onSwitchView(View view) {
+        switchTo(EventsGridActivity.class);
+    }
 }
