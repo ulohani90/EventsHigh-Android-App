@@ -49,7 +49,7 @@ public class Utils {
     public static Uri getAppUri(Uri webUri) {
         Uri.Builder builder = Uri.parse("android-app://com.eventshigh.nearme.app/").buildUpon();
         builder.appendPath(webUri.getScheme());
-        builder.appendPath(webUri.getHost());
+        builder.appendPath(webUri.getHost().replaceAll("www.", ""));
         for (String pathSegment : webUri.getPathSegments()) {
             builder.appendPath(pathSegment);
         }

@@ -44,6 +44,7 @@
     <string name="onboarding_map">See events happening near you!</string>
     <string name="onboarding_city">Explore the biggest guide to events in your city!</string>
     <string name="onboarding_follow">Follow your interests and never miss an event again!</string>
+    <string name="onboarding_like">Personalize to get events that matter!</string>
     <string name="onboarding_share">Share and plan your favorite events with friends!</string>
     <string name="onboarding_filter">Filter events by selecting a category!</string>
     <string name="onboarding_action">Use these action buttons to search, filter, change location or see events in map view!</string>

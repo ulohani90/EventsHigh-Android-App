@@ -46,7 +46,7 @@ public class OnBoardingActivity extends BaseActivity {
     private final OnBoardingStepResource[] ON_BOARDING_STEP_RESOURCES = new OnBoardingStepResource[]{
             new OnBoardingStepResource(R.string.onboarding_city, R.drawable.onboarding_city),
             new OnBoardingStepResource(R.string.onboarding_map, R.drawable.onboarding_map),
-            new OnBoardingStepResource(R.string.onboarding_follow, R.drawable.onboarding_follow),
+            new OnBoardingStepResource(R.string.onboarding_like, R.drawable.onboarding_like),
             new OnBoardingStepResource(R.string.onboarding_share, R.drawable.onboarding_share),
     };
 
