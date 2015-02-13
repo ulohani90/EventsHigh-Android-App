@@ -35,7 +35,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsCollection.EventTab;
-import com.eventshigh.nearme.app.data.EventsCollection.TagInfo;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.settings.SettingsActivity;
@@ -325,11 +324,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     protected abstract boolean showLocationInActionBar();
 
     /**
-     * @return true if explore tab should shown.
-     */
-    protected abstract boolean showExploreTab();
-
-    /**
      * @return true if the view represented by this activity is default view.
      */
     protected abstract boolean isDefaultView();
@@ -399,9 +393,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private void updateEventsCollection(EventsCollection events) {
         String tagToSearch = lastSelectedTabName;
 
-        EventsPagerAdapter adapter = showExploreTab() && eventFetcherParam.query.isEmpty() ?
-                new ExploreAndEventsPagerAdapter(getSupportFragmentManager(), events) :
-                new EventsPagerAdapter(getSupportFragmentManager(), events);
+        EventsPagerAdapter adapter = new EventsPagerAdapter(getSupportFragmentManager(), events);
         viewPager.setAdapter(adapter);
         slidingTab.setCustomTabColorizer(adapter);
         slidingTab.setCustomTabView(R.layout.tab_title, R.id.tab_title, R.id.num_events);
@@ -524,65 +516,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     public void onRetryButtonClicked(View view) {
         reportActionToAnalytics("retryFetch");
         fetchNewListing(false /* bypass cache*/);
-    }
-
-    private class ExploreAndEventsPagerAdapter extends EventsPagerAdapter {
-        private final String exploreTabName;
-        private final ArrayList<TagInfo> tagInfos;
-
-        private ExploreAndEventsPagerAdapter(FragmentManager fm, EventsCollection events) {
-            super(fm, events);
-
-            exploreTabName = getResources().getString(R.string.ui_explore);
-            tagInfos = new ArrayList<>();
-            tagInfos.addAll(events.getTagInfos());
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            if (position == 0) {
-                ExploreFragment fragment = new ExploreFragment();
-                Bundle args = new Bundle();
-                args.putParcelableArrayList(ExploreFragment.TAGS_LIST_PARAMETER, tagInfos);
-                fragment.setArguments(args);
-                return fragment;
-            }
-
-            return super.getItem(position - 1);
-        }
-
-        @Override
-        public int getCount() {
-            return 1 + super.getCount();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return position == 0 ? exploreTabName : super.getPageTitle(position - 1);
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            if (position == 0) {
-                fab.animate().scaleX(0).scaleY(0).setDuration(300).start();
-                lastSelectedTabName = exploreTabName;
-            } else {
-                fab.animate().scaleX(1).scaleY(1).setDuration(300).start();
-                super.onPageSelected(position - 1);
-            }
-        }
-
-        @Override
-        public String getNumEvents(int position) {
-            return position == 0 ? "" : super.getNumEvents(position - 1);
-        }
-
-        @Override
-        public int getIndicatorColor(int position) {
-            return position == 0 ?
-                    getResources().getColor(android.R.color.holo_purple) :
-                    super.getIndicatorColor(position - 1);
-        }
     }
 
     private class EventsPagerAdapter extends SlidingTabPagerAdapter

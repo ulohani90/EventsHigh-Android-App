@@ -134,11 +134,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
     }
 
     @Override
-    protected boolean showExploreTab() {
-        return false;
-    }
-
-    @Override
     protected boolean isDefaultView() {
         return pref.isMapsViewDefault();
     }

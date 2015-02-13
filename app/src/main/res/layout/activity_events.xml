@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_color"
+    tools:context=".activity.EventsGridActivity"
 >
 
     <ViewSwitcher
@@ -83,17 +84,19 @@
         android:id="@+id/fab_switch_view"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:layout_gravity="bottom|right"
+        android:layout_gravity="bottom|end"
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/fab"
         android:elevation="4dp"
         android:padding="16dp"
         android:scaleType="fitXY"
         android:onClick="onSwitchView"
-        android:scaleX="0"
-        android:scaleY="0"
+        android:scaleX="1"
+        android:scaleY="1"
         android:src="@drawable/ic_map_white_36dp"
+        tools:ignore="UnusedAttribute"
     />
 
 </FrameLayout>
