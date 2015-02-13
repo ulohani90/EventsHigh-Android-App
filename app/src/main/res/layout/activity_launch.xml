@@ -7,20 +7,93 @@
     android:background="@color/background_color"
     tools:context=".activity.LaunchActivity"
 >
-    <GridView
-        android:id="@+id/explore_grid"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:columnWidth="100dp"
-        android:numColumns="auto_fit"
-        android:stretchMode="columnWidth"
-        android:gravity="center"
-        android:horizontalSpacing="8dp"
-        android:verticalSpacing="8dp"
-        android:padding="8dp"
-        android:clipToPadding="false"
-        tools:listitem="@layout/explore_card"
-    />
+        android:scrollbars="none"
+    >
+        <LinearLayout
+            android:id="@+id/explore_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+        >
+            <TextView
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:text="@string/ui_featured_event"
+                android:gravity="center"
+                android:padding="8dp"
+                android:elevation="8dp"
+                tools:ignore="UnusedAttribute"
+            />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/eh_logo_with_text"
+            />
+            <TextView
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:text="@string/ui_explore"
+                android:gravity="center"
+                android:padding="8dp"
+                android:elevation="8dp"
+                tools:ignore="UnusedAttribute"
+            />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+            >
+                <TextView
+                    style="@style/EventDetailButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/ui_today"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:onClick="showToday"
+                />
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/shape_vertical_divider"
+                />
+                <TextView
+                    style="@style/EventDetailButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/ui_tomorrow"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:onClick="showTomorrow"
+                />
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/shape_vertical_divider"
+                />
+                <TextView
+                    style="@style/EventDetailButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/ui_this_weekend"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:onClick="showThisWeekend"
+                />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <ListView
         android:id="@+id/city_selector"
@@ -29,6 +102,3 @@
         tools:listitem="@android:layout/simple_list_item_1"
     />
 </ViewSwitcher>
-
-
-

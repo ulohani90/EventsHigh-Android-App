@@ -10,8 +10,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ import com.eventshigh.nearme.app.data.EventFetcherParam;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -58,6 +60,7 @@ public class LaunchActivity extends BaseActivity {
 
     // Context for next activity.
     private EventFetcherParam param = null;
+    private String tabName = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +73,16 @@ public class LaunchActivity extends BaseActivity {
         ListView citySelector = (ListView) findViewById(R.id.city_selector);
         citySelector.setAdapter(new CityListAdapter());
 
-        CategoryAdapter categoryAdapter = new CategoryAdapter();
-        categoryAdapter.addAll(EXPLORE_TAGS);
-        GridView exploreGrid = (GridView) findViewById(R.id.explore_grid);
-        exploreGrid.setAdapter(categoryAdapter);
+        LinearLayout exploreLayout = (LinearLayout) findViewById(R.id.explore_layout);
+        LinearLayout last = null;
+        for (int i = 0; i < EXPLORE_TAGS.length; i++) {
+            if (i % 3 == 0) {
+                last = new LinearLayout(this);
+                exploreLayout.addView(last);
+            }
+
+            last.addView(getExploreCard(EXPLORE_TAGS[i], last));
+        }
 
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
@@ -83,7 +92,7 @@ public class LaunchActivity extends BaseActivity {
     @Override
     public void onNewIntent(Intent intent) {
         param = IntentUtils.processIntent(this, intent);
-        showNextScreen(true);
+        showNextScreen(false);
     }
 
     public void onStart() {
@@ -116,7 +125,7 @@ public class LaunchActivity extends BaseActivity {
         gcmRegistration.updateGcmRegistrationIdIfNeeded();
 
         // Show next screen.
-        showNextScreen(true);
+        showNextScreen(false);
     }
 
 
@@ -165,7 +174,7 @@ public class LaunchActivity extends BaseActivity {
 
             // If we have user location, start next activity.
             if (param.city != null) {
-                showNextScreen(true);
+                showNextScreen(false);
                 return;
             }
 
@@ -184,7 +193,22 @@ public class LaunchActivity extends BaseActivity {
     // Helper methods
     // ***********************
 
-    private void showNextScreen(boolean shouldFinish) {
+    public void showToday(View view) {
+        tabName = "Today";
+        showNextScreen(true);
+    }
+
+    public void showTomorrow(View view) {
+        tabName = "Tomorrow";
+        showNextScreen(true);
+    }
+
+    public void showThisWeekend(View view) {
+        tabName = "This Weekend";
+        showNextScreen(true);
+    }
+
+    private void showNextScreen(boolean isUserAction) {
         // If we do not have user city, use GoogleLocation api to get user location.
         if (param.city == null) {
             disconnectClient();
@@ -198,7 +222,7 @@ public class LaunchActivity extends BaseActivity {
         }
 
         // If we do not have query, show explore screen.
-        if (param.query.isEmpty()) {
+        if (!isUserAction && param.query.isEmpty()) {
             viewSwitcher.setDisplayedChild(0);
             return;
         }
@@ -207,8 +231,12 @@ public class LaunchActivity extends BaseActivity {
         Class target = pref.isMapsViewDefault() ? EventsMapsActivity.class : EventsGridActivity.class;
         Intent outIntent = new Intent(this, target);
         outIntent.putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, param);
+        if (tabName != null) {
+            outIntent.putExtra(BaseEventsActivity.EXTRA_EVENT_TAB_NAME, tabName);
+        }
+
         startActivity(outIntent);
-        if (shouldFinish) {
+        if (!isUserAction) {
             finish();
         }
     }
@@ -229,36 +257,10 @@ public class LaunchActivity extends BaseActivity {
                     City city = getItem(position);
                     param.changeLocation(city.cityBounds.getCenter());
                     gcmRegistration.setLastCity(city);
-                    showNextScreen(true);
-                }
-            });
-
-            return view;
-        }
-    }
-
-    private class CategoryAdapter extends ArrayAdapter<String> {
-
-        public CategoryAdapter() {
-            super(LaunchActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView != null ? convertView :
-                    getLayoutInflater().inflate(R.layout.explore_card, parent, false);
-            final String tagName = getItem(position);
-            ((TextView) view.findViewById(R.id.explore_name)).setText(tagName);
-            ((ImageView) view.findViewById(R.id.explore_image)).setImageResource(
-                    getInfoGraphId(tagName));
-
-            view.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    param.query = tagName;
                     showNextScreen(false);
                 }
             });
+
             return view;
         }
     }
@@ -282,5 +284,31 @@ public class LaunchActivity extends BaseActivity {
 
     private boolean isClientConnecting() {
         return client != null && (client.isConnected() || client.isConnecting());
+    }
+
+    private View getExploreCard(final String tagName, ViewGroup parent) {
+        final View view = getLayoutInflater().inflate(R.layout.explore_card, parent, false);
+        view.setLayoutParams(new LayoutParams(Utils.dpToPx(this, 100), LayoutParams.MATCH_PARENT, 1));
+        ((TextView) view.findViewById(R.id.explore_name)).setText(tagName);
+        ((ImageView) view.findViewById(R.id.explore_image)).setImageResource(
+                getInfoGraphId(tagName));
+
+        view.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                param.query = tagName;
+                showNextScreen(true);
+            }
+        });
+
+        Utils.waitForViewVisible(view, new Runnable() {
+            @Override
+            public void run() {
+                LayoutParams lp = (LayoutParams) view.getLayoutParams();
+                lp.height = lp.width;
+                view.setLayoutParams(lp);
+            }
+        });
+        return view;
     }
 }

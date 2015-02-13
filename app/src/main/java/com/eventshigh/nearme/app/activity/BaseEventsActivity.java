@@ -75,7 +75,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // ***********************
     // CONSTANTS
     // ***********************
-    public static final String EXTRA_TAG_NAME_PARAM = "extra.event.tag.name";
+    public static final String EXTRA_EVENT_TAB_NAME = "extra.event.tab.name";
     public static final int NUM_MAX_PREFETCH = 10;
     public static final int SECONDS_FOR_REFRESH = 600;
 
@@ -123,7 +123,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // See if we have context passed to us within intent.
         eventFetcherParam = IntentUtils.processIntent(this, getIntent());
-        lastSelectedTabName = getIntent().getStringExtra(EXTRA_TAG_NAME_PARAM);
+        lastSelectedTabName = getIntent().getStringExtra(EXTRA_EVENT_TAB_NAME);
 
         // Show query as title.
         ActionBar actionBar = getSupportActionBar();
@@ -339,7 +339,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // ***********************
 
     public void showEventDetails(Event event, int position) {
-        showEventDetails(event, lastSelectedTabName, eventFetcherParam.query, position);
+        reportEventAction(event, "showEventDetails", position);
+        Intent detailIntent = new Intent(this, EventDetailActivity.class);
+        detailIntent.putExtra(EventDetailFragment.ARG_EVENT_INFO, event);
+        startActivity(detailIntent);
     }
 
     public void showSearchView(String query) {
@@ -373,7 +376,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 .putExtra(IntentUtils.EXTRA_EVENT_FETCHER_PARAM, eventFetcherParam);
         if (lastSelectedTabName != null) {
-            intent.putExtra(EXTRA_TAG_NAME_PARAM, lastSelectedTabName);
+            intent.putExtra(EXTRA_EVENT_TAB_NAME, lastSelectedTabName);
         }
         startActivity(intent);
     }
@@ -429,7 +432,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
                             slidingTab.scrollTo(selectedItem.getLeft() - 100, 0);
                         }
                     }
-                }, 100);
+                });
             }
         }
     }
@@ -607,4 +610,14 @@ public abstract class BaseEventsActivity extends BaseActivity {
             }
         }
     };
+
+    public void reportEventAction(Event event, String actionName, int position) {
+        reportActionToAnalytics(actionName,
+                lastSelectedTabName == null ? "" : lastSelectedTabName,
+                1,
+                isFavourite(event) ? "Favourite" : "No-Favourite",
+                event.ehRecommended ? "Recommended" : "Non-Recommended",
+                eventFetcherParam.query.isEmpty() ? " " : eventFetcherParam.query,
+                Integer.toString(position));
+    }
 }

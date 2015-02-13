@@ -9,18 +9,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.ui.EventsAdapter;
-import com.eventshigh.nearme.app.ui.MapMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.OnEventMarkChangeListener;
+import com.eventshigh.nearme.app.ui.EventsAdapter;
+import com.eventshigh.nearme.app.ui.MapMarkerManager;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
@@ -82,7 +81,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Setup the local member variables.
+        // Setup the UI.
         View pager = findViewById(R.id.pager);
         LinearLayout parent = (LinearLayout) pager.getParent();
         View mapsView = getLayoutInflater().inflate(R.layout.view_maps, parent, false);
@@ -90,10 +89,9 @@ public class EventsMapsActivity extends BaseEventsActivity {
         parent.addView(mapsView, pager.getLayoutParams());
         setUpMap();
         setupGestureDetectorIfNeeded();
+
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
         fab.setImageResource(R.drawable.ic_list_white_36dp);
-        fab.setScaleX(1);
-        fab.setScaleY(1);
     }
 
     @Override

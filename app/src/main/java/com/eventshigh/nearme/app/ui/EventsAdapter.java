@@ -190,7 +190,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
         eventCard.favouriteView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.reportEventAction(event, "addFavourite");
+                activity.reportEventAction(event, "addFavourite", position);
                 if (adapter != null) {
                     adapter.lastChangedEventId = event.id;
                 }
@@ -202,7 +202,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
         eventCard.favouritedView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.reportEventAction(event, "removeFavourite");
+                activity.reportEventAction(event, "removeFavourite", position);
                 if (adapter != null) {
                     adapter.lastChangedEventId = event.id;
                 }
@@ -214,7 +214,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
         eventCard.dismissView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.reportEventAction(event, "dismiss");
+                activity.reportEventAction(event, "dismiss", position);
                 if (adapter != null) {
                     adapter.enableAnimation = false;
                 }

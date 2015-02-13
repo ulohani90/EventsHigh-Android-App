@@ -187,7 +187,7 @@ public class EventDetailFragment extends Fragment {
      **********************************/
 
     private void openSourceSite() {
-        activity.reportActionToAnalytics("openSource");
+        activity.reportEventAction(event, "openSource");
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.sourceUrl));
         try {
             startActivity(intent);
@@ -197,7 +197,7 @@ public class EventDetailFragment extends Fragment {
     }
 
     private void call() {
-        activity.reportActionToAnalytics("callOrganizer");
+        activity.reportEventAction(event, "callOrganizer");
         Intent intent = new Intent(Intent.ACTION_DIAL)
                 .setData(Uri.parse("tel:" + event.organizerPhone));
         try {
@@ -208,7 +208,7 @@ public class EventDetailFragment extends Fragment {
     }
 
     private void openOrganizerWebsite() {
-        activity.reportActionToAnalytics("openOrganizerWebsite");
+        activity.reportEventAction(event, "openOrganizerWebsite");
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerWebsite));
         try {
             startActivity(intent);
@@ -232,7 +232,7 @@ public class EventDetailFragment extends Fragment {
     }
 
     private void openBookingSite() {
-        activity.reportActionToAnalytics("bookTicket");
+        activity.reportEventAction(event, "bookTicket");
         Intent intent = new Intent(activity, BookTicketActivity.class);
         intent.putExtra(BookTicketActivity.EVENT_BOOKING_URL_INTENT_KEY, event.bookingUrl);
         startActivity(intent);
@@ -346,7 +346,7 @@ public class EventDetailFragment extends Fragment {
             eventCard.bgView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.reportActionToAnalytics("imagePreview");
+                    activity.reportEventAction(event, "imagePreview");
                     final Dialog nagDialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
                     nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     nagDialog.setCancelable(true);
@@ -592,7 +592,7 @@ public class EventDetailFragment extends Fragment {
                         eventCard.readMoreView.setVisibility(View.VISIBLE);
                     }
                 }
-            }, 100);
+            });
         }
 
         // Show tags.
@@ -620,7 +620,7 @@ public class EventDetailFragment extends Fragment {
                     addTag(ll, tag);
                 }
             }
-        }, 100);
+        });
     }
 
     private TextView addTag(LinearLayout ll, final String tag) {
@@ -630,7 +630,7 @@ public class EventDetailFragment extends Fragment {
         tagView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.reportActionToAnalytics("tagClick");
+                activity.reportEventAction(event, "tagClick");
                 Intent searchIntent = new Intent(activity, LaunchActivity.class);
                 searchIntent.setAction(Intent.ACTION_SEARCH);
                 searchIntent.putExtra(SearchManager.QUERY, tag);

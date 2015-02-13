@@ -156,17 +156,6 @@ public abstract class BaseActivity extends ActionBarActivity {
     }
 
     /**
-     * Open events details page.
-     * @param event event for which to show details page.
-     */
-    public void showEventDetails(Event event, @Nullable String label, @Nullable String query, int position) {
-        reportEventAction(event, "showEventDetails", label, query, position);
-        Intent detailIntent = new Intent(this, EventDetailActivity.class);
-        detailIntent.putExtra(EventDetailFragment.ARG_EVENT_INFO, event);
-        startActivity(detailIntent);
-    }
-
-    /**
      * Helper method to share an Event. This method coverts and view
      * into jpeg image which is then shared with external tool.
      */
@@ -271,15 +260,5 @@ public abstract class BaseActivity extends ActionBarActivity {
                 1,
                 isFavourite(event) ? "Favourite" : "No-Favourite",
                 event.ehRecommended ? "Recommended" : "Non-Recommended");
-    }
-
-    public void reportEventAction(Event event, String actionName, @Nullable String label, String query, int position) {
-        reportActionToAnalytics(actionName,
-                label == null ? "" : label,
-                1,
-                isFavourite(event) ? "Favourite" : "No-Favourite",
-                event.ehRecommended ? "Recommended" : "Non-Recommended",
-                query,
-                Integer.toString(position));
     }
 }

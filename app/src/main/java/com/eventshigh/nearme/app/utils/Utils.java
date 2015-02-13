@@ -60,6 +60,10 @@ public class Utils {
         return builder.build();
     }
 
+    public static void waitForViewVisible(final View view, final Runnable callback) {
+        waitForViewVisible(view, callback, 100);
+    }
+
     public static void waitForViewVisible(final View view, final Runnable callback, final int nTimes) {
         if (nTimes < 0) {
             return;
