@@ -9,6 +9,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -90,6 +91,9 @@ public class EventsMapsActivity extends BaseEventsActivity {
         setUpMap();
         setupGestureDetectorIfNeeded();
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
+        fab.setImageResource(R.drawable.ic_list_white_36dp);
+        fab.setScaleX(1);
+        fab.setScaleY(1);
     }
 
     @Override
@@ -137,11 +141,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
     @Override
     protected boolean isDefaultView() {
         return pref.isMapsViewDefault();
-    }
-
-    @Override
-    protected int getDisabledMenuId() {
-        return R.id.action_map;
     }
 
     @Override
@@ -262,6 +261,14 @@ public class EventsMapsActivity extends BaseEventsActivity {
                         return gestureDetector.onTouchEvent(event);
                     }
                 });
+        eventView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                v.removeOnLayoutChangeListener(this);
+                fab.animate().translationY(-v.getHeight()).setDuration(300).start();
+            }
+        });
         eventCardContainer.removeAllViews();
         eventCardContainer.addView(eventView);
     }
@@ -307,6 +314,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
             }
             lastSelectedMarker = null;
             eventCardContainer.removeAllViews();
+            fab.animate().translationY(0).setDuration(300).start();
         }
     };
 
@@ -341,4 +349,9 @@ public class EventsMapsActivity extends BaseEventsActivity {
             }
         }
     };
+
+    // Called when fab icon is pressed
+    public void onSwitchView(View view) {
+        switchTo(EventsGridActivity.class);
+    }
 }

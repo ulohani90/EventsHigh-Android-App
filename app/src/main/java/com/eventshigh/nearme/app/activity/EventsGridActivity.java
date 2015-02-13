@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.activity;
 
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
+import android.view.View;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.task.ShowLocalityTask;
@@ -13,6 +14,11 @@ import com.google.android.gms.maps.model.LatLng;
  * we try to put more columns as per the width offered.
  */
 public class EventsGridActivity extends BaseEventsActivity {
+
+    // Called when fab icon is pressed
+    public void onSwitchView(View view) {
+        switchTo(EventsMapsActivity.class);
+    }
 
     // ***********************
     // Helper Methods
@@ -31,11 +37,6 @@ public class EventsGridActivity extends BaseEventsActivity {
     @Override
     protected boolean isDefaultView() {
         return !pref.isMapsViewDefault();
-    }
-
-    @Override
-    protected int getDisabledMenuId() {
-        return R.id.action_list;
     }
 
     @Override
