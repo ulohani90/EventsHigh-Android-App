@@ -88,7 +88,7 @@ public class GAHelper {
                 .setLabel(label)
                 .setValue(value);
         for (int i = 0; i < customValues.length; i++) {
-            builder.setCustomDimension(i, customValues[i]);
+            builder.setCustomDimension(i + 1, customValues[i]);
         }
         tracker.send(builder.build());
 

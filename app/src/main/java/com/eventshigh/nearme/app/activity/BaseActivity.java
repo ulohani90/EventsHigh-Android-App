@@ -160,7 +160,7 @@ public abstract class BaseActivity extends ActionBarActivity {
      * @param event event for which to show details page.
      */
     public void showEventDetails(Event event, @Nullable String label, @Nullable String query, int position) {
-        reportEventAction(event, "showEventDetails", label, query, Integer.toString(position));
+        reportEventAction(event, "showEventDetails", label, query, position);
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.putExtra(EventDetailFragment.ARG_EVENT_INFO, event);
         startActivity(detailIntent);
@@ -273,22 +273,13 @@ public abstract class BaseActivity extends ActionBarActivity {
                 event.ehRecommended ? "Recommended" : "Non-Recommended");
     }
 
-    public void reportEventAction(Event event, String actionName, @Nullable String label, String param) {
+    public void reportEventAction(Event event, String actionName, @Nullable String label, String query, int position) {
         reportActionToAnalytics(actionName,
                 label == null ? "" : label,
                 1,
                 isFavourite(event) ? "Favourite" : "No-Favourite",
                 event.ehRecommended ? "Recommended" : "Non-Recommended",
-                param);
-    }
-
-    public void reportEventAction(Event event, String actionName, @Nullable String label, String param1, String param2) {
-        reportActionToAnalytics(actionName,
-                label == null ? "" : label,
-                1,
-                isFavourite(event) ? "Favourite" : "No-Favourite",
-                event.ehRecommended ? "Recommended" : "Non-Recommended",
-                param1,
-                param2);
+                query,
+                Integer.toString(position));
     }
 }
