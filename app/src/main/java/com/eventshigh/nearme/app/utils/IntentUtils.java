@@ -7,21 +7,21 @@ import android.os.Bundle;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.data.EventsContext;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Helper to process the intent in EventsHigh app.
  */
 public class IntentUtils {
-    public static final String EXTRA_EVENT_FETCHER_PARAM = IntentUtils.class.getCanonicalName() + "_PARAM";
+    public static final String EXTRA_EVENT_CONTEXT = IntentUtils.class.getCanonicalName() + "_PARAM";
     public static final String EXTRA_LATITUDE_PARAM = IntentUtils.class.getCanonicalName() + "_LAT";
     public static final String EXTRA_LONGITUDE_PARAM = IntentUtils.class.getCanonicalName() + "_LON";
 
-    public static EventFetcherParam processIntent(BaseActivity activity, Intent inIntent) {
-        EventFetcherParam param = inIntent.getParcelableExtra(EXTRA_EVENT_FETCHER_PARAM);
+    public static EventsContext processIntent(BaseActivity activity, Intent inIntent) {
+        EventsContext param = inIntent.getParcelableExtra(EXTRA_EVENT_CONTEXT);
         if (param == null) {
-            param = new EventFetcherParam(null, "");
+            param = new EventsContext(null, "");
         }
 
         if (inIntent.hasExtra(EXTRA_LATITUDE_PARAM) && inIntent.hasExtra(EXTRA_LONGITUDE_PARAM)) {
@@ -44,9 +44,9 @@ public class IntentUtils {
     }
 
     private final BaseActivity activity;
-    private EventFetcherParam param;
+    private EventsContext param;
 
-    private IntentUtils(BaseActivity activity, EventFetcherParam param) {
+    private IntentUtils(BaseActivity activity, EventsContext param) {
         this.activity = activity;
         this.param = param;
     }
@@ -57,8 +57,8 @@ public class IntentUtils {
 
         Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
         if (appData != null) {
-            EventFetcherParam appDataParam =
-                    appData.getParcelable(EXTRA_EVENT_FETCHER_PARAM);
+            EventsContext appDataParam =
+                    appData.getParcelable(EXTRA_EVENT_CONTEXT);
             if (appDataParam != null) {
                 param = appDataParam;
             }

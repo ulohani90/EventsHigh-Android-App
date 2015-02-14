@@ -17,7 +17,7 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -125,7 +125,7 @@ public class GcmIntentService extends IntentService {
         } else {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
-            intent.setData(EventsHighEndpoints.getWebUri(new EventFetcherParam(null, query)));
+            intent.setData(EventsHighEndpoints.getWebUri(new EventsContext(null, query)));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         }
 

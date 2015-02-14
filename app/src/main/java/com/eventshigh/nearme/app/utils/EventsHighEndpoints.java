@@ -5,7 +5,7 @@ import android.net.Uri;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.data.EventsContext;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -42,7 +42,7 @@ public class EventsHighEndpoints {
                 .build();
     }
 
-    public static Uri getWebUri(EventFetcherParam param) {
+    public static Uri getWebUri(EventsContext param) {
         Uri.Builder builder = Uri.parse(WEB_URI_BASE).buildUpon();
         if (param.query.isEmpty()) {
             if (param.city != null) {

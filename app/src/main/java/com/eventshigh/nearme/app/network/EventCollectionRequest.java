@@ -10,7 +10,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventFetcherParam;
+import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
@@ -28,25 +28,25 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
-     * @param activity an application context to initiate the volley.
-     * @param param EventFetcherParam representing the request.
+     * @param activity an application eventsContext to initiate the volley.
+     * @param eventsContext EventFetcherParam representing the request.
      * @param listener callback on success.
      * @param errorListener callback on failures.
      */
-    public static void submit(BaseActivity activity, EventFetcherParam param,
+    public static void submit(BaseActivity activity, EventsContext eventsContext,
                               Priority priority, boolean shouldBypassCache,
                               Listener<EventsCollection> listener, ErrorListener errorListener) {
-        if (param.city == null) {
-            errorListener.onErrorResponse(new VolleyError("No City for: " + param.toString()));
+        if (eventsContext.city == null) {
+            errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
             return;
         }
 
         String url;
-        if (param.query.isEmpty()) {
-            url = EventsHighEndpoints.getApiEndpointDate(param.city);
+        if (eventsContext.query.isEmpty()) {
+            url = EventsHighEndpoints.getApiEndpointDate(eventsContext.city);
         } else {
             try {
-                url = EventsHighEndpoints.getApiEndpointQuery(param.city, param.query);
+                url = EventsHighEndpoints.getApiEndpointQuery(eventsContext.city, eventsContext.query);
             } catch (UnsupportedEncodingException e) {
                 errorListener.onErrorResponse(new VolleyError("Invalid Query", e));
                 return;
@@ -54,13 +54,13 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         }
 
         EventCollectionRequest request = new EventCollectionRequest(
-                activity, url, param, shouldBypassCache, priority, listener, errorListener);
+                activity, url, eventsContext, shouldBypassCache, priority, listener, errorListener);
         request.setTag(activity);
         VolleyHelper.addToRequestQueue(activity, request);
     }
 
     private final BaseActivity activity;
-    private final EventFetcherParam param;
+    private final EventsContext param;
     private final Priority priority;
     private final EventsMarkerManager eventsMarkerManager;
 
@@ -74,7 +74,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
      * @param listener Listener to receive the JSON response
      * @param errorListener Error listener, or null to ignore errors.
      */
-    public EventCollectionRequest(BaseActivity activity, String url, EventFetcherParam param,
+    public EventCollectionRequest(BaseActivity activity, String url, EventsContext param,
                                   boolean shouldBypassCache, Priority priority,
                                   Listener<EventsCollection> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);

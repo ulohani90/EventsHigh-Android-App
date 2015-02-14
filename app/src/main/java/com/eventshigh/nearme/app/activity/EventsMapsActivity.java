@@ -234,7 +234,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
      * fetching new events was submitted.
      */
     private boolean refreshListingsIfNeeded(LatLng userLocation) {
-        if (!eventFetcherParam.changeLocation(userLocation)) {
+        if (!eventsContext.changeLocation(userLocation)) {
             super.updateUserLocation(userLocation);
             return true;
         }

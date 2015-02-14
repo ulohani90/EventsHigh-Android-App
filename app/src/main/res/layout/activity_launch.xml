@@ -22,11 +22,11 @@
                 style="@android:style/TextAppearance.Large"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/white"
+                android:background="@color/app_color"
                 android:text="@string/ui_featured_event"
                 android:gravity="center"
                 android:padding="8dp"
-                android:elevation="8dp"
+                android:elevation="4dp"
                 tools:ignore="UnusedAttribute"
             />
             <ImageView
@@ -39,11 +39,11 @@
                 style="@android:style/TextAppearance.Large"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/white"
+                android:background="@color/app_color"
                 android:text="@string/ui_explore"
                 android:gravity="center"
                 android:padding="8dp"
-                android:elevation="8dp"
+                android:elevation="4dp"
                 tools:ignore="UnusedAttribute"
             />
             <LinearLayout

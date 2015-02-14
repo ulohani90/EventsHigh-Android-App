@@ -335,7 +335,7 @@ public class Event implements Parcelable {
     }
 
     public static EventsCollection parseUpcomingEvents(
-            EventFetcherParam param, EventsMarkerManager eventsMarkerManager, JSONObject eventsJSON)
+            EventsContext param, EventsMarkerManager eventsMarkerManager, JSONObject eventsJSON)
             throws JSONException {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
         JSONArray whitelistCategoriesJSON = eventsJSON.optJSONArray("categories");
