@@ -4,13 +4,19 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Simplified parameters for fetching events. The current Fetcher supports fetching
  * events for a city and optionally filtered by query. Query can also be a date.
  */
 public class EventsContext implements Parcelable {
+    private static final String DATE_FILTER_FORMAT = "%4d-%02d-%02d";
+
     @Nullable public City city;
     @Nullable public LatLng location;
     public String query;
@@ -29,6 +35,19 @@ public class EventsContext implements Parcelable {
         City oldCity = city;
         city = City.getCity(location);
         return (oldCity == null && city == null) || (oldCity != null && oldCity.equals(city));
+    }
+
+    public @Nullable Date getDateFilter() {
+        return DateTimeUtils.parseDateSafe(dateFilter);
+    }
+
+    public void setDateFilter(Calendar calendar) {
+        setDateFilter(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
+    }
+
+    public void setDateFilter(int year, int monthOfYear, int dayOfMonth) {
+        dateFilter = String.format(DATE_FILTER_FORMAT, year, monthOfYear + 1, dayOfMonth);
     }
 
     @Override

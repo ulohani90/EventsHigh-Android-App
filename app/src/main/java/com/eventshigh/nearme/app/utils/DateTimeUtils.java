@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -32,7 +33,8 @@ public class DateTimeUtils {
         }
     }
 
-    private static final SimpleDateFormat FULL_DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+    private static final SimpleDateFormat FULL_DATE_TIME_FORMAT =
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.US);
     public static @Nullable
     Date mergeDateTime(String date, String time, String timeZone) throws ParseException {
         if (date == null || date.isEmpty() || date.equalsIgnoreCase("null")) {
@@ -74,9 +76,9 @@ public class DateTimeUtils {
         return cal;
     }
 
-    private static final SimpleDateFormat SIMPLE_DAY_FORMAT = new SimpleDateFormat("EE");
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("d MMM");
-    private static final SimpleDateFormat SIMPLE_TIME_FORMAT = new SimpleDateFormat("h:mm a");
+    private static final SimpleDateFormat SIMPLE_DAY_FORMAT = new SimpleDateFormat("EE", Locale.US);
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("d MMM", Locale.US);
+    private static final SimpleDateFormat SIMPLE_TIME_FORMAT = new SimpleDateFormat("h:mm a", Locale.US);
 
     public static @Nullable EventTime getEventTime(Event event, int index) {
         if (index >= event.eventTimings.length) {
@@ -107,15 +109,24 @@ public class DateTimeUtils {
         }
     }
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     public static String queryToTitle(String dateStr) {
-        try {
-            Date date = DATE_FORMAT.parse(dateStr);
+        Date date = parseDateSafe(dateStr);
+        if (date != null) {
             synchronized (SIMPLE_DATE_FORMAT) {
                 return SIMPLE_DAY_FORMAT.format(date) + " " + SIMPLE_DATE_FORMAT.format(date);
             }
-        } catch (ParseException e) {
-            return Utils.capitalize(dateStr);
         }
+
+        return Utils.capitalize(dateStr);
+    }
+
+    public static @Nullable Date parseDateSafe(String dateStr) {
+        try {
+            return DATE_FORMAT.parse(dateStr);
+        } catch (ParseException e) {
+            // do nothing
+        }
+        return  null;
     }
 }

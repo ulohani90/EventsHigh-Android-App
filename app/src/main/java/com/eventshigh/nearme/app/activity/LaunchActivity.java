@@ -33,6 +33,8 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.Calendar;
+
 /**
  * A placeholder {@link android.app.Activity} which is responsible for launching
  * either {@link EventsMapsActivity} or
@@ -199,17 +201,19 @@ public class LaunchActivity extends BaseActivity {
     // ***********************
 
     public void showToday(View view) {
-        eventsContext.tabName = "Today";
+        eventsContext.setDateFilter(Calendar.getInstance());
         showNextScreen(true);
     }
 
     public void showTomorrow(View view) {
-        eventsContext.tabName = "Tomorrow";
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        eventsContext.setDateFilter(calendar);
         showNextScreen(true);
     }
 
     public void showThisWeekend(View view) {
-        eventsContext.tabName = "This Weekend";
+        eventsContext.query = "this weekend";
         showNextScreen(true);
     }
 

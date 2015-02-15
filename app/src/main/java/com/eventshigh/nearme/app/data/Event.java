@@ -334,9 +334,8 @@ public class Event implements Parcelable {
         return events;
     }
 
-    public static EventsCollection parseUpcomingEvents(
-            EventsContext param, EventsMarkerManager eventsMarkerManager, JSONObject eventsJSON)
-            throws JSONException {
+    public static EventsCollection parseUpcomingEvents(EventsContext eventsContext,
+            EventsMarkerManager eventsMarkerManager, JSONObject eventsJSON) throws JSONException {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
         JSONArray whitelistCategoriesJSON = eventsJSON.optJSONArray("categories");
 
@@ -348,12 +347,12 @@ public class Event implements Parcelable {
         }
 
         eventsMarkerManager.waitForLoading();
-        EventsCollection.Builder builder =
-                new EventsCollection.Builder(param.city, eventsMarkerManager,
-                        !EventsHighEndpoints.isDateQuery(param.query), whitelistCategories);
-        List<Event> events = fromJSON(param.city, upcomingEvents);
-        if (param.location != null) {
-            Collections.sort(events, new EventComparator(param.location, eventsMarkerManager));
+        EventsCollection.Builder builder =  new EventsCollection.Builder(eventsContext.city,
+                eventsMarkerManager, !EventsHighEndpoints.isDateQuery(eventsContext.query),
+                whitelistCategories);
+        List<Event> events = fromJSON(eventsContext.city, upcomingEvents);
+        if (eventsContext.location != null) {
+            Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
         }
         return builder.addAllEvent(events).build();
     }

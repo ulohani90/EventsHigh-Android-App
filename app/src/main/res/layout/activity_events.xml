@@ -30,6 +30,16 @@
                 android:layout_height="wrap_content"
             />
 
+            <DatePicker
+                android:id="@+id/date_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:calendarViewShown="false"
+                android:datePickerMode="spinner"
+                android:visibility="gone"
+                tools:ignore="UnusedAttribute"
+            />
+
             <com.example.android.common.view.SlidingTabLayout
                 android:id="@+id/sliding_tabs"
                 android:layout_width="match_parent"

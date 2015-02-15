@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.DialogFragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.util.Pair;
@@ -20,6 +18,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.DatePicker;
+import android.widget.DatePicker.OnDateChangedListener;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -32,13 +32,12 @@ import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsCollection.EventTab;
+import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.settings.SettingsActivity;
-import com.eventshigh.nearme.app.ui.DatePickerFragment;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
@@ -56,6 +55,8 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import fr.nicolaspomepuy.discreetapprate.AppRate;
@@ -86,6 +87,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // UI elements.
     private ViewSwitcher viewSwitcher;
     private View topProgressBar;
+    private DatePicker datePicker;
     private SlidingTabLayout slidingTab;
     private ViewPager viewPager;
     protected ImageButton fab;
@@ -110,9 +112,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
         // Setup the UI.
         setContentView(R.layout.activity_events);
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
+        datePicker = (DatePicker) findViewById(R.id.date_filter);
         slidingTab = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         viewPager = (ViewPager) findViewById(R.id.pager);
         topProgressBar = findViewById(R.id.top_progress_bar);
+        fab = (ImageButton) findViewById(R.id.fab_switch_view);
 
         // Set the context in term of eventFetcherParam. Use Intent
         // to restore the context.
@@ -122,16 +126,18 @@ public abstract class BaseEventsActivity extends BaseActivity {
         eventsContext = IntentUtils.processIntent(this, getIntent());
 
         // Show query as title.
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null && !eventsContext.query.isEmpty()) {
-            actionBar.setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
+        if (!eventsContext.query.isEmpty()) {
+            getSupportActionBar().setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
             if (!EventsHighEndpoints.isDateQuery(eventsContext.query)) {
                 reportActionToAnalytics("search", eventsContext.query);
                 EventSearchSuggestionsProvider.saveRecentQuery(this, eventsContext.query);
+            } else {
+                eventsContext.dateFilter = "";
             }
         }
 
-        fab = (ImageButton) findViewById(R.id.fab_switch_view);
+        // See if date filter is passed.
+        showDateFilter();
     }
 
     @Override
@@ -139,11 +145,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         super.onStart();
 
         // Show the Up button in the action bar.
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(
-                    !eventsContext.query.isEmpty() || !isDefaultView());
-        }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(
+                !eventsContext.query.isEmpty() || !isDefaultView());
 
         // Setup GoogleApiClient
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.APP_INDEX_API).build();
@@ -230,8 +233,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         // Do not show filterByDate for search.
-        if (!eventsContext.query.isEmpty() &&
-            !EventsHighEndpoints.isDateQuery(eventsContext.query)) {
+        if (EventsHighEndpoints.isDateQuery(eventsContext.query)) {
             menu.findItem(R.id.action_filter).setVisible(false);
         }
 
@@ -248,13 +250,15 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         if (id == R.id.action_filter) {
-            DialogFragment selectDateFragment = new DatePickerFragment();
-            if (eventsContext.city != null) {
-                Bundle args = new Bundle();
-                args.putString(City.class.getName(), eventsContext.city.toString());
-                selectDateFragment.setArguments(args);
+            if (eventsContext.dateFilter.isEmpty()) {
+                eventsContext.setDateFilter(Calendar.getInstance());
+                showDateFilter();
+            } else {
+                eventsContext.dateFilter = "";
+                slidingTab.setVisibility(View.VISIBLE);
+                datePicker.setVisibility(View.GONE);
             }
-            selectDateFragment.show(getFragmentManager(), "selectDate");
+            fetchNewListing(false);
             return true;
         }
 
@@ -334,6 +338,17 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // Helper methods
     // ***********************
 
+
+    public void reportEventAction(Event event, String actionName, int position) {
+        reportActionToAnalytics(actionName,
+                eventsContext.tabName,
+                1,
+                isFavourite(event) ? "Favourite" : "No-Favourite",
+                event.ehRecommended ? "Recommended" : "Non-Recommended",
+                eventsContext.query.isEmpty() ? " " : eventsContext.query,
+                Integer.toString(position));
+    }
+
     public void showEventDetails(Event event, int position) {
         reportEventAction(event, "showEventDetails", position);
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
@@ -356,10 +371,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             @Override
             public void onLocationSelection(String locationString, LatLng locationPoint) {
                 if (showLocationInActionBar()) {
-                    ActionBar actionBar = getSupportActionBar();
-                    if (actionBar != null) {
-                        actionBar.setSubtitle(locationString);
-                    }
+                    getSupportActionBar().setSubtitle(locationString);
                 }
                 updateUserLocation(locationPoint);
             }
@@ -522,7 +534,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         public EventsPagerAdapter(FragmentManager fm, EventsCollection events) {
             super(fm);
             this.events = events;
-            this.tabs = events.getTabs();
+            this.tabs = events.isEmpty() || eventsContext.dateFilter.isEmpty() ? events.getTabs() :
+                    events.getTabs().subList(0, 1);
         }
 
         @Override
@@ -583,7 +596,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
     }
 
-    protected ErrorListener mErrorListener = new ErrorListener() {
+    private ErrorListener mErrorListener = new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
             topProgressBar.setVisibility(View.GONE);
@@ -604,13 +617,23 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
     };
 
-    public void reportEventAction(Event event, String actionName, int position) {
-        reportActionToAnalytics(actionName,
-                eventsContext.tabName,
-                1,
-                isFavourite(event) ? "Favourite" : "No-Favourite",
-                event.ehRecommended ? "Recommended" : "Non-Recommended",
-                eventsContext.query.isEmpty() ? " " : eventsContext.query,
-                Integer.toString(position));
+    private void showDateFilter() {
+        Date filteredDate = eventsContext.getDateFilter();
+        if (filteredDate != null) {
+            slidingTab.setVisibility(View.GONE);
+            datePicker.setVisibility(View.VISIBLE);
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(filteredDate);
+            datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH),
+                    new OnDateChangedListener() {
+                        @Override
+                        public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            eventsContext.setDateFilter(year, monthOfYear, dayOfMonth);
+                            fetchNewListing(false);
+                        }
+                    });
+        }
     }
 }

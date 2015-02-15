@@ -17,9 +17,9 @@ import java.util.regex.Pattern;
 public class EventsHighEndpoints {
     private static final String WEB_URI_BASE = "http://www.eventshigh.com/";
     private static final String API_ENDPOINT_DATE_FORMAT =
-            "http://apiserver.eventshigh.com:8888/api/date/%s/%s?sortby=popularity&limit=500&mobile=%d";
+            "http://apiserver.eventshigh.com:8888/api/date/%s/%s?limit=500&mobile=%d";
     private static final String API_ENDPOINT_QUERY_FORMAT =
-            "http://apiserver.eventshigh.com:8888/api/events/%s/%s?sortby=popularity&limit=200&mobile=%d";
+            "http://apiserver.eventshigh.com:8888/api/events/%s/%s?limit=200&mobile=%d";
     private static final String API_ENDPOINT_EVENT_UBER_FORMAT =
             "http://apiserver.eventshigh.com:8888/api/get_event_uber_info/%s?mobile=1";
 
@@ -58,18 +58,34 @@ public class EventsHighEndpoints {
         return builder.appendQueryParameter("interest", param.query).build();
     }
 
-    public static String getApiEndpointDate(City city) {
-        return String.format(API_ENDPOINT_DATE_FORMAT,
-                city.toString().toLowerCase(), "this%20week", BuildConfig.VERSION_CODE);
-    }
+    public static String getApiEndpoint(EventsContext eventsContext) throws IllegalArgumentException {
+        if (eventsContext.city == null) {
+            throw new IllegalArgumentException("city is not passed");
+        }
 
-    public static String getApiEndpointQuery(City city, String query) throws UnsupportedEncodingException {
-        if (isDateQuery(query)) {
+        if (eventsContext.query.isEmpty()) {
             return String.format(API_ENDPOINT_DATE_FORMAT,
-                    city.toString().toLowerCase(), URLEncoder.encode(query, "UTF-8"), BuildConfig.VERSION_CODE);
-        } else {
-            return String.format(API_ENDPOINT_QUERY_FORMAT,
-                    city.toString().toLowerCase(), URLEncoder.encode(query, "UTF-8"), BuildConfig.VERSION_CODE);
+                    eventsContext.city.toString().toLowerCase(),
+                    eventsContext.dateFilter.isEmpty() ? "this%20week" : eventsContext.dateFilter,
+                    BuildConfig.VERSION_CODE);
+        }
+
+        try {
+            if (isDateQuery(eventsContext.query)) {
+                return String.format(API_ENDPOINT_DATE_FORMAT,
+                        eventsContext.city.toString().toLowerCase(),
+                        URLEncoder.encode(eventsContext.query, "UTF-8"), BuildConfig.VERSION_CODE);
+            }
+
+            String url = String.format(API_ENDPOINT_QUERY_FORMAT,
+                        eventsContext.city.toString().toLowerCase(),
+                        URLEncoder.encode(eventsContext.query, "UTF-8"), BuildConfig.VERSION_CODE);
+            if (eventsContext.dateFilter.isEmpty()) {
+                url += "&date=" + eventsContext.dateFilter;
+            }
+            return url;
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 

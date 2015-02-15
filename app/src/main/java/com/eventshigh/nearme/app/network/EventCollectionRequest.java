@@ -10,8 +10,8 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsCollection;
+import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -42,15 +42,11 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         }
 
         String url;
-        if (eventsContext.query.isEmpty()) {
-            url = EventsHighEndpoints.getApiEndpointDate(eventsContext.city);
-        } else {
-            try {
-                url = EventsHighEndpoints.getApiEndpointQuery(eventsContext.city, eventsContext.query);
-            } catch (UnsupportedEncodingException e) {
-                errorListener.onErrorResponse(new VolleyError("Invalid Query", e));
-                return;
-            }
+        try {
+            url = EventsHighEndpoints.getApiEndpoint(eventsContext);
+        } catch (IllegalArgumentException e) {
+            errorListener.onErrorResponse(new VolleyError("Invalid Query", e));
+            return;
         }
 
         EventCollectionRequest request = new EventCollectionRequest(
