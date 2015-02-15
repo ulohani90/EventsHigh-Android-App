@@ -44,7 +44,9 @@ import com.google.android.gms.location.LocationServices;
 public class LaunchActivity extends BaseActivity {
 
     // Constants
-    private static String[] EXPLORE_TAGS = { "Parties", "Health & Wellness", "Tech",
+    private static final int MIN_WIDTH_EXPLORE_CARD_DP = 120;
+    private static final int MAX_EXPLORE_CARD_IN_ROW = 5;
+    private static final String[] EXPLORE_TAGS = { "Parties", "Health & Wellness", "Tech",
             "Education", "Theatre", "Outdoors", "Kids", "Dance", "Shopping", "Food", "Literature",
             "Film", "Social Causes", "Environment", "Sports", "Spiritual", "Comedy", "Fashion"};
 
@@ -72,15 +74,19 @@ public class LaunchActivity extends BaseActivity {
         ListView citySelector = (ListView) findViewById(R.id.city_selector);
         citySelector.setAdapter(new CityListAdapter());
 
+        int widthPixels = getResources().getDisplayMetrics().widthPixels;
+        int numColumns = Math.min(widthPixels / Utils.dpToPx(this, MIN_WIDTH_EXPLORE_CARD_DP),
+                MAX_EXPLORE_CARD_IN_ROW);
+        int size = widthPixels / numColumns;
         LinearLayout exploreLayout = (LinearLayout) findViewById(R.id.explore_layout);
-        LinearLayout last = null;
+        LinearLayout last = new LinearLayout(this);
         for (int i = 0; i < EXPLORE_TAGS.length; i++) {
-            if (i % 3 == 0) {
+            if (i % numColumns == 0) {
                 last = new LinearLayout(this);
                 exploreLayout.addView(last);
             }
 
-            last.addView(getExploreCard(EXPLORE_TAGS[i], last));
+            last.addView(getExploreCard(EXPLORE_TAGS[i], size, last));
         }
 
         // Set defaults for preferences.
@@ -282,9 +288,9 @@ public class LaunchActivity extends BaseActivity {
         return client != null && (client.isConnected() || client.isConnecting());
     }
 
-    private View getExploreCard(final String tagName, ViewGroup parent) {
+    private View getExploreCard(final String tagName, int size, ViewGroup parent) {
         final View view = getLayoutInflater().inflate(R.layout.explore_card, parent, false);
-        view.setLayoutParams(new LayoutParams(Utils.dpToPx(this, 100), LayoutParams.MATCH_PARENT, 1));
+        view.setLayoutParams(new LayoutParams(size, size));
         ((TextView) view.findViewById(R.id.explore_name)).setText(tagName);
         ((ImageView) view.findViewById(R.id.explore_image)).setImageResource(
                 getInfoGraphId(tagName));
@@ -294,15 +300,6 @@ public class LaunchActivity extends BaseActivity {
             public void onClick(View v) {
                 eventsContext.query = tagName;
                 showNextScreen(true);
-            }
-        });
-
-        Utils.waitForViewVisible(view, new Runnable() {
-            @Override
-            public void run() {
-                LayoutParams lp = (LayoutParams) view.getLayoutParams();
-                lp.height = lp.width;
-                view.setLayoutParams(lp);
             }
         });
         return view;

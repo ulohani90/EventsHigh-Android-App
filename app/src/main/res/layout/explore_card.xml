@@ -1,30 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                                    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="match_parent"
+    card_view:cardCornerRadius="2dp"
+    tools:layout_width="120dp"
+    tools:layout_height="120dp"
 >
-    <ImageView
-        android:id="@+id/explore_image"
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                 xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        tools:src="@drawable/infograph_music"
-    />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/shape_film"
-    />
-    <TextView
-        style="@android:style/TextAppearance.Small"
-        android:id="@+id/explore_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:layout_gravity="bottom"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        tools:text="Music"
-    />
-</FrameLayout>
+    >
+        <ImageView
+            android:id="@+id/explore_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/infograph_music"
+        />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/shape_film"
+        />
+        <TextView
+            style="@android:style/TextAppearance.Small"
+            android:id="@+id/explore_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_gravity="bottom"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            tools:text="Music"
+        />
+    </FrameLayout>
+</android.support.v7.widget.CardView>
