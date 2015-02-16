@@ -52,9 +52,9 @@ public class EventsContext implements Parcelable {
 
     @Override
     public String toString() {
-        return tabName + query + " events" +
+        return (tabName + " " + query + " events" +
                 (city == null ? " near you" : " in " + city.toString().toLowerCase()) +
-                (dateFilter.isEmpty() ? "" : " on " + dateFilter);
+                (dateFilter.isEmpty() ? "" : " on " + dateFilter)).trim();
     }
 
     @Override
