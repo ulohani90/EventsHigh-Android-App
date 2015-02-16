@@ -63,7 +63,7 @@ public class LaunchActivity extends BaseActivity {
     private GcmRegistration gcmRegistration;
 
     // Context for next activity.
-    private EventsContext eventsContext = null;
+    private EventsContext eventsContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,33 +73,9 @@ public class LaunchActivity extends BaseActivity {
         setContentView(R.layout.activity_launch);
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
 
-        ListView citySelector = (ListView) findViewById(R.id.city_selector);
-        citySelector.setAdapter(new CityListAdapter());
-
-        int widthPixels = getResources().getDisplayMetrics().widthPixels;
-        int numColumns = Math.min(widthPixels / Utils.dpToPx(this, MIN_WIDTH_EXPLORE_CARD_DP),
-                MAX_EXPLORE_CARD_IN_ROW);
-        int size = widthPixels / numColumns;
-        LinearLayout exploreLayout = (LinearLayout) findViewById(R.id.explore_layout);
-        LinearLayout last = new LinearLayout(this);
-        for (int i = 0; i < EXPLORE_TAGS.length; i++) {
-            if (i % numColumns == 0) {
-                last = new LinearLayout(this);
-                exploreLayout.addView(last);
-            }
-
-            last.addView(getExploreCard(EXPLORE_TAGS[i], size, last));
-        }
-
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
-    }
-
-    @Override
-    public void onNewIntent(Intent intent) {
-        eventsContext = IntentUtils.processIntent(this, intent);
-        showNextScreen(false);
     }
 
     public void onStart() {
@@ -121,10 +97,17 @@ public class LaunchActivity extends BaseActivity {
         // We show the onboarding If this is first activity and there was no
         // location/query passed through intent.
         eventsContext = IntentUtils.processIntent(this, getIntent());
-        if (eventsContext.location == null && eventsContext.query.isEmpty() && pref.shouldShowOnBoarding()) {
-            startActivity(new Intent(this, OnBoardingActivity.class));
-            finish();
-            return;
+        if (eventsContext.location == null && eventsContext.query.isEmpty()) {
+            if (pref.shouldShowOnBoarding()) {
+                startActivity(new Intent(this, OnBoardingActivity.class));
+                finish();
+                return;
+            }
+
+            if (!isTaskRoot()) {
+                finish();
+                return;
+            }
         }
 
         // Register with GCM if needed. GCM is used for notifications messages.
@@ -189,6 +172,8 @@ public class LaunchActivity extends BaseActivity {
             // select the city.
             reportActionToAnalytics("locationFailed");
             viewSwitcher.setDisplayedChild(1);
+            ListView citySelector = (ListView) findViewById(R.id.city_selector);
+            citySelector.setAdapter(new CityListAdapter());
             if (connectionResult != null) {
                 Toast.makeText(LaunchActivity.this, R.string.failed_location, Toast.LENGTH_SHORT).show();
             }
@@ -220,7 +205,6 @@ public class LaunchActivity extends BaseActivity {
     private void showNextScreen(boolean isUserAction) {
         // If we do not have user city, use GoogleLocation api to get user location.
         if (eventsContext.city == null) {
-            disconnectClient();
             client = new GoogleApiClient.Builder(this)
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(mConnectionCallbacks)
@@ -232,7 +216,7 @@ public class LaunchActivity extends BaseActivity {
 
         // If we do not have query, show explore screen.
         if (!isUserAction && eventsContext.query.isEmpty()) {
-            viewSwitcher.setDisplayedChild(0);
+            showExploreScreen();
             return;
         }
 
@@ -244,6 +228,24 @@ public class LaunchActivity extends BaseActivity {
         startActivity(outIntent);
         if (!isUserAction) {
             finish();
+        }
+    }
+
+    private void showExploreScreen() {
+        viewSwitcher.setDisplayedChild(0);
+        int widthPixels = getResources().getDisplayMetrics().widthPixels;
+        int numColumns = Math.min(widthPixels / Utils.dpToPx(this, MIN_WIDTH_EXPLORE_CARD_DP),
+                MAX_EXPLORE_CARD_IN_ROW);
+        int size = widthPixels / numColumns;
+        LinearLayout exploreLayout = (LinearLayout) findViewById(R.id.explore_layout);
+        LinearLayout last = new LinearLayout(this);
+        for (int i = 0; i < EXPLORE_TAGS.length; i++) {
+            if (i % numColumns == 0) {
+                last = new LinearLayout(this);
+                exploreLayout.addView(last);
+            }
+
+            last.addView(getExploreCard(EXPLORE_TAGS[i], size, last));
         }
     }
 
@@ -271,27 +273,6 @@ public class LaunchActivity extends BaseActivity {
         }
     }
 
-    private static int getInfoGraphId(String tag) {
-        try {
-            return R.drawable.class.getField("infograph_" +
-                    EventCategory.toCategoryParsableString(tag).toLowerCase()).getInt(null);
-        } catch (IllegalAccessException| NoSuchFieldException e) {
-            // Ignore
-        }
-
-        return R.drawable.eh_default_event_list;
-    }
-
-    private void disconnectClient() {
-        if (isClientConnecting()) {
-            client.disconnect();
-        }
-    }
-
-    private boolean isClientConnecting() {
-        return client != null && (client.isConnected() || client.isConnecting());
-    }
-
     private View getExploreCard(final String tagName, int size, ViewGroup parent) {
         final View view = getLayoutInflater().inflate(R.layout.explore_card, parent, false);
         view.setLayoutParams(new LayoutParams(size, size));
@@ -307,5 +288,16 @@ public class LaunchActivity extends BaseActivity {
             }
         });
         return view;
+    }
+
+    private static int getInfoGraphId(String tag) {
+        try {
+            return R.drawable.class.getField("infograph_" +
+                    EventCategory.toCategoryParsableString(tag).toLowerCase()).getInt(null);
+        } catch (IllegalAccessException| NoSuchFieldException e) {
+            // Ignore
+        }
+
+        return R.drawable.eh_default_event_list;
     }
 }
