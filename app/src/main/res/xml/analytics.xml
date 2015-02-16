@@ -12,6 +12,7 @@
     <screenName name="com.eventshigh.nearme.app.activity.BookTicketActivity">BookTicket</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.OnBoardingActivity">OnBoarding</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.ShareAppActivity">ShareApp</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.PhoneLoginActivity">PhoneLogin</screenName>
     <screenName name="com.eventshigh.nearme.app.settings.SettingsActivity">Settings</screenName>
     <screenName name="com.eventshigh.nearme.app.settings.AboutUsActivity">AboutUs</screenName>
 

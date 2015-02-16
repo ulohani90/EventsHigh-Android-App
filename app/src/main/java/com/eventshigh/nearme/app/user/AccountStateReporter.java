@@ -12,7 +12,6 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.eventshigh.nearme.app.broadcast.InstallReferrer;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
@@ -25,44 +24,44 @@ import java.security.GeneralSecurityException;
  */
 public class AccountStateReporter {
 
-    public static boolean reportReferrer(Context context, String referrer) {
-        return sendSignedRequest(context, getBaseUri(context, "reportReferrer")
+    public static void reportReferrer(Context context, String referrer, Runnable onSuccess) {
+        sendSignedRequest(context, getBaseUri(context, "reportReferrer")
             .appendQueryParameter("referrer", referrer)
-            .build());
+            .build(), onSuccess);
     }
 
-    public static boolean reportReferrerCode(Context context, String referrerCode) {
-        return sendSignedRequest(context, getBaseUri(context, "reportReferrerId")
+    public static void reportReferrerCode(Context context, String referrerCode, Runnable onSuccess) {
+        sendSignedRequest(context, getBaseUri(context, "reportReferrerId")
                 .appendQueryParameter("referrer_id", referrerCode)
-                .build());
+                .build(), onSuccess);
     }
 
-    public static boolean reportFacebookEmail(Context context, String facebookEmail) {
-        return sendSignedRequest(context, getBaseUri(context, "reportFbEmailId")
+    public static void reportFacebookEmail(Context context, String facebookEmail, Runnable onSuccess) {
+        sendSignedRequest(context, getBaseUri(context, "reportFbEmailId")
                 .appendQueryParameter("fb_email_id", facebookEmail)
-                .build());
+                .build(), onSuccess);
     }
 
-    public static boolean reportGcmRegistrationId(Context context, String gcmRegistationId) {
-        return sendSignedRequest(context, getBaseUri(context, "reportGcmRegistationId")
+    public static void reportGcmRegistrationId(Context context, String gcmRegistationId, Runnable onSuccess) {
+        sendSignedRequest(context, getBaseUri(context, "reportGcmRegistationId")
                 .appendQueryParameter("gcm_registration_id", gcmRegistationId)
-                .build());
+                .build(), onSuccess);
     }
 
-    public static boolean reportLastCity(Context context, City city) {
-        return sendSignedRequest(context, getBaseUri(context, "reportLastCity")
+    public static void reportLastCity(Context context, City city, Runnable onSuccess) {
+        sendSignedRequest(context, getBaseUri(context, "reportLastCity")
                 .appendQueryParameter("last_city", city.toString())
-                .build());
+                .build(), onSuccess);
     }
 
-    private static boolean sendSignedRequest(Context context, Uri uri) {
+    private static void sendSignedRequest(Context context, Uri uri, final Runnable onSuccess) {
         try {
             VolleyHelper.addToRequestQueue(context,
                     new StringRequest(Method.GET, Signer.sign(uri).toString(),
                             new Listener<String>() {
                                 @Override
                                 public void onResponse(String s, boolean isIntermediate) {
-                                    // do nothing.
+                                    onSuccess.run();
                                 }
                             },
                             new ErrorListener() {
@@ -73,10 +72,8 @@ public class AccountStateReporter {
                             }
                     )
             );
-            return true;
         } catch (IOException | GeneralSecurityException e) {
-            Log.w(InstallReferrer.class.getSimpleName(), "Failed to report referrerId", e);
-            return false;
+            Log.w(AccountStateReporter.class.getSimpleName(), "Failed to sendSignedRequest: " + uri, e);
         }
     }
 

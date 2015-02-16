@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.util.Pair;
 
 import com.android.volley.Request;
 import com.android.volley.Response.ErrorListener;
@@ -26,9 +27,8 @@ public class Account {
     // Constants used for SharedPreferences.
     private static final String PREFS_FILE_NAME = "eh_user_credentials";
 
-    private static final String PREF_PHONE_NO = "phone_no";
-    private static final String PREF_NUM_LOGIN_ATTEMPTS = "num_login_attempts";
-    private static final String PREF_ASK_LOGIN = "ask_login";
+    private static final String PREF_MOBILE_NO = "mobile_no";
+    private static final String PREF_MOBILE_NO_VERIFIED = "mobile_no_verified";
 
     // The referrer for this user. this user installed the app via this referrer.
     private static final String PREF_REFERRER = "referrer";
@@ -42,9 +42,6 @@ public class Account {
     private static final String PREF_FACEBOOK_EMAIL = "facebook_email";
     private static final String PREF_FACEBOOK_EMAIL_UPLOADED = "facebook_email_uploaded";
 
-    // Constant used to skip the login screen if there are too many failed login attempts
-    private static final int NUM_MAX_LOGIN_ATTEMPT = 3;
-
     // Member variables used to store the user account details in preferences.
     private final Context context;
     private final SharedPreferences accountInfo;
@@ -57,33 +54,22 @@ public class Account {
         new AccountStateRegistar().execute();
     }
 
-    public boolean shouldAskForLogin() {
-        return accountInfo.getBoolean(PREF_ASK_LOGIN, true);
+    public Pair<String, Boolean> getPhoneNumber() {
+        return Pair.create(accountInfo.getString(PREF_MOBILE_NO, null),
+                accountInfo.getBoolean(PREF_MOBILE_NO_VERIFIED, false));
     }
 
-    public boolean recordLoginFailure() {
-        boolean tooManyFailures = false;
-        int numFailedLogin = accountInfo.getInt(PREF_NUM_LOGIN_ATTEMPTS, 0) + 1;
+    public void recordPhoneNumber(String phoneNumber) {
         SharedPreferences.Editor editor = accountInfo.edit();
-        editor.putInt(PREF_NUM_LOGIN_ATTEMPTS, numFailedLogin);
-        if (numFailedLogin >= NUM_MAX_LOGIN_ATTEMPT) {
-            tooManyFailures = true;
-            editor.putBoolean(PREF_ASK_LOGIN, false);
-        }
-        editor.apply();
-
-        return tooManyFailures;
-    }
-
-    public void recordLoginSuccess(String phoneNumber) {
-        SharedPreferences.Editor editor = accountInfo.edit();
-        editor.putString(PREF_PHONE_NO, phoneNumber);
-        editor.putBoolean(PREF_ASK_LOGIN, false);
+        editor.putString(PREF_MOBILE_NO, phoneNumber);
+        editor.remove(PREF_MOBILE_NO_VERIFIED);
         editor.apply();
     }
 
-    public void recordSkipLogin() {
-        accountInfo.edit().putBoolean(PREF_ASK_LOGIN, false).apply();
+    public void recordVerifiedPhoneNumber() {
+        SharedPreferences.Editor editor = accountInfo.edit();
+        editor.putBoolean(PREF_MOBILE_NO_VERIFIED, true);
+        editor.apply();
     }
 
     public boolean recordReferrer(String referrer) {
@@ -166,25 +152,34 @@ public class Account {
 
         private void uploadReferrer(@Nullable String referrer) {
             if (referrer != null) {
-                if (AccountStateReporter.reportReferrer(context, referrer)) {
-                    accountInfo.edit().putBoolean(PREF_REFERRER_UPLOADED, true).apply();
-                }
+                AccountStateReporter.reportReferrer(context, referrer, new Runnable() {
+                    @Override
+                    public void run() {
+                        accountInfo.edit().putBoolean(PREF_REFERRER_UPLOADED, true).apply();
+                    }
+                });
             }
         }
 
         private void uploadReferrerCode(@Nullable String referrerCode) {
             if (referrerCode != null) {
-                if (AccountStateReporter.reportReferrerCode(context, referrerCode)) {
-                    accountInfo.edit().putBoolean(PREF_REFERRER_CODE_UPLOADED, true).apply();
-                }
+                AccountStateReporter.reportReferrerCode(context, referrerCode, new Runnable() {
+                    @Override
+                    public void run() {
+                        accountInfo.edit().putBoolean(PREF_REFERRER_CODE_UPLOADED, true).apply();
+                    }
+                });
             }
         }
 
         private void uploadFacebookEmail(@Nullable String facebookEmail) {
             if (facebookEmail != null) {
-                if (AccountStateReporter.reportFacebookEmail(context, facebookEmail)) {
-                    accountInfo.edit().putBoolean(PREF_REFERRER_CODE_UPLOADED, true).apply();
-                }
+                AccountStateReporter.reportFacebookEmail(context, facebookEmail, new Runnable() {
+                    @Override
+                    public void run() {
+                        accountInfo.edit().putBoolean(PREF_REFERRER_CODE_UPLOADED, true).apply();
+                    }
+                });
             }
         }
     }

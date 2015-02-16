@@ -82,9 +82,12 @@ public class GcmRegistration {
             }
 
             if (!gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
-                if (AccountStateReporter.reportLastCity(context, lastCity)) {
-                    gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();
-                }
+                AccountStateReporter.reportLastCity(context, lastCity, new Runnable() {
+                        @Override
+                        public void run() {
+                            gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();
+                        }
+                    });
             }
             return null;
         }
@@ -127,9 +130,12 @@ public class GcmRegistration {
 
             if (registrationId != null &&
                 !gcmRegistrationInfo.getBoolean(PREF_REGISTRATION_ID_UPLOADED, false)) {
-                if (AccountStateReporter.reportGcmRegistrationId(context, registrationId)) {
-                    gcmRegistrationInfo.edit().putBoolean(PREF_REGISTRATION_ID_UPLOADED, true).apply();
-                }
+                AccountStateReporter.reportGcmRegistrationId(context, registrationId, new Runnable() {
+                    @Override
+                    public void run() {
+                        gcmRegistrationInfo.edit().putBoolean(PREF_REGISTRATION_ID_UPLOADED, true).apply();
+                    }
+                });
             }
 
             return null;

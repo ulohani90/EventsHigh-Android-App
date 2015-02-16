@@ -27,13 +27,11 @@ import java.util.List;
  */
 public class FacebookLoginActivity extends BaseActivity {
     private static final List<String> PERMISSIONS = Arrays.asList("email", "public_profile");
-    public static final String PARAM_ONBOARDING = "onboarding";
 
     private TextView connectMessageView;
     private TextView skipView;
     private LoginButton authButton;
     private UiLifecycleHelper uiHelper;
-    private boolean isOnBoarding;
     private boolean isConnected = false;
 
     @Override
@@ -49,8 +47,6 @@ public class FacebookLoginActivity extends BaseActivity {
             public void onClick(View v) {
                 if (!isConnected) {
                     reportActionToAnalytics("skipLogin");
-                    Account account = new Account(getApplicationContext());
-                    account.recordSkipLogin();
                 }
                 up();
             }
@@ -108,12 +104,6 @@ public class FacebookLoginActivity extends BaseActivity {
     }
 
     @Override
-    public void onNewIntent(Intent intent) {
-        isOnBoarding = intent.hasExtra(PARAM_ONBOARDING);
-        setTheme(isOnBoarding ? R.style.NoActionBar : R.style.AppTheme);
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         uiHelper.onActivityResult(requestCode, resultCode, data);
@@ -138,9 +128,6 @@ public class FacebookLoginActivity extends BaseActivity {
     }
 
     private void up() {
-        if (isOnBoarding) {
-            startActivity(new Intent(FacebookLoginActivity.this, LaunchActivity.class));
-        }
         finish();
     }
 
@@ -176,9 +163,6 @@ public class FacebookLoginActivity extends BaseActivity {
                         isConnected = true;
                         skipView.setText(R.string.action_done);
                         connectMessageView.setText("Logged in as " + email);
-                        if (isOnBoarding) {
-                            up();
-                        }
                     }
                 }).executeAsync();
             } else {

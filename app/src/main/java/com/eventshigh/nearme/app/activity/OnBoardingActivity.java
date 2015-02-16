@@ -133,12 +133,10 @@ public class OnBoardingActivity extends BaseActivity {
     }
 
     /**
-     * Starts the {@link com.eventshigh.nearme.app.activity.FacebookLoginActivity} and finishes this activity.
+     * Starts the {@link com.eventshigh.nearme.app.activity.LaunchActivity} and finishes this activity.
      */
     private void getStarted() {
-        reportActionToAnalytics("endOnboarding", Integer.toString(lastPosition));
-        startActivity(new Intent(this, FacebookLoginActivity.class)
-                .putExtra(FacebookLoginActivity.PARAM_ONBOARDING, true));
+        startActivity(new Intent(this, LaunchActivity.class));
         finish();
     }
 
