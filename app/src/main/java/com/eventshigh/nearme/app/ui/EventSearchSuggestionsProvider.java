@@ -9,6 +9,7 @@ import android.database.MergeCursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.SearchRecentSuggestions;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.eventshigh.nearme.app.utils.StreamUtils;
@@ -32,7 +33,7 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs,
                         String sortOrder) {
         Cursor recentsCursor = super.query(uri, projection, selection, selectionArgs, sortOrder);
 

@@ -17,7 +17,6 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.OnEventMarkChangeListener;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
-import com.eventshigh.nearme.app.ui.EventsAdapterWrapper;
 import com.eventshigh.nearme.app.view.GridViewAnimator;
 
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
         super.onViewCreated(view, savedInstanceState);
 
         RecyclerView eventGridView = (RecyclerView) view.findViewById(R.id.event_grid);
-        eventGridView.setAdapter(new EventsAdapterWrapper(eventsAdapter));
+        eventGridView.setAdapter(eventsAdapter);
         eventGridView.setItemAnimator(new GridViewAnimator(eventsAdapter));
 
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
