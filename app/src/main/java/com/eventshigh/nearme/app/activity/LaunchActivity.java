@@ -8,7 +8,11 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.widget.SearchView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,6 +56,7 @@ import java.util.Calendar;
 public class LaunchActivity extends BaseActivity {
 
     // Constants
+    private static final int MAX_FEATURED_EVENTS = 5;
     private static final int MIN_WIDTH_EXPLORE_CARD_DP = 120;
     private static final int MAX_EXPLORE_CARD_IN_ROW = 5;
     private static final String[] EXPLORE_TAGS = { "Parties", "Health & Wellness", "Tech",
@@ -262,22 +267,70 @@ public class LaunchActivity extends BaseActivity {
         }
     }
 
+    private boolean exploreScreenPopulated = false;
     private void showExploreScreen() {
         viewSwitcher.setDisplayedChild(0);
-        int widthPixels = getResources().getDisplayMetrics().widthPixels;
-        int numColumns = Math.min(widthPixels / Utils.dpToPx(this, MIN_WIDTH_EXPLORE_CARD_DP),
-                MAX_EXPLORE_CARD_IN_ROW);
-        int size = widthPixels / numColumns;
-        LinearLayout exploreLayout = (LinearLayout) findViewById(R.id.explore_layout);
-        LinearLayout last = new LinearLayout(this);
-        for (int i = 0; i < EXPLORE_TAGS.length; i++) {
-            if (i % numColumns == 0) {
-                last = new LinearLayout(this);
-                exploreLayout.addView(last);
+
+        if (!exploreScreenPopulated) {
+            int spacing = Utils.dpToPx(this, 4);
+            int widthPixels = getResources().getDisplayMetrics().widthPixels;
+            int numColumns = Math.min(widthPixels / Utils.dpToPx(this, MIN_WIDTH_EXPLORE_CARD_DP),
+                    MAX_EXPLORE_CARD_IN_ROW);
+            int size = (widthPixels - spacing * numColumns * 2) / numColumns;
+            LayoutParams lp = new LayoutParams(size, size);
+            lp.setMargins(spacing, spacing, spacing, spacing);
+
+            LinearLayout exploreLayout = (LinearLayout) findViewById(R.id.explore_layout);
+            LinearLayout last = new LinearLayout(this);
+            for (int i = 0; i < EXPLORE_TAGS.length; i++) {
+                if (i % numColumns == 0) {
+                    last = new LinearLayout(this);
+                    exploreLayout.addView(last);
+                }
+
+                last.addView(getExploreCard(EXPLORE_TAGS[i], lp, last));
             }
 
-            last.addView(getExploreCard(EXPLORE_TAGS[i], size, last));
+            exploreScreenPopulated = true;
         }
+
+        // Populated Featured Events.
+        int dp4 = Utils.dpToPx(this, 4);
+        int dp8 = Utils.dpToPx(this, 8);
+        int dp12 = Utils.dpToPx(this, 12);
+        final LayoutParams smallDotLayoutParams = new LayoutParams(dp8, dp8);
+        smallDotLayoutParams.setMargins(dp4, dp4, dp4, dp4);
+        final LayoutParams bigDotLayoutParams = new LayoutParams(dp12, dp12);
+        bigDotLayoutParams.setMargins(dp4, dp4, dp4, dp4);
+
+        final LinearLayout dotsView = (LinearLayout) findViewById(R.id.dots_parent);
+        dotsView.removeAllViews();
+        LayoutInflater layoutInflater = getLayoutInflater();
+        for (int i = 0; i < MAX_FEATURED_EVENTS; i++) {
+            View view = layoutInflater.inflate(R.layout.viewpager_dot, dotsView, false);
+            dotsView.addView(view);
+            view.setLayoutParams(i == 0 ? bigDotLayoutParams : smallDotLayoutParams);
+        }
+        ViewPager featuredEventsPager = (ViewPager) findViewById(R.id.featured_events_pager);
+        featuredEventsPager.setAdapter(mFeaturedEventsAdapter);
+        featuredEventsPager.setOnPageChangeListener(new OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                // do nothing.
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                for (int i = 0; i < dotsView.getChildCount(); i++) {
+                    dotsView.getChildAt(i).setLayoutParams( i == position ? bigDotLayoutParams : smallDotLayoutParams);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                // do nothing.
+            }
+        });
     }
 
     private class CityListAdapter extends ArrayAdapter<City> {
@@ -304,9 +357,9 @@ public class LaunchActivity extends BaseActivity {
         }
     }
 
-    private View getExploreCard(final String tagName, int size, ViewGroup parent) {
+    private View getExploreCard(final String tagName, LayoutParams lp, ViewGroup parent) {
         final View view = getLayoutInflater().inflate(R.layout.explore_card, parent, false);
-        view.setLayoutParams(new LayoutParams(size, size));
+        view.setLayoutParams(lp);
         ((TextView) view.findViewById(R.id.explore_name)).setText(tagName);
         ((ImageView) view.findViewById(R.id.explore_image)).setImageResource(
                 getInfoGraphId(tagName));
@@ -331,4 +384,30 @@ public class LaunchActivity extends BaseActivity {
 
         return R.drawable.eh_default_event_list;
     }
+
+    private PagerAdapter mFeaturedEventsAdapter = new PagerAdapter() {
+        @Override
+        public int getCount() {
+            return MAX_FEATURED_EVENTS;
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            TextView view = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, container, false);
+            view.setText("Featured: " + position);
+            container.addView(view);
+            return view;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);
+        }
+    };
+
 }

@@ -4,6 +4,7 @@
     <!-- Title -->
     <string name="app_name">EventsHigh Beta</string>
     <string name="title_book">Book Ticket</string>
+    <string name="title_explore">Explore</string>
 
     <!-- Actions -->
     <string name="action_skip">Skip</string>
@@ -23,8 +24,6 @@
     <string name="menu_refresh">Refresh</string>
 
     <!-- Other Strings used in UI -->
-    <string name="ui_explore">Explore</string>
-    <string name="ui_featured_event">Featured Events</string>
     <string name="ui_favourite">Favourite</string>
     <string name="ui_today">Today</string>
     <string name="ui_tomorrow">Tomorrow</string>

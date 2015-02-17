@@ -18,33 +18,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
         >
-            <TextView
-                style="@android:style/TextAppearance.Large"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/app_color"
-                android:text="@string/ui_featured_event"
-                android:gravity="center"
-                android:padding="8dp"
-                android:elevation="4dp"
-                tools:ignore="UnusedAttribute"
-            />
-            <ImageView
+            <android.support.v4.view.ViewPager
+                android:id="@+id/featured_events_pager"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:scaleType="centerCrop"
-                tools:src="@drawable/eh_logo_with_text"
             />
-            <TextView
-                style="@android:style/TextAppearance.Large"
+            <LinearLayout
+                android:id="@+id/dots_parent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/app_color"
-                android:text="@string/ui_explore"
                 android:gravity="center"
-                android:padding="8dp"
-                android:elevation="4dp"
-                tools:ignore="UnusedAttribute"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp"
             />
             <LinearLayout
                 android:layout_width="match_parent"

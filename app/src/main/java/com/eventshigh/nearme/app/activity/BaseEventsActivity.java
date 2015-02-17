@@ -37,6 +37,7 @@ import com.eventshigh.nearme.app.data.EventsCollection.EventTab;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
+import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
@@ -384,6 +385,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         viewSwitcher.setDisplayedChild(0);
         topProgressBar.setVisibility(View.VISIBLE);
 
+        // Stop all requests associated with this activity and then submit new request.
+        VolleyHelper.getRequestQueue(getApplicationContext()).cancelAll(this);
         EventCollectionRequest.submit(this, eventsContext, Priority.IMMEDIATE,
                 shouldBypassCache, mEventsFetcherCallBack, mErrorListener);
     }
