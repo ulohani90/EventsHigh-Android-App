@@ -42,6 +42,10 @@
     <string name="ui_fb_promiss">We never post on your behalf. We just use it to provide personalized event recommendations.</string>
     <string name="ui_referrer_default">Share the joy of attending amazing events!</string>
     <string name="ui_referrer">You have helped {0,choice,1#one friend|1&lt;{0} friends} in finding amazing events, thank you!</string>
+    <string name="ui_phone_no">Phone No</string>
+    <string name="ui_code">Code</string>
+    <string name="ui_send_code">Send Code</string>
+    <string name="ui_verify_code">Verify Code</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>
@@ -77,6 +81,7 @@
     <string name="no_map_app">Maps application not found!</string>
     <string name="no_cal_app">Calendar application not found!</string>
     <string name="no_events">No events found!</string>
+    <string name="retry">Something went wrong. Please retry.</string>
 
     <!-- formatting -->
     <plurals name="people_interested">

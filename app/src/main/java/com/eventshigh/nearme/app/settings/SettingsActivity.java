@@ -149,6 +149,12 @@ public class SettingsActivity extends PreferenceActivity {
         // Add 'general' preferences.
         addPreferencesFromResource(R.xml.pref_general);
 
+        // Add 'account' preferences.
+        PreferenceCategory accountHeader = new PreferenceCategory(this);
+        accountHeader.setTitle(R.string.pref_header_account);
+        getPreferenceScreen().addPreference(accountHeader);
+        addPreferencesFromResource(R.xml.pref_account);
+
         // Add 'notifications' preferences, and a corresponding header.
         PreferenceCategory notificationHeader = new PreferenceCategory(this);
         notificationHeader.setTitle(R.string.pref_header_notifications);

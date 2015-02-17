@@ -33,7 +33,7 @@ public class PhoneLoginActivity extends BaseActivity {
         VERIFIED,
         CODE_SENT,
         RETRY
-    };
+    }
 
     private Account account;
     private EditText phoneNoView;
@@ -87,7 +87,7 @@ public class PhoneLoginActivity extends BaseActivity {
                                     if (status == VerificationStatus.VERIFIED) {
                                         account.recordVerifiedPhoneNumber();
                                         setVerifiedMobileNoView();
-                                    } else {
+                                    } else if (status == VerificationStatus.CODE_SENT) {
                                         setRequestCodeView();
                                     }
                                 }
@@ -140,7 +140,7 @@ public class PhoneLoginActivity extends BaseActivity {
     }
 
     private void retry() {
-        Toast.makeText(this, "retry", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.retry, Toast.LENGTH_SHORT).show();
     }
 
     private VerificationStatus parseStatus(@Nullable String statusString) {

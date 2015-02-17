@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
@@ -13,26 +14,6 @@
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.ShareAppActivity"
-        />
-    </Preference>
-    <Preference android:title="@string/pref_title_facebook">
-        <intent
-            android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.FacebookLoginActivity"
-        />
-    </Preference>
-    <Preference android:title="@string/pref_title_delete_query_history">
-        <intent
-            android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.settings.SettingsActivity"
-            android:action="com.eventshigh.delete_query_history"
-        />
-    </Preference>
-    <Preference android:title="@string/pref_title_restore_event">
-        <intent
-            android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.settings.SettingsActivity"
-            android:action="com.eventshigh.restore_events"
         />
     </Preference>
     <Preference android:title="@string/pref_title_about_us">

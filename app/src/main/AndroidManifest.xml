@@ -343,7 +343,7 @@
         </activity>
         <activity
             android:name=".activity.PhoneLoginActivity"
-            android:label="Verify Mobile No"
+            android:label="@string/pref_title_phone_no"
             android:screenOrientation="portrait"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTask"

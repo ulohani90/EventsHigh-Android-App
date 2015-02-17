@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      xmlns:myApp="http://schemas.android.com/apk/res-auto"
+      tools:context=".activity.LaunchActivity"
+>
+    <item android:id="@+id/action_search"
+          android:title="@string/abc_searchview_description_search"
+          android:icon="@drawable/ic_search_white_36dp"
+          android:orderInCategory="10"
+          myApp:showAsAction="ifRoom|collapseActionView"
+          myApp:actionViewClass="android.support.v7.widget.SearchView"
+    />
+    <item android:id="@+id/action_settings"
+          android:title="@string/title_activity_settings"
+          android:icon="@drawable/ic_settings_white_36dp"
+          android:orderInCategory="20"
+          myApp:showAsAction="ifRoom"
+    />
+</menu>
