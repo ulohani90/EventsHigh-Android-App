@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                                    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="4dp"
+    android:layout_margin="8dp"
+    android:elevation="4dp"
+    card_view:cardCornerRadius="10dp"
+    tools:layout_height="120dp"
+    tools:ignore="UnusedAttribute"
+>
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/event_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="false"
+        android:background="@drawable/shape_film"
+        tools:src="@drawable/infograph_music"
+    />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/shape_film"
+    />
+    <TextView
+        style="@android:style/TextAppearance.Medium"
+        android:id="@+id/event_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        tools:text="This is example of event title"
+    />
+</android.support.v7.widget.CardView>
