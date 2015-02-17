@@ -137,15 +137,12 @@ public class EventsCollection {
             }
             **/
 
-            // Temporary: Do not show Today tab.
-            /**
             // See if this events is happening today.
             if (showToday &&
                 event.eventTimings.length > 0 &&
                 event.eventTimings[0] < tomorrowMidnightTimestamp) {
                 addEvent(EventTab.TODAY, event);
             }
-            **/
 
             if (! whiteListedTagCategories.isEmpty()) {
                 for (String tag : event.tags) {

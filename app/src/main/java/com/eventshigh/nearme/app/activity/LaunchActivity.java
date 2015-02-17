@@ -250,6 +250,12 @@ public class LaunchActivity extends BaseActivity {
             return;
         }
 
+        // TEMPORARY: Show date filter as query.
+        if (!eventsContext.dateFilter.isEmpty()) {
+            eventsContext.query = eventsContext.dateFilter;
+            eventsContext.dateFilter = "";
+        }
+
         // If we do not have query, show explore screen.
         if (!isUserAction && eventsContext.query.isEmpty()) {
             showExploreScreen();
