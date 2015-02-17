@@ -5,9 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="4dp"
+    android:elevation="4dp"
     card_view:cardCornerRadius="10dp"
     tools:layout_width="120dp"
     tools:layout_height="120dp"
+    tools:ignore="UnusedAttribute"
 >
     <ImageView
         android:id="@+id/explore_image"
