@@ -23,28 +23,6 @@
     />
     <uses-permission android:name="com.eventshigh.nearme.app.permission.C2D_MESSAGE" />
 
-
-    <!-- Our application is compatible with all screens - except small and ldpi -->
-    <compatible-screens>
-        <screen android:screenSize="normal" android:screenDensity="mdpi" />
-        <screen android:screenSize="normal" android:screenDensity="hdpi" />
-        <screen android:screenSize="normal" android:screenDensity="xhdpi" />
-        <screen android:screenSize="normal" android:screenDensity="213" />
-        <screen android:screenSize="normal" android:screenDensity="480" />
-
-        <screen android:screenSize="large" android:screenDensity="mdpi" />
-        <screen android:screenSize="large" android:screenDensity="hdpi" />
-        <screen android:screenSize="large" android:screenDensity="xhdpi" />
-        <screen android:screenSize="large" android:screenDensity="213" />
-        <screen android:screenSize="large" android:screenDensity="480" />
-
-        <screen android:screenSize="xlarge" android:screenDensity="mdpi" />
-        <screen android:screenSize="xlarge" android:screenDensity="hdpi" />
-        <screen android:screenSize="xlarge" android:screenDensity="xhdpi" />
-        <screen android:screenSize="xlarge" android:screenDensity="213" />
-        <screen android:screenSize="xlarge" android:screenDensity="480" />
-    </compatible-screens>
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
