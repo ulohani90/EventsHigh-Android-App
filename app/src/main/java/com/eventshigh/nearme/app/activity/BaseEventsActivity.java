@@ -233,9 +233,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         // Do not show filterByDate for search.
-        if (EventsHighEndpoints.isDateQuery(eventsContext.query)) {
-            menu.findItem(R.id.action_filter).setVisible(false);
-        }
+        menu.findItem(R.id.action_filter).setVisible(eventsContext.query.isEmpty());
 
         return true;
     }
