@@ -354,9 +354,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     public void showEventDetails(Event event, int position) {
         reportEventAction(event, "showEventDetails", position);
-        Intent detailIntent = new Intent(this, EventDetailActivity.class);
-        detailIntent.putExtra(EventDetailFragment.ARG_EVENT_INFO, event);
-        startActivity(detailIntent);
+        showEventDetails(event);
     }
 
     public void showSearchView(String query) {

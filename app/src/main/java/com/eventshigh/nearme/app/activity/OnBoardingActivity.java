@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -111,13 +110,7 @@ public class OnBoardingActivity extends BaseActivity {
         findViewById(R.id.get_started).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                getStarted();
-            }
-        });
-        findViewById(R.id.skip).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getStarted();
+                finish();
             }
         });
     }
@@ -130,14 +123,6 @@ public class OnBoardingActivity extends BaseActivity {
         // in onStart. If users kills the app or if app crashes for any reasons, we
         // do not show onboarding screen again.
         pref.setShowOnboarding(false);
-    }
-
-    /**
-     * Starts the {@link com.eventshigh.nearme.app.activity.LaunchActivity} and finishes this activity.
-     */
-    private void getStarted() {
-        startActivity(new Intent(this, LaunchActivity.class));
-        finish();
     }
 
 

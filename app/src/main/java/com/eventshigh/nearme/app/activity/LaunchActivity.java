@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,10 +28,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import com.android.volley.Request.Priority;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
+import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.settings.SettingsActivity;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -44,6 +53,7 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.location.LocationServices;
 
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * A placeholder {@link android.app.Activity} which is responsible for launching
@@ -65,6 +75,8 @@ public class LaunchActivity extends BaseActivity {
 
     // UI Elements for this activity.
     private ViewSwitcher viewSwitcher;
+    private LinearLayout dotsView;
+    private ViewPager featuredEventsPager;
 
     // Client to Google api so that we can fetch the user location if
     // its not passed in intent.
@@ -83,6 +95,8 @@ public class LaunchActivity extends BaseActivity {
         // Set View.
         setContentView(R.layout.activity_launch);
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
+        dotsView = (LinearLayout) findViewById(R.id.dots_parent);
+        featuredEventsPager = (ViewPager) findViewById(R.id.featured_events_pager);
 
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
@@ -111,7 +125,6 @@ public class LaunchActivity extends BaseActivity {
         if (eventsContext.location == null && eventsContext.query.isEmpty()) {
             if (pref.shouldShowOnBoarding()) {
                 startActivity(new Intent(this, OnBoardingActivity.class));
-                finish();
                 return;
             }
 
@@ -300,47 +313,20 @@ public class LaunchActivity extends BaseActivity {
             exploreScreenPopulated = true;
         }
 
-        // Populated Featured Events.
-        int dp4 = Utils.dpToPx(this, 4);
-        int dp8 = Utils.dpToPx(this, 8);
-        int dp12 = Utils.dpToPx(this, 12);
-        final LayoutParams smallDotLayoutParams = new LayoutParams(dp8, dp8);
-        smallDotLayoutParams.setMargins(dp4, dp4, dp4, dp4);
-        final LayoutParams bigDotLayoutParams = new LayoutParams(dp12, dp12);
-        bigDotLayoutParams.setMargins(dp4, dp4, dp4, dp4);
-
-        final LinearLayout dotsView = (LinearLayout) findViewById(R.id.dots_parent);
+        // Submit the request to populate Featured Events.
         dotsView.removeAllViews();
-        LayoutInflater layoutInflater = getLayoutInflater();
-        for (int i = 0; i < MAX_FEATURED_EVENTS; i++) {
-            View view = layoutInflater.inflate(R.layout.viewpager_dot, dotsView, false);
-            dotsView.addView(view);
-            view.setLayoutParams(i == 0 ? bigDotLayoutParams : smallDotLayoutParams);
-        }
-        ViewPager featuredEventsPager = (ViewPager) findViewById(R.id.featured_events_pager);
-        featuredEventsPager.setAdapter(mFeaturedEventsAdapter);
-        featuredEventsPager.setOnPageChangeListener(new OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                // do nothing.
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                for (int i = 0; i < dotsView.getChildCount(); i++) {
-                    dotsView.getChildAt(i).setLayoutParams( i == position ? bigDotLayoutParams : smallDotLayoutParams);
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                // do nothing.
-            }
-        });
+        featuredEventsPager.setAdapter(mLoadingAdapter);
+        FeaturedEventsRequest.submit(this, eventsContext, Priority.IMMEDIATE, false, mEventsListener,
+                new ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Toast.makeText(LaunchActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
+                        featuredEventsPager.setVisibility(View.GONE);
+                    }
+                });
     }
 
     private class CityListAdapter extends ArrayAdapter<City> {
-
         public CityListAdapter() {
             super(LaunchActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1);
             addAll(City.values());
@@ -373,6 +359,7 @@ public class LaunchActivity extends BaseActivity {
         view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                reportActionToAnalytics("exploreCategory", tagName);
                 eventsContext.query = tagName;
                 showNextScreen(true);
             }
@@ -391,10 +378,59 @@ public class LaunchActivity extends BaseActivity {
         return R.drawable.eh_default_event_list;
     }
 
-    private PagerAdapter mFeaturedEventsAdapter = new PagerAdapter() {
+    private Listener<List<Event>> mEventsListener = new Listener<List<Event>>() {
+        @Override
+        public void onResponse(final List<Event> events, boolean isIntermediate) {
+            int dp4 = Utils.dpToPx(LaunchActivity.this, 4);
+            int dp8 = Utils.dpToPx(LaunchActivity.this, 8);
+            int dp12 = Utils.dpToPx(LaunchActivity.this, 12);
+            final LayoutParams smallDotLayoutParams = new LayoutParams(dp8, dp8);
+            smallDotLayoutParams.setMargins(dp4, dp4, dp4, dp4);
+            final LayoutParams bigDotLayoutParams = new LayoutParams(dp12, dp12);
+            bigDotLayoutParams.setMargins(dp4, dp4, dp4, dp4);
+
+
+            LayoutInflater layoutInflater = getLayoutInflater();
+            int numEventsToShow = Math.min(events.size(), MAX_FEATURED_EVENTS);
+            dotsView.removeAllViews();
+            for (int i = 0; i < numEventsToShow; i++) {
+                View view = layoutInflater.inflate(R.layout.viewpager_dot, dotsView, false);
+                dotsView.addView(view);
+                view.setLayoutParams(i == 0 ? bigDotLayoutParams : smallDotLayoutParams);
+            }
+
+            featuredEventsPager.setAdapter(new FeaturedEventsAdapter(events.subList(0, numEventsToShow)));
+            featuredEventsPager.setOnPageChangeListener(new OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    // do nothing.
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+                    for (int i = 0; i < dotsView.getChildCount(); i++) {
+                        dotsView.getChildAt(i).setLayoutParams( i == position ? bigDotLayoutParams : smallDotLayoutParams);
+                    }
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+                    // do nothing.
+                }
+            });
+        }
+    };
+
+    private class FeaturedEventsAdapter extends PagerAdapter {
+        private final List<Event> events;
+
+        private FeaturedEventsAdapter(List<Event> events) {
+            this.events = events;
+        }
+
         @Override
         public int getCount() {
-            return MAX_FEATURED_EVENTS;
+            return events.size();
         }
 
         @Override
@@ -404,8 +440,47 @@ public class LaunchActivity extends BaseActivity {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            TextView view = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, container, false);
-            view.setText("Featured: " + position);
+            CardView eventCard = (CardView) getLayoutInflater().inflate(
+                    R.layout.explore_event_card, container, false);
+            final Event event = events.get(position);
+
+            if (event.imgUrl != null) {
+                ((NetworkImageView) eventCard.findViewById(R.id.event_bg)).setImageUrl(
+                        event.imgUrl, VolleyHelper.getImageLoader(LaunchActivity.this));
+            }
+            ((TextView)eventCard.findViewById(R.id.event_title)).setText(event.title);
+            eventCard.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    reportEventAction(event, "featuredClick");
+                    showEventDetails(event);
+                }
+            });
+
+            container.addView(eventCard);
+            return eventCard;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);
+        }
+    }
+
+    private PagerAdapter mLoadingAdapter = new PagerAdapter() {
+        @Override
+        public int getCount() {
+            return 1;
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            View view = getLayoutInflater().inflate(R.layout.view_loading, container, false);
             container.addView(view);
             return view;
         }
@@ -415,5 +490,4 @@ public class LaunchActivity extends BaseActivity {
             container.removeView((View) object);
         }
     };
-
 }

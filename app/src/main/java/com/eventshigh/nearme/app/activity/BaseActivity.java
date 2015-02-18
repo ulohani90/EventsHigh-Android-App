@@ -192,6 +192,12 @@ public abstract class BaseActivity extends ActionBarActivity {
         }
     }
 
+    public void showEventDetails(Event event) {
+        Intent detailIntent = new Intent(this, EventDetailActivity.class);
+        detailIntent.putExtra(EventDetailFragment.ARG_EVENT_INFO, event);
+        startActivity(detailIntent);
+    }
+
     public void showDirections(Event event) {
         reportEventAction(event, "showDirections");
 
