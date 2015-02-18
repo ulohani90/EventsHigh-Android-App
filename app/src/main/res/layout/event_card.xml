@@ -74,7 +74,6 @@
 
         <TextView
             android:id="@+id/event_title"
-            style="@style/EventTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -89,6 +88,8 @@
             android:maxLines="2"
             android:minLines="2"
             android:ellipsize="end"
+            android:textSize="14sp"
+            android:textColor="#CC000000"
             tools:text="My Awesome Event with a long long title!"
         />
 
@@ -128,13 +129,12 @@
             tools:text="Sun, 29 Mar at 8:30 pm"
         />
 
-        <include
+        <View
             android:id="@+id/divider_line"
-            layout="@layout/utils_horizontal_line"
             android:layout_below="@id/event_time"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/divider_dark_gray"
+            android:background="@drawable/shape_horizontal_divider"
         />
 
         <LinearLayout

@@ -18,10 +18,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.DatePicker;
-import android.widget.DatePicker.OnDateChangedListener;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
@@ -87,7 +87,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // UI elements.
     private ViewSwitcher viewSwitcher;
     private View topProgressBar;
-    private DatePicker datePicker;
+    private SlidingTabLayout dateFilter;
     private SlidingTabLayout slidingTab;
     private ViewPager viewPager;
     protected ImageButton fab;
@@ -112,7 +112,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         // Setup the UI.
         setContentView(R.layout.activity_events);
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
-        datePicker = (DatePicker) findViewById(R.id.date_filter);
+        dateFilter = (SlidingTabLayout) findViewById(R.id.date_filter);
         slidingTab = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         viewPager = (ViewPager) findViewById(R.id.pager);
         topProgressBar = findViewById(R.id.top_progress_bar);
@@ -254,7 +254,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             } else {
                 eventsContext.dateFilter = "";
                 slidingTab.setVisibility(View.VISIBLE);
-                datePicker.setVisibility(View.GONE);
+                dateFilter.setVisibility(View.GONE);
             }
             fetchNewListing(false);
             return true;
@@ -397,7 +397,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         EventsPagerAdapter adapter = new EventsPagerAdapter(getSupportFragmentManager(), events);
         viewPager.setAdapter(adapter);
         slidingTab.setCustomTabColorizer(adapter);
-        slidingTab.setCustomTabView(R.layout.tab_title, R.id.tab_title, R.id.num_events);
         slidingTab.setViewPager(viewPager);
         slidingTab.setOnPageChangeListener(adapter);
 
@@ -570,15 +569,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         @Override
-        public String getNumEvents(int position) {
-            return isFavouriteView(position) ? "" : Integer.toString(events.getEvents(position).size());
-        }
-
-        private boolean isFavouriteView(int position) {
-            return tabs.get(position).first == EventTab.FAVOURITES;
-        }
-
-        @Override
         public int getIndicatorColor(int position) {
             return getResources().getColor(tabs.get(position).first.colorId);
         }
@@ -586,6 +576,21 @@ public abstract class BaseEventsActivity extends BaseActivity {
         @Override
         public int getDividerColor(int position) {
             return 0x26000000;
+        }
+
+        @Override
+        public View getView(int position, ViewGroup parent) {
+            View tabView = getLayoutInflater().inflate(R.layout.tab_title, parent, false);
+            ((TextView) tabView.findViewById(R.id.tab_title)).setText(getPageTitle(position));
+            if (! isFavouriteView(position)) {
+                ((TextView) tabView.findViewById(R.id.num_events)).setText(
+                        Integer.toString(tabs.get(position).second));
+            }
+            return tabView;
+        }
+
+        private boolean isFavouriteView(int position) {
+            return tabs.get(position).first == EventTab.FAVOURITES;
         }
     }
 
@@ -614,19 +619,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
         Date filteredDate = eventsContext.getDateFilter();
         if (filteredDate != null) {
             slidingTab.setVisibility(View.GONE);
-            datePicker.setVisibility(View.VISIBLE);
+            dateFilter.setVisibility(View.VISIBLE);
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(filteredDate);
-            datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.DAY_OF_MONTH),
-                    new OnDateChangedListener() {
-                        @Override
-                        public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            eventsContext.setDateFilter(year, monthOfYear, dayOfMonth);
-                            fetchNewListing(false);
-                        }
-                    });
+            // TODO: initialize dateFilter
         }
     }
 }

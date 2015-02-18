@@ -3,7 +3,7 @@
              xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color"
+    android:background="@android:color/white"
     tools:context=".activity.EventsGridActivity"
 >
 
@@ -30,13 +30,12 @@
                 android:layout_height="wrap_content"
             />
 
-            <DatePicker
+            <com.example.android.common.view.SlidingTabLayout
                 android:id="@+id/date_filter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:calendarViewShown="false"
-                android:datePickerMode="spinner"
-                android:visibility="gone"
+                android:elevation="8dp"
+                android:background="#FBFBFB"
                 tools:ignore="UnusedAttribute"
             />
 
@@ -73,7 +72,11 @@
                 android:padding="8dp"
             />
 
-            <include layout="@layout/utils_vertical_line" />
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/shape_vertical_divider"
+            />
 
             <Button
                 style="@style/ButtonTransparentDark"

@@ -19,11 +19,11 @@ package com.example.android.common.view;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
@@ -41,8 +41,6 @@ import android.widget.TextView;
  * alternative is via the {@link TabColorizer} interface which provides you complete control over
  * which color is used for any individual position.
  * <p>
- * The views used as tabs can be customized by calling {@link #setCustomTabView(int, int, int)},
- * providing the layout ID of your custom layout.
  */
 public class SlidingTabLayout extends HorizontalScrollView {
 
@@ -69,10 +67,6 @@ public class SlidingTabLayout extends HorizontalScrollView {
     private static final int TAB_VIEW_TEXT_SIZE_SP = 12;
 
     private int mTitleOffset;
-
-    private int mTabViewLayoutId;
-    private int mTabViewTextViewId;
-    private int mTabEventCountTextViewId;
 
     private ViewPager mViewPager;
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
@@ -140,20 +134,6 @@ public class SlidingTabLayout extends HorizontalScrollView {
     }
 
     /**
-     * Set the custom layout to be inflated for the tab views.
-     *
-     * @param layoutResId Layout id to be inflated
-     * @param textViewId id of the {@link TextView} in the inflated view
-     * @param numEventsId id of the {@link TextView} which displays the number of events in the tab
-     *                    title
-     */
-    public void setCustomTabView(int layoutResId, int textViewId, int numEventsId) {
-        mTabViewLayoutId = layoutResId;
-        mTabViewTextViewId = textViewId;
-        mTabEventCountTextViewId = numEventsId;
-    }
-
-    /**
      * Sets the associated view pager. Note that the assumption here is that the pager content
      * (number of tabs and tab titles) does not change after this call has been made.
      */
@@ -169,7 +149,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
     /**
      * Create a default view to be used for tabs. This is called if a custom tab view is not set via
-     * {@link #setCustomTabView(int, int, int)}.
+     * {@link @SlidingTabPagerAdapter}.
      */
     protected TextView createDefaultTabView(Context context) {
         TextView textView = new TextView(context);
@@ -199,41 +179,25 @@ public class SlidingTabLayout extends HorizontalScrollView {
     }
 
     private void populateTabStrip() {
-        final SlidingTabPagerAdapter adapter = (SlidingTabPagerAdapter) mViewPager.getAdapter();
+        PagerAdapter adapter =  mViewPager.getAdapter();
         final View.OnClickListener tabClickListener = new TabClickListener();
 
         if (adapter.getCount() == 0) {
             return;
         }
+
+        boolean customView = adapter instanceof SlidingTabPagerAdapter;
         int minWidth = getContext().getResources().getDisplayMetrics().widthPixels / adapter.getCount() + 1;
         for (int i = 0; i < adapter.getCount(); i++) {
-            View tabView = null;
-            TextView tabTitleView = null;
-
-            if (mTabViewLayoutId != 0) {
-                // If there is a custom tab view layout id set, try and inflate it
-                tabView = LayoutInflater.from(getContext()).inflate(mTabViewLayoutId, mTabStrip,
-                        false);
-                tabView.setMinimumWidth(minWidth);
-                tabTitleView = (TextView) tabView.findViewById(mTabViewTextViewId);
-                TextView tabNumEventsView = (TextView) tabView.findViewById(
-                        mTabEventCountTextViewId);
-                tabNumEventsView.setText(adapter.getNumEvents(i));
+            View tabView = customView ?
+                    ((SlidingTabPagerAdapter) adapter).getView(i, mTabStrip) :
+                    createDefaultTabView(getContext());
+            if (!customView) {
+                ((TextView)tabView).setText(adapter.getPageTitle(i));
             }
 
-            if (tabView == null) {
-                tabView = createDefaultTabView(getContext());
-            }
-
-            if (tabTitleView == null && TextView.class.isInstance(tabView)) {
-                tabTitleView = (TextView) tabView;
-            }
-
-            if (tabTitleView != null) {
-                tabTitleView.setText(adapter.getPageTitle(i));
-            }
+            tabView.setMinimumWidth(minWidth);
             tabView.setOnClickListener(tabClickListener);
-
             mTabStrip.addView(tabView);
         }
     }

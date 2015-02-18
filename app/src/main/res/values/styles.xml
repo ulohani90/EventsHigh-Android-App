@@ -58,7 +58,7 @@
         <item name="android:textSize">11sp</item>
         <item name="android:drawablePadding">2dp</item>
         <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-medium</item>
-        <item name="android:textColor">#7A212121</item>
+        <item name="android:textColor">#99212121</item>
     </style>
 
     <!-- Themes used by Onboarding widgets powered by showcase library -->
@@ -69,12 +69,6 @@
 
     <style name="ShowcaseCustomTitle" parent="TextAppearance.ShowcaseView.Title">
         <item name="android:textColor">@android:color/white</item>
-    </style>
-
-    <style name="EventTitle">
-        <item name="android:textColor">@color/gray800</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily" tools:ignore="NewApi">sans-serif</item>
     </style>
 
 </resources>
