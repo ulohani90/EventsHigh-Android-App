@@ -160,7 +160,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_toRightOf="@+id/event_venue_icon"
                     android:layout_toEndOf="@+id/event_venue_icon"
-                    android:textColor="#CC000000"
+                    android:textColor="#A3000000"
                     tools:text="Counter Culture"
                 />
                 <TextView
@@ -173,7 +173,6 @@
                     android:layout_alignParentRight="true"
                     android:layout_toRightOf="@+id/event_venue_icon"
                     android:layout_toEndOf="@+id/event_venue_icon"
-                    android:textSize="@dimen/abc_text_size_caption_material"
                     android:textColor="#999197A3"
                     tools:text="Near Hoodi circle, Whitefield, Bangalore, 560037."
                 />
@@ -221,7 +220,7 @@
                         android:layout_alignParentTop="true"
                         android:layout_toRightOf="@+id/event_time_icon"
                         android:layout_toEndOf="@+id/event_time_icon"
-                        android:textColor="#CC000000"
+                        android:textColor="#A3000000"
                         tools:text="Wed, 14 Jan at 9:30 AM"
                     />
                     <TextView
@@ -232,7 +231,6 @@
                         android:layout_toRightOf="@+id/event_time_icon"
                         android:layout_toEndOf="@+id/event_time_icon"
                         android:layout_below="@+id/event_time"
-                        android:textSize="@dimen/abc_text_size_caption_material"
                         android:textColor="#999197A3"
                         tools:text="2 days from now"
                     />

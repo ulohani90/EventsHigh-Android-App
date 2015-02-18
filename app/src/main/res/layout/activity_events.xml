@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     android:orientation="vertical"
+    tools:context=".activity.EventsGridActivity"
     >
 
     <include
         android:id="@+id/event_grid_toolbar"
         layout="@layout/event_grid_toolbar"
-    />
+        />
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                 xmlns:tools="http://schemas.android.com/tools"
-                 android:layout_width="match_parent"
-                 android:layout_height="match_parent"
-                 android:background="@color/background_color"
-                 tools:context=".activity.EventsGridActivity"
-        >
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <ViewSwitcher
             android:id="@+id/view_switcher"
@@ -44,13 +41,12 @@
                     android:layout_height="wrap_content"
                     />
 
-                <DatePicker
+                <com.example.android.common.view.SlidingTabLayout
                     android:id="@+id/date_filter"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:calendarViewShown="false"
-                    android:datePickerMode="spinner"
-                    android:visibility="gone"
+                    android:elevation="8dp"
+                    android:background="#FBFBFB"
                     tools:ignore="UnusedAttribute"
                     />
 
@@ -88,7 +84,11 @@
                     android:padding="8dp"
                     />
 
-                <include layout="@layout/utils_vertical_line"/>
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/shape_vertical_divider"
+                    />
 
                 <Button
                     style="@style/ButtonTransparentDark"
@@ -121,7 +121,6 @@
             android:src="@drawable/ic_map_white_36dp"
             tools:ignore="UnusedAttribute"
             />
-
     </FrameLayout>
 
 </LinearLayout>
