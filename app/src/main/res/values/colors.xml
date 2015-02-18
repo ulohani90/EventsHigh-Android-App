@@ -21,4 +21,6 @@
     <color name="link_color">#990071B8</color>
     <color name="highlight_color">#EAEAEA</color>
 
+    <color name="button_theme">#0589B1</color>
+    <color name="button_theme_dark">#026991</color>
 </resources>

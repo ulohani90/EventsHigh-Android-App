@@ -24,6 +24,7 @@
     <string name="menu_refresh">Refresh</string>
 
     <!-- Other Strings used in UI -->
+    <string name="ui_follow">Follow</string>
     <string name="ui_favourite">Favourite</string>
     <string name="ui_today">Today</string>
     <string name="ui_tomorrow">Tomorrow</string>

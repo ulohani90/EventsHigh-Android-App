@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -111,6 +112,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Setup the UI.
         setContentView(R.layout.activity_events);
+        setSupportActionBar((Toolbar) findViewById(R.id.event_grid_toolbar));
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
         dateFilter = (SlidingTabLayout) findViewById(R.id.date_filter);
         slidingTab = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
@@ -127,7 +129,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Show query as title.
         if (!eventsContext.query.isEmpty()) {
-            getSupportActionBar().setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
+            ((TextView) findViewById(R.id.title)).setText(DateTimeUtils.queryToTitle(eventsContext.query));
+            // TODO: enable this?
+            // getSupportActionBar().setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
+
             if (!EventsHighEndpoints.isDateQuery(eventsContext.query)) {
                 reportActionToAnalytics("search", eventsContext.query);
                 EventSearchSuggestionsProvider.saveRecentQuery(this, eventsContext.query);
@@ -224,6 +229,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // TODO: uncomment this
+        /*
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.activity_event, menu);
 
@@ -234,6 +241,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Do not show filterByDate for search.
         menu.findItem(R.id.action_filter).setVisible(eventsContext.query.isEmpty());
+        */
 
         return true;
     }
@@ -362,7 +370,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
             @Override
             public void onLocationSelection(String locationString, LatLng locationPoint) {
                 if (showLocationInActionBar()) {
-                    getSupportActionBar().setSubtitle(locationString);
+                    // TODO: enable this?
+                    //getSupportActionBar().setSubtitle(locationString);
                 }
                 updateUserLocation(locationPoint);
             }
