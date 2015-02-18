@@ -1,12 +1,9 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -16,12 +13,6 @@ import com.google.android.gms.maps.model.LatLng;
  * we try to put more columns as per the width offered.
  */
 public class EventsGridActivity extends BaseEventsActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setSupportActionBar((Toolbar) findViewById(R.id.event_grid_toolbar));
-    }
 
     // Called when fab icon is pressed
     public void onSwitchView(View view) {

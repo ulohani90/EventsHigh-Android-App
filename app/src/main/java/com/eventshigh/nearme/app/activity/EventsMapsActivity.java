@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.widget.Toolbar;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -83,7 +82,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
         super.onCreate(savedInstanceState);
 
         // Setup the UI.
-        findViewById(R.id.event_grid_toolbar).setVisibility(View.GONE);
         View pager = findViewById(R.id.pager);
         LinearLayout parent = (LinearLayout) pager.getParent();
         View mapsView = getLayoutInflater().inflate(R.layout.view_maps, parent, false);
