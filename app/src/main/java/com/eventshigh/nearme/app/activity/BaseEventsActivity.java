@@ -113,7 +113,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Setup the UI.
         setContentView(R.layout.activity_events);
-        setSupportActionBar((Toolbar) findViewById(R.id.event_grid_toolbar));
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
         datePicker = (DatePicker) findViewById(R.id.date_filter);
         slidingTab = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
