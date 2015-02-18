@@ -150,11 +150,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        // TODO: enable this?
         // Show the Up button in the action bar.
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(
-//                !eventsContext.query.isEmpty() || !isDefaultView());
+        getSupportActionBar().setDisplayHomeAsUpEnabled(
+                !eventsContext.query.isEmpty() || !isDefaultView());
 
         // Setup GoogleApiClient
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.APP_INDEX_API).build();
