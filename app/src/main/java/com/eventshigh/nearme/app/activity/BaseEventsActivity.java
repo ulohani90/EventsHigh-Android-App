@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -39,6 +40,7 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
@@ -129,13 +131,14 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Show query as title.
         if (!eventsContext.query.isEmpty()) {
-            ((TextView) findViewById(R.id.title)).setText(DateTimeUtils.queryToTitle(eventsContext.query));
-            // TODO: enable this?
-            // getSupportActionBar().setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
+            getSupportActionBar().setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
 
             if (!EventsHighEndpoints.isDateQuery(eventsContext.query)) {
                 reportActionToAnalytics("search", eventsContext.query);
                 EventSearchSuggestionsProvider.saveRecentQuery(this, eventsContext.query);
+
+                findViewById(R.id.follow_widget).setVisibility(View.VISIBLE);
+                ((TextView) findViewById(R.id.title)).setText(DateTimeUtils.queryToTitle(eventsContext.query));
             } else {
                 eventsContext.dateFilter = "";
             }
@@ -229,19 +232,19 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // TODO: uncomment this
-        /*
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_event, menu);
+        // TODO: this check should not be there.
+        if (eventsContext.query.isEmpty() || EventsHighEndpoints.isDateQuery(eventsContext.query)) {
+            // Inflate the menu; this adds items to the action bar if it is present.
+            getMenuInflater().inflate(R.menu.activity_event, menu);
 
-        // Search View.
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            // Search View.
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
-        // Do not show filterByDate for search.
-        menu.findItem(R.id.action_filter).setVisible(eventsContext.query.isEmpty());
-        */
+            // Do not show filterByDate for search.
+            menu.findItem(R.id.action_filter).setVisible(eventsContext.query.isEmpty());
+        }
 
         return true;
     }
@@ -299,6 +302,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
      * @param userLocation user location as reported by location client.
      */
     protected void updateUserLocation(@Nullable LatLng userLocation) {
+        if (showLocationInActionBar()) {
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0) {
+                new ShowLocalityTask(this, actionBar).execute(userLocation);
+            }
+        }
+
         eventsContext.changeLocation(userLocation);
         if (eventsContext.city == null) {
             if (userLocation != null) {
@@ -370,8 +380,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             @Override
             public void onLocationSelection(String locationString, LatLng locationPoint) {
                 if (showLocationInActionBar()) {
-                    // TODO: enable this?
-                    //getSupportActionBar().setSubtitle(locationString);
+                    getSupportActionBar().setSubtitle(locationString);
                 }
                 updateUserLocation(locationPoint);
             }
