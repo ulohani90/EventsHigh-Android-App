@@ -1,111 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color"
-    tools:context=".activity.EventsGridActivity"
->
-
-    <ViewSwitcher
-        android:id="@+id/view_switcher"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    android:orientation="vertical"
     >
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-        >
-
-            <ProgressBar
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:id="@+id/top_progress_bar"
-                android:indeterminate="true"
-                android:layout_marginTop="-4dp"
-                android:layout_marginBottom="-4dp"
-                android:gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-            />
-
-            <DatePicker
-                android:id="@+id/date_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:calendarViewShown="false"
-                android:datePickerMode="spinner"
-                android:visibility="gone"
-                tools:ignore="UnusedAttribute"
-            />
-
-            <com.example.android.common.view.SlidingTabLayout
-                android:id="@+id/sliding_tabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:elevation="8dp"
-                android:background="@color/app_color"
-                tools:ignore="UnusedAttribute"
-            />
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/pager"
-                android:layout_width="match_parent"
-                android:layout_height="0px"
-                android:layout_weight="1"
-            />
-        </LinearLayout>
-
-        <LinearLayout
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-        >
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/failed_load"
-                android:gravity="center"
-                android:padding="8dp"
-            />
-
-            <include layout="@layout/utils_vertical_line" />
-
-            <Button
-                style="@style/ButtonTransparentDark"
-                android:id="@+id/retry_button"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:drawableLeft="@drawable/ic_refresh_grey600_48dp"
-                android:drawableStart="@drawable/ic_refresh_grey600_48dp"
-                android:padding="8dp"
-                android:drawablePadding="8dp"
-                android:onClick="onRetryButtonClicked"
-                android:text="@string/action_retry"
-            />
-        </LinearLayout>
-    </ViewSwitcher>
-
-    <ImageButton
-        android:id="@+id/fab_switch_view"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:background="@drawable/fab"
-        android:elevation="4dp"
-        android:padding="16dp"
-        android:scaleType="fitXY"
-        android:onClick="onSwitchView"
-        android:scaleX="1"
-        android:scaleY="1"
-        android:src="@drawable/ic_map_white_36dp"
-        tools:ignore="UnusedAttribute"
+    <include
+        android:id="@+id/event_grid_toolbar"
+        layout="@layout/event_grid_toolbar"
     />
 
-</FrameLayout>
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                 xmlns:tools="http://schemas.android.com/tools"
+                 android:layout_width="match_parent"
+                 android:layout_height="match_parent"
+                 android:background="@color/background_color"
+                 tools:context=".activity.EventsGridActivity"
+        >
 
+        <ViewSwitcher
+            android:id="@+id/view_switcher"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                >
+
+                <ProgressBar
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:id="@+id/top_progress_bar"
+                    android:indeterminate="true"
+                    android:layout_marginTop="-4dp"
+                    android:layout_marginBottom="-4dp"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    />
+
+                <DatePicker
+                    android:id="@+id/date_filter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:calendarViewShown="false"
+                    android:datePickerMode="spinner"
+                    android:visibility="gone"
+                    tools:ignore="UnusedAttribute"
+                    />
+
+                <com.example.android.common.view.SlidingTabLayout
+                    android:id="@+id/sliding_tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:elevation="8dp"
+                    android:background="@color/app_color"
+                    tools:ignore="UnusedAttribute"
+                    />
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="0px"
+                    android:layout_weight="1"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/failed_load"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    />
+
+                <include layout="@layout/utils_vertical_line"/>
+
+                <Button
+                    style="@style/ButtonTransparentDark"
+                    android:id="@+id/retry_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:drawableLeft="@drawable/ic_refresh_grey600_48dp"
+                    android:drawableStart="@drawable/ic_refresh_grey600_48dp"
+                    android:padding="8dp"
+                    android:drawablePadding="8dp"
+                    android:onClick="onRetryButtonClicked"
+                    android:text="@string/action_retry"
+                    />
+            </LinearLayout>
+        </ViewSwitcher>
+
+        <ImageButton
+            android:id="@+id/fab_switch_view"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:background="@drawable/fab"
+            android:elevation="4dp"
+            android:padding="16dp"
+            android:scaleType="fitXY"
+            android:onClick="onSwitchView"
+            android:scaleX="1"
+            android:scaleY="1"
+            android:src="@drawable/ic_map_white_36dp"
+            tools:ignore="UnusedAttribute"
+            />
+
+    </FrameLayout>
+
+</LinearLayout>

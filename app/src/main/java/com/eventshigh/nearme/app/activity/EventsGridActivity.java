@@ -40,10 +40,11 @@ public class EventsGridActivity extends BaseEventsActivity {
 
     @Override
     protected void updateUserLocation(LatLng userLocation) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0) {
-            new ShowLocalityTask(this, actionBar).execute(userLocation);
-        }
+        // TODO: enable this
+//        ActionBar actionBar = getSupportActionBar();
+//        if (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0) {
+//            new ShowLocalityTask(this, actionBar).execute(userLocation);
+//        }
 
         super.updateUserLocation(userLocation);
     }
