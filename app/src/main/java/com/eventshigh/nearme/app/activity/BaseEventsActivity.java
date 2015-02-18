@@ -580,7 +580,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         @Override
         public View getView(int position, ViewGroup parent) {
-            View tabView = getLayoutInflater().inflate(R.layout.tab_title, parent, false);
+            View tabView = getLayoutInflater().inflate(R.layout.tab_event, parent, false);
             ((TextView) tabView.findViewById(R.id.tab_title)).setText(getPageTitle(position));
             if (! isFavouriteView(position)) {
                 ((TextView) tabView.findViewById(R.id.num_events)).setText(
