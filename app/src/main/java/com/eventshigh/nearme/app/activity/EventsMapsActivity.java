@@ -132,11 +132,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
     }
 
     @Override
-    protected boolean isDefaultView() {
-        return pref.isMapsViewDefault();
-    }
-
-    @Override
     protected Fragment getNewFragment() {
         return new Fragment();
     }

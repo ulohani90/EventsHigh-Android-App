@@ -4,11 +4,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
-import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Simplified parameters for fetching events. The current Fetcher supports fetching
@@ -37,17 +35,14 @@ public class EventsContext implements Parcelable {
         return (oldCity == null && city == null) || (oldCity != null && oldCity.equals(city));
     }
 
-    public @Nullable Date getDateFilter() {
-        return DateTimeUtils.parseDateSafe(dateFilter);
-    }
-
     public void setDateFilter(Calendar calendar) {
-        setDateFilter(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH));
+        dateFilter = formatDateFilter(calendar);
     }
 
-    public void setDateFilter(int year, int monthOfYear, int dayOfMonth) {
-        dateFilter = String.format(DATE_FILTER_FORMAT, year, monthOfYear + 1, dayOfMonth);
+    public static String formatDateFilter(Calendar calendar) {
+        return String.format(DATE_FILTER_FORMAT, calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH) + 1,
+                calendar.get(Calendar.DAY_OF_MONTH));
     }
 
     @Override

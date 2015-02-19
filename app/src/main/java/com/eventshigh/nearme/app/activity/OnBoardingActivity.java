@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
@@ -63,6 +64,10 @@ public class OnBoardingActivity extends BaseActivity {
     // show the coach mark for first time user has reached last step.
     private boolean showCoachMark = true;
 
+    // User preferences.
+    protected Preferences pref;
+
+
     /**
      * The layout param that makes the view pager dot look big indicating the current page the user
      * is currently on.
@@ -113,6 +118,9 @@ public class OnBoardingActivity extends BaseActivity {
                 finish();
             }
         });
+
+        // Read Preferences
+        pref = Preferences.getInstance(getApplicationContext());
     }
 
     @Override

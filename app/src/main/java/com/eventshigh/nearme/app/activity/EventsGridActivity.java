@@ -25,11 +25,6 @@ public class EventsGridActivity extends BaseEventsActivity {
     }
 
     @Override
-    protected boolean isDefaultView() {
-        return !pref.isMapsViewDefault();
-    }
-
-    @Override
     protected Fragment getNewFragment() {
         return new EventGridFragment();
     }

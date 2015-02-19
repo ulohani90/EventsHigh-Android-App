@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -59,8 +58,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import fr.nicolaspomepuy.discreetapprate.AppRate;
 import fr.nicolaspomepuy.discreetapprate.AppRate.OnShowListener;
@@ -95,8 +94,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private ViewPager viewPager;
     protected ImageButton fab;
 
+
     // Last city and query for which events are shown.
     protected EventsContext eventsContext;
+    private boolean showFollowScreen;
     // when was this activity last started on.
     private long lastStartedAt;
     // GoogleApiClient to report the page view.
@@ -128,20 +129,20 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // See if we have context passed to us within intent.
         eventsContext = IntentUtils.processIntent(this, getIntent());
+        showFollowScreen = !eventsContext.query.isEmpty() && !EventsHighEndpoints.isDateQuery(eventsContext.query);
 
         // Show query as title.
         if (!eventsContext.query.isEmpty()) {
             getSupportActionBar().setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
+            eventsContext.dateFilter = "";
+        }
 
-            if (!EventsHighEndpoints.isDateQuery(eventsContext.query)) {
-                reportActionToAnalytics("search", eventsContext.query);
-                EventSearchSuggestionsProvider.saveRecentQuery(this, eventsContext.query);
+        if (showFollowScreen) {
+            findViewById(R.id.follow_widget).setVisibility(View.VISIBLE);
+            ((TextView) findViewById(R.id.title)).setText(DateTimeUtils.queryToTitle(eventsContext.query));
 
-                findViewById(R.id.follow_widget).setVisibility(View.VISIBLE);
-                ((TextView) findViewById(R.id.title)).setText(DateTimeUtils.queryToTitle(eventsContext.query));
-            } else {
-                eventsContext.dateFilter = "";
-            }
+            reportActionToAnalytics("search", eventsContext.query);
+            EventSearchSuggestionsProvider.saveRecentQuery(this, eventsContext.query);
         }
 
         // See if date filter is passed.
@@ -151,10 +152,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        // Show the Up button in the action bar.
-        getSupportActionBar().setDisplayHomeAsUpEnabled(
-                !eventsContext.query.isEmpty() || !isDefaultView());
 
         // Setup GoogleApiClient
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.APP_INDEX_API).build();
@@ -233,7 +230,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // TODO: this check should not be there.
-        if (eventsContext.query.isEmpty() || EventsHighEndpoints.isDateQuery(eventsContext.query)) {
+        if (!showFollowScreen) {
             // Inflate the menu; this adds items to the action bar if it is present.
             getMenuInflater().inflate(R.menu.activity_event, menu);
 
@@ -264,7 +261,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 showDateFilter();
             } else {
                 eventsContext.dateFilter = "";
-                slidingTab.setVisibility(View.VISIBLE);
                 dateFilter.setVisibility(View.GONE);
             }
             fetchNewListing(false);
@@ -333,11 +329,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
      * @return true if location should be shown in action bar as subtitle.
      */
     protected abstract boolean showLocationInActionBar();
-
-    /**
-     * @return true if the view represented by this activity is default view.
-     */
-    protected abstract boolean isDefaultView();
 
     /**
      * @return a new Fragment which will be used to show events list.
@@ -423,33 +414,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             return;
         }
 
-        int currentItem = 0;
-        if (tagToSearch != null) {
-            for (int i = 0; i < adapter.getCount(); i++) {
-                if (adapter.getPageTitle(i).equals(tagToSearch)) {
-                    currentItem = i;
-                    break;
-                }
-            }
-        }
-
-        if (currentItem == 0) {
-            adapter.onPageSelected(0);
-        } else {
-            viewPager.setCurrentItem(currentItem);
-            final View selectedItem =
-                    ((LinearLayout) slidingTab.getChildAt(0)).getChildAt(currentItem);
-            if (selectedItem != null) {
-                Utils.waitForViewVisible(selectedItem, new Runnable() {
-                    @Override
-                    public void run() {
-                        if (selectedItem.getLeft() > 100) {
-                            slidingTab.scrollTo(selectedItem.getLeft() - 100, 0);
-                        }
-                    }
-                });
-            }
-        }
+        slidingTab.scrollTo(tagToSearch);
     }
 
     private void createShortcut() {
@@ -544,8 +509,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         public EventsPagerAdapter(FragmentManager fm, EventsCollection events) {
             super(fm);
             this.events = events;
-            this.tabs = events.isEmpty() || eventsContext.dateFilter.isEmpty() ? events.getTabs() :
-                    events.getTabs().subList(0, 1);
+            this.tabs = events.getTabs();
         }
 
         @Override
@@ -634,14 +598,76 @@ public abstract class BaseEventsActivity extends BaseActivity {
     };
 
     private void showDateFilter() {
-        Date filteredDate = eventsContext.getDateFilter();
-        if (filteredDate != null) {
-            slidingTab.setVisibility(View.GONE);
-            dateFilter.setVisibility(View.VISIBLE);
+        if (!eventsContext.dateFilter.isEmpty()) {
+            DatesPagerAdapter adapter = new DatesPagerAdapter(getSupportFragmentManager());
+            ViewPager dummyViewPager = new ViewPager(this);
+            dummyViewPager.setVisibility(View.GONE);
+            dummyViewPager.setAdapter(adapter);
 
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(filteredDate);
-            // TODO: initialize dateFilter
+            dateFilter.setVisibility(View.VISIBLE);
+            dateFilter.setViewPager(dummyViewPager);
+            dateFilter.setOnPageChangeListener(adapter);
+            dateFilter.scrollTo(eventsContext.dateFilter);
         }
     }
+
+    private class DatesPagerAdapter extends SlidingTabPagerAdapter
+            implements OnPageChangeListener {
+        private static final int NUM_DAYS = 14;
+        private final Calendar today = DateTimeUtils.toMidnight(Calendar.getInstance(), null);
+
+        public DatesPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return new Fragment();
+        }
+
+        @Override
+        public int getCount() {
+            return NUM_DAYS;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return EventsContext.formatDateFilter(getDate(position));
+        }
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            // do nothing
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            eventsContext.setDateFilter(getDate(position));
+            fetchNewListing(false);
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+            // do nothing
+        }
+
+        @Override
+        public View getView(int position, ViewGroup parent) {
+            Calendar calendar = getDate(position);
+            View tabView = getLayoutInflater().inflate(R.layout.tab_date, parent, false);
+            ((TextView) tabView.findViewById(R.id.weekday)).setText(
+                    calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US));
+            ((TextView) tabView.findViewById(R.id.dayofmoth)).setText(
+                    Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));
+            return tabView;
+        }
+
+        private Calendar getDate(int position) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(today.getTime());
+            calendar.add(Calendar.DAY_OF_MONTH, position);
+            return calendar;
+        }
+    }
+
 }

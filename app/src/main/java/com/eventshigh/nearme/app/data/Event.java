@@ -348,7 +348,8 @@ public class Event implements Parcelable {
 
         eventsMarkerManager.waitForLoading();
         EventsCollection.Builder builder =  new EventsCollection.Builder(eventsContext.city,
-                eventsMarkerManager, !EventsHighEndpoints.isDateQuery(eventsContext.query),
+                eventsMarkerManager,
+                !EventsHighEndpoints.isDateQuery(eventsContext.query) && eventsContext.dateFilter.isEmpty(),
                 whitelistCategories);
         List<Event> events = fromJSON(eventsContext.city, upcomingEvents);
         if (eventsContext.location != null) {

@@ -130,7 +130,7 @@ public class EventsCollection {
 
             addEvent(EventTab.ALL, event);
 
-            // Temporary: Do not show RECOMMENDED tab.
+            // TODO: check we should show RECOMMENDED tab.
             /**
             if (event.ehRecommended) {
                 addEvent(EventTab.RECOMMENDED, event);

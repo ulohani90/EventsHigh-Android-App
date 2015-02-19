@@ -22,7 +22,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
@@ -48,9 +47,6 @@ public abstract class BaseActivity extends ActionBarActivity {
     // Google Analytics
     protected GAHelper gaHelper;
 
-    // User preferences.
-    protected Preferences pref;
-
 
     // ***********************
     // Activity lifecycle  Methods
@@ -68,9 +64,6 @@ public abstract class BaseActivity extends ActionBarActivity {
         if (!BuildConfig.DEBUG) {
             Fabric.with(this, new Crashlytics());
         }
-
-        // Read Preferences
-        pref = Preferences.getInstance(getApplicationContext());
 
         // Setup Google Analytics.
         gaHelper = GAHelper.getInstance(getApplicationContext());

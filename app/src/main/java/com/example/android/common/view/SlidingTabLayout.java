@@ -21,12 +21,15 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
+
+import com.eventshigh.nearme.app.utils.Utils;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
@@ -144,6 +147,42 @@ public class SlidingTabLayout extends HorizontalScrollView {
         if (viewPager != null) {
             viewPager.setOnPageChangeListener(new InternalViewPagerListener());
             populateTabStrip();
+        }
+    }
+
+    public void scrollTo(int position) {
+        final View selectedItem = mTabStrip.getChildAt(position);
+        if (selectedItem != null) {
+            Utils.waitForViewVisible(selectedItem, new Runnable() {
+                @Override
+                public void run() {
+                    if (selectedItem.getLeft() > 100) {
+                        scrollTo(selectedItem.getLeft() - 100, 0);
+                    }
+                }
+            });
+        }
+    }
+
+    public void scrollTo(String tabTitle) {
+        PagerAdapter adapter = mViewPager.getAdapter();
+        int position = 0;
+        if (tabTitle != null) {
+            for (int i = 0; i < adapter.getCount(); i++) {
+                if (adapter.getPageTitle(i).equals(tabTitle)) {
+                    position = i;
+                    break;
+                }
+            }
+        }
+
+        if (position == 0) {
+            if (adapter instanceof OnPageChangeListener) {
+                ((OnPageChangeListener) adapter).onPageSelected(0);
+            }
+        } else {
+            mViewPager.setCurrentItem(position);
+            scrollTo(position);
         }
     }
 

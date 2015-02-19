@@ -40,6 +40,7 @@ import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.settings.SettingsActivity;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -88,6 +89,10 @@ public class LaunchActivity extends BaseActivity {
     // Context for next activity.
     private EventsContext eventsContext;
 
+    // User preferences.
+    protected Preferences pref;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +106,9 @@ public class LaunchActivity extends BaseActivity {
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
+
+        // Read Preferences
+        pref = Preferences.getInstance(getApplicationContext());
     }
 
     public void onStart() {
@@ -261,12 +269,6 @@ public class LaunchActivity extends BaseActivity {
                     .build();
             client.connect();
             return;
-        }
-
-        // TEMPORARY: Show date filter as query.
-        if (!eventsContext.dateFilter.isEmpty()) {
-            eventsContext.query = eventsContext.dateFilter;
-            eventsContext.dateFilter = "";
         }
 
         // If we do not have query, show explore screen.
