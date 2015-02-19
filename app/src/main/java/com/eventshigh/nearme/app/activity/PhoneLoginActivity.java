@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.util.Linkify;
 import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
@@ -35,6 +36,10 @@ public class PhoneLoginActivity extends BaseActivity {
         RETRY
     }
 
+    private View phoneNoParent;
+    private View codeParent;
+    private View verifiedParent;
+
     private Account account;
     private EditText phoneNoView;
     private EditText codeView;
@@ -46,6 +51,10 @@ public class PhoneLoginActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_login);
+
+        phoneNoParent = findViewById(R.id.phone_no_parent);
+        codeParent = findViewById(R.id.code_parent);
+        verifiedParent = findViewById(R.id.verified);
 
         phoneNoView = (EditText) findViewById(R.id.phone_no);
         codeView = (EditText) findViewById(R.id.code);
@@ -59,11 +68,24 @@ public class PhoneLoginActivity extends BaseActivity {
         } else {
             phoneNoView.setText(accountPhoneStatus.first);
             if (accountPhoneStatus.second) {
+                setPhoneNumerInStringResource(R.id.verified, R.string.ui_code_verified,
+                        accountPhoneStatus.first);
                 setVerifiedMobileNoView();
             } else {
+                setPhoneNumerInStringResource(R.id.code_label, R.string.ui_code,
+                        accountPhoneStatus.first);
                 setRequestCodeView();
             }
         }
+    }
+
+    private void setPhoneNumerInStringResource(int viewId, int stringResourceId,
+                                               String phoneNumber) {
+        String codeLabelString = String.format(
+                getResources().getString(stringResourceId), phoneNumber);
+        TextView codeLabelView = (TextView) findViewById(viewId);
+        codeLabelView.setText(codeLabelString);
+        Linkify.addLinks(codeLabelView, Linkify.PHONE_NUMBERS);
     }
 
     public void sendCode(View view) {
@@ -79,7 +101,7 @@ public class PhoneLoginActivity extends BaseActivity {
                                 public void onResponse(JSONObject s, boolean isIntermediate) {
                                     VerificationStatus status = parseStatus(s.optString("status"));
                                     if (status == VerificationStatus.RETRY) {
-                                        retry();
+                                        showRetryMessage();
                                         return;
                                     }
 
@@ -95,13 +117,13 @@ public class PhoneLoginActivity extends BaseActivity {
                             new ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError volleyError) {
-                                    retry();
+                                    showRetryMessage();
                                 }
                             }
                     )
             );
         } catch (IOException | GeneralSecurityException e) {
-            retry();
+            showRetryMessage();
         }
     }
 
@@ -118,7 +140,7 @@ public class PhoneLoginActivity extends BaseActivity {
                                 public void onResponse(JSONObject s, boolean isIntermediate) {
                                     VerificationStatus status = parseStatus(s.optString("status"));
                                     if (status != VerificationStatus.VERIFIED) {
-                                        retry();
+                                        showRetryMessage();
                                         return;
                                     }
 
@@ -129,17 +151,17 @@ public class PhoneLoginActivity extends BaseActivity {
                             new ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError volleyError) {
-                                    retry();
+                                    showRetryMessage();
                                 }
                             }
                     )
             );
         } catch (IOException | GeneralSecurityException e) {
-            retry();
+            showRetryMessage();
         }
     }
 
-    private void retry() {
+    private void showRetryMessage() {
         Toast.makeText(this, R.string.retry, Toast.LENGTH_SHORT).show();
     }
 
@@ -157,25 +179,22 @@ public class PhoneLoginActivity extends BaseActivity {
 
     // Set the UI elements when we need to ask for mobile no.
     private void setRequestMobileNoView() {
-        phoneNoView.setEnabled(true);
-        codeView.setEnabled(false);
-        sendCodeButton.setVisibility(View.VISIBLE);
-        verifyCodeButton.setVisibility(View.GONE);
+        phoneNoParent.setVisibility(View.VISIBLE);
+        codeParent.setVisibility(View.GONE);
+        verifiedParent.setVisibility(View.GONE);
     }
 
     // Set the UI elements when we need to ask for verification code.
     private void setRequestCodeView() {
-        phoneNoView.setEnabled(false);
-        codeView.setEnabled(true);
-        sendCodeButton.setVisibility(View.GONE);
-        verifyCodeButton.setVisibility(View.VISIBLE);
+        phoneNoParent.setVisibility(View.GONE);
+        codeParent.setVisibility(View.VISIBLE);
+        verifiedParent.setVisibility(View.GONE);
     }
 
     // Set the UI elements when user mobile no is verified.
     private void setVerifiedMobileNoView() {
-        phoneNoView.setEnabled(false);
-        codeView.setEnabled(false);
-        sendCodeButton.setVisibility(View.GONE);
-        verifyCodeButton.setVisibility(View.GONE);
+        phoneNoParent.setVisibility(View.GONE);
+        codeParent.setVisibility(View.GONE);
+        verifiedParent.setVisibility(View.VISIBLE);
     }
 }
