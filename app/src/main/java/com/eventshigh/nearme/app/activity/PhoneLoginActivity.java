@@ -43,8 +43,6 @@ public class PhoneLoginActivity extends BaseActivity {
     private Account account;
     private EditText phoneNoView;
     private EditText codeView;
-    private TextView sendCodeButton;
-    private TextView verifyCodeButton;
 
 
     @Override
@@ -58,8 +56,6 @@ public class PhoneLoginActivity extends BaseActivity {
 
         phoneNoView = (EditText) findViewById(R.id.phone_no);
         codeView = (EditText) findViewById(R.id.code);
-        sendCodeButton = (TextView) findViewById(R.id.send_code);
-        verifyCodeButton = (TextView) findViewById(R.id.verify_code);
 
         account = new Account(this);
         Pair<String, Boolean> accountPhoneStatus = account.getPhoneNumber();
@@ -68,12 +64,8 @@ public class PhoneLoginActivity extends BaseActivity {
         } else {
             phoneNoView.setText(accountPhoneStatus.first);
             if (accountPhoneStatus.second) {
-                setPhoneNumerInStringResource(R.id.verified, R.string.ui_code_verified,
-                        accountPhoneStatus.first);
                 setVerifiedMobileNoView();
             } else {
-                setPhoneNumerInStringResource(R.id.code_label, R.string.ui_code,
-                        accountPhoneStatus.first);
                 setRequestCodeView();
             }
         }
@@ -90,7 +82,7 @@ public class PhoneLoginActivity extends BaseActivity {
 
     public void sendCode(View view) {
         final String phoneNo = phoneNoView.getText().toString();
-        Uri requestUrl =  AccountStateReporter.getBaseUri(this, "registerMobileNo")
+        Uri requestUrl = AccountStateReporter.getBaseUri(this, "registerMobileNo")
                 .appendQueryParameter("mobile_no", phoneNo)
                 .build();
         try {
@@ -128,7 +120,7 @@ public class PhoneLoginActivity extends BaseActivity {
     }
 
     public void verifyCode(View view) {
-        Uri requestUrl =  AccountStateReporter.getBaseUri(this, "verifyMobileNo")
+        Uri requestUrl = AccountStateReporter.getBaseUri(this, "verifyMobileNo")
                 .appendQueryParameter("mobile_no", phoneNoView.getText().toString())
                 .appendQueryParameter("verification_code", codeView.getText().toString())
                 .build();
@@ -186,6 +178,8 @@ public class PhoneLoginActivity extends BaseActivity {
 
     // Set the UI elements when we need to ask for verification code.
     private void setRequestCodeView() {
+        setPhoneNumerInStringResource(R.id.code_label, R.string.ui_code,
+                phoneNoView.getText().toString());
         phoneNoParent.setVisibility(View.GONE);
         codeParent.setVisibility(View.VISIBLE);
         verifiedParent.setVisibility(View.GONE);
@@ -193,6 +187,8 @@ public class PhoneLoginActivity extends BaseActivity {
 
     // Set the UI elements when user mobile no is verified.
     private void setVerifiedMobileNoView() {
+        setPhoneNumerInStringResource(R.id.verified, R.string.ui_code_verified,
+                phoneNoView.getText().toString());
         phoneNoParent.setVisibility(View.GONE);
         codeParent.setVisibility(View.GONE);
         verifiedParent.setVisibility(View.VISIBLE);
