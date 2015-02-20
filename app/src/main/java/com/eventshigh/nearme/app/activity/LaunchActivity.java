@@ -11,8 +11,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.SearchView;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -43,6 +44,8 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.settings.SettingsActivity;
 import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -68,8 +71,8 @@ public class LaunchActivity extends BaseActivity {
 
     // Constants
     private static final int MAX_FEATURED_EVENTS = 5;
-    private static final int MIN_WIDTH_EXPLORE_CARD_DP = 120;
-    private static final int MAX_EXPLORE_CARD_IN_ROW = 5;
+    private static final int EXPLORE_CARD_WIDTH_DP = 160;
+    private static final int MIN_EXPLORE_CARD_IN_ROW = 2;
     private static final String[] EXPLORE_TAGS = { "Parties", "Health & Wellness", "Tech",
             "Education", "Theatre", "Outdoors", "Kids", "Dance", "Shopping", "Food", "Literature",
             "Film", "Social Causes", "Environment", "Sports", "Spiritual", "Comedy", "Fashion"};
@@ -248,10 +251,7 @@ public class LaunchActivity extends BaseActivity {
         showNextScreen(true);
     }
 
-    public void showTomorrow(View view) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        eventsContext.setDateFilter(calendar);
+    public void showAll(View view) {
         showNextScreen(true);
     }
 
@@ -294,23 +294,34 @@ public class LaunchActivity extends BaseActivity {
         viewSwitcher.setDisplayedChild(0);
 
         if (!exploreScreenPopulated) {
-            int spacing = Utils.dpToPx(this, 4);
-            int widthPixels = getResources().getDisplayMetrics().widthPixels;
-            int numColumns = Math.min(widthPixels / Utils.dpToPx(this, MIN_WIDTH_EXPLORE_CARD_DP),
-                    MAX_EXPLORE_CARD_IN_ROW);
-            int size = (widthPixels - spacing * numColumns * 2) / numColumns;
-            LayoutParams lp = new LayoutParams(size, size);
-            lp.setMargins(spacing, spacing, spacing, spacing);
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+
+            FrameLayout.LayoutParams param = (FrameLayout.LayoutParams) featuredEventsPager.getLayoutParams();
+            param.height = Math.min(displayMetrics.heightPixels,  3 * displayMetrics.widthPixels / 4);
+            featuredEventsPager.setLayoutParams(param);
+
+            int spacing = Utils.dpToPx(this, 10);
+            int widthPixels = displayMetrics.widthPixels;
+            int numColumns = Math.max(MIN_EXPLORE_CARD_IN_ROW,
+                    (widthPixels - spacing * 2) / Utils.dpToPx(this, EXPLORE_CARD_WIDTH_DP));
+
+            int size = (widthPixels - spacing * (numColumns + 1)) / numColumns;
+            LayoutParams exploreCardLP = new LayoutParams(size, size);
+            exploreCardLP.setMargins(0, spacing, spacing, 0);
+
+            LayoutParams rowLP = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            rowLP.setMargins(spacing, 0, 0, 0);
 
             LinearLayout exploreLayout = (LinearLayout) findViewById(R.id.explore_layout);
             LinearLayout last = new LinearLayout(this);
             for (int i = 0; i < EXPLORE_TAGS.length; i++) {
                 if (i % numColumns == 0) {
                     last = new LinearLayout(this);
+                    last.setLayoutParams(rowLP);
                     exploreLayout.addView(last);
                 }
 
-                last.addView(getExploreCard(EXPLORE_TAGS[i], lp, last));
+                last.addView(getExploreCard(EXPLORE_TAGS[i], exploreCardLP, last));
             }
 
             exploreScreenPopulated = true;
@@ -324,7 +335,7 @@ public class LaunchActivity extends BaseActivity {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         Toast.makeText(LaunchActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
-                        featuredEventsPager.setVisibility(View.GONE);
+                        // featuredEventsPager.setAdapter(mFailedAdaper);
                     }
                 });
     }
@@ -443,15 +454,30 @@ public class LaunchActivity extends BaseActivity {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            CardView eventCard = (CardView) getLayoutInflater().inflate(
+            View eventCard = getLayoutInflater().inflate(
                     R.layout.explore_event_card, container, false);
             final Event event = events.get(position);
 
+            NetworkImageView imageView = (NetworkImageView) eventCard.findViewById(R.id.event_bg);
             if (event.imgUrl != null) {
-                ((NetworkImageView) eventCard.findViewById(R.id.event_bg)).setImageUrl(
+                imageView.setImageUrl(
                         event.imgUrl, VolleyHelper.getImageLoader(LaunchActivity.this));
+            } else {
+                imageView.setImageBitmap(null);
             }
+
             ((TextView)eventCard.findViewById(R.id.event_title)).setText(event.title);
+            ((TextView)eventCard.findViewById(R.id.event_venue)).setText(Utils.capitalize(
+                    event.venue == null ? event.city.toString() : event.venue));
+
+            EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
+            if (eventTime != null) {
+                ((TextView)eventCard.findViewById(R.id.event_date)).setText(eventTime.day + ", " + eventTime.date);
+                if (eventTime.time != null) {
+                    ((TextView) eventCard.findViewById(R.id.event_time)).setText(eventTime.time);
+                }
+            }
+
             eventCard.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -493,4 +519,5 @@ public class LaunchActivity extends BaseActivity {
             container.removeView((View) object);
         }
     };
+
 }
