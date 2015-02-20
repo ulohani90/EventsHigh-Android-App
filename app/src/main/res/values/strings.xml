@@ -43,8 +43,10 @@
     <string name="ui_fb_promiss">We never post on your behalf. We just use it to provide personalized event recommendations.</string>
     <string name="ui_referrer_default">Share the joy of attending amazing events!</string>
     <string name="ui_referrer">You have helped {0,choice,1#one friend|1&lt;{0} friends} in finding amazing events, thank you!</string>
-    <string name="ui_phone_no">Phone No</string>
-    <string name="ui_code">Code</string>
+    <string name="ui_enter_phone_number_hint">Your Phone Number</string>
+    <string name="ui_phone_verify_tip">Get exciting new deals on your favourite events in town!</string>
+    <string name="ui_code">We have sent a code to %s. Please enter it below</string>
+    <string name="ui_code_verified">Your phone number %s has been verified</string>
     <string name="ui_send_code">Send Code</string>
     <string name="ui_verify_code">Verify Code</string>
 
