@@ -13,7 +13,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -43,6 +42,7 @@ import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -94,6 +94,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private ViewPager viewPager;
     protected ImageButton fab;
 
+    private View followButton;
+    private View followingButton;
 
     // Last city and query for which events are shown.
     protected EventsContext eventsContext;
@@ -115,13 +117,14 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Setup the UI.
         setContentView(R.layout.activity_events);
-        setSupportActionBar((Toolbar) findViewById(R.id.event_grid_toolbar));
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
         dateFilter = (SlidingTabLayout) findViewById(R.id.date_filter);
         slidingTab = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         viewPager = (ViewPager) findViewById(R.id.pager);
         topProgressBar = findViewById(R.id.top_progress_bar);
         fab = (ImageButton) findViewById(R.id.fab_switch_view);
+        followButton = findViewById(R.id.follow_button);
+        followingButton = findViewById(R.id.following_button);
 
         // Set the context in term of eventFetcherParam. Use Intent
         // to restore the context.
@@ -138,11 +141,31 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         if (showFollowScreen) {
-            findViewById(R.id.follow_widget).setVisibility(View.VISIBLE);
-            ((TextView) findViewById(R.id.title)).setText(DateTimeUtils.queryToTitle(eventsContext.query));
-
             reportActionToAnalytics("search", eventsContext.query);
             EventSearchSuggestionsProvider.saveRecentQuery(this, eventsContext.query);
+
+            final Account account = new Account(this);
+            View followWidget = findViewById(R.id.follow_widget);
+            TextView followWidgetTitle = (TextView) findViewById(R.id.follow_title);
+
+            followWidget.setVisibility(View.VISIBLE);
+            followWidgetTitle.setText(Utils.capitalize(eventsContext.query));
+            setFollowButtons(account.isFollowing(eventsContext.query));
+
+            followButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    account.setIsFollowing(eventsContext.query, true);
+                    setFollowButtons(true);
+                }
+            });
+            followingButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    account.setIsFollowing(eventsContext.query, false);
+                    setFollowButtons(false);
+                }
+            });
         }
 
         // See if date filter is passed.
@@ -229,20 +252,16 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // TODO: this check should not be there.
-        if (!showFollowScreen) {
-            // Inflate the menu; this adds items to the action bar if it is present.
-            getMenuInflater().inflate(R.menu.activity_event, menu);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.activity_event, menu);
 
-            // Search View.
-            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-            SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        // Search View.
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
-            // Do not show filterByDate for search.
-            menu.findItem(R.id.action_filter).setVisible(eventsContext.query.isEmpty());
-        }
-
+        // Do not show filterByDate for search.
+        menu.findItem(R.id.action_filter).setVisible(!showFollowScreen);
         return true;
     }
 
@@ -670,4 +689,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
     }
 
+    private void setFollowButtons(boolean isFollowing) {
+        followButton.setVisibility(isFollowing ? View.INVISIBLE : View.VISIBLE);
+        followingButton.setVisibility(isFollowing ? View.VISIBLE : View.INVISIBLE);
+    }
 }

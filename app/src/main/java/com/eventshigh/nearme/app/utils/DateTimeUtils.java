@@ -110,15 +110,15 @@ public class DateTimeUtils {
     }
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    public static String queryToTitle(String dateStr) {
-        Date date = parseDateSafe(dateStr);
+    public static String queryToTitle(String query) {
+        Date date = parseDateSafe(query);
         if (date != null) {
             synchronized (SIMPLE_DATE_FORMAT) {
                 return SIMPLE_DAY_FORMAT.format(date) + " " + SIMPLE_DATE_FORMAT.format(date);
             }
         }
 
-        return Utils.capitalize(dateStr);
+        return Utils.capitalize(query);
     }
 
     public static @Nullable Date parseDateSafe(String dateStr) {

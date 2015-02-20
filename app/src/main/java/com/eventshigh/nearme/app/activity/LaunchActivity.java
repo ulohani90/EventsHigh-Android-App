@@ -362,7 +362,7 @@ public class LaunchActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 reportActionToAnalytics("exploreCategory", tagName);
-                eventsContext.query = tagName;
+                eventsContext.query = tagName.toLowerCase();
                 showNextScreen(true);
             }
         });

@@ -33,7 +33,7 @@
         android:paddingBottom="8dp"
         android:layout_marginTop="-4dp"
         android:textSize="9sp"
-        android:textColor="#80000000"
+        android:textColor="#80FFFFFF"
         tools:text="200"
         tools:ignore="SmallSp"
     />

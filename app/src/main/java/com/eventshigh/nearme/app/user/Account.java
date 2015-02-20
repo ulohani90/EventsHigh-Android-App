@@ -11,6 +11,7 @@ import com.android.volley.Request;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 
 import org.json.JSONObject;
@@ -132,6 +133,18 @@ public class Account {
 
     public @Nullable String getFacebookEmail() {
         return accountInfo.getString(PREF_FACEBOOK_EMAIL, null);
+    }
+
+    public boolean isFollowing(String tag) {
+        return accountInfo.getBoolean(getKeyForTag(tag), false);
+    }
+
+    public void setIsFollowing(String tag, boolean isFollowing) {
+        accountInfo.edit().putBoolean(getKeyForTag(tag), isFollowing).apply();
+    }
+
+    private static String getKeyForTag(String tag) {
+        return "Follow_" + EventCategory.toCategoryParsableString(tag);
     }
 
     private class AccountStateRegistar extends AsyncTask<Void, Void, Void> {
