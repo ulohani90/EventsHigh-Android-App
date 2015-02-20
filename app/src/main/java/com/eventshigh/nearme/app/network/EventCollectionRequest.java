@@ -56,7 +56,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     }
 
     private final BaseActivity activity;
-    private final EventsContext param;
+    private final EventsContext eventsContext;
     private final Priority priority;
     private final EventsMarkerManager eventsMarkerManager;
 
@@ -70,7 +70,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
      * @param listener Listener to receive the JSON response
      * @param errorListener Error listener, or null to ignore errors.
      */
-    public EventCollectionRequest(BaseActivity activity, String url, EventsContext param,
+    public EventCollectionRequest(BaseActivity activity, String url, EventsContext eventsContext,
                                   boolean shouldBypassCache, Priority priority,
                                   Listener<EventsCollection> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
@@ -78,7 +78,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         setShouldAllowStaleResponse(true);
 
         this.activity = activity;
-        this.param = param;
+        this.eventsContext = eventsContext;
         this.priority = priority;
         this.eventsMarkerManager = EventsMarkerManager.getInstance(activity);
     }
@@ -96,7 +96,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject eventsJson = new JSONObject(jsonString);
-            return Response.success(Event.parseUpcomingEvents(param, eventsMarkerManager, eventsJson),
+            return Response.success(Event.parseUpcomingEvents(eventsContext, eventsMarkerManager, eventsJson),
                 HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));

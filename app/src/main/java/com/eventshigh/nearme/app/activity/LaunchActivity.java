@@ -99,6 +99,7 @@ public class LaunchActivity extends BaseActivity {
 
         // Set View.
         setContentView(R.layout.activity_launch);
+        getSupportActionBar().setTitle(R.string.title_explore);
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
         dotsView = (LinearLayout) findViewById(R.id.dots_parent);
         featuredEventsPager = (ViewPager) findViewById(R.id.featured_events_pager);

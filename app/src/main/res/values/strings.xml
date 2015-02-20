@@ -2,7 +2,7 @@
 <resources>
 
     <!-- Title -->
-    <string name="app_name">EventsHigh Beta</string>
+    <string name="app_name">EventsHigh</string>
     <string name="title_book">Book Ticket</string>
     <string name="title_explore">Explore</string>
 

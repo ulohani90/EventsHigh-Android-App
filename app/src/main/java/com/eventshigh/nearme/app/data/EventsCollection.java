@@ -108,7 +108,8 @@ public class EventsCollection {
         private final Map<EventTab, List<Event>> events = new LinkedHashMap<>();
         private final Map<String, Counter> categories = new HashMap<>();
 
-        public Builder(City city, EventsMarkerManager eventsMarkerManager, boolean showToday, Set<String> whiteListedTagCategories) {
+        public Builder(City city, EventsMarkerManager eventsMarkerManager, boolean showToday,
+                       Set<String> whiteListedTagCategories) {
             this.eventsMarkerManager = eventsMarkerManager;
             this.showToday = showToday;
             this.whiteListedTagCategories = whiteListedTagCategories;

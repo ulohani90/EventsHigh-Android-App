@@ -661,8 +661,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         @Override
         public void onPageSelected(int position) {
+            String oldDateFilter = eventsContext.dateFilter;
             eventsContext.setDateFilter(getDate(position));
-            fetchNewListing(false);
+            if (! oldDateFilter.equals(eventsContext.dateFilter)) {
+                fetchNewListing(false);
+            }
         }
 
         @Override
