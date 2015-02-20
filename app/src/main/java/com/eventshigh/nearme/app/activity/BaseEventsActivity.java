@@ -155,6 +155,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             followButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    reportActionToAnalytics("addFollowing", eventsContext.query);
                     account.setIsFollowing(eventsContext.query, true);
                     setFollowButtons(true);
                 }
@@ -162,6 +163,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             followingButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    reportActionToAnalytics("removeFollowing", eventsContext.query);
                     account.setIsFollowing(eventsContext.query, false);
                     setFollowButtons(false);
                 }
