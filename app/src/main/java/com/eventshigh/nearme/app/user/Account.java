@@ -30,6 +30,7 @@ public class Account {
 
     private static final String PREF_MOBILE_NO = "mobile_no";
     private static final String PREF_MOBILE_NO_VERIFIED = "mobile_no_verified";
+    private static final String PREF_MOBILE_NO_RETRY = "mobile_no_retry";
 
     // The referrer for this user. this user installed the app via this referrer.
     private static final String PREF_REFERRER = "referrer";
@@ -64,12 +65,25 @@ public class Account {
         SharedPreferences.Editor editor = accountInfo.edit();
         editor.putString(PREF_MOBILE_NO, phoneNumber);
         editor.remove(PREF_MOBILE_NO_VERIFIED);
+        editor.putBoolean(PREF_MOBILE_NO_RETRY, false);
         editor.apply();
     }
 
     public void recordVerifiedPhoneNumber() {
         SharedPreferences.Editor editor = accountInfo.edit();
         editor.putBoolean(PREF_MOBILE_NO_VERIFIED, true);
+        editor.putBoolean(PREF_MOBILE_NO_RETRY, false);
+        editor.apply();
+    }
+
+    public boolean isRetryingPhoneVerification() {
+        return accountInfo.getBoolean(PREF_MOBILE_NO_RETRY, false);
+    }
+
+    public void retryPhoneVerification() {
+        SharedPreferences.Editor editor = accountInfo.edit();
+        editor.remove(PREF_MOBILE_NO_VERIFIED);
+        editor.putBoolean(PREF_MOBILE_NO_RETRY, true);
         editor.apply();
     }
 

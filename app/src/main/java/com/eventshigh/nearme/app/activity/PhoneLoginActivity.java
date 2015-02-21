@@ -52,18 +52,24 @@ public class PhoneLoginActivity extends BaseActivity {
 
         phoneNoParent = findViewById(R.id.phone_no_parent);
         codeParent = findViewById(R.id.code_parent);
-        verifiedParent = findViewById(R.id.verified);
+        verifiedParent = findViewById(R.id.verified_parent);
 
         phoneNoView = (EditText) findViewById(R.id.phone_no);
         codeView = (EditText) findViewById(R.id.code);
 
         account = new Account(this);
+        updateView();
+    }
+
+    private void updateView() {
         Pair<String, Boolean> accountPhoneStatus = account.getPhoneNumber();
         if (accountPhoneStatus.first == null) {
             setRequestMobileNoView();
         } else {
             phoneNoView.setText(accountPhoneStatus.first);
-            if (accountPhoneStatus.second) {
+            if (account.isRetryingPhoneVerification()) {
+                setRequestMobileNoView();
+            } else if (accountPhoneStatus.second) {
                 setVerifiedMobileNoView();
             } else {
                 setRequestCodeView();
@@ -151,6 +157,11 @@ public class PhoneLoginActivity extends BaseActivity {
         } catch (IOException | GeneralSecurityException e) {
             showRetryMessage();
         }
+    }
+
+    public void retryPhoneVerification(View view) {
+        account.retryPhoneVerification();
+        updateView();
     }
 
     private void showRetryMessage() {
