@@ -50,6 +50,8 @@
     <string name="ui_code_verified">Your phone number %s has been verified</string>
     <string name="ui_send_code">Send Code</string>
     <string name="ui_verify_code">Verify Code</string>
+    <string name="ui_retry">Retry</string>
+    <string name="ui_reverify">Verify Again</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>
