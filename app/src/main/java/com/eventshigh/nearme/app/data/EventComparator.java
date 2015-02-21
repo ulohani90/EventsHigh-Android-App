@@ -1,5 +1,7 @@
 package com.eventshigh.nearme.app.data;
 
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -25,33 +27,26 @@ public class EventComparator implements Comparator<Event> {
     @Override
     public int compare(Event lhs, Event rhs) {
         return Double.compare(
-                weightedDistance(lhs, eventsMarkerManager.isFavourite(lhs.id), userLocation, eventToDistanceMap),
-                weightedDistance(rhs, eventsMarkerManager.isFavourite(rhs.id), userLocation, eventToDistanceMap)
+                weightedScore(rhs, eventsMarkerManager.isFavourite(rhs.id), userLocation, eventToDistanceMap),
+                weightedScore(lhs, eventsMarkerManager.isFavourite(lhs.id), userLocation, eventToDistanceMap)
         );
     }
 
     // Find the distance of events from user's position with weight for popular events.
     // If event has e**N users going, we reduce 500*N meters from its distance.
-    private static double weightedDistance(Event event, boolean isFavourite, LatLng userLocation,
+    private static double weightedScore(Event event, boolean isFavourite, LatLng userLocation,
                                            Map<String, Double> eventToDistanceMap) {
         Double result = eventToDistanceMap.get(event.id);
         if (result != null) {
             return result;
         }
 
-        float distance = LocationUtils.distanceInMeters(event.location, userLocation);
-        float timeWeight = event.eventTimings.length > 0 ? 2000 : 10000;
-        for (long eventTime : event.eventTimings) {
-            if (eventTime > System.currentTimeMillis()) {
-                timeWeight = 0.000025f * (eventTime - System.currentTimeMillis());
-                break;
-            }
-        }
 
-        double recommendedDiscount = (event.numPeopleInterested > 0 ? Math.log(event.numPeopleInterested) * 500 : 0)
-                + (event.ehRecommended || isFavourite ? 2000 : 0);
-        double weightedDistance = distance + timeWeight - recommendedDiscount;
-        eventToDistanceMap.put(event.id, weightedDistance);
-        return weightedDistance;
+        EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
+        float distance = LocationUtils.distanceInMeters(event.location, userLocation);
+        boolean isPastEvent = eventTime == null || eventTime.time == null || event.eventTimings[0] < System.currentTimeMillis();
+
+        return event.uberScore + (isFavourite ? 20 : 0) - (isPastEvent ? 20 : 0)
+                - Math.min(30, Math.pow(1.4, distance / 1000));
     }
 }

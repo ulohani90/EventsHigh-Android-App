@@ -45,6 +45,7 @@ public class Event implements Parcelable {
 
     public final int numPeopleInterested;
     public final boolean ehRecommended;
+    public final float uberScore;
 
     public final long[] eventTimings;    // each start time is stored as milliseconds since epoch.
 
@@ -59,7 +60,7 @@ public class Event implements Parcelable {
     public Event(String id, City city, String title, EventCategory category,
                  String description, String[] tags,
                  @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
-                 int numPeopleInterested, boolean ehRecommended,
+                 int numPeopleInterested, boolean ehRecommended, float uberScore,
                  long[] eventTimings,
                  @Nullable LatLng location, @Nullable String venue, @Nullable String address,
                  String organizerName, String organizerPhone, String organizerWebsite) {
@@ -77,6 +78,7 @@ public class Event implements Parcelable {
 
         this.numPeopleInterested = numPeopleInterested;
         this.ehRecommended = ehRecommended;
+        this.uberScore = uberScore;
 
         this.eventTimings = eventTimings;
 
@@ -132,6 +134,7 @@ public class Event implements Parcelable {
 
         dest.writeInt(numPeopleInterested);
         dest.writeBooleanArray(new boolean[]{ehRecommended});
+        dest.writeFloat(uberScore);
 
         dest.writeLongArray(eventTimings);
 
@@ -163,6 +166,7 @@ public class Event implements Parcelable {
 
                             in.readInt(),
                             in.createBooleanArray()[0],
+                            in.readFloat(),
 
                             in.createLongArray(),
 
@@ -203,6 +207,7 @@ public class Event implements Parcelable {
 
         int num_people_interested = eventJson.optInt("num_people_interested", 0);
         boolean eh_recommends = eventJson.optBoolean("eh_editor");
+        float uberScore = (float) eventJson.optDouble("uber_score", 1);
 
         double lat = 0;
         double lon = 0;
@@ -306,6 +311,7 @@ public class Event implements Parcelable {
 
                 num_people_interested,
                 eh_recommends,
+                uberScore,
 
                 eventTimingsArr,
 
