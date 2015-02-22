@@ -312,7 +312,8 @@ public class LaunchActivity extends BaseActivity {
             DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 
             FrameLayout.LayoutParams param = (FrameLayout.LayoutParams) featuredEventsPager.getLayoutParams();
-            param.height = Math.min(displayMetrics.heightPixels,  3 * displayMetrics.widthPixels / 4);
+            param.height = Math.min(displayMetrics.heightPixels,
+                    Utils.dpToPx(this, 100) + 9 * displayMetrics.widthPixels / 16);
             featuredEventsPager.setLayoutParams(param);
 
             int spacing = Utils.dpToPx(this, MARGIN_DP);
@@ -399,11 +400,11 @@ public class LaunchActivity extends BaseActivity {
 
             LayoutInflater layoutInflater = getLayoutInflater();
             dotsView.removeAllViews();
-//            for (int i = 0; i < events.size(); i++) {
-//                View view = layoutInflater.inflate(R.layout.explore_dot, dotsView, false);
-//                dotsView.addView(view);
-//                view.setLayoutParams(i == 0 ? bigDotLayoutParams : smallDotLayoutParams);
-//            }
+            for (int i = 0; i < events.size(); i++) {
+                View view = layoutInflater.inflate(R.layout.explore_dot, dotsView, false);
+                dotsView.addView(view);
+                view.setLayoutParams(i == 0 ? bigDotLayoutParams : smallDotLayoutParams);
+            }
 
             featuredEventsPager.setAdapter(new FeaturedEventsAdapter(LaunchActivity.this,  events));
             featuredEventsPager.setOnPageChangeListener(new OnPageChangeListener() {

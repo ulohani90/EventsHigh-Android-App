@@ -10,6 +10,7 @@ import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -94,7 +95,10 @@ public abstract class BaseActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        getSupportActionBar().collapseActionView();
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.collapseActionView();
+        }
     }
 
     @Override

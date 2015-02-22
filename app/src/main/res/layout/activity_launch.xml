@@ -44,6 +44,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:background="#D1E1E5"
+                android:elevation="4dp"
+                tools:ignore="UnusedAttribute"
             >
                 <TextView
                     android:layout_width="0dp"
