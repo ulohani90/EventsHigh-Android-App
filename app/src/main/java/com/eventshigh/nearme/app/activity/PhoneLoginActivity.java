@@ -39,6 +39,7 @@ public class PhoneLoginActivity extends BaseActivity {
     private View phoneNoParent;
     private View codeParent;
     private View verifiedParent;
+    private View progressBar;
 
     private Account account;
     private EditText phoneNoView;
@@ -56,12 +57,14 @@ public class PhoneLoginActivity extends BaseActivity {
 
         phoneNoView = (EditText) findViewById(R.id.phone_no);
         codeView = (EditText) findViewById(R.id.code);
+        progressBar = findViewById(R.id.top_progress_bar);
 
         account = new Account(this);
         updateView();
     }
 
     public void sendCode(View view) {
+        progressBar.setVisibility(View.VISIBLE);
         final String phoneNo = phoneNoView.getText().toString();
         Uri requestUrl = AccountStateReporter.getBaseUri(this, "registerMobileNo")
                 .appendQueryParameter("mobile_no", phoneNo)
@@ -72,6 +75,7 @@ public class PhoneLoginActivity extends BaseActivity {
                             new Listener<JSONObject>() {
                                 @Override
                                 public void onResponse(JSONObject s, boolean isIntermediate) {
+                                    progressBar.setVisibility(View.GONE);
                                     VerificationStatus status = parseStatus(s.optString("status"));
                                     if (status == VerificationStatus.RETRY) {
                                         reportActionToAnalytics("sendCodeRetry");
@@ -93,6 +97,7 @@ public class PhoneLoginActivity extends BaseActivity {
                             new ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError volleyError) {
+                                    progressBar.setVisibility(View.GONE);
                                     reportActionToAnalytics("sendCodeRetry");
                                     showRetryMessage();
                                 }
@@ -100,12 +105,14 @@ public class PhoneLoginActivity extends BaseActivity {
                     )
             );
         } catch (IOException | GeneralSecurityException e) {
+            progressBar.setVisibility(View.GONE);
             reportActionToAnalytics("sendCodeRetry");
             showRetryMessage();
         }
     }
 
     public void verifyCode(View view) {
+        progressBar.setVisibility(View.VISIBLE);
         Uri requestUrl = AccountStateReporter.getBaseUri(this, "verifyMobileNo")
                 .appendQueryParameter("mobile_no", phoneNoView.getText().toString())
                 .appendQueryParameter("verification_code", codeView.getText().toString())
@@ -116,6 +123,7 @@ public class PhoneLoginActivity extends BaseActivity {
                             new Listener<JSONObject>() {
                                 @Override
                                 public void onResponse(JSONObject s, boolean isIntermediate) {
+                                    progressBar.setVisibility(View.GONE);
                                     VerificationStatus status = parseStatus(s.optString("status"));
                                     if (status != VerificationStatus.VERIFIED) {
                                         reportActionToAnalytics("verifyCodeRetry");
@@ -131,6 +139,7 @@ public class PhoneLoginActivity extends BaseActivity {
                             new ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError volleyError) {
+                                    progressBar.setVisibility(View.GONE);
                                     reportActionToAnalytics("verifyCodeRetry");
                                     showRetryMessage();
                                 }
@@ -138,6 +147,7 @@ public class PhoneLoginActivity extends BaseActivity {
                     )
             );
         } catch (IOException | GeneralSecurityException e) {
+            progressBar.setVisibility(View.GONE);
             reportActionToAnalytics("verifyCodeRetry");
             showRetryMessage();
         }
