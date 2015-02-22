@@ -51,7 +51,7 @@
     <string name="ui_send_code">Send Code</string>
     <string name="ui_verify_code">Verify Code</string>
     <string name="ui_retry">Retry</string>
-    <string name="ui_reverify">Verify Again</string>
+    <string name="ui_change_no">Change Number</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>

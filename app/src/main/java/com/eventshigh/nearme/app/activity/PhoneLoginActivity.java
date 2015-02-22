@@ -7,7 +7,6 @@ import android.text.util.Linkify;
 import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,12 +39,12 @@ public class PhoneLoginActivity extends BaseActivity {
     private View phoneNoParent;
     private View codeParent;
     private View verifiedParent;
+    private View progressBar;
 
     private Account account;
     private EditText phoneNoView;
     private EditText codeView;
 
-    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,36 +57,10 @@ public class PhoneLoginActivity extends BaseActivity {
 
         phoneNoView = (EditText) findViewById(R.id.phone_no);
         codeView = (EditText) findViewById(R.id.code);
-
-        progressBar = (ProgressBar) findViewById(R.id.top_progress_bar);
+        progressBar = findViewById(R.id.top_progress_bar);
 
         account = new Account(this);
         updateView();
-    }
-
-    private void updateView() {
-        Pair<String, Boolean> accountPhoneStatus = account.getPhoneNumber();
-        if (accountPhoneStatus.first == null) {
-            setRequestMobileNoView();
-        } else {
-            phoneNoView.setText(accountPhoneStatus.first);
-            if (account.isRetryingPhoneVerification()) {
-                setRequestMobileNoView();
-            } else if (accountPhoneStatus.second) {
-                setVerifiedMobileNoView();
-            } else {
-                setRequestCodeView();
-            }
-        }
-    }
-
-    private void setPhoneNumerInStringResource(int viewId, int stringResourceId,
-                                               String phoneNumber) {
-        String codeLabelString = String.format(
-                getResources().getString(stringResourceId), phoneNumber);
-        TextView codeLabelView = (TextView) findViewById(viewId);
-        codeLabelView.setText(codeLabelString);
-        Linkify.addLinks(codeLabelView, Linkify.PHONE_NUMBERS);
     }
 
     public void sendCode(View view) {
@@ -103,18 +76,20 @@ public class PhoneLoginActivity extends BaseActivity {
                                 @Override
                                 public void onResponse(JSONObject s, boolean isIntermediate) {
                                     progressBar.setVisibility(View.GONE);
-
                                     VerificationStatus status = parseStatus(s.optString("status"));
                                     if (status == VerificationStatus.RETRY) {
+                                        reportActionToAnalytics("sendCodeRetry");
                                         showRetryMessage();
                                         return;
                                     }
 
                                     account.recordPhoneNumber(phoneNo);
                                     if (status == VerificationStatus.VERIFIED) {
+                                        reportActionToAnalytics("sendCodeVerified");
                                         account.recordVerifiedPhoneNumber();
                                         setVerifiedMobileNoView();
                                     } else if (status == VerificationStatus.CODE_SENT) {
+                                        reportActionToAnalytics("sendCodeSuccess");
                                         setRequestCodeView();
                                     }
                                 }
@@ -123,12 +98,15 @@ public class PhoneLoginActivity extends BaseActivity {
                                 @Override
                                 public void onErrorResponse(VolleyError volleyError) {
                                     progressBar.setVisibility(View.GONE);
+                                    reportActionToAnalytics("sendCodeRetry");
                                     showRetryMessage();
                                 }
                             }
                     )
             );
         } catch (IOException | GeneralSecurityException e) {
+            progressBar.setVisibility(View.GONE);
+            reportActionToAnalytics("sendCodeRetry");
             showRetryMessage();
         }
     }
@@ -148,10 +126,12 @@ public class PhoneLoginActivity extends BaseActivity {
                                     progressBar.setVisibility(View.GONE);
                                     VerificationStatus status = parseStatus(s.optString("status"));
                                     if (status != VerificationStatus.VERIFIED) {
+                                        reportActionToAnalytics("verifyCodeRetry");
                                         showRetryMessage();
                                         return;
                                     }
 
+                                    reportActionToAnalytics("verifyCodeSuccess");
                                     account.recordVerifiedPhoneNumber();
                                     setVerifiedMobileNoView();
                                 }
@@ -160,19 +140,46 @@ public class PhoneLoginActivity extends BaseActivity {
                                 @Override
                                 public void onErrorResponse(VolleyError volleyError) {
                                     progressBar.setVisibility(View.GONE);
+                                    reportActionToAnalytics("verifyCodeRetry");
                                     showRetryMessage();
                                 }
                             }
                     )
             );
         } catch (IOException | GeneralSecurityException e) {
+            progressBar.setVisibility(View.GONE);
+            reportActionToAnalytics("verifyCodeRetry");
             showRetryMessage();
         }
     }
 
-    public void retryPhoneVerification(View view) {
-        account.retryPhoneVerification();
-        updateView();
+    public void changeNumber(View view) {
+        reportActionToAnalytics("changeNumber");
+        account.removePhoneNumber();
+        setRequestMobileNoView();
+    }
+
+    private void updateView() {
+        Pair<String, Boolean> accountPhoneStatus = account.getPhoneNumber();
+        if (accountPhoneStatus.first == null) {
+            setRequestMobileNoView();
+        } else {
+            phoneNoView.setText(accountPhoneStatus.first);
+            if (accountPhoneStatus.second) {
+                setVerifiedMobileNoView();
+            } else {
+                setRequestCodeView();
+            }
+        }
+    }
+
+    private void setPhoneNumberInStringResource(int viewId, int stringResourceId,
+                                                String phoneNumber) {
+        String codeLabelString = String.format(
+                getResources().getString(stringResourceId), phoneNumber);
+        TextView codeLabelView = (TextView) findViewById(viewId);
+        codeLabelView.setText(codeLabelString);
+        Linkify.addLinks(codeLabelView, Linkify.PHONE_NUMBERS);
     }
 
     private void showRetryMessage() {
@@ -200,7 +207,7 @@ public class PhoneLoginActivity extends BaseActivity {
 
     // Set the UI elements when we need to ask for verification code.
     private void setRequestCodeView() {
-        setPhoneNumerInStringResource(R.id.code_label, R.string.ui_code,
+        setPhoneNumberInStringResource(R.id.code_label, R.string.ui_code,
                 phoneNoView.getText().toString());
         phoneNoParent.setVisibility(View.GONE);
         codeParent.setVisibility(View.VISIBLE);
@@ -209,7 +216,7 @@ public class PhoneLoginActivity extends BaseActivity {
 
     // Set the UI elements when user mobile no is verified.
     private void setVerifiedMobileNoView() {
-        setPhoneNumerInStringResource(R.id.verified, R.string.ui_code_verified,
+        setPhoneNumberInStringResource(R.id.verified, R.string.ui_code_verified,
                 phoneNoView.getText().toString());
         phoneNoParent.setVisibility(View.GONE);
         codeParent.setVisibility(View.GONE);

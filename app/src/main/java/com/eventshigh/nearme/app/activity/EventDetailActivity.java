@@ -4,8 +4,6 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -38,13 +36,7 @@ public class EventDetailActivity extends BaseActivity implements MyScrollListene
         setContentView(R.layout.activity_event_detail);
         container = (FrameLayout) findViewById(R.id.container);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
-        toolbar.setNavigationOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navigateUp();
-            }
-        });
+        setSupportActionBar(toolbar);
 
         onNewIntent(getIntent());
     }
