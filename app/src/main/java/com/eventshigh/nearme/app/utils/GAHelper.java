@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
-import com.amplitude.api.Amplitude;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -34,11 +33,6 @@ public class GAHelper {
         if (BuildConfig.DEBUG) {
             googleAnalytics.setAppOptOut(true);
         }
-
-        if (!BuildConfig.DEBUG) {
-            // Setup Amplitude
-            Amplitude.initialize(context, "41ed6c5c945d7f1c2f2d829b90288562");
-        }
     }
 
     public static synchronized GAHelper getInstance(Context context) {
@@ -51,21 +45,10 @@ public class GAHelper {
 
     public void reportActivityStart(Activity activity) {
         googleAnalytics.reportActivityStart(activity);
-
-        // Flurry, Amplitude reporting
-        if (!BuildConfig.DEBUG) {
-            Amplitude.startSession();
-            Amplitude.logEvent(activity.getClass().getSimpleName());
-        }
     }
 
     public void reportActivityStop(Activity activity) {
         googleAnalytics.reportActivityStop(activity);
-
-        // Flurry, Amplitude reporting
-        if (!BuildConfig.DEBUG) {
-            Amplitude.endSession();
-        }
     }
 
     public void setAppOptOut(boolean optOut) {
@@ -91,10 +74,6 @@ public class GAHelper {
             builder.setCustomDimension(i + 1, customValues[i]);
         }
         tracker.send(builder.build());
-
-        if (!BuildConfig.DEBUG) {
-            Amplitude.logEvent(actionName);
-        }
     }
 
     public static String getDateReportString(@Nullable Date date) {

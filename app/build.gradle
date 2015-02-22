@@ -57,7 +57,6 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:21.0.3'
 
     compile 'com.github.amlcurran.showcaseview:library:5.0.0'
-    compile 'com.amplitude:android-sdk:1.4.3'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
     compile 'fr.nicolaspomepuy:discreetapprate:2.0.3@aar'
 
