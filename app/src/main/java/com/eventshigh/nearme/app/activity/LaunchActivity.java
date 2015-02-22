@@ -399,11 +399,11 @@ public class LaunchActivity extends BaseActivity {
 
             LayoutInflater layoutInflater = getLayoutInflater();
             dotsView.removeAllViews();
-            for (int i = 0; i < events.size(); i++) {
-                View view = layoutInflater.inflate(R.layout.explore_dot, dotsView, false);
-                dotsView.addView(view);
-                view.setLayoutParams(i == 0 ? bigDotLayoutParams : smallDotLayoutParams);
-            }
+//            for (int i = 0; i < events.size(); i++) {
+//                View view = layoutInflater.inflate(R.layout.explore_dot, dotsView, false);
+//                dotsView.addView(view);
+//                view.setLayoutParams(i == 0 ? bigDotLayoutParams : smallDotLayoutParams);
+//            }
 
             featuredEventsPager.setAdapter(new FeaturedEventsAdapter(LaunchActivity.this,  events));
             featuredEventsPager.setOnPageChangeListener(new OnPageChangeListener() {
