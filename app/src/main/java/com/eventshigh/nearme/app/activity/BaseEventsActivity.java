@@ -263,7 +263,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         // Do not show filterByDate for search.
-        menu.findItem(R.id.action_filter).setVisible(!showFollowScreen);
+        menu.findItem(R.id.action_filter).setVisible(eventsContext.query.isEmpty());
         return true;
     }
 
@@ -517,7 +517,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
     };
 
-    public void onRetryButtonClicked(View view) {
+    public void onRetry(View view) {
         reportActionToAnalytics("retryFetch");
         fetchNewListing(false /* bypass cache*/);
     }

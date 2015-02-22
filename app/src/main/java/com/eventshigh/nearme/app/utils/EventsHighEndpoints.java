@@ -20,6 +20,8 @@ public class EventsHighEndpoints {
             "http://apiserver.eventshigh.com:8888/api/date/%s/%s?limit=500&mobile=%d";
     private static final String API_ENDPOINT_QUERY_FORMAT =
             "http://apiserver.eventshigh.com:8888/api/events/%s/%s?limit=200&mobile=%d";
+    private static final String API_ENDPOINT_FEATURED_FORMAT =
+            "http://apiserver.eventshigh.com:8888/api/get_featured_events/%s?mobile=%d";
     private static final String API_ENDPOINT_EVENT_UBER_FORMAT =
             "http://apiserver.eventshigh.com:8888/api/get_event_uber_info/%s?mobile=1";
 
@@ -56,6 +58,12 @@ public class EventsHighEndpoints {
             builder.appendQueryParameter("city", param.city.toString().toLowerCase());
         }
         return builder.appendQueryParameter("interest", param.query).build();
+    }
+
+    public static String getFeaturedEventsEndpoint(City city) {
+        return String.format(API_ENDPOINT_FEATURED_FORMAT,
+                city.toString().toLowerCase(),
+                BuildConfig.VERSION_CODE);
     }
 
     public static String getApiEndpoint(EventsContext eventsContext) throws IllegalArgumentException {

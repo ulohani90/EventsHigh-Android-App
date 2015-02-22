@@ -20,9 +20,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * This class describes one Event. Event have few attributes like title, category, location etc.
@@ -343,20 +341,10 @@ public class Event implements Parcelable {
     public static EventsCollection parseUpcomingEvents(EventsContext eventsContext,
             EventsMarkerManager eventsMarkerManager, JSONObject eventsJSON) throws JSONException {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
-        JSONArray whitelistCategoriesJSON = eventsJSON.optJSONArray("categories");
-
-        Set<String> whitelistCategories = new HashSet<>();
-        if (whitelistCategoriesJSON != null) {
-            for (int i = 0; i < whitelistCategoriesJSON.length(); i++) {
-                whitelistCategories.add(whitelistCategoriesJSON.getString(i).toLowerCase());
-            }
-        }
-
         eventsMarkerManager.waitForLoading();
         EventsCollection.Builder builder =  new EventsCollection.Builder(eventsContext.city,
                 eventsMarkerManager,
-                !EventsHighEndpoints.isDateQuery(eventsContext.query) && eventsContext.dateFilter.isEmpty(),
-                whitelistCategories);
+                !EventsHighEndpoints.isDateQuery(eventsContext.query) && eventsContext.dateFilter.isEmpty());
         List<Event> events = fromJSON(eventsContext.city, upcomingEvents);
         if (eventsContext.location != null) {
             Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));

@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.widget.SearchView;
@@ -19,13 +18,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
@@ -33,19 +30,20 @@ import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
-import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.settings.SettingsActivity;
+import com.eventshigh.nearme.app.ui.CityListAdapter;
+import com.eventshigh.nearme.app.ui.CityListAdapter.OnCitySelectionListener;
+import com.eventshigh.nearme.app.ui.FailedRetryAdapter;
+import com.eventshigh.nearme.app.ui.FeaturedEventsAdapter;
+import com.eventshigh.nearme.app.ui.LoadingAdapter;
 import com.eventshigh.nearme.app.user.GcmRegistration;
-import com.eventshigh.nearme.app.utils.DateTimeUtils;
-import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -68,14 +66,14 @@ import java.util.List;
  * preference in future.
  */
 public class LaunchActivity extends BaseActivity {
-
     // Constants
-    private static final int MAX_FEATURED_EVENTS = 5;
     private static final int EXPLORE_CARD_WIDTH_DP = 160;
     private static final int MIN_EXPLORE_CARD_IN_ROW = 2;
-    private static final String[] EXPLORE_TAGS = { "Parties", "Health & Wellness", "Tech",
-            "Education", "Theatre", "Outdoors", "Kids", "Dance", "Shopping", "Food", "Literature",
-            "Film", "Social Causes", "Environment", "Sports", "Spiritual", "Comedy", "Fashion"};
+    private static final long REFRESH_FEATURED_EVENTS_INTERVAL = 3600 * 1000L;
+    private static final int MARGIN_DP = 10;
+    private static final String[] EXPLORE_TAGS = { "Parties", "Tech", "Education", "Theatre",
+            "Outdoors", "Kids", "Dance", "Food", "Literature", "Film", "Environment", "Sports",
+            "Comedy", "Fashion"};
 
     // UI Elements for this activity.
     private ViewSwitcher viewSwitcher;
@@ -184,6 +182,23 @@ public class LaunchActivity extends BaseActivity {
     // Callbacks
     // ***********************
 
+    public void onRetry(View view) {
+        dotsView.removeAllViews();
+        if (featuredEventsPager.getAdapter() == null ||
+            featuredEventsPager.getAdapter() instanceof FailedRetryAdapter) {
+            featuredEventsPager.setAdapter(new LoadingAdapter(this));
+        }
+
+        FeaturedEventsRequest.submit(this, eventsContext, Priority.IMMEDIATE, false, mFeaturedEventsListener,
+                new ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Toast.makeText(LaunchActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
+                        featuredEventsPager.setAdapter(new FailedRetryAdapter(LaunchActivity.this));
+                    }
+                });
+    }
+
     // Callback for GoogleClientApi. This is called when googleClientApi is
     // ready to accept requests. We set the user location if needed and start
     // next activity.
@@ -234,7 +249,7 @@ public class LaunchActivity extends BaseActivity {
             reportActionToAnalytics("locationFailed");
             viewSwitcher.setDisplayedChild(1);
             ListView citySelector = (ListView) findViewById(R.id.city_selector);
-            citySelector.setAdapter(new CityListAdapter());
+            citySelector.setAdapter(new CityListAdapter(LaunchActivity.this, mCitySelectionListener));
             if (connectionResult != null) {
                 Toast.makeText(LaunchActivity.this, R.string.failed_location, Toast.LENGTH_SHORT).show();
             }
@@ -289,18 +304,18 @@ public class LaunchActivity extends BaseActivity {
         }
     }
 
-    private boolean exploreScreenPopulated = false;
+    private long exploreScreenPopulatedTimestamp = 0;
     private void showExploreScreen() {
         viewSwitcher.setDisplayedChild(0);
 
-        if (!exploreScreenPopulated) {
+        if (exploreScreenPopulatedTimestamp == 0) {
             DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 
             FrameLayout.LayoutParams param = (FrameLayout.LayoutParams) featuredEventsPager.getLayoutParams();
             param.height = Math.min(displayMetrics.heightPixels,  3 * displayMetrics.widthPixels / 4);
             featuredEventsPager.setLayoutParams(param);
 
-            int spacing = Utils.dpToPx(this, 10);
+            int spacing = Utils.dpToPx(this, MARGIN_DP);
             int widthPixels = displayMetrics.widthPixels;
             int numColumns = Math.max(MIN_EXPLORE_CARD_IN_ROW,
                     (widthPixels - spacing * 2) / Utils.dpToPx(this, EXPLORE_CARD_WIDTH_DP));
@@ -323,50 +338,28 @@ public class LaunchActivity extends BaseActivity {
 
                 last.addView(getExploreCard(EXPLORE_TAGS[i], exploreCardLP, last));
             }
-
-            exploreScreenPopulated = true;
         }
 
         // Submit the request to populate Featured Events.
-        dotsView.removeAllViews();
-        featuredEventsPager.setAdapter(mLoadingAdapter);
-        FeaturedEventsRequest.submit(this, eventsContext, Priority.IMMEDIATE, false, mEventsListener,
-                new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(LaunchActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
-                        // featuredEventsPager.setAdapter(mFailedAdaper);
-                    }
-                });
+        if (exploreScreenPopulatedTimestamp + REFRESH_FEATURED_EVENTS_INTERVAL <
+                System.currentTimeMillis()) {
+            onRetry(null);
+        }
+        exploreScreenPopulatedTimestamp = System.currentTimeMillis();
     }
 
-    private class CityListAdapter extends ArrayAdapter<City> {
-        public CityListAdapter() {
-            super(LaunchActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1);
-            addAll(City.values());
-        }
-
+    private final OnCitySelectionListener mCitySelectionListener = new OnCitySelectionListener() {
         @Override
-        public View getView(final int position, View convertView, ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            view.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    City city = getItem(position);
-                    eventsContext.changeLocation(city.cityBounds.getCenter());
-                    gcmRegistration.setLastCity(city);
-                    showNextScreen(false);
-                }
-            });
-
-            return view;
+        public void onCitySelection(City city) {
+            eventsContext.changeLocation(city.cityBounds.getCenter());
+            gcmRegistration.setLastCity(city);
+            showNextScreen(false);
         }
-    }
+    };
 
     private View getExploreCard(final String tagName, LayoutParams lp, ViewGroup parent) {
         final View view = getLayoutInflater().inflate(R.layout.explore_card, parent, false);
         view.setLayoutParams(lp);
-        ((TextView) view.findViewById(R.id.explore_name)).setText(tagName);
         ((ImageView) view.findViewById(R.id.explore_image)).setImageResource(
                 getInfoGraphId(tagName));
 
@@ -392,7 +385,7 @@ public class LaunchActivity extends BaseActivity {
         return R.drawable.eh_default_event_list;
     }
 
-    private Listener<List<Event>> mEventsListener = new Listener<List<Event>>() {
+    private Listener<List<Event>> mFeaturedEventsListener = new Listener<List<Event>>() {
         @Override
         public void onResponse(final List<Event> events, boolean isIntermediate) {
             int dp4 = Utils.dpToPx(LaunchActivity.this, 4);
@@ -405,25 +398,26 @@ public class LaunchActivity extends BaseActivity {
 
 
             LayoutInflater layoutInflater = getLayoutInflater();
-            int numEventsToShow = Math.min(events.size(), MAX_FEATURED_EVENTS);
             dotsView.removeAllViews();
-            for (int i = 0; i < numEventsToShow; i++) {
+            for (int i = 0; i < events.size(); i++) {
                 View view = layoutInflater.inflate(R.layout.viewpager_dot, dotsView, false);
                 dotsView.addView(view);
                 view.setLayoutParams(i == 0 ? bigDotLayoutParams : smallDotLayoutParams);
             }
 
-            featuredEventsPager.setAdapter(new FeaturedEventsAdapter(events.subList(0, numEventsToShow)));
+            featuredEventsPager.setAdapter(new FeaturedEventsAdapter(LaunchActivity.this,  events));
             featuredEventsPager.setOnPageChangeListener(new OnPageChangeListener() {
                 @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                public void onPageScrolled(int position, float positionOffset,
+                                           int positionOffsetPixels) {
                     // do nothing.
                 }
 
                 @Override
                 public void onPageSelected(int position) {
                     for (int i = 0; i < dotsView.getChildCount(); i++) {
-                        dotsView.getChildAt(i).setLayoutParams( i == position ? bigDotLayoutParams : smallDotLayoutParams);
+                        dotsView.getChildAt(i).setLayoutParams(
+                                i == position ? bigDotLayoutParams : smallDotLayoutParams);
                     }
                 }
 
@@ -432,91 +426,6 @@ public class LaunchActivity extends BaseActivity {
                     // do nothing.
                 }
             });
-        }
-    };
-
-    private class FeaturedEventsAdapter extends PagerAdapter {
-        private final List<Event> events;
-
-        private FeaturedEventsAdapter(List<Event> events) {
-            this.events = events;
-        }
-
-        @Override
-        public int getCount() {
-            return events.size();
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == object;
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            View eventCard = getLayoutInflater().inflate(
-                    R.layout.explore_event_card, container, false);
-            final Event event = events.get(position);
-
-            NetworkImageView imageView = (NetworkImageView) eventCard.findViewById(R.id.event_bg);
-            if (event.imgUrl != null) {
-                imageView.setImageUrl(
-                        event.imgUrl, VolleyHelper.getImageLoader(LaunchActivity.this));
-            } else {
-                imageView.setImageBitmap(null);
-            }
-
-            ((TextView)eventCard.findViewById(R.id.event_title)).setText(event.title);
-            ((TextView)eventCard.findViewById(R.id.event_venue)).setText(Utils.capitalize(
-                    event.venue == null ? event.city.toString() : event.venue));
-
-            EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
-            if (eventTime != null) {
-                ((TextView)eventCard.findViewById(R.id.event_date)).setText(eventTime.day + ", " + eventTime.date);
-                if (eventTime.time != null) {
-                    ((TextView) eventCard.findViewById(R.id.event_time)).setText(eventTime.time);
-                }
-            }
-
-            eventCard.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    reportEventAction(event, "featuredClick");
-                    showEventDetails(event);
-                }
-            });
-
-            container.addView(eventCard);
-            return eventCard;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View) object);
-        }
-    }
-
-    private PagerAdapter mLoadingAdapter = new PagerAdapter() {
-        @Override
-        public int getCount() {
-            return 1;
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == object;
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            View view = getLayoutInflater().inflate(R.layout.view_loading, container, false);
-            container.addView(view);
-            return view;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View) object);
         }
     };
 

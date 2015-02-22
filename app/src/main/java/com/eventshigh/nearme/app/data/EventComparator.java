@@ -35,12 +35,11 @@ public class EventComparator implements Comparator<Event> {
     // Find the distance of events from user's position with weight for popular events.
     // If event has e**N users going, we reduce 500*N meters from its distance.
     private static double weightedScore(Event event, boolean isFavourite, LatLng userLocation,
-                                           Map<String, Double> eventToDistanceMap) {
+                                        Map<String, Double> eventToDistanceMap) {
         Double result = eventToDistanceMap.get(event.id);
         if (result != null) {
             return result;
         }
-
 
         EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
         float distance = LocationUtils.distanceInMeters(event.location, userLocation);

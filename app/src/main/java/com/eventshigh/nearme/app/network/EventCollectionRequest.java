@@ -29,7 +29,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
      * Helper method to submit a volley request to fetch Events information.
      *
      * @param activity an application eventsContext to initiate the volley.
-     * @param eventsContext EventFetcherParam representing the request.
+     * @param eventsContext EventsContext representing the request.
      * @param listener callback on success.
      * @param errorListener callback on failures.
      */

@@ -114,39 +114,9 @@
             />
         </LinearLayout>
 
-        <LinearLayout
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-        >
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/failed_load"
-                android:gravity="center"
-                android:padding="8dp"
-            />
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="@drawable/shape_vertical_divider"
-            />
-            <Button
-                style="@style/ButtonTransparentDark"
-                android:id="@+id/retry_button"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:drawableLeft="@drawable/ic_refresh_grey600_48dp"
-                android:drawableStart="@drawable/ic_refresh_grey600_48dp"
-                android:padding="8dp"
-                android:drawablePadding="8dp"
-                android:onClick="onRetryButtonClicked"
-                android:text="@string/action_retry"
-            />
-        </LinearLayout>
+        <include
+            layout="@layout/view_retry"
+        />
     </ViewSwitcher>
 
     <ImageButton
