@@ -92,6 +92,12 @@ public abstract class BaseActivity extends ActionBarActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        getSupportActionBar().collapseActionView();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {

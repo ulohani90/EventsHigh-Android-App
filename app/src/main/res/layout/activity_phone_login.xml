@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:paddingLeft="24dp"
-              android:paddingRight="24dp"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:background="@android:color/white"
-              tools:context=".activity.PhoneLoginActivity"
-    >
-
+    android:layout_width="match_parent"
+    android:paddingLeft="24dp"
+    android:paddingRight="24dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    tools:context=".activity.PhoneLoginActivity"
+>
     <ImageView
         android:id="@+id/eh_logo"
         android:layout_width="wrap_content"
@@ -18,7 +17,7 @@
         android:layout_gravity="center"
         android:src="@drawable/eh_logo_with_text"
         tools:ignore="ContentDescription"
-        />
+    />
 
     <LinearLayout
         android:id="@+id/phone_no_parent"
@@ -27,15 +26,15 @@
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
+        android:layout_height="wrap_content"
+    >
         <EditText
             android:id="@+id/phone_no"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="phone"
             android:hint="@string/ui_enter_phone_number_hint"
-            />
+        />
 
         <Button
             android:id="@+id/send_code"
@@ -45,7 +44,7 @@
             android:layout_margin="24dp"
             android:text="@string/ui_send_code"
             android:onClick="sendCode"
-            />
+        />
 
         <TextView
             android:layout_width="match_parent"
@@ -53,10 +52,10 @@
             android:layout_marginTop="24dp"
             android:textSize="14sp"
             android:drawableLeft="@drawable/onboarding_info"
+            android:drawableStart="@drawable/onboarding_info"
             android:drawablePadding="8dp"
             android:text="@string/ui_phone_verify_tip"
-            />
-
+        />
     </LinearLayout>
 
     <LinearLayout
@@ -66,15 +65,15 @@
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
+        android:layout_height="wrap_content"
+    >
         <TextView
             android:id="@+id/code_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:text="@string/ui_code"
-            />
+        />
 
         <EditText
             android:layout_marginTop="8dp"
@@ -82,27 +81,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
-            />
+        />
 
         <LinearLayout
             android:layout_marginTop="24dp"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            android:layout_height="wrap_content"
+        >
             <Button
                 style="@style/PhoneLoginRetryButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/ui_retry"
-                android:onClick="retryPhoneVerification"
-                />
-
+                android:onClick="sendCode"
+            />
             <Space
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-
+                android:layout_weight="1"
+            />
             <Button
                 android:id="@+id/verify_code"
                 style="@style/PhoneLoginButton"
@@ -110,10 +108,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/ui_verify_code"
                 android:onClick="verifyCode"
-                />
-
+            />
         </LinearLayout>
-
     </LinearLayout>
 
     <LinearLayout
@@ -121,8 +117,8 @@
         android:layout_marginTop="24dp"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
+        android:layout_height="wrap_content"
+    >
         <TextView
             android:id="@+id/verified"
             android:layout_marginTop="24dp"
@@ -131,16 +127,15 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:text="@string/ui_code_verified"
-            />
+        />
 
         <Button
             style="@style/PhoneLoginRetryButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ui_reverify"
-            android:onClick="retryPhoneVerification"
-            />
-
+            android:text="@string/ui_change_no"
+            android:onClick="changeNumber"
+        />
     </LinearLayout>
 
 </LinearLayout>
