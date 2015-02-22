@@ -4,14 +4,13 @@
                                     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:descendantFocusability="blocksDescendants"
     card_view:cardCornerRadius="2dp"
 >
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/selector_event_card"
-        android:descendantFocusability="blocksDescendants"
     >
         <com.android.volley.toolbox.NetworkImageView
             android:id="@+id/event_bg"

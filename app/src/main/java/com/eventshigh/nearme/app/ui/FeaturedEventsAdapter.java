@@ -11,6 +11,7 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -60,6 +61,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
     private static class ExploreEventCard {
         public final View root;
         public final NetworkImageView imageView;
+        public final TextView categoryView;
         public final TextView titleView;
         public final TextView venueView;
         public final TextView dateView;
@@ -70,6 +72,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
         public ExploreEventCard(View root) {
             this.root = root;
             this.imageView = (NetworkImageView) root.findViewById(R.id.event_bg);
+            this.categoryView = (TextView) root.findViewById(R.id.event_category);
             this.titleView = (TextView) root.findViewById(R.id.event_title);
             this.venueView = (TextView) root.findViewById(R.id.event_venue);
             this.dateView = (TextView) root.findViewById(R.id.event_date);
@@ -86,6 +89,10 @@ public class FeaturedEventsAdapter extends PagerAdapter {
             titleView.setText(event.title);
             venueView.setText(Utils.capitalize(
                     event.venue == null ? event.city.toString() : event.venue));
+
+            if (event.category != EventCategory.OTHER) {
+                categoryView.setText(Utils.capitalize(event.category.toString()));
+            }
 
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
             if (eventTime != null) {
