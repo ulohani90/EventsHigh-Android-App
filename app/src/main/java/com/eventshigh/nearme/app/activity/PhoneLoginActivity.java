@@ -7,6 +7,7 @@ import android.text.util.Linkify;
 import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +45,7 @@ public class PhoneLoginActivity extends BaseActivity {
     private EditText phoneNoView;
     private EditText codeView;
 
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,8 @@ public class PhoneLoginActivity extends BaseActivity {
 
         phoneNoView = (EditText) findViewById(R.id.phone_no);
         codeView = (EditText) findViewById(R.id.code);
+
+        progressBar = (ProgressBar) findViewById(R.id.top_progress_bar);
 
         account = new Account(this);
         updateView();
@@ -87,6 +91,7 @@ public class PhoneLoginActivity extends BaseActivity {
     }
 
     public void sendCode(View view) {
+        progressBar.setVisibility(View.VISIBLE);
         final String phoneNo = phoneNoView.getText().toString();
         Uri requestUrl = AccountStateReporter.getBaseUri(this, "registerMobileNo")
                 .appendQueryParameter("mobile_no", phoneNo)
@@ -97,6 +102,8 @@ public class PhoneLoginActivity extends BaseActivity {
                             new Listener<JSONObject>() {
                                 @Override
                                 public void onResponse(JSONObject s, boolean isIntermediate) {
+                                    progressBar.setVisibility(View.GONE);
+
                                     VerificationStatus status = parseStatus(s.optString("status"));
                                     if (status == VerificationStatus.RETRY) {
                                         showRetryMessage();
@@ -115,6 +122,7 @@ public class PhoneLoginActivity extends BaseActivity {
                             new ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError volleyError) {
+                                    progressBar.setVisibility(View.GONE);
                                     showRetryMessage();
                                 }
                             }
@@ -126,6 +134,7 @@ public class PhoneLoginActivity extends BaseActivity {
     }
 
     public void verifyCode(View view) {
+        progressBar.setVisibility(View.VISIBLE);
         Uri requestUrl = AccountStateReporter.getBaseUri(this, "verifyMobileNo")
                 .appendQueryParameter("mobile_no", phoneNoView.getText().toString())
                 .appendQueryParameter("verification_code", codeView.getText().toString())
@@ -136,6 +145,7 @@ public class PhoneLoginActivity extends BaseActivity {
                             new Listener<JSONObject>() {
                                 @Override
                                 public void onResponse(JSONObject s, boolean isIntermediate) {
+                                    progressBar.setVisibility(View.GONE);
                                     VerificationStatus status = parseStatus(s.optString("status"));
                                     if (status != VerificationStatus.VERIFIED) {
                                         showRetryMessage();
@@ -149,6 +159,7 @@ public class PhoneLoginActivity extends BaseActivity {
                             new ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError volleyError) {
+                                    progressBar.setVisibility(View.GONE);
                                     showRetryMessage();
                                 }
                             }
