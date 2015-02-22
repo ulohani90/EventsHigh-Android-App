@@ -47,8 +47,8 @@ public class EventMarkDbHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    static void addEntry(final SQLiteDatabase database, final String eventId, final EventMark eventMark) {
-        new Thread(new Runnable() {
+    static Thread addEntry(final SQLiteDatabase database, final String eventId, final EventMark eventMark) {
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 ContentValues values = new ContentValues();
@@ -57,25 +57,31 @@ public class EventMarkDbHelper extends SQLiteOpenHelper {
                 values.put(EVENT_PREFS_COLUMN_UPDATED_AT, (int) (System.currentTimeMillis() / 1000));
                 database.replace(EVENT_PREFS_TABLE_NAME, null, values);
             }
-        }).start();
+        });
+        thread.start();
+        return thread;
     }
 
-    static void removeEntry(final SQLiteDatabase database, final String eventId) {
-        new Thread(new Runnable() {
+    static Thread removeEntry(final SQLiteDatabase database, final String eventId) {
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 database.delete(EVENT_PREFS_TABLE_NAME,
                         EVENT_PREFS_COLUMN_EVENT_ID + " = '" + eventId + "'", null);
             }
-        }).start();
+        });
+        thread.start();
+        return thread;
     }
 
-    static void restoreAll(final SQLiteDatabase database) {
+    static void restoreAll(Context context) {
+        final SQLiteDatabase database = new EventMarkDbHelper(context).getWritableDatabase();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 database.delete(EVENT_PREFS_TABLE_NAME,
                         EVENT_PREFS_COLUMN_EVENT_MARK + " = " + EventMark.DISMISSED.value, null);
+                database.close();
             }
         }).start();
     }

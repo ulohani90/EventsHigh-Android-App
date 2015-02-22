@@ -72,30 +72,40 @@ public class EventsMarkerManager {
      * closed after its not needed.
      */
     public class Editor implements Closeable {
-        private SQLiteDatabase database;
+        private final SQLiteDatabase database;
+        private final List<Thread> threads = new ArrayList<>();
 
         private Editor(Context context) {
             database = new EventMarkDbHelper(context).getWritableDatabase();
         }
 
         public void close() {
+            for (Thread thread : threads) {
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    // do nothing.
+                }
+            }
             database.close();
         }
 
-        public void recordPref(String eventId, @Nullable EventMark pref) {
+        public Editor recordEventMark(String eventId, @Nullable EventMark pref) {
             if (pref == null) {
-                removePref(eventId);
+                removeEventMark(eventId);
             } else {
                 eventMarkMap.put(eventId, pref);
                 callListeners(eventId, pref);
-                EventMarkDbHelper.addEntry(database, eventId, pref);
+                threads.add(EventMarkDbHelper.addEntry(database, eventId, pref));
             }
+            return this;
         }
 
-        public void removePref(String eventId) {
+        public Editor removeEventMark(String eventId) {
             eventMarkMap.remove(eventId);
             callListeners(eventId, null);
-            EventMarkDbHelper.removeEntry(database, eventId);
+            threads.add(EventMarkDbHelper.removeEntry(database, eventId));
+            return this;
         }
 
         public EventsMarkerManager getEventsMarkerManager() {
@@ -178,8 +188,7 @@ public class EventsMarkerManager {
     }
 
     public void restoreAll() {
-        SQLiteDatabase database = new EventMarkDbHelper(context).getWritableDatabase();
-        EventMarkDbHelper.restoreAll(database);
+        EventMarkDbHelper.restoreAll(context);
 
         Iterator<Entry<String, EventMark>> it = eventMarkMap.entrySet().iterator();
         while (it.hasNext()) {

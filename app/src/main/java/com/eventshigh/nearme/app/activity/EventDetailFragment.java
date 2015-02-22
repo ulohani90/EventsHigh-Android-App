@@ -376,7 +376,7 @@ public class EventDetailFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 activity.reportEventAction(event, "addFavourite");
-                eventsMarkerEditor.recordPref(event.id, EventMark.FAVOURITE);
+                eventsMarkerEditor.recordEventMark(event.id, EventMark.FAVOURITE);
                 setFavouriteView(eventCard, EventMark.FAVOURITE);
             }
         });
@@ -384,7 +384,7 @@ public class EventDetailFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 activity.reportEventAction(event, "removeFavourite");
-                eventsMarkerEditor.recordPref(event.id, null);
+                eventsMarkerEditor.recordEventMark(event.id, null);
                 setFavouriteView(eventCard, null);
             }
         });
@@ -393,7 +393,7 @@ public class EventDetailFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 activity.reportEventAction(event, "dismiss");
-                eventsMarkerEditor.recordPref(event.id, EventMark.DISMISSED);
+                eventsMarkerEditor.recordEventMark(event.id, EventMark.DISMISSED);
                 activity.finish();
                 activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }

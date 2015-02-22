@@ -194,7 +194,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
                 if (adapter != null) {
                     adapter.lastChangedEventId = event.id;
                 }
-                eventsMarkerEditor.recordPref(event.id, EventMark.FAVOURITE);
+                eventsMarkerEditor.recordEventMark(event.id, EventMark.FAVOURITE);
                 setFavouriteView(eventCard, EventMark.FAVOURITE);
             }
         });
@@ -206,7 +206,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
                 if (adapter != null) {
                     adapter.lastChangedEventId = event.id;
                 }
-                eventsMarkerEditor.recordPref(event.id, null);
+                eventsMarkerEditor.recordEventMark(event.id, null);
                 setFavouriteView(eventCard, null);
             }
         });
@@ -218,7 +218,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
                 if (adapter != null) {
                     adapter.enableAnimation = false;
                 }
-                eventsMarkerEditor.recordPref(event.id, EventMark.DISMISSED);
+                eventsMarkerEditor.recordEventMark(event.id, EventMark.DISMISSED);
                 if (showDismissToast) {
                     Toast.makeText(activity, R.string.message_dismiss, Toast.LENGTH_SHORT).show();
                     showDismissToast = false;

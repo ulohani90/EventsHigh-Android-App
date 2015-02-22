@@ -4,12 +4,15 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
@@ -44,34 +47,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
         View eventCard = activity.getLayoutInflater().inflate(
                 R.layout.explore_event_card, container, false);
         final Event event = events.get(position);
-
-        NetworkImageView imageView = (NetworkImageView) eventCard.findViewById(R.id.event_bg);
-        if (event.imgUrl != null) {
-            imageView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(activity));
-        } else {
-            imageView.setImageBitmap(null);
-        }
-
-        ((TextView)eventCard.findViewById(R.id.event_title)).setText(event.title);
-        ((TextView)eventCard.findViewById(R.id.event_venue)).setText(Utils.capitalize(
-                event.venue == null ? event.city.toString() : event.venue));
-
-        EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
-        if (eventTime != null) {
-            ((TextView)eventCard.findViewById(R.id.event_date)).setText(eventTime.day + ", " + eventTime.date);
-            if (eventTime.time != null) {
-                ((TextView) eventCard.findViewById(R.id.event_time)).setText(eventTime.time);
-            }
-        }
-
-        eventCard.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.reportEventAction(event, "featuredClick");
-                activity.showEventDetails(event);
-            }
-        });
-
+        new ExploreEventCard(eventCard).attachTo(event, activity);
         container.addView(eventCard);
         return eventCard;
     }
@@ -79,5 +55,77 @@ public class FeaturedEventsAdapter extends PagerAdapter {
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((View) object);
+    }
+
+    private static class ExploreEventCard {
+        public final View root;
+        public final NetworkImageView imageView;
+        public final TextView titleView;
+        public final TextView venueView;
+        public final TextView dateView;
+        public final TextView timeView;
+        public final ImageView favouriteView;
+        public final ImageView favouritedView;
+
+        public ExploreEventCard(View root) {
+            this.root = root;
+            this.imageView = (NetworkImageView) root.findViewById(R.id.event_bg);
+            this.titleView = (TextView) root.findViewById(R.id.event_title);
+            this.venueView = (TextView) root.findViewById(R.id.event_venue);
+            this.dateView = (TextView) root.findViewById(R.id.event_date);
+            this.timeView = (TextView) root.findViewById(R.id.event_time);
+            this.favouriteView = (ImageView) root.findViewById(R.id.action_favourite);
+            this.favouritedView = (ImageView) root.findViewById(R.id.action_favourited);
+        }
+
+        public void attachTo(final Event event, final BaseActivity activity) {
+            if (event.imgUrl != null) {
+                imageView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(activity));
+            }
+
+            titleView.setText(event.title);
+            venueView.setText(Utils.capitalize(
+                    event.venue == null ? event.city.toString() : event.venue));
+
+            EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
+            if (eventTime != null) {
+                dateView.setText(eventTime.day + ", " + eventTime.date);
+                if (eventTime.time != null) {
+                    timeView.setText(eventTime.time);
+                }
+            }
+
+            final EventsMarkerManager eventsMarkerManager = EventsMarkerManager.getInstance(activity);
+            setFavouriteView(eventsMarkerManager.isFavourite(event.id));
+            favouriteView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.reportEventAction(event, "addFavourite");
+                    eventsMarkerManager.getEditor().recordEventMark(event.id, EventMark.FAVOURITE).close();
+                    setFavouriteView(true);
+                }
+            });
+            favouritedView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.reportEventAction(event, "removeFavourite");
+                    eventsMarkerManager.getEditor().removeEventMark(event.id).close();
+                    setFavouriteView(false);
+                }
+            });
+
+            root.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.reportEventAction(event, "featuredClick");
+                    activity.showEventDetails(event);
+                }
+            });
+        }
+
+        public void setFavouriteView(boolean isFavourite) {
+            favouriteView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
+            favouritedView.setVisibility(isFavourite ? View.VISIBLE : View.GONE);
+        }
     }
 }

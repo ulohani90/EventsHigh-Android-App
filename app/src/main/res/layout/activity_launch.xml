@@ -33,9 +33,10 @@
                     android:id="@+id/dots_parent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="top|center_horizontal"
+                    android:gravity="center"
+                    android:layout_gravity="bottom"
                     android:orientation="horizontal"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="80dp"
                 />
             </FrameLayout>
             <LinearLayout

@@ -22,6 +22,17 @@
         android:scaleType="centerCrop"
         android:adjustViewBounds="false"
     />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignTop="@+id/event_bg"
+        android:layout_alignBottom="@+id/event_bg"
+        android:layout_alignLeft="@+id/event_bg"
+        android:layout_alignRight="@+id/event_bg"
+        android:layout_alignStart="@+id/event_bg"
+        android:layout_alignEnd="@+id/event_bg"
+        android:background="@drawable/shape_film"
+    />
     <TextView
         android:id="@+id/event_title"
         android:layout_width="match_parent"
@@ -99,5 +110,31 @@
         android:fontFamily="sans-serif-light"
         android:textColor="@android:color/white"
         tools:text="10:30 am"
+    />
+    <ImageView
+        android:id="@+id/action_favourite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="6dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/event_time"
+        android:src="@drawable/eh_favourite_normal_white"
+        android:clickable="true"
+    />
+    <ImageView
+        android:id="@+id/action_favourited"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="6dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/event_time"
+        android:src="@drawable/eh_favourite_active"
+        android:clickable="true"
     />
 </RelativeLayout>
