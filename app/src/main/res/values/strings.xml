@@ -71,8 +71,8 @@
     <!-- Sharing -->
     <string name="action_share_app">Share This App?</string>
     <string name="action_share_app2">Share App</string>
-    <string name="share_app_text">Hey, Check out this app to know all the amazing events happening near you and in your locality! https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&amp;referrer=%s</string>
-    <string name="share_event_text">Hey, Check out this amazing event! What say? %s?src=ehm</string>
+    <string name="share_app_text">Hey, check out this app to know all the amazing events happening near you and in your locality! https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&amp;referrer=%s</string>
+    <string name="share_event_text">Hey, check out this event! What say? %s?src=ehm (EventsHigh: Find amazing events near you!)</string>
 
     <!-- Failed messages -->
     <string name="failed_login">Failed to login! You can retry or skip.</string>

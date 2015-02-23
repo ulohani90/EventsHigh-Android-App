@@ -59,8 +59,7 @@ import java.util.List;
 
 /**
  * A placeholder {@link android.app.Activity} which is responsible for launching
- * either {@link EventsMapsActivity} or
- * {@link EventsGridActivity} based on user preference.
+ * either {@link EventsMapsActivity} or {@link EventsGridActivity} based on user preference.
  *
  * For now, this activity sets the preference 50%-50% for first time and then use this
  * preference in future.
