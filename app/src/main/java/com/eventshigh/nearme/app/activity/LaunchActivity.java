@@ -70,9 +70,8 @@ public class LaunchActivity extends BaseActivity {
     private static final int MIN_EXPLORE_CARD_IN_ROW = 2;
     private static final long REFRESH_FEATURED_EVENTS_INTERVAL = 3600 * 1000L;
     private static final int MARGIN_DP = 10;
-    private static final String[] EXPLORE_TAGS = { "Parties", "Tech", "Education", "Theatre",
-            "Outdoors", "Kids", "Dance", "Food", "Literature", "Film", "Environment", "Sports",
-            "Comedy", "Fashion"};
+    private static final String[] EXPLORE_TAGS = { "Parties", "Tech", "Theatre", "Kids", "Food",
+            "Dance",  "Sports", "Comedy", "Film", "Literature", "Environment", "Fashion"};
 
     // UI Elements for this activity.
     private ViewSwitcher viewSwitcher;
