@@ -37,7 +37,7 @@
                     android:gravity="center"
                     android:layout_gravity="bottom"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="84dp"
+                    android:layout_marginBottom="88dp"
                 />
             </FrameLayout>
             <LinearLayout

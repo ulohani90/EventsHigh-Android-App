@@ -9,7 +9,6 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FF0099B2"
     >
         <com.android.volley.toolbox.NetworkImageView
             android:id="@+id/event_bg"
@@ -35,13 +34,18 @@
             android:layout_alignEnd="@+id/event_bg"
             android:background="@drawable/shape_film"
         />
-        <View
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/shape_triangle"
-            android:layout_marginLeft="12dp"
-            android:layout_marginStart="12dp"
-            android:layout_above="@+id/event_category"
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/event_title"
+            android:layout_marginTop="-40dp"
+            android:src="@drawable/featured_event_card_wrapper"
+            android:scaleType="fitXY"
         />
         <TextView
             android:id="@+id/event_category"

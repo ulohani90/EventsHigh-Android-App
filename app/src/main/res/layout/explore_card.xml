@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:foreground="?android:attr/selectableItemBackground"
     android:descendantFocusability="blocksDescendants"
-    card_view:cardCornerRadius="10dp"
+    card_view:cardCornerRadius="5dp"
     card_view:cardPreventCornerOverlap="false"
     card_view:cardElevation="4dp"
     tools:layout_width="120dp"
