@@ -29,7 +29,7 @@
     <string name="ui_following">Following</string>
     <string name="ui_favourite">Favourite</string>
     <string name="ui_today">Today</string>
-    <string name="ui_all">All</string>
+    <string name="ui_tomorrow">Tomorrow</string>
     <string name="ui_this_weekend">Weekend</string>
     <string name="ui_favourited">Favourited</string>
     <string name="ui_dismiss">Not Interested</string>

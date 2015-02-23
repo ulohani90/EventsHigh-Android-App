@@ -204,8 +204,8 @@ public abstract class BaseActivity extends ActionBarActivity {
     public void showDirections(Event event) {
         reportEventAction(event, "showDirections");
 
-        String query = event.address;
-        if (query == null) {
+        String query = (event.venue == null ? "" : event.venue + " " ) + (event.address == null ? "" : event.address);
+        if (query.isEmpty()) {
             if (event.location == null) {
                 reportActionToAnalytics("skipDirectionsNoLocation");
                 Toast.makeText(this, R.string.failed_event_location, Toast.LENGTH_SHORT).show();

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.location.Location;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
@@ -34,6 +35,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
+import com.eventshigh.nearme.app.data.EventsCollection.EventTab;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.settings.Preferences;
@@ -69,8 +71,8 @@ public class LaunchActivity extends BaseActivity {
     private static final int EXPLORE_CARD_WIDTH_DP = 160;
     private static final int MIN_EXPLORE_CARD_IN_ROW = 2;
     private static final long REFRESH_FEATURED_EVENTS_INTERVAL = 3600 * 1000L;
-    private static final int MARGIN_DP = 10;
-    private static final String[] EXPLORE_TAGS = { "Parties", "Tech", "Theatre", "Kids", "Food",
+    private static final int MARGIN_DP = android.os.Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP ? 10 : 2;
+    private static final String[] EXPLORE_TAGS = { "All", "Favourite", "Parties", "Tech", "Theatre", "Kids", "Food",
             "Dance",  "Sports", "Comedy", "Film", "Literature", "Environment", "Fashion"};
 
     // UI Elements for this activity.
@@ -260,15 +262,21 @@ public class LaunchActivity extends BaseActivity {
     // ***********************
 
     public void showToday(View view) {
+        reportActionToAnalytics("showToday");
         eventsContext.setDateFilter(Calendar.getInstance());
         showNextScreen(true);
     }
 
-    public void showAll(View view) {
+    public void showTomorrow(View view) {
+        reportActionToAnalytics("showTomorrow");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        eventsContext.setDateFilter(calendar);
         showNextScreen(true);
     }
 
     public void showThisWeekend(View view) {
+        reportActionToAnalytics("showThisWeekend");
         eventsContext.query = "this weekend";
         showNextScreen(true);
     }
@@ -366,7 +374,17 @@ public class LaunchActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 reportActionToAnalytics("exploreCategory", tagName);
-                eventsContext.query = tagName.toLowerCase();
+                switch (tagName) {
+                    case "All":
+                        eventsContext.tabName = Utils.capitalize(EventTab.ALL.name());
+                        break;
+                    case "Favourite":
+                        eventsContext.tabName = Utils.capitalize(EventTab.FAVOURITES.name());
+                        break;
+                    default:
+                        eventsContext.query = tagName.toLowerCase();
+                        break;
+                }
                 showNextScreen(true);
             }
         });

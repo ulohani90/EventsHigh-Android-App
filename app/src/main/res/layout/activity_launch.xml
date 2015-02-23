@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none"
-        android:layout_marginBottom="10dp"
+        android:paddingBottom="10dp"
+        android:clipToPadding="false"
     >
         <LinearLayout
             android:id="@+id/explore_layout"
@@ -59,8 +60,8 @@
                     android:fontFamily="sans-serif-medium"
                     android:textSize="15sp"
                     android:textColor="#798082"
-                    android:text="@string/ui_all"
-                    android:onClick="showAll"
+                    android:text="@string/ui_today"
+                    android:onClick="showToday"
                     tools:ignore="UnusedAttribute"
                 />
                 <View
@@ -81,8 +82,8 @@
                     android:fontFamily="sans-serif-medium"
                     android:textSize="15sp"
                     android:textColor="#798082"
-                    android:text="@string/ui_today"
-                    android:onClick="showToday"
+                    android:text="@string/ui_tomorrow"
+                    android:onClick="showTomorrow"
                     tools:ignore="UnusedAttribute"
                 />
                 <View
