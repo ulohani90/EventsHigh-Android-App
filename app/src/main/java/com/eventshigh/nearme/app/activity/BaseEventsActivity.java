@@ -99,7 +99,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     // Last city and query for which events are shown.
     protected EventsContext eventsContext;
-    private boolean showFollowScreen;
     // when was this activity last started on.
     private long lastStartedAt;
     // GoogleApiClient to report the page view.
@@ -132,7 +131,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // See if we have context passed to us within intent.
         eventsContext = IntentUtils.processIntent(this, getIntent());
-        showFollowScreen = !eventsContext.query.isEmpty() && !EventsHighEndpoints.isDateQuery(eventsContext.query);
 
         // Show query as title.
         if (!eventsContext.query.isEmpty()) {
@@ -140,15 +138,18 @@ public abstract class BaseEventsActivity extends BaseActivity {
             eventsContext.dateFilter = "";
         }
 
+        boolean showFollowScreen = !eventsContext.query.isEmpty() &&
+                !EventsHighEndpoints.isDateQuery(eventsContext.query);
         if (showFollowScreen) {
             reportActionToAnalytics("search", eventsContext.query);
             EventSearchSuggestionsProvider.saveRecentQuery(this, eventsContext.query);
 
             final Account account = new Account(this);
-            View followWidget = findViewById(R.id.follow_widget);
+            // View followWidget = findViewById(R.id.follow_widget);
             TextView followWidgetTitle = (TextView) findViewById(R.id.follow_title);
 
-            followWidget.setVisibility(View.VISIBLE);
+            // TODO: Enable follow widget once we get the follow flow correct.
+            // followWidget.setVisibility(View.VISIBLE);
             followWidgetTitle.setText(Utils.capitalize(eventsContext.query));
             setFollowButtons(account.isFollowing(eventsContext.query));
 
