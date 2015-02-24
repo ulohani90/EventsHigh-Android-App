@@ -26,6 +26,8 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,7 +48,8 @@ public abstract class BaseActivity extends ActionBarActivity {
     public static final String NOTIFICATION_ACTION = "com.eventshigh.nearme.app.notification";
 
     // Google Analytics
-    protected GAHelper gaHelper;
+    protected boolean isPlayServicesPresent;
+    private GAHelper gaHelper;
 
 
     // ***********************
@@ -67,7 +70,13 @@ public abstract class BaseActivity extends ActionBarActivity {
         }
 
         // Setup Google Analytics.
-        gaHelper = GAHelper.getInstance(getApplicationContext());
+        isPlayServicesPresent = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS;
+        if (isPlayServicesPresent) {
+            gaHelper = GAHelper.getInstance(getApplicationContext());
+            if (BuildConfig.DEBUG) {
+                gaHelper.setAppOptOut(true);
+            }
+        }
     }
 
     @Override
@@ -75,7 +84,9 @@ public abstract class BaseActivity extends ActionBarActivity {
         super.onStart();
 
         // Google Analytics reporting.
-        gaHelper.reportActivityStart(this);
+        if (isPlayServicesPresent) {
+            gaHelper.reportActivityStart(this);
+        }
 
         // Report app to Facebook
         com.facebook.AppEventsLogger.activateApp(this, "196111897251952");
@@ -87,7 +98,9 @@ public abstract class BaseActivity extends ActionBarActivity {
         VolleyHelper.getRequestQueue(getApplicationContext()).cancelAll(this);
 
         // Google Analytics reporting.
-        gaHelper.reportActivityStop(this);
+        if (isPlayServicesPresent) {
+            gaHelper.reportActivityStop(this);
+        }
 
         super.onStop();
     }
@@ -137,8 +150,9 @@ public abstract class BaseActivity extends ActionBarActivity {
 
     public void reportActionToAnalytics(String actionName, String label, long value,
                                         String... customValues) {
-        if (gaHelper != null) {
-            gaHelper.reportActionToAnalytics(getClass().getSimpleName(), actionName, label, value, customValues);
+        if (isPlayServicesPresent) {
+            gaHelper.reportActionToAnalytics(getClass().getSimpleName(),
+                    actionName, label, value, customValues);
         }
     }
 

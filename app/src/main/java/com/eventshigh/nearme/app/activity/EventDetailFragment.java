@@ -27,7 +27,6 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
@@ -68,9 +67,6 @@ public class EventDetailFragment extends Fragment {
     // The argument representing the event that this activity represents.
     public static final String ARG_EVENT_INFO = "event_info";
 
-    // Number of taps needed for GA opt out.
-    private static final int NUM_TAPS_FOR_GA_OPT_OUT = 7;
-
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -95,9 +91,6 @@ public class EventDetailFragment extends Fragment {
     private EventCard eventCard;
     // Activity to which this fragment is attached
     private BaseActivity activity;
-    // Hidden trick to disable a device from GA reporting is to tap on
-    // num_people_interested text multiple times.
-    private int gaOptOutCounter = 0;
     // GoogleApiClient to report the page view.
     private GoogleApiClient client;
     // Editor to edit the event mark in case user favourite or dismiss this event.
@@ -401,16 +394,6 @@ public class EventDetailFragment extends Fragment {
 
         // Set title
         eventCard.titleView.setText(event.title);
-        eventCard.titleView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                gaOptOutCounter++;
-                if (gaOptOutCounter == NUM_TAPS_FOR_GA_OPT_OUT) {
-                    Toast.makeText(activity, "GA reporting disabled on this device", Toast.LENGTH_SHORT).show();
-                    activity.gaHelper.setAppOptOut(true);
-                }
-            }
-        });
 
         // Add attribution.
         if (event.sourceUrl == null) {

@@ -71,7 +71,9 @@ public class ShowLocalityTask extends AsyncTask<LatLng, Void, String> {
             }
         }
 
-        LAT_LNG_TO_LOCALITY.put(key, locality);
+        if (locality != null && !locality.isEmpty()) {
+            LAT_LNG_TO_LOCALITY.put(key, locality);
+        }
         return locality;
     }
 
@@ -88,4 +90,6 @@ public class ShowLocalityTask extends AsyncTask<LatLng, Void, String> {
         }
         return locality;
     }
+
+
 }

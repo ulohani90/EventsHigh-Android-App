@@ -2,8 +2,6 @@ package com.eventshigh.nearme.app.activity;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Build.VERSION_CODES;
@@ -54,7 +52,6 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
@@ -120,19 +117,6 @@ public class LaunchActivity extends BaseActivity {
 
     public void onStart() {
         super.onStart();
-
-        // Check for Google Play Services.
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (status != ConnectionResult.SUCCESS) {
-            Toast.makeText(this, GooglePlayServicesUtil.getErrorString(status), Toast.LENGTH_SHORT).show();
-            GooglePlayServicesUtil.getErrorDialog(status, this, 0, new OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    finish();
-                }
-            }).show();
-            return;
-        }
 
         // We show the onboarding If this is first activity and there was no
         // location/query passed through intent.
@@ -333,7 +317,8 @@ public class LaunchActivity extends BaseActivity {
         }
 
         // Launch the target activity.
-        Class target = pref.isMapsViewDefault() ? EventsMapsActivity.class : EventsGridActivity.class;
+        Class target = isPlayServicesPresent && pref.isMapsViewDefault() ?
+                EventsMapsActivity.class : EventsGridActivity.class;
         Intent outIntent = new Intent(this, target);
         outIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
 
