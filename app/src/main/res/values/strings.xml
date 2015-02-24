@@ -13,6 +13,10 @@
     <string name="action_book">Book</string>
     <string name="action_call">Call</string>
     <string name="action_retry">Retry</string>
+    <string name="action_send_code">Send Code</string>
+    <string name="action_verify_code">Verify Code</string>
+    <string name="action_change_no">Change Number</string>
+    <string name="action_register">Register</string>
 
     <!-- Menu items -->
     <string name="menu_list">Show as List</string>
@@ -46,12 +50,9 @@
     <string name="ui_referrer">You have helped {0,choice,1#one friend|1&lt;{0} friends} in finding amazing events, thank you!</string>
     <string name="ui_enter_phone_number_hint">Your Phone Number</string>
     <string name="ui_phone_verify_tip">Get exciting new deals on your favourite events in town!</string>
+    <string name="ui_onboarding_phone_verify_tip">Register with your phone number to get exciting new deals on your favourite events in town!</string>
     <string name="ui_code">We have sent a code to %s. Please enter it below</string>
     <string name="ui_code_verified">Your phone number %s has been verified</string>
-    <string name="ui_send_code">Send Code</string>
-    <string name="ui_verify_code">Verify Code</string>
-    <string name="ui_retry">Retry</string>
-    <string name="ui_change_no">Change Number</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>

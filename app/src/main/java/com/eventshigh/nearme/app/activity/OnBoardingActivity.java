@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -116,6 +117,10 @@ public class OnBoardingActivity extends BaseActivity {
         findViewById(R.id.get_started).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent phoneLoginIntent = new Intent(OnBoardingActivity.this,
+                        PhoneLoginActivity.class);
+                phoneLoginIntent.putExtra(PhoneLoginActivity.EXTRA_IN_ONBOARDING_FLOW, true);
+                startActivity(phoneLoginIntent);
                 finish();
             }
         });
