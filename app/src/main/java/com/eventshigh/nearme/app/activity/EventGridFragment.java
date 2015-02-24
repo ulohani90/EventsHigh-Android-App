@@ -24,15 +24,11 @@ import java.util.List;
 
 public class EventGridFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     public static final String EVENTS_LIST_PARAMETER = "events";
-    public static final String IS_FAVOURITE_VIEW_PARAMETER = "is.favourite.view";
 
     private EventsGridActivity activity;
     private EventsAdapter eventsAdapter;
     private Editor eventsMarkerEditor;
     private SwipeRefreshLayout swipeRefreshLayout;
-
-    private boolean isFavouriteView;
-    private List<Event> events;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,17 +57,13 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
         this.activity = (EventsGridActivity) activity;
         eventsMarkerEditor = EventsMarkerManager.getInstance(activity).getEditor();
 
+        List<Event> events = new ArrayList<>();
         if (getArguments() != null) {
-            isFavouriteView = getArguments().getBoolean(IS_FAVOURITE_VIEW_PARAMETER, false);
             events = getArguments().getParcelableArrayList(EVENTS_LIST_PARAMETER);
             eventsMarkerEditor.getEventsMarkerManager().removeDismissed(events);
-        } else {
-            isFavouriteView = false;
-            events = new ArrayList<>();
         }
 
-        eventsAdapter = new EventsAdapter(this.activity,
-                isFavouriteView ? getFavouriteEvents() : events, eventsMarkerEditor);
+        eventsAdapter = new EventsAdapter(this.activity, events, eventsMarkerEditor);
 
         // Add listener to remove dismissed events.
         eventsMarkerEditor.getEventsMarkerManager()
@@ -106,31 +98,9 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
                 return;
             }
 
-            // Event is either favourited or un-favourited. In case of favourite tab view, when
-            // new event is marked as favourite we add it into list. Note that, we do not remove
-            // an event from favourite tab even when user has un-favourited it. This is to make
-            // sure, user do not confuse with un-favourite and dismiss (not interested)
-            if (isFavouriteView && EventMark.isFavourite(eventMark)) {
-                int insertAt = 0;
-                for (Event event : events) {
-                    boolean eventFound = insertAt < eventsAdapter.getItemCount() &&
-                            eventsAdapter.getItem(insertAt).equals(event);
-                    if (eventFound) {
-                        insertAt ++;
-                    }
-
-                    if (event.id.equals(eventId)) {
-                        if (!eventFound) {
-                            eventsAdapter.insert(event, insertAt);
-                        }
-                        break;
-                    }
-                }
-            } else {
-                // An event can be present in multiple tabs and we need to redraw the event cards
-                // so that favourite status is shown correctly in all tabs.
-                eventsAdapter.notifyDataSetChanged(eventId);
-            }
+            // An event can be present in multiple tabs and we need to redraw the event cards
+            // so that favourite status is shown correctly in all tabs.
+            eventsAdapter.notifyDataSetChanged(eventId);
         }
     };
 
@@ -139,9 +109,5 @@ public class EventGridFragment extends Fragment implements SwipeRefreshLayout.On
         activity.reportActionToAnalytics("swipeRefresh");
         swipeRefreshLayout.setRefreshing(false);
         activity.fetchNewListing(true /* bypass cache*/);
-    }
-
-    private List<Event> getFavouriteEvents() {
-        return eventsMarkerEditor.getEventsMarkerManager().filterFavouriteEvents(events);
     }
 }

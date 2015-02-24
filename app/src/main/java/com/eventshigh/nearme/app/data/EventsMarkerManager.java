@@ -207,16 +207,6 @@ public class EventsMarkerManager {
         }
     }
 
-    public List<Event> filterFavouriteEvents(Collection<? extends Event> events) {
-        List<Event> favEvents = new ArrayList<>();
-        for (Event event : events) {
-            if (isFavourite(event.id)) {
-                favEvents.add(event);
-            }
-        }
-        return  favEvents;
-    }
-
     private void callListeners(String eventId, @Nullable EventMark pref) {
         synchronized (eventMarkChangeListeners) {
             for (OnEventMarkChangeListener listener : eventMarkChangeListeners) {

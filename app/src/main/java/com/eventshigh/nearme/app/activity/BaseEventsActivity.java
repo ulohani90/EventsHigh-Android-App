@@ -313,13 +313,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 Toast.makeText(this, R.string.unsupported_city, Toast.LENGTH_SHORT).show();
             }
             updateEventsCollection(EventsCollection.EMPTY);
-            updateEventListing(new ArrayList<Event>(), false);
+            updateEventListing(new ArrayList<Event>());
         } else {
             fetchNewListing(false /* bypass cache*/);
         }
     }
 
-    protected void updateEventListing(List<Event> events, boolean isFavouriteView) {
+    protected void updateEventListing(List<Event> events) {
         // Prefetch first 10 events.
         for (Event event : events.subList(0, Math.min(events.size(), NUM_MAX_PREFETCH))) {
             EventUberPrefetcher.getInstance(getApplicationContext()).prefetch(event.id);
@@ -395,6 +395,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         slidingTab.setCustomTabColorizer(adapter);
         slidingTab.setViewPager(viewPager);
         slidingTab.setOnPageChangeListener(adapter);
+        slidingTab.setVisibility(events.getTabs().size() > 1 ? View.VISIBLE : View.GONE);
 
         if (events.isEmpty()) {
             // nothing to show.
@@ -505,7 +506,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
             Bundle args = new Bundle();
             ArrayList<Event> eventsToShow = new ArrayList<>();
             eventsToShow.addAll(events.getEvents(position));
-            args.putBoolean(EventGridFragment.IS_FAVOURITE_VIEW_PARAMETER, isFavouriteView(position));
             args.putParcelableArrayList(EventGridFragment.EVENTS_LIST_PARAMETER, eventsToShow);
             fragment.setArguments(args);
             return fragment;
@@ -529,7 +529,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         @Override
         public void onPageSelected(int position) {
             eventsContext.tabName = getPageTitle(position).toString();
-            updateEventListing(events.getEvents(position), isFavouriteView(position));
+            updateEventListing(events.getEvents(position));
         }
 
         @Override
@@ -551,15 +551,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
         public View getView(int position, ViewGroup parent) {
             View tabView = getLayoutInflater().inflate(R.layout.tab_event, parent, false);
             ((TextView) tabView.findViewById(R.id.tab_title)).setText(getPageTitle(position));
-            if (! isFavouriteView(position)) {
-                ((TextView) tabView.findViewById(R.id.num_events)).setText(
-                        Integer.toString(tabs.get(position).second));
-            }
+            ((TextView) tabView.findViewById(R.id.num_events)).setText(
+                    Integer.toString(tabs.get(position).second));
             return tabView;
-        }
-
-        private boolean isFavouriteView(int position) {
-            return tabs.get(position).first == EventTab.FAVOURITES;
         }
     }
 

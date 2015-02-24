@@ -361,8 +361,7 @@ public class Event implements Parcelable {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
         eventsMarkerManager.waitForLoading();
         EventsCollection.Builder builder =  new EventsCollection.Builder(eventsContext.city,
-                eventsMarkerManager,
-                !EventsHighEndpoints.isDateQuery(eventsContext.query) && eventsContext.dateFilter.isEmpty());
+                eventsMarkerManager, false);
         List<Event> events = fromJSON(eventsContext.city, upcomingEvents, includeWithoutLocation);
         if (eventsContext.location != null) {
             Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
