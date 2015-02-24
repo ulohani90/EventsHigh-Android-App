@@ -127,7 +127,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
     // ***********************
 
     @Override
-    protected boolean showLocationInActionBar() {
+    protected boolean shouldIncludeWithoutLocation() {
         return false;
     }
 

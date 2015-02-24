@@ -42,7 +42,7 @@ public class EventComparator implements Comparator<Event> {
         }
 
         EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
-        float distance = LocationUtils.distanceInMeters(event.location, userLocation);
+        float distance = event.location == null ? 20000 : LocationUtils.distanceInMeters(event.location, userLocation);
         boolean isPastEvent = eventTime == null || eventTime.time == null || event.eventTimings[0] < System.currentTimeMillis();
 
         return event.uberScore + (isFavourite ? 20 : 0) - (isPastEvent ? 20 : 0)

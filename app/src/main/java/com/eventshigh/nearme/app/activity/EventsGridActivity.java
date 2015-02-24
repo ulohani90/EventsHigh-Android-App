@@ -1,7 +1,12 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.view.View;
+
+import com.eventshigh.nearme.app.task.ShowLocalityTask;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * An {@link com.eventshigh.nearme.app.activity.BaseEventsActivity} which shows the events in Grid.
@@ -20,12 +25,23 @@ public class EventsGridActivity extends BaseEventsActivity {
     // ***********************
 
     @Override
-    protected boolean showLocationInActionBar() {
+    protected boolean shouldIncludeWithoutLocation() {
         return true;
     }
 
     @Override
     protected Fragment getNewFragment() {
         return new EventGridFragment();
+    }
+
+    protected void updateUserLocation(@Nullable LatLng userLocation) {
+        if (userLocation != null) {
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0) {
+                new ShowLocalityTask(this, actionBar).execute(userLocation);
+            }
+        }
+
+        super.updateUserLocation(userLocation);
     }
 }

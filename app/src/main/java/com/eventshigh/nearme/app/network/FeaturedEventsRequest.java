@@ -94,7 +94,7 @@ public class FeaturedEventsRequest extends JsonRequest<List<Event>> {
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject eventsJson = new JSONObject(jsonString);
             EventsCollection eventsCollection = Event.parseUpcomingEvents(
-                    eventsContext, eventsMarkerManager, eventsJson);
+                    eventsContext, eventsMarkerManager, eventsJson, true);
             List<Event> events = eventsCollection.getEvents(0);
             List<Event> filteredEvents = new ArrayList<>(MAX_FEATURED_EVENTS);
 

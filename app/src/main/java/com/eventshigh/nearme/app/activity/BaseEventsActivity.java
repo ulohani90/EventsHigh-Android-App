@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.util.Pair;
@@ -38,7 +37,6 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
@@ -308,13 +306,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
      * @param userLocation user location as reported by location client.
      */
     protected void updateUserLocation(@Nullable LatLng userLocation) {
-        if (showLocationInActionBar()) {
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0) {
-                new ShowLocalityTask(this, actionBar).execute(userLocation);
-            }
-        }
-
         eventsContext.changeLocation(userLocation);
         if (eventsContext.city == null) {
             if (userLocation != null) {
@@ -336,9 +327,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     /**
-     * @return true if location should be shown in action bar as subtitle.
+     * @return true if events without location information are shown.
      */
-    protected abstract boolean showLocationInActionBar();
+    protected abstract boolean shouldIncludeWithoutLocation();
 
     /**
      * @return a new Fragment which will be used to show events list.
@@ -388,7 +379,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         // Stop all requests associated with this activity and then submit new request.
         VolleyHelper.getRequestQueue(getApplicationContext()).cancelAll(this);
         EventCollectionRequest.submit(this, eventsContext, Priority.IMMEDIATE,
-                shouldBypassCache, mEventsFetcherCallBack, mErrorListener);
+                shouldBypassCache, shouldIncludeWithoutLocation(),
+                mEventsFetcherCallBack, mErrorListener);
     }
 
     private boolean isDataShown() {

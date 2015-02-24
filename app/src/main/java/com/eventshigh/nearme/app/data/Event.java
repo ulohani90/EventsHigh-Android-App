@@ -340,12 +340,12 @@ public class Event implements Parcelable {
         );
     }
 
-    public static List<Event> fromJSON(City city, JSONArray jsonArray) {
+    public static List<Event> fromJSON(City city, JSONArray jsonArray, boolean includeWithoutLocation) {
         List<Event> events = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 Event event = fromJSON(city, jsonArray.getJSONObject(i));
-                if (event.location != null) {
+                if (includeWithoutLocation || event.location != null) {
                     events.add(event);
                 }
             } catch (JSONException | ParseException e) {
@@ -356,13 +356,14 @@ public class Event implements Parcelable {
     }
 
     public static EventsCollection parseUpcomingEvents(EventsContext eventsContext,
-            EventsMarkerManager eventsMarkerManager, JSONObject eventsJSON) throws JSONException {
+            EventsMarkerManager eventsMarkerManager, JSONObject eventsJSON, boolean includeWithoutLocation)
+            throws JSONException {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
         eventsMarkerManager.waitForLoading();
         EventsCollection.Builder builder =  new EventsCollection.Builder(eventsContext.city,
                 eventsMarkerManager,
                 !EventsHighEndpoints.isDateQuery(eventsContext.query) && eventsContext.dateFilter.isEmpty());
-        List<Event> events = fromJSON(eventsContext.city, upcomingEvents);
+        List<Event> events = fromJSON(eventsContext.city, upcomingEvents, includeWithoutLocation);
         if (eventsContext.location != null) {
             Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
         }

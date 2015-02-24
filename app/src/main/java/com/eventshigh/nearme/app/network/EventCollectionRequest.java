@@ -35,6 +35,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
      */
     public static void submit(BaseActivity activity, EventsContext eventsContext,
                               Priority priority, boolean shouldBypassCache,
+                              boolean includeWithoutLocation,
                               Listener<EventsCollection> listener, ErrorListener errorListener) {
         if (eventsContext.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
@@ -50,7 +51,8 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         }
 
         EventCollectionRequest request = new EventCollectionRequest(
-                activity, url, eventsContext, shouldBypassCache, priority, listener, errorListener);
+                activity, url, eventsContext, priority, shouldBypassCache, includeWithoutLocation,
+                listener, errorListener);
         request.setTag(activity);
         VolleyHelper.addToRequestQueue(activity, request);
     }
@@ -59,6 +61,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     private final EventsContext eventsContext;
     private final Priority priority;
     private final EventsMarkerManager eventsMarkerManager;
+    private final boolean includeWithoutLocation;
 
     /**
      * Creates a new request.
@@ -71,7 +74,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
      * @param errorListener Error listener, or null to ignore errors.
      */
     public EventCollectionRequest(BaseActivity activity, String url, EventsContext eventsContext,
-                                  boolean shouldBypassCache, Priority priority,
+                                  Priority priority, boolean shouldBypassCache, boolean includeWithoutLocation,
                                   Listener<EventsCollection> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
@@ -81,6 +84,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         this.eventsContext = eventsContext;
         this.priority = priority;
         this.eventsMarkerManager = EventsMarkerManager.getInstance(activity);
+        this.includeWithoutLocation = includeWithoutLocation;
     }
 
     @Override
@@ -96,8 +100,9 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject eventsJson = new JSONObject(jsonString);
-            return Response.success(Event.parseUpcomingEvents(eventsContext, eventsMarkerManager, eventsJson),
-                HttpHeaderParser.parseCacheHeaders(response));
+            EventsCollection eventsCollection = Event.parseUpcomingEvents(
+                    eventsContext, eventsMarkerManager, eventsJson, includeWithoutLocation);
+            return Response.success(eventsCollection, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JSONException e) {
