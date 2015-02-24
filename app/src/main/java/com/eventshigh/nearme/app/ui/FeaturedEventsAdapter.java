@@ -87,8 +87,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
             }
 
             titleView.setText(event.title);
-            venueView.setText(Utils.capitalize(
-                    event.venue == null ? event.city.toString() : event.venue));
+            venueView.setText(event.getShortAddress());
 
             if (event.category != EventCategory.OTHER) {
                 categoryView.setText(Utils.capitalize(event.category.toString()));

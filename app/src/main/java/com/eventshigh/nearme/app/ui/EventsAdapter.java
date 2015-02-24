@@ -174,8 +174,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
         }
 
         // Set the venue.
-        eventCard.venueView.setText(Utils.capitalize(
-                event.venue == null ? event.city.toString() : event.venue));
+        eventCard.venueView.setText(event.getShortAddress());
 
         // Set num people interested.
         if (event.numPeopleInterested <= 0) {

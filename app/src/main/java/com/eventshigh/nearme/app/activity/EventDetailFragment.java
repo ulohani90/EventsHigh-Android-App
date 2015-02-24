@@ -413,23 +413,14 @@ public class EventDetailFragment extends Fragment {
         }
 
         // Set Venue and address.
-        if (event.venue == null && event.address == null) {
-            eventCard.venueGroupView.setVisibility(View.GONE);
-        } else {
-            if (event.venue == null) {
-                eventCard.venueView.setVisibility(View.GONE);
-            } else {
-                eventCard.venueView.setText(Utils.capitalize(event.venue));
+        eventCard.venueView.setText(event.getShortAddress());
+        eventCard.addressView.setText(event.getFullAddress());
+        eventCard.venueGroupView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.showDirections(event);
             }
-            eventCard.addressView.setText(
-                    event.address == null ? Utils.capitalize(event.city.toString()) : event.address);
-            eventCard.venueGroupView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.showDirections(event);
-                }
-            });
-        }
+        });
 
         // Set action buttons.
         if (event.bookingUrl == null) {

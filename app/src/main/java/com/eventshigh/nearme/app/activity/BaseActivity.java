@@ -218,7 +218,7 @@ public abstract class BaseActivity extends ActionBarActivity {
     public void showDirections(Event event) {
         reportEventAction(event, "showDirections");
 
-        String query = (event.venue == null ? "" : event.venue + " " ) + (event.address == null ? "" : event.address);
+        String query = event.getFullAddress();
         if (query.isEmpty()) {
             if (event.location == null) {
                 reportActionToAnalytics("skipDirectionsNoLocation");
@@ -242,11 +242,10 @@ public abstract class BaseActivity extends ActionBarActivity {
     public void addToCalendar(Event event, @Nullable Date date) {
         reportEventAction(event, "addToCalendar", GAHelper.getDateReportString(date));
 
-        String venue = event.address == null ? event.venue : event.address;
         Intent intent = new Intent(Intent.ACTION_INSERT)
                 .setData(Events.CONTENT_URI)
                 .putExtra(Events.TITLE, event.title)
-                .putExtra(Events.EVENT_LOCATION, venue)
+                .putExtra(Events.EVENT_LOCATION, event.getFullAddress())
                 .putExtra(Events.DESCRIPTION,
                         event.getEventDetailsURI().toString() + "?src=ehm \n\n" + event.description);
 

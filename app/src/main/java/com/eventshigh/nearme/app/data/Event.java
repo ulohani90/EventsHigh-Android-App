@@ -49,6 +49,7 @@ public class Event implements Parcelable {
 
     @Nullable public final LatLng location;
     @Nullable public final String venue;
+    @Nullable public final String locality;
     @Nullable public final String address;
 
     @Nullable public final String organizerName;
@@ -60,7 +61,8 @@ public class Event implements Parcelable {
                  @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
                  int numPeopleInterested, boolean ehRecommended, float uberScore,
                  long[] eventTimings,
-                 @Nullable LatLng location, @Nullable String venue, @Nullable String address,
+                 @Nullable LatLng location, @Nullable String venue, @Nullable String locality,
+                 @Nullable String address,
                  String organizerName, String organizerPhone, String organizerWebsite) {
         this.id = id;
         this.city = city;
@@ -82,6 +84,7 @@ public class Event implements Parcelable {
 
         this.location = location != null && city.cityBounds.contains(location) ? location : null;
         this.venue = Utils.checkIfUnknown(venue);
+        this.locality = Utils.checkIfUnknown(locality);
         this.address = Utils.checkIfUnknown(address);
 
         this.organizerName = Utils.checkIfUnknown(organizerName);
@@ -95,6 +98,15 @@ public class Event implements Parcelable {
 
     public int getPopularityScore() {
         return ehRecommended ? Math.max(EH_RECOMMENDATION_BOOST, numPeopleInterested) : numPeopleInterested;
+    }
+
+    public String getFullAddress() {
+        return  (venue == null ? "" : venue + " " ) + (address == null ? "" : address).trim();
+    }
+
+    public String getShortAddress() {
+        String shortAddress = (venue == null ? "" : venue + " " ) + (locality == null ? "" : "(" + locality +")").trim();
+        return shortAddress.isEmpty() ? Utils.capitalize(city.name()) : shortAddress;
     }
 
     @Override
@@ -138,6 +150,7 @@ public class Event implements Parcelable {
 
         dest.writeParcelable(location == null ? new LatLng(0, 0) : location, flags);
         dest.writeString(emptyIfNull(venue));
+        dest.writeString(emptyIfNull(locality));
         dest.writeString(emptyIfNull(address));
 
         dest.writeString(emptyIfNull(organizerName));
@@ -169,6 +182,7 @@ public class Event implements Parcelable {
                             in.createLongArray(),
 
                             (LatLng) in.readParcelable(LatLng.class.getClassLoader()),
+                            in.readString(),
                             in.readString(),
                             in.readString(),
 
@@ -231,8 +245,10 @@ public class Event implements Parcelable {
         if (mashup != null) {
             venue = Utils.checkIfUnknown(mashup.optString("venue_name"));
         }
-        if (venue == null && localityJson != null) {
-            venue = localityJson.optString("locality");
+
+        String locality = null;
+        if (localityJson != null) {
+            locality = localityJson.optString("locality");
         }
 
         if (address != null && venue != null && address.startsWith(venue)) {
@@ -315,6 +331,7 @@ public class Event implements Parcelable {
 
                 new LatLng(lat, lon),
                 venue,
+                locality,
                 address,
 
                 organizerName,
