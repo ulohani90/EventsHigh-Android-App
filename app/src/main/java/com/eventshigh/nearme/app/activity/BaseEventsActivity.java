@@ -32,7 +32,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsCollection;
-import com.eventshigh.nearme.app.data.EventsCollection.EventTab;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
@@ -492,7 +491,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private class EventsPagerAdapter extends SlidingTabPagerAdapter
             implements OnPageChangeListener, TabColorizer {
         private final EventsCollection events;
-        private final List<Pair<EventTab, Integer>> tabs;
+        private final List<Pair<String, Integer>> tabs;
 
         public EventsPagerAdapter(FragmentManager fm, EventsCollection events) {
             super(fm);
@@ -518,7 +517,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return Utils.capitalize(tabs.get(position).first.toString());
+            return Utils.capitalize(tabs.get(position).first);
         }
 
         @Override
@@ -539,12 +538,12 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         @Override
         public int getIndicatorColor(int position) {
-            return getResources().getColor(tabs.get(position).first.colorId);
+            return getResources().getColor(android.R.color.holo_green_dark);
         }
 
         @Override
         public int getDividerColor(int position) {
-            return 0x26000000;
+            return 0x26FFFFFF;
         }
 
         @Override

@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class describes one Event. Event have few attributes like title, category, location etc.
@@ -359,9 +361,18 @@ public class Event implements Parcelable {
             EventsMarkerManager eventsMarkerManager, JSONObject eventsJSON, boolean includeWithoutLocation)
             throws JSONException {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
+        JSONArray whiteListCategoriesJSON = eventsJSON.optJSONArray("categories");
+
+        Set<String> whiteListCategories = new HashSet<>();
+        if (whiteListCategoriesJSON != null &&
+            (eventsContext.query.isEmpty() ||  EventsHighEndpoints.isDateQuery(eventsContext.query))) {
+            for (int i = 0; i < whiteListCategoriesJSON.length(); i++) {
+                whiteListCategories.add(whiteListCategoriesJSON.getString(i).toLowerCase());
+            }
+        }
+
         eventsMarkerManager.waitForLoading();
-        EventsCollection.Builder builder =  new EventsCollection.Builder(eventsContext.city,
-                eventsMarkerManager, false);
+        EventsCollection.Builder builder =  new EventsCollection.Builder(eventsMarkerManager, whiteListCategories);
         List<Event> events = fromJSON(eventsContext.city, upcomingEvents, includeWithoutLocation);
         if (eventsContext.location != null) {
             Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));

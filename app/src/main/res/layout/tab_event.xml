@@ -3,7 +3,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    tools:background="@color/app_color"
+    tools:background="@android:color/black"
 >
     <TextView
         android:id="@+id/tab_title"
@@ -11,8 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
         android:paddingTop="12dp"
         android:textColor="@android:color/white"
         android:fontFamily="sans-serif-medium"

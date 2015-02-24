@@ -34,7 +34,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.data.EventsCollection.EventTab;
+import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.settings.Preferences;
@@ -396,7 +396,7 @@ public class LaunchActivity extends BaseActivity {
                 reportActionToAnalytics("exploreCategory", tagName);
                 switch (tagName) {
                     case "All":
-                        eventsContext.tabName = Utils.capitalize(EventTab.ALL.name());
+                        eventsContext.tabName = Utils.capitalize(EventsCollection.ALL_TAB_NAME);
                         break;
                     default:
                         eventsContext.query = tagName.toLowerCase();
