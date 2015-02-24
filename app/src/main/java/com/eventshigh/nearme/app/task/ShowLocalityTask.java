@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
+import android.util.LruCache;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -23,6 +24,9 @@ public class ShowLocalityTask extends AsyncTask<LatLng, Void, String> {
     private static final String LOG_TAG = ShowLocalityTask.class.getSimpleName();
     private static final Pattern INVALID_LOCALITY_PATTERN = Pattern.compile("[^a-zA-Z]+[a-zA-Z]?");
 
+    private static final String LAT_LNG_KEY_FORMAT = "%.2f-%.2f";
+    private static final LruCache<String, String> LAT_LNG_TO_LOCALITY = new LruCache<>(100);
+
     private final Context context;
     private final ActionBar actionBar;
 
@@ -33,7 +37,14 @@ public class ShowLocalityTask extends AsyncTask<LatLng, Void, String> {
 
     @Override
     protected String doInBackground(LatLng... params) {
-        String locality = null;
+        // Check for Cache if entry is there.
+        String key = String.format(LAT_LNG_KEY_FORMAT, params[0].latitude, params[0].longitude);
+        String locality = LAT_LNG_TO_LOCALITY.get(key);
+        if (locality != null) {
+            return locality;
+        }
+
+        // Use GeoCoder for lat lng to locality.
         List<Address> addresses = null;
         try {
             addresses = new Geocoder(context)
@@ -59,6 +70,8 @@ public class ShowLocalityTask extends AsyncTask<LatLng, Void, String> {
                 locality = (locality == null ? "" : locality + ", ") + city;
             }
         }
+
+        LAT_LNG_TO_LOCALITY.put(key, locality);
         return locality;
     }
 

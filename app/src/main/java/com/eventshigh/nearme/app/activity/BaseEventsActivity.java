@@ -30,7 +30,6 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsCollection.EventTab;
@@ -40,10 +39,7 @@ import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
-import com.eventshigh.nearme.app.ui.LocationPickerDialog;
-import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -145,11 +141,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
             EventSearchSuggestionsProvider.saveRecentQuery(this, eventsContext.query);
 
             final Account account = new Account(this);
-            // View followWidget = findViewById(R.id.follow_widget);
+            View followWidget = findViewById(R.id.follow_widget);
             TextView followWidgetTitle = (TextView) findViewById(R.id.follow_title);
 
-            // TODO: Enable follow widget once we get the follow flow correct.
-            // followWidget.setVisibility(View.VISIBLE);
+            followWidget.setVisibility(View.VISIBLE);
             followWidgetTitle.setText(Utils.capitalize(eventsContext.query));
             setFollowButtons(account.isFollowing(eventsContext.query));
 
@@ -203,21 +198,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
         // We do not refresh the app if user is in same session or has returned
         // within {@code SECONDS_FOR_REFRESH} seconds.
         if (lastStartedAt < System.currentTimeMillis() - SECONDS_FOR_REFRESH * 1000) {
-            // If location is passed in param, use it.
             LatLng location = eventsContext.location;
-            if (location == null) {
-                City lastCity = GcmRegistration.getInstance(getApplicationContext()).getLastCity();
-                if (lastCity != null) {
-                    location = lastCity.cityBounds.getCenter();
-                }
-            }
-
-            if (location == null) {
-                askUserForLocation();
-            } else {
-                eventsContext.changeLocation(null);
-                updateUserLocation(location);
-            }
+            eventsContext.changeLocation(null);
+            updateUserLocation(location);
         }
 
         lastStartedAt = System.currentTimeMillis();
@@ -271,11 +254,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        if (id == R.id.action_change_location) {
-            askUserForLocation();
-            return true;
-        }
 
         if (id == R.id.action_filter) {
             if (eventsContext.dateFilter.isEmpty()) {
@@ -383,21 +361,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         Intent intent = new Intent(this, this.getClass())
                 .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
         startActivity(intent);
-    }
-
-    protected void askUserForLocation() {
-        reportActionToAnalytics("askUserForLocation");
-        String countryCode = eventsContext.city == null ?
-                null : eventsContext.city.countryCode;
-        new LocationPickerDialog().show(this, countryCode, new OnLocationSelection() {
-            @Override
-            public void onLocationSelection(String locationString, LatLng locationPoint) {
-                if (showLocationInActionBar()) {
-                    getSupportActionBar().setSubtitle(locationString);
-                }
-                updateUserLocation(locationPoint);
-            }
-        });
     }
 
     protected void switchTo(Class<?> cls) {

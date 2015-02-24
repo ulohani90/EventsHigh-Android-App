@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -40,11 +41,14 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.settings.SettingsActivity;
+import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.CityListAdapter;
 import com.eventshigh.nearme.app.ui.CityListAdapter.OnCitySelectionListener;
 import com.eventshigh.nearme.app.ui.FailedRetryAdapter;
 import com.eventshigh.nearme.app.ui.FeaturedEventsAdapter;
 import com.eventshigh.nearme.app.ui.LoadingAdapter;
+import com.eventshigh.nearme.app.ui.LocationPickerDialog;
+import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
@@ -55,6 +59,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Calendar;
 import java.util.List;
@@ -169,6 +174,11 @@ public class LaunchActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        if (id == R.id.action_change_location) {
+            askUserForLocation();
+            return true;
+        }
+
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
@@ -183,6 +193,9 @@ public class LaunchActivity extends BaseActivity {
     // ***********************
 
     public void onRetry(View view) {
+        if (view != null) {
+            reportActionToAnalytics("retry");
+        }
         dotsView.removeAllViews();
         if (featuredEventsPager.getAdapter() == null ||
             featuredEventsPager.getAdapter() instanceof FailedRetryAdapter) {
@@ -197,6 +210,26 @@ public class LaunchActivity extends BaseActivity {
                         featuredEventsPager.setAdapter(new FailedRetryAdapter(LaunchActivity.this));
                     }
                 });
+    }
+
+    public void showToday(View view) {
+        reportActionToAnalytics("showToday");
+        eventsContext.setDateFilter(Calendar.getInstance());
+        showNextScreen(true);
+    }
+
+    public void showTomorrow(View view) {
+        reportActionToAnalytics("showTomorrow");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        eventsContext.setDateFilter(calendar);
+        showNextScreen(true);
+    }
+
+    public void showThisWeekend(View view) {
+        reportActionToAnalytics("showThisWeekend");
+        eventsContext.query = "this weekend";
+        showNextScreen(true);
     }
 
     // Callback for GoogleClientApi. This is called when googleClientApi is
@@ -261,24 +294,19 @@ public class LaunchActivity extends BaseActivity {
     // Helper methods
     // ***********************
 
-    public void showToday(View view) {
-        reportActionToAnalytics("showToday");
-        eventsContext.setDateFilter(Calendar.getInstance());
-        showNextScreen(true);
-    }
-
-    public void showTomorrow(View view) {
-        reportActionToAnalytics("showTomorrow");
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        eventsContext.setDateFilter(calendar);
-        showNextScreen(true);
-    }
-
-    public void showThisWeekend(View view) {
-        reportActionToAnalytics("showThisWeekend");
-        eventsContext.query = "this weekend";
-        showNextScreen(true);
+    protected void askUserForLocation() {
+        reportActionToAnalytics("askUserForLocation");
+        String countryCode = eventsContext.city == null ?
+                null : eventsContext.city.countryCode;
+        new LocationPickerDialog().show(this, countryCode, new OnLocationSelection() {
+            @Override
+            public void onLocationSelection(String locationString, LatLng locationPoint) {
+                getSupportActionBar().setSubtitle(locationString);
+                eventsContext.changeLocation(locationPoint);
+                featuredEventsPager.setAdapter(new LoadingAdapter(LaunchActivity.this));
+                onRetry(null);
+            }
+        });
     }
 
     private void showNextScreen(boolean isUserAction) {
@@ -291,6 +319,11 @@ public class LaunchActivity extends BaseActivity {
                     .build();
             client.connect();
             return;
+        }
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0) {
+            new ShowLocalityTask(this, actionBar).execute(eventsContext.location);
         }
 
         // If we do not have query, show explore screen.
@@ -358,6 +391,7 @@ public class LaunchActivity extends BaseActivity {
     private final OnCitySelectionListener mCitySelectionListener = new OnCitySelectionListener() {
         @Override
         public void onCitySelection(City city) {
+            getSupportActionBar().setSubtitle(Utils.capitalize(city.name()));
             eventsContext.changeLocation(city.cityBounds.getCenter());
             gcmRegistration.setLastCity(city);
             showNextScreen(false);
