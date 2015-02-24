@@ -30,6 +30,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsCollection.EventTab;
@@ -40,6 +41,7 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -128,6 +130,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // See if we have context passed to us within intent.
         eventsContext = IntentUtils.processIntent(this, getIntent());
+        if (eventsContext.location == null) {
+            City lastCity = GcmRegistration.getInstance(this).getLastCity();
+            if (lastCity != null) {
+                reportActionToAnalytics("usedLastCity");
+                eventsContext.changeLocation(lastCity.cityBounds.getCenter());
+            }
+        }
 
         // Show query as title.
         if (!eventsContext.query.isEmpty()) {
