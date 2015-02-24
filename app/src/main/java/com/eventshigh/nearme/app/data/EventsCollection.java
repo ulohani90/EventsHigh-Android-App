@@ -21,8 +21,6 @@ import java.util.Map.Entry;
 public class EventsCollection {
     public static enum EventTab {
         ALL(android.R.color.holo_green_dark),
-        RECOMMENDED(android.R.color.holo_orange_dark),
-        FAVOURITES(android.R.color.holo_red_dark),
         TODAY(R.color.ripple_dark);
 
         public final int colorId;
@@ -60,7 +58,6 @@ public class EventsCollection {
             tomorrowMidnightTimestamp = midnight.getTime().getTime();
 
             events.put(EventTab.ALL, new ArrayList<Event>());
-            events.put(EventTab.RECOMMENDED, new ArrayList<Event>());
             events.put(EventTab.TODAY, new ArrayList<Event>());
         }
 
@@ -104,12 +101,6 @@ public class EventsCollection {
                     taggedEventsList.add(new TaggedEvents(
                             tagEvents.getKey(), Collections.unmodifiableList(tagEvents.getValue())));
                 }
-            }
-            if (taggedEventsList.size() > 0) {
-                boolean isRecommendedShown = taggedEventsList.size() > 1 &&
-                        taggedEventsList.get(1).tab == EventTab.RECOMMENDED;
-                taggedEventsList.add(isRecommendedShown ? 2 : 1, new TaggedEvents(
-                        EventTab.FAVOURITES, taggedEventsList.get(0).events));
             }
 
             return new EventsCollection(taggedEventsList);
