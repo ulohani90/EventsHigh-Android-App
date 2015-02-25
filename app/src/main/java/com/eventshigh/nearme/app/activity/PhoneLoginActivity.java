@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.util.Linkify;
 import android.util.Pair;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +33,8 @@ import java.security.GeneralSecurityException;
  * This screen allows user to register and verify his phone number.
  */
 public class PhoneLoginActivity extends BaseActivity {
+    public static final String EXTRA_IN_ONBOARDING_FLOW = "inOnboardingFlow";
+
     private static enum VerificationStatus {
         VERIFIED,
         CODE_SENT,
@@ -45,6 +50,7 @@ public class PhoneLoginActivity extends BaseActivity {
     private EditText phoneNoView;
     private EditText codeView;
 
+    private boolean inOnboardingFlow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +66,7 @@ public class PhoneLoginActivity extends BaseActivity {
         progressBar = findViewById(R.id.top_progress_bar);
 
         account = new Account(this);
+        inOnboardingFlow = getIntent().getBooleanExtra(EXTRA_IN_ONBOARDING_FLOW, false);
         updateView();
     }
 
@@ -200,6 +207,14 @@ public class PhoneLoginActivity extends BaseActivity {
 
     // Set the UI elements when we need to ask for mobile no.
     private void setRequestMobileNoView() {
+        findViewById(R.id.top_tip).setVisibility(inOnboardingFlow ? View.VISIBLE : View.GONE);
+        findViewById(R.id.bottom_tip).setVisibility(inOnboardingFlow ? View.GONE : View.VISIBLE);
+        findViewById(R.id.skip).setVisibility(inOnboardingFlow ? View.VISIBLE : View.GONE);
+        ((Button) findViewById(R.id.send_code)).setText(inOnboardingFlow
+                ? R.string.action_register : R.string.action_send_code);
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) findViewById(
+                R.id.send_code).getLayoutParams();
+        layoutParams.gravity = inOnboardingFlow ? Gravity.RIGHT : Gravity.CENTER_HORIZONTAL;
         phoneNoParent.setVisibility(View.VISIBLE);
         codeParent.setVisibility(View.GONE);
         verifiedParent.setVisibility(View.GONE);
@@ -207,6 +222,10 @@ public class PhoneLoginActivity extends BaseActivity {
 
     // Set the UI elements when we need to ask for verification code.
     private void setRequestCodeView() {
+        if (inOnboardingFlow) {
+            finish();
+            return;
+        }
         setPhoneNumberInStringResource(R.id.code_label, R.string.ui_code,
                 phoneNoView.getText().toString());
         phoneNoParent.setVisibility(View.GONE);
@@ -216,10 +235,18 @@ public class PhoneLoginActivity extends BaseActivity {
 
     // Set the UI elements when user mobile no is verified.
     private void setVerifiedMobileNoView() {
+        if (inOnboardingFlow) {
+            finish();
+            return;
+        }
         setPhoneNumberInStringResource(R.id.verified, R.string.ui_code_verified,
                 phoneNoView.getText().toString());
         phoneNoParent.setVisibility(View.GONE);
         codeParent.setVisibility(View.GONE);
         verifiedParent.setVisibility(View.VISIBLE);
+    }
+
+    public void skip(View view) {
+        finish();
     }
 }

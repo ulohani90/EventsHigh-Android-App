@@ -22,7 +22,8 @@
         android:id="@+id/eh_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="48dp"
+        android:layout_marginBottom="36dp"
+        android:layout_marginTop="48dp"
         android:layout_gravity="center"
         android:src="@drawable/eh_logo_with_text"
         tools:ignore="ContentDescription"
@@ -37,6 +38,19 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
     >
+        <TextView
+            android:id="@+id/top_tip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="36dp"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:drawablePadding="8dp"
+            android:fontFamily="sans-serif-light"
+            android:visibility="gone"
+            android:text="@string/ui_onboarding_phone_verify_tip"
+            />
+
         <EditText
             android:id="@+id/phone_no"
             android:layout_width="match_parent"
@@ -45,17 +59,34 @@
             android:hint="@string/ui_enter_phone_number_hint"
         />
 
-        <Button
-            android:id="@+id/send_code"
-            style="@style/PhoneLoginButton"
-            android:layout_width="wrap_content"
+        <FrameLayout
+            android:layout_marginTop="24dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="24dp"
-            android:text="@string/ui_send_code"
-            android:onClick="sendCode"
-        />
+            >
+            <Button
+                android:id="@+id/skip"
+                android:visibility="gone"
+                style="@style/PhoneLoginRetryButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/action_skip"
+                android:onClick="skip"
+                android:layout_gravity="left"
+                />
+            <Button
+                android:id="@+id/send_code"
+                style="@style/PhoneLoginButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/action_send_code"
+                android:onClick="sendCode"
+                android:layout_gravity="right"
+                />
+        </FrameLayout>
 
         <TextView
+            android:id="@+id/bottom_tip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
@@ -94,6 +125,7 @@
         <LinearLayout
             android:layout_marginTop="24dp"
             android:orientation="horizontal"
+            android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
         >
@@ -101,7 +133,7 @@
                 style="@style/PhoneLoginRetryButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/ui_retry"
+                android:text="@string/action_retry"
                 android:onClick="sendCode"
             />
             <Space
@@ -114,7 +146,7 @@
                 style="@style/PhoneLoginButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/ui_verify_code"
+                android:text="@string/action_verify_code"
                 android:onClick="verifyCode"
             />
         </LinearLayout>
@@ -141,7 +173,7 @@
             style="@style/PhoneLoginRetryButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ui_change_no"
+            android:text="@string/action_change_no"
             android:onClick="changeNumber"
         />
     </LinearLayout>
