@@ -17,7 +17,7 @@ import java.util.Map;
 public class EventComparator implements Comparator<Event> {
     private final EventsMarkerManager eventsMarkerManager;
     private final LatLng userLocation;
-    private final Map<String, Double> eventToDistanceMap = new HashMap<>();
+    private final Map<String, Double> eventScoreMap = new HashMap<>();
 
     public EventComparator(LatLng userLocation, EventsMarkerManager eventsMarkerManager) {
         this.userLocation = userLocation;
@@ -26,26 +26,26 @@ public class EventComparator implements Comparator<Event> {
 
     @Override
     public int compare(Event lhs, Event rhs) {
-        return Double.compare(
-                weightedScore(rhs, eventsMarkerManager.isFavourite(rhs.id), userLocation, eventToDistanceMap),
-                weightedScore(lhs, eventsMarkerManager.isFavourite(lhs.id), userLocation, eventToDistanceMap)
-        );
+        return Double.compare(weightedScore(rhs), weightedScore(lhs));
     }
 
-    // Find the distance of events from user's position with weight for popular events.
-    // If event has e**N users going, we reduce 500*N meters from its distance.
-    private static double weightedScore(Event event, boolean isFavourite, LatLng userLocation,
-                                        Map<String, Double> eventToDistanceMap) {
-        Double result = eventToDistanceMap.get(event.id);
-        if (result != null) {
-            return result;
+    // Find the weighted score of event -- we take uber score and then put some penalty
+    // for distance and if its a past event.
+    private double weightedScore(Event event) {
+        Double result = eventScoreMap.get(event.id);
+        if (result == null) {
+            double distancePenalty = event.location == null ? 30 :
+                    Math.min(30, Math.pow(1.4,
+                            LocationUtils.distanceInMeters(event.location, userLocation) / 1000));
+            EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
+            double timePenalty = eventTime == null || eventTime.time == null ? 20 :
+                    (event.eventTimings[0] < System.currentTimeMillis() ?
+                            2.31e-7 * (System.currentTimeMillis() - event.eventTimings[0]) : 0);
+
+            result = event.uberScore + (eventsMarkerManager.isFavourite(event.id) ? 20 : 0)
+                    - timePenalty - distancePenalty;
+            eventScoreMap.put(event.id, result);
         }
-
-        EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
-        float distance = event.location == null ? 20000 : LocationUtils.distanceInMeters(event.location, userLocation);
-        boolean isPastEvent = eventTime == null || eventTime.time == null || event.eventTimings[0] < System.currentTimeMillis();
-
-        return event.uberScore + (isFavourite ? 20 : 0) - (isPastEvent ? 20 : 0)
-                - Math.min(30, Math.pow(1.4, distance / 1000));
+        return result;
     }
 }
