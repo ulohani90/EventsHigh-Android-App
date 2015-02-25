@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -642,11 +643,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 TextView last = dateTabViews.get(lastPosition).dayOfMonthView;
                 last.setTextColor(0xff797979);
                 last.setBackgroundResource(android.R.color.transparent);
+                last.setTypeface(null, Typeface.NORMAL);
             }
 
             TextView selected = dateTabViews.get(position).dayOfMonthView;
             selected.setTextColor(getResources().getColor(android.R.color.white));
             selected.setBackgroundResource(R.drawable.selector_oval);
+            selected.setTypeface(null, Typeface.BOLD);
             lastPosition = position;
 
             String oldDateFilter = eventsContext.dateFilter;
