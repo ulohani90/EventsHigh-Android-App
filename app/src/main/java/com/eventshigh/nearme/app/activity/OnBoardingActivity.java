@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.settings.Preferences;
-import com.eventshigh.nearme.app.utils.Utils;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
@@ -60,53 +59,25 @@ public class OnBoardingActivity extends BaseActivity {
      */
     private LinearLayout dotsView;
 
-    // The last view pager position from which the user navigated.
-    private int lastPosition = 0;
-
     // show the coach mark for first time user has reached last step.
     private boolean showCoachMark = true;
 
     // User preferences.
     protected Preferences pref;
 
-
-    /**
-     * The layout param that makes the view pager dot look big indicating the current page the user
-     * is currently on.
-     */
-    private LinearLayout.LayoutParams bigDotLayoutParams;
-
-    /**
-     * The layout param the makes the view pager dots look small indicating the number of pages in
-     * the view pager.
-     */
-    private LinearLayout.LayoutParams smallDotLayoutParams;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_onboarding);
-
-        // Convert dp units to pixels, because layout params uses px units
-        int dp4 = Utils.dpToPx(this, 4);
-        int dp8 = Utils.dpToPx(this, 8);
-        int dp12 = Utils.dpToPx(this, 12);
-        smallDotLayoutParams = new LinearLayout.LayoutParams(dp8, dp8);
-        smallDotLayoutParams.setMargins(dp4, dp4, dp4, dp4);
-        bigDotLayoutParams = new LinearLayout.LayoutParams(dp12, dp12);
-        bigDotLayoutParams.setMargins(dp4, dp4, dp4, dp4);
-
 
         // Initialize the dotsView. Add dots to indicate the number of pages in view pager.
         dotsView = (LinearLayout) findViewById(R.id.dots_parent);
         LayoutInflater layoutInflater = getLayoutInflater();
         for (int i = 0; i < NUM_ON_BOARDING_STEPS; i++) {
             View view = layoutInflater.inflate(R.layout.viewpager_dot, dotsView, false);
+            view.setSelected(i == 0);
             dotsView.addView(view);
-            view.setLayoutParams(smallDotLayoutParams);
         }
-        mOnPageChangeListener.onPageSelected(0);
-
 
         // Initialize the The view pager which shows the onboarding steps
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
@@ -171,12 +142,9 @@ public class OnBoardingActivity extends BaseActivity {
                 showCoachMark = false;
             }
 
-            // Change the last active dot to small dot
-            dotsView.getChildAt(lastPosition).setLayoutParams(smallDotLayoutParams);
-            // Change the currently active dot to big dot
-            dotsView.getChildAt(position).setLayoutParams(bigDotLayoutParams);
-            // Keep track of the currently active page
-            lastPosition = position;
+            for (int i = 0 ; i < dotsView.getChildCount(); i++) {
+                dotsView.getChildAt(i).setSelected(i == position);
+            }
         }
 
         @Override

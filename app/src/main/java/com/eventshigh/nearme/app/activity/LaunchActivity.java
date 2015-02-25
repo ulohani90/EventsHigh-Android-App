@@ -422,21 +422,12 @@ public class LaunchActivity extends BaseActivity {
     private Listener<List<Event>> mFeaturedEventsListener = new Listener<List<Event>>() {
         @Override
         public void onResponse(final List<Event> events, boolean isIntermediate) {
-            int dp4 = Utils.dpToPx(LaunchActivity.this, 4);
-            int dp8 = Utils.dpToPx(LaunchActivity.this, 8);
-            int dp12 = Utils.dpToPx(LaunchActivity.this, 12);
-            final LayoutParams smallDotLayoutParams = new LayoutParams(dp8, dp8);
-            smallDotLayoutParams.setMargins(dp4, dp4, dp4, dp4);
-            final LayoutParams bigDotLayoutParams = new LayoutParams(dp12, dp12);
-            bigDotLayoutParams.setMargins(dp4, dp4, dp4, dp4);
-
-
             LayoutInflater layoutInflater = getLayoutInflater();
             dotsView.removeAllViews();
             for (int i = 0; i < events.size(); i++) {
                 View view = layoutInflater.inflate(R.layout.explore_dot, dotsView, false);
+                view.setSelected(i == 0);
                 dotsView.addView(view);
-                view.setLayoutParams(i == 0 ? bigDotLayoutParams : smallDotLayoutParams);
             }
 
             featuredEventsPager.setAdapter(new FeaturedEventsAdapter(LaunchActivity.this,  events));
@@ -450,8 +441,7 @@ public class LaunchActivity extends BaseActivity {
                 @Override
                 public void onPageSelected(int position) {
                     for (int i = 0; i < dotsView.getChildCount(); i++) {
-                        dotsView.getChildAt(i).setLayoutParams(
-                                i == position ? bigDotLayoutParams : smallDotLayoutParams);
+                        dotsView.getChildAt(i).setSelected(i == position);
                     }
                 }
 
