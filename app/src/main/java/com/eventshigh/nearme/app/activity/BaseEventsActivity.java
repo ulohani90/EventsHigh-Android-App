@@ -587,14 +587,30 @@ public abstract class BaseEventsActivity extends BaseActivity {
             dateFilter.setVisibility(View.VISIBLE);
             dateFilter.setViewPager(dummyViewPager);
             dateFilter.setOnPageChangeListener(adapter);
+            dateFilter.setCustomTabColorizer(adapter);
             dateFilter.scrollTo(eventsContext.dateFilter);
         }
     }
 
     private class DatesPagerAdapter extends SlidingTabPagerAdapter
-            implements OnPageChangeListener {
+            implements OnPageChangeListener, TabColorizer {
         private static final int NUM_DAYS = 14;
+
+        private class DateTabView {
+            private final View root;
+            public final TextView weekDayView;
+            public final TextView dayOfMonthView;
+
+            public DateTabView(View root) {
+                this.root  = root;
+                weekDayView = (TextView) root.findViewById(R.id.weekday);
+                dayOfMonthView = (TextView) root.findViewById(R.id.dayofmonth);
+            }
+        }
+
         private final Calendar today = DateTimeUtils.toMidnight(Calendar.getInstance(), null);
+        private final List<DateTabView> dateTabViews = new ArrayList<>(NUM_DAYS);
+        private int lastPosition = -1;
 
         public DatesPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -622,6 +638,17 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         @Override
         public void onPageSelected(int position) {
+            if (lastPosition >= 0) {
+                TextView last = dateTabViews.get(lastPosition).dayOfMonthView;
+                last.setTextColor(0xff797979);
+                last.setBackgroundResource(android.R.color.transparent);
+            }
+
+            TextView selected = dateTabViews.get(position).dayOfMonthView;
+            selected.setTextColor(getResources().getColor(android.R.color.white));
+            selected.setBackgroundResource(R.drawable.selector_oval);
+            lastPosition = position;
+
             String oldDateFilter = eventsContext.dateFilter;
             eventsContext.setDateFilter(getDate(position));
             if (! oldDateFilter.equals(eventsContext.dateFilter)) {
@@ -637,12 +664,25 @@ public abstract class BaseEventsActivity extends BaseActivity {
         @Override
         public View getView(int position, ViewGroup parent) {
             Calendar calendar = getDate(position);
-            View tabView = getLayoutInflater().inflate(R.layout.tab_date, parent, false);
-            ((TextView) tabView.findViewById(R.id.weekday)).setText(
+            DateTabView dateTabView = new DateTabView(
+                    getLayoutInflater().inflate(R.layout.tab_date, parent, false));
+            dateTabView.weekDayView.setText(
                     calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US));
-            ((TextView) tabView.findViewById(R.id.dayofmoth)).setText(
+            dateTabView.dayOfMonthView.setText(
                     Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));
-            return tabView;
+
+            dateTabViews.add(position, dateTabView);
+            return dateTabView.root;
+        }
+
+        @Override
+        public int getIndicatorColor(int position) {
+            return 0x00000000;
+        }
+
+        @Override
+        public int getDividerColor(int position) {
+            return 0x26000000;
         }
 
         private Calendar getDate(int position) {
