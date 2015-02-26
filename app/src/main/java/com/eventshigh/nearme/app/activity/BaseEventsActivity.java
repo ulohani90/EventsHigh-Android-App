@@ -213,11 +213,15 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         lastStartedAt = System.currentTimeMillis();
 
-        // Show the rate this app in non intrusive way.
-        AppRate.with(this)
-                .delay(3000).initialLaunchCount(5).retryPolicy(RetryPolicy.EXPONENTIAL)
-                .text(R.string.action_share_app).listener(mAppRateOnShowListener)
-                .checkAndShow();
+        if (Account.isPhoneVerifyPending(this)) {
+            showVerifyPhoneSnackbar();
+        } else {
+            // Show the rate this app in non intrusive way.
+            AppRate.with(this)
+                    .delay(3000).initialLaunchCount(5).retryPolicy(RetryPolicy.EXPONENTIAL)
+                    .text(R.string.action_share_app).listener(mAppRateOnShowListener)
+                    .checkAndShow();
+        }
     }
 
     @Override

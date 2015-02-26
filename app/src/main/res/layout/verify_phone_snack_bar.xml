@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/verify_phone_container"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_gravity="bottom"
+                android:visibility="gone"
+                android:background="#aa000000"
+                android:paddingLeft="10dp">
+
+    <TextView
+        android:id="@+id/verify_phone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:text="@string/ui_verify_phone"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:layout_toLeftOf="@+id/verify_phone_close"/>
+
+    <ImageButton
+        android:id="@+id/verify_phone_close"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/button_transparent_dark"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+</RelativeLayout>

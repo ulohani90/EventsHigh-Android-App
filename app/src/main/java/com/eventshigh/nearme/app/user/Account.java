@@ -80,6 +80,12 @@ public class Account {
         editor.apply();
     }
 
+    public static boolean isPhoneVerifyPending(Context context) {
+        Account account = new Account(context);
+        Pair<String, Boolean> accountPhoneStatus = account.getPhoneNumber();
+        return true; //accountPhoneStatus.first != null && !accountPhoneStatus.second;
+    }
+
     public boolean recordReferrer(String referrer) {
         if (!accountInfo.contains(PREF_REFERRER)) {
             accountInfo.edit().putString(PREF_REFERRER, referrer).apply();

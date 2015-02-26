@@ -283,4 +283,36 @@ public abstract class BaseActivity extends ActionBarActivity {
                 isFavourite(event) ? "Favourite" : "No-Favourite",
                 event.ehRecommended ? "Recommended" : "Non-Recommended");
     }
+
+    protected void showVerifyPhoneSnackbar() {
+        final View fab = findViewById(R.id.fab_switch_view);
+        final View view = findViewById(R.id.verify_phone_container);
+        view.setVisibility(View.VISIBLE);
+        view.findViewById(R.id.verify_phone).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(BaseActivity.this, PhoneLoginActivity.class));
+                fab.animate().translationY(0).setDuration(300).start();
+                view.setVisibility(View.GONE);
+            }
+        });
+        view.findViewById(R.id.verify_phone_close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fab.animate().translationY(0).setDuration(300).start();
+                view.setVisibility(View.GONE);
+            }
+        });
+
+        if (fab != null) {
+            view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                           int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    v.removeOnLayoutChangeListener(this);
+                    fab.animate().translationY(-v.getHeight()).setDuration(500).start();
+                }
+            });
+        }
+    }
 }
