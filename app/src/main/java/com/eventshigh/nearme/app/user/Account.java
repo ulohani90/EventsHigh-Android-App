@@ -43,6 +43,8 @@ public class Account {
     private static final String PREF_FACEBOOK_EMAIL = "facebook_email";
     private static final String PREF_FACEBOOK_EMAIL_UPLOADED = "facebook_email_uploaded";
 
+    private static boolean disableSnackBar = false;
+
     // Member variables used to store the user account details in preferences.
     private final Context context;
     private final SharedPreferences accountInfo;
@@ -80,10 +82,17 @@ public class Account {
         editor.apply();
     }
 
+    public static void disablePhoneVerifySnackbar() {
+        Account.disableSnackBar = true;
+    }
+
     public static boolean isPhoneVerifyPending(Context context) {
+        if (disableSnackBar) {
+            return false;
+        }
         Account account = new Account(context);
         Pair<String, Boolean> accountPhoneStatus = account.getPhoneNumber();
-        return true; //accountPhoneStatus.first != null && !accountPhoneStatus.second;
+        return accountPhoneStatus.first != null && !accountPhoneStatus.second;
     }
 
     public boolean recordReferrer(String referrer) {

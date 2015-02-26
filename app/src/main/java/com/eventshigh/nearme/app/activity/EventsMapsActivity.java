@@ -275,7 +275,13 @@ public class EventsMapsActivity extends BaseEventsActivity {
             }
             lastSelectedMarker = null;
             eventCardContainer.removeAllViews();
-            fab.animate().translationY(0).setDuration(300).start();
+
+            final View view = findViewById(R.id.verify_phone_container);
+            int fabTranslateY = 0;
+            if (view.getVisibility() == View.VISIBLE) {
+                fabTranslateY = -view.getHeight();
+            }
+            fab.animate().translationY(fabTranslateY).setDuration(300).start();
         }
     };
 

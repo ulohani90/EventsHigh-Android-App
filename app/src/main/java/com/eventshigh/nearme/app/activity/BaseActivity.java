@@ -292,14 +292,19 @@ public abstract class BaseActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(BaseActivity.this, PhoneLoginActivity.class));
-                fab.animate().translationY(0).setDuration(300).start();
+                if (fab != null) {
+                    fab.animate().translationY(0).setDuration(300).start();
+                }
                 view.setVisibility(View.GONE);
             }
         });
         view.findViewById(R.id.verify_phone_close).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fab.animate().translationY(0).setDuration(300).start();
+                if (fab != null) {
+                    fab.animate().translationY(0).setDuration(300).start();
+                }
+                Account.disablePhoneVerifySnackbar();
                 view.setVisibility(View.GONE);
             }
         });
