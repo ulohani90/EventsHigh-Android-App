@@ -7,6 +7,7 @@ import android.location.Location;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
@@ -136,6 +137,15 @@ public class LaunchActivity extends BaseActivity {
         // Register with GCM if needed. GCM is used for notifications messages.
         gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
         gcmRegistration.updateGcmRegistrationIdIfNeeded();
+    }
+
+    protected void onResume() {
+        super.onResume();
+
+        PagerAdapter adapter = featuredEventsPager.getAdapter();
+        if (adapter != null) {
+            featuredEventsPager.setAdapter(adapter);
+        }
 
         // Show next screen.
         showNextScreen(false);
