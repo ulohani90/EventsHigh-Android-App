@@ -88,14 +88,6 @@
                 android:background="#FBFBFB"
                 tools:ignore="UnusedAttribute"
             />
-            <com.example.android.common.view.SlidingTabLayout
-                android:id="@+id/sliding_tabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:elevation="8dp"
-                android:background="@android:color/black"
-                tools:ignore="UnusedAttribute"
-            />
             <ProgressBar
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:id="@+id/top_progress_bar"
@@ -106,8 +98,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
             />
-            <android.support.v4.view.ViewPager
-                android:id="@+id/pager"
+           <FrameLayout
+                android:id="@+id/event_container"
                 android:layout_width="match_parent"
                 android:layout_height="0px"
                 android:layout_weight="1"
