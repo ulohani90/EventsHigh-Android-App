@@ -1,7 +1,5 @@
 package com.eventshigh.nearme.app.data;
 
-import android.util.Pair;
-
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 
 import java.util.ArrayList;
@@ -110,14 +108,6 @@ public class EventsCollection {
 
     public boolean isEmpty() {
         return taggedEventsList.isEmpty();
-    }
-
-    public List<Pair<String, Integer>> getTabs() {
-        List<Pair<String, Integer>> results = new ArrayList<>(taggedEventsList.size());
-        for (TaggedEvents categoryEvents : taggedEventsList) {
-            results.add(Pair.create(categoryEvents.tabName, categoryEvents.events.size()));
-        }
-        return results;
     }
 
     public List<Event> getEvents(int tabPosition) {

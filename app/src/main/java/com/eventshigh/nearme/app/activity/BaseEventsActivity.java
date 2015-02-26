@@ -14,12 +14,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +34,9 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -86,8 +89,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private ViewSwitcher viewSwitcher;
     private View topProgressBar;
     private SlidingTabLayout dateFilter;
-    private SlidingTabLayout slidingTab;
-    private ViewPager viewPager;
+    protected FrameLayout eventContainer;
     protected ImageButton fab;
 
     private View followButton;
@@ -95,10 +97,12 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     // Last city and query for which events are shown.
     protected EventsContext eventsContext;
+    private boolean isDataShown = false;
     // when was this activity last started on.
     private long lastStartedAt;
     // GoogleApiClient to report the page view.
     private GoogleApiClient client;
+    protected Editor eventsMarkerEditor;
 
 
     // ***********************
@@ -114,9 +118,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         setContentView(R.layout.activity_events);
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
         dateFilter = (SlidingTabLayout) findViewById(R.id.date_filter);
-        slidingTab = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-        viewPager = (ViewPager) findViewById(R.id.pager);
         topProgressBar = findViewById(R.id.top_progress_bar);
+        eventContainer = (FrameLayout) findViewById(R.id.event_container);
         fab = (ImageButton) findViewById(R.id.fab_switch_view);
         followButton = findViewById(R.id.follow_button);
         followingButton = findViewById(R.id.following_button);
@@ -213,6 +216,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         lastStartedAt = System.currentTimeMillis();
 
+        // Initialize the EventsMarkerManager.Editor.
+        eventsMarkerEditor = EventsMarkerManager.getInstance(this).getEditor();
+
         // Show the rate this app in non intrusive way.
         AppRate.with(this)
                 .delay(3000).initialLaunchCount(5).retryPolicy(RetryPolicy.EXPONENTIAL)
@@ -223,6 +229,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     @Override
     protected void onStop() {
         topProgressBar.setVisibility(View.GONE);
+        eventsMarkerEditor.close();
 
         if (client != null && client.isConnected()) {
             if (eventsContext != null) {
@@ -291,10 +298,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (isDataShown()) {
-            slidingTab.setViewPager(viewPager);
-        }
+        showDateFilter();
     }
+
 
     // ***********************
     // Delegated methods
@@ -313,15 +319,17 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 Toast.makeText(this, R.string.unsupported_city, Toast.LENGTH_SHORT).show();
             }
             updateEventsCollection(EventsCollection.EMPTY);
-            updateEventListing(new ArrayList<Event>());
         } else {
             fetchNewListing(false /* bypass cache*/);
         }
     }
 
-    protected void updateEventListing(List<Event> events) {
+    protected void updateEventsCollection(EventsCollection events) {
+        isDataShown = true;
+
         // Prefetch first 10 events.
-        for (Event event : events.subList(0, Math.min(events.size(), NUM_MAX_PREFETCH))) {
+        List<Event> allEvents = events.getEvents(0);
+        for (Event event : allEvents.subList(0, Math.min(allEvents.size(), NUM_MAX_PREFETCH))) {
             EventUberPrefetcher.getInstance(getApplicationContext()).prefetch(event.id);
         }
     }
@@ -332,19 +340,30 @@ public abstract class BaseEventsActivity extends BaseActivity {
     protected abstract boolean shouldIncludeWithoutLocation();
 
     /**
-     * @return a new Fragment which will be used to show events list.
+     * Removes an event from view as it was marked as "not interested".
+     * @param event event to remove.
      */
-    protected abstract Fragment getNewFragment();
+    protected abstract void remove(Event event);
 
 
     // ***********************
     // Helper methods
     // ***********************
 
+    public @Nullable EventMark getEventMark(Event event) {
+        return eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id);
+    }
+
+    public void recordEventMark(Event event, @Nullable EventMark mark) {
+        if (EventMark.isDismissed(mark)) {
+            remove(event);
+        }
+        eventsMarkerEditor.recordEventMark(event.id, mark);
+    }
 
     public void reportEventAction(Event event, String actionName, int position) {
         reportActionToAnalytics(actionName,
-                eventsContext.tabName,
+                eventsContext.dateFilter,
                 1,
                 isFavourite(event) ? "Favourite" : "No-Favourite",
                 event.ehRecommended ? "Recommended" : "Non-Recommended",
@@ -381,28 +400,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         EventCollectionRequest.submit(this, eventsContext, Priority.IMMEDIATE,
                 shouldBypassCache, shouldIncludeWithoutLocation(),
                 mEventsFetcherCallBack, mErrorListener);
-    }
-
-    private boolean isDataShown() {
-        return viewPager.getAdapter() != null && viewPager.getAdapter().getCount() > 0;
-    }
-
-    private void updateEventsCollection(EventsCollection events) {
-        String tagToSearch = eventsContext.tabName;
-
-        EventsPagerAdapter adapter = new EventsPagerAdapter(getSupportFragmentManager(), events);
-        viewPager.setAdapter(adapter);
-        slidingTab.setCustomTabColorizer(adapter);
-        slidingTab.setViewPager(viewPager);
-        slidingTab.setOnPageChangeListener(adapter);
-        slidingTab.setVisibility(events.getTabs().size() > 1 ? View.VISIBLE : View.GONE);
-
-        if (events.isEmpty()) {
-            // nothing to show.
-            return;
-        }
-
-        slidingTab.scrollTo(tagToSearch);
     }
 
     private void createShortcut() {
@@ -489,79 +486,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
         fetchNewListing(false /* bypass cache*/);
     }
 
-    private class EventsPagerAdapter extends SlidingTabPagerAdapter
-            implements OnPageChangeListener, TabColorizer {
-        private final EventsCollection events;
-        private final List<Pair<String, Integer>> tabs;
-
-        public EventsPagerAdapter(FragmentManager fm, EventsCollection events) {
-            super(fm);
-            this.events = events;
-            this.tabs = events.getTabs();
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            Fragment fragment = getNewFragment();
-            Bundle args = new Bundle();
-            ArrayList<Event> eventsToShow = new ArrayList<>();
-            eventsToShow.addAll(events.getEvents(position));
-            args.putParcelableArrayList(EventGridFragment.EVENTS_LIST_PARAMETER, eventsToShow);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public int getCount() {
-            return tabs.size();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return Utils.capitalize(tabs.get(position).first);
-        }
-
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            // do nothing
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            eventsContext.tabName = getPageTitle(position).toString();
-            updateEventListing(events.getEvents(position));
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-            // do nothing
-        }
-
-        @Override
-        public int getIndicatorColor(int position) {
-            return getResources().getColor(android.R.color.holo_green_dark);
-        }
-
-        @Override
-        public int getDividerColor(int position) {
-            return 0x26FFFFFF;
-        }
-
-        @Override
-        public View getView(int position, ViewGroup parent) {
-            View tabView = getLayoutInflater().inflate(R.layout.tab_event, parent, false);
-            ((TextView) tabView.findViewById(R.id.tab_title)).setText(getPageTitle(position));
-            ((TextView) tabView.findViewById(R.id.num_events)).setText(
-                    Integer.toString(tabs.get(position).second));
-            return tabView;
-        }
-    }
-
     private ErrorListener mErrorListener = new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
             topProgressBar.setVisibility(View.GONE);
-            if (isDataShown()) {
+            if (isDataShown) {
                 Toast.makeText(BaseEventsActivity.this, R.string.failed_refresh, Toast.LENGTH_SHORT).show();
             } else {
                 viewSwitcher.setDisplayedChild(1);

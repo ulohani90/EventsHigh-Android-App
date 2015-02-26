@@ -15,18 +15,18 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
+import com.eventshigh.nearme.app.data.EventsCollection;
+import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.EventsAdapter.EventCard;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,45 +39,41 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
     private static boolean showDismissToast = true;
 
     private final BaseEventsActivity activity;
-    private final Editor eventsMarkerEditor;
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
     private final Set<Integer> usedItemIds = new HashSet<>();
-    private final List<Event> events;
+    private List<Event> events;
 
-    private final int animationOffset;
-    private boolean enableAnimation = true;
-    private int lastPosition = -1;
-    private String lastChangedEventId;
-
-    public EventsAdapter(BaseEventsActivity activity, Collection<Event> events, Editor eventsMarkerEditor) {
+    public EventsAdapter(BaseEventsActivity activity) {
         this.activity = activity;
-        this.eventsMarkerEditor = eventsMarkerEditor;
-        this.events = new ArrayList<>(events);
-        animationOffset = Utils.dpToPx(activity, 100);
+        events = new ArrayList<>();
 
         setHasStableIds(true);
     }
 
-    public void remove(Event event) {
-        this.events.remove(event);
-        notifyDataSetChanged();
-    }
-
-    public void insert(Event event, int insertAt) {
-        this.events.add(insertAt, event);
-        enableAnimation = false;
-        notifyDataSetChanged();
-    }
-
-    public void notifyDataSetChanged(String eventId) {
-        if (lastChangedEventId == null || !eventId.equals(lastChangedEventId)) {
+    public void removeEvent(Event event) {
+        if (events.remove(event)) {
             notifyDataSetChanged();
         }
-        lastChangedEventId = null;
     }
 
-    public void onResumeAnimation() {
-        enableAnimation = true;
+    public void setEvents(EventsCollection eventsCollection) {
+        events = new ArrayList<>(eventsCollection.getEvents(0));
+        notifyDataSetChanged();
+    }
+
+    public void removeDismissedEvents(EventsMarkerManager markerManager) {
+        boolean changed = false;
+        for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
+            Event event = it.next();
+            if (markerManager.isDismissed(event.id)) {
+                it.remove();
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -88,13 +84,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
 
     @Override
     public void onBindViewHolder(EventCard eventCard, int i) {
-        bindView(eventCard, events.get(i), activity, i, eventsMarkerEditor, this);
-
-        if (enableAnimation) {
-            eventCard.cardView.setTranslationY(i > lastPosition ? animationOffset : -animationOffset);
-            lastPosition = i;
-            eventCard.cardView.animate().translationY(0).setDuration(500).start();
-        }
+        bindView(eventCard, events.get(i), activity, i);
     }
 
     @Override
@@ -127,21 +117,18 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
 
     // Build the view, reuse existing if possible.
     public static View getView(final Event event, final BaseEventsActivity activity,
-                               @Nullable View reuseView, ViewGroup parent,
-                               final Editor eventsMarkerEditor) {
+                               @Nullable View reuseView, ViewGroup parent) {
         // Build the view, reuse existing if possible.
         final View view = reuseView == null ?
                 activity.getLayoutInflater().inflate(R.layout.event_card, parent, false) :
                 reuseView;
         final EventCard eventCard = new EventCard(view);
-        bindView(eventCard, event, activity, 0, eventsMarkerEditor, null);
+        bindView(eventCard, event, activity, 0);
         return view;
     }
 
     private static void bindView(final EventCard eventCard, final Event event,
-                                 final BaseEventsActivity activity, final int position,
-                                 final Editor eventsMarkerEditor,
-                                 @Nullable final EventsAdapter adapter) {
+                                 final BaseEventsActivity activity, final int position) {
         eventCard.cardView.setVisibility(View.VISIBLE);
         eventCard.cardView.setOnClickListener(new OnClickListener() {
             @Override
@@ -186,16 +173,12 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
         }
 
         // Set actions handlers.
-        setFavouriteView(eventCard, eventsMarkerEditor.getEventsMarkerManager().getEventMark(
-                event.id));
+        setFavouriteView(eventCard, activity.getEventMark(event));
         eventCard.favouriteView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 activity.reportEventAction(event, "addFavourite", position);
-                if (adapter != null) {
-                    adapter.lastChangedEventId = event.id;
-                }
-                eventsMarkerEditor.recordEventMark(event.id, EventMark.FAVOURITE);
+                activity.recordEventMark(event, EventMark.FAVOURITE);
                 setFavouriteView(eventCard, EventMark.FAVOURITE);
             }
         });
@@ -204,10 +187,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
             @Override
             public void onClick(View v) {
                 activity.reportEventAction(event, "removeFavourite", position);
-                if (adapter != null) {
-                    adapter.lastChangedEventId = event.id;
-                }
-                eventsMarkerEditor.recordEventMark(event.id, null);
+                activity.recordEventMark(event, null);
                 setFavouriteView(eventCard, null);
             }
         });
@@ -216,10 +196,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
             @Override
             public void onClick(View v) {
                 activity.reportEventAction(event, "dismiss", position);
-                if (adapter != null) {
-                    adapter.enableAnimation = false;
-                }
-                eventsMarkerEditor.recordEventMark(event.id, EventMark.DISMISSED);
+                activity.recordEventMark(event, EventMark.DISMISSED);
                 if (showDismissToast) {
                     Toast.makeText(activity, R.string.message_dismiss, Toast.LENGTH_SHORT).show();
                     showDismissToast = false;

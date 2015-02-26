@@ -7,7 +7,6 @@ import android.util.Pair;
 
 import java.io.Closeable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -90,13 +89,13 @@ public class EventsMarkerManager {
             database.close();
         }
 
-        public Editor recordEventMark(String eventId, @Nullable EventMark pref) {
-            if (pref == null) {
+        public Editor recordEventMark(String eventId, @Nullable EventMark mark) {
+            if (mark == null) {
                 removeEventMark(eventId);
             } else {
-                eventMarkMap.put(eventId, pref);
-                callListeners(eventId, pref);
-                threads.add(EventMarkDbHelper.addEntry(database, eventId, pref));
+                eventMarkMap.put(eventId, mark);
+                callListeners(eventId, mark);
+                threads.add(EventMarkDbHelper.addEntry(database, eventId, mark));
             }
             return this;
         }
@@ -193,15 +192,6 @@ public class EventsMarkerManager {
         Iterator<Entry<String, EventMark>> it = eventMarkMap.entrySet().iterator();
         while (it.hasNext()) {
             if (it.next().getValue() == EventMark.DISMISSED) {
-                it.remove();
-            }
-        }
-    }
-
-    public void removeDismissed(Collection<? extends Event> events) {
-        for(Iterator<? extends Event> it = events.iterator(); it.hasNext();) {
-            Event event = it.next();
-            if (isDismissed(event.id)) {
                 it.remove();
             }
         }

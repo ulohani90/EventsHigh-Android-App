@@ -18,13 +18,11 @@ public class EventsContext implements Parcelable {
     @Nullable public City city;
     @Nullable public LatLng location;
     public String query;
-    public String tabName;
     public String dateFilter;
 
     public EventsContext(@Nullable LatLng location, String query) {
         this.query = query;
         changeLocation(location);
-        tabName = "";
         dateFilter = "";
     }
 
@@ -47,7 +45,7 @@ public class EventsContext implements Parcelable {
 
     @Override
     public String toString() {
-        return (tabName + " " + query + " events" +
+        return (query + " events" +
                 (city == null ? " near you" : " in " + city.toString().toLowerCase()) +
                 (dateFilter.isEmpty() ? "" : " on " + dateFilter)).trim();
     }
@@ -72,7 +70,6 @@ public class EventsContext implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(location, flags);
         dest.writeString(query);
-        dest.writeString(tabName);
         dest.writeString(dateFilter);
     }
 
@@ -83,9 +80,7 @@ public class EventsContext implements Parcelable {
         public EventsContext createFromParcel(Parcel in) {
             LatLng location = in.readParcelable(LatLng.class.getClassLoader());
             String query = in.readString();
-
             EventsContext context =  new EventsContext(location, query);
-            context.tabName = in.readString();
             context.dateFilter = in.readString();
             return context;
         }
