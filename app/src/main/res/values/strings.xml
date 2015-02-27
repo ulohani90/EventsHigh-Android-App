@@ -53,6 +53,7 @@
     <string name="ui_onboarding_phone_verify_tip">Register with your phone number to get exciting new deals on your favourite events in town!</string>
     <string name="ui_code">We have sent a code to %s. Please enter it below</string>
     <string name="ui_code_verified">Your phone number %s has been verified</string>
+    <string name="ui_verify_phone">Verify your phone number</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>
