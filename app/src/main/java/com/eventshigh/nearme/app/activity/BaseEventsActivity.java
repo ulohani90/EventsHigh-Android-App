@@ -32,7 +32,6 @@ import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
@@ -318,18 +317,17 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 reportActionToAnalytics("unsupportedCity");
                 Toast.makeText(this, R.string.unsupported_city, Toast.LENGTH_SHORT).show();
             }
-            updateEventsCollection(EventsCollection.EMPTY);
+            updateEventsCollection(new ArrayList<Event>());
         } else {
             fetchNewListing(false /* bypass cache*/);
         }
     }
 
-    protected void updateEventsCollection(EventsCollection events) {
+    protected void updateEventsCollection(List<Event> events) {
         isDataShown = true;
 
         // Prefetch first 10 events.
-        List<Event> allEvents = events.getEvents(0);
-        for (Event event : allEvents.subList(0, Math.min(allEvents.size(), NUM_MAX_PREFETCH))) {
+        for (Event event : events.subList(0, Math.min(events.size(), NUM_MAX_PREFETCH))) {
             EventUberPrefetcher.getInstance(getApplicationContext()).prefetch(event.id);
         }
     }
@@ -440,9 +438,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     // This callback is called by EventsFetcher when new set of events are available. We build the
     // markers for all events and then call method to show selected markers.
-    private Listener<EventsCollection> mEventsFetcherCallBack = new Listener<EventsCollection>() {
+    private Listener<List<Event>> mEventsFetcherCallBack = new Listener<List<Event>>() {
         @Override
-        public void onResponse(EventsCollection events, boolean isIntermediate) {
+        public void onResponse(List<Event> events, boolean isIntermediate) {
             if (!isIntermediate) {
                 topProgressBar.setVisibility(View.GONE);
 

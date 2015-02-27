@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.MapMarkerManager;
@@ -26,6 +25,9 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Maps activity which shows users events happening in given locality. The events are marked
@@ -106,11 +108,11 @@ public class EventsMapsActivity extends BaseEventsActivity {
     }
 
     @Override
-    protected void updateEventsCollection(EventsCollection events) {
+    protected void updateEventsCollection(List<Event> events) {
         super.updateEventsCollection(events);
 
         mOnMapClickListener.onMapClick(null);
-        mapMarkerManager.setEvents(map, EventsMarkerManager.getInstance(this), events.getEvents(0));
+        mapMarkerManager.setEvents(map, EventsMarkerManager.getInstance(this), events);
     }
 
     @Override
@@ -252,7 +254,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
                     showZoomToast = false;
                 }
 
-                updateEventsCollection(EventsCollection.EMPTY);
+                updateEventsCollection(new ArrayList<Event>());
             } else if (!refreshListingsIfNeeded(cameraPosition.target)) {
                 if (!isAppMovement && lastSelectedMarker == null) {
                     reportActionToAnalytics("onCameraChange");

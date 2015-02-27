@@ -15,7 +15,6 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -56,8 +55,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventCard> {
         }
     }
 
-    public void setEvents(EventsCollection eventsCollection) {
-        events = new ArrayList<>(eventsCollection.getEvents(0));
+    public void setEvents(List<Event> events) {
+        this.events = events;
         notifyDataSetChanged();
     }
 

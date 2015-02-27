@@ -10,7 +10,6 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
@@ -20,11 +19,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
  * Volley Request to fetch Events collections.
  */
-public class EventCollectionRequest extends JsonRequest<EventsCollection> {
+public class EventCollectionRequest extends JsonRequest<List<Event>> {
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
@@ -36,7 +36,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     public static void submit(BaseActivity activity, EventsContext eventsContext,
                               Priority priority, boolean shouldBypassCache,
                               boolean includeWithoutLocation,
-                              Listener<EventsCollection> listener, ErrorListener errorListener) {
+                              Listener<List<Event>> listener, ErrorListener errorListener) {
         if (eventsContext.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
             return;
@@ -75,7 +75,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
      */
     public EventCollectionRequest(BaseActivity activity, String url, EventsContext eventsContext,
                                   Priority priority, boolean shouldBypassCache, boolean includeWithoutLocation,
-                                  Listener<EventsCollection> listener, ErrorListener errorListener) {
+                                  Listener<List<Event>> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
         setShouldAllowStaleResponse(true);
@@ -93,16 +93,16 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     }
 
     @Override
-    protected Response<EventsCollection> parseNetworkResponse(NetworkResponse response) {
+    protected Response<List<Event>> parseNetworkResponse(NetworkResponse response) {
         new ReportTimingTask(activity, "events").execute(response.networkTimeMs);
 
         try {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject eventsJson = new JSONObject(jsonString);
-            EventsCollection eventsCollection = Event.parseUpcomingEvents(
+            List<Event> events = Event.parseUpcomingEvents(
                     eventsContext, eventsMarkerManager, eventsJson, includeWithoutLocation);
-            return Response.success(eventsCollection, HttpHeaderParser.parseCacheHeaders(response));
+            return Response.success(events, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JSONException e) {

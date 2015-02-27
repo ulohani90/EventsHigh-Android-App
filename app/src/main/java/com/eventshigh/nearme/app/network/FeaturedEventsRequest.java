@@ -10,7 +10,6 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
@@ -93,9 +92,8 @@ public class FeaturedEventsRequest extends JsonRequest<List<Event>> {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject eventsJson = new JSONObject(jsonString);
-            EventsCollection eventsCollection = Event.parseUpcomingEvents(
+            List<Event> events = Event.parseUpcomingEvents(
                     eventsContext, eventsMarkerManager, eventsJson, true);
-            List<Event> events = eventsCollection.getEvents(0);
             List<Event> filteredEvents = new ArrayList<>(MAX_FEATURED_EVENTS);
 
             for (Event event : events) {

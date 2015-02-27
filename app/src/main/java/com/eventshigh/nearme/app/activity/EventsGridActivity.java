@@ -9,10 +9,11 @@ import android.view.View;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsCollection;
 import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.List;
 
 /**
  * An {@link com.eventshigh.nearme.app.activity.BaseEventsActivity} which shows the events in Grid.
@@ -66,7 +67,7 @@ public class EventsGridActivity extends BaseEventsActivity {
     }
 
     @Override
-    protected void updateEventsCollection(EventsCollection events) {
+    protected void updateEventsCollection(List<Event> events) {
         super.updateEventsCollection(events);
         eventsAdapter.setEvents(events);
     }
