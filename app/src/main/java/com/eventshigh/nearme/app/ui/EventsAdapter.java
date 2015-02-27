@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -54,7 +55,16 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     public void removeEvent(Event event) {
-        if (dataToShow.remove(new EventData(event))) {
+        boolean changed = false;
+        for (Iterator<Data> it =  dataToShow.iterator(); it.hasNext(); ) {
+            Data data = it.next();
+            if (data instanceof EventData &&
+                event.id.equals(((EventData) data).event.id)) {
+                it.remove();
+                changed = true;
+            }
+        }
+        if (changed) {
             notifyDataSetChanged();
         }
     }
@@ -62,7 +72,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public void setEvents(List<Event> events) {
         dataToShow.clear();
         for (Event event: events) {
-            dataToShow.add(new EventData(event));
+            dataToShow.add(new EventData("", event));
         }
         notifyDataSetChanged();
     }
@@ -73,7 +83,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             dataToShow.add(new HeaderData(myEventEntry.first));
             for (Event event : myEventEntry.second.subList(0,
                     Math.min(NUM_MAX_EVENTS_PER_INTEREST, myEventEntry.second.size()))) {
-                dataToShow.add(new EventData(event));
+                dataToShow.add(new EventData(myEventEntry.first, event));
             }
         }
         notifyDataSetChanged();
@@ -83,7 +93,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         boolean changed = false;
         for (Iterator<Data> it =  dataToShow.iterator(); it.hasNext(); ) {
             Data data = it.next();
-            if (markerManager.isDismissed(data.getId())) {
+            if (data instanceof EventData &&
+                markerManager.isDismissed(((EventData) data).event.id)) {
                 it.remove();
                 changed = true;
             }
@@ -96,6 +107,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
+        Log.w("TEXT", "size: " + dataToShow.size() + ", position: " + position);
         return dataToShow.get(position).getType().typeId;
     }
 
@@ -181,7 +193,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public DataType getType() {
-            return null;
+            return DataType.HEADER;
         }
 
         @Override
@@ -215,9 +227,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     // EventData.
     private class EventData implements Data {
+        private final String header;
         private final Event event;
 
-        public EventData(Event event) {
+        public EventData(String header, Event event) {
+            this.header = header;
             this.event = event;
         }
 
@@ -232,15 +246,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public String getId() {
-            return event.id;
-        }
-
-        @Override
-        public boolean equals(Object another) {
-            return another instanceof EventData && ((EventData) another).event.equals(event);
+            return header + ":" + event.id;
         }
     }
-
 
     private static class EventCard extends ViewHolder {
         public final View cardView;
