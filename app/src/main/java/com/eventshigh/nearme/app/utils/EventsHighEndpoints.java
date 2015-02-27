@@ -72,7 +72,7 @@ public class EventsHighEndpoints {
             throw new IllegalArgumentException("city is not passed");
         }
 
-        if (eventsContext.query.isEmpty()) {
+        if (eventsContext.query.isEmpty() || isMyEventQuery(eventsContext.query)) {
             return String.format(API_ENDPOINT_DATE_FORMAT,
                     eventsContext.city.toString().toLowerCase(),
                     eventsContext.dateFilter.isEmpty() ? "this%20week" : eventsContext.dateFilter,

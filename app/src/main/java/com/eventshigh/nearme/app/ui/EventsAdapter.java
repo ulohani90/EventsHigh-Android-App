@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,10 +19,12 @@ import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,8 +82,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         dataToShow.clear();
         for (Pair<String, List<Event>> myEventEntry : myEvents) {
             dataToShow.add(new HeaderData(myEventEntry.first));
-            for (Event event : myEventEntry.second.subList(0,
-                    Math.min(NUM_MAX_EVENTS_PER_INTEREST, myEventEntry.second.size()))) {
+            List<Event> events = myEventEntry.first.equals(MyEventsRequest.FAVOURITES_NAME) ?
+                    myEventEntry.second :
+                    myEventEntry.second.subList(0,
+                            Math.min(NUM_MAX_EVENTS_PER_INTEREST, myEventEntry.second.size()));
+            for (Event event : events) {
                 dataToShow.add(new EventData(myEventEntry.first, event));
             }
         }
@@ -107,7 +111,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        Log.w("TEXT", "size: " + dataToShow.size() + ", position: " + position);
         return dataToShow.get(position).getType().typeId;
     }
 
@@ -221,7 +224,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         private void bindHeaderView(String header) {
-            titleView.setText(header);
+            titleView.setText(Utils.capitalize(header));
         }
     }
 

@@ -107,8 +107,8 @@ public class EventCollectionRequest extends JsonRequest<List<Event>> {
                     includeWithoutLocation);
 
             // Filter out the events which user has favourited or is following.
-            eventsMarkerManager.waitForLoading();
             if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
+                eventsMarkerManager.waitForLoading();
                 for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
                     Event event = it.next();
                     if (! eventsMarkerManager.isFavourite(event.id)) {

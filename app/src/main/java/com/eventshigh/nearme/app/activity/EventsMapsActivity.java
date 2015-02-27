@@ -29,7 +29,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Maps activity which shows users events happening in given locality. The events are marked
@@ -119,11 +121,12 @@ public class EventsMapsActivity extends BaseEventsActivity {
 
     @Override
     protected void updateMyEvents(MyEvents myEvents) {
-        List<Event> events = new ArrayList<>();
+        Set<Event> events = new HashSet<>();
         for (Pair<String, List<Event>> myEventEntry : myEvents) {
             events.addAll(myEventEntry.second);
         }
-        this.updateEventsCollection(events);
+
+        this.updateEventsCollection(new ArrayList<Event>(events));
     }
 
     @Override

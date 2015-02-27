@@ -10,6 +10,7 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
  * favourite and few events for all follow.
  */
 public class MyEventsRequest {
-    public static String FAVOURITES_NAME = "Favourites";
+    public static String FAVOURITES_NAME = "favourites";
     public static class MyEvents extends ArrayList<Pair<String, List<Event>>> {
     }
 
@@ -58,7 +59,8 @@ public class MyEventsRequest {
         InternalErrorListener errorListener = new InternalErrorListener();
 
         // Favourites event requests.
-        EventCollectionRequest.submit(activity, new EventsContext(eventsContext.location, ""),
+        EventCollectionRequest.submit(activity,
+                new EventsContext(eventsContext.location, EventsHighEndpoints.QUERY_MY_EVENT),
                 priority, shouldBypassCache, includeWithoutLocation, new FavouritedEventsListener(),
                 errorListener);
 
