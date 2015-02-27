@@ -186,6 +186,15 @@ public class EventsMarkerManager {
         return EventMark.isDismissed(getEventMark(eventId));
     }
 
+    public void removeDismissed(List<Event> events) {
+        for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
+            Event event = it.next();
+            if (isDismissed(event.id)) {
+                it.remove();
+            }
+        }
+    }
+
     public void restoreAll() {
         EventMarkDbHelper.restoreAll(context);
 

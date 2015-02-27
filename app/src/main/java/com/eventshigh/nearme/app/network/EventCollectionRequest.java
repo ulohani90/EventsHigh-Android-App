@@ -106,9 +106,12 @@ public class EventCollectionRequest extends JsonRequest<List<Event>> {
             List<Event> events = Event.parseUpcomingEvents(eventsContext.city, eventsJson,
                     includeWithoutLocation);
 
-            // Filter out the events which user has favourited or is following.
+            // Filter out the events which are dismissed.
+            eventsMarkerManager.waitForLoading();
+            eventsMarkerManager.removeDismissed(events);
+
+            // Filter out the events which user has favourited.
             if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-                eventsMarkerManager.waitForLoading();
                 for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
                     Event event = it.next();
                     if (! eventsMarkerManager.isFavourite(event.id)) {
@@ -119,7 +122,6 @@ public class EventCollectionRequest extends JsonRequest<List<Event>> {
 
             // Sort the event list to user.
             if (eventsContext.location != null) {
-                eventsMarkerManager.waitForLoading();
                 Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
             }
 

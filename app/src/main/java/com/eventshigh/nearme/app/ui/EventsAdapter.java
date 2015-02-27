@@ -38,7 +38,7 @@ import java.util.Set;
  * An adapter which can be used to populate the Event card.
  */
 public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
-    private static int NUM_MAX_EVENTS_PER_INTEREST = 3;
+    private static final int NUM_MAX_EVENTS_PER_INTEREST = 3;
 
     // We show the dismiss toast once per session.
     private static boolean showDismissToast = true;

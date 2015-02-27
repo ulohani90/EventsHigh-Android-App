@@ -96,8 +96,10 @@ public class FeaturedEventsRequest extends JsonRequest<List<Event>> {
             JSONObject eventsJson = new JSONObject(jsonString);
             List<Event> events = Event.parseUpcomingEvents(eventsContext.city, eventsJson, true);
 
+            eventsMarkerManager.waitForLoading();
+            eventsMarkerManager.removeDismissed(events);
+
             if (eventsContext.location != null) {
-                eventsMarkerManager.waitForLoading();
                 Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
             }
 
