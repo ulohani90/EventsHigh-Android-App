@@ -215,7 +215,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private void showEventCard() {
         View eventView = eventCardContainer.getChildAt(0);
         Event event = mapMarkerManager.getEvent(lastSelectedMarker);
-        eventView = EventsAdapter.getView(
+        eventView = EventsAdapter.getEventCard(
                 event, EventsMapsActivity.this, eventView, eventCardContainer);
         eventView.setOnTouchListener(
                 new OnTouchListener() {
