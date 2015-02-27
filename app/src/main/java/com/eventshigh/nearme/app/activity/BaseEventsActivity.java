@@ -14,6 +14,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +39,8 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
+import com.eventshigh.nearme.app.network.MyEventsRequest;
+import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.user.Account;
@@ -337,6 +340,22 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
     }
 
+    protected void updateMyEvents(MyEvents myEvents) {
+        isDataShown = true;
+
+        // Prefetch first 10 events.
+        int numPrefetched = 0;
+        for (Pair<String, List<Event>> myEventEntry : myEvents) {
+            for (Event event : myEventEntry.second) {
+                if (numPrefetched >= NUM_MAX_PREFETCH) {
+                    break;
+                }
+                EventUberPrefetcher.getInstance(getApplicationContext()).prefetch(event.id);
+                numPrefetched ++;
+            }
+        }
+    }
+
     /**
      * @return true if events without location information are shown.
      */
@@ -393,9 +412,15 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Stop all requests associated with this activity and then submit new request.
         VolleyHelper.getRequestQueue(getApplicationContext()).cancelAll(this);
-        EventCollectionRequest.submit(this, eventsContext, Priority.IMMEDIATE,
-                shouldBypassCache, shouldIncludeWithoutLocation(),
-                mEventsFetcherCallBack, mErrorListener);
+        if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
+            new MyEventsRequest(this, eventsContext, Priority.IMMEDIATE,
+                    shouldBypassCache, shouldIncludeWithoutLocation(),
+                    mMyEventsFetcherCallBack, mErrorListener).execute();
+        } else {
+            EventCollectionRequest.submit(this, eventsContext, Priority.IMMEDIATE,
+                    shouldBypassCache, shouldIncludeWithoutLocation(),
+                    mEventsFetcherCallBack, mErrorListener);
+        }
     }
 
     private void createShortcut() {
@@ -433,6 +458,24 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // ***********************
     // Callbacks
     // ***********************
+
+    private Listener<MyEvents> mMyEventsFetcherCallBack = new Listener<MyEvents>() {
+        @Override
+        public void onResponse(MyEvents myEvents, boolean isIntermediate) {
+            if (!isIntermediate) {
+                topProgressBar.setVisibility(View.GONE);
+
+                if (myEvents.isEmpty()) {
+                    // Failed. Show toast and return empty list.
+                    Toast.makeText(BaseEventsActivity.this, R.string.no_events, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            if (!isIntermediate || !myEvents.isEmpty()) {
+                updateMyEvents(myEvents);
+            }
+        }
+    };
 
     // This callback is called by EventsFetcher when new set of events are available. We build the
     // markers for all events and then call method to show selected markers.

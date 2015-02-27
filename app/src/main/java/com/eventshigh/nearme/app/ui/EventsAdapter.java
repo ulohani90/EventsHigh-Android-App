@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
@@ -34,6 +36,8 @@ import java.util.Set;
  * An adapter which can be used to populate the Event card.
  */
 public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
+    private static int NUM_MAX_EVENTS_PER_INTEREST = 3;
+
     // We show the dismiss toast once per session.
     private static boolean showDismissToast = true;
 
@@ -56,9 +60,21 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     public void setEvents(List<Event> events) {
-        dataToShow = new ArrayList<>();
+        dataToShow.clear();
         for (Event event: events) {
             dataToShow.add(new EventData(event));
+        }
+        notifyDataSetChanged();
+    }
+
+    public void setMyEvents(MyEvents myEvents) {
+        dataToShow.clear();
+        for (Pair<String, List<Event>> myEventEntry : myEvents) {
+            dataToShow.add(new HeaderData(myEventEntry.first));
+            for (Event event : myEventEntry.second.subList(0,
+                    Math.min(NUM_MAX_EVENTS_PER_INTEREST, myEventEntry.second.size()))) {
+                dataToShow.add(new EventData(event));
+            }
         }
         notifyDataSetChanged();
     }
@@ -170,7 +186,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-
+            ((HeaderCard) card).bindHeaderView(header);
         }
 
         @Override
@@ -180,7 +196,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     private static class HeaderCard extends ViewHolder {
-        private final View cardView;
         private final TextView titleView;
 
         private static HeaderCard newInstance(Activity activity, ViewGroup parent) {
@@ -190,12 +205,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private HeaderCard(View cardView) {
             super(cardView);
-            this.cardView = cardView;
             this.titleView = (TextView) cardView;
         }
 
-        private void bindEventView(HeaderData headerData) {
-            titleView.setText(headerData.header);
+        private void bindHeaderView(String header) {
+            titleView.setText(header);
         }
     }
 

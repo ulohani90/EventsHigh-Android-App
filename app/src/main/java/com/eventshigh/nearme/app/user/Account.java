@@ -18,6 +18,9 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 /**
@@ -162,11 +165,25 @@ public class Account {
     }
 
     public void setIsFollowing(String tag, boolean isFollowing) {
-        accountInfo.edit().putBoolean(getKeyForTag(tag), isFollowing).apply();
+        if (isFollowing) {
+            accountInfo.edit().putString(getKeyForTag(tag), tag).apply();
+        } else {
+            accountInfo.edit().remove(getKeyForTag(tag)).apply();
+        }
+    }
+
+    public List<String> getFollowingInterests() {
+        List<String> interests = new ArrayList<>();
+        for (Entry<String, ?> entry : accountInfo.getAll().entrySet()) {
+            if (entry.getKey().startsWith("follow_")) {
+                interests.add(entry.getValue().toString());
+            }
+        }
+        return interests;
     }
 
     private static String getKeyForTag(String tag) {
-        return "Follow_" + EventCategory.toCategoryParsableString(tag);
+        return "follow_" + EventCategory.toCategoryParsableString(tag);
     }
 
     private class AccountStateRegistar extends AsyncTask<Void, Void, Void> {

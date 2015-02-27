@@ -9,6 +9,7 @@ import android.view.View;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.google.android.gms.maps.model.LatLng;
@@ -70,6 +71,12 @@ public class EventsGridActivity extends BaseEventsActivity {
     protected void updateEventsCollection(List<Event> events) {
         super.updateEventsCollection(events);
         eventsAdapter.setEvents(events);
+    }
+
+    @Override
+    protected void updateMyEvents(MyEvents myEvents) {
+        super.updateMyEvents(myEvents);
+        eventsAdapter.setMyEvents(myEvents);
     }
 
     @Override

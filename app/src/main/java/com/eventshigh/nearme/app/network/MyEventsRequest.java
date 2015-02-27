@@ -1,0 +1,131 @@
+package com.eventshigh.nearme.app.network;
+
+import android.util.Pair;
+
+import com.android.volley.Request.Priority;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
+import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.user.Account;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Supports fetching of MyEvents for user -- it includes upcoming events which are marked as
+ * favourite and few events for all follow.
+ */
+public class MyEventsRequest {
+    public static String FAVOURITES_NAME = "Favourites";
+    public static class MyEvents extends ArrayList<Pair<String, List<Event>>> {
+    }
+
+    private final BaseActivity activity;
+    private final EventsContext eventsContext;
+    private final Priority priority;
+    private final boolean shouldBypassCache;
+    private final boolean includeWithoutLocation;
+    private final Listener<MyEvents> listener;
+    private final ErrorListener errorListener;
+
+    private boolean hasErrorOccurred = false;
+    private int numPendingRequests;
+    private MyEvents result = new MyEvents();
+
+    public MyEventsRequest(BaseActivity activity, EventsContext eventsContext, Priority priority,
+                           boolean shouldBypassCache, boolean includeWithoutLocation,
+                           Listener<MyEvents> listener, ErrorListener errorListener) {
+        this.activity = activity;
+        this.eventsContext = eventsContext;
+        this.priority = priority;
+        this.shouldBypassCache = shouldBypassCache;
+        this.includeWithoutLocation = includeWithoutLocation;
+        this.listener = listener;
+        this.errorListener = errorListener;
+    }
+
+    public void execute() {
+        if (eventsContext.city == null) {
+            errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
+            return;
+        }
+
+        List<String> interests = new Account(activity).getFollowingInterests();
+        numPendingRequests = interests.size() + 1;
+        InternalErrorListener errorListener = new InternalErrorListener();
+
+        // Favourites event requests.
+        EventCollectionRequest.submit(activity, new EventsContext(eventsContext.location, ""),
+                priority, shouldBypassCache, includeWithoutLocation, new FavouritedEventsListener(),
+                errorListener);
+
+        // Interest based requests.
+        for (String interest : interests) {
+            EventCollectionRequest.submit(activity, new EventsContext(eventsContext.location, interest),
+                    priority, shouldBypassCache, includeWithoutLocation, new EventsListener(interest),
+                    errorListener);
+        }
+    }
+
+    public class FavouritedEventsListener extends EventsListener {
+        public FavouritedEventsListener() {
+            super(FAVOURITES_NAME);
+        }
+
+        public void addToResult(List<Event> events) {
+            result.add(0, Pair.create(FAVOURITES_NAME, events));
+        }
+    }
+
+    public class EventsListener implements Listener<List<Event>> {
+        private final String title;
+
+        public EventsListener(String title) {
+            this.title = title;
+        }
+
+        public void addToResult(List<Event> events) {
+            result.add(Pair.create(title, events));
+        }
+
+        @Override
+        public void onResponse(List<Event> events, boolean intermediate) {
+            if (intermediate) {
+                return;
+            }
+
+            synchronized (this) {
+                if (hasErrorOccurred) {
+                    return;
+                }
+                if (!events.isEmpty()) {
+                    addToResult(events);
+                }
+                numPendingRequests --;
+
+                if (numPendingRequests == 0) {
+                    listener.onResponse(result, false);
+                }
+            }
+        }
+    }
+
+    public class InternalErrorListener implements ErrorListener {
+        @Override
+        public void onErrorResponse(VolleyError volleyError) {
+            boolean call = false;
+            synchronized (MyEventsRequest.this) {
+                if (!hasErrorOccurred) {
+                    hasErrorOccurred = true;
+                    call = true;
+                }
+            }
+            if (call) {
+                errorListener.onErrorResponse(volleyError);
+            }
+        }
+    }
+}

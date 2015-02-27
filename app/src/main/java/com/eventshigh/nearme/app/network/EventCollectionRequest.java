@@ -103,10 +103,10 @@ public class EventCollectionRequest extends JsonRequest<List<Event>> {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject eventsJson = new JSONObject(jsonString);
-            List<Event> events = Event.parseUpcomingEvents( eventsContext.city, eventsJson,
+            List<Event> events = Event.parseUpcomingEvents(eventsContext.city, eventsJson,
                     includeWithoutLocation);
 
-            // if its my events, filter out the events which user has favourited or is following.
+            // Filter out the events which user has favourited or is following.
             eventsMarkerManager.waitForLoading();
             if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
                 for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
@@ -119,6 +119,7 @@ public class EventCollectionRequest extends JsonRequest<List<Event>> {
 
             // Sort the event list to user.
             if (eventsContext.location != null) {
+                eventsMarkerManager.waitForLoading();
                 Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
             }
 
