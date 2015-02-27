@@ -145,7 +145,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         boolean showFollowScreen = !eventsContext.query.isEmpty() &&
-                !EventsHighEndpoints.isDateQuery(eventsContext.query);
+                !EventsHighEndpoints.isDateQuery(eventsContext.query) &&
+                !EventsHighEndpoints.isMyEventQuery(eventsContext.query);
         if (showFollowScreen) {
             reportActionToAnalytics("search", eventsContext.query);
             EventSearchSuggestionsProvider.saveRecentQuery(this, eventsContext.query);
@@ -265,7 +266,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         // Do not show filterByDate for search.
-        menu.findItem(R.id.action_filter).setVisible(eventsContext.query.isEmpty());
+        menu.findItem(R.id.action_filter_date).setVisible(eventsContext.query.isEmpty());
         return true;
     }
 
@@ -273,7 +274,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_filter) {
+        if (id == R.id.action_filter_date) {
             if (eventsContext.dateFilter.isEmpty()) {
                 eventsContext.setDateFilter(Calendar.getInstance());
                 showDateFilter();
@@ -376,13 +377,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     public void showEventDetails(Event event, int position) {
         reportEventAction(event, "showEventDetails", position);
         showEventDetails(event);
-    }
-
-    public void showSearchView(String query) {
-        EventsContext param = new EventsContext(eventsContext.location, query);
-        Intent intent = new Intent(this, this.getClass())
-                .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
-        startActivity(intent);
     }
 
     protected void switchTo(Class<?> cls) {

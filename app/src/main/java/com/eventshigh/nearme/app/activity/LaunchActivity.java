@@ -49,6 +49,7 @@ import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -172,6 +173,12 @@ public class LaunchActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+
+        if (id == R.id.action_my_events) {
+            eventsContext.query = EventsHighEndpoints.QUERY_MY_EVENT;
+            showNextScreen(true);
+            return true;
+        }
 
         if (id == R.id.action_change_location) {
             askUserForLocation();

@@ -355,16 +355,10 @@ public class Event implements Parcelable {
         return events;
     }
 
-    public static List<Event> parseUpcomingEvents(EventsContext eventsContext,
-            EventsMarkerManager eventsMarkerManager, JSONObject eventsJSON, boolean includeWithoutLocation)
-            throws JSONException {
+    public static List<Event> parseUpcomingEvents(City city, JSONObject eventsJSON,
+            boolean includeWithoutLocation) throws JSONException {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
-        eventsMarkerManager.waitForLoading();
-        List<Event> events = fromJSON(eventsContext.city, upcomingEvents, includeWithoutLocation);
-        if (eventsContext.location != null) {
-            Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
-        }
-        return events;
+        return fromJSON(city, upcomingEvents, includeWithoutLocation);
     }
 
     private static String emptyIfNull(@Nullable String string) {

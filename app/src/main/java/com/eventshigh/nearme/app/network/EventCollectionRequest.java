@@ -10,6 +10,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
@@ -19,6 +20,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -100,8 +103,25 @@ public class EventCollectionRequest extends JsonRequest<List<Event>> {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject eventsJson = new JSONObject(jsonString);
-            List<Event> events = Event.parseUpcomingEvents(
-                    eventsContext, eventsMarkerManager, eventsJson, includeWithoutLocation);
+            List<Event> events = Event.parseUpcomingEvents( eventsContext.city, eventsJson,
+                    includeWithoutLocation);
+
+            // if its my events, filter out the events which user has favourited or is following.
+            eventsMarkerManager.waitForLoading();
+            if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
+                for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
+                    Event event = it.next();
+                    if (! eventsMarkerManager.isFavourite(event.id)) {
+                        it.remove();
+                    }
+                }
+            }
+
+            // Sort the event list to user.
+            if (eventsContext.location != null) {
+                Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
+            }
+
             return Response.success(events, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));

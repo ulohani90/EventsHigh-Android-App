@@ -10,6 +10,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
@@ -20,6 +21,7 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -92,10 +94,14 @@ public class FeaturedEventsRequest extends JsonRequest<List<Event>> {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject eventsJson = new JSONObject(jsonString);
-            List<Event> events = Event.parseUpcomingEvents(
-                    eventsContext, eventsMarkerManager, eventsJson, true);
-            List<Event> filteredEvents = new ArrayList<>(MAX_FEATURED_EVENTS);
+            List<Event> events = Event.parseUpcomingEvents(eventsContext.city, eventsJson, true);
 
+            if (eventsContext.location != null) {
+                eventsMarkerManager.waitForLoading();
+                Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
+            }
+
+            List<Event> filteredEvents = new ArrayList<>(MAX_FEATURED_EVENTS);
             for (Event event : events) {
                 if (event.imgUrl != null) {
                     filteredEvents.add(event);

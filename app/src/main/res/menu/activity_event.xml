@@ -11,8 +11,8 @@
           myApp:showAsAction="ifRoom|collapseActionView"
           myApp:actionViewClass="android.support.v7.widget.SearchView"
     />
-    <item android:id="@+id/action_filter"
-          android:title="@string/menu_filter"
+    <item android:id="@+id/action_filter_date"
+          android:title="@string/menu_filter_date"
           android:icon="@drawable/ic_today_white_36dp"
           android:orderInCategory="30"
           myApp:showAsAction="ifRoom"

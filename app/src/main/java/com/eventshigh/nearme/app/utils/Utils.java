@@ -6,10 +6,6 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Helper methods for managing strings and titles.
  */
@@ -37,13 +33,6 @@ public class Utils {
         }
 
         return sb.toString().trim();
-    }
-
-    public static <T> T[] mergeArray(T[] first, T[] second) {
-        List<T> both = new ArrayList<>(first.length + second.length);
-        Collections.addAll(both, first);
-        Collections.addAll(both, second);
-        return both.toArray(first);
     }
 
     public static Uri getAppUri(Uri webUri) {

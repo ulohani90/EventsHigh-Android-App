@@ -24,6 +24,7 @@ public class EventsHighEndpoints {
             "http://apiserver.eventshigh.com:8888/api/get_featured_events/%s?mobile=%d";
     private static final String API_ENDPOINT_EVENT_UBER_FORMAT =
             "http://apiserver.eventshigh.com:8888/api/get_event_uber_info/%s?mobile=1";
+    public static final String QUERY_MY_EVENT = "my events";
 
     public static Uri getEventDetailsURI(Event event) {
         StringBuilder sb = new StringBuilder(event.id);
@@ -71,7 +72,7 @@ public class EventsHighEndpoints {
             throw new IllegalArgumentException("city is not passed");
         }
 
-        if (eventsContext.query.isEmpty()) {
+        if (eventsContext.query.isEmpty() || isMyEventQuery(eventsContext.query)) {
             return String.format(API_ENDPOINT_DATE_FORMAT,
                     eventsContext.city.toString().toLowerCase(),
                     eventsContext.dateFilter.isEmpty() ? "this%20week" : eventsContext.dateFilter,
@@ -105,5 +106,9 @@ public class EventsHighEndpoints {
     public static boolean isDateQuery(String query) {
         // this week, this weekend are valid date queries
         return query.toLowerCase().startsWith("this") ||  DATE_PATTERN.matcher(query).matches();
+    }
+
+    public static boolean isMyEventQuery(String query) {
+        return query.equalsIgnoreCase(QUERY_MY_EVENT);
     }
 }
