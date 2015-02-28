@@ -398,6 +398,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
         showEventDetails(event);
     }
 
+    public void showSearchView(String query) {
+        EventsContext param = new EventsContext(eventsContext.location, query);
+        Intent intent = new Intent(this, this.getClass())
+                .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
+        startActivity(intent);
+    }
+
     protected void switchTo(Class<?> cls) {
         reportActionToAnalytics("switchView");
         Intent intent = new Intent(this, cls)

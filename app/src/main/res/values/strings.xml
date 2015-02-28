@@ -70,7 +70,7 @@
     <string name="message_dismiss">Event removed. This will improve your recommendations.</string>
 
     <!-- Sharing -->
-    <string name="action_share_app">Share This App?</string>
+    <string name="action_share_app">Like the app? Help others find amazing events!</string>
     <string name="action_share_app2">Share App</string>
     <string name="share_app_text">Hey, check out this app to know all the amazing events happening near you and in your locality! https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&amp;referrer=%s</string>
     <string name="share_event_text">Hey, check out this event! What say? %s?src=ehm (EventsHigh: Find amazing events near you!)</string>

@@ -39,6 +39,13 @@ import java.util.Set;
  */
 public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static final int NUM_MAX_EVENTS_PER_INTEREST = 3;
+    private static final int FAVOURITE_COLOR = android.R.color.holo_red_light;
+    private static final int HEADER_COLORS[] = new int [] {
+            android.R.color.holo_orange_light,
+            android.R.color.holo_blue_light,
+            android.R.color.holo_green_light
+    };
+
 
     // We show the dismiss toast once per session.
     private static boolean showDismissToast = true;
@@ -80,10 +87,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     public void setMyEvents(MyEvents myEvents) {
         dataToShow.clear();
-        for (Pair<String, List<Event>> myEventEntry : myEvents) {
-            dataToShow.add(new HeaderData(myEventEntry.first));
-            List<Event> events = myEventEntry.first.equals(MyEventsRequest.FAVOURITES_NAME) ?
-                    myEventEntry.second :
+
+        for (int i = 0; i < myEvents.size(); i++) {
+            Pair<String, List<Event>> myEventEntry = myEvents.get(i);
+            boolean isFavourite = myEventEntry.first.equals(MyEventsRequest.FAVOURITES_NAME);
+            dataToShow.add(new HeaderData(myEventEntry.first,
+                    isFavourite ? FAVOURITE_COLOR : HEADER_COLORS[i % HEADER_COLORS.length]));
+            List<Event> events = isFavourite ? myEventEntry.second :
                     myEventEntry.second.subList(0,
                             Math.min(NUM_MAX_EVENTS_PER_INTEREST, myEventEntry.second.size()));
             for (Event event : events) {
@@ -155,7 +165,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         final EventCard eventCard = reuseView == null ? EventCard.newInstance(activity, parent) :
                 new EventCard(reuseView);
         eventCard.bindEventView(event, activity, 0);
-        return eventCard.cardView;
+        return eventCard.itemView;
     }
 
     private static enum DataType {
@@ -189,9 +199,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     // Header Data.
     private class HeaderData implements Data {
         private final String header;
+        private final int colorId;
 
-        private HeaderData(String header) {
+        private HeaderData(String header, int colorId) {
             this.header = header;
+            this.colorId = colorId;
         }
 
         @Override
@@ -201,7 +213,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            ((HeaderCard) card).bindHeaderView(header);
+            ((HeaderCard) card).bindHeaderView(activity, this);
         }
 
         @Override
@@ -212,19 +224,32 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private static class HeaderCard extends ViewHolder {
         private final TextView titleView;
+        private final ImageView arrowView;
 
         private static HeaderCard newInstance(Activity activity, ViewGroup parent) {
-            View view = activity.getLayoutInflater().inflate(android.R.layout.simple_list_item_1, parent, false);
+            View view = activity.getLayoutInflater().inflate(R.layout.event_header, parent, false);
             return new HeaderCard(view);
         }
 
         private HeaderCard(View cardView) {
             super(cardView);
-            this.titleView = (TextView) cardView;
+            this.titleView = (TextView) cardView.findViewById(R.id.header);
+            this.arrowView = (ImageView) cardView.findViewById(R.id.header_arrow);
         }
 
-        private void bindHeaderView(String header) {
-            titleView.setText(Utils.capitalize(header));
+        private void bindHeaderView(final BaseEventsActivity activity, final HeaderData header) {
+            titleView.setBackgroundColor(activity.getResources().getColor(header.colorId));
+            titleView.setText(Utils.capitalize(header.header));
+            boolean isFavourite = header.header.equals(MyEventsRequest.FAVOURITES_NAME);
+            arrowView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
+            if (!isFavourite) {
+                itemView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        activity.showSearchView(header.header);
+                    }
+                });
+            }
         }
     }
 
@@ -254,7 +279,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     private static class EventCard extends ViewHolder {
-        public final View cardView;
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
         private final TextView titleView;
@@ -272,7 +296,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         public EventCard(View cardView) {
             super(cardView);
-            this.cardView = cardView;
             bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
             recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
             titleView = (TextView) cardView.findViewById(R.id.event_title);
@@ -292,8 +315,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private void bindEventView(final Event event, final BaseEventsActivity activity,
                                           final int position) {
-            cardView.setVisibility(View.VISIBLE);
-            cardView.setOnClickListener(new OnClickListener() {
+            itemView.setVisibility(View.VISIBLE);
+            itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     activity.showEventDetails(event, position);
