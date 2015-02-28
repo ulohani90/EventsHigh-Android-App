@@ -175,6 +175,7 @@ public class LaunchActivity extends BaseActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_my_events) {
+            reportActionToAnalytics("myEvents");
             eventsContext.query = EventsHighEndpoints.QUERY_MY_EVENT;
             showNextScreen(true);
             return true;
@@ -186,6 +187,7 @@ public class LaunchActivity extends BaseActivity {
         }
 
         if (id == R.id.action_settings) {
+            reportActionToAnalytics("settings");
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
