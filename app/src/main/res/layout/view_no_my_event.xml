@@ -5,8 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.EventsGridActivity"
+    tools:background="@android:color/white"
 >
     <TextView
+        style="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -14,6 +16,7 @@
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
         android:gravity="center"
+        android:textColor="@android:color/black"
         android:text="@string/ui_no_my_event"
     />
 

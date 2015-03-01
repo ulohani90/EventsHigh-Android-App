@@ -54,7 +54,7 @@
     <string name="ui_code">We have sent a code to %s. Please enter it below</string>
     <string name="ui_code_verified">Your phone number %s has been verified</string>
     <string name="ui_verify_phone">Verify your phone number</string>
-    <string name="ui_no_my_event">Follow your interests or favourite events to get personalized events list!</string>
+    <string name="ui_no_my_event">No events found!\n\nFollow your interests or favourite events to see them in personalized events list!</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>
