@@ -42,4 +42,15 @@ public enum City {
 
         return null;
     }
+
+    public static City getCity(String cityName) {
+        String cityNameInUpperCase = cityName.toUpperCase();
+        for (City city : City.values()) {
+            if (city.name().equals(cityNameInUpperCase)) {
+                return city;
+            }
+        }
+
+        return null;
+    }
 }
