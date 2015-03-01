@@ -293,7 +293,7 @@ category#android.intent.category.BROWSABLE
 ADDED from AndroidManifest.xml:277:17
 	android:name
 		ADDED from AndroidManifest.xml:277:27
-activity#com.eventshigh.nearme.app.activity.BookTicketActivity
+activity#com.eventshigh.nearme.app.activity.CustomUrlActivity
 ADDED from AndroidManifest.xml:285:9
 	android:label
 		ADDED from AndroidManifest.xml:287:13

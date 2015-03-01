@@ -283,7 +283,7 @@
         </activity>
 
         <activity
-            android:name=".activity.BookTicketActivity"
+            android:name=".activity.CustomUrlActivity"
             android:label="@string/title_book"
             android:launchMode="singleTask"
             android:configChanges="orientation|keyboardHidden|screenSize"

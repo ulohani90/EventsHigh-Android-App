@@ -226,8 +226,8 @@ public class EventDetailFragment extends Fragment {
 
     private void openBookingSite() {
         activity.reportEventAction(event, "bookTicket");
-        Intent intent = new Intent(activity, BookTicketActivity.class);
-        intent.putExtra(BookTicketActivity.EVENT_BOOKING_URL_INTENT_KEY, event.bookingUrl);
+        Intent intent = new Intent(activity, CustomUrlActivity.class);
+        intent.putExtra(CustomUrlActivity.EXTRA_URL_KEY, event.bookingUrl);
         startActivity(intent);
     }
 

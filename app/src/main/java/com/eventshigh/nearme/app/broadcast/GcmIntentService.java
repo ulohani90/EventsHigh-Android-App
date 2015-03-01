@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
@@ -81,8 +82,9 @@ public class GcmIntentService extends IntentService {
 
         String eventId = Utils.checkIfUnknown(msg.getString("id"));
         String query = Utils.checkIfUnknown(msg.getString("q"));
-        if (eventId == null && query == null) {
-            Log.w(LOG_TAG, "Invalid notification, nether eventId or query passed");
+        String contestUrl = Utils.checkIfUnknown(msg.getString("contest"));
+        if (eventId == null && query == null && contestUrl == null) {
+            Log.w(LOG_TAG, "Invalid notification, nether eventId, query or contest param passed");
             return;
         }
 
@@ -119,10 +121,16 @@ public class GcmIntentService extends IntentService {
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        } else {
+        } else if (query != null) {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             intent.setData(EventsHighEndpoints.getWebUri(new EventsContext(null, query)));
+            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        } else {
+            Intent intent = new Intent(this, CustomUrlActivity.class);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+            intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);
+            intent.putExtra(CustomUrlActivity.EXTRA_URL_KEY, contestUrl);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         }
 

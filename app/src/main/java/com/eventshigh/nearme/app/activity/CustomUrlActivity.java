@@ -16,8 +16,9 @@ import android.webkit.WebViewClient;
 
 import com.eventshigh.nearme.app.R;
 
-public class BookTicketActivity extends BaseActivity {
-    public static final String EVENT_BOOKING_URL_INTENT_KEY = "EVENT_BOOKING_URL_INTENT_KEY";
+public class CustomUrlActivity extends BaseActivity {
+    public static final String EXTRA_URL_KEY = CustomUrlActivity.class.getName() + ".url";
+    public static final String EXTRA_TITLE_KEY =  CustomUrlActivity.class.getName() + ".title";
 
     private String url;
     private WebView webView;
@@ -51,8 +52,15 @@ public class BookTicketActivity extends BaseActivity {
         webView.setWebViewClient(new BookTicketWebViewClient());
         webView.setWebChromeClient(new BookTicketWebChromeClient());
 
-        // Load the url in the web view
-        url = getIntent().getExtras().getString(EVENT_BOOKING_URL_INTENT_KEY);
+        // Set title.
+        Bundle extras = getIntent().getExtras();
+        String title = extras.getString(EXTRA_TITLE_KEY);
+        if (title != null) {
+            getSupportActionBar().setTitle(title);
+        }
+
+        // Load the url in the web view.
+        url = extras.getString(EXTRA_URL_KEY);
         webView.loadUrl(url);
     }
 
