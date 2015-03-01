@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                                    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:descendantFocusability="blocksDescendants"
+    card_view:cardCornerRadius="5dp"
+    card_view:cardPreventCornerOverlap="false"
+    card_view:cardElevation="4dp"
+    tools:ignore="UnusedAttribute"
+>
+    <TextView
+        style="?android:attr/textAppearanceLarge"
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/holo_green_dark"
+        android:textColor="@android:color/white"
+        android:gravity="center"
+        tools:text="Music"
+    />
+    <ImageView
+        android:id="@+id/header_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_keyboard_arrow_right_white_48dp"
+        android:layout_gravity="end|center_vertical"
+    />
+</android.support.v7.widget.CardView>

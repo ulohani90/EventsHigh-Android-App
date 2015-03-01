@@ -17,6 +17,8 @@
     <string name="action_verify_code">Verify Code</string>
     <string name="action_change_no">Change Number</string>
     <string name="action_register">Register</string>
+    <string name="action_find_event">Find Events</string>
+    <string name="action_explore_categories">Explore Categories</string>
 
     <!-- Menu items -->
     <string name="menu_my_events">My Events</string>
@@ -48,11 +50,11 @@
     <string name="ui_referrer_default">Share the joy of attending amazing events!</string>
     <string name="ui_referrer">You have helped {0,choice,1#one friend|1&lt;{0} friends} in finding amazing events, thank you!</string>
     <string name="ui_enter_phone_number_hint">Your Phone Number</string>
-    <string name="ui_phone_verify_tip">Get exciting new deals on your favourite events in town!</string>
-    <string name="ui_onboarding_phone_verify_tip">Register with your phone number to get exciting new deals on your favourite events in town!</string>
+    <string name="ui_phone_verify_tip">Register with your phone number to get exciting new deals on your favourite events in town!</string>
     <string name="ui_code">We have sent a code to %s. Please enter it below</string>
     <string name="ui_code_verified">Your phone number %s has been verified</string>
     <string name="ui_verify_phone">Verify your phone number</string>
+    <string name="ui_no_my_event">No events found!\n\nFollow your interests or favourite events to see them in personalized events list!</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>
@@ -70,13 +72,11 @@
     <string name="message_dismiss">Event removed. This will improve your recommendations.</string>
 
     <!-- Sharing -->
-    <string name="action_share_app">Share This App?</string>
-    <string name="action_share_app2">Share App</string>
+    <string name="action_share_app">Share App</string>
     <string name="share_app_text">Hey, check out this app to know all the amazing events happening near you and in your locality! https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&amp;referrer=%s</string>
     <string name="share_event_text">Hey, check out this event! What say? %s?src=ehm (EventsHigh: Find amazing events near you!)</string>
 
     <!-- Failed messages -->
-    <string name="failed_login">Failed to login! You can retry or skip.</string>
     <string name="failed_load">Failed to load events information!</string>
     <string name="failed_refresh">Failed to refresh events information, showing stale data!</string>
     <string name="unsupported_city">Sorry, we are not in your city, yet!</string>

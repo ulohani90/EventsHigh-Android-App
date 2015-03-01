@@ -161,7 +161,7 @@ public class Account {
     }
 
     public boolean isFollowing(String tag) {
-        return accountInfo.getBoolean(getKeyForTag(tag), false);
+        return accountInfo.getString(getKeyForTag(tag), null) != null;
     }
 
     public void setIsFollowing(String tag, boolean isFollowing) {

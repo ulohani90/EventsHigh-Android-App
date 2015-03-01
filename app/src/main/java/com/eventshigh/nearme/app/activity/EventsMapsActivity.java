@@ -126,7 +126,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
             events.addAll(myEventEntry.second);
         }
 
-        this.updateEventsCollection(new ArrayList<Event>(events));
+        this.updateEventsCollection(new ArrayList<>(events));
     }
 
     @Override

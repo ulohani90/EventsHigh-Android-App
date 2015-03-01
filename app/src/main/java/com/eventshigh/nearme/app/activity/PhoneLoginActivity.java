@@ -207,8 +207,6 @@ public class PhoneLoginActivity extends BaseActivity {
 
     // Set the UI elements when we need to ask for mobile no.
     private void setRequestMobileNoView() {
-        findViewById(R.id.top_tip).setVisibility(inOnboardingFlow ? View.VISIBLE : View.GONE);
-        findViewById(R.id.bottom_tip).setVisibility(inOnboardingFlow ? View.GONE : View.VISIBLE);
         findViewById(R.id.skip).setVisibility(inOnboardingFlow ? View.VISIBLE : View.GONE);
         ((Button) findViewById(R.id.send_code)).setText(inOnboardingFlow
                 ? R.string.action_register : R.string.action_send_code);

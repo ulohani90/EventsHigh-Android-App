@@ -1,44 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
-
-    <ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:tools="http://schemas.android.com/tools"
-                  android:id="@+id/view_switcher"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:background="@android:color/white"
-                  tools:context=".activity.LaunchActivity"
-        >
-
+<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/view_switcher"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".activity.LaunchActivity"
+>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+    >
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:scrollbars="none"
             android:paddingBottom="10dp"
             android:clipToPadding="false"
-            >
-
+        >
             <LinearLayout
                 android:id="@+id/explore_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="10dp"
-                >
-
+            >
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    >
-
+                >
                     <android.support.v4.view.ViewPager
                         android:id="@+id/featured_events_pager"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
-                        />
+                    />
 
                     <LinearLayout
                         android:id="@+id/dots_parent"
@@ -48,7 +46,7 @@
                         android:layout_gravity="bottom"
                         android:orientation="horizontal"
                         android:layout_marginBottom="88dp"
-                        />
+                    />
                 </FrameLayout>
 
                 <LinearLayout
@@ -58,8 +56,7 @@
                     android:background="#D1E1E5"
                     android:elevation="4dp"
                     tools:ignore="UnusedAttribute"
-                    >
-
+                >
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -75,13 +72,13 @@
                         android:text="@string/ui_today"
                         android:onClick="showToday"
                         tools:ignore="UnusedAttribute"
-                        />
+                    />
 
                     <View
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
                         android:background="@drawable/shape_vertical_divider"
-                        />
+                    />
 
                     <TextView
                         style="?android:attr/textAppearanceMedium"
@@ -99,13 +96,13 @@
                         android:text="@string/ui_tomorrow"
                         android:onClick="showTomorrow"
                         tools:ignore="UnusedAttribute"
-                        />
+                    />
 
                     <View
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
                         android:background="@drawable/shape_vertical_divider"
-                        />
+                    />
 
                     <TextView
                         style="?android:attr/textAppearanceMedium"
@@ -123,7 +120,7 @@
                         android:text="@string/ui_this_weekend"
                         android:onClick="showThisWeekend"
                         tools:ignore="UnusedAttribute"
-                        />
+                    />
                 </LinearLayout>
 
                 <TextView
@@ -135,18 +132,25 @@
                     android:textColor="#4E5B60"
                     android:textSize="14sp"
                     android:text="@string/explore_cat"
-                    />
+                />
             </LinearLayout>
         </ScrollView>
 
-        <ListView
-            android:id="@+id/city_selector"
+        <include
+            android:id="@+id/verify_phone_container"
+            layout="@layout/verify_phone_snack_bar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:listitem="@android:layout/simple_list_item_1"
-            />
-    </ViewSwitcher>
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+        />
 
-    <include layout="@layout/verify_phone_snack_bar" />
+    </LinearLayout>
 
-</FrameLayout>
+    <ListView
+        android:id="@+id/city_selector"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@android:layout/simple_list_item_1"
+    />
+</ViewSwitcher>
+

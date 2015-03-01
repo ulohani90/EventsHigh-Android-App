@@ -48,8 +48,9 @@
             android:drawablePadding="8dp"
             android:fontFamily="sans-serif-light"
             android:visibility="gone"
-            android:text="@string/ui_onboarding_phone_verify_tip"
-            />
+            android:text="@string/ui_phone_verify_tip"
+            tools:ignore="UnusedAttribute"
+        />
 
         <EditText
             android:id="@+id/phone_no"
@@ -63,7 +64,7 @@
             android:layout_marginTop="24dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            >
+        >
             <Button
                 android:id="@+id/skip"
                 android:visibility="gone"
@@ -72,8 +73,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/action_skip"
                 android:onClick="skip"
-                android:layout_gravity="left"
-                />
+                android:layout_gravity="start"
+            />
             <Button
                 android:id="@+id/send_code"
                 style="@style/PhoneLoginButton"
@@ -81,21 +82,9 @@
                 android:layout_height="wrap_content"
                 android:text="@string/action_send_code"
                 android:onClick="sendCode"
-                android:layout_gravity="right"
-                />
+                android:layout_gravity="end"
+            />
         </FrameLayout>
-
-        <TextView
-            android:id="@+id/bottom_tip"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:textSize="14sp"
-            android:drawableLeft="@drawable/onboarding_info"
-            android:drawableStart="@drawable/onboarding_info"
-            android:drawablePadding="8dp"
-            android:text="@string/ui_phone_verify_tip"
-        />
     </LinearLayout>
 
     <LinearLayout
