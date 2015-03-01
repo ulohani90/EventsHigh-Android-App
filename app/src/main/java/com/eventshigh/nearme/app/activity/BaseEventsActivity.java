@@ -62,10 +62,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import fr.nicolaspomepuy.discreetapprate.AppRate;
-import fr.nicolaspomepuy.discreetapprate.AppRate.OnShowListener;
-import fr.nicolaspomepuy.discreetapprate.RetryPolicy;
-
 /**
  * Base activity for location aware events listing. This class implements common methods to fetch
  * fetch event listings when needed and asking the parent activity to show events as per user
@@ -150,15 +146,14 @@ public abstract class BaseEventsActivity extends BaseActivity {
         boolean showFollowScreen = !eventsContext.query.isEmpty() &&
                 !EventsHighEndpoints.isDateQuery(eventsContext.query) &&
                 !EventsHighEndpoints.isMyEventQuery(eventsContext.query);
+        View followWidget = findViewById(R.id.follow_widget);
+        followWidget.setVisibility(showFollowScreen ? View.VISIBLE : View.GONE);
         if (showFollowScreen) {
             reportActionToAnalytics("search", eventsContext.query);
             EventSearchSuggestionsProvider.saveRecentQuery(this, eventsContext.query);
 
             final Account account = new Account(this);
-            View followWidget = findViewById(R.id.follow_widget);
             TextView followWidgetTitle = (TextView) findViewById(R.id.follow_title);
-
-            followWidget.setVisibility(View.VISIBLE);
             followWidgetTitle.setText(Utils.capitalize(eventsContext.query));
             setFollowButtons(account.isFollowing(eventsContext.query));
 
@@ -224,12 +219,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         if (Account.isPhoneVerifyPending(this)) {
             showVerifyPhoneSnackbar();
-        } else {
-            // Show the rate this app in non intrusive way.
-            AppRate.with(this)
-                    .delay(3000).initialLaunchCount(5).retryPolicy(RetryPolicy.EXPONENTIAL)
-                    .text(R.string.action_share_app).listener(mAppRateOnShowListener)
-                    .checkAndShow();
         }
     }
 
@@ -414,8 +403,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     protected void fetchNewListing(boolean shouldBypassCache) {
-        viewSwitcher.setDisplayedChild(0);
         topProgressBar.setVisibility(View.VISIBLE);
+        viewSwitcher.setDisplayedChild(0);
 
         // Stop all requests associated with this activity and then submit new request.
         VolleyHelper.getRequestQueue(getApplicationContext()).cancelAll(this);
@@ -473,8 +462,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 topProgressBar.setVisibility(View.GONE);
 
                 if (myEvents.isEmpty()) {
-                    // Failed. Show toast and return empty list.
-                    Toast.makeText(BaseEventsActivity.this, R.string.no_events, Toast.LENGTH_SHORT).show();
+                    viewSwitcher.setDisplayedChild(1);
+                    findViewById(R.id.view_retry).setVisibility(View.GONE);
+                    findViewById(R.id.view_no_my_event).setVisibility(View.VISIBLE);
                 }
             }
 
@@ -504,32 +494,20 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
     };
 
-    private OnShowListener mAppRateOnShowListener = new OnShowListener() {
-        @Override
-        public void onRateAppShowing(AppRate appRate, final View view) {
-            reportActionToAnalytics("shareAppShown");
-            view.findViewById(R.id.dar_rate_element).setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    shareApp();
-                    view.setVisibility(View.GONE);
-                }
-            });
-        }
-
-        @Override
-        public void onRateAppDismissed() {
-            reportActionToAnalytics("shareAppDismissed");
-        }
-
-        @Override
-        public void onRateAppClicked() {
-        }
-    };
-
     public void onRetry(View view) {
         reportActionToAnalytics("retryFetch");
         fetchNewListing(false /* bypass cache*/);
+    }
+
+    public void onFindEvents(View view) {
+        reportActionToAnalytics("findEvents");
+        showSearchView("");
+        finish();
+    }
+
+    public void onExploreCategories(View view) {
+        reportActionToAnalytics("exploreCategories");
+        finish();
     }
 
     private ErrorListener mErrorListener = new ErrorListener() {
@@ -540,6 +518,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 Toast.makeText(BaseEventsActivity.this, R.string.failed_refresh, Toast.LENGTH_SHORT).show();
             } else {
                 viewSwitcher.setDisplayedChild(1);
+                findViewById(R.id.view_retry).setVisibility(View.VISIBLE);
+                findViewById(R.id.view_no_my_event).setVisibility(View.GONE);
             }
 
             Throwable cause = volleyError.getCause();
@@ -672,7 +652,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     private void setFollowButtons(boolean isFollowing) {
-        followButton.setVisibility(isFollowing ? View.INVISIBLE : View.VISIBLE);
-        followingButton.setVisibility(isFollowing ? View.VISIBLE : View.INVISIBLE);
+        followButton.setVisibility(isFollowing ? View.GONE : View.VISIBLE);
+        followingButton.setVisibility(isFollowing ? View.VISIBLE : View.GONE);
     }
 }
