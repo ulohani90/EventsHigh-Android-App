@@ -263,6 +263,9 @@ public class Event implements Parcelable {
             Object currentTag = tagsJsonArr.get(j);
             String tag = currentTag instanceof JSONObject ?
                     tagsJsonArr.getJSONObject(j).getString("tag") : String.valueOf(currentTag);
+            if (tag.equalsIgnoreCase("featured")) {
+                continue;
+            }
             tagsList.add(Utils.capitalize(tag));
 
             if (category == EventCategory.OTHER) {

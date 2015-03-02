@@ -17,7 +17,6 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.List;
 
@@ -89,8 +88,18 @@ public class FeaturedEventsAdapter extends PagerAdapter {
             titleView.setText(event.title);
             venueView.setText(event.getShortAddress());
 
-            if (event.category != EventCategory.OTHER) {
-                categoryView.setText(Utils.capitalize(event.category.toString()));
+            String tagToShow = null;
+            for (String tag : event.tags) {
+                if (EventCategory.parseCategory(tag) != null) {
+                    tagToShow = tag;
+                    break;
+                }
+            }
+            if (tagToShow == null && event.tags.length > 0) {
+                tagToShow = event.tags[0];
+            }
+            if (tagToShow != null) {
+                categoryView.setText(tagToShow);
             }
 
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
