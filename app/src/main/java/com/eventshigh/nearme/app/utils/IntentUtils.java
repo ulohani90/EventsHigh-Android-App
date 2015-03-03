@@ -56,21 +56,16 @@ public class IntentUtils {
         String query = inIntent.getStringExtra(SearchManager.QUERY);
         activity.reportActionToAnalytics("search", query);
 
-        if (query.startsWith(EventsHighEndpoints.getWebUriDetailsBase().toString())) {
-            processDetailViewIntent(Uri.parse(query));
-        } else {
-
-            Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
-            if (appData != null) {
-                EventsContext appDataParam =
-                        appData.getParcelable(EXTRA_EVENT_CONTEXT);
-                if (appDataParam != null) {
-                    param = appDataParam;
-                }
+        Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
+        if (appData != null) {
+            EventsContext appDataParam =
+                    appData.getParcelable(EXTRA_EVENT_CONTEXT);
+            if (appDataParam != null) {
+                param = appDataParam;
             }
-
-            param.query = query;
         }
+
+        param.query = query;
     }
 
     private void processViewIntent(Intent inIntent) {
@@ -80,6 +75,8 @@ public class IntentUtils {
             processCityViewIntent(inUri);
         } else if (inUri.getPath().startsWith("/search")) {
             processSearchViewIntent(inUri);
+        } else if (inUri.getPath().startsWith("/detail")) {
+            processDetailViewIntent(inUri);
         } else {
             activity.reportActionToAnalytics("deepLink", "homepage");
         }
@@ -113,6 +110,7 @@ public class IntentUtils {
     }
 
     private void processDetailViewIntent(Uri webUri) {
+        activity.reportActionToAnalytics("search", "detail");
         Intent intent = new Intent(activity, EventDetailActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         intent.setData(webUri);
