@@ -41,6 +41,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static final int NUM_MAX_EVENTS_PER_INTEREST = 3;
     private static final int HEADER_BG_RESOURCES[] = new int [] {
             R.drawable.eh_myevents_header1,
+            R.drawable.eh_myevents_header2,
+            R.drawable.eh_myevents_header3,
+            R.drawable.eh_myevents_header4,
     };
 
 

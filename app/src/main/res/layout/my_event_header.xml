@@ -12,15 +12,14 @@
         android:id="@+id/header_bg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/eh_myevents_header1"
         android:adjustViewBounds="true"
+        tools:src="@drawable/eh_myevents_header1"
     />
     <TextView
         style="?android:attr/textAppearanceLarge"
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/eh_myevents_header1"
         android:textColor="@android:color/white"
         android:gravity="center"
         tools:text="Music"
