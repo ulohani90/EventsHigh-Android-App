@@ -87,9 +87,6 @@ public abstract class BaseActivity extends ActionBarActivity {
         if (isPlayServicesPresent) {
             gaHelper.reportActivityStart(this);
         }
-
-        // Report app to Facebook
-        com.facebook.AppEventsLogger.activateApp(this, "196111897251952");
     }
 
     @Override

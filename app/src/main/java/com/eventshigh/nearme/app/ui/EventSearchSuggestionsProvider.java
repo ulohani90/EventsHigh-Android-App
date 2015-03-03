@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SearchRecentSuggestionsProvider;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.database.MergeCursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.SearchRecentSuggestions;
