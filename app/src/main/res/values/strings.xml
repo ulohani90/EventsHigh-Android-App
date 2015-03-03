@@ -49,14 +49,14 @@
     <string name="ui_read_more">Read More …</string>
     <string name="ui_connect_facebook">EventsHigh recommends great events that match your interests. We would like to know you better.</string>
     <string name="ui_fb_promiss">We never post on your behalf. We just use it to provide personalized event recommendations.</string>
-    <string name="ui_referrer_default">Share the joy of attending amazing events!</string>
-    <string name="ui_referrer">You have helped {0,choice,1#one friend|1&lt;{0} friends} in finding amazing events, thank you!</string>
+    <string name="ui_referrer_default">Like this app? Tell your friends!</string>
+    <string name="ui_referrer">You\'ve helped {0,choice,1#one friend|1&lt;{0} friends} in finding amazing events, thank you!</string>
     <string name="ui_enter_phone_number_hint">Your Phone Number</string>
     <string name="ui_phone_verify_tip">Register with your phone number to get exciting new deals on your favourite events in town!</string>
     <string name="ui_code">We have sent a code to %s. Please enter it below</string>
     <string name="ui_code_verified">Your phone number %s has been verified</string>
     <string name="ui_verify_phone">Verify your phone number</string>
-    <string name="ui_no_my_event">Favourite events or follow your interests to see them here in your personalized events list!</string>
+    <string name="ui_no_my_event">This looks so empty! Want to choose some favourites?</string>
     <string name="ui_pick_interest">Pick Your Interests</string>
     <string name="ui_filter">Filter</string>
 
@@ -78,8 +78,8 @@
 
     <!-- Sharing -->
     <string name="action_share_app">Share App</string>
-    <string name="share_app_text">Hey, check out this app to know all the amazing events happening near you and in your locality! https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&amp;referrer=%s</string>
-    <string name="share_event_text">Hey, check out this event! What say? %s?src=ehm (EventsHigh: Find amazing events near you!)</string>
+    <string name="share_app_text">Hi! Checkout this app to know all the amazing events near you! https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&amp;referrer=%s</string>
+    <string name="share_event_text">Hi! Checkout this amazing event! %s?src=ehm (EventsHigh: Find amazing events near you!)</string>
 
     <!-- Failed messages -->
     <string name="failed_load">Failed to load events information!</string>
@@ -93,7 +93,7 @@
     <string name="no_map_app">Maps application not found!</string>
     <string name="no_cal_app">Calendar application not found!</string>
     <string name="no_events">No events found!</string>
-    <string name="retry">Something went wrong. Please retry.</string>
+    <string name="retry">Oops! You\'ve stumped us. Lets try again.</string>
 
     <!-- formatting -->
     <plurals name="people_interested">

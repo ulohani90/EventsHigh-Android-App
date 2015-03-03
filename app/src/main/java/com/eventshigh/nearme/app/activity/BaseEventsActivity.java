@@ -604,7 +604,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
             TextView selected = dateTabViews.get(position).dayOfMonthView;
             selected.setTextColor(getResources().getColor(android.R.color.white));
-            selected.setBackgroundResource(R.drawable.selector_oval);
+            selected.setBackgroundResource(R.drawable.shape_date_oval);
             selected.setTypeface(null, Typeface.BOLD);
             lastPosition = position;
 

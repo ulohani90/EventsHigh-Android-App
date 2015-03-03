@@ -283,7 +283,6 @@
         </activity>
         <activity android:name=".activity.ShowFiltersActivity"
             android:label="@string/ui_filter"
-            android:exported="true"
         />
         <activity
             android:name=".activity.CustomUrlActivity"

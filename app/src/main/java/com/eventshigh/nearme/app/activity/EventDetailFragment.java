@@ -45,6 +45,7 @@ import org.apmem.tools.layouts.FlowLayout;
 
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
@@ -66,6 +67,10 @@ public class EventDetailFragment extends Fragment {
 
     // The argument representing the event that this activity represents.
     public static final String ARG_EVENT_INFO = "event_info";
+
+    // Regex to check if description is plane text or html.
+    private static final Pattern htmlCheckPattern = Pattern.compile(
+            "<[A-Za-z].*</[A-Za-z]|<[A-Za-z].*/>");
 
     /**
      * Use this factory method to create a new instance of
@@ -511,7 +516,11 @@ public class EventDetailFragment extends Fragment {
         }
 
         // Set description.
-        eventCard.descriptionView.setText(Html.fromHtml(event.description));
+        if (htmlCheckPattern.matcher(event.description).find()) {
+            eventCard.descriptionView.setText(Html.fromHtml(event.description));
+        } else {
+            eventCard.descriptionView.setText(event.description);
+        }
         eventCard.readMoreView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

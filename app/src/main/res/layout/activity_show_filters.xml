@@ -39,7 +39,7 @@
     </ScrollView>
     <TextView
         android:id="@+id/show_all"
-        style="@style/EventDetailButton"
+        style="@style/EHButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -52,7 +52,7 @@
     />
     <TextView
         android:id="@+id/apply_filter"
-        style="@style/EventDetailButton"
+        style="@style/EHButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

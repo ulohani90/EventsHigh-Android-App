@@ -33,45 +33,25 @@
     </style>
 
     <!-- Theme used for Events Details Pane -->
-    <style name="EventDetailText" parent="android:style/TextAppearance.Small">
+    <style name="EHText" parent="android:style/TextAppearance.Small">
         <item name="android:paddingLeft">8dp</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="EventDetailHeader" parent="EventDetailText">
+    <style name="EHHeader" parent="EHText">
         <item name="android:layout_marginTop">14dp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:typeface">sans</item>
     </style>
 
-    <style name="EventDetailButton" parent="android:style/TextAppearance.Small">
+    <style name="EHButton" parent="android:style/TextAppearance.Small">
         <item name="android:clickable">true</item>
         <item name="android:padding">18dp</item>
-        <item name="android:background">@drawable/selector_button</item>
+        <item name="android:background">@drawable/shape_eh_button</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center</item>
-    </style>
-
-    <!-- Theme used for Phone Login screen -->
-    <style name="PhoneLoginButton" parent="android:style/TextAppearance.Small">
-        <item name="android:clickable">true</item>
-        <item name="android:paddingLeft">24dp</item>
-        <item name="android:paddingRight">24dp</item>
-        <item name="android:background">@drawable/button_theme</item>
-        <item name="android:gravity">center</item>
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:layout_gravity">center</item>
-    </style>
-
-    <style name="PhoneLoginRetryButton" parent="android:style/TextAppearance.Small">
-        <item name="android:clickable">true</item>
-        <item name="android:paddingLeft">24dp</item>
-        <item name="android:paddingRight">24dp</item>
-        <item name="android:background">@drawable/button_gray</item>
-        <item name="android:gravity">center</item>
-        <item name="android:textColor">@color/gray700</item>
-        <item name="android:layout_gravity">center</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 
     <!-- Theme used for Events Cards -->

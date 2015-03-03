@@ -68,7 +68,7 @@
             <Button
                 android:id="@+id/skip"
                 android:visibility="gone"
-                style="@style/PhoneLoginRetryButton"
+                style="@style/EHButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/action_skip"
@@ -77,7 +77,7 @@
             />
             <Button
                 android:id="@+id/send_code"
-                style="@style/PhoneLoginButton"
+                style="@style/EHButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/action_send_code"
@@ -119,7 +119,7 @@
             android:layout_height="wrap_content"
         >
             <Button
-                style="@style/PhoneLoginRetryButton"
+                style="@style/EHButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/action_retry"
@@ -132,7 +132,7 @@
             />
             <Button
                 android:id="@+id/verify_code"
-                style="@style/PhoneLoginButton"
+                style="@style/EHButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/action_verify_code"
@@ -158,8 +158,8 @@
             android:text="@string/ui_code_verified"
         />
 
-        <Button
-            style="@style/PhoneLoginRetryButton"
+        <TextView
+            style="@style/EHButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/action_change_no"
