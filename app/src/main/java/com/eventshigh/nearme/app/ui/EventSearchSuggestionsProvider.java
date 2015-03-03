@@ -19,6 +19,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.StreamUtils;
 
@@ -112,8 +113,14 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
             return;
         }
 
-        request = new JsonArrayRequest("https://s3-ap-southeast-1.amazonaws.com/"
-                + "ehautocomplete/autocomplete_events_bangalore.json",
+        City lastCity = GcmRegistration.getInstance(getContext()).getLastCity();
+        if (lastCity == null) {
+            return;
+        }
+
+        String autoCompleteEventsUrl = "https://s3-ap-southeast-1.amazonaws.com/"
+                + "ehautocomplete/autocomplete_events_" + lastCity.name().toLowerCase() + ".json";
+        request = new JsonArrayRequest(autoCompleteEventsUrl,
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray jsonArray, boolean b) {
