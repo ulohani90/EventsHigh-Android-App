@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.ui;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SearchRecentSuggestionsProvider;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -74,7 +73,7 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
         }
 
         if (allEvents == null) {
-            loadEvents();
+            // loadEvents();
         } else {
             int iconColumnIndex = suggestionsCursor.getColumnIndex(
                     SearchManager.SUGGEST_COLUMN_ICON_1);
