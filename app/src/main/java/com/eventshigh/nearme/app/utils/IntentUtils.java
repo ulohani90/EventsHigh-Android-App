@@ -113,7 +113,6 @@ public class IntentUtils {
     }
 
     private void processDetailViewIntent(Uri webUri) {
-        activity.reportActionToAnalytics("search", "detail");
         Intent intent = new Intent(activity, EventDetailActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         intent.setData(webUri);
