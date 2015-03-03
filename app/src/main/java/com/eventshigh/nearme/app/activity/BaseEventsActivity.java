@@ -456,6 +456,22 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // Callbacks
     // ***********************
 
+    public void onRetry(View view) {
+        reportActionToAnalytics("retryFetch");
+        fetchNewListing(false /* bypass cache*/);
+    }
+
+    public void onFindEvents(View view) {
+        reportActionToAnalytics("findEvents");
+        showSearchView("");
+        finish();
+    }
+
+    public void onExploreCategories(View view) {
+        reportActionToAnalytics("exploreCategories");
+        finish();
+    }
+
     private Listener<MyEvents> mMyEventsFetcherCallBack = new Listener<MyEvents>() {
         @Override
         public void onResponse(MyEvents myEvents, boolean isIntermediate) {
@@ -494,22 +510,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
             }
         }
     };
-
-    public void onRetry(View view) {
-        reportActionToAnalytics("retryFetch");
-        fetchNewListing(false /* bypass cache*/);
-    }
-
-    public void onFindEvents(View view) {
-        reportActionToAnalytics("findEvents");
-        showSearchView("");
-        finish();
-    }
-
-    public void onExploreCategories(View view) {
-        reportActionToAnalytics("exploreCategories");
-        finish();
-    }
 
     private ErrorListener mErrorListener = new ErrorListener() {
         @Override
