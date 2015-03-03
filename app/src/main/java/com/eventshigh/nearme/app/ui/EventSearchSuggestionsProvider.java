@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.ui;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SearchRecentSuggestionsProvider;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -56,51 +57,36 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
         }
 
         readTags();
-        MatrixCursor suggestionsCursor = new MatrixCursor(new String[] {
-                BaseColumns._ID,
-                SearchManager.SUGGEST_COLUMN_TEXT_1,
-                SearchManager.SUGGEST_COLUMN_QUERY,
-                SearchManager.SUGGEST_COLUMN_ICON_1,
-                SearchManager.SUGGEST_COLUMN_INTENT_ACTION,
-                SearchManager.SUGGEST_COLUMN_INTENT_DATA,
-        });
-
-        int idIndex = suggestionsCursor.getColumnIndex(BaseColumns._ID);
-        int titleColumnIndex = suggestionsCursor.getColumnIndex(
-                SearchManager.SUGGEST_COLUMN_TEXT_1);
-        int queryColumnIndex = suggestionsCursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_QUERY);
-        int columnCount = suggestionsCursor.getColumnCount();
+        MatrixCursor suggestionsCursor = new MatrixCursor(recentsCursor.getColumnNames());
+        int idIndex = recentsCursor.getColumnIndex(BaseColumns._ID);
+        int titleColumnIndex = recentsCursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1);
+        int queryColumnIndex = recentsCursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_QUERY);
+        int columnCount = recentsCursor.getColumnCount();
         for (int i = 0; i < allTags.length && suggestionsCursor.getCount() < 5; i++) {
-            if (allTags[i].startsWith(selectionArgs[0])) {
+            String tag = allTags[i];
+            if (tag.startsWith(selectionArgs[0])) {
                 Object[] newRow = new Object[columnCount];
                 newRow[idIndex] = SUGGESTION_ID_START + i;
-                newRow[queryColumnIndex] = allTags[i];
-                newRow[titleColumnIndex] = allTags[i];
+                newRow[queryColumnIndex] = tag;
+                newRow[titleColumnIndex] = tag;
                 suggestionsCursor.addRow(newRow);
             }
         }
 
         if (allEvents == null) {
-            // loadEvents();
+            loadEvents();
         } else {
             int iconColumnIndex = suggestionsCursor.getColumnIndex(
                     SearchManager.SUGGEST_COLUMN_ICON_1);
-            int intentActionColumnIndex = suggestionsCursor.getColumnIndex(
-                    SearchManager.SUGGEST_COLUMN_INTENT_ACTION);
-            int intentDataColumnIndex = suggestionsCursor.getColumnIndex(
-                    SearchManager.SUGGEST_COLUMN_INTENT_DATA);
             for (int i = 0; i < allEvents.length && suggestionsCursor.getCount() < 5; i++) {
                 String suggestion = allEvents[i].name;
                 if (suggestion.contains(selectionArgs[0])) {
                     Object[] newRow = new Object[columnCount];
                     newRow[idIndex] = EVENT_ID_START + i;
-                    newRow[queryColumnIndex] = suggestion;
+                    newRow[queryColumnIndex] = EventsHighEndpoints.getEventDetailsURI(
+                            City.getCity(allEvents[i].city), allEvents[i].id);
                     newRow[titleColumnIndex] = suggestion;
                     newRow[iconColumnIndex] = R.drawable.ic_location_on_white_36dp;
-                    // TODO(chandanp): figure out a way to add action view or other custom intent
-                    // newRow[intentActionColumnIndex] = Intent.ACTION_VIEW;
-                    newRow[intentDataColumnIndex] = EventsHighEndpoints.getEventDetailsURI(
-                            City.getCity(allEvents[i].city), allEvents[i].id);
                     suggestionsCursor.addRow(newRow);
                 }
             }

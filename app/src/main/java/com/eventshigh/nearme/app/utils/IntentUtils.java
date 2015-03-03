@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.google.android.gms.maps.model.LatLng;
@@ -55,16 +56,21 @@ public class IntentUtils {
         String query = inIntent.getStringExtra(SearchManager.QUERY);
         activity.reportActionToAnalytics("search", query);
 
-        Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
-        if (appData != null) {
-            EventsContext appDataParam =
-                    appData.getParcelable(EXTRA_EVENT_CONTEXT);
-            if (appDataParam != null) {
-                param = appDataParam;
-            }
-        }
+        if (query.startsWith(EventsHighEndpoints.getWebUriDetailsBase().toString())) {
+            processDetailViewIntent(Uri.parse(query));
+        } else {
 
-        param.query = query;
+            Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
+            if (appData != null) {
+                EventsContext appDataParam =
+                        appData.getParcelable(EXTRA_EVENT_CONTEXT);
+                if (appDataParam != null) {
+                    param = appDataParam;
+                }
+            }
+
+            param.query = query;
+        }
     }
 
     private void processViewIntent(Intent inIntent) {
@@ -104,5 +110,13 @@ public class IntentUtils {
         if (query != null) {
             param.query = query;
         }
+    }
+
+    private void processDetailViewIntent(Uri webUri) {
+        activity.reportActionToAnalytics("search", "detail");
+        Intent intent = new Intent(activity, EventDetailActivity.class);
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setData(webUri);
+        activity.startActivity(intent);
     }
 }
