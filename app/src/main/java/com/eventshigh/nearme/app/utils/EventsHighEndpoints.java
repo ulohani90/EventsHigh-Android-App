@@ -38,11 +38,15 @@ public class EventsHighEndpoints {
     }
 
     public static Uri getEventDetailsURI(City city, String eventId) {
-        return Uri.parse(WEB_URI_BASE).buildUpon()
-                .appendPath("detail")
+        return getWebUriDetailsBase()
                 .appendPath(Utils.capitalize(city.toString()))
                 .appendPath(eventId)
                 .build();
+    }
+
+    public static Uri.Builder getWebUriDetailsBase() {
+        return Uri.parse(WEB_URI_BASE).buildUpon()
+                .appendPath("detail");
     }
 
     public static Uri getWebUri(EventsContext param) {
