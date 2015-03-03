@@ -47,8 +47,6 @@
     <string name="ui_website">Website - </string>
     <string name="ui_also_on">also on …</string>
     <string name="ui_read_more">Read More …</string>
-    <string name="ui_connect_facebook">EventsHigh recommends great events that match your interests. We would like to know you better.</string>
-    <string name="ui_fb_promiss">We never post on your behalf. We just use it to provide personalized event recommendations.</string>
     <string name="ui_referrer_default">Like this app? Tell your friends!</string>
     <string name="ui_referrer">You\'ve helped {0,choice,1#one friend|1&lt;{0} friends} in finding amazing events, thank you!</string>
     <string name="ui_enter_phone_number_hint">Your Phone Number</string>
