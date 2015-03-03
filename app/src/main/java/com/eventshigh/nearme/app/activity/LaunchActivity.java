@@ -76,7 +76,7 @@ public class LaunchActivity extends BaseActivity {
     private static final int MIN_EXPLORE_CARD_IN_ROW = 2;
     private static final long REFRESH_FEATURED_EVENTS_INTERVAL = 3600 * 1000L;
     private static final int MARGIN_DP = android.os.Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP ? 10 : 2;
-    private static final String[] EXPLORE_TAGS = { "All", "Parties", "Tech", "Theatre", "Kids",
+    public static final String[] EXPLORE_TAGS = { "All", "Parties", "Tech", "Theatre", "Kids",
             "Sports", "Health & Wellness", "Food", "Dance", "Art", "Literature", "Film"};
 
 
@@ -94,6 +94,7 @@ public class LaunchActivity extends BaseActivity {
 
     // Context for next activity.
     private EventsContext eventsContext;
+    private EventsContext lastEventsContext;
 
     // User preferences.
     protected Preferences pref;
@@ -116,6 +117,10 @@ public class LaunchActivity extends BaseActivity {
 
         // Read Preferences
         pref = Preferences.getInstance(getApplicationContext());
+        gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
+
+        // Process the incoming intent.
+        eventsContext = IntentUtils.processIntent(this, getIntent());
     }
 
     public void onStart() {
@@ -123,7 +128,6 @@ public class LaunchActivity extends BaseActivity {
 
         // We show the onboarding If this is first activity and there was no
         // location/query passed through intent.
-        eventsContext = IntentUtils.processIntent(this, getIntent());
         if (eventsContext.location == null && eventsContext.query.isEmpty()) {
             if (pref.shouldShowOnBoarding()) {
                 startActivity(new Intent(this, OnBoardingActivity.class));
@@ -137,8 +141,9 @@ public class LaunchActivity extends BaseActivity {
         }
 
         // Register with GCM if needed. GCM is used for notifications messages.
-        gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
-        gcmRegistration.updateGcmRegistrationIdIfNeeded();
+        if (isPlayServicesPresent) {
+            gcmRegistration.updateGcmRegistrationIdIfNeeded();
+        }
     }
 
     protected void onResume() {
@@ -311,6 +316,7 @@ public class LaunchActivity extends BaseActivity {
             public void onLocationSelection(String locationString, LatLng locationPoint) {
                 getSupportActionBar().setSubtitle(locationString);
                 eventsContext.changeLocation(locationPoint);
+                lastEventsContext.changeLocation(locationPoint);
                 featuredEventsPager.setAdapter(new LoadingAdapter(LaunchActivity.this));
                 onRetry(null);
             }
@@ -320,6 +326,7 @@ public class LaunchActivity extends BaseActivity {
     private void showNextScreen(boolean isUserAction) {
         // If we do not have user city, use GoogleLocation api to get user location.
         if (eventsContext.city == null) {
+            lastEventsContext = new EventsContext(eventsContext);
             client = new GoogleApiClient.Builder(this)
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(mConnectionCallbacks)
@@ -336,6 +343,7 @@ public class LaunchActivity extends BaseActivity {
 
         // If we do not have query, show explore screen.
         if (!isUserAction && eventsContext.query.isEmpty()) {
+            lastEventsContext = new EventsContext(eventsContext);
             showExploreScreen();
             return;
         }
@@ -345,6 +353,9 @@ public class LaunchActivity extends BaseActivity {
                 EventsMapsActivity.class : EventsGridActivity.class;
         Intent outIntent = new Intent(this, target);
         outIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
+        if (lastEventsContext != null) {
+            eventsContext = lastEventsContext;
+        }
 
         startActivity(outIntent);
         if (!isUserAction) {

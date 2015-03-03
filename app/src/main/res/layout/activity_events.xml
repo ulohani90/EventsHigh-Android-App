@@ -37,7 +37,7 @@
             android:paddingRight="16dp"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
-            android:background="@drawable/selector_oval"
+            android:background="@drawable/shape_date_oval"
             android:drawableStart="@drawable/ic_done_white_12dp"
             android:drawableLeft="@drawable/ic_done_white_12dp"
             android:drawablePadding="4dp"
@@ -55,7 +55,7 @@
             android:paddingRight="16dp"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
-            android:background="@drawable/selector_oval"
+            android:background="@drawable/shape_date_oval"
             android:drawablePadding="4dp"
             android:textStyle="bold"
             android:textSize="12sp"
@@ -105,7 +105,7 @@
                 android:onClick="onSwitchView"
                 android:scaleX="1"
                 android:scaleY="1"
-                android:src="@drawable/ic_map_white_36dp"
+                android:src="@drawable/ic_place_white_36dp"
                 tools:ignore="UnusedAttribute"
             />
         </FrameLayout>

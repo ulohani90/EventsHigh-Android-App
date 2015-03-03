@@ -112,7 +112,7 @@
             />
             <TextView
                 android:id="@+id/event_from"
-                style="@style/EventDetailText"
+                style="@style/EHText"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_marginTop="4dp"
@@ -134,7 +134,7 @@
             />
             <RelativeLayout
                 android:id="@+id/event_venue_group"
-                style="@style/EventDetailButton"
+                style="@style/EHButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
             >
@@ -152,7 +152,7 @@
                 />
                 <TextView
                     android:id="@+id/event_venue"
-                    style="@style/EventDetailText"
+                    style="@style/EHText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -165,7 +165,7 @@
                 />
                 <TextView
                     android:id="@+id/event_address"
-                    style="@style/EventDetailText"
+                    style="@style/EHText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/event_venue"
@@ -186,7 +186,7 @@
             />
             <LinearLayout
                 android:id="@+id/event_time_group"
-                style="@style/EventDetailButton"
+                style="@style/EHButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -198,7 +198,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_weight="1"
-                    android:background="@drawable/selector_button"
+                    android:background="@drawable/shape_eh_button"
                 >
                     <ImageView
                         android:id="@+id/event_time_icon"
@@ -214,7 +214,7 @@
                     />
                     <TextView
                         android:id="@+id/event_time"
-                        style="@style/EventDetailText"
+                        style="@style/EHText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
@@ -225,7 +225,7 @@
                     />
                     <TextView
                         android:id="@+id/event_time_details"
-                        style="@style/EventDetailText"
+                        style="@style/EHText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_toRightOf="@+id/event_time_icon"
@@ -237,11 +237,11 @@
                 </RelativeLayout>
                 <TextView
                     android:id="@+id/also_on"
-                    style="@style/EventDetailText"
+                    style="@style/EHText"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:background="@drawable/selector_button"
+                    android:background="@drawable/shape_eh_button"
                     android:padding="6dp"
                     android:textColor="#80000000"
                     android:text="@string/ui_also_on"
@@ -282,7 +282,7 @@
         >
             <FrameLayout
                 android:id="@+id/book_ticket"
-                style="@style/EventDetailButton"
+                style="@style/EHButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -301,7 +301,7 @@
 
             <FrameLayout
                 android:id="@+id/call"
-                style="@style/EventDetailButton"
+                style="@style/EHButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -320,7 +320,7 @@
 
             <FrameLayout
                 android:id="@+id/share"
-                style="@style/EventDetailButton"
+                style="@style/EHButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -344,19 +344,16 @@
         />
 
         <!-- Event tags -->
-        <LinearLayout
+        <org.apmem.tools.layouts.FlowLayout
             android:id="@+id/event_tags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:orientation="vertical"
-            tools:listitem="@layout/event_tag"
         />
 
         <!-- Event Description -->
         <TextView
             android:id="@+id/event_description"
-            style="@style/EventDetailText"
+            style="@style/EHText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textIsSelectable="true"
@@ -369,7 +366,7 @@
         />
         <TextView
             android:id="@+id/read_more"
-            style="@style/EventDetailText"
+            style="@style/EHText"
             android:background="?android:attr/selectableItemBackground"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -384,7 +381,7 @@
         <!-- Organizer Info -->
         <TextView
             android:id="@+id/organizer_header"
-            style="@style/EventDetailHeader"
+            style="@style/EHHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
@@ -404,7 +401,7 @@
             android:layout_marginStart="8dp"
         >
             <TextView
-                style="@style/EventDetailText"
+                style="@style/EHText"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:textColor="#CC222222"
@@ -412,7 +409,7 @@
             />
             <TextView
                 android:id="@+id/organizer_name"
-                style="@style/EventDetailText"
+                style="@style/EHText"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -429,7 +426,7 @@
             android:layout_marginStart="8dp"
         >
             <TextView
-                style="@style/EventDetailText"
+                style="@style/EHText"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:textColor="#CC222222"
@@ -437,7 +434,7 @@
             />
             <TextView
                 android:id="@+id/organizer_phone"
-                style="@style/EventDetailText"
+                style="@style/EHText"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -456,7 +453,7 @@
             android:layout_marginStart="8dp"
         >
             <TextView
-                style="@style/EventDetailText"
+                style="@style/EHText"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:textColor="#CC222222"
@@ -464,7 +461,7 @@
             />
             <TextView
                 android:id="@+id/organizer_website"
-                style="@style/EventDetailText"
+                style="@style/EHText"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
                 android:layout_weight="1"

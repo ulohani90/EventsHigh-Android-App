@@ -26,6 +26,11 @@ public class EventsContext implements Parcelable {
         dateFilter = "";
     }
 
+    public EventsContext(EventsContext other) {
+        this(other.location, other.query);
+        this.dateFilter = other.dateFilter;
+    }
+
     public boolean changeLocation(@Nullable LatLng location) {
         this.location = location;
         City oldCity = city;

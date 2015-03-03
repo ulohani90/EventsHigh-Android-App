@@ -39,11 +39,11 @@ import java.util.Set;
  */
 public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static final int NUM_MAX_EVENTS_PER_INTEREST = 3;
-    private static final int FAVOURITE_COLOR = android.R.color.holo_red_light;
-    private static final int HEADER_COLORS[] = new int [] {
-            android.R.color.holo_orange_light,
-            android.R.color.holo_blue_light,
-            android.R.color.holo_green_light
+    private static final int HEADER_BG_RESOURCES[] = new int [] {
+            R.drawable.eh_myevents_header1,
+            R.drawable.eh_myevents_header2,
+            R.drawable.eh_myevents_header3,
+            R.drawable.eh_myevents_header4,
     };
 
 
@@ -92,7 +92,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             Pair<String, List<Event>> myEventEntry = myEvents.get(i);
             boolean isFavourite = myEventEntry.first.equals(MyEventsRequest.FAVOURITES_NAME);
             dataToShow.add(new HeaderData(myEventEntry.first,
-                    isFavourite ? FAVOURITE_COLOR : HEADER_COLORS[i % HEADER_COLORS.length]));
+                    HEADER_BG_RESOURCES[i % HEADER_BG_RESOURCES.length]));
             List<Event> events = isFavourite ? myEventEntry.second :
                     myEventEntry.second.subList(0,
                             Math.min(NUM_MAX_EVENTS_PER_INTEREST, myEventEntry.second.size()));
@@ -199,11 +199,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     // Header Data.
     private class HeaderData implements Data {
         private final String header;
-        private final int colorId;
+        private final int bgResourceId;
 
-        private HeaderData(String header, int colorId) {
+        private HeaderData(String header, int bgResourceId) {
             this.header = header;
-            this.colorId = colorId;
+            this.bgResourceId = bgResourceId;
         }
 
         @Override
@@ -223,22 +223,24 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     private static class HeaderCard extends ViewHolder {
+        private final ImageView headerBg;
         private final TextView titleView;
         private final ImageView arrowView;
 
         private static HeaderCard newInstance(Activity activity, ViewGroup parent) {
-            View view = activity.getLayoutInflater().inflate(R.layout.event_header, parent, false);
+            View view = activity.getLayoutInflater().inflate(R.layout.my_event_header, parent, false);
             return new HeaderCard(view);
         }
 
         private HeaderCard(View cardView) {
             super(cardView);
+            this.headerBg = (ImageView) cardView.findViewById(R.id.header_bg);
             this.titleView = (TextView) cardView.findViewById(R.id.header);
             this.arrowView = (ImageView) cardView.findViewById(R.id.header_arrow);
         }
 
         private void bindHeaderView(final BaseEventsActivity activity, final HeaderData header) {
-            titleView.setBackgroundColor(activity.getResources().getColor(header.colorId));
+            headerBg.setImageResource(header.bgResourceId);
             titleView.setText(Utils.capitalize(header.header));
             boolean isFavourite = header.header.equals(MyEventsRequest.FAVOURITES_NAME);
             arrowView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);

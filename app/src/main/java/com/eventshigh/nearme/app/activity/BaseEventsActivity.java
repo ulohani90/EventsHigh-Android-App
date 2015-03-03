@@ -388,6 +388,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     public void showSearchView(String query) {
+        reportActionToAnalytics("showSearchView");
         EventsContext param = new EventsContext(eventsContext.location, query);
         Intent intent = new Intent(this, this.getClass())
                 .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
@@ -455,6 +456,22 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // Callbacks
     // ***********************
 
+    public void onRetry(View view) {
+        reportActionToAnalytics("retryFetch");
+        fetchNewListing(false /* bypass cache*/);
+    }
+
+    public void onFindEvents(View view) {
+        reportActionToAnalytics("findEvents");
+        showSearchView("");
+        finish();
+    }
+
+    public void onExploreCategories(View view) {
+        reportActionToAnalytics("exploreCategories");
+        finish();
+    }
+
     private Listener<MyEvents> mMyEventsFetcherCallBack = new Listener<MyEvents>() {
         @Override
         public void onResponse(MyEvents myEvents, boolean isIntermediate) {
@@ -493,22 +510,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
             }
         }
     };
-
-    public void onRetry(View view) {
-        reportActionToAnalytics("retryFetch");
-        fetchNewListing(false /* bypass cache*/);
-    }
-
-    public void onFindEvents(View view) {
-        reportActionToAnalytics("findEvents");
-        showSearchView("");
-        finish();
-    }
-
-    public void onExploreCategories(View view) {
-        reportActionToAnalytics("exploreCategories");
-        finish();
-    }
 
     private ErrorListener mErrorListener = new ErrorListener() {
         @Override
@@ -603,7 +604,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
             TextView selected = dateTabViews.get(position).dayOfMonthView;
             selected.setTextColor(getResources().getColor(android.R.color.white));
-            selected.setBackgroundResource(R.drawable.selector_oval);
+            selected.setBackgroundResource(R.drawable.shape_date_oval);
             selected.setTypeface(null, Typeface.BOLD);
             lastPosition = position;
 
