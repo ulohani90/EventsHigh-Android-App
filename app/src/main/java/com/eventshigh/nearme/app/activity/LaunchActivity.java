@@ -116,6 +116,7 @@ public class LaunchActivity extends BaseActivity {
 
         // Read Preferences
         pref = Preferences.getInstance(getApplicationContext());
+        gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
     }
 
     public void onStart() {
@@ -137,8 +138,9 @@ public class LaunchActivity extends BaseActivity {
         }
 
         // Register with GCM if needed. GCM is used for notifications messages.
-        gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
-        gcmRegistration.updateGcmRegistrationIdIfNeeded();
+        if (isPlayServicesPresent) {
+            gcmRegistration.updateGcmRegistrationIdIfNeeded();
+        }
     }
 
     protected void onResume() {
