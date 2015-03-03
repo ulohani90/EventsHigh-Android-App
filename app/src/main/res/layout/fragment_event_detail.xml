@@ -344,13 +344,10 @@
         />
 
         <!-- Event tags -->
-        <LinearLayout
+        <org.apmem.tools.layouts.FlowLayout
             android:id="@+id/event_tags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:orientation="vertical"
-            tools:listitem="@layout/event_tag"
         />
 
         <!-- Event Description -->

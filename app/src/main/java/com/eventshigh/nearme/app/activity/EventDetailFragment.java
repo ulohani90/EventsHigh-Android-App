@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Html;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,7 +22,6 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -42,6 +40,8 @@ import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+
+import org.apmem.tools.layouts.FlowLayout;
 
 import java.text.MessageFormat;
 import java.util.Date;
@@ -265,7 +265,7 @@ public class EventDetailFragment extends Fragment {
         private final FrameLayout callView;
         private final FrameLayout shareView;
 
-        private final LinearLayout tagsView;
+        private final FlowLayout tagsView;
         private final TextView descriptionView;
         private final TextView readMoreView;
 
@@ -306,7 +306,7 @@ public class EventDetailFragment extends Fragment {
             callView = (FrameLayout) rootView.findViewById(R.id.call);
             shareView = (FrameLayout) rootView.findViewById(R.id.share);
 
-            tagsView = (LinearLayout) rootView.findViewById(R.id.event_tags);
+            tagsView = (FlowLayout) rootView.findViewById(R.id.event_tags);
             descriptionView = (TextView) rootView.findViewById(R.id.event_description);
             readMoreView = (TextView) rootView.findViewById(R.id.read_more);
 
@@ -570,65 +570,21 @@ public class EventDetailFragment extends Fragment {
         }
 
         // Show tags.
-        if (event.tags.length > 0) {
-            showTags();
-        }
-    }
-
-    private void showTags() {
-        Utils.waitForViewVisible(eventCard.tagsView, new Runnable() {
-            public void run() {
-                LayoutParams layoutParams = getLayoutParam();
-                int maxWidth = eventCard.tagsView.getWidth()
-                        - layoutParams.leftMargin - layoutParams.rightMargin;
-                LinearLayout ll = getLL(layoutParams);
-                for (String tag : event.tags) {
-                    TextView tagView = addTag(ll, tag);
-                    ll.measure(0, 0);
-                    if (ll.getMeasuredWidth() < maxWidth) {
-                        continue;
-                    }
-
-                    tagView.setVisibility(View.GONE);
-                    ll = getLL(layoutParams);
-                    addTag(ll, tag);
+        for (final String tag : event.tags) {
+            activity.getLayoutInflater().inflate(R.layout.event_tag, eventCard.tagsView);
+            TextView tagView = (TextView) eventCard.tagsView.getChildAt(eventCard.tagsView.getChildCount() - 1);
+            tagView.setText(tag);
+            tagView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.reportEventAction(event, "tagClick");
+                    Intent searchIntent = new Intent(activity, LaunchActivity.class);
+                    searchIntent.setAction(Intent.ACTION_SEARCH);
+                    searchIntent.putExtra(SearchManager.QUERY, tag);
+                    startActivity(searchIntent);
                 }
-            }
-        });
-    }
-
-    private TextView addTag(LinearLayout ll, final String tag) {
-        activity.getLayoutInflater().inflate(R.layout.event_tag, ll);
-        TextView tagView = (TextView) ll.getChildAt(ll.getChildCount() - 1);
-        tagView.setText(tag);
-        tagView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.reportEventAction(event, "tagClick");
-                Intent searchIntent = new Intent(activity, LaunchActivity.class);
-                searchIntent.setAction(Intent.ACTION_SEARCH);
-                searchIntent.putExtra(SearchManager.QUERY, tag);
-                startActivity(searchIntent);
-            }
-        });
-        return  tagView;
-    }
-
-    private LinearLayout getLL(LayoutParams layoutParams) {
-        LinearLayout ll = new LinearLayout(activity);
-        ll.setLayoutParams(layoutParams);
-        ll.setOrientation(LinearLayout.HORIZONTAL);
-        eventCard.tagsView.addView(ll);
-        return  ll;
-    }
-
-    private LayoutParams getLayoutParam() {
-        LayoutParams layoutParams =
-                new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        int margin = Math.round(TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
-        layoutParams.setMargins(0, 0 , margin, 0);
-        return layoutParams;
+            });
+        }
     }
 
     public static void setFavouriteView(EventCard eventCard, @Nullable EventMark pref) {
