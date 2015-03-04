@@ -262,6 +262,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Do not show filterByDate for search.
         menu.findItem(R.id.action_filter_date).setVisible(eventsContext.query.isEmpty());
+        menu.findItem(R.id.action_filter).setVisible(
+                eventsContext.query.isEmpty() || EventsHighEndpoints.isDateQuery(eventsContext.query));
+
         return true;
     }
 
@@ -452,7 +455,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
         // Create an intent for creating shortcut and broadcast it.
         Intent addIntent = new Intent();
         addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-        addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, eventsContext.toString());
+        addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME,
+                eventsContext.query.isEmpty() ? getString(R.string.app_name)
+                        : Utils.capitalize(eventsContext.query));
         addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                 Intent.ShortcutIconResource.fromContext(getApplicationContext(),
                         R.drawable.ic_launcher));
