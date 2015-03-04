@@ -281,6 +281,12 @@ public abstract class BaseActivity extends ActionBarActivity {
                 event.ehRecommended ? "Recommended" : "Non-Recommended");
     }
 
+    public void reportCampaignParams(String campaignData) {
+        if (isPlayServicesPresent) {
+            gaHelper.reportCampaignParams(campaignData);
+        }
+    }
+
     protected void showVerifyPhoneSnackbar() {
         final View view = findViewById(R.id.verify_phone_container);
         view.setVisibility(View.VISIBLE);

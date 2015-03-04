@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.HitBuilders.EventBuilder;
 import com.google.android.gms.analytics.Tracker;
 
@@ -61,6 +62,13 @@ public class GAHelper {
 
     public void reportActionToAnalytics(String category, String actionName, String label) {
         reportActionToAnalytics(category, actionName, label, 1);
+    }
+
+    public void reportCampaignParams(String campaignData) {
+        tracker.send(new HitBuilders.ScreenViewBuilder()
+            .setCampaignParamsFromUrl(campaignData)
+            .build()
+        );
     }
 
     public void reportActionToAnalytics(String category, String actionName, String label, long value,

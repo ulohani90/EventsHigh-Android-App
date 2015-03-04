@@ -20,7 +20,20 @@ public class IntentUtils {
     public static final String EXTRA_LONGITUDE_PARAM = IntentUtils.class.getCanonicalName() + "_LON";
 
     public static EventsContext processIntent(BaseActivity activity, Intent inIntent) {
-        EventsContext param = inIntent.getParcelableExtra(EXTRA_EVENT_CONTEXT);
+        IntentUtils utils = new IntentUtils(activity);
+        utils.processIntent(inIntent);
+        return utils.param;
+    }
+
+    private final BaseActivity activity;
+    private EventsContext param;
+
+    private IntentUtils(BaseActivity activity) {
+        this.activity = activity;
+    }
+
+    private void processIntent(Intent inIntent) {
+        param = inIntent.getParcelableExtra(EXTRA_EVENT_CONTEXT);
         if (param == null) {
             param = new EventsContext(null, "");
         }
@@ -31,25 +44,18 @@ public class IntentUtils {
                     inIntent.getDoubleExtra(EXTRA_LONGITUDE_PARAM, 0)));
         }
 
-        IntentUtils utils = new IntentUtils(activity, param);
         if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
-            utils.processSearchIntent(inIntent);
+            processSearchIntent(inIntent);
         } else if (Intent.ACTION_VIEW.equals(inIntent.getAction())) {
-            utils.processViewIntent(inIntent);
+            processViewIntent(inIntent);
         } else if (BaseActivity.NOTIFICATION_ACTION.equals(inIntent.getAction())) {
             activity.reportActionToAnalytics("openNotification");
-            utils.processViewIntent(inIntent);
+            processViewIntent(inIntent);
         }
 
-        return utils.param;
-    }
-
-    private final BaseActivity activity;
-    private EventsContext param;
-
-    private IntentUtils(BaseActivity activity, EventsContext param) {
-        this.activity = activity;
-        this.param = param;
+        if (inIntent.getDataString() != null) {
+            activity.reportCampaignParams(inIntent.getDataString());
+        }
     }
 
     private void processSearchIntent(Intent inIntent) {
