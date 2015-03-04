@@ -36,7 +36,8 @@ public class EventsGridActivity extends BaseEventsActivity {
         super.onCreate(savedInstanceState);
 
         // Setup the UI.
-        getLayoutInflater().inflate(R.layout.activity_event_grid, eventContainer);
+        View view = getLayoutInflater().inflate(R.layout.activity_event_grid, eventContainer, false);
+        eventContainer.addView(view, 0);
 
         eventsAdapter = new EventsAdapter(this);
         RecyclerView eventGridView = (RecyclerView) findViewById(R.id.event_grid);

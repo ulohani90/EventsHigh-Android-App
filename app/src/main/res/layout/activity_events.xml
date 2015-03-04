@@ -94,17 +94,14 @@
         >
             <ImageButton
                 android:id="@+id/fab_switch_view"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
                 android:layout_margin="16dp"
+                android:padding="16dp"
                 android:background="@drawable/fab"
                 android:elevation="4dp"
-                android:padding="16dp"
-                android:scaleType="fitXY"
                 android:onClick="onSwitchView"
-                android:scaleX="1"
-                android:scaleY="1"
                 android:src="@drawable/ic_place_white_36dp"
                 tools:ignore="UnusedAttribute"
             />

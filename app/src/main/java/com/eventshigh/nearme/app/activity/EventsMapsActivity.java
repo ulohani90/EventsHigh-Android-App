@@ -79,7 +79,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
         super.onCreate(savedInstanceState);
 
         // Setup the UI.
-        getLayoutInflater().inflate(R.layout.view_maps, eventContainer);
+        View view = getLayoutInflater().inflate(R.layout.view_maps, eventContainer, false);
+        eventContainer.addView(view, 0);
         setUpMap();
         setupGestureDetectorIfNeeded();
 

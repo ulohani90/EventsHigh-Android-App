@@ -121,7 +121,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         fab = (ImageButton) findViewById(R.id.fab_switch_view);
         followButton = findViewById(R.id.follow_button);
         followingButton = findViewById(R.id.following_button);
-        fab.setVisibility(isPlayServicesPresent ? View.VISIBLE : View.GONE);
 
         // Set the context in term of eventFetcherParam. Use Intent
         // to restore the context.
@@ -217,9 +216,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
         // Initialize the EventsMarkerManager.Editor.
         eventsMarkerEditor = EventsMarkerManager.getInstance(this).getEditor();
 
+        // Show the verify phone snakbar if needed.
         if (Account.isPhoneVerifyPending(this)) {
             showVerifyPhoneSnackbar();
         }
+
+        // Set the visibility of fab icon.
+        fab.setVisibility(isPlayServicesPresent ? View.VISIBLE : View.GONE);
     }
 
     @Override
