@@ -250,9 +250,8 @@
 
         <activity
             android:name=".activity.EventDetailActivity"
-            android:label="@string/app_name"
+            android:label="@string/loading"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:launchMode="singleTask"
             android:exported="true"
             android:theme="@style/NoActionBar"
         >
