@@ -353,6 +353,7 @@
 
         <!-- Receivers within our application -->
         <!-- Receives the Install referrer from play store -->
+        <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
         <receiver
             android:name=".broadcast.InstallReferrer"
             android:exported="true"

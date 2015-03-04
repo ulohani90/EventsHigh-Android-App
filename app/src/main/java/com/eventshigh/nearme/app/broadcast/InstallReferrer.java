@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.broadcast;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.eventshigh.nearme.app.user.Account;
 import com.google.android.gms.analytics.CampaignTrackingReceiver;
@@ -23,7 +22,6 @@ public class InstallReferrer extends BroadcastReceiver {
         if (intent.getAction().equals("com.android.vending.INSTALL_REFERRER")) {
             try {
                 String referrer = intent.getStringExtra("referrer");
-                Log.d(getClass().getSimpleName(), "Got INSTALL_REFERRER: " + referrer);
                 if (referrer == null) {
                     return;
                 }
