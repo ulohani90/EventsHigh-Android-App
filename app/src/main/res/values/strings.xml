@@ -29,6 +29,7 @@
     <string name="menu_open_in_browser">Open In Browser</string>
     <string name="menu_shortcut">Add to homescreen</string>
     <string name="menu_refresh">Refresh</string>
+    <string name="menu_filter">Filter</string>
 
     <!-- Other Strings used in UI -->
     <string name="explore_cat">Explore By Categories</string>
@@ -56,7 +57,6 @@
     <string name="ui_verify_phone">Verify your phone number</string>
     <string name="ui_no_my_event">This looks so empty! Want to choose some favourites?</string>
     <string name="ui_pick_interest">Pick Your Interests</string>
-    <string name="ui_filter">Filter</string>
 
 
     <!-- Onbaording message -->

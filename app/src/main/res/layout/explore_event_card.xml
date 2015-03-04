@@ -44,7 +44,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignTop="@+id/event_title"
             android:layout_marginTop="-40dp"
-            android:src="@drawable/featured_event_card_wrapper"
+            android:src="@drawable/eh_event_card_wrapper"
             android:scaleType="fitXY"
         />
         <TextView

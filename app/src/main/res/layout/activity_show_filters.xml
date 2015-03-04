@@ -3,40 +3,21 @@
                 xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".activity.ShowFiltersActivity"
 >
-    <TextView
-        android:id="@+id/top_label"
-        style="?android:attr/textAppearanceMedium"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="8dp"
-        android:textColor="#ff4e5b60"
-        android:text="@string/ui_pick_interest"
-    />
-    <ScrollView
+    <org.apmem.tools.layouts.FlowLayout
+        android:id="@+id/category_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/top_label"
+        android:layout_alignParentTop="true"
         android:layout_above="@+id/show_all"
-        android:scrollbars="none"
-        android:padding="8dp"
-        android:clipToPadding="false"
-    >
-        <org.apmem.tools.layouts.FlowLayout
-            android:id="@+id/category_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-        />
-    </ScrollView>
+        android:gravity="center"
+    />
     <TextView
         android:id="@+id/show_all"
         style="@style/EHButton"
@@ -48,6 +29,7 @@
         android:layout_margin="8dp"
         android:elevation="4dp"
         android:text="@string/action_show_all"
+        android:onClick="showAll"
         tools:ignore="UnusedAttribute"
     />
     <TextView
@@ -61,6 +43,7 @@
         android:layout_margin="8dp"
         android:elevation="4dp"
         android:text="@string/action_apply_filter"
+        android:onClick="applyFilters"
         tools:ignore="RelativeOverlap,UnusedAttribute"
     />
 </RelativeLayout>

@@ -281,6 +281,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
             return true;
         }
 
+        if (id == R.id.action_filter) {
+            startActivityForResult(new Intent(this, ShowFiltersActivity.class), 0);
+            return true;
+        }
+
         if (id == R.id.action_shortcut) {
             createShortcut();
             return true;
@@ -298,6 +303,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         showDateFilter();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            Toast.makeText(this, data.toString(), Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -607,7 +619,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
             TextView selected = dateTabViews.get(position).dayOfMonthView;
             selected.setTextColor(getResources().getColor(android.R.color.white));
-            selected.setBackgroundResource(R.drawable.shape_date_oval);
+            selected.setBackgroundResource(R.drawable.shape_oval);
             selected.setTypeface(null, Typeface.BOLD);
             lastPosition = position;
 
@@ -658,5 +670,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private void setFollowButtons(boolean isFollowing) {
         followButton.setVisibility(isFollowing ? View.GONE : View.VISIBLE);
         followingButton.setVisibility(isFollowing ? View.VISIBLE : View.GONE);
+        followButton.setSelected(true);
     }
 }

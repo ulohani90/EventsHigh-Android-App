@@ -276,9 +276,11 @@
                 />
             </intent-filter>
         </activity>
+
         <activity android:name=".activity.ShowFiltersActivity"
-            android:label="@string/ui_filter"
+            android:label="@string/ui_pick_interest"
         />
+
         <activity
             android:name=".activity.CustomUrlActivity"
             android:label="@string/title_book"
