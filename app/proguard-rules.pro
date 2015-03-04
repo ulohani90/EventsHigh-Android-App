@@ -18,20 +18,10 @@
 
 -include ../proguard-com.twitter.sdk.android.twitter.txt
 
-# Amplitude
--keep public class com.google.android.gms.ads.** { public protected *; }
-
 # Google Play Services
 -keep class * extends java.util.ListResourceBundle {
     protected Object[][] getContents();
 }
-
-# Facebook
--keep class com.facebook.** {
-   *;
-}
--keepattributes Signature
-
 
 # v7 support library
 -keep public class android.support.v7.widget.SearchView { *; }
@@ -50,4 +40,3 @@
 -keepnames class * implements android.os.Parcelable {
     public static final ** CREATOR;
 }
-
