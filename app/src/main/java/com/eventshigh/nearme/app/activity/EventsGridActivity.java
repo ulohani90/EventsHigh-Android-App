@@ -60,7 +60,6 @@ public class EventsGridActivity extends BaseEventsActivity {
         super.onResume();
 
         eventsAdapter.removeDismissedEvents(eventsMarkerEditor.getEventsMarkerManager());
-        eventsAdapter.notifyDataSetChanged();
     }
 
     @Override
