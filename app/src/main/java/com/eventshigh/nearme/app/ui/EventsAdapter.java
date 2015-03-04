@@ -44,6 +44,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             R.drawable.eh_myevents_header2,
             R.drawable.eh_myevents_header3,
             R.drawable.eh_myevents_header4,
+            R.drawable.eh_myevents_header5,
+            R.drawable.eh_myevents_header6
     };
 
 
