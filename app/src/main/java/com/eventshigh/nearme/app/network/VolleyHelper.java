@@ -66,4 +66,8 @@ public class VolleyHelper {
     public static ImageLoader getImageLoader(Context context) {
         return getInstance(context).imageLoader;
     }
+
+    public void invalidateCache(Request request) {
+        requestQueue.getCache().remove(request.getCacheKey());
+    }
 }

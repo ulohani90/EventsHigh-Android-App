@@ -93,7 +93,7 @@ public class EventsHighEndpoints {
             String url = String.format(API_ENDPOINT_QUERY_FORMAT,
                         eventsContext.city.toString().toLowerCase(),
                         URLEncoder.encode(eventsContext.query, "UTF-8"), BuildConfig.VERSION_CODE);
-            if (eventsContext.dateFilter.isEmpty()) {
+            if (!eventsContext.dateFilter.isEmpty()) {
                 url += "&date=" + eventsContext.dateFilter;
             }
             return url;

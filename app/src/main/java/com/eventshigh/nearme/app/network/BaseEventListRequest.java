@@ -1,11 +1,13 @@
 package com.eventshigh.nearme.app.network;
 
+import android.util.Log;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
-import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -26,7 +28,7 @@ import java.util.Set;
  * Base class for request to fetch event list.
  */
 public abstract class BaseEventListRequest extends JsonRequest<List<Event>>  {
-    private final BaseActivity activity;
+    protected final BaseActivity activity;
     protected final EventsContext eventsContext;
     private final Priority priority;
     protected final EventsMarkerManager eventsMarkerManager;
@@ -65,8 +67,8 @@ public abstract class BaseEventListRequest extends JsonRequest<List<Event>>  {
             throws UnsupportedEncodingException, JSONException {
         new ReportTimingTask(activity, "events").execute(response.networkTimeMs);
 
-        String jsonString = new String(response.data,
-                HttpHeaderParser.parseCharset(response.headers));
+        String jsonString = new String(response.data, "UTF-8");
+        Log.d(BaseEventsActivity.class.getSimpleName(), "json: " + jsonString);
         JSONObject eventsJson = new JSONObject(jsonString);
         List<Event> events = Event.parseUpcomingEvents(eventsContext.city, eventsJson,
                 includeWithoutLocation);

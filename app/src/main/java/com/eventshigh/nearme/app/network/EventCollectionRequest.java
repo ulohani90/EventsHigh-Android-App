@@ -80,6 +80,7 @@ public class EventCollectionRequest extends BaseEventListRequest {
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JSONException e) {
+            VolleyHelper.getInstance(activity).invalidateCache(this);
             return Response.error(new ParseError(e));
         }
     }
