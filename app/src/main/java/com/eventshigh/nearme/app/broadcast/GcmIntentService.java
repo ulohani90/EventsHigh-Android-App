@@ -9,7 +9,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.support.v4.app.NotificationCompat;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.eventshigh.nearme.app.R;
@@ -18,6 +20,7 @@ import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.user.GcmRegistration;
@@ -39,6 +42,7 @@ public class GcmIntentService extends IntentService {
     private static final String LOG_TAG = GcmIntentService.class.getSimpleName();
 
     public static final int NOTIFICATION_ID = 1;
+    public static final String BUNDLE_EVENT_KEY = "event";
 
     private GoogleApiClient client;
 
@@ -50,8 +54,6 @@ public class GcmIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         // The getMessageType() intent parameter must be the intent you received
         // in your BroadcastReceiver.
-        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
-        String messageType = gcm.getMessageType(intent);
 
         Bundle extras = intent.getExtras();
         if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
@@ -60,15 +62,46 @@ public class GcmIntentService extends IntentService {
              * will be extended in the future with new message types, just ignore
              * any message types you're not interested in, or that you don't recognize.
              */
+            GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
+            String messageType = gcm.getMessageType(intent);
             if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 // This loop represents the service doing some work.
                 // Post notification of received message.
                 sendNotification(extras);
             }
+
+            byte[] byteArrayExtra = intent.getByteArrayExtra(BUNDLE_EVENT_KEY);
+            if (byteArrayExtra != null) {
+                Parcel parcel = Parcel.obtain();
+                parcel.unmarshall(byteArrayExtra, 0, byteArrayExtra.length);
+                parcel.setDataPosition(0);
+                Event event = Event.CREATOR.createFromParcel(parcel);
+                showNotification(event);
+                parcel.recycle();
+            }
         }
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         GcmBroadcastReceiver.completeWakefulIntent(intent);
+    }
+
+    private void showNotification(Event event) {
+        CharSequence relativeTime = DateUtils.getRelativeDateTimeString(
+                getApplicationContext(), event.eventTimings[0],
+                DateUtils.DAY_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0);
+        final Notification notification = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.notification)
+                .setContentTitle(event.title)
+                .setContentText(relativeTime)
+                .setAutoCancel(true)
+                .setShowWhen(false)
+                .setCategory(Notification.CATEGORY_RECOMMENDATION)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(relativeTime))
+//                .setContentIntent(contentIntent)
+                .build();
+        showNotification(notification);
     }
 
     // Put the message into a notification and post it.

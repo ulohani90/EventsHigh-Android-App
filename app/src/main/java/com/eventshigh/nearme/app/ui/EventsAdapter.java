@@ -1,9 +1,15 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Parcel;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.text.format.DateUtils;
 import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,6 +22,8 @@ import android.widget.Toast;
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
+import com.eventshigh.nearme.app.broadcast.GcmBroadcastReceiver;
+import com.eventshigh.nearme.app.broadcast.GcmIntentService;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
@@ -368,6 +376,23 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     activity.reportEventAction(event, "addFavourite", position);
                     activity.recordEventMark(event, EventMark.FAVOURITE);
                     setFavouriteView(EventMark.FAVOURITE);
+
+                    // Setup an alarm
+                    final AlarmManager alarmMgr = (AlarmManager) activity.getSystemService(
+                            Context.ALARM_SERVICE);
+                    Parcel parcel = Parcel.obtain();
+                    event.writeToParcel(parcel, 0);
+                    parcel.setDataPosition(0);
+                    final Intent intent = new Intent(activity, GcmBroadcastReceiver.class);
+                    intent.putExtra(GcmIntentService.BUNDLE_EVENT_KEY, parcel.marshall());
+                    PendingIntent alarmIntent = PendingIntent.getBroadcast(activity,
+                            event.hashCode(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    alarmMgr.set(
+                            AlarmManager.RTC_WAKEUP,
+                            //System.currentTimeMillis() + 1000,
+                            event.eventTimings[0] - DateUtils.DAY_IN_MILLIS,
+                            alarmIntent);
+                    parcel.recycle();
                 }
             });
 
@@ -377,6 +402,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     activity.reportEventAction(event, "removeFavourite", position);
                     activity.recordEventMark(event, null);
                     setFavouriteView(null);
+
+                    // Remove alarm
+                    // TODO(chandanp): do this
                 }
             });
 
