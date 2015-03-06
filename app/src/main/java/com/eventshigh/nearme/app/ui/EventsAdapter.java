@@ -377,7 +377,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     activity.recordEventMark(event, EventMark.FAVOURITE);
                     setFavouriteView(EventMark.FAVOURITE);
 
-                    // Setup an alarm
+                    // Setup an alarm 1 day before the event
                     final AlarmManager alarmMgr = (AlarmManager) activity.getSystemService(
                             Context.ALARM_SERVICE);
                     Parcel parcel = Parcel.obtain();
@@ -389,7 +389,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                             event.hashCode(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
                     alarmMgr.set(
                             AlarmManager.RTC_WAKEUP,
-                            //System.currentTimeMillis() + 1000,
                             event.eventTimings[0] - DateUtils.DAY_IN_MILLIS,
                             alarmIntent);
                     parcel.recycle();

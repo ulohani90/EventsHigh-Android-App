@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.broadcast;
 
-import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -89,18 +88,8 @@ public class GcmIntentService extends IntentService {
         CharSequence relativeTime = DateUtils.getRelativeDateTimeString(
                 getApplicationContext(), event.eventTimings[0],
                 DateUtils.DAY_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0);
-        final Notification notification = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.notification)
-                .setContentTitle(event.title)
-                .setContentText(relativeTime)
-                .setAutoCancel(true)
-                .setShowWhen(false)
-                .setCategory(Notification.CATEGORY_RECOMMENDATION)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(relativeTime))
-//                .setContentIntent(contentIntent)
-                .build();
+        PendingIntent pendingIntent = createPendingIntent(event.id);
+        Notification notification = createNotification(event.title, relativeTime, pendingIntent);
         showNotification(notification);
     }
 
@@ -143,17 +132,7 @@ public class GcmIntentService extends IntentService {
 
         PendingIntent contentIntent;
         if (eventId != null) {
-            GcmRegistration gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
-            City city = gcmRegistration.getLastCity();
-            if (city == null) {
-                // placeholder for city.
-                city = City.BANGALORE;
-            }
-
-            Intent intent = new Intent(this, EventDetailActivity.class);
-            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
-            intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
-            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+            contentIntent = createPendingIntent(eventId);
         } else if (query != null) {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
@@ -167,19 +146,7 @@ public class GcmIntentService extends IntentService {
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         }
 
-        @SuppressLint("InlinedApi")
-        final Notification notification = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.notification)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setAutoCancel(true)
-                .setShowWhen(false)
-                .setCategory(Notification.CATEGORY_RECOMMENDATION)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
-                .setContentIntent(contentIntent)
-                .build();
+        final Notification notification = createNotification(title, message, contentIntent);
 
         if (!bounded) {
             showNotification(notification);
@@ -211,6 +178,36 @@ public class GcmIntentService extends IntentService {
                 .build();
             client.connect();
         }
+    }
+
+    private PendingIntent createPendingIntent(String eventId) {
+        GcmRegistration gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
+        City city = gcmRegistration.getLastCity();
+        if (city == null) {
+            // placeholder for city.
+            city = City.BANGALORE;
+        }
+
+        Intent intent = new Intent(this, EventDetailActivity.class);
+        intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+        intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
+        return PendingIntent.getActivity(this, 0, intent, 0);
+    }
+
+    private Notification createNotification(String title, CharSequence message,
+                                            PendingIntent contentIntent) {
+        return new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.notification)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setShowWhen(false)
+                .setCategory(Notification.CATEGORY_RECOMMENDATION)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                .setContentIntent(contentIntent)
+                .build();
     }
 
     private void showNotification(Notification notification) {
