@@ -1,13 +1,10 @@
 package com.eventshigh.nearme.app.network;
 
-import android.util.Log;
-
 import com.android.volley.NetworkResponse;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -68,7 +65,6 @@ public abstract class BaseEventListRequest extends JsonRequest<List<Event>>  {
         new ReportTimingTask(activity, "events").execute(response.networkTimeMs);
 
         String jsonString = new String(response.data, "UTF-8");
-        Log.d(BaseEventsActivity.class.getSimpleName(), "json: " + jsonString);
         JSONObject eventsJson = new JSONObject(jsonString);
         List<Event> events = Event.parseUpcomingEvents(eventsContext.city, eventsJson,
                 includeWithoutLocation);

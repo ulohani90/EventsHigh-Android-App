@@ -24,6 +24,9 @@ public class EventsHighEndpoints {
             "http://apiserver.eventshigh.com:8888/api/get_featured_events/%s?mobile=%d";
     private static final String API_ENDPOINT_EVENT_UBER_FORMAT =
             "http://apiserver.eventshigh.com:8888/api/get_event_uber_info/%s?mobile=1";
+    private static final String API_EVENTS_SUGGEST_FORMAT =
+            "https://s3-ap-southeast-1.amazonaws.com/ehautocomplete/autocomplete_events_%s.json";
+
     public static final String QUERY_MY_EVENT = "my events";
 
     public static Uri getEventDetailsURI(Event event) {
@@ -37,16 +40,16 @@ public class EventsHighEndpoints {
         return getEventDetailsURI(event.city, sb.toString());
     }
 
+    public static String getEventSuggestURI(City city) {
+        return String.format(API_EVENTS_SUGGEST_FORMAT, city.toString().toLowerCase());
+    }
+
     public static Uri getEventDetailsURI(City city, String eventId) {
-        return getWebUriDetailsBase()
+        return Uri.parse(WEB_URI_BASE).buildUpon()
+                .appendPath("detail")
                 .appendPath(Utils.capitalize(city.toString()))
                 .appendPath(eventId)
                 .build();
-    }
-
-    public static Uri.Builder getWebUriDetailsBase() {
-        return Uri.parse(WEB_URI_BASE).buildUpon()
-                .appendPath("detail");
     }
 
     public static Uri getWebUri(EventsContext param) {
