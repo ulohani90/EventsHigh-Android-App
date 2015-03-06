@@ -378,12 +378,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     setFavouriteView(EventMark.FAVOURITE);
 
                     // Setup an alarm 1 day before the event
-                    final AlarmManager alarmMgr = (AlarmManager) activity.getSystemService(
+                    AlarmManager alarmMgr = (AlarmManager) activity.getSystemService(
                             Context.ALARM_SERVICE);
                     Parcel parcel = Parcel.obtain();
                     event.writeToParcel(parcel, 0);
                     parcel.setDataPosition(0);
-                    final Intent intent = new Intent(activity, GcmBroadcastReceiver.class);
+                    Intent intent = new Intent(activity, GcmBroadcastReceiver.class);
                     intent.putExtra(GcmIntentService.BUNDLE_EVENT_KEY, parcel.marshall());
                     PendingIntent alarmIntent = PendingIntent.getBroadcast(activity,
                             event.hashCode(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -403,7 +403,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     setFavouriteView(null);
 
                     // Remove alarm
-                    // TODO(chandanp): do this
+                    AlarmManager alarmMgr = (AlarmManager) activity.getSystemService(
+                            Context.ALARM_SERVICE);
+                    Intent intent = new Intent(activity, GcmBroadcastReceiver.class);
+                    PendingIntent alarmIntent = PendingIntent.getBroadcast(activity,
+                            event.hashCode(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    alarmMgr.cancel(alarmIntent);
                 }
             });
 
