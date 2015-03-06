@@ -7,27 +7,21 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Volley Request to fetch Featured events.
  */
-public class FeaturedEventsRequest extends JsonRequest<List<Event>> {
+public class FeaturedEventsRequest extends BaseEventListRequest {
     private static final int MAX_FEATURED_EVENTS = 5;
 
     /**
@@ -53,55 +47,18 @@ public class FeaturedEventsRequest extends JsonRequest<List<Event>> {
         VolleyHelper.addToRequestQueue(activity, request);
     }
 
-    private final BaseActivity activity;
-    private final Priority priority;
-    private final EventsContext eventsContext;
-    private final EventsMarkerManager eventsMarkerManager;
-
-    /**
-     * Creates a new request.
-     *
-     * @param activity application context.
-     * @param url URL to fetch the JSON from.
-     * @param shouldBypassCache true if local cache should be bypassed
-     * @param priority priority of request.
-     * @param listener Listener to receive the JSON response
-     * @param errorListener Error listener, or null to ignore errors.
-     */
     public FeaturedEventsRequest(BaseActivity activity, String url, EventsContext eventsContext,
                                  boolean shouldBypassCache, Priority priority,
                                  Listener<List<Event>> listener, ErrorListener errorListener) {
-        super(Method.GET, url, null, listener, errorListener);
-        setShouldBypassCache(shouldBypassCache);
-        setShouldAllowStaleResponse(true);
-
-        this.activity = activity;
-        this.priority = priority;
-        this.eventsContext = eventsContext;
-        this.eventsMarkerManager = EventsMarkerManager.getInstance(activity);
-    }
-
-    @Override
-    public Priority getPriority() {
-        return priority;
+        super(activity, url, eventsContext, priority, shouldBypassCache, true, listener,
+                errorListener);
     }
 
     @Override
     protected Response<List<Event>> parseNetworkResponse(NetworkResponse response) {
-        new ReportTimingTask(activity, "featured_events").execute(response.networkTimeMs);
-
         try {
-            String jsonString = new String(response.data,
-                    HttpHeaderParser.parseCharset(response.headers));
-            JSONObject eventsJson = new JSONObject(jsonString);
-            List<Event> events = Event.parseUpcomingEvents(eventsContext.city, eventsJson, true);
-
-            eventsMarkerManager.waitForLoading();
-            eventsMarkerManager.removeDismissed(events);
-
-            if (eventsContext.location != null) {
-                Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
-            }
+            // Parse the response.
+            List<Event> events = parseEventsFromNetworkResponse(response);
 
             List<Event> filteredEvents = new ArrayList<>(MAX_FEATURED_EVENTS);
             for (Event event : events) {

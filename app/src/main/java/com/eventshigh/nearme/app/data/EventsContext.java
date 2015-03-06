@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -19,16 +20,19 @@ public class EventsContext implements Parcelable {
     @Nullable public LatLng location;
     public String query;
     public String dateFilter;
+    public ArrayList<String> categoryFilters;
 
     public EventsContext(@Nullable LatLng location, String query) {
         this.query = query;
         changeLocation(location);
         dateFilter = "";
+        categoryFilters = new ArrayList<>();
     }
 
     public EventsContext(EventsContext other) {
         this(other.location, other.query);
         this.dateFilter = other.dateFilter;
+        this.categoryFilters = new ArrayList<>(other.categoryFilters);
     }
 
     public boolean changeLocation(@Nullable LatLng location) {
@@ -76,6 +80,7 @@ public class EventsContext implements Parcelable {
         dest.writeParcelable(location, flags);
         dest.writeString(query);
         dest.writeString(dateFilter);
+        dest.writeStringList(categoryFilters);
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -87,6 +92,7 @@ public class EventsContext implements Parcelable {
             String query = in.readString();
             EventsContext context =  new EventsContext(location, query);
             context.dateFilter = in.readString();
+            in.readStringList(context.categoryFilters);
             return context;
         }
 

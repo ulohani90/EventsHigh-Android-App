@@ -285,7 +285,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         if (id == R.id.action_filter) {
-            startActivityForResult(new Intent(this, ShowFiltersActivity.class), 0);
+            Intent filterActivityIntent = new Intent(this, ShowFiltersActivity.class);
+            filterActivityIntent.putStringArrayListExtra(ShowFiltersActivity.PARAM_FILTERS,
+                    eventsContext.categoryFilters);
+            startActivityForResult(filterActivityIntent, 0);
             return true;
         }
 
@@ -310,8 +313,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            Toast.makeText(this, data.toString(), Toast.LENGTH_SHORT).show();
+        if (resultCode == RESULT_OK && data.hasExtra(ShowFiltersActivity.PARAM_FILTERS)) {
+            eventsContext.categoryFilters =
+                    data.getStringArrayListExtra(ShowFiltersActivity.PARAM_FILTERS);
+            fetchNewListing(false);
         }
     }
 
