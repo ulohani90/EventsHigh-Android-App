@@ -89,7 +89,10 @@ public class GcmIntentService extends IntentService {
                 getApplicationContext(), event.eventTimings[0],
                 DateUtils.DAY_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0);
         PendingIntent pendingIntent = createPendingIntent(event.id);
-        Notification notification = createNotification(event.title, relativeTime, pendingIntent);
+        String message = String.format(
+                getResources().getString(R.string.event_time_venue),
+                relativeTime, event.getShortAddress());
+        Notification notification = createNotification(event.title, message, pendingIntent);
         showNotification(notification);
     }
 
