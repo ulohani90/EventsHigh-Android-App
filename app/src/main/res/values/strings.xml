@@ -100,4 +100,5 @@
     </plurals>
     <string name="event_time_details">{0,choice,0#Happening Today|1#Happening Tomorrow|1&lt;{0} days from now}</string>
     <string name="event_detail_from">Event details from: %s</string>
+    <string name="event_time_venue">%1$s, %2$s</string>
 </resources>

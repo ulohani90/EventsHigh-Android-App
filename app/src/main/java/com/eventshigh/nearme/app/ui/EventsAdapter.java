@@ -1,9 +1,15 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Parcel;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.text.format.DateUtils;
 import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,12 +22,15 @@ import android.widget.Toast;
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
+import com.eventshigh.nearme.app.broadcast.GcmBroadcastReceiver;
+import com.eventshigh.nearme.app.broadcast.GcmIntentService;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -368,6 +377,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     activity.reportEventAction(event, "addFavourite", position);
                     activity.recordEventMark(event, EventMark.FAVOURITE);
                     setFavouriteView(EventMark.FAVOURITE);
+                    AlarmUtils.setAlarm(activity, event);
                 }
             });
 
@@ -377,6 +387,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     activity.reportEventAction(event, "removeFavourite", position);
                     activity.recordEventMark(event, null);
                     setFavouriteView(null);
+                    AlarmUtils.cancelAlarm(activity, event);
                 }
             });
 

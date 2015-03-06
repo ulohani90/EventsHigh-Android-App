@@ -38,6 +38,7 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -372,6 +373,7 @@ public class EventDetailActivity extends BaseActivity {
                     reportEventAction(event, "addFavourite");
                     eventsMarkerEditor.recordEventMark(event.id, EventMark.FAVOURITE);
                     setFavouriteView(EventMark.FAVOURITE);
+                    AlarmUtils.setAlarm(EventDetailActivity.this, event);
                 }
             });
             favouritedView.setOnClickListener(new OnClickListener() {
@@ -380,6 +382,7 @@ public class EventDetailActivity extends BaseActivity {
                     reportEventAction(event, "removeFavourite");
                     eventsMarkerEditor.recordEventMark(event.id, null);
                     setFavouriteView(null);
+                    AlarmUtils.cancelAlarm(EventDetailActivity.this, event);
                 }
             });
 
