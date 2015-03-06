@@ -30,6 +30,7 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -376,22 +377,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     activity.reportEventAction(event, "addFavourite", position);
                     activity.recordEventMark(event, EventMark.FAVOURITE);
                     setFavouriteView(EventMark.FAVOURITE);
-
-                    // Setup an alarm 1 day before the event
-                    AlarmManager alarmMgr = (AlarmManager) activity.getSystemService(
-                            Context.ALARM_SERVICE);
-                    Parcel parcel = Parcel.obtain();
-                    event.writeToParcel(parcel, 0);
-                    parcel.setDataPosition(0);
-                    Intent intent = new Intent(activity, GcmBroadcastReceiver.class);
-                    intent.putExtra(GcmIntentService.BUNDLE_EVENT_KEY, parcel.marshall());
-                    PendingIntent alarmIntent = PendingIntent.getBroadcast(activity,
-                            event.hashCode(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
-                    alarmMgr.set(
-                            AlarmManager.RTC_WAKEUP,
-                            event.eventTimings[0] - DateUtils.DAY_IN_MILLIS,
-                            alarmIntent);
-                    parcel.recycle();
+                    AlarmUtils.setAlarm(activity, event);
                 }
             });
 
@@ -401,14 +387,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     activity.reportEventAction(event, "removeFavourite", position);
                     activity.recordEventMark(event, null);
                     setFavouriteView(null);
-
-                    // Remove alarm
-                    AlarmManager alarmMgr = (AlarmManager) activity.getSystemService(
-                            Context.ALARM_SERVICE);
-                    Intent intent = new Intent(activity, GcmBroadcastReceiver.class);
-                    PendingIntent alarmIntent = PendingIntent.getBroadcast(activity,
-                            event.hashCode(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
-                    alarmMgr.cancel(alarmIntent);
+                    AlarmUtils.cancelAlarm(activity, event);
                 }
             });
 
