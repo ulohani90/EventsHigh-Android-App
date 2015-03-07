@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.data;
 import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
@@ -23,7 +24,7 @@ public enum EventCategory {
     FASHION,
     FILM,
     FOOD,
-    HEALTH_WELLNESS,
+    HEALTH_WELLNESS("Health & Wellness"),
     KIDS,
     LITERATURE,
     MUSIC,
@@ -37,6 +38,16 @@ public enum EventCategory {
     TECH,
     THEATRE,
     OTHER;
+
+    public final String categoryName;
+
+    private EventCategory(@Nullable String categoryName) {
+        this.categoryName = categoryName == null ? Utils.capitalize(name().replace('_', ' ')) : categoryName;
+    }
+
+    private EventCategory() {
+        this(null);
+    }
 
     /**
      * Get an Icon associated with this Category.
