@@ -14,7 +14,6 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 public abstract class BaseWakefulBroadcastReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        System.out.println("-------> 1");
         // Explicitly specify that GcmIntentService will handle the intent.
         ComponentName comp = new ComponentName(context.getPackageName(),
                 getIntentServiceClass().getName());
