@@ -12,21 +12,20 @@ import android.provider.SearchRecentSuggestions;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.android.volley.Response;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.network.EventSuggestRequest;
+import com.eventshigh.nearme.app.network.EventSuggestRequest.SuggestEvent;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.StreamUtils;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
+import java.util.List;
 
 /**
  * This class provides the search suggestions from recent queries and static event tags.
@@ -41,20 +40,22 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
 
     private String[] allTags;
     private SuggestEvent[] allEvents;
-    private JsonArrayRequest request;
+    private EventSuggestRequest request;
 
     public EventSearchSuggestionsProvider() {
         setupSuggestions(AUTHORITY, MODE);
     }
 
     @Override
-    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs,
-                        String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection,
+                        String[] selectionArgs, String sortOrder) {
+        readTags();
+        loadEvents();
+
         if (selectionArgs.length <=0 || selectionArgs[0].isEmpty()) {
             return super.query(uri, projection, selection, selectionArgs, sortOrder);
         }
 
-        readTags();
         MatrixCursor suggestionsCursor = new MatrixCursor(new String[] {
                 BaseColumns._ID,
                 SearchManager.SUGGEST_COLUMN_TEXT_1,
@@ -68,10 +69,16 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
         int titleColumnIndex = suggestionsCursor.getColumnIndex(
                 SearchManager.SUGGEST_COLUMN_TEXT_1);
         int queryColumnIndex = suggestionsCursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_QUERY);
+        int iconColumnIndex = suggestionsCursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_ICON_1);
+        int intentActionColumnIndex = suggestionsCursor.getColumnIndex(
+                SearchManager.SUGGEST_COLUMN_INTENT_ACTION);
+        int intentDataColumnIndex = suggestionsCursor.getColumnIndex(
+                SearchManager.SUGGEST_COLUMN_INTENT_DATA);
         int columnCount = suggestionsCursor.getColumnCount();
-        for (int i = 0; i < allTags.length && suggestionsCursor.getCount() < 5; i++) {
+
+        for (int i = 0; i < allTags.length && suggestionsCursor.getCount() < 3; i++) {
             String tag = allTags[i];
-            if (tag.startsWith(selectionArgs[0])) {
+            if (tag.contains(selectionArgs[0])) {
                 Object[] newRow = new Object[columnCount];
                 newRow[idIndex] = SUGGESTION_ID_START + i;
                 newRow[queryColumnIndex] = tag;
@@ -80,32 +87,31 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
             }
         }
 
-        if (allEvents == null) {
-            // loadEvents();
-        } else {
-            int iconColumnIndex = suggestionsCursor.getColumnIndex(
-                    SearchManager.SUGGEST_COLUMN_ICON_1);
-            int intentActionColumnIndex = suggestionsCursor.getColumnIndex(
-                    SearchManager.SUGGEST_COLUMN_INTENT_ACTION);
-            int intentDataColumnIndex = suggestionsCursor.getColumnIndex(
-                    SearchManager.SUGGEST_COLUMN_INTENT_DATA);
-            for (int i = 0; i < allEvents.length && suggestionsCursor.getCount() < 5; i++) {
-                String suggestion = allEvents[i].name;
-                if (suggestion.contains(selectionArgs[0])) {
-                    Object[] newRow = new Object[columnCount];
-                    newRow[idIndex] = EVENT_ID_START + i;
-                    newRow[queryColumnIndex] = suggestion;
-                    newRow[titleColumnIndex] = suggestion;
-                    newRow[iconColumnIndex] = R.drawable.ic_location_on_white_36dp;
-                    newRow[intentActionColumnIndex] = Intent.ACTION_VIEW;
-                    newRow[intentDataColumnIndex] = EventsHighEndpoints.getEventDetailsURI(
-                            City.getCity(allEvents[i].city), allEvents[i].id);
-                    suggestionsCursor.addRow(newRow);
-                }
+        for (int i = 0; i < allEvents.length && suggestionsCursor.getCount() < 5; i++) {
+            if (allEvents[i].name.contains(selectionArgs[0])) {
+                Object[] newRow = new Object[columnCount];
+                newRow[idIndex] = EVENT_ID_START + i;
+                newRow[queryColumnIndex] = allEvents[i].name;
+                newRow[titleColumnIndex] = allEvents[i].name;
+                newRow[iconColumnIndex] = R.drawable.ic_location_on_white_36dp;
+                newRow[intentActionColumnIndex] = Intent.ACTION_VIEW;
+                newRow[intentDataColumnIndex] = EventsHighEndpoints.getEventDetailsURI(
+                        City.getCity(allEvents[i].city), allEvents[i].id);
+                suggestionsCursor.addRow(newRow);
             }
         }
 
         return suggestionsCursor;
+    }
+
+    public static void saveRecentQuery(Context context, String query) {
+        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(context, AUTHORITY, MODE);
+        suggestions.saveRecentQuery(query, null);
+    }
+
+    public static void clearHistory(Context context) {
+        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(context, AUTHORITY, MODE);
+        suggestions.clearHistory();
     }
 
     private synchronized void readTags() {
@@ -121,7 +127,7 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
 
     private synchronized void loadEvents() {
         // Request is already in flight
-        if (request != null) {
+        if (allEvents != null && request != null) {
             return;
         }
 
@@ -130,60 +136,27 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
             return;
         }
 
-        String autoCompleteEventsUrl = "https://s3-ap-southeast-1.amazonaws.com/"
-                + "ehautocomplete/autocomplete_events_" + lastCity.name().toLowerCase() + ".json";
-        request = new JsonArrayRequest(autoCompleteEventsUrl,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray jsonArray, boolean b) {
-                        allEvents = new SuggestEvent[jsonArray.length()];
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            try {
-                                allEvents[i] = SuggestEvent.parse(jsonArray.getJSONObject(i));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                synchronized (this) {
-                    // Try again
-                    request = null;
-                }
-            }
-        });
-
+        request = new EventSuggestRequest(lastCity, mSuggestListener, mErrorListener);
         VolleyHelper.addToRequestQueue(getContext(), request);
     }
 
-    public static void saveRecentQuery(Context context, String query) {
-        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(context, AUTHORITY, MODE);
-        suggestions.saveRecentQuery(query, null);
-    }
-
-    public static void clearHistory(Context context) {
-        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(context, AUTHORITY, MODE);
-        suggestions.clearHistory();
-    }
-
-    private static class SuggestEvent {
-        private final String id;
-        private final String city;
-        private final String type;
-        private final String name;
-
-        public SuggestEvent(String id, String city, String type, String name) {
-            this.id = id;
-            this.city = city;
-            this.type = type;
-            this.name = name;
+    private Listener<List<SuggestEvent>> mSuggestListener = new Listener<List<SuggestEvent>>() {
+        @Override
+        public void onResponse(List<SuggestEvent> suggestEvents, boolean isIntermediate) {
+            synchronized (EventSearchSuggestionsProvider.this) {
+                allEvents = suggestEvents.toArray(new SuggestEvent[suggestEvents.size()]);
+                request = null;
+            }
         }
+    };
 
-        public static SuggestEvent parse(JSONObject jsonObject) throws JSONException {
-            return new SuggestEvent(jsonObject.getString("id"), jsonObject.getString("city"),
-                    jsonObject.getString("type"), jsonObject.getString("name"));
+    private ErrorListener mErrorListener = new ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            synchronized (EventSearchSuggestionsProvider.this) {
+                // Try again
+                request = null;
+            }
         }
-    }
+    };
 }

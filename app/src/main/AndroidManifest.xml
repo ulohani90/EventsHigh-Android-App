@@ -5,7 +5,6 @@
     android:installLocation="auto"
     android:backupAgent="utils.EhBackupAgent"
 >
-
     <!-- Ask for permissions, we need internet access and Google Maps access -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -109,6 +108,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <intent-filter>
+                <data
+                    android:scheme="http"
+                    android:host="www.eventshigh.com"
+                    android:pathPrefix="/"
+                />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <data
+                    android:scheme="http"
+                    android:host="eventshigh.com"
+                    android:pathPrefix="/"
+                />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
             <!-- Accept Search requests withing app -->
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -117,92 +137,6 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"
             />
-
-            <!-- Accepts URIs "http://www.eventshigh.com/" -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <data
-                    android:scheme="http"
-                    android:host="www.eventshigh.com"
-                    android:path="/"
-                />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="andrsoid.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <data
-                    android:scheme="http"
-                    android:host="www.eventshigh.com"
-                    android:path=""
-                />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="andrsoid.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <data
-                    android:scheme="http"
-                    android:host="eventshigh.com"
-                    android:path="/"
-                />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="andrsoid.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <data
-                    android:scheme="http"
-                    android:host="eventshigh.com"
-                    android:path=""
-                />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="andrsoid.intent.category.BROWSABLE" />
-            </intent-filter>
-
-            <!-- Accepts URIs that begin with "http://www.eventshigh.com/city/" -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <data
-                    android:scheme="http"
-                    android:host="www.eventshigh.com"
-                    android:pathPrefix="/city"
-                />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="andrsoid.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <data
-                    android:scheme="http"
-                    android:host="eventshigh.com"
-                    android:pathPrefix="/city"
-                />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="andrsoid.intent.category.BROWSABLE" />
-            </intent-filter>
-
-            <!-- Accepts URIs that begin with "http://www.eventshigh.com/search" -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <data
-                    android:scheme="http"
-                    android:host="www.eventshigh.com"
-                    android:pathPrefix="/search"
-                />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="andrsoid.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <data
-                    android:scheme="http"
-                    android:host="eventshigh.com"
-                    android:pathPrefix="/search"
-                />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="andrsoid.intent.category.BROWSABLE" />
-            </intent-filter>
         </activity>
 
         <activity
@@ -252,30 +186,8 @@
             android:name=".activity.EventDetailActivity"
             android:label="@string/loading"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:exported="true"
             android:theme="@style/NoActionBar"
-        >
-            <!-- Accepts URIs that begin with "http://www.eventshigh.com/detail/" -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="andrsoid.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="http"
-                    android:host="www.eventshigh.com"
-                    android:pathPrefix="/detail"
-                />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http"
-                    android:host="eventshigh.com"
-                    android:pathPrefix="/detail"
-                />
-            </intent-filter>
-        </activity>
+        />
 
         <activity android:name=".activity.ShowFiltersActivity"
             android:label="@string/ui_pick_interest"

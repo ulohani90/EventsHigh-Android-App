@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,7 +12,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.user.GcmRegistration;
 
 /**
  * Helper class to create and show notifications in android notification bar.
@@ -28,6 +28,7 @@ public class NotificationUtils {
         return PendingIntent.getActivity(context, 0, intent, 0);
     }
 
+    @SuppressLint("InlinedApi")
     public static Notification createNotification(Context context, String title,
             CharSequence message, PendingIntent contentIntent) {
         return new NotificationCompat.Builder(context)

@@ -42,10 +42,6 @@ public class GcmIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        System.out.println("-------> 2");
-        // The getMessageType() intent parameter must be the intent you received
-        // in your BroadcastReceiver.
-
         Bundle extras = intent.getExtras();
         if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
             /*
