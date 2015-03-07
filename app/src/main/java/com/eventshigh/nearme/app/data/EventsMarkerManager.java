@@ -109,7 +109,7 @@ public class EventsMarkerManager {
 
         public Editor removeEventMark(Event event) {
             EventMark mark = eventMarkMap.remove(event.id);
-            if (EventMark.isFavourite(mark)) {
+            if (EventMark.isFavourite(mark) || EventMark.isDismissed(mark)) {
                 AlarmUtils.cancelAlarm(context, event);
             }
             callListeners(event.id, null);
