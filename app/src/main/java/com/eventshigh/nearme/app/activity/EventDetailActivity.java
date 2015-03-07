@@ -371,7 +371,7 @@ public class EventDetailActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     reportEventAction(event, "addFavourite");
-                    eventsMarkerEditor.recordEventMark(event.id, EventMark.FAVOURITE);
+                    eventsMarkerEditor.recordEventMark(event, EventMark.FAVOURITE);
                     setFavouriteView(EventMark.FAVOURITE);
                     AlarmUtils.setAlarm(EventDetailActivity.this, event);
                 }
@@ -380,7 +380,7 @@ public class EventDetailActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     reportEventAction(event, "removeFavourite");
-                    eventsMarkerEditor.recordEventMark(event.id, null);
+                    eventsMarkerEditor.recordEventMark(event, null);
                     setFavouriteView(null);
                     AlarmUtils.cancelAlarm(EventDetailActivity.this, event);
                 }
@@ -390,7 +390,7 @@ public class EventDetailActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     reportEventAction(event, "dismiss");
-                    eventsMarkerEditor.recordEventMark(event.id, EventMark.DISMISSED);
+                    eventsMarkerEditor.recordEventMark(event, EventMark.DISMISSED);
                     finish();
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 }

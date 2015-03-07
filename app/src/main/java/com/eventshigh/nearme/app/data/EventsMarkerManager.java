@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.util.Pair;
 
+import com.eventshigh.nearme.app.utils.AlarmUtils;
+
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -73,9 +75,11 @@ public class EventsMarkerManager {
     public class Editor implements Closeable {
         private final SQLiteDatabase database;
         private final List<Thread> threads = new ArrayList<>();
+        private final Context context;
 
         private Editor(Context context) {
             database = new EventMarkDbHelper(context).getWritableDatabase();
+            this.context = context;
         }
 
         public void close() {
@@ -89,21 +93,27 @@ public class EventsMarkerManager {
             database.close();
         }
 
-        public Editor recordEventMark(String eventId, @Nullable EventMark mark) {
+        public Editor recordEventMark(Event event, @Nullable EventMark mark) {
             if (mark == null) {
-                removeEventMark(eventId);
+                removeEventMark(event);
             } else {
-                eventMarkMap.put(eventId, mark);
-                callListeners(eventId, mark);
-                threads.add(EventMarkDbHelper.addEntry(database, eventId, mark));
+                eventMarkMap.put(event.id, mark);
+                if (EventMark.isFavourite(mark)) {
+                    AlarmUtils.setAlarm(context, event);
+                }
+                callListeners(event.id, mark);
+                threads.add(EventMarkDbHelper.addEntry(database, event.id, mark));
             }
             return this;
         }
 
-        public Editor removeEventMark(String eventId) {
-            eventMarkMap.remove(eventId);
-            callListeners(eventId, null);
-            threads.add(EventMarkDbHelper.removeEntry(database, eventId));
+        public Editor removeEventMark(Event event) {
+            EventMark mark = eventMarkMap.remove(event.id);
+            if (EventMark.isFavourite(mark)) {
+                AlarmUtils.cancelAlarm(context, event);
+            }
+            callListeners(event.id, null);
+            threads.add(EventMarkDbHelper.removeEntry(database, event.id));
             return this;
         }
 

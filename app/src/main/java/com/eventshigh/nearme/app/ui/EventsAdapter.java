@@ -377,7 +377,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     activity.reportEventAction(event, "addFavourite", position);
                     activity.recordEventMark(event, EventMark.FAVOURITE);
                     setFavouriteView(EventMark.FAVOURITE);
-                    AlarmUtils.setAlarm(activity, event);
                 }
             });
 
@@ -387,7 +386,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     activity.reportEventAction(event, "removeFavourite", position);
                     activity.recordEventMark(event, null);
                     setFavouriteView(null);
-                    AlarmUtils.cancelAlarm(activity, event);
                 }
             });
 

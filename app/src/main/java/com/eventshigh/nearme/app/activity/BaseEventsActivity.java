@@ -392,7 +392,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         if (EventMark.isDismissed(mark)) {
             remove(event);
         }
-        eventsMarkerEditor.recordEventMark(event.id, mark);
+        eventsMarkerEditor.recordEventMark(event, mark);
     }
 
     public void reportEventAction(Event event, String actionName, int position) {
