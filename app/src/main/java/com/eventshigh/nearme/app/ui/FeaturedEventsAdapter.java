@@ -116,7 +116,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
                 @Override
                 public void onClick(View v) {
                     activity.reportEventAction(event, "addFavourite");
-                    eventsMarkerManager.getEditor().recordEventMark(event.id, EventMark.FAVOURITE).close();
+                    eventsMarkerManager.getEditor().recordEventMark(event, EventMark.FAVOURITE).close();
                     setFavouriteView(true);
                 }
             });
@@ -124,7 +124,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
                 @Override
                 public void onClick(View v) {
                     activity.reportEventAction(event, "removeFavourite");
-                    eventsMarkerManager.getEditor().removeEventMark(event.id).close();
+                    eventsMarkerManager.getEditor().removeEventMark(event).close();
                     setFavouriteView(false);
                 }
             });

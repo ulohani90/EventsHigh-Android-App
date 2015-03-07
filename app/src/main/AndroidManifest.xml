@@ -286,6 +286,10 @@
             </intent-filter>
         </receiver>
         <service android:name=".broadcast.GcmIntentService" />
+
+        <!-- Receives the alarm broadcast messages, which is used for notification -->
+        <receiver android:name=".broadcast.EventAlarmBroadcastReceiver" />
+        <service android:name=".broadcast.EventNotificationIntentService" />
     </application>
 
 </manifest>

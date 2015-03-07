@@ -1,31 +1,22 @@
 package com.eventshigh.nearme.app.broadcast;
 
-import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.support.v4.app.NotificationCompat;
-import android.text.format.DateUtils;
 import android.util.Log;
 
-import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
-import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
-import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.settings.Preferences;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.LocationUtils;
+import com.eventshigh.nearme.app.utils.NotificationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -42,7 +33,6 @@ public class GcmIntentService extends IntentService {
     private static final String LOG_TAG = GcmIntentService.class.getSimpleName();
 
     public static final int NOTIFICATION_ID = 1;
-    public static final String BUNDLE_EVENT_KEY = "event";
 
     private GoogleApiClient client;
 
@@ -66,32 +56,10 @@ public class GcmIntentService extends IntentService {
                 // Post notification of received message.
                 sendNotification(extras);
             }
-
-            byte[] byteArrayExtra = intent.getByteArrayExtra(BUNDLE_EVENT_KEY);
-            if (byteArrayExtra != null) {
-                Parcel parcel = Parcel.obtain();
-                parcel.unmarshall(byteArrayExtra, 0, byteArrayExtra.length);
-                parcel.setDataPosition(0);
-                Event event = Event.CREATOR.createFromParcel(parcel);
-                showNotification(event);
-                parcel.recycle();
-            }
         }
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         GcmBroadcastReceiver.completeWakefulIntent(intent);
-    }
-
-    private void showNotification(Event event) {
-        CharSequence relativeTime = DateUtils.getRelativeDateTimeString(
-                getApplicationContext(), event.eventTimings[0],
-                DateUtils.DAY_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0);
-        PendingIntent pendingIntent = createPendingIntent(event.id);
-        String message = String.format(
-                getResources().getString(R.string.event_time_venue),
-                relativeTime, event.getShortAddress());
-        Notification notification = createNotification(event.title, message, pendingIntent);
-        showNotification(notification);
     }
 
     // Put the message into a notification and post it.
@@ -133,7 +101,9 @@ public class GcmIntentService extends IntentService {
 
         PendingIntent contentIntent;
         if (eventId != null) {
-            contentIntent = createPendingIntent(eventId);
+            GcmRegistration gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
+            contentIntent = NotificationUtils.createPendingIntent(this, eventId,
+                    gcmRegistration.getLastCity());
         } else if (query != null) {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
@@ -147,10 +117,11 @@ public class GcmIntentService extends IntentService {
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         }
 
-        final Notification notification = createNotification(title, message, contentIntent);
+        final Notification notification = NotificationUtils.createNotification(
+                this, title, message, contentIntent);
 
         if (!bounded) {
-            showNotification(notification);
+            NotificationUtils.showNotification(this, notification, NOTIFICATION_ID);
         } else {
             final LatLng center = new LatLng(lat, lon);
             final double radius = distance;
@@ -165,7 +136,8 @@ public class GcmIntentService extends IntentService {
                                     LocationUtils.locationToLatLng(location), center) > radius) {
                             Log.w(LOG_TAG, "notification skipped, user location: " + location);
                         } else {
-                            showNotification(notification);
+                            NotificationUtils.showNotification(GcmIntentService.this, notification,
+                                    NOTIFICATION_ID);
                         }
 
 						client.disconnect();
@@ -179,42 +151,5 @@ public class GcmIntentService extends IntentService {
                 .build();
             client.connect();
         }
-    }
-
-    private PendingIntent createPendingIntent(String eventId) {
-        GcmRegistration gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
-        City city = gcmRegistration.getLastCity();
-        if (city == null) {
-            // placeholder for city.
-            city = City.BANGALORE;
-        }
-
-        Intent intent = new Intent(this, EventDetailActivity.class);
-        intent.setAction(BaseActivity.NOTIFICATION_ACTION);
-        intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
-        return PendingIntent.getActivity(this, 0, intent, 0);
-    }
-
-    @SuppressLint("InlinedApi")
-    private Notification createNotification(String title, CharSequence message,
-                                            PendingIntent contentIntent) {
-        return new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.notification)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setAutoCancel(true)
-                .setShowWhen(false)
-                .setCategory(Notification.CATEGORY_RECOMMENDATION)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
-                .setContentIntent(contentIntent)
-                .build();
-    }
-
-    private void showNotification(Notification notification) {
-        NotificationManager notificationManager = (NotificationManager)
-                getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFICATION_ID, notification);
     }
 }
