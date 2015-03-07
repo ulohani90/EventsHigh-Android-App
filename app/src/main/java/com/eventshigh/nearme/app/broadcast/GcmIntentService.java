@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.broadcast;
 
+import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -51,9 +52,6 @@ public class GcmIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        // The getMessageType() intent parameter must be the intent you received
-        // in your BroadcastReceiver.
-
         Bundle extras = intent.getExtras();
         if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
             /*
@@ -197,6 +195,7 @@ public class GcmIntentService extends IntentService {
         return PendingIntent.getActivity(this, 0, intent, 0);
     }
 
+    @SuppressLint("InlinedApi")
     private Notification createNotification(String title, CharSequence message,
                                             PendingIntent contentIntent) {
         return new NotificationCompat.Builder(this)
@@ -215,7 +214,7 @@ public class GcmIntentService extends IntentService {
 
     private void showNotification(Notification notification) {
         NotificationManager notificationManager = (NotificationManager)
-                this.getSystemService(Context.NOTIFICATION_SERVICE);
+                getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID, notification);
     }
 }
