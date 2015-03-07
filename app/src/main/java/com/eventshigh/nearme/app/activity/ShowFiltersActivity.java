@@ -8,6 +8,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.EventCategory;
 
 import org.apmem.tools.layouts.FlowLayout;
 
@@ -31,26 +32,26 @@ public class ShowFiltersActivity extends BaseActivity {
             selectedTags = getIntent().getStringArrayListExtra(PARAM_FILTERS);
         }
         FlowLayout categoryContainer = (FlowLayout) findViewById(R.id.category_container);
-        for (final String tag : LaunchActivity.EXPLORE_TAGS) {
-            if (tag.equalsIgnoreCase("All")) {
+        for (final EventCategory category : EventCategory.values()) {
+            if (category == EventCategory.OTHER) {
                 continue;
             }
 
             FrameLayout card = (FrameLayout) getLayoutInflater().inflate(
                     R.layout.filter_card, categoryContainer, false);
             final TextView textView = (TextView) card.getChildAt(0);
-            textView.setText(tag);
-            textView.setSelected(selectedTags.contains(tag));
+            textView.setText(category.categoryName);
+            textView.setSelected(selectedTags.contains(category.categoryName));
             categoryContainer.addView(card);
 
             card.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (textView.isSelected()) {
-                        selectedTags.remove(tag);
+                        selectedTags.remove(category.categoryName);
                         textView.setSelected(false);
                     } else {
-                        selectedTags.add(tag);
+                        selectedTags.add(category.categoryName);
                         textView.setSelected(true);
                     }
                 }

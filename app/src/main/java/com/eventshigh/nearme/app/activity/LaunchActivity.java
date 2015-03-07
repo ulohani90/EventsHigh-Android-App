@@ -76,8 +76,19 @@ public class LaunchActivity extends BaseActivity {
     private static final int MIN_EXPLORE_CARD_IN_ROW = 2;
     private static final long REFRESH_FEATURED_EVENTS_INTERVAL = 3600 * 1000L;
     private static final int MARGIN_DP = android.os.Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP ? 10 : 2;
-    public static final String[] EXPLORE_TAGS = { "All", "Music", "Parties", "Theatre", "Kids",
-            "Tech", "Sports", "Health & Wellness", "Dance", "Art", "Food", "Literature"};
+    public static final String[] EXPLORE_TAGS = { "All",
+            EventCategory.MUSIC.categoryName,
+            EventCategory.PARTIES.categoryName,
+            EventCategory.THEATRE.categoryName,
+            EventCategory.KIDS.categoryName,
+            EventCategory.TECH.categoryName,
+            EventCategory.SPORTS.categoryName,
+            EventCategory.HEALTH_WELLNESS.categoryName,
+            EventCategory.DANCE.categoryName,
+            EventCategory.ART.categoryName,
+            EventCategory.FOOD.categoryName,
+            EventCategory.LITERATURE.categoryName
+    };
 
 
     // UI Elements for this activity.
