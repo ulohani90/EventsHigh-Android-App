@@ -30,6 +30,7 @@ public enum EventCategory {
     OUTDOORS,
     PARTIES,
     PHOTOGRAPHY,
+    SHOPPING,
     SOCIAL_CAUSES,
     SPIRITUAL,
     SPORTS,
