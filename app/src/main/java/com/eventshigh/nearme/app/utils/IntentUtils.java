@@ -47,10 +47,10 @@ public class IntentUtils {
         if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
             processSearchIntent(inIntent);
         } else if (Intent.ACTION_VIEW.equals(inIntent.getAction())) {
-            processViewIntent(inIntent);
+            processViewIntent(inIntent, true);
         } else if (BaseActivity.NOTIFICATION_ACTION.equals(inIntent.getAction())) {
             activity.reportActionToAnalytics("openNotification");
-            processViewIntent(inIntent);
+            processViewIntent(inIntent, false);
         }
 
         if (inIntent.getDataString() != null) {
@@ -74,22 +74,24 @@ public class IntentUtils {
         param.query = query;
     }
 
-    private void processViewIntent(Intent inIntent) {
+    private void processViewIntent(Intent inIntent, boolean isDeepLink) {
         Uri inUri = inIntent.getData();
 
         if (inUri.getPath().startsWith("/city")) {
-            processCityViewIntent(inUri);
+            processCityViewIntent(inUri, isDeepLink);
         } else if (inUri.getPath().startsWith("/search")) {
-            processSearchViewIntent(inUri);
+            processSearchViewIntent(inUri, isDeepLink);
         } else if (inUri.getPath().startsWith("/detail")) {
-            processDetailViewIntent(inUri);
-        } else {
+            processDetailViewIntent(inUri, isDeepLink);
+        } else if (isDeepLink) {
             activity.reportActionToAnalytics("deepLink", "homepage");
         }
     }
 
-    private void processCityViewIntent(Uri webUri) {
-        activity.reportActionToAnalytics("deepLink", "city");
+    private void processCityViewIntent(Uri webUri, boolean isDeepLink) {
+        if (isDeepLink) {
+            activity.reportActionToAnalytics("deepLink", "city");
+        }
 
         try {
             City city = City.valueOf(webUri.getLastPathSegment().toUpperCase());
@@ -99,8 +101,10 @@ public class IntentUtils {
         }
     }
 
-    private void processSearchViewIntent(Uri webUri) {
-        activity.reportActionToAnalytics("deepLink", "search");
+    private void processSearchViewIntent(Uri webUri, boolean isDeepLink) {
+        if (isDeepLink) {
+            activity.reportActionToAnalytics("deepLink", "search");
+        }
 
         try {
             City city = City.valueOf(webUri.getQueryParameter("city").toUpperCase());
@@ -115,8 +119,10 @@ public class IntentUtils {
         }
     }
 
-    private void processDetailViewIntent(Uri webUri) {
-        activity.reportActionToAnalytics("search", "detail");
+    private void processDetailViewIntent(Uri webUri, boolean isDeepLink) {
+        if (isDeepLink) {
+            activity.reportActionToAnalytics("deepLink", "detail");
+        }
         Intent intent = new Intent(activity, EventDetailActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         intent.setData(webUri);

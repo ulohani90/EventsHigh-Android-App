@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,10 +16,8 @@ import android.webkit.WebViewClient;
 import com.eventshigh.nearme.app.R;
 
 public class CustomUrlActivity extends BaseActivity {
-    public static final String EXTRA_URL_KEY = CustomUrlActivity.class.getName() + ".url";
     public static final String EXTRA_TITLE_KEY =  CustomUrlActivity.class.getName() + ".title";
 
-    private String url;
     private WebView webView;
     private View progressBar;
 
@@ -37,6 +34,8 @@ public class CustomUrlActivity extends BaseActivity {
         webSettings.setJavaScriptEnabled(true);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webSettings.setSupportMultipleWindows(true);
+        webSettings.setSupportZoom(true);
+        webSettings.setBuiltInZoomControls(true);
 
         webSettings.setAllowContentAccess(true);
         webSettings.setAllowFileAccess(true);
@@ -49,19 +48,21 @@ public class CustomUrlActivity extends BaseActivity {
 
         // Setup a new web view client so we can listen in on events and also customize web view
         // behavior.
-        webView.setWebViewClient(new BookTicketWebViewClient());
-        webView.setWebChromeClient(new BookTicketWebChromeClient());
+        webView.setWebViewClient(new EHWebViewClient());
+        webView.setWebChromeClient(new EHWebChromeClient());
 
         // Set title.
-        Bundle extras = getIntent().getExtras();
-        String title = extras.getString(EXTRA_TITLE_KEY);
+        String action = getIntent().getAction();
+        if (action != null && action.equals(NOTIFICATION_ACTION)) {
+            reportActionToAnalytics("openNotification");
+        }
+        String title = getIntent().getStringExtra(EXTRA_TITLE_KEY);
         if (title != null) {
             getSupportActionBar().setTitle(title);
         }
 
         // Load the url in the web view.
-        url = extras.getString(EXTRA_URL_KEY);
-        webView.loadUrl(url);
+        webView.loadUrl(getIntent().getDataString());
     }
 
     @Override
@@ -76,7 +77,7 @@ public class CustomUrlActivity extends BaseActivity {
         int id = item.getItemId();
         if (id == R.id.action_open_in_browser) {
             reportActionToAnalytics("openInBrowser");
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            Intent intent = new Intent(Intent.ACTION_VIEW, getIntent().getData());
             try {
                 startActivity(intent);
             } catch (ActivityNotFoundException e) {
@@ -98,7 +99,7 @@ public class CustomUrlActivity extends BaseActivity {
         }
     }
 
-    private class BookTicketWebViewClient extends WebViewClient {
+    private class EHWebViewClient extends WebViewClient {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             reportActionToAnalytics("startLoading");
@@ -131,7 +132,7 @@ public class CustomUrlActivity extends BaseActivity {
         }
     }
 
-    private class BookTicketWebChromeClient extends WebChromeClient {
+    private class EHWebChromeClient extends WebChromeClient {
 
     }
 }

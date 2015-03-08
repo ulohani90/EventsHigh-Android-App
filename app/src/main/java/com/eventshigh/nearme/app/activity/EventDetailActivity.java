@@ -223,7 +223,8 @@ public class EventDetailActivity extends BaseActivity {
     private void openBookingSite() {
         reportEventAction(event, "bookTicket");
         Intent intent = new Intent(this, CustomUrlActivity.class);
-        intent.putExtra(CustomUrlActivity.EXTRA_URL_KEY, event.bookingUrl);
+        intent.setData(Uri.parse(event.bookingUrl));
+        intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, getString(R.string.title_book));
         startActivity(intent);
     }
 

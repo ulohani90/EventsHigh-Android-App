@@ -5,6 +5,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -112,8 +113,8 @@ public class GcmIntentService extends IntentService {
         } else {
             Intent intent = new Intent(this, CustomUrlActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+            intent.setData(Uri.parse(contestUrl));
             intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);
-            intent.putExtra(CustomUrlActivity.EXTRA_URL_KEY, contestUrl);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         }
 
