@@ -16,6 +16,10 @@ import com.eventshigh.nearme.app.data.Event;
  */
 public class AlarmUtils {
     public static void setAlarm(Context context, Event event) {
+        // Don't set an alarm if the event is going to happen within 1 day
+        if (event.eventTimings[0] - System.currentTimeMillis() < DateUtils.DAY_IN_MILLIS) {
+            return;
+        }
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Parcel parcel = Parcel.obtain();
         event.writeToParcel(parcel, 0);
