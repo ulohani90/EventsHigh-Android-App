@@ -136,21 +136,6 @@ public class LaunchActivity extends BaseActivity {
     public void onStart() {
         super.onStart();
 
-        // We show the onboarding If this is first activity and there was no
-        // location/query passed through intent.
-        if (eventsContext.location == null && eventsContext.query.isEmpty()) {
-            if (pref.shouldShowOnBoarding()) {
-                startActivity(new Intent(this, OnBoardingActivity.class));
-                finish();
-                return;
-            }
-
-            if (!isTaskRoot()) {
-                finish();
-                return;
-            }
-        }
-
         // Register with GCM if needed. GCM is used for notifications messages.
         if (isPlayServicesPresent) {
             gcmRegistration.updateGcmRegistrationIdIfNeeded();
@@ -159,6 +144,20 @@ public class LaunchActivity extends BaseActivity {
 
     protected void onResume() {
         super.onResume();
+
+        // We show the onboarding If this is first activity and there was no
+        // location/query passed through intent.
+        if (eventsContext.location == null && eventsContext.query.isEmpty()) {
+            if (pref.shouldShowOnBoarding()) {
+                startActivity(new Intent(this, OnBoardingActivity.class));
+                return;
+            }
+
+            if (!isTaskRoot()) {
+                finish();
+                return;
+            }
+        }
 
         // Redraw the featured events module so that if event was marked as favourite
         // it will be reflected.
