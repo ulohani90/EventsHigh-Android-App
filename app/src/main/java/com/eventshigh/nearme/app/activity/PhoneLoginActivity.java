@@ -212,7 +212,7 @@ public class PhoneLoginActivity extends BaseActivity {
                 ? R.string.action_register : R.string.action_send_code);
         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) findViewById(
                 R.id.send_code).getLayoutParams();
-        layoutParams.gravity = inOnboardingFlow ? Gravity.RIGHT : Gravity.CENTER_HORIZONTAL;
+        layoutParams.gravity = inOnboardingFlow ? Gravity.END : Gravity.CENTER_HORIZONTAL;
         phoneNoParent.setVisibility(View.VISIBLE);
         codeParent.setVisibility(View.GONE);
         verifiedParent.setVisibility(View.GONE);
