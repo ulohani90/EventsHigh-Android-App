@@ -7,7 +7,6 @@ import android.text.util.Linkify;
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -208,8 +207,6 @@ public class PhoneLoginActivity extends BaseActivity {
     // Set the UI elements when we need to ask for mobile no.
     private void setRequestMobileNoView() {
         findViewById(R.id.skip).setVisibility(inOnboardingFlow ? View.VISIBLE : View.GONE);
-        ((Button) findViewById(R.id.send_code)).setText(inOnboardingFlow
-                ? R.string.action_register : R.string.action_send_code);
         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) findViewById(
                 R.id.send_code).getLayoutParams();
         layoutParams.gravity = inOnboardingFlow ? Gravity.END : Gravity.CENTER_HORIZONTAL;

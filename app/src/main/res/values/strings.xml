@@ -13,7 +13,6 @@
     <string name="action_book">Book</string>
     <string name="action_call">Call</string>
     <string name="action_retry">Retry</string>
-    <string name="action_send_code">Send Code</string>
     <string name="action_verify_code">Verify Code</string>
     <string name="action_change_no">Change Number</string>
     <string name="action_register">Register</string>
