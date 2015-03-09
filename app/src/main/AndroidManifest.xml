@@ -196,7 +196,6 @@
         <activity
             android:name=".activity.CustomUrlActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTask"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:parentActivityName=".activity.EventDetailActivity"
             tools:ignore="UnusedAttribute"

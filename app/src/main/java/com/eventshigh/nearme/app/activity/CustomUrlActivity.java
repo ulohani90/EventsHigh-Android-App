@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -128,6 +129,11 @@ public class CustomUrlActivity extends BaseActivity {
             //     view.getContext().startActivity(intent);
             //     return true;
             //   }
+            if (url.contains("eventshigh.com") || url.contains("twitter.com")) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                view.getContext().startActivity(intent);
+                return true;
+            }
             return false;
         }
     }
