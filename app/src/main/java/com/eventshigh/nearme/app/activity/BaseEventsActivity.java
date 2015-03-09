@@ -148,8 +148,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         View followWidget = findViewById(R.id.follow_widget);
         followWidget.setVisibility(showFollowScreen ? View.VISIBLE : View.GONE);
         if (showFollowScreen) {
-            EventSearchSuggestionsProvider.saveRecentQuery(this, eventsContext.query);
-
             final Account account = new Account(this);
             TextView followWidgetTitle = (TextView) findViewById(R.id.follow_title);
             followWidgetTitle.setText(Utils.capitalize(eventsContext.query));

@@ -9,6 +9,7 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -61,6 +62,7 @@ public class IntentUtils {
     private void processSearchIntent(Intent inIntent) {
         String query = inIntent.getStringExtra(SearchManager.QUERY);
         activity.reportActionToAnalytics("search", query);
+        EventSearchSuggestionsProvider.saveRecentQuery(activity, query);
 
         Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
         if (appData != null) {
