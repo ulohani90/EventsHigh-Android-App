@@ -681,6 +681,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private void setFollowButtons(boolean isFollowing) {
         followButton.setVisibility(isFollowing ? View.GONE : View.VISIBLE);
         followingButton.setVisibility(isFollowing ? View.VISIBLE : View.GONE);
-        followButton.setSelected(true);
+        followingButton.setSelected(true);
     }
 }

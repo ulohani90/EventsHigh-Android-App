@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -221,7 +222,7 @@ public class PhoneLoginActivity extends BaseActivity {
     // Set the UI elements when we need to ask for verification code.
     private void setRequestCodeView() {
         if (inOnboardingFlow) {
-            finish();
+            skip(null);
             return;
         }
         setPhoneNumberInStringResource(R.id.code_label, R.string.ui_code,
@@ -234,7 +235,7 @@ public class PhoneLoginActivity extends BaseActivity {
     // Set the UI elements when user mobile no is verified.
     private void setVerifiedMobileNoView() {
         if (inOnboardingFlow) {
-            finish();
+            skip(null);
             return;
         }
         setPhoneNumberInStringResource(R.id.verified, R.string.ui_code_verified,
@@ -245,6 +246,10 @@ public class PhoneLoginActivity extends BaseActivity {
     }
 
     public void skip(View view) {
+        if (view != null) {
+            reportActionToAnalytics("skipPhoneLogin");
+        }
+        startActivity(new Intent(this, LaunchActivity.class));
         finish();
     }
 }

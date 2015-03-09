@@ -36,15 +36,12 @@
 
     <TextView
         android:id="@+id/get_started"
-        style="@style/EHButton"
-        android:background="?android:attr/selectableItemBackground"
+        style="@style/EHButtonCTA"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_margin="24dp"
         android:text="@string/onboarding_title"
-        android:textStyle="bold"
-        android:textColor="#444444"
     />
 </RelativeLayout>

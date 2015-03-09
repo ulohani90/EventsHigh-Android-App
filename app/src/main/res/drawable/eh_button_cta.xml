@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- finger down -->
-    <item android:state_pressed="true" android:drawable="@color/highlight_color" />
+    <item android:state_pressed="true" android:drawable="@color/primary_dark" />
 
     <!-- Default, "just hanging' out" state. -->
     <item android:drawable="@color/app_color" />

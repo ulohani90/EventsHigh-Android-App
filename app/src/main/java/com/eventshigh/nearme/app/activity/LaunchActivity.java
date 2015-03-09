@@ -141,6 +141,7 @@ public class LaunchActivity extends BaseActivity {
         if (eventsContext.location == null && eventsContext.query.isEmpty()) {
             if (pref.shouldShowOnBoarding()) {
                 startActivity(new Intent(this, OnBoardingActivity.class));
+                finish();
                 return;
             }
 
