@@ -160,9 +160,13 @@ public class LaunchActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
+        // Redraw the featured events module so that if event was marked as favourite
+        // it will be reflected.
         PagerAdapter adapter = featuredEventsPager.getAdapter();
         if (adapter != null) {
+            int currentItem = featuredEventsPager.getCurrentItem();
             featuredEventsPager.setAdapter(adapter);
+            featuredEventsPager.setCurrentItem(currentItem);
         }
 
         // Show next screen.
@@ -470,7 +474,7 @@ public class LaunchActivity extends BaseActivity {
                 dotsView.addView(view);
             }
 
-            featuredEventsPager.setAdapter(new FeaturedEventsAdapter(LaunchActivity.this,  events));
+            featuredEventsPager.setAdapter(new FeaturedEventsAdapter(LaunchActivity.this, events));
             featuredEventsPager.setOnPageChangeListener(new OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset,
