@@ -42,7 +42,6 @@ import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -144,7 +143,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         boolean showFollowScreen = !eventsContext.query.isEmpty() &&
                 !EventsHighEndpoints.isDateQuery(eventsContext.query) &&
-                !EventsHighEndpoints.isMyEventQuery(eventsContext.query);
+                !EventsHighEndpoints.isMyEventQuery(eventsContext.query) &&
+                !EventsHighEndpoints.isFeaturedEventQuery(eventsContext.query);
         View followWidget = findViewById(R.id.follow_widget);
         followWidget.setVisibility(showFollowScreen ? View.VISIBLE : View.GONE);
         if (showFollowScreen) {

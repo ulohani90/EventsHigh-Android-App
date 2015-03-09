@@ -19,6 +19,7 @@ public class IntentUtils {
     public static final String EXTRA_EVENT_CONTEXT = IntentUtils.class.getCanonicalName() + "_PARAM";
     public static final String EXTRA_LATITUDE_PARAM = IntentUtils.class.getCanonicalName() + "_LAT";
     public static final String EXTRA_LONGITUDE_PARAM = IntentUtils.class.getCanonicalName() + "_LON";
+    public static final String QUERY_ALL = "All";
 
     public static EventsContext processIntent(BaseActivity activity, Intent inIntent) {
         IntentUtils utils = new IntentUtils(activity);
@@ -52,6 +53,10 @@ public class IntentUtils {
         } else if (BaseActivity.NOTIFICATION_ACTION.equals(inIntent.getAction())) {
             activity.reportActionToAnalytics("openNotification");
             processViewIntent(inIntent, false);
+        }
+
+        if (param.query.equalsIgnoreCase(QUERY_ALL)) {
+            param.query = "";
         }
 
         if (inIntent.getDataString() != null) {

@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
@@ -17,6 +18,7 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import java.util.List;
 
@@ -24,17 +26,17 @@ import java.util.List;
 * A {@link android.support.v4.view.PagerAdapter} which can be used to show Featured Events.
 */
 public class FeaturedEventsAdapter extends PagerAdapter {
-    private final BaseActivity activity;
+    private final LaunchActivity activity;
     private final List<Event> events;
 
-    public FeaturedEventsAdapter(BaseActivity activity, List<Event> events) {
+    public FeaturedEventsAdapter(LaunchActivity activity, List<Event> events) {
         this.activity = activity;
         this.events = events;
     }
 
     @Override
     public int getCount() {
-        return events.size();
+        return events.size() + 1;
     }
 
     @Override
@@ -44,12 +46,26 @@ public class FeaturedEventsAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        View eventCard = activity.getLayoutInflater().inflate(
-                R.layout.explore_event_card, container, false);
-        final Event event = events.get(position);
-        new ExploreEventCard(eventCard).attachTo(event, activity);
-        container.addView(eventCard);
-        return eventCard;
+        if (position < events.size()) {
+            View eventCard = activity.getLayoutInflater().inflate(
+                    R.layout.explore_event_card, container, false);
+            final Event event = events.get(position);
+            new ExploreEventCard(eventCard).attachTo(event, activity);
+            container.addView(eventCard);
+            return eventCard;
+        }
+
+        View showAllCard = activity.getLayoutInflater().inflate(
+                R.layout.view_show_all, container, false);
+        showAllCard.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.reportActionToAnalytics("seeAllFeatured");
+                activity.showSearchView(EventsHighEndpoints.QUERY_FEATURED);
+            }
+        });
+        container.addView(showAllCard);
+        return showAllCard;
     }
 
     @Override

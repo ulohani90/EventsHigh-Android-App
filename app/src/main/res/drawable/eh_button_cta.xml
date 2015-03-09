@@ -5,6 +5,6 @@
     <item android:state_pressed="true" android:drawable="@color/primary_dark" />
 
     <!-- Default, "just hanging' out" state. -->
-    <item android:drawable="@color/app_color" />
+    <item android:drawable="@color/primary" />
 
 </selector>

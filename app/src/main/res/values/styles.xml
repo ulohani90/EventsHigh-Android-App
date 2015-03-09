@@ -6,11 +6,11 @@
         <item name="android:textColor">#80FFFFFF</item>
     </style>
     <style name="EHActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/app_color</item>
+        <item name="android:background">@color/primary</item>
         <item name="subtitleTextStyle">@style/EHActionBarSubtitle</item>
     </style>
     <style name="EHActionBarDark" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:background">@color/app_color</item>
+        <item name="android:background">@color/primary</item>
     </style>
     <style name="EHActionBarNoElevation" parent="EHActionBar">
         <item name="elevation" tools:ignore="NewApi">0dp</item>

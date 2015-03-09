@@ -28,6 +28,7 @@ public class EventsHighEndpoints {
             "https://s3-ap-southeast-1.amazonaws.com/ehautocomplete/autocomplete_events_%s.json";
 
     public static final String QUERY_MY_EVENT = "my events";
+    public static final String QUERY_FEATURED = "featured";
 
     public static Uri getEventDetailsURI(Event event) {
         StringBuilder sb = new StringBuilder(event.id);
@@ -93,6 +94,10 @@ public class EventsHighEndpoints {
                         URLEncoder.encode(eventsContext.query, "UTF-8"), BuildConfig.VERSION_CODE);
             }
 
+            if (isFeaturedEventQuery(eventsContext.query)) {
+                return getFeaturedEventsEndpoint(eventsContext.city);
+            }
+
             String url = String.format(API_ENDPOINT_QUERY_FORMAT,
                         eventsContext.city.toString().toLowerCase(),
                         URLEncoder.encode(eventsContext.query, "UTF-8"), BuildConfig.VERSION_CODE);
@@ -117,5 +122,9 @@ public class EventsHighEndpoints {
 
     public static boolean isMyEventQuery(String query) {
         return query.equalsIgnoreCase(QUERY_MY_EVENT);
+    }
+
+    public static boolean isFeaturedEventQuery(String query) {
+        return query.equalsIgnoreCase(QUERY_FEATURED);
     }
 }

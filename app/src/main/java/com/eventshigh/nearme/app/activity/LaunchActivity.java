@@ -76,7 +76,7 @@ public class LaunchActivity extends BaseActivity {
     private static final int MIN_EXPLORE_CARD_IN_ROW = 2;
     private static final long REFRESH_FEATURED_EVENTS_INTERVAL = 3600 * 1000L;
     private static final int MARGIN_DP = android.os.Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP ? 10 : 2;
-    public static final String[] EXPLORE_TAGS = { "All",
+    public static final String[] EXPLORE_TAGS = { IntentUtils.QUERY_ALL,
             EventCategory.MUSIC.categoryName,
             EventCategory.PARTIES.categoryName,
             EventCategory.THEATRE.categoryName,
@@ -256,6 +256,12 @@ public class LaunchActivity extends BaseActivity {
     public void showThisWeekend(View view) {
         reportActionToAnalytics("showThisWeekend");
         eventsContext.query = "this weekend";
+        showNextScreen(true);
+    }
+
+
+    public void showSearchView(String query) {
+        eventsContext.query = query;
         showNextScreen(true);
     }
 
@@ -442,10 +448,7 @@ public class LaunchActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 reportActionToAnalytics("exploreCategory", tagName);
-                if (!tagName.equals("All")) {
-                    eventsContext.query = tagName.toLowerCase();
-                }
-                showNextScreen(true);
+                showSearchView(tagName);
             }
         });
         return view;
@@ -465,15 +468,18 @@ public class LaunchActivity extends BaseActivity {
     private Listener<List<Event>> mFeaturedEventsListener = new Listener<List<Event>>() {
         @Override
         public void onResponse(final List<Event> events, boolean isIntermediate) {
+            FeaturedEventsAdapter featuredEventsAdapter =
+                    new FeaturedEventsAdapter(LaunchActivity.this, events);
+
             LayoutInflater layoutInflater = getLayoutInflater();
             dotsView.removeAllViews();
-            for (int i = 0; i < events.size(); i++) {
+            for (int i = 0; i < featuredEventsAdapter.getCount(); i++) {
                 View view = layoutInflater.inflate(R.layout.explore_dot, dotsView, false);
                 view.setSelected(i == 0);
                 dotsView.addView(view);
             }
 
-            featuredEventsPager.setAdapter(new FeaturedEventsAdapter(LaunchActivity.this, events));
+            featuredEventsPager.setAdapter(featuredEventsAdapter);
             featuredEventsPager.setOnPageChangeListener(new OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset,
@@ -483,7 +489,9 @@ public class LaunchActivity extends BaseActivity {
 
                 @Override
                 public void onPageSelected(int position) {
-                    reportActionToAnalytics("featuredSwipe");
+                    if (position != 0) {
+                        reportActionToAnalytics("featuredSwipe");
+                    }
                     for (int i = 0; i < dotsView.getChildCount(); i++) {
                         dotsView.getChildAt(i).setSelected(i == position);
                     }
@@ -496,5 +504,4 @@ public class LaunchActivity extends BaseActivity {
             });
         }
     };
-
 }

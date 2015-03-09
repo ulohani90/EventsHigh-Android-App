@@ -54,7 +54,7 @@ public class EventsGridActivity extends BaseEventsActivity {
                 fetchNewListing(true /* bypass cache*/);
             }
         });
-        swipeRefreshLayout.setColorSchemeResources(R.color.app_color);
+        swipeRefreshLayout.setColorSchemeResources(R.color.primary);
     }
 
     @Override
