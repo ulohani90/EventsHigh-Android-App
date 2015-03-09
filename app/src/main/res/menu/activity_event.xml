@@ -19,7 +19,7 @@
     />
     <item android:id="@+id/action_filter"
           android:title="@string/menu_filter"
-          android:icon="@drawable/ic_empty_filter"
+          android:icon="@drawable/eh_filter"
           android:orderInCategory="40"
           myApp:showAsAction="ifRoom"
     />

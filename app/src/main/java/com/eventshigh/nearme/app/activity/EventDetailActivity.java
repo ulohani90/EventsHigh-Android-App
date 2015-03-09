@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -517,6 +518,7 @@ public class EventDetailActivity extends BaseActivity {
             // Set description.
             if (HTML_PATTERN.matcher(event.description).find()) {
                 descriptionView.setText(Html.fromHtml(event.description));
+                descriptionView.setMovementMethod(LinkMovementMethod.getInstance());
             } else {
                 descriptionView.setText(event.description);
             }
