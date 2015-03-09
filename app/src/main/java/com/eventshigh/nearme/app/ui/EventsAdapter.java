@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
@@ -83,6 +84,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         dataToShow.clear();
         for (Event event: events) {
             dataToShow.add(new EventData("", event));
+        }
+        if (events.size() > 10) {
+            dataToShow.add(10, new ShareAppData());
         }
         notifyDataSetChanged();
     }
@@ -172,20 +176,25 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private static enum DataType {
         HEADER(0),
-        EVENT(1);
+        EVENT(1),
+        SHARE_APP(2);
 
         public final int typeId;
         DataType (int typeId) {
             this.typeId = typeId;
         }
 
-        public static ViewHolder onCreateViewHolder(Activity activity, ViewGroup parent, int typeId) {
+        public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
             if (typeId == HEADER.typeId) {
                 return HeaderCard.newInstance(activity, parent);
             }
 
             if (typeId == EVENT.typeId) {
                 return EventCard.newInstance(activity, parent);
+            }
+
+            if (typeId == SHARE_APP.typeId) {
+                return ShareAppCard.newInstance(activity, parent);
             }
 
             throw new IllegalArgumentException("invalid typeid");
@@ -391,6 +400,44 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     }
                 }
             });
+        }
+    }
+
+    private static class ShareAppData implements Data {
+
+        @Override
+        public DataType getType() {
+            return DataType.SHARE_APP;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder card, int position) {
+            // do nothing.
+        }
+
+        @Override
+        public String getId() {
+            return getType().toString();
+        }
+    }
+
+    private static class ShareAppCard extends ViewHolder {
+
+        private static HeaderCard newInstance(final BaseActivity activity, ViewGroup parent) {
+            View view = activity.getLayoutInflater().inflate(
+                    R.layout.share_app_card, parent, false);
+            view.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.shareApp();
+                }
+            });
+
+            return new HeaderCard(view);
+        }
+
+        public ShareAppCard(View itemView) {
+            super(itemView);
         }
     }
 }
