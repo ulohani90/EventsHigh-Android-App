@@ -328,10 +328,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             });
 
             // Set the background image.
-            bgView.setImageBitmap(null);
             bgView.setDefaultImageResId(R.drawable.eh_default_event_list);
             bgView.setErrorImageResId(R.drawable.eh_default_event_list);
-            if (event.imgUrl != null) {
+            if (event.imgUrl == null) {
+                bgView.setImageResource(R.drawable.eh_default_event_list);
+            } else {
                 bgView.setImageUrl(event.imgUrl,
                         VolleyHelper.getImageLoader(activity.getApplicationContext()));
             }
