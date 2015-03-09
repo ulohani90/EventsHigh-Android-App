@@ -328,6 +328,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private void bindEventView(final Event event, final BaseEventsActivity activity,
                                           final int position) {
+            itemView.setTag(new Integer(position));
             itemView.setVisibility(View.VISIBLE);
             itemView.setOnClickListener(new OnClickListener() {
                 @Override

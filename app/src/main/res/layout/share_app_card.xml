@@ -9,15 +9,15 @@
     card_view:cardCornerRadius="2dp"
 >
         <TextView
-            android:id="@+id/event_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="32dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
             android:gravity="center"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textColor="#CC000000"
+            android:fontFamily="sans-serif-medium"
             android:text="@string/ui_referrer_default"
+            tools:ignore="UnusedAttribute"
         />
 </android.support.v7.widget.CardView>

@@ -148,7 +148,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         View followWidget = findViewById(R.id.follow_widget);
         followWidget.setVisibility(showFollowScreen ? View.VISIBLE : View.GONE);
         if (showFollowScreen) {
-            reportActionToAnalytics("search", eventsContext.query);
             EventSearchSuggestionsProvider.saveRecentQuery(this, eventsContext.query);
 
             final Account account = new Account(this);

@@ -341,73 +341,71 @@ ADDED from AndroidManifest.xml:237:9
 	android:configChanges
 		ADDED from AndroidManifest.xml:241:13
 	android:parentActivityName
-		ADDED from AndroidManifest.xml:243:13
+		ADDED from AndroidManifest.xml:242:13
 	android:name
 		ADDED from AndroidManifest.xml:238:13
-	android:launchMode
-		ADDED from AndroidManifest.xml:242:13
 	tools:ignore
-		ADDED from AndroidManifest.xml:244:13
+		ADDED from AndroidManifest.xml:243:13
 activity#com.eventshigh.nearme.app.settings.AboutUsActivity
-ADDED from AndroidManifest.xml:251:9
+ADDED from AndroidManifest.xml:250:9
 	android:label
-		ADDED from AndroidManifest.xml:253:13
-	android:configChanges
-		ADDED from AndroidManifest.xml:254:13
-	android:parentActivityName
-		ADDED from AndroidManifest.xml:256:13
-	android:name
 		ADDED from AndroidManifest.xml:252:13
-	android:launchMode
+	android:configChanges
+		ADDED from AndroidManifest.xml:253:13
+	android:parentActivityName
 		ADDED from AndroidManifest.xml:255:13
+	android:name
+		ADDED from AndroidManifest.xml:251:13
+	android:launchMode
+		ADDED from AndroidManifest.xml:254:13
 	tools:ignore
-		ADDED from AndroidManifest.xml:257:13
+		ADDED from AndroidManifest.xml:256:13
 service#com.google.android.gms.analytics.CampaignTrackingService
-ADDED from AndroidManifest.xml:267:9
+ADDED from AndroidManifest.xml:266:9
 	android:name
-		ADDED from AndroidManifest.xml:267:18
+		ADDED from AndroidManifest.xml:266:18
 receiver#com.eventshigh.nearme.app.broadcast.InstallReferrer
-ADDED from AndroidManifest.xml:268:9
+ADDED from AndroidManifest.xml:267:9
 	android:exported
-		ADDED from AndroidManifest.xml:270:13
-	android:name
 		ADDED from AndroidManifest.xml:269:13
+	android:name
+		ADDED from AndroidManifest.xml:268:13
 	tools:ignore
-		ADDED from AndroidManifest.xml:271:13
+		ADDED from AndroidManifest.xml:270:13
 intent-filter#com.android.vending.INSTALL_REFERRER
-ADDED from AndroidManifest.xml:273:13
+ADDED from AndroidManifest.xml:272:13
 action#com.android.vending.INSTALL_REFERRER
-ADDED from AndroidManifest.xml:274:17
+ADDED from AndroidManifest.xml:273:17
 	android:name
-		ADDED from AndroidManifest.xml:274:25
+		ADDED from AndroidManifest.xml:273:25
 receiver#com.eventshigh.nearme.app.broadcast.GcmBroadcastReceiver
-ADDED from AndroidManifest.xml:279:9
+ADDED from AndroidManifest.xml:278:9
 	android:permission
-		ADDED from AndroidManifest.xml:281:13
-	android:name
 		ADDED from AndroidManifest.xml:280:13
+	android:name
+		ADDED from AndroidManifest.xml:279:13
 intent-filter#com.example.gcm+com.google.android.c2dm.intent.RECEIVE
-ADDED from AndroidManifest.xml:282:13
+ADDED from AndroidManifest.xml:281:13
 action#com.google.android.c2dm.intent.RECEIVE
+ADDED from AndroidManifest.xml:282:17
+	android:name
+		ADDED from AndroidManifest.xml:282:25
+category#com.example.gcm
 ADDED from AndroidManifest.xml:283:17
 	android:name
-		ADDED from AndroidManifest.xml:283:25
-category#com.example.gcm
-ADDED from AndroidManifest.xml:284:17
-	android:name
-		ADDED from AndroidManifest.xml:284:27
+		ADDED from AndroidManifest.xml:283:27
 service#com.eventshigh.nearme.app.broadcast.GcmIntentService
-ADDED from AndroidManifest.xml:287:9
+ADDED from AndroidManifest.xml:286:9
 	android:name
-		ADDED from AndroidManifest.xml:287:18
+		ADDED from AndroidManifest.xml:286:18
 receiver#com.eventshigh.nearme.app.broadcast.EventAlarmBroadcastReceiver
+ADDED from AndroidManifest.xml:289:9
+	android:name
+		ADDED from AndroidManifest.xml:289:19
+service#com.eventshigh.nearme.app.broadcast.EventNotificationIntentService
 ADDED from AndroidManifest.xml:290:9
 	android:name
-		ADDED from AndroidManifest.xml:290:19
-service#com.eventshigh.nearme.app.broadcast.EventNotificationIntentService
-ADDED from AndroidManifest.xml:291:9
-	android:name
-		ADDED from AndroidManifest.xml:291:18
+		ADDED from AndroidManifest.xml:290:18
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from NearMe:volley:unspecified:7:5

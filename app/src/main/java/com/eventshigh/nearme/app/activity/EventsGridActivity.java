@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.eventshigh.nearme.app.R;
@@ -24,6 +25,7 @@ import java.util.List;
 public class EventsGridActivity extends BaseEventsActivity {
 
     private SwipeRefreshLayout swipeRefreshLayout;
+    private RecyclerView eventGridView;
     private EventsAdapter eventsAdapter;
 
 
@@ -40,7 +42,7 @@ public class EventsGridActivity extends BaseEventsActivity {
         eventContainer.addView(view, 0);
 
         eventsAdapter = new EventsAdapter(this);
-        RecyclerView eventGridView = (RecyclerView) findViewById(R.id.event_grid);
+        eventGridView = (RecyclerView) findViewById(R.id.event_grid);
         eventGridView.setAdapter(eventsAdapter);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
@@ -60,6 +62,21 @@ public class EventsGridActivity extends BaseEventsActivity {
         super.onResume();
 
         eventsAdapter.removeDismissedEvents(eventsMarkerEditor.getEventsMarkerManager());
+    }
+
+    @Override
+    public void onBackPressed() {
+        reportScrollBy();
+        super.onBackPressed();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            reportScrollBy();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -104,5 +121,16 @@ public class EventsGridActivity extends BaseEventsActivity {
     // Called when fab icon is pressed
     public void onSwitchView(View view) {
         switchTo(EventsMapsActivity.class);
+    }
+
+
+    private void reportScrollBy() {
+        View card = eventGridView.getChildAt(0);
+        if (card != null) {
+            Object tag = card.getTag();
+            if (tag != null && tag instanceof Integer) {
+                reportActionToAnalytics("scrolledTo", tag.toString());
+            }
+        }
     }
 }

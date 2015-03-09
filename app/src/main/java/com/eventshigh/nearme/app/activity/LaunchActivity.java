@@ -483,6 +483,7 @@ public class LaunchActivity extends BaseActivity {
 
                 @Override
                 public void onPageSelected(int position) {
+                    reportActionToAnalytics("featuredSwipe");
                     for (int i = 0; i < dotsView.getChildCount(); i++) {
                         dotsView.getChildAt(i).setSelected(i == position);
                     }
