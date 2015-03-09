@@ -29,26 +29,12 @@ public class EventNotificationIntentService extends IntentService {
                 parcel.unmarshall(byteArrayExtra, 0, byteArrayExtra.length);
                 parcel.setDataPosition(0);
                 Event event = Event.CREATOR.createFromParcel(parcel);
-                showNotification(event);
+                NotificationUtils.showNotification(this, event);
                 parcel.recycle();
             }
         }
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         EventAlarmBroadcastReceiver.completeWakefulIntent(intent);
-    }
-
-    private void showNotification(Event event) {
-        CharSequence relativeTime = DateUtils.getRelativeDateTimeString(
-                getApplicationContext(), event.eventTimings[0],
-                DateUtils.DAY_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0);
-        PendingIntent pendingIntent = NotificationUtils.createPendingIntent(this, event.id,
-                event.city);
-        String message = String.format(
-                getResources().getString(R.string.event_time_venue),
-                relativeTime, event.getShortAddress());
-        Notification notification = NotificationUtils.createNotification(this, event.title, message,
-                pendingIntent);
-        NotificationUtils.showNotification(this, notification, event.hashCode());
     }
 }
