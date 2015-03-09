@@ -580,6 +580,7 @@ public class EventDetailActivity extends BaseActivity {
             }
 
             // Show tags.
+            tagsView.removeAllViews();
             for (final String tag : event.tags) {
                 getLayoutInflater().inflate(R.layout.event_tag, tagsView);
                 TextView tagView = (TextView) tagsView.getChildAt(tagsView.getChildCount() - 1);
