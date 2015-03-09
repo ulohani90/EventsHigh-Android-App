@@ -319,7 +319,7 @@ public class EventDetailActivity extends BaseActivity {
 
 
         private void populateView(final Event event) {
-           eventScrollView.getViewTreeObserver().addOnScrollChangedListener(
+            eventScrollView.getViewTreeObserver().addOnScrollChangedListener(
                new OnScrollChangedListener() {
                     @Override
                     public void onScrollChanged() {
@@ -335,35 +335,38 @@ public class EventDetailActivity extends BaseActivity {
             ViewGroup.LayoutParams params = bgView.getLayoutParams();
             params.height = (int) (0.3 * metrics.heightPixels);
             bgView.setLayoutParams(params);
+
             bgView.setDefaultImageResId(R.drawable.eh_default_event_detail);
-            if (event.imgUrl != null) {
-                bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(EventDetailActivity.this));
-                bgView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        reportEventAction(event, "imagePreview");
-                        final Dialog nagDialog = new Dialog(EventDetailActivity.this,
-                                android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
-                        nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                        nagDialog.setCancelable(true);
-                        nagDialog.setContentView(R.layout.dialog_image_preview);
-
-                        ImageViewTouch preview = (ImageViewTouch) nagDialog.findViewById(R.id.image_preview);
-                        VolleyHelper.getImageLoader(EventDetailActivity.this).get(
-                                event.imgUrl, ImageLoader.getImageListener(preview, 0, 0));
-
-                        Button btnClose = (Button) nagDialog.findViewById(R.id.btn_close);
-                        btnClose.setOnClickListener(new OnClickListener() {
-                            @Override
-                            public void onClick(View arg0) {
-                                nagDialog.dismiss();
-                            }
-                        });
-
-                        nagDialog.show();
+            bgView.setErrorImageResId(R.drawable.eh_default_event_detail);
+            bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(EventDetailActivity.this));
+            bgView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (event.imgUrl == null) {
+                        return;
                     }
-                });
-            }
+                    reportEventAction(event, "imagePreview");
+                    final Dialog nagDialog = new Dialog(EventDetailActivity.this,
+                            android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+                    nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    nagDialog.setCancelable(true);
+                    nagDialog.setContentView(R.layout.dialog_image_preview);
+
+                    ImageViewTouch preview = (ImageViewTouch) nagDialog.findViewById(R.id.image_preview);
+                    VolleyHelper.getImageLoader(EventDetailActivity.this).get(
+                            event.imgUrl, ImageLoader.getImageListener(preview, 0, 0));
+
+                    Button btnClose = (Button) nagDialog.findViewById(R.id.btn_close);
+                    btnClose.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View arg0) {
+                            nagDialog.dismiss();
+                        }
+                    });
+
+                    nagDialog.show();
+                }
+            });
 
             // Set EH recommendation and favourite views.
             recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
