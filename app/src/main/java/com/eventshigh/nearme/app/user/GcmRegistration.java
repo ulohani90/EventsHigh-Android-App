@@ -33,14 +33,14 @@ public class GcmRegistration {
     private final SharedPreferences gcmRegistrationInfo;
 
     private GcmRegistration(Context context) {
-        this.context = context;
-        gcmRegistrationInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
+        this.context = context.getApplicationContext();
+        gcmRegistrationInfo = this.context.getSharedPreferences(PREFS_FILE_NAME, 0);
     }
 
     private static GcmRegistration instance;
     public static synchronized GcmRegistration getInstance(Context context) {
         if (instance == null) {
-            instance = new GcmRegistration(context.getApplicationContext());
+            instance = new GcmRegistration(context);
         }
         return  instance;
     }

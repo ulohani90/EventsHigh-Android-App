@@ -20,15 +20,15 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     private final SharedPreferences sharedPreferences;
 
     private Preferences(Context context) {
-        this.context = context;
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        this.context = context.getApplicationContext();
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     private static Preferences instance;
     public static synchronized Preferences getInstance(Context context) {
         if (instance == null) {
-            instance = new Preferences(context.getApplicationContext());
+            instance = new Preferences(context);
         }
         return instance;
     }

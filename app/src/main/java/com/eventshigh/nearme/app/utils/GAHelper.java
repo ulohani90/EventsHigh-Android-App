@@ -26,7 +26,7 @@ public class GAHelper {
     private final Tracker tracker;
 
     private GAHelper(Context context) {
-        googleAnalytics = GoogleAnalytics.getInstance(context);
+        googleAnalytics = GoogleAnalytics.getInstance(context.getApplicationContext());
         tracker = googleAnalytics.newTracker(R.xml.analytics);
         tracker.enableAdvertisingIdCollection(true);
 
@@ -38,7 +38,7 @@ public class GAHelper {
 
     public static synchronized GAHelper getInstance(Context context) {
         if (instance == null) {
-            instance = new GAHelper(context.getApplicationContext());
+            instance = new GAHelper(context);
         }
 
         return instance;

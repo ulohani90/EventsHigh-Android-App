@@ -348,7 +348,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Prefetch first 10 events.
         for (Event event : events.subList(0, Math.min(events.size(), NUM_MAX_PREFETCH))) {
-            EventUberPrefetcher.getInstance(getApplicationContext()).prefetch(event.id);
+            EventUberPrefetcher.getInstance(this).prefetch(event.id);
         }
     }
 
@@ -362,7 +362,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 if (numPrefetched >= NUM_MAX_PREFETCH) {
                     break;
                 }
-                EventUberPrefetcher.getInstance(getApplicationContext()).prefetch(event.id);
+                EventUberPrefetcher.getInstance(this).prefetch(event.id);
                 numPrefetched ++;
             }
         }
@@ -431,7 +431,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         viewSwitcher.setDisplayedChild(0);
 
         // Stop all requests associated with this activity and then submit new request.
-        VolleyHelper.getRequestQueue(getApplicationContext()).cancelAll(this);
+        VolleyHelper.getRequestQueue(this).cancelAll(this);
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
             new MyEventsRequest(this, eventsContext, Priority.IMMEDIATE,
                     shouldBypassCache, shouldIncludeWithoutLocation(),

@@ -333,8 +333,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             if (event.imgUrl == null) {
                 bgView.setImageResource(R.drawable.eh_default_event_list);
             } else {
-                bgView.setImageUrl(event.imgUrl,
-                        VolleyHelper.getImageLoader(activity.getApplicationContext()));
+                bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(activity));
             }
 
             // Check if its a recommended event or not.

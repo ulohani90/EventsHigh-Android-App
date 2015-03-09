@@ -126,8 +126,8 @@ public class LaunchActivity extends BaseActivity {
         PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
 
         // Read Preferences
-        pref = Preferences.getInstance(getApplicationContext());
-        gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
+        pref = Preferences.getInstance(this);
+        gcmRegistration = GcmRegistration.getInstance(this);
 
         // Process the incoming intent.
         eventsContext = IntentUtils.processIntent(this, getIntent());

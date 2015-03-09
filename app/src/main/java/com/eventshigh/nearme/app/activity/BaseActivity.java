@@ -72,7 +72,7 @@ public abstract class BaseActivity extends ActionBarActivity {
         // Setup Google Analytics.
         isPlayServicesPresent = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS;
         if (isPlayServicesPresent) {
-            gaHelper = GAHelper.getInstance(getApplicationContext());
+            gaHelper = GAHelper.getInstance(this);
             if (BuildConfig.DEBUG) {
                 gaHelper.setAppOptOut(true);
             }
@@ -92,7 +92,7 @@ public abstract class BaseActivity extends ActionBarActivity {
     @Override
     protected void onStop() {
         // Stop all requests associated with this activity.
-        VolleyHelper.getRequestQueue(getApplicationContext()).cancelAll(this);
+        VolleyHelper.getRequestQueue(this).cancelAll(this);
 
         // Google Analytics reporting.
         if (isPlayServicesPresent) {

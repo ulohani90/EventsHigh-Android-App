@@ -137,7 +137,7 @@ public class EventDetailActivity extends BaseActivity {
     private Listener<Event> mEventListener = new Listener<Event>() {
         @Override
         public void onResponse(final Event event, boolean isIntermediate) {
-            eventsMarkerEditor =  EventsMarkerManager.getInstance(getApplicationContext()).getEditor();
+            eventsMarkerEditor =  EventsMarkerManager.getInstance(EventDetailActivity.this).getEditor();
             toolbar.setTitle(event.title);
             if (event.numPeopleInterested <= 0) {
                 toolbar.setSubtitle("");
@@ -336,8 +336,7 @@ public class EventDetailActivity extends BaseActivity {
             bgView.setLayoutParams(params);
             bgView.setDefaultImageResId(R.drawable.eh_default_event_detail);
             if (event.imgUrl != null) {
-                bgView.setImageUrl(event.imgUrl,
-                        VolleyHelper.getImageLoader(getApplicationContext()));
+                bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(EventDetailActivity.this));
                 bgView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -349,7 +348,7 @@ public class EventDetailActivity extends BaseActivity {
                         nagDialog.setContentView(R.layout.dialog_image_preview);
 
                         ImageViewTouch preview = (ImageViewTouch) nagDialog.findViewById(R.id.image_preview);
-                        VolleyHelper.getImageLoader(getApplicationContext()).get(
+                        VolleyHelper.getImageLoader(EventDetailActivity.this).get(
                                 event.imgUrl, ImageLoader.getImageListener(preview, 0, 0));
 
                         Button btnClose = (Button) nagDialog.findViewById(R.id.btn_close);

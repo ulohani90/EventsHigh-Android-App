@@ -38,7 +38,7 @@ public class EventUberPrefetcher {
             });
 
     public EventUberPrefetcher(Context context) {
-        this.context = context;
+        this.context = context.getApplicationContext();
     }
 
     public void prefetch(String eventId) {

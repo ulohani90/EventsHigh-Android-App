@@ -97,7 +97,7 @@ public class OnBoardingActivity extends BaseActivity {
         });
 
         // Read Preferences
-        pref = Preferences.getInstance(getApplicationContext());
+        pref = Preferences.getInstance(this);
     }
 
     @Override
