@@ -43,9 +43,6 @@ public class Account {
     private static final String PREF_REFERRER_CODE = "referrer_code";
     private static final String PREF_REFERRER_CODE_UPLOADED = "referrer_code_uploaded";
 
-    private static final String PREF_FACEBOOK_EMAIL = "facebook_email";
-    private static final String PREF_FACEBOOK_EMAIL_UPLOADED = "facebook_email_uploaded";
-
     private static boolean disableSnackBar = false;
 
     // Member variables used to store the user account details in preferences.
@@ -124,20 +121,8 @@ public class Account {
         }
     }
 
-    public void recordFacebookEmail(String facebookEmail) {
-        String oldFacebookMail = getFacebookEmail();
-        if (oldFacebookMail == null || !oldFacebookMail.equals(facebookEmail)) {
-            try {
-                facebookEmail = URLEncoder.encode(facebookEmail, "UTF-8");
-                accountInfo.edit()
-                        .putString(PREF_FACEBOOK_EMAIL, facebookEmail)
-                        .putBoolean(PREF_FACEBOOK_EMAIL_UPLOADED, false).apply();
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        new AccountStateRegistar().execute();
+    public String getAppDownloadLink() {
+        return "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + getUserReferrerCode();
     }
 
     public void getNumReferrerInstalls(
@@ -154,10 +139,6 @@ public class Account {
              }, errorListener);
         request.setTag(activity);
         VolleyHelper.addToRequestQueue(context.getApplicationContext(), request);
-    }
-
-    public @Nullable String getFacebookEmail() {
-        return accountInfo.getString(PREF_FACEBOOK_EMAIL, null);
     }
 
     public boolean isFollowing(String tag) {
@@ -195,9 +176,6 @@ public class Account {
             if (!accountInfo.getBoolean(PREF_REFERRER_CODE_UPLOADED, false)) {
                 uploadReferrerCode(accountInfo.getString(PREF_REFERRER_CODE, null));
             }
-            if (!accountInfo.getBoolean(PREF_FACEBOOK_EMAIL_UPLOADED, false)) {
-                uploadFacebookEmail(accountInfo.getString(PREF_FACEBOOK_EMAIL, null));
-            }
 
             return null;
         }
@@ -216,17 +194,6 @@ public class Account {
         private void uploadReferrerCode(@Nullable String referrerCode) {
             if (referrerCode != null) {
                 AccountStateReporter.reportReferrerCode(context, referrerCode, new Runnable() {
-                    @Override
-                    public void run() {
-                        accountInfo.edit().putBoolean(PREF_REFERRER_CODE_UPLOADED, true).apply();
-                    }
-                });
-            }
-        }
-
-        private void uploadFacebookEmail(@Nullable String facebookEmail) {
-            if (facebookEmail != null) {
-                AccountStateReporter.reportFacebookEmail(context, facebookEmail, new Runnable() {
                     @Override
                     public void run() {
                         accountInfo.edit().putBoolean(PREF_REFERRER_CODE_UPLOADED, true).apply();

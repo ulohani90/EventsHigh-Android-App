@@ -76,21 +76,21 @@
 
     <!-- Sharing -->
     <string name="action_share_app">Share App</string>
-    <string name="share_app_text">Hi! Checkout this app to know all the amazing events near you! https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&amp;referrer=%s</string>
-    <string name="share_event_text">Hi! Checkout this amazing event! %s?src=ehm (EventsHigh: Find amazing events near you!)</string>
+    <string name="share_app_text">Hey! I liked this app and I think you will too. Check it out. %s</string>
+    <string name="share_event_text">Hey Check this event out. Sounds fun! %1$s (This link is best viewed in EventsHigh App. Download it here: %2$s)</string>
 
     <!-- Failed messages -->
-    <string name="failed_load">Failed to load events information!</string>
-    <string name="failed_refresh">Failed to refresh events information, showing stale data!</string>
-    <string name="unsupported_city">Sorry, we are not in your city, yet!</string>
-    <string name="failed_locality">Sorry, we could not find locality, try again later?</string>
-    <string name="failed_save">Sharing failed as we could not save image</string>
-    <string name="failed_share">Sharing failed as there is no application installed</string>
-    <string name="failed_location">Could not determine your location</string>
-    <string name="failed_event_location">Could not find the location for the event!</string>
+    <string name="failed_load">Oops! Something\'s gone wrong, lets try that again.</string>
+    <string name="failed_refresh">Not able to refresh, this is old info.</string>
+    <string name="unsupported_city">Sorry! We are not in your city. But we will be there soon!</string>
+    <string name="failed_locality">Uh oh! Not able to find your locality. Want to try again?</string>
+    <string name="failed_save">That didn't work out. Lets try again!</string>
+    <string name="failed_share">We couldn't share as there is no app installed at the other end. </string>
+    <string name="failed_location">Sorry! We didn't get your location.</string>
+    <string name="failed_event_location">Sorry! We are not able to find the location for this event!</string>
     <string name="no_map_app">Maps application not found!</string>
     <string name="no_cal_app">Calendar application not found!</string>
-    <string name="no_events">No events found!</string>
+    <string name="no_events">Uh oh! No events found!</string>
     <string name="retry">Oops! You\'ve stumped us. Lets try again.</string>
 
     <!-- formatting -->

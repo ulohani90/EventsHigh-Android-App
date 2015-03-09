@@ -163,7 +163,7 @@ public abstract class BaseActivity extends ActionBarActivity {
         sendIntent.putExtra(Intent.EXTRA_TEXT,
                 String.format(
                         getResources().getString(R.string.share_app_text),
-                        new Account(this).getUserReferrerCode())
+                        new Account(this).getAppDownloadLink())
         );
         sendIntent.setType("text/plain");
         startActivity(sendIntent);
@@ -192,8 +192,10 @@ public abstract class BaseActivity extends ActionBarActivity {
                             "com.eventshigh.nearme.app.fileprovider", file));
             sendIntent.putExtra(Intent.EXTRA_TITLE, event.title);
             sendIntent.putExtra(Intent.EXTRA_TEXT,
-                    String.format(getResources().getString(R.string.share_event_text),
-                            event.getEventDetailsURI()));
+                String.format(getResources().getString(R.string.share_event_text),
+                        event.getEventDetailsURI(),
+                        new Account(this).getAppDownloadLink())
+            );
             sendIntent.setType("image/jpeg");
             sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(sendIntent);
