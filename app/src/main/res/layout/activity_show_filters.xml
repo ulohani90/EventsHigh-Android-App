@@ -20,21 +20,21 @@
     />
     <TextView
         android:id="@+id/show_all"
-        style="@style/EHButton"
-        android:layout_width="wrap_content"
+        style="@style/EHButtonCTA"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_margin="8dp"
         android:elevation="4dp"
-        android:text="@string/action_show_all"
+        android:text="@string/action_reset"
         android:onClick="showAll"
         tools:ignore="UnusedAttribute"
     />
     <TextView
         android:id="@+id/apply_filter"
-        style="@style/EHButton"
+        style="@style/EHButtonCTA"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

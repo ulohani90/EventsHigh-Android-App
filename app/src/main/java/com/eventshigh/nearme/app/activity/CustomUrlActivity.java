@@ -53,13 +53,18 @@ public class CustomUrlActivity extends BaseActivity {
         webView.setWebChromeClient(new EHWebChromeClient());
 
         // Set title.
+        String title = getIntent().getStringExtra(EXTRA_TITLE_KEY);
+        if (getIntent().getDataString().equals("http://www.eventshigh.com/add_event")) {
+            reportActionToAnalytics("addEvent");
+            title = getString(R.string.pref_title_add_event);
+        }
+        if (title != null) {
+            getSupportActionBar().setTitle(title);
+        }
+
         String action = getIntent().getAction();
         if (action != null && action.equals(NOTIFICATION_ACTION)) {
             reportActionToAnalytics("openNotification");
-        }
-        String title = getIntent().getStringExtra(EXTRA_TITLE_KEY);
-        if (title != null) {
-            getSupportActionBar().setTitle(title);
         }
 
         // Load the url in the web view.

@@ -3,5 +3,5 @@
     android:layout_margin="4dp"
     android:layout_width="8dp"
     android:layout_height="8dp"
-    android:background="@drawable/shape_onboaridng_dot"
+    android:background="@drawable/eh_onboaridng_dot"
 />

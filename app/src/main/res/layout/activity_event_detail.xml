@@ -204,7 +204,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:layout_weight="1"
-                        android:background="@drawable/shape_eh_button"
+                        android:background="@drawable/eh_button"
                     >
                         <ImageView
                             android:id="@+id/event_time_icon"
@@ -247,7 +247,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
-                        android:background="@drawable/shape_eh_button"
+                        android:background="@drawable/eh_button"
                         android:padding="6dp"
                         android:textColor="#80000000"
                         android:text="@string/ui_also_on"

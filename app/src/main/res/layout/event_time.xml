@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:paddingLeft="@dimen/abc_dropdownitem_text_padding_left"
     android:paddingRight="@dimen/abc_dropdownitem_text_padding_left"
-    android:background="@drawable/shape_eh_button"
+    android:background="@drawable/eh_button"
 >
     <TextView
         android:id="@+id/event_day"

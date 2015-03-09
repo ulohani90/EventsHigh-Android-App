@@ -19,7 +19,7 @@
     <string name="action_register">Register</string>
     <string name="action_find_event">Find Events</string>
     <string name="action_explore_categories">Explore Categories</string>
-    <string name="action_show_all">Show All</string>
+    <string name="action_reset">Reset</string>
     <string name="action_apply_filter">Apply Filter</string>
 
     <!-- Menu items -->

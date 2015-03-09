@@ -285,6 +285,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
 
         if (id == R.id.action_filter) {
+            reportActionToAnalytics("applyFilters");
             Intent filterActivityIntent = new Intent(this, ShowFiltersActivity.class);
             filterActivityIntent.putStringArrayListExtra(ShowFiltersActivity.PARAM_FILTERS,
                     eventsContext.categoryFilters);
@@ -629,7 +630,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
             TextView selected = dateTabViews.get(position).dayOfMonthView;
             selected.setTextColor(getResources().getColor(android.R.color.white));
-            selected.setBackgroundResource(R.drawable.shape_oval);
+            selected.setBackgroundResource(R.drawable.eh_oval);
             selected.setTypeface(null, Typeface.BOLD);
             lastPosition = position;
 

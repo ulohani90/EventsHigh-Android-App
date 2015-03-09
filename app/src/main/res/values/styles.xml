@@ -48,12 +48,16 @@
     <style name="EHButton" parent="android:style/TextAppearance.Small">
         <item name="android:clickable">true</item>
         <item name="android:padding">18dp</item>
-        <item name="android:background">@drawable/shape_eh_button</item>
+        <item name="android:background">@drawable/eh_button</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:textAllCaps">true</item>
     </style>
-
+    <style name="EHButtonCTA" parent="EHButton">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-medium"</item>
+        <item name="android:background">@drawable/eh_button_cta</item>
+    </style>
     <!-- Theme used for Events Cards -->
     <style name="EventCardText" parent="android:style/TextAppearance.Small">
         <item name="android:maxLines">1</item>
