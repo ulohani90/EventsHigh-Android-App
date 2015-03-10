@@ -16,6 +16,7 @@ import com.android.volley.toolbox.ImageRequest;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
+import com.eventshigh.nearme.app.broadcast.EventAlarmBroadcastReceiver;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -40,17 +41,18 @@ public class NotificationUtils {
         return createNotificationBuilder(context, title, message, contentIntent).build();
     }
 
-    public static void showNotification(final Context context, final Event event) {
+    public static void showNotification(final Context context, final Event event,
+                                        final Intent intent) {
         ImageRequest request = new ImageRequest(event.imgUrl,
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap bitmap, boolean b) {
-                        showNotification(context, event, bitmap);
+                        showNotificationAndReleaseWakeLock(context, event, bitmap, intent);
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
-                        showNotification(context, event, null);
+                        showNotificationAndReleaseWakeLock(context, event, null, intent);
                     }
                 }
         );
@@ -59,7 +61,8 @@ public class NotificationUtils {
         VolleyHelper.addToRequestQueue(context, request);
     }
 
-    private static void showNotification(final Context context, final Event event, Bitmap bitmap) {
+    private static void showNotificationAndReleaseWakeLock(final Context context, final Event event,
+                                                           Bitmap bitmap, Intent intent) {
         PendingIntent pendingIntent = NotificationUtils.createPendingIntent(
                 context, event.id, event.city);
         CharSequence relativeTime = DateUtils.getRelativeDateTimeString(
@@ -74,6 +77,9 @@ public class NotificationUtils {
                 .setLargeIcon(bitmap)
                 .build();
         showNotification(context, notification, event.hashCode());
+
+        // Release the wake lock provided by the WakefulBroadcastReceiver.
+        EventAlarmBroadcastReceiver.completeWakefulIntent(intent);
     }
 
     @SuppressLint("InlinedApi")
