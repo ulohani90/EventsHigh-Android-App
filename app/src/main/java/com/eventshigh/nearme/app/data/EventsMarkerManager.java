@@ -22,8 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * It is very efficient to check for event mark as it is kept in-memory and backed by
  * DB for persistent storage.
- *
- * This class also supports for listening to marker changes via {@link OnEventMarkChangeListener}.
  */
 public class EventsMarkerManager {
 
@@ -62,13 +60,6 @@ public class EventsMarkerManager {
     }
 
     /**
-     * A listener which can be registered to listen for changes on EventMark.
-     */
-    public interface OnEventMarkChangeListener {
-        void onEventStateChange(String eventId, @Nullable EventMark eventMark);
-    }
-
-    /**
      * Supports the modification for event marks. Each instance of editor should be
      * closed after its not needed.
      */
@@ -100,8 +91,9 @@ public class EventsMarkerManager {
                 eventMarkMap.put(event.id, mark);
                 if (EventMark.isFavourite(mark)) {
                     AlarmUtils.setAlarm(context, event);
+                } else if (EventMark.isDismissed(mark)) {
+                    AlarmUtils.cancelAlarm(context, event);
                 }
-                callListeners(event.id, mark);
                 threads.add(EventMarkDbHelper.addEntry(database, event.id, mark));
             }
             return this;
@@ -109,10 +101,9 @@ public class EventsMarkerManager {
 
         public Editor removeEventMark(Event event) {
             EventMark mark = eventMarkMap.remove(event.id);
-            if (EventMark.isFavourite(mark) || EventMark.isDismissed(mark)) {
+            if (EventMark.isFavourite(mark)) {
                 AlarmUtils.cancelAlarm(context, event);
             }
-            callListeners(event.id, null);
             threads.add(EventMarkDbHelper.removeEntry(database, event.id));
             return this;
         }
@@ -137,7 +128,6 @@ public class EventsMarkerManager {
     private final Context context;
     private boolean loaded = false;
     private final Map<String, EventMark> eventMarkMap = new ConcurrentHashMap<>();
-    private final List<OnEventMarkChangeListener> eventMarkChangeListeners = new ArrayList<>();
 
     private EventsMarkerManager(Context context) {
         this.context = context.getApplicationContext();
@@ -176,18 +166,6 @@ public class EventsMarkerManager {
         return new Editor(context);
     }
 
-    public void addOnEventMarkChangeListener(OnEventMarkChangeListener listener) {
-        synchronized (eventMarkChangeListeners) {
-            eventMarkChangeListeners.add(listener);
-        }
-    }
-
-    public boolean removeOnEventMarkChangeListener(OnEventMarkChangeListener listener) {
-        synchronized (eventMarkChangeListeners) {
-            return eventMarkChangeListeners.remove(listener);
-        }
-    }
-
     public boolean isFavourite(String eventId) {
         return EventMark.isFavourite(getEventMark(eventId));
     }
@@ -212,14 +190,6 @@ public class EventsMarkerManager {
         while (it.hasNext()) {
             if (it.next().getValue() == EventMark.DISMISSED) {
                 it.remove();
-            }
-        }
-    }
-
-    private void callListeners(String eventId, @Nullable EventMark pref) {
-        synchronized (eventMarkChangeListeners) {
-            for (OnEventMarkChangeListener listener : eventMarkChangeListeners) {
-                listener.onEventStateChange(eventId, pref);
             }
         }
     }
