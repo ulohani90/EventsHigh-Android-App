@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:foreground="?android:attr/selectableItemBackground"
     android:descendantFocusability="blocksDescendants"
-    tools:ignore="UnusedAttribute"
 >
     <ImageView
         android:id="@+id/header_bg"

@@ -129,7 +129,7 @@ public class EventsGridActivity extends BaseEventsActivity {
         if (card != null) {
             Object tag = card.getTag();
             if (tag != null && tag instanceof Integer) {
-                reportActionToAnalytics("scrolledTo", tag.toString());
+                reportActionToAnalytics("scrolledTo", eventsContext.query, ((Integer) tag).longValue());
             }
         }
     }
