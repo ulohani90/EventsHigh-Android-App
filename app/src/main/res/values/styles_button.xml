@@ -1,11 +1,8 @@
 <resources>
 
-    <style name="Button">
+    <style name="ButtonTransparentDark">
         <item name="android:textAllCaps">true</item>
         <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="ButtonTransparentDark" parent="Button">
         <item name="android:textColor">@color/gray700</item>
         <item name="android:background">@drawable/button_transparent_dark</item>
     </style>
