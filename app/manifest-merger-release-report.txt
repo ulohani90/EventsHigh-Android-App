@@ -308,7 +308,7 @@ ADDED from AndroidManifest.xml:209:9
 		ADDED from AndroidManifest.xml:210:13
 	android:launchMode
 		ADDED from AndroidManifest.xml:215:13
-activity#com.eventshigh.nearme.app.settings.SettingsActivity
+activity#com.eventshigh.nearme.app.activity.SettingsActivity
 ADDED from AndroidManifest.xml:218:9
 	android:label
 		ADDED from AndroidManifest.xml:220:13
@@ -346,7 +346,7 @@ ADDED from AndroidManifest.xml:237:9
 		ADDED from AndroidManifest.xml:238:13
 	tools:ignore
 		ADDED from AndroidManifest.xml:243:13
-activity#com.eventshigh.nearme.app.settings.AboutUsActivity
+activity#com.eventshigh.nearme.app.activity.AboutUsActivity
 ADDED from AndroidManifest.xml:250:9
 	android:label
 		ADDED from AndroidManifest.xml:252:13

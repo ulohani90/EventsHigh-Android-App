@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.settings;
+package com.eventshigh.nearme.app.user;
 
 import android.app.backup.BackupManager;
 import android.content.Context;

@@ -1,11 +1,10 @@
-package com.eventshigh.nearme.app.settings;
+package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.activity.BaseActivity;
 
 /**
  * About Us Page.

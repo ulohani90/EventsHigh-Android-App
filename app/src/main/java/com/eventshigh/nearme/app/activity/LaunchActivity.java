@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
@@ -10,7 +11,9 @@ import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -37,8 +40,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
-import com.eventshigh.nearme.app.settings.Preferences;
-import com.eventshigh.nearme.app.settings.SettingsActivity;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.CityListAdapter;
 import com.eventshigh.nearme.app.ui.CityListAdapter.OnCitySelectionListener;
@@ -95,6 +97,7 @@ public class LaunchActivity extends BaseActivity {
     private ViewSwitcher viewSwitcher;
     private LinearLayout dotsView;
     private ViewPager featuredEventsPager;
+    private ActionBarDrawerToggle drawerToggle;
 
     // Client to Google api so that we can fetch the user location if
     // its not passed in intent.
@@ -120,6 +123,13 @@ public class LaunchActivity extends BaseActivity {
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
         dotsView = (LinearLayout) findViewById(R.id.dots_parent);
         featuredEventsPager = (ViewPager) findViewById(R.id.featured_events_pager);
+
+        // Setup the Drawer Layout.
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.nav_drawer);
+        drawerToggle = new ActionBarDrawerToggle(this, drawer, R.string.app_name, R.string.title_activity_settings);
+        drawer.setDrawerListener(drawerToggle);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
@@ -177,6 +187,18 @@ public class LaunchActivity extends BaseActivity {
     }
 
     @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.activity_launch, menu);
@@ -191,8 +213,13 @@ public class LaunchActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
 
+        int id = item.getItemId();
         if (id == R.id.action_my_events) {
             reportActionToAnalytics("myEvents");
             eventsContext.query = EventsHighEndpoints.QUERY_MY_EVENT;
@@ -202,12 +229,6 @@ public class LaunchActivity extends BaseActivity {
 
         if (id == R.id.action_change_location) {
             askUserForLocation();
-            return true;
-        }
-
-        if (id == R.id.action_settings) {
-            reportActionToAnalytics("settings");
-            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 

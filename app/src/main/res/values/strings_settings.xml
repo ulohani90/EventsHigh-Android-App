@@ -19,7 +19,7 @@
 
     <!-- Account Settings -->
     <string name="pref_header_account">Account</string>
-    <string name="pref_title_phone_no">Verify Phone No</string>
+    <string name="pref_title_phone_no">Register Phone No</string>
     <string name="pref_title_delete_query_history">Delete Query History</string>
     <string name="pref_title_restore_event">Restore All Events</string>
     <string name="message_delete_query_history">Query history was cleared successfully!</string>

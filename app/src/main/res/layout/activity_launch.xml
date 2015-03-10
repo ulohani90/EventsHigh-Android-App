@@ -1,156 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/view_switcher"
+    android:id="@+id/nav_drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
     tools:context=".activity.LaunchActivity"
 >
-    <LinearLayout
+    <ViewSwitcher
+        android:id="@+id/view_switcher"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
     >
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:scrollbars="none"
-            android:paddingBottom="10dp"
-            android:clipToPadding="false"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
         >
-            <LinearLayout
-                android:id="@+id/explore_layout"
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="10dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:scrollbars="none"
+                android:paddingBottom="10dp"
+                android:clipToPadding="false"
             >
-                <FrameLayout
+                <LinearLayout
+                    android:id="@+id/explore_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="10dp"
                 >
-                    <android.support.v4.view.ViewPager
-                        android:id="@+id/featured_events_pager"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                    />
+                        android:layout_height="wrap_content"
+                    >
+                        <android.support.v4.view.ViewPager
+                            android:id="@+id/featured_events_pager"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                        />
+
+                        <LinearLayout
+                            android:id="@+id/dots_parent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:layout_gravity="bottom"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="88dp"
+                        />
+                    </FrameLayout>
 
                     <LinearLayout
-                        android:id="@+id/dots_parent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:layout_gravity="bottom"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="88dp"
-                    />
-                </FrameLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:background="#D1E1E5"
-                    android:elevation="4dp"
-                    tools:ignore="UnusedAttribute"
-                >
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:padding="10dp"
-                        android:gravity="center"
-                        android:maxLines="1"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:fontFamily="sans-serif-medium"
-                        android:textSize="15sp"
-                        android:textColor="#798082"
-                        android:text="@string/ui_today"
-                        android:onClick="showToday"
+                        android:background="#D1E1E5"
+                        android:elevation="4dp"
                         tools:ignore="UnusedAttribute"
-                    />
+                    >
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="10dp"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:fontFamily="sans-serif-medium"
+                            android:textSize="15sp"
+                            android:textColor="#798082"
+                            android:text="@string/ui_today"
+                            android:onClick="showToday"
+                            tools:ignore="UnusedAttribute"
+                        />
 
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/shape_vertical_divider"
-                    />
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/shape_vertical_divider"
+                        />
+
+                        <TextView
+                            style="?android:attr/textAppearanceMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="10dp"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:fontFamily="sans-serif-medium"
+                            android:textSize="15sp"
+                            android:textColor="#798082"
+                            android:text="@string/ui_tomorrow"
+                            android:onClick="showTomorrow"
+                            tools:ignore="UnusedAttribute"
+                        />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/shape_vertical_divider"
+                        />
+
+                        <TextView
+                            style="?android:attr/textAppearanceMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="10dp"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:fontFamily="sans-serif-medium"
+                            android:textSize="15sp"
+                            android:textColor="#798082"
+                            android:text="@string/ui_this_weekend"
+                            android:onClick="showThisWeekend"
+                            tools:ignore="UnusedAttribute"
+                        />
+                    </LinearLayout>
 
                     <TextView
-                        style="?android:attr/textAppearanceMedium"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:padding="10dp"
-                        android:gravity="center"
-                        android:maxLines="1"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:fontFamily="sans-serif-medium"
-                        android:textSize="15sp"
-                        android:textColor="#798082"
-                        android:text="@string/ui_tomorrow"
-                        android:onClick="showTomorrow"
-                        tools:ignore="UnusedAttribute"
-                    />
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/shape_vertical_divider"
-                    />
-
-                    <TextView
-                        style="?android:attr/textAppearanceMedium"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:padding="10dp"
-                        android:gravity="center"
-                        android:maxLines="1"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:fontFamily="sans-serif-medium"
-                        android:textSize="15sp"
-                        android:textColor="#798082"
-                        android:text="@string/ui_this_weekend"
-                        android:onClick="showThisWeekend"
-                        tools:ignore="UnusedAttribute"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"
+                        android:textColor="#4E5B60"
+                        android:textSize="14sp"
+                        android:text="@string/explore_cat"
                     />
                 </LinearLayout>
+            </ScrollView>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
-                    android:textColor="#4E5B60"
-                    android:textSize="14sp"
-                    android:text="@string/explore_cat"
-                />
-            </LinearLayout>
-        </ScrollView>
+            <include
+                android:id="@+id/verify_phone_container"
+                layout="@layout/view_phone_snack_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+            />
 
-        <include
-            android:id="@+id/verify_phone_container"
-            layout="@layout/view_phone_snack_bar"
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/city_selector"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:layout_height="match_parent"
+            tools:listitem="@android:layout/simple_list_item_1"
         />
-
-    </LinearLayout>
-
-    <ListView
-        android:id="@+id/city_selector"
-        android:layout_width="match_parent"
+    </ViewSwitcher>
+    <FrameLayout
+        android:layout_width="@dimen/event_card_width"
         android:layout_height="match_parent"
-        tools:listitem="@android:layout/simple_list_item_1"
-    />
-</ViewSwitcher>
-
+        android:layout_gravity="start"
+        android:background="@android:color/white"
+        android:scrollbars="none"
+    >
+        <fragment
+            android:id="@+id/preferences_all"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:name="com.eventshigh.nearme.app.activity.EHPreferenceFragment"
+            tools:layout="@layout/view_loading"
+        />
+    </FrameLayout>
+</android.support.v4.widget.DrawerLayout>
