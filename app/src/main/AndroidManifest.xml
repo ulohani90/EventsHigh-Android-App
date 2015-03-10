@@ -286,6 +286,10 @@
         <!-- Receives the alarm broadcast messages, which is used for notification -->
         <receiver android:name=".broadcast.EventAlarmBroadcastReceiver" />
         <service android:name=".broadcast.EventNotificationIntentService" />
+
+        <!-- Receives the alarm broadcast messages, which is used for notification -->
+        <receiver android:name=".broadcast.DownloadEventsBroadcastReceiver" />
+        <service android:name=".broadcast.DownloadEventsIntentService" />
     </application>
 
 </manifest>
