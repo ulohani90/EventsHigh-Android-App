@@ -16,6 +16,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -97,6 +98,7 @@ public class LaunchActivity extends BaseActivity {
     private ViewSwitcher viewSwitcher;
     private LinearLayout dotsView;
     private ViewPager featuredEventsPager;
+    private DrawerLayout drawer;
     private ActionBarDrawerToggle drawerToggle;
 
     // Client to Google api so that we can fetch the user location if
@@ -125,7 +127,7 @@ public class LaunchActivity extends BaseActivity {
         featuredEventsPager = (ViewPager) findViewById(R.id.featured_events_pager);
 
         // Setup the Drawer Layout.
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.nav_drawer);
+        drawer = (DrawerLayout) findViewById(R.id.nav_drawer);
         drawerToggle = new ActionBarDrawerToggle(this, drawer, R.string.app_name, R.string.title_activity_settings);
         drawer.setDrawerListener(drawerToggle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -233,6 +235,15 @@ public class LaunchActivity extends BaseActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(drawer.isDrawerOpen(Gravity.LEFT)) {
+            drawer.closeDrawer(Gravity.LEFT);
+        } else {
+            super.onBackPressed();
+        }
     }
 
 
