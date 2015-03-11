@@ -30,18 +30,6 @@ public class AccountStateReporter {
             .build(), onSuccess);
     }
 
-    public static void reportReferrerCode(Context context, String referrerCode, Runnable onSuccess) {
-        sendSignedRequest(context, getBaseUri(context, "reportReferrerId")
-                .appendQueryParameter("referrer_id", referrerCode)
-                .build(), onSuccess);
-    }
-
-    public static void reportFacebookEmail(Context context, String facebookEmail, Runnable onSuccess) {
-        sendSignedRequest(context, getBaseUri(context, "reportFbEmailId")
-                .appendQueryParameter("fb_email_id", facebookEmail)
-                .build(), onSuccess);
-    }
-
     public static void reportGcmRegistrationId(Context context, String gcmRegistationId, Runnable onSuccess) {
         sendSignedRequest(context, getBaseUri(context, "reportGcmRegistationId")
                 .appendQueryParameter("gcm_registration_id", gcmRegistationId)
