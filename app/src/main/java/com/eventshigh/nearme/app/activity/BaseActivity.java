@@ -216,19 +216,12 @@ public abstract class BaseActivity extends ActionBarActivity {
 
     public void showDirections(Event event) {
         reportEventAction(event, "showDirections");
-
-        String query = event.getFullAddress();
-        if (query.isEmpty()) {
-            if (event.location == null) {
-                reportActionToAnalytics("skipDirectionsNoLocation");
-                Toast.makeText(this, R.string.failed_event_location, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            query = event.location.latitude + "," + event.location.longitude +  " (" + event.title + ")";
+        Intent intent = event.getShowOnMapIntent();
+        if (intent == null) {
+            reportActionToAnalytics("skipDirectionsNoLocation");
+            Toast.makeText(this, R.string.failed_event_location, Toast.LENGTH_SHORT).show();
+            return;
         }
-
-        Uri locationUri = Uri.parse("geo:0,0?q=" + query);
-        Intent intent = new Intent(Intent.ACTION_VIEW, locationUri);
 
         try {
             startActivity(intent);

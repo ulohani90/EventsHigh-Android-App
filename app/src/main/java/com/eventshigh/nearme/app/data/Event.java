@@ -1,11 +1,14 @@
 package com.eventshigh.nearme.app.data;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -363,5 +366,18 @@ public class Event implements Parcelable {
 
     private static String emptyIfNull(@Nullable String string) {
         return (string == null ? "" : string);
+    }
+
+    public Intent getShowOnMapIntent() {
+        String query = getFullAddress();
+        if (query.isEmpty()) {
+            if (location == null) {
+                return null;
+            }
+            query = location.latitude + "," + location.longitude +  " (" + title + ")";
+        }
+
+        Uri locationUri = Uri.parse("geo:0,0?q=" + query);
+        return new Intent(Intent.ACTION_VIEW, locationUri);
     }
 }

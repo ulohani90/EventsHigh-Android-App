@@ -57,7 +57,7 @@
     <string name="ui_verify_phone">Verify your phone number</string>
     <string name="ui_no_my_event">This looks so empty! Want to choose some favourites?</string>
     <string name="ui_pick_interest">Pick Your Interests</string>
-
+    <string name="ui_view_location_on_map">View location on map</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>

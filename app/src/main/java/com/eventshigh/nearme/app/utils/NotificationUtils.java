@@ -66,25 +66,34 @@ public class NotificationUtils {
 
     private static void showNotificationAndReleaseWakeLock(final Context context, final Event event,
                                                            Bitmap bitmap, Intent intent) {
-        PendingIntent pendingIntent = NotificationUtils.createPendingIntent(
-                context, event.id, event.city);
+        PendingIntent pendingIntent = createPendingIntent(context, event.id, event.city);
         CharSequence relativeTime = DateUtils.getRelativeDateTimeString(
                 context, event.eventTimings[0],
                 DateUtils.DAY_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0);
         String message = String.format(
                 context.getResources().getString(R.string.event_time_venue),
                 relativeTime, event.getShortAddress());
-
-        Notification notification = createNotificationBuilder(context, event.title,
-                message, pendingIntent)
+        NotificationCompat.Builder notificationBuilder = createNotificationBuilder(
+                context, event.title, message, pendingIntent)
                 .setStyle(
                         new NotificationCompat.BigPictureStyle()
                                 .setSummaryText(message)
                                 .bigPicture(bitmap)
                                 .setBigContentTitle(event.title)
-                )
-                .build();
-        showNotification(context, notification, event.hashCode());
+                );
+
+        Intent showOnMapIntent = event.getShowOnMapIntent();
+        if (showOnMapIntent != null) {
+            PendingIntent showOnMapPendingIntent = PendingIntent.getActivity(
+                    context, 0, showOnMapIntent, 0);
+            NotificationCompat.Action showOnMapAction = new NotificationCompat.Action(
+                    R.drawable.ic_location_on_grey600_24dp,
+                    context.getString(R.string.ui_view_location_on_map),
+                    showOnMapPendingIntent);
+            notificationBuilder.addAction(showOnMapAction);
+        }
+
+        showNotification(context, notificationBuilder.build(), event.hashCode());
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         EventAlarmBroadcastReceiver.completeWakefulIntent(intent);
