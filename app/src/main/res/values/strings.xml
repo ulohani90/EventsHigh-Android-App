@@ -49,7 +49,7 @@
     <string name="ui_also_on">also on …</string>
     <string name="ui_read_more">Read More …</string>
     <string name="ui_referrer_default">Like this app? Tell your friends!</string>
-    <string name="ui_referrer">You\'ve helped {0,choice,1#one friend|1&lt;{0} friends} in finding amazing events, thank you!</string>
+    <string name="ui_referrer">You\'\'ve helped {0,choice,1#one friend|1&lt;{0} friends} in finding amazing events, thank you!</string>
     <string name="ui_enter_phone_number_hint">Your Phone Number</string>
     <string name="ui_phone_verify_tip">Register with your phone number to get exciting new deals on your favourite events in town!</string>
     <string name="ui_code">We have sent a code to %s. Please enter it below</string>
