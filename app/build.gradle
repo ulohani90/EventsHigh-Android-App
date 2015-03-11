@@ -24,8 +24,8 @@ android {
         applicationId "com.eventshigh.nearme.app"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 92
-        versionName "0.9.2"
+        versionCode 93
+        versionName "0.9.3"
     }
     buildTypes {
         release {

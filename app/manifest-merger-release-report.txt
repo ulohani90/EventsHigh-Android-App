@@ -402,6 +402,14 @@ service#com.eventshigh.nearme.app.broadcast.EventNotificationIntentService
 ADDED from AndroidManifest.xml:289:9
 	android:name
 		ADDED from AndroidManifest.xml:289:18
+receiver#com.eventshigh.nearme.app.broadcast.DownloadEventsBroadcastReceiver
+ADDED from AndroidManifest.xml:292:9
+	android:name
+		ADDED from AndroidManifest.xml:292:19
+service#com.eventshigh.nearme.app.broadcast.DownloadEventsIntentService
+ADDED from AndroidManifest.xml:293:9
+	android:name
+		ADDED from AndroidManifest.xml:293:18
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from NearMe:volley:unspecified:7:5
@@ -425,7 +433,6 @@ MERGED from com.android.support:support-v4:21.0.3:15:5
 MERGED from com.android.support:cardview-v7:21.0.3:15:5
 MERGED from com.android.support:recyclerview-v7:21.0.3:15:5
 MERGED from com.android.support:support-v4:21.0.3:15:5
-MERGED from com.github.amlcurran.showcaseview:library:5.0.0:7:5
 MERGED from it.sephiroth.android.library.imagezoom:imagezoom:1.0.5:3:5
 MERGED from it.sephiroth.android.library.easing:android-easing:1.0.3:3:5
 MERGED from org.apmem.tools:layouts:1.8:7:5
