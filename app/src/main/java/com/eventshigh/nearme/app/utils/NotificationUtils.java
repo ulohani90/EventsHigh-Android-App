@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.DateUtils;
 
@@ -38,7 +39,9 @@ public class NotificationUtils {
 
     public static Notification createNotification(Context context, String title,
             CharSequence message, PendingIntent contentIntent) {
-        return createNotificationBuilder(context, title, message, contentIntent).build();
+        return createNotificationBuilder(context, title, message, contentIntent)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                .build();
     }
 
     public static void showNotification(final Context context, final Event event,
@@ -74,7 +77,12 @@ public class NotificationUtils {
 
         Notification notification = createNotificationBuilder(context, event.title,
                 message, pendingIntent)
-                .setLargeIcon(bitmap)
+                .setStyle(
+                        new NotificationCompat.BigPictureStyle()
+                                .setSummaryText(message)
+                                .bigPicture(bitmap)
+                                .setBigContentTitle(event.title)
+                )
                 .build();
         showNotification(context, notification, event.hashCode());
 
@@ -85,6 +93,8 @@ public class NotificationUtils {
     @SuppressLint("InlinedApi")
     private static NotificationCompat.Builder createNotificationBuilder(Context context,
             String title, CharSequence message, PendingIntent contentIntent) {
+        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(),
+                R.drawable.ic_launcher);
         return new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.notification)
                 .setContentTitle(title)
@@ -94,7 +104,7 @@ public class NotificationUtils {
                 .setCategory(Notification.CATEGORY_RECOMMENDATION)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                .setLargeIcon(largeIcon)
                 .setContentIntent(contentIntent);
     }
 
