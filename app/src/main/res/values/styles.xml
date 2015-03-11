@@ -58,6 +58,7 @@
         <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-medium"</item>
         <item name="android:background">@drawable/eh_button_cta</item>
     </style>
+
     <!-- Theme used for Events Cards -->
     <style name="EventCardText" parent="android:style/TextAppearance.Small">
         <item name="android:maxLines">1</item>
@@ -68,15 +69,4 @@
         <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-medium</item>
         <item name="android:textColor">#99212121</item>
     </style>
-
-    <!-- Themes used by Onboarding widgets powered by showcase library -->
-    <style name="ShowcaseTheme" parent="ShowcaseView">
-        <item name="sv_backgroundColor">#99000000</item>
-        <item name="sv_detailTextAppearance">@style/ShowcaseCustomTitle</item>
-    </style>
-
-    <style name="ShowcaseCustomTitle" parent="TextAppearance.ShowcaseView.Title">
-        <item name="android:textColor">@android:color/white</item>
-    </style>
-
 </resources>

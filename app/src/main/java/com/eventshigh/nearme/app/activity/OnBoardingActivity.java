@@ -14,8 +14,6 @@ import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.user.Preferences;
-import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
 /**
  * Onboarding activity for first time users. This activity is shown to a user when the app is
@@ -58,9 +56,6 @@ public class OnBoardingActivity extends BaseActivity {
      * that the user is currently on when swiping through the view pager content.
      */
     private LinearLayout dotsView;
-
-    // show the coach mark for first time user has reached last step.
-    private boolean showCoachMark = true;
 
     // User preferences.
     protected Preferences pref;
@@ -123,25 +118,6 @@ public class OnBoardingActivity extends BaseActivity {
 
         @Override
         public void onPageSelected(int position) {
-            if (position == NUM_ON_BOARDING_STEPS - 1 && showCoachMark) {
-                dotsView.postDelayed(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!isFinishing()) {
-                                reportActionToAnalytics("onBoardingCoachHelp");
-                                new ShowcaseView.Builder(OnBoardingActivity.this, true)
-                                        .setTarget(new ViewTarget(findViewById(R.id.get_started)))
-                                        .setContentText(R.string.onboarding_get_started)
-                                        .setStyle(R.style.ShowcaseTheme)
-                                        .hideOnTouchOutside()
-                                        .build();
-                            }
-                        }
-                    }, 5000);
-                showCoachMark = false;
-            }
-
             for (int i = 0 ; i < dotsView.getChildCount(); i++) {
                 dotsView.getChildAt(i).setSelected(i == position);
             }
