@@ -164,7 +164,8 @@ public class LaunchActivity extends BaseActivity {
 
         // We show the onboarding If this is first activity and there was no
         // location/query passed through intent.
-        if (eventsContext.location == null && eventsContext.query.isEmpty()) {
+        if (eventsContext.location == null && eventsContext.query.isEmpty() &&
+            eventsContext.dateFilter.isEmpty()) {
             if (pref.shouldShowOnBoarding()) {
                 startActivity(new Intent(this, OnBoardingActivity.class));
                 return;
@@ -244,8 +245,8 @@ public class LaunchActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if(drawer.isDrawerOpen(Gravity.LEFT)) {
-            drawer.closeDrawer(Gravity.LEFT);
+        if(drawer.isDrawerOpen(Gravity.START)) {
+            drawer.closeDrawer(Gravity.START);
         } else {
             super.onBackPressed();
         }
@@ -399,7 +400,7 @@ public class LaunchActivity extends BaseActivity {
         }
 
         // If we do not have query, show explore screen.
-        if (!isUserAction && eventsContext.query.isEmpty()) {
+        if (!isUserAction && eventsContext.query.isEmpty() && eventsContext.dateFilter.isEmpty()) {
             lastEventsContext = new EventsContext(eventsContext);
             showExploreScreen();
             return;

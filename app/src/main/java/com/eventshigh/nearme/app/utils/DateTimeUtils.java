@@ -109,7 +109,7 @@ public class DateTimeUtils {
         }
     }
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    private static final SimpleDateFormat QUERY_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     public static String queryToTitle(String query) {
         Date date = parseDateSafe(query);
         if (date != null) {
@@ -123,10 +123,22 @@ public class DateTimeUtils {
 
     public static @Nullable Date parseDateSafe(String dateStr) {
         try {
-            return DATE_FORMAT.parse(dateStr);
+            return QUERY_DATE_FORMAT.parse(dateStr);
         } catch (ParseException e) {
             // do nothing
         }
+        return  null;
+    }
+
+
+    private static final SimpleDateFormat BROWSE_DATE_FORMAT = new SimpleDateFormat("EEE-dd-MMM-yyyy", Locale.US);
+    public static @Nullable String parseBrowseDate(String browseQuery) {
+        try {
+            return QUERY_DATE_FORMAT.format(BROWSE_DATE_FORMAT.parse(browseQuery));
+        } catch (ParseException e) {
+            // do nothing
+        }
+
         return  null;
     }
 }

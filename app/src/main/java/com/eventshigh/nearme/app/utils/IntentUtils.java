@@ -12,6 +12,10 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.List;
+
 /**
  * Helper to process the intent in EventsHigh app.
  */
@@ -84,22 +88,28 @@ public class IntentUtils {
     private void processViewIntent(Intent inIntent, boolean isDeepLink) {
         Uri inUri = inIntent.getData();
 
+        if (isDeepLink) {
+            String deepLinkName = "homepage";
+            try {
+                deepLinkName = inUri.getPathSegments().get(0);
+            } catch (IndexOutOfBoundsException e) {
+                // ignore.
+            }
+            activity.reportActionToAnalytics("deepLink", deepLinkName);
+        }
+
         if (inUri.getPath().startsWith("/city")) {
-            processCityViewIntent(inUri, isDeepLink);
+            processCityViewIntent(inUri);
         } else if (inUri.getPath().startsWith("/search")) {
-            processSearchViewIntent(inUri, isDeepLink);
+            processSearchViewIntent(inUri);
         } else if (inUri.getPath().startsWith("/detail")) {
-            processDetailViewIntent(inUri, isDeepLink);
-        } else if (isDeepLink) {
-            activity.reportActionToAnalytics("deepLink", "homepage");
+            processDetailViewIntent(inUri);
+        } else if (inUri.getPath().startsWith("/browse")) {
+            processBrowseViewIntent(inUri);
         }
     }
 
-    private void processCityViewIntent(Uri webUri, boolean isDeepLink) {
-        if (isDeepLink) {
-            activity.reportActionToAnalytics("deepLink", "city");
-        }
-
+    private void processCityViewIntent(Uri webUri) {
         try {
             City city = City.valueOf(webUri.getLastPathSegment().toUpperCase());
             param.changeLocation(city.cityBounds.getCenter());
@@ -108,11 +118,7 @@ public class IntentUtils {
         }
     }
 
-    private void processSearchViewIntent(Uri webUri, boolean isDeepLink) {
-        if (isDeepLink) {
-            activity.reportActionToAnalytics("deepLink", "search");
-        }
-
+    private void processSearchViewIntent(Uri webUri) {
         try {
             City city = City.valueOf(webUri.getQueryParameter("city").toUpperCase());
             param.changeLocation(city.cityBounds.getCenter());
@@ -126,10 +132,25 @@ public class IntentUtils {
         }
     }
 
-    private void processDetailViewIntent(Uri webUri, boolean isDeepLink) {
-        if (isDeepLink) {
-            activity.reportActionToAnalytics("deepLink", "detail");
+    private void processBrowseViewIntent(Uri webUri) {
+        try {
+            List<String> pathSegments = webUri.getPathSegments();
+            City city = City.valueOf(pathSegments.get(pathSegments.size() - 2).toUpperCase());
+            param.changeLocation(city.cityBounds.getCenter());
+
+            String query = pathSegments.get(pathSegments.size() - 1).split("-in-")[0];
+            String dateQuery = DateTimeUtils.parseBrowseDate(query);
+            if (dateQuery != null) {
+                param.dateFilter = dateQuery;
+            } else {
+                param.query = URLDecoder.decode(query.toLowerCase(), "UTF-8").replace('+', ' ');
+            }
+        } catch (IndexOutOfBoundsException| IllegalArgumentException | NullPointerException | UnsupportedEncodingException e) {
+            // Invalid city in URI. Ignore.
         }
+    }
+
+    private void processDetailViewIntent(Uri webUri) {
         Intent intent = new Intent(activity, EventDetailActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         intent.setData(webUri);

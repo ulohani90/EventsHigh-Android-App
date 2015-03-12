@@ -94,9 +94,6 @@ public class EventDetailActivity extends BaseActivity {
         super.onStart();
 
         String action = getIntent().getAction();
-        if (Intent.ACTION_VIEW.equals(action)) {
-            reportActionToAnalytics("deepLink", "detail");
-        }
         if (BaseActivity.NOTIFICATION_ACTION.equals(action)) {
             reportActionToAnalytics("openNotification", getIntent().getDataString());
         }
