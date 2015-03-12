@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Parcel;
 
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
 
 public class EventNotificationIntentService extends IntentService {
@@ -19,7 +20,9 @@ public class EventNotificationIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         boolean releaseWakeLock = true;
         Bundle extras = intent.getExtras();
-        if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
+
+        if (Preferences.getInstance(getApplicationContext()).shouldNotifyFavourited() &&
+            !extras.isEmpty()) {  // has effect of unparcelling Bundle
             byte[] byteArrayExtra = intent.getByteArrayExtra(BUNDLE_EVENT_KEY);
             if (byteArrayExtra != null) {
                 Parcel parcel = Parcel.obtain();
