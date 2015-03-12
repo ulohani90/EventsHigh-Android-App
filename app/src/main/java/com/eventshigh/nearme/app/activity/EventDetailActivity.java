@@ -476,7 +476,7 @@ public class EventDetailActivity extends BaseActivity {
                 int numDays = DateTimeUtils.getDaysLater(event);
                 if (numDays >= 0) {
                     timeDetailView.setText(
-                            MessageFormat.format(getResources().getString(R.string.event_time_details), numDays));
+                        MessageFormat.format(getResources().getString(R.string.event_time_details), numDays));
                 }
 
                 if (event.eventTimings.length > 1) {

@@ -3,25 +3,30 @@ package com.eventshigh.nearme.app.user;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.net.Uri.Builder;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
+import android.provider.Settings;
+import android.provider.Settings.Secure;
+import android.util.Log;
 import android.util.Pair;
 
 import com.android.volley.Request;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.security.Signer;
 
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 /**
  * Manages the user account on this device. The account information is stored using
@@ -31,6 +36,7 @@ public class Account {
     // Constants used for SharedPreferences.
     private static final String PREFS_FILE_NAME = "eh_user_credentials";
 
+    // Mobile no of the user.
     private static final String PREF_MOBILE_NO = "mobile_no";
     private static final String PREF_MOBILE_NO_VERIFIED = "mobile_no_verified";
 
@@ -38,10 +44,9 @@ public class Account {
     private static final String PREF_REFERRER = "referrer";
     private static final String PREF_REFERRER_UPLOADED = "referrer_uploaded";
 
-    // The referrer code for installation happened because of this user. This
-    // user has asked his friends to install the app and passed this code.
-    private static final String PREF_REFERRER_CODE = "referrer_code";
-    private static final String PREF_REFERRER_CODE_UPLOADED = "referrer_code_uploaded";
+    // The app download link for the user. Each user has unique link so that we can
+    // track the number of installs.
+    private static final String PREF_SHARE_APP_LINK = "app_download_link";
 
     private static boolean disableSnackBar = false;
 
@@ -50,7 +55,7 @@ public class Account {
     private final SharedPreferences accountInfo;
 
     public Account(Context context) {
-        this.context = context;
+        this.context = context.getApplicationContext();
         accountInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
 
         // Check if we need to upload the data.
@@ -105,30 +110,21 @@ public class Account {
         return false;
     }
 
-    public String getUserReferrerCode() {
-        String referrerCode = accountInfo.getString(PREF_REFERRER_CODE, null);
-        if (referrerCode != null) {
-            return referrerCode;
-        }
-
-        try {
-            referrerCode = URLEncoder.encode(UUID.randomUUID().toString(), "UTF-8");
-            accountInfo.edit().putString(PREF_REFERRER_CODE, referrerCode).apply();
-            new AccountStateRegistar().execute();
-            return referrerCode;
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public String getAppDownloadLink() {
-        return "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + getUserReferrerCode();
+        String defaultLink =
+            "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" +
+            Settings.Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+        return accountInfo.getString(PREF_SHARE_APP_LINK, defaultLink);
     }
 
-    public void getNumReferrerInstalls(
-            Activity activity, final Listener<Integer> listener, ErrorListener errorListener) {
-        String url = AccountStateReporter.getBaseUri(context, "getReferrerCount")
-                .appendQueryParameter("referrer_id", getUserReferrerCode()).build().toString();
+    public void getNumReferrerInstalls(Activity activity, final Listener<Integer> listener,
+                                       ErrorListener errorListener) {
+        Pair<String, Boolean> phoneRecord = getPhoneNumber();
+        Builder baseUri = AccountStateReporter.getBaseUri(context, "getReferrerCount");
+        if (phoneRecord.first != null && phoneRecord.second) {
+            baseUri.appendQueryParameter("mobile_no", phoneRecord.first);
+        }
+        String url = baseUri.build().toString();
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
             new Listener<JSONObject>() {
@@ -138,7 +134,7 @@ public class Account {
                 }
              }, errorListener);
         request.setTag(activity);
-        VolleyHelper.addToRequestQueue(context.getApplicationContext(), request);
+        VolleyHelper.addToRequestQueue(context, request);
     }
 
     public boolean isFollowing(String tag) {
@@ -167,39 +163,61 @@ public class Account {
         return "follow_" + EventCategory.toCategoryParsableString(tag);
     }
 
+    private static final Object AccountStateRegistarLock = new Object();
+    private static boolean inProgress = false;
+
     private class AccountStateRegistar extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            if (!accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false)) {
-                uploadReferrer(accountInfo.getString(PREF_REFERRER, null));
-            }
-            if (!accountInfo.getBoolean(PREF_REFERRER_CODE_UPLOADED, false)) {
-                uploadReferrerCode(accountInfo.getString(PREF_REFERRER_CODE, null));
+            String referrer = accountInfo.getString(PREF_REFERRER, null);
+            if (referrer != null && !accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false)) {
+                uploadReferrer(referrer);
             }
 
+            synchronized (AccountStateRegistarLock) {
+                if (!inProgress && accountInfo.getString(PREF_SHARE_APP_LINK, null) == null) {
+                    try {
+                        Uri uri = AccountStateReporter.getBaseUri(context, "getReferrerLink").build();
+                        String url = Signer.sign(uri).toString();
+                        inProgress = true;
+                        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                                new Listener<JSONObject>() {
+                                    @Override
+                                    public void onResponse(JSONObject jsonObject, boolean isIntermediate) {
+                                        String link = jsonObject.optString("link");
+                                        if (link != null && !link.isEmpty()) {
+                                            accountInfo.edit().putString(PREF_SHARE_APP_LINK, link).apply();
+                                        }
+                                        synchronized (AccountStateRegistarLock) {
+                                            inProgress = false;
+                                        }
+                                    }
+                                },
+                                new ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError volleyError) {
+                                        synchronized (AccountStateRegistarLock) {
+                                            inProgress = false;
+                                        }
+                                    }
+                                }
+                        );
+                        VolleyHelper.addToRequestQueue(context, request);
+                    } catch (IOException | GeneralSecurityException e) {
+                        Log.w(Account.class.getSimpleName(), "failed to get shortlink", e);
+                    }
+                }
+            }
             return null;
         }
 
-        private void uploadReferrer(@Nullable String referrer) {
-            if (referrer != null) {
-                AccountStateReporter.reportReferrer(context, referrer, new Runnable() {
-                    @Override
-                    public void run() {
-                        accountInfo.edit().putBoolean(PREF_REFERRER_UPLOADED, true).apply();
-                    }
-                });
-            }
-        }
-
-        private void uploadReferrerCode(@Nullable String referrerCode) {
-            if (referrerCode != null) {
-                AccountStateReporter.reportReferrerCode(context, referrerCode, new Runnable() {
-                    @Override
-                    public void run() {
-                        accountInfo.edit().putBoolean(PREF_REFERRER_CODE_UPLOADED, true).apply();
-                    }
-                });
-            }
+        private void uploadReferrer(String referrer) {
+            AccountStateReporter.reportReferrer(context, referrer, new Runnable() {
+                @Override
+                public void run() {
+                    accountInfo.edit().putBoolean(PREF_REFERRER_UPLOADED, true).apply();
+                }
+            });
         }
     }
 }
