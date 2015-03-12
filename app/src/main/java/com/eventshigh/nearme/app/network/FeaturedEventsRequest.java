@@ -22,7 +22,7 @@ import java.util.List;
  * Volley Request to fetch Featured events.
  */
 public class FeaturedEventsRequest extends BaseEventListRequest {
-    private static final int MAX_FEATURED_EVENTS = 5;
+    private static final int MAX_FEATURED_EVENTS = 4;
 
     /**
      * Helper method to submit a volley request to fetch Events information.

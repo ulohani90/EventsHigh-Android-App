@@ -20,7 +20,7 @@
     <string name="action_explore_categories">Explore Categories</string>
     <string name="action_reset">Reset</string>
     <string name="action_apply_filter">Apply Filter</string>
-    <string name="action_see_all_featured">See All Featured</string>
+    <string name="action_see_all_featured">See All Featured Events</string>
 
     <!-- Menu items -->
     <string name="menu_my_events">My Events</string>
