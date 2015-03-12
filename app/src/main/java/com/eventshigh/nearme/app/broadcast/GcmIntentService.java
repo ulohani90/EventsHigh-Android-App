@@ -43,6 +43,12 @@ public class GcmIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Preferences preferences = Preferences.getInstance(getApplicationContext());
+        if (!preferences.shouldNotifyEHRecommendation()) {
+            Log.w(LOG_TAG, "notification skipped as per user preference");
+            return;
+        }
+
         Bundle extras = intent.getExtras();
         if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
             /*
@@ -77,13 +83,6 @@ public class GcmIntentService extends IntentService {
         String contestUrl = Utils.checkIfUnknown(msg.getString("contest"));
         if (eventId == null && query == null && contestUrl == null) {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query or contest param passed");
-            return;
-        }
-
-        Preferences preferences = Preferences.getInstance(getApplicationContext());
-        if ((eventId != null && !preferences.shouldNotifyNearBy()) ||
-            (query != null && !preferences.shouldNotifyWeekend())) {
-            Log.w(LOG_TAG, "notification skipped as per user preference");
             return;
         }
 

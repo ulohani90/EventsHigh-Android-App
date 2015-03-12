@@ -2,15 +2,20 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <CheckBoxPreference
-        android:key="notifications_weekend"
-        android:title="@string/pref_title_weekend_notifications"
-        android:summary="Generally shown once per week"
+        android:key="notifications_favourited"
+        android:title="@string/pref_title_favourite_notifications"
         android:defaultValue="true"
     />
     <CheckBoxPreference
-        android:key="notifications_nearby"
-        android:title="@string/pref_title_nearby_notifications"
-        android:summary="Generally shown twice per week"
+        android:key="notifications_weekend"
+        android:title="@string/pref_title_weekend_notifications"
+        android:summary="Shown once per week"
+        android:defaultValue="true"
+    />
+    <CheckBoxPreference
+        android:key="notifications_eh"
+        android:title="@string/pref_title_eh_notifications"
+        android:summary="Approximately shown once per week"
         android:defaultValue="true"
     />
 

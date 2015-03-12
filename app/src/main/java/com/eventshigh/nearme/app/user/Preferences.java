@@ -12,8 +12,9 @@ import android.preference.PreferenceManager;
  */
 public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_DEFAULT_ACTIVITY = "default_activity";
+    public static final String PREF_NOTIFY_FAVOURITED = "notifications_favourited";
     public static final String PREF_NOTIFY_WEEKEND = "notifications_weekend";
-    public static final String PREF_NOTIFY_NEARBY = "notifications_nearby";
+    public static final String PREF_NOTIFY_EH = "notifications_eh";
     public static final String PREF_SHOW_ONBOARDING = "show_onboarding";
 
     private final Context context;
@@ -37,12 +38,16 @@ public class Preferences implements OnSharedPreferenceChangeListener {
         return "maps".equals(sharedPreferences.getString(PREF_DEFAULT_ACTIVITY, ""));
     }
 
+    public boolean shouldNotifyFavourited() {
+        return sharedPreferences.getBoolean(PREF_NOTIFY_FAVOURITED, true);
+    }
+
     public boolean shouldNotifyWeekend() {
         return sharedPreferences.getBoolean(PREF_NOTIFY_WEEKEND, true);
     }
 
-    public boolean shouldNotifyNearBy() {
-        return sharedPreferences.getBoolean(PREF_NOTIFY_NEARBY, true);
+    public boolean shouldNotifyEHRecommendation() {
+        return sharedPreferences.getBoolean(PREF_NOTIFY_EH, true);
     }
 
     public void setShowOnboarding(boolean shouldShowOnboarding) {

@@ -27,8 +27,9 @@
 
     <!-- Notifications settings -->
     <string name="pref_header_notifications">Notifications</string>
+    <string name="pref_title_favourite_notifications">Favourited Events</string>
     <string name="pref_title_weekend_notifications">Weekend Events</string>
-    <string name="pref_title_nearby_notifications">Nearby Events</string>
+    <string name="pref_title_eh_notifications">EventsHigh Recommendations</string>
 
 
     <!-- About US text -->
