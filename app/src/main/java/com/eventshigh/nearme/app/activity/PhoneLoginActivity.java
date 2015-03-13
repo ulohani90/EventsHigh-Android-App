@@ -5,10 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.util.Linkify;
 import android.util.Pair;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -207,9 +205,6 @@ public class PhoneLoginActivity extends BaseActivity {
     // Set the UI elements when we need to ask for mobile no.
     private void setRequestMobileNoView() {
         findViewById(R.id.skip).setVisibility(inOnboardingFlow ? View.VISIBLE : View.GONE);
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) findViewById(
-                R.id.send_code).getLayoutParams();
-        layoutParams.gravity = inOnboardingFlow ? Gravity.END : Gravity.CENTER_HORIZONTAL;
         phoneNoParent.setVisibility(View.VISIBLE);
         codeParent.setVisibility(View.GONE);
         verifiedParent.setVisibility(View.GONE);

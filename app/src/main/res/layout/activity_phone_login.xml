@@ -29,20 +29,25 @@
         tools:ignore="ContentDescription"
     />
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/phone_no_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_margin="24dp"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
     >
         <TextView
+            android:id="@+id/phone_no_info_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="36dp"
-            android:textSize="20sp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:textSize="18sp"
             android:gravity="center"
             android:drawablePadding="8dp"
             android:fontFamily="sans-serif-light"
@@ -50,40 +55,59 @@
             tools:ignore="UnusedAttribute"
         />
 
+        <TextView
+            style="?android:attr/textAppearanceMedium"
+            android:id="@+id/plus_91"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/phone_no_info_message"
+            android:layout_alignBottom="@+id/phone_no"
+            android:gravity="center"
+            android:text="+91"
+            tools:ignore="HardcodedText"
+        />
         <EditText
             android:id="@+id/phone_no"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="phone"
+            android:layout_marginBottom="18dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/phone_no_info_message"
+            android:layout_toRightOf="@+id/plus_91"
+            android:layout_toEndOf="@+id/plus_91"
             android:hint="@string/ui_enter_phone_number_hint"
+            android:inputType="numberDecimal"
+            android:digits="0123456789"
+            android:maxLength="11"
+            tools:ignore="TextFields"
         />
 
-        <FrameLayout
-            android:layout_marginTop="24dp"
-            android:layout_width="match_parent"
+        <TextView
+            style="@style/EHButton"
+            android:id="@+id/skip"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-        >
-            <Button
-                android:id="@+id/skip"
-                android:visibility="gone"
-                style="@style/EHButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/action_skip"
-                android:onClick="skip"
-                android:layout_gravity="start"
-            />
-            <Button
-                android:id="@+id/send_code"
-                style="@style/EHButtonCTA"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/action_register"
-                android:onClick="sendCode"
-                android:layout_gravity="end"
-            />
-        </FrameLayout>
-    </LinearLayout>
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/phone_no"
+            android:text="@string/action_skip"
+            android:onClick="skip"
+        />
+        <TextView
+            android:id="@+id/send_code"
+            style="@style/EHButtonCTA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/phone_no"
+            android:text="@string/action_register"
+            android:onClick="sendCode"
+        />
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/code_parent"
@@ -92,6 +116,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
     >
         <TextView
             android:id="@+id/code_label"
@@ -107,6 +132,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
+            android:digits="0123456789"
         />
 
         <LinearLayout
@@ -145,6 +171,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
     >
         <TextView
             android:id="@+id/verified"
