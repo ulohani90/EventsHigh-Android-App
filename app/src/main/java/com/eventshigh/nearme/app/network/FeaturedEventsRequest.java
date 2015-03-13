@@ -1,5 +1,7 @@
 package com.eventshigh.nearme.app.network;
 
+import android.content.Context;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
@@ -7,7 +9,6 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -27,12 +28,12 @@ public class FeaturedEventsRequest extends BaseEventListRequest {
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
-     * @param activity an application eventsContext to initiate the volley.
+     * @param context an application context to initiate the volley.
      * @param eventsContext EventsContext representing the request.
      * @param listener callback on success.
      * @param errorListener callback on failures.
      */
-    public static void submit(BaseActivity activity, EventsContext eventsContext,
+    public static void submit(Context context, EventsContext eventsContext,
                               Priority priority, boolean shouldBypassCache,
                               Listener<List<Event>> listener, ErrorListener errorListener) {
         if (eventsContext.city == null) {
@@ -42,15 +43,15 @@ public class FeaturedEventsRequest extends BaseEventListRequest {
 
         String url = EventsHighEndpoints.getFeaturedEventsEndpoint(eventsContext.city);
         FeaturedEventsRequest request = new FeaturedEventsRequest(
-                activity, url, eventsContext, shouldBypassCache, priority, listener, errorListener);
-        request.setTag(activity);
-        VolleyHelper.addToRequestQueue(activity, request);
+                context, url, eventsContext, shouldBypassCache, priority, listener, errorListener);
+        request.setTag(context);
+        VolleyHelper.addToRequestQueue(context, request);
     }
 
-    public FeaturedEventsRequest(BaseActivity activity, String url, EventsContext eventsContext,
+    public FeaturedEventsRequest(Context context, String url, EventsContext eventsContext,
                                  boolean shouldBypassCache, Priority priority,
                                  Listener<List<Event>> listener, ErrorListener errorListener) {
-        super(activity, url, eventsContext, priority, shouldBypassCache, true, listener,
+        super(context, url, eventsContext, priority, shouldBypassCache, true, listener,
                 errorListener);
     }
 

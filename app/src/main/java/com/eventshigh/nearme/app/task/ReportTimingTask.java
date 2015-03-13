@@ -7,17 +7,18 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.utils.GAHelper;
 
 /**
  * An {@link android.os.AsyncTask} which is used to report the network time in GA. This class also
  * reports the user connection type as event label.
  */
 public class ReportTimingTask extends AsyncTask<Long, Void, Void> {
-    private final BaseActivity activity;
+    private final Context context;
     private final String resourceType;
 
-    public ReportTimingTask(BaseActivity activity, String resourceType) {
-        this.activity = activity;
+    public ReportTimingTask(Context context, String resourceType) {
+        this.context = context;
         this.resourceType = resourceType;
     }
 
@@ -30,7 +31,7 @@ public class ReportTimingTask extends AsyncTask<Long, Void, Void> {
             network = "cache";
         } else {
             ConnectivityManager connectivityManager =
-                    (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
             network = getNetworkName(networkInfo);
         }
@@ -40,7 +41,12 @@ public class ReportTimingTask extends AsyncTask<Long, Void, Void> {
     }
 
     private void report(String nwType, long time) {
-        activity.reportActionToAnalytics("fetch_" + resourceType, nwType, time);
+        if (context instanceof BaseActivity) {
+            ((BaseActivity) context).reportActionToAnalytics("fetch_" + resourceType, nwType, time);
+        } else {
+            GAHelper.getInstance(context).reportActionToAnalytics(
+                    "background", "fetch_" + resourceType, nwType, time);
+        }
     }
 
     private String getNetworkName(@Nullable NetworkInfo networkInfo) {

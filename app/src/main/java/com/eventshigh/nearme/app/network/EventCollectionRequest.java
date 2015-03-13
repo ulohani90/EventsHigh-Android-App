@@ -1,5 +1,7 @@
 package com.eventshigh.nearme.app.network;
 
+import android.content.Context;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
@@ -7,7 +9,6 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -25,12 +26,12 @@ public class EventCollectionRequest extends BaseEventListRequest {
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
-     * @param activity an application eventsContext to initiate the volley.
+     * @param context an application eventsContext to initiate the volley.
      * @param eventsContext EventsContext representing the request.
      * @param listener callback on success.
      * @param errorListener callback on failures.
      */
-    public static void submit(BaseActivity activity, EventsContext eventsContext, Priority priority,
+    public static void submit(Context context, EventsContext eventsContext, Priority priority,
                               boolean shouldBypassCache, boolean includeWithoutLocation,
                               Listener<List<Event>> listener, ErrorListener errorListener) {
         if (eventsContext.city == null) {
@@ -47,16 +48,16 @@ public class EventCollectionRequest extends BaseEventListRequest {
         }
 
         EventCollectionRequest request = new EventCollectionRequest(
-                activity, url, eventsContext, priority, shouldBypassCache, includeWithoutLocation,
+                context, url, eventsContext, priority, shouldBypassCache, includeWithoutLocation,
                 listener, errorListener);
-        request.setTag(activity);
-        VolleyHelper.addToRequestQueue(activity, request);
+        request.setTag(context);
+        VolleyHelper.addToRequestQueue(context, request);
     }
 
-    public EventCollectionRequest(BaseActivity activity, String url, EventsContext eventsContext,
+    public EventCollectionRequest(Context context, String url, EventsContext eventsContext,
                                   Priority priority, boolean shouldBypassCache, boolean includeWithoutLocation,
                                   Listener<List<Event>> listener, ErrorListener errorListener) {
-        super(activity, url, eventsContext, priority, shouldBypassCache, includeWithoutLocation,
+        super(context, url, eventsContext, priority, shouldBypassCache, includeWithoutLocation,
                 listener, errorListener);
     }
 
@@ -80,7 +81,7 @@ public class EventCollectionRequest extends BaseEventListRequest {
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JSONException e) {
-            VolleyHelper.getInstance(activity).invalidateCache(this);
+            VolleyHelper.getInstance(context).invalidateCache(this);
             return Response.error(new ParseError(e));
         }
     }

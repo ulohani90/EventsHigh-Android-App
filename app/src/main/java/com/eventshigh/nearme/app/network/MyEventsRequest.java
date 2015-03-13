@@ -1,12 +1,12 @@
 package com.eventshigh.nearme.app.network;
 
+import android.content.Context;
 import android.util.Pair;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.user.Account;
@@ -24,7 +24,7 @@ public class MyEventsRequest {
     public static class MyEvents extends ArrayList<Pair<String, List<Event>>> {
     }
 
-    private final BaseActivity activity;
+    private final Context context;
     private final EventsContext eventsContext;
     private final Priority priority;
     private final boolean shouldBypassCache;
@@ -36,10 +36,10 @@ public class MyEventsRequest {
     private int numPendingRequests;
     private MyEvents result = new MyEvents();
 
-    public MyEventsRequest(BaseActivity activity, EventsContext eventsContext, Priority priority,
+    public MyEventsRequest(Context context, EventsContext eventsContext, Priority priority,
                            boolean shouldBypassCache, boolean includeWithoutLocation,
                            Listener<MyEvents> listener, ErrorListener errorListener) {
-        this.activity = activity;
+        this.context = context;
         this.eventsContext = eventsContext;
         this.priority = priority;
         this.shouldBypassCache = shouldBypassCache;
@@ -54,19 +54,19 @@ public class MyEventsRequest {
             return;
         }
 
-        List<String> interests = new Account(activity).getFollowingInterests();
+        List<String> interests = new Account(context).getFollowingInterests();
         numPendingRequests = interests.size() + 1;
         InternalErrorListener errorListener = new InternalErrorListener();
 
         // Favourites event requests.
-        EventCollectionRequest.submit(activity,
+        EventCollectionRequest.submit(context,
                 new EventsContext(eventsContext.location, EventsHighEndpoints.QUERY_MY_EVENT),
                 priority, shouldBypassCache, includeWithoutLocation, new FavouritedEventsListener(),
                 errorListener);
 
         // Interest based requests.
         for (String interest : interests) {
-            EventCollectionRequest.submit(activity, new EventsContext(eventsContext.location, interest),
+            EventCollectionRequest.submit(context, new EventsContext(eventsContext.location, interest),
                     priority, shouldBypassCache, includeWithoutLocation, new EventsListener(interest),
                     errorListener);
         }
