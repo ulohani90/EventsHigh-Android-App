@@ -1,15 +1,18 @@
 package com.eventshigh.nearme.app.utils;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
+import com.eventshigh.nearme.app.user.Account;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.UnsupportedEncodingException;
@@ -104,6 +107,8 @@ public class IntentUtils {
             processSearchViewIntent(inUri);
         } else if (inUri.getPath().startsWith("/detail")) {
             processDetailViewIntent(inUri);
+        } else if (inUri.getPath().startsWith("/contest")) {
+            processContestViewIntent(activity, inUri, "Contest");
         } else if (inUri.getPath().startsWith("/browse")) {
             processBrowseViewIntent(inUri);
         }
@@ -154,6 +159,15 @@ public class IntentUtils {
         Intent intent = new Intent(activity, EventDetailActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         intent.setData(webUri);
+        activity.startActivity(intent);
+    }
+
+    public static void processContestViewIntent(Activity activity, Uri webUri, String title) {
+        Uri data = webUri.buildUpon()
+                .appendQueryParameter("reflink", new Account(activity).getAppDownloadLink()).build();
+        Intent intent = new Intent(activity, CustomUrlActivity.class);
+        intent.setData(data);
+        intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);
         activity.startActivity(intent);
     }
 }

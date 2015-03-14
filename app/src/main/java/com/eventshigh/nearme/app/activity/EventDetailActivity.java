@@ -42,6 +42,7 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
+import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -226,6 +227,13 @@ public class EventDetailActivity extends BaseActivity {
         startActivity(intent);
     }
 
+    private void openContestSite() {
+        reportEventAction(event, "openContest");
+        IntentUtils.processContestViewIntent(this,
+                Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
+                event.contestTitle);
+    }
+
 
     /**********************************
      Helper class to hold all UI elements.
@@ -260,6 +268,7 @@ public class EventDetailActivity extends BaseActivity {
         private final FrameLayout callView;
         private final FrameLayout shareView;
 
+        private final TextView contestView;
         private final FlowLayout tagsView;
         private final TextView descriptionView;
         private final TextView readMoreView;
@@ -301,6 +310,7 @@ public class EventDetailActivity extends BaseActivity {
             callView = (FrameLayout) findViewById(R.id.call);
             shareView = (FrameLayout) findViewById(R.id.share);
 
+            contestView = (TextView) findViewById(R.id.contest);
             tagsView = (FlowLayout) findViewById(R.id.event_tags);
             descriptionView = (TextView) findViewById(R.id.event_description);
             readMoreView = (TextView) findViewById(R.id.read_more);
@@ -476,6 +486,7 @@ public class EventDetailActivity extends BaseActivity {
                         MessageFormat.format(getResources().getString(R.string.event_time_details), numDays));
                 }
 
+                futureTimesView.removeAllViews();
                 if (event.eventTimings.length > 1) {
                     for (int i = 1; i < event.eventTimings.length; i++) {
                         eventTime = DateTimeUtils.getEventTime(event, i);
@@ -513,6 +524,20 @@ public class EventDetailActivity extends BaseActivity {
                 } else {
                     alsoOnView.setVisibility(View.GONE);
                 }
+            }
+
+            // Set contest.
+            if (event.contestTitle != null) {
+                contestView.setVisibility(View.VISIBLE);
+                contestView.setText(event.contestTitle);
+                contestView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openContestSite();
+                    }
+                });
+            } else {
+                contestView.setVisibility(View.GONE);
             }
 
             // Set description.

@@ -272,6 +272,26 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Contest -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#1a4d4d4d"
+            />
+            <TextView
+                android:id="@+id/contest"
+                style="@style/EHButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="12sp"
+                android:textColor="#A3000000"
+                android:textAllCaps="false"
+                android:drawableLeft="@drawable/ic_local_offer_grey600_24dp"
+                android:drawableStart="@drawable/ic_local_offer_grey600_24dp"
+                tools:text="Win Free Pass to Arijit Singh Live Concert on 5th April"
+            />
+
             <!-- Action Items -->
             <View
                 android:layout_width="match_parent"

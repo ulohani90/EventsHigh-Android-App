@@ -6,9 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -36,6 +34,7 @@ public class Event implements Parcelable {
     public final String title;
     public final EventCategory category;
 
+    @Nullable public final String contestTitle;
     public final String description;
     public final String[] tags;
 
@@ -59,7 +58,7 @@ public class Event implements Parcelable {
     @Nullable public final String organizerWebsite;
 
     public Event(String id, City city, String title, EventCategory category,
-                 String description, String[] tags,
+                 @Nullable String contestTitle, String description, String[] tags,
                  @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
                  int numPeopleInterested, boolean ehRecommended, float uberScore,
                  long[] eventTimings,
@@ -71,6 +70,7 @@ public class Event implements Parcelable {
         this.title = title;
         this.category = category;
 
+        this.contestTitle = Utils.checkIfUnknown(contestTitle);
         this.description = description;
         this.tags = tags;
 
@@ -137,6 +137,7 @@ public class Event implements Parcelable {
         dest.writeString(title);
         dest.writeString(category.toString());
 
+        dest.writeString(emptyIfNull(contestTitle));
         dest.writeString(description);
         dest.writeStringArray(tags);
 
@@ -170,6 +171,7 @@ public class Event implements Parcelable {
                             in.readString(),
                             EventCategory.valueOf(in.readString()),
 
+                            in.readString(),
                             in.readString(),
                             in.createStringArray(),
 
@@ -257,6 +259,13 @@ public class Event implements Parcelable {
             address = address.substring(venue.length()).trim();
         }
 
+        // Contest
+        String contestTitle = null;
+        JSONObject contest = eventJson.optJSONObject("event_contest");
+        if (contest != null) {
+            contestTitle = contest.optString("title");
+        }
+
         // Tags.
         EventCategory category = EventCategory.OTHER;
         JSONArray tagsJsonArr = eventJson.getJSONArray("tags");
@@ -319,6 +328,7 @@ public class Event implements Parcelable {
                 title,
                 category,
 
+                contestTitle,
                 description,
                 tagsList.toArray(new String[tagsList.size()]),
 
