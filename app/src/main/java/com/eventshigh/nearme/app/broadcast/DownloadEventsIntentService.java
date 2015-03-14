@@ -21,6 +21,7 @@ import java.util.List;
 
 public class DownloadEventsIntentService extends IntentService
         implements Response.ErrorListener, Response.Listener<MyEventsRequest.MyEvents> {
+    private static final int MAX_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
     private Intent intent;
     private LatLng location;
 
@@ -61,7 +62,7 @@ public class DownloadEventsIntentService extends IntentService
 
         if (events.size() == 1) {
             NotificationUtils.showNotificationAndReleaseWakeLock(this, events.get(0), intent);
-        } else if (events.size() > 1) {
+        } else if (events.size() > 1 && events.size() <= MAX_EVENTS_TO_SHOW_IN_NOTIFICATION) {
             NotificationUtils.showNotificationAndReleaseWakeLock(this, events, intent, location);
         } else {
             WakefulBroadcastReceiver.completeWakefulIntent(intent);

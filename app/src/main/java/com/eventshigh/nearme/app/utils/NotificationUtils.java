@@ -137,6 +137,12 @@ public class NotificationUtils {
                                                           final List<Event> events,
                                                           final Intent alarmIntent,
                                                           LatLng location) {
+        StringBuilder message = new StringBuilder();
+        for (Event event : events) {
+            message.append(event.title);
+            message.append("\n");
+        }
+
         Intent myEventsIntent = new Intent(context, LaunchActivity.class);
         myEventsIntent.putExtra(SearchManager.QUERY, EventsHighEndpoints.QUERY_MY_EVENT);
         if (location != null) {
@@ -147,7 +153,8 @@ public class NotificationUtils {
         }
         myEventsIntent.setAction(Intent.ACTION_SEARCH);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, myEventsIntent, 0);
-        Notification notification = createNotification(context, "title", "message", pendingIntent);
+        Notification notification = createNotification(context,
+                context.getString(R.string.ui_upcoming_events), message, pendingIntent);
         showNotification(context, notification, MY_EVENTS_NOTIFICATION_ID);
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
