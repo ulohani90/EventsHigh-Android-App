@@ -4,6 +4,7 @@
     <CheckBoxPreference
         android:key="notifications_favourited"
         android:title="@string/pref_title_favourite_notifications"
+        android:summary="Shown one day before event start time"
         android:defaultValue="true"
     />
     <CheckBoxPreference
