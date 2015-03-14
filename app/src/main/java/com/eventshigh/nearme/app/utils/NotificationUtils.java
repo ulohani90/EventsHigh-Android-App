@@ -35,6 +35,8 @@ public class NotificationUtils {
     public static final int GCM_NOTIFICATION_ID = 1;
     public static final int MY_EVENTS_NOTIFICATION_ID = 2;
 
+    private static final int MAX__MY_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
+
     public static PendingIntent createPendingIntent(Context context, String eventId, City city) {
         if (city == null) {
             // placeholder for city.
@@ -138,8 +140,11 @@ public class NotificationUtils {
                                                           final Intent alarmIntent,
                                                           LatLng location) {
         StringBuilder message = new StringBuilder();
-        for (Event event : events) {
-            message.append(event.title);
+        for (int i = 0; i < events.size(); i++) {
+            if (i >= MAX__MY_EVENTS_TO_SHOW_IN_NOTIFICATION) {
+                break;
+            }
+            message.append(events.get(i).title);
             message.append("\n");
         }
 
