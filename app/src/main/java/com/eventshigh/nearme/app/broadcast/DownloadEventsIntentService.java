@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.broadcast;
 import android.app.IntentService;
 import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
+import android.util.Pair;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -12,12 +13,13 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.user.GcmRegistration;
-import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DownloadEventsIntentService extends IntentService
         implements Response.ErrorListener, Response.Listener<MyEventsRequest.MyEvents> {
@@ -50,18 +52,17 @@ public class DownloadEventsIntentService extends IntentService
     }
 
     @Override
-    public void onResponse(MyEventsRequest.MyEvents pairs, boolean b) {
-        List<Event> events = new ArrayList<>();
-        for (int i = 0; i < pairs.size(); i++) {
-            for (Event event : pairs.get(0).second) {
-                events.add(event);
-            }
+    public void onResponse(MyEventsRequest.MyEvents pairs, boolean isIntermediate) {
+        Set<Event> eventSet = new HashSet<>();
+        for (Pair<String, List<Event>> entry : pairs) {
+            eventSet.addAll(entry.second);
         }
 
+        List<Event> events = new ArrayList<>(eventSet);
         if (events.size() == 1) {
             NotificationUtils.showNotificationAndReleaseWakeLock(this, events.get(0), intent);
         } else if (events.size() > 1) {
-            NotificationUtils.showNotificationAndReleaseWakeLock(this, events, intent, location);
+            NotificationUtils.showNotificationAndReleaseWakeLock(this, events, intent);
         } else {
             WakefulBroadcastReceiver.completeWakefulIntent(intent);
         }

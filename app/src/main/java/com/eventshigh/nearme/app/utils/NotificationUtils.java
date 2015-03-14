@@ -24,7 +24,6 @@ import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
@@ -137,10 +136,8 @@ public class NotificationUtils {
         notificationManager.notify(notificationId, notification);
     }
 
-    public synchronized static void showNotificationAndReleaseWakeLock(final Context context,
-                                                                       final List<Event> events,
-                                                                       final Intent alarmIntent,
-                                                                       LatLng location) {
+    public synchronized static void showNotificationAndReleaseWakeLock(
+            final Context context, final List<Event> events, final Intent alarmIntent) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(
                 SHARED_PREFS_FOR_MY_EVENTS_NOTIFICATIONS, Context.MODE_PRIVATE);
         int count = 0;
@@ -160,12 +157,6 @@ public class NotificationUtils {
 
         Intent myEventsIntent = new Intent(context, LaunchActivity.class);
         myEventsIntent.putExtra(SearchManager.QUERY, EventsHighEndpoints.QUERY_MY_EVENT);
-        if (location != null) {
-            myEventsIntent.putExtra(IntentUtils.EXTRA_LATITUDE_PARAM,
-                    location.latitude);
-            myEventsIntent.putExtra(IntentUtils.EXTRA_LONGITUDE_PARAM,
-                    location.longitude);
-        }
         myEventsIntent.setAction(Intent.ACTION_SEARCH);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, myEventsIntent, 0);
         Notification notification = createNotification(context,

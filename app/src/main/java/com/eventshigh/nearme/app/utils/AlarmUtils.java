@@ -21,6 +21,7 @@ import java.util.Random;
  */
 public class AlarmUtils {
     private static String LOG_TAG = AlarmUtils.class.getName();
+
     public static void setAlarm(Context context, Event event) {
         // Don't set an alarm if the event is going to happen within 1 day
         if (event.eventTimings[0] - System.currentTimeMillis() < DateUtils.DAY_IN_MILLIS) {
