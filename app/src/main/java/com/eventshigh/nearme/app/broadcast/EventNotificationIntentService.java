@@ -29,7 +29,7 @@ public class EventNotificationIntentService extends IntentService {
                 parcel.unmarshall(byteArrayExtra, 0, byteArrayExtra.length);
                 parcel.setDataPosition(0);
                 Event event = Event.CREATOR.createFromParcel(parcel);
-                NotificationUtils.showNotification(this, event, intent);
+                NotificationUtils.showNotificationAndReleaseWakeLock(this, event, intent);
                 releaseWakeLock = false;
                 parcel.recycle();
             }
