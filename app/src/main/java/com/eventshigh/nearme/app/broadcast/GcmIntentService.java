@@ -33,8 +33,6 @@ import com.google.android.gms.maps.model.LatLng;
 public class GcmIntentService extends IntentService {
     private static final String LOG_TAG = GcmIntentService.class.getSimpleName();
 
-    public static final int NOTIFICATION_ID = 1;
-
     private GoogleApiClient client;
 
     public GcmIntentService() {
@@ -121,7 +119,8 @@ public class GcmIntentService extends IntentService {
                 this, title, message, contentIntent);
 
         if (!bounded) {
-            NotificationUtils.showNotification(this, notification, NOTIFICATION_ID);
+            NotificationUtils.showNotification(this, notification,
+                    NotificationUtils.GCM_NOTIFICATION_ID);
         } else {
             final LatLng center = new LatLng(lat, lon);
             final double radius = distance;
@@ -137,7 +136,7 @@ public class GcmIntentService extends IntentService {
                             Log.w(LOG_TAG, "notification skipped, user location: " + location);
                         } else {
                             NotificationUtils.showNotification(GcmIntentService.this, notification,
-                                    NOTIFICATION_ID);
+                                    NotificationUtils.GCM_NOTIFICATION_ID);
                         }
 
 						client.disconnect();

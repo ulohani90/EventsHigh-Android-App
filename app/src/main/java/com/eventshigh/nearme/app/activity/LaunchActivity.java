@@ -53,6 +53,7 @@ import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
@@ -148,6 +149,8 @@ public class LaunchActivity extends BaseActivity {
 
         // Process the incoming intent.
         eventsContext = IntentUtils.processIntent(this, getIntent());
+
+        AlarmUtils.setMyEventsAlarm(this);
     }
 
     public void onStart() {

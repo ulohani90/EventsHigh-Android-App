@@ -4,11 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.WakefulBroadcastReceiver;
 import android.text.format.DateUtils;
 
 import com.android.volley.Response;
@@ -17,15 +20,25 @@ import com.android.volley.toolbox.ImageRequest;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
-import com.eventshigh.nearme.app.broadcast.EventAlarmBroadcastReceiver;
+import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.List;
 
 /**
  * Helper class to create and show notifications in android notification bar.
  */
 public class NotificationUtils {
+    public static final int GCM_NOTIFICATION_ID = 1;
+    public static final int MY_EVENTS_NOTIFICATION_ID = 2;
+
+    private static final int MAX__MY_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
+
+    private static final String SHARED_PREFS_FOR_MY_EVENTS_NOTIFICATIONS = "MyEventsNotifications";
+
     public static PendingIntent createPendingIntent(Context context, String eventId, City city) {
         if (city == null) {
             // placeholder for city.
@@ -44,8 +57,8 @@ public class NotificationUtils {
                 .build();
     }
 
-    public static void showNotification(final Context context, final Event event,
-                                        final Intent intent) {
+    public static void showNotificationAndReleaseWakeLock(final Context context, final Event event,
+                                                          final Intent intent) {
         ImageRequest request = new ImageRequest(event.imgUrl,
                 new Response.Listener<Bitmap>() {
                     @Override
@@ -96,7 +109,7 @@ public class NotificationUtils {
         showNotification(context, notificationBuilder.build(), event.hashCode());
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
-        EventAlarmBroadcastReceiver.completeWakefulIntent(intent);
+        WakefulBroadcastReceiver.completeWakefulIntent(intent);
     }
 
     @SuppressLint("InlinedApi")
@@ -122,5 +135,44 @@ public class NotificationUtils {
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(notificationId, notification);
+    }
+
+    public synchronized static void showNotificationAndReleaseWakeLock(final Context context,
+                                                                       final List<Event> events,
+                                                                       final Intent alarmIntent,
+                                                                       LatLng location) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(
+                SHARED_PREFS_FOR_MY_EVENTS_NOTIFICATIONS, Context.MODE_PRIVATE);
+        int count = 0;
+        StringBuilder message = new StringBuilder();
+        for (int i = 0; i < events.size(); i++) {
+            if (count >= MAX__MY_EVENTS_TO_SHOW_IN_NOTIFICATION) {
+                break;
+            }
+            if (sharedPreferences.contains(events.get(i).id)) {
+                continue;
+            }
+            count++;
+            message.append(events.get(i).title);
+            message.append("\n");
+            sharedPreferences.edit().putBoolean(events.get(i).id, true).apply();
+        }
+
+        Intent myEventsIntent = new Intent(context, LaunchActivity.class);
+        myEventsIntent.putExtra(SearchManager.QUERY, EventsHighEndpoints.QUERY_MY_EVENT);
+        if (location != null) {
+            myEventsIntent.putExtra(IntentUtils.EXTRA_LATITUDE_PARAM,
+                    location.latitude);
+            myEventsIntent.putExtra(IntentUtils.EXTRA_LONGITUDE_PARAM,
+                    location.longitude);
+        }
+        myEventsIntent.setAction(Intent.ACTION_SEARCH);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, myEventsIntent, 0);
+        Notification notification = createNotification(context,
+                context.getString(R.string.ui_upcoming_events), message, pendingIntent);
+        showNotification(context, notification, MY_EVENTS_NOTIFICATION_ID);
+
+        // Release the wake lock provided by the WakefulBroadcastReceiver.
+        WakefulBroadcastReceiver.completeWakefulIntent(alarmIntent);
     }
 }
