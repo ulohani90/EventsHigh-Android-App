@@ -17,6 +17,7 @@ import android.webkit.WebViewClient;
 import com.eventshigh.nearme.app.R;
 
 public class CustomUrlActivity extends BaseActivity {
+    public static final String ADD_EVENT_URL = "http://www.eventshigh.com/add_event";
     public static final String EXTRA_TITLE_KEY =  CustomUrlActivity.class.getName() + ".title";
 
     private WebView webView;
@@ -54,7 +55,7 @@ public class CustomUrlActivity extends BaseActivity {
 
         // Set title.
         String title = getIntent().getStringExtra(EXTRA_TITLE_KEY);
-        if (getIntent().getDataString().equals("http://www.eventshigh.com/add_event")) {
+        if (getIntent().getDataString().equals(ADD_EVENT_URL)) {
             reportActionToAnalytics("addEvent");
             title = getString(R.string.pref_title_add_event);
         }

@@ -24,8 +24,8 @@ android {
         applicationId "com.eventshigh.nearme.app"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 94
-        versionName "0.9.4"
+        versionCode 95
+        versionName "0.9.5"
     }
     buildTypes {
         release {
@@ -55,6 +55,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:21.0.3'
     compile 'com.android.support:recyclerview-v7:21.0.3'
 
+    compile 'com.facebook.android:facebook-android-sdk:3.23.0'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
     compile 'org.apmem.tools:layouts:1.8@aar'
 

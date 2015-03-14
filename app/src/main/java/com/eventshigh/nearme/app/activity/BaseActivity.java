@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
@@ -109,6 +108,9 @@ public abstract class BaseActivity extends ActionBarActivity {
         if (actionBar != null) {
             actionBar.collapseActionView();
         }
+
+        // Report app to Facebook
+        com.facebook.AppEventsLogger.activateApp(this, "196111897251952");
     }
 
     @Override
