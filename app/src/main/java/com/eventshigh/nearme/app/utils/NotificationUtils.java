@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
@@ -22,7 +23,6 @@ import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -36,6 +36,8 @@ public class NotificationUtils {
     public static final int MY_EVENTS_NOTIFICATION_ID = 2;
 
     private static final int MAX__MY_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
+
+    private static final String SHARED_PREFS_FOR_MY_EVENTS_NOTIFICATIONS = "MyEventsNotifications";
 
     public static PendingIntent createPendingIntent(Context context, String eventId, City city) {
         if (city == null) {
@@ -135,17 +137,25 @@ public class NotificationUtils {
         notificationManager.notify(notificationId, notification);
     }
 
-    public static void showNotificationAndReleaseWakeLock(final Context context,
-                                                          final List<Event> events,
-                                                          final Intent alarmIntent,
-                                                          LatLng location) {
+    public synchronized static void showNotificationAndReleaseWakeLock(final Context context,
+                                                                       final List<Event> events,
+                                                                       final Intent alarmIntent,
+                                                                       LatLng location) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(
+                SHARED_PREFS_FOR_MY_EVENTS_NOTIFICATIONS, Context.MODE_PRIVATE);
+        int count = 0;
         StringBuilder message = new StringBuilder();
         for (int i = 0; i < events.size(); i++) {
-            if (i >= MAX__MY_EVENTS_TO_SHOW_IN_NOTIFICATION) {
+            if (count >= MAX__MY_EVENTS_TO_SHOW_IN_NOTIFICATION) {
                 break;
             }
+            if (sharedPreferences.contains(events.get(i).id)) {
+                continue;
+            }
+            count++;
             message.append(events.get(i).title);
             message.append("\n");
+            sharedPreferences.edit().putBoolean(events.get(i).id, true).apply();
         }
 
         Intent myEventsIntent = new Intent(context, LaunchActivity.class);

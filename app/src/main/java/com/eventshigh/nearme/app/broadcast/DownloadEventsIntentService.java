@@ -33,12 +33,11 @@ public class DownloadEventsIntentService extends IntentService
         this.intent = intent;
 
         // TODO(chandanp): may be get the user location from LocationClient
-        EventsContext eventsContext = new EventsContext(null, "this week");
         City lastCity = GcmRegistration.getInstance(this).getLastCity();
         if (lastCity != null) {
             location = lastCity.cityBounds.getCenter();
-            eventsContext.changeLocation(location);
         }
+        EventsContext eventsContext = new EventsContext(location, "this week");
 
         new MyEventsRequest(this, eventsContext, Request.Priority.IMMEDIATE,
                 true /* shouldBypassCache */, true /* includeWithoutLocation */,
