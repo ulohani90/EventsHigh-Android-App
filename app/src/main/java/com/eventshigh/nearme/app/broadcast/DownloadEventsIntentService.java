@@ -34,7 +34,7 @@ public class DownloadEventsIntentService extends IntentService
     protected void onHandleIntent(Intent intent) {
         this.intent = intent;
 
-        // TODO(chandanp): may be get the user location from LocationClient
+        // TODO: may be get the user location from LocationClient
         City lastCity = GcmRegistration.getInstance(this).getLastCity();
         if (lastCity != null) {
             location = lastCity.cityBounds.getCenter();
@@ -42,12 +42,14 @@ public class DownloadEventsIntentService extends IntentService
         EventsContext eventsContext = new EventsContext(location, "this week");
 
         new MyEventsRequest(this, eventsContext, Request.Priority.IMMEDIATE,
-                true /* shouldBypassCache */, true /* includeWithoutLocation */,
+                false /* shouldBypassCache */, true /* includeWithoutLocation */,
                 this, this).execute();
     }
 
     @Override
     public void onErrorResponse(VolleyError volleyError) {
+        // TODO: This could happen when user is not connected. should we retry at some other point?
+        // Should we switch to SyncAdapters ?
         WakefulBroadcastReceiver.completeWakefulIntent(intent);
     }
 
