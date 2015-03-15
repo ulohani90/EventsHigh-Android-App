@@ -142,8 +142,7 @@ public class DateTimeUtils {
         return  null;
     }
 
-    public static String getFormattedTime(long timeMillis) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-        return sdf.format(new Date(timeMillis));
+    public static String timeToFullFormat(long timeMillis) {
+        return FULL_DATE_TIME_FORMAT.format(new Date(timeMillis));
     }
 }

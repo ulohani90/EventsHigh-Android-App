@@ -150,6 +150,8 @@ public class LaunchActivity extends BaseActivity {
         // Process the incoming intent.
         eventsContext = IntentUtils.processIntent(this, getIntent());
 
+        // Set the alarm which will check the "My Events" at regular interval and fire
+        // notification if user has new events in his stream.
         AlarmUtils.setMyEventsAlarm(this);
     }
 
