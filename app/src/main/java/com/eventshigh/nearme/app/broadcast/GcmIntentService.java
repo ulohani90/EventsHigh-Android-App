@@ -7,20 +7,23 @@ import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -33,47 +36,57 @@ import com.google.android.gms.maps.model.LatLng;
 public class GcmIntentService extends IntentService {
     private static final String LOG_TAG = GcmIntentService.class.getSimpleName();
 
-    private GoogleApiClient client;
-
     public GcmIntentService() {
         super("GcmIntentService");
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleIntent(final Intent intent) {
         Preferences preferences = Preferences.getInstance(getApplicationContext());
         if (!preferences.shouldNotifyEHRecommendation()) {
             Log.w(LOG_TAG, "notification skipped as per user preference");
             return;
         }
 
-        Bundle extras = intent.getExtras();
-        if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
-            /*
-             * Filter messages based on message type. Since it is likely that GCM
-             * will be extended in the future with new message types, just ignore
-             * any message types you're not interested in, or that you don't recognize.
-             */
-            GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
-            String messageType = gcm.getMessageType(intent);
-            if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                // This loop represents the service doing some work.
-                // Post notification of received message.
-                sendNotification(extras);
-            }
+        // Filter messages based on message type. Since it is likely that GCM will be extended
+        // in the future with new message types, just ignore any message types you're not
+        // interested in, or that you don't recognize.
+        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
+        String messageType = gcm.getMessageType(intent);
+        if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+            ParsedBundle parsedBundle = parsedBundle(intent.getExtras());
+            sendNotification(parsedBundle, intent);
         }
-
-        // Release the wake lock provided by the WakefulBroadcastReceiver.
-        GcmBroadcastReceiver.completeWakefulIntent(intent);
     }
 
-    // Put the message into a notification and post it.
-    private void sendNotification(Bundle msg) {
+    private static class ParsedBundle {
+        public final Notification notification;
+        @Nullable
+        public final LatLng boundCenter;
+        public final double radiusInMeter;
+
+        private ParsedBundle (Notification notification, @Nullable LatLng boundCenter, double radiusInMeter) {
+            this.notification = notification;
+            this.boundCenter = boundCenter;
+            this.radiusInMeter = radiusInMeter;
+        }
+
+        private boolean isInRadius(@Nullable LatLng location) {
+            return location != null &&
+                LocationUtils.distanceInMeters(location, boundCenter) < radiusInMeter;
+        }
+
+        private boolean isInRadius(@Nullable Location location) {
+            return location != null && isInRadius(LocationUtils.locationToLatLng(location));
+        }
+    }
+
+    private @Nullable ParsedBundle parsedBundle(Bundle msg) {
         String title = Utils.checkIfUnknown(msg.getString("t"));
         String message = Utils.checkIfUnknown(msg.getString("m"));
         if (message == null || title == null) {
             Log.w(LOG_TAG, "Invalid notification: message: " + message + ", title: " + title);
-            return;
+            return null;
         }
 
         String eventId = Utils.checkIfUnknown(msg.getString("id"));
@@ -81,7 +94,7 @@ public class GcmIntentService extends IntentService {
         String contestUrl = Utils.checkIfUnknown(msg.getString("contest"));
         if (eventId == null && query == null && contestUrl == null) {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query or contest param passed");
-            return;
+            return null;
         }
 
         double lat = 0 , lon = 0, distance = 0;
@@ -115,40 +128,74 @@ public class GcmIntentService extends IntentService {
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         }
 
-        final Notification notification = NotificationUtils.createNotification(
-                this, title, message, contentIntent);
+        Notification notification = NotificationUtils.createNotification(
+            this, title, message, contentIntent);
+        return new ParsedBundle(notification, bounded ? new LatLng(lat, lon) : null, distance);
+    }
 
-        if (!bounded) {
-            NotificationUtils.showNotification(this, notification,
-                    NotificationUtils.GCM_NOTIFICATION_ID);
-        } else {
-            final LatLng center = new LatLng(lat, lon);
-            final double radius = distance;
-            client = new GoogleApiClient.Builder(this)
+    private void sendNotification(@Nullable ParsedBundle parsedBundle, Intent intent) {
+        if (parsedBundle != null) {
+            if (parsedBundle.boundCenter != null) {
+                NotificationUtils.showNotification(this, parsedBundle.notification,
+                        NotificationUtils.GCM_NOTIFICATION_ID);
+            } else {
+                new BoundsVerifier(parsedBundle, intent).checkAndNotify();
+                return;
+            }
+        }
+
+        // Release the wake lock provided by the WakefulBroadcastReceiver.
+        GcmBroadcastReceiver.completeWakefulIntent(intent);
+    }
+
+    private  class BoundsVerifier {
+        private final ParsedBundle parsedBundle;
+        private final Intent intent;
+        private GoogleApiClient client;
+        private boolean completeWakefulIntentCalled = false;
+
+        private BoundsVerifier(ParsedBundle parsedBundle, Intent intent) {
+            this.parsedBundle = parsedBundle;
+            this.intent = intent;
+        }
+
+        private void checkAndNotify() {
+            client = new GoogleApiClient.Builder(GcmIntentService.this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(new ConnectionCallbacks() {
                     @Override
                     public void onConnected(Bundle bundle) {
                         Location location = LocationServices.FusedLocationApi.getLastLocation(client);
-                        if (location == null ||
-                            LocationUtils.distanceInMeters(
-                                    LocationUtils.locationToLatLng(location), center) > radius) {
-                            Log.w(LOG_TAG, "notification skipped, user location: " + location);
-                        } else {
-                            NotificationUtils.showNotification(GcmIntentService.this, notification,
-                                    NotificationUtils.GCM_NOTIFICATION_ID);
+                        if (parsedBundle.isInRadius(location)) {
+                            NotificationUtils.showNotification(GcmIntentService.this,
+                                    parsedBundle.notification, NotificationUtils.GCM_NOTIFICATION_ID);
                         }
 
-						client.disconnect();
+                        client.disconnect();
+                        completeWakefulIntent();
                     }
 
                     @Override
                     public void onConnectionSuspended(int i) {
-                        // do nothing
+                        completeWakefulIntent();
+                    }
+                })
+                .addOnConnectionFailedListener(new OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(ConnectionResult connectionResult) {
+                        completeWakefulIntent();
                     }
                 })
                 .build();
+
             client.connect();
+        }
+
+        private synchronized void completeWakefulIntent() {
+            if (!completeWakefulIntentCalled) {
+                GcmBroadcastReceiver.completeWakefulIntent(intent);
+                completeWakefulIntentCalled = true;
+            }
         }
     }
 }
