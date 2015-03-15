@@ -60,7 +60,7 @@ public class AlarmUtils {
         // Set the alarm to start at approximately between 10:00 a.m. and 2:00 p.m. to reduce load
         // on server (to make sure that not all devices contact the server at the same time).
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTimeInMillis(System.currentTimeMillis() + DateUtils.DAY_IN_MILLIS);
         calendar.set(Calendar.HOUR_OF_DAY, 10 + new Random().nextInt(5));
         calendar.set(Calendar.MINUTE, new Random().nextInt(60));
         long alarmTimeMillis = calendar.getTimeInMillis();
