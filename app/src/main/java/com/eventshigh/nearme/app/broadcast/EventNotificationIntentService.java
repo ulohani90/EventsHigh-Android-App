@@ -16,19 +16,16 @@ public class EventNotificationIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (Preferences.getInstance(getApplicationContext()).shouldNotifyFavourited()) {
-            Event event = intent.getParcelableExtra(BUNDLE_EVENT_KEY);
-            if (event != null) {
-                // Notify user about the Event.
-                NotificationUtils.showNotificationAndReleaseWakeLock(this, event, intent);
+        Event event = intent.getParcelableExtra(BUNDLE_EVENT_KEY);
 
-                // do not release the WakeLock, it will be done by
-                // NotificationUtils.showNotificationAndReleaseWakeLock called above.
-                return;
-            }
+        if (!Preferences.getInstance(getApplicationContext()).shouldNotifyFavourited() ||
+            event == null) {
+            // Release the wake lock provided by the WakefulBroadcastReceiver.
+            EventAlarmBroadcastReceiver.completeWakefulIntent(intent);
+            return;
         }
 
-        // Release the wake lock provided by the WakefulBroadcastReceiver.
-        EventAlarmBroadcastReceiver.completeWakefulIntent(intent);
+        // Notify user about the Event.
+        NotificationUtils.showNotificationAndReleaseWakeLock(this, event, intent);
     }
 }

@@ -136,11 +136,11 @@ public class GcmIntentService extends IntentService {
     private void sendNotification(@Nullable ParsedBundle parsedBundle, Intent intent) {
         if (parsedBundle != null) {
             if (parsedBundle.boundCenter != null) {
-                NotificationUtils.showNotification(this, parsedBundle.notification,
-                        NotificationUtils.GCM_NOTIFICATION_ID);
-            } else {
                 new BoundsVerifier(parsedBundle, intent).checkAndNotify();
                 return;
+            } else {
+                NotificationUtils.showNotification(this, parsedBundle.notification,
+                        NotificationUtils.GCM_NOTIFICATION_ID);
             }
         }
 

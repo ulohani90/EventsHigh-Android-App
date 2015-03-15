@@ -15,8 +15,8 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,54 +24,72 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class DownloadEventsIntentService extends IntentService
-        implements Response.ErrorListener, Response.Listener<MyEventsRequest.MyEvents> {
-    private Intent intent;
-    private LatLng location;
-
+public class DownloadEventsIntentService extends IntentService {
     public DownloadEventsIntentService() {
         super("DownloadEventsIntentService");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        this.intent = intent;
+        if (!Preferences.getInstance(getApplicationContext()).shouldNotifyWeekly()) {
+            WakefulBroadcastReceiver.completeWakefulIntent(intent);
+            return;
+        }
 
         // TODO: may be get the user location from LocationClient
+        EventsContext eventsContext = new EventsContext(null, "this week");
         City lastCity = GcmRegistration.getInstance(this).getLastCity();
         if (lastCity != null) {
-            location = lastCity.cityBounds.getCenter();
+            eventsContext.changeLocation(lastCity.cityBounds.getCenter());
         }
-        EventsContext eventsContext = new EventsContext(location, "this week");
 
         new MyEventsRequest(this, eventsContext, Request.Priority.IMMEDIATE,
                 false /* shouldBypassCache */, true /* includeWithoutLocation */,
-                this, this).execute();
+                new MyEventsListener(intent), new ErrorListener(intent)).execute();
     }
 
-    @Override
-    public void onErrorResponse(VolleyError volleyError) {
-        // TODO: This could happen when user is not connected. should we retry at some other point?
-        // Should we switch to SyncAdapters ?
-        WakefulBroadcastReceiver.completeWakefulIntent(intent);
-    }
+    private class ErrorListener implements Response.ErrorListener {
+        private final Intent intent;
 
-    @Override
-    public void onResponse(MyEventsRequest.MyEvents pairs, boolean isIntermediate) {
-        // Merge all events into one List and remove duplicates.
-        Set<Event> eventSet = new HashSet<>();
-        for (Pair<String, List<Event>> entry : pairs) {
-            eventSet.addAll(entry.second);
+        private ErrorListener(Intent intent) {
+            this.intent = intent;
         }
-        List<Event> events = new ArrayList<>(eventSet);
-        Collections.sort(events, new EventComparator(null, EventsMarkerManager.getInstance(this)));
 
-        if (events.size() == 1) {
-            NotificationUtils.showNotificationAndReleaseWakeLock(this, events.get(0), intent);
-        } else if (events.size() > 1) {
-            NotificationUtils.showNotificationAndReleaseWakeLock(this, events, intent);
-        } else {
+        @Override
+        public void onErrorResponse(VolleyError volleyError) {
+            // TODO: This could happen when user is not connected. should we retry at some other point?
+            // Should we switch to SyncAdapters ?
             WakefulBroadcastReceiver.completeWakefulIntent(intent);
+        }
+    }
+
+    private class MyEventsListener implements Response.Listener<MyEventsRequest.MyEvents> {
+        private final Intent intent;
+
+        private MyEventsListener(Intent intent) {
+            this.intent = intent;
+        }
+
+        @Override
+        public void onResponse(MyEventsRequest.MyEvents pairs, boolean isIntermediate) {
+            // Merge all events into one List and remove duplicates.
+            Set<Event> eventSet = new HashSet<>();
+            for (Pair<String, List<Event>> entry : pairs) {
+                eventSet.addAll(entry.second);
+            }
+            List<Event> events = new ArrayList<>(eventSet);
+            Collections.sort(events, new EventComparator(null,
+                    EventsMarkerManager.getInstance(DownloadEventsIntentService.this)));
+
+            if (events.size() == 1) {
+                NotificationUtils.showNotificationAndReleaseWakeLock(
+                        DownloadEventsIntentService.this, events.get(0), intent);
+            } else if (events.size() > 1) {
+                NotificationUtils.showNotificationAndReleaseWakeLock(
+                        DownloadEventsIntentService.this, events, intent);
+            } else {
+                WakefulBroadcastReceiver.completeWakefulIntent(intent);
+            }
         }
     }
 }

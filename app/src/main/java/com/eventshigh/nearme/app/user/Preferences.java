@@ -13,7 +13,7 @@ import android.preference.PreferenceManager;
 public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_DEFAULT_ACTIVITY = "default_activity";
     public static final String PREF_NOTIFY_FAVOURITED = "notifications_favourited";
-    public static final String PREF_NOTIFY_WEEKEND = "notifications_weekend";
+    public static final String PREF_NOTIFY_WEEKLY = "notifications_weekly";
     public static final String PREF_NOTIFY_EH = "notifications_eh";
     public static final String PREF_SHOW_ONBOARDING = "show_onboarding";
 
@@ -42,8 +42,8 @@ public class Preferences implements OnSharedPreferenceChangeListener {
         return sharedPreferences.getBoolean(PREF_NOTIFY_FAVOURITED, true);
     }
 
-    public boolean shouldNotifyWeekend() {
-        return sharedPreferences.getBoolean(PREF_NOTIFY_WEEKEND, true);
+    public boolean shouldNotifyWeekly() {
+        return sharedPreferences.getBoolean(PREF_NOTIFY_WEEKLY, true);
     }
 
     public boolean shouldNotifyEHRecommendation() {
