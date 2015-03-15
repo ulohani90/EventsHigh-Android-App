@@ -32,9 +32,8 @@ public class MyEventsRequest {
     private final Listener<MyEvents> listener;
     private final ErrorListener errorListener;
 
-    private boolean hasErrorOccurred = false;
     private int numPendingRequests;
-    private MyEvents result = new MyEvents();
+    private final MyEvents result = new MyEvents();
 
     public MyEventsRequest(Context context, EventsContext eventsContext, Priority priority,
                            boolean shouldBypassCache, boolean includeWithoutLocation,
@@ -72,7 +71,15 @@ public class MyEventsRequest {
         }
     }
 
-    public class FavouritedEventsListener extends EventsListener {
+    private synchronized void reportResult() {
+        numPendingRequests --;
+
+        if (numPendingRequests == 0) {
+            listener.onResponse(result, false);
+        }
+    }
+
+    private class FavouritedEventsListener extends EventsListener {
         public FavouritedEventsListener() {
             super(FAVOURITES_NAME);
         }
@@ -82,7 +89,7 @@ public class MyEventsRequest {
         }
     }
 
-    public class EventsListener implements Listener<List<Event>> {
+    private class EventsListener implements Listener<List<Event>> {
         private final String title;
 
         public EventsListener(String title) {
@@ -90,7 +97,9 @@ public class MyEventsRequest {
         }
 
         public void addToResult(List<Event> events) {
-            result.add(Pair.create(title, events));
+            synchronized (result) {
+                result.add(Pair.create(title, events));
+            }
         }
 
         @Override
@@ -99,35 +108,17 @@ public class MyEventsRequest {
                 return;
             }
 
-            synchronized (this) {
-                if (hasErrorOccurred) {
-                    return;
-                }
-                if (!events.isEmpty()) {
-                    addToResult(events);
-                }
-                numPendingRequests --;
-
-                if (numPendingRequests == 0) {
-                    listener.onResponse(result, false);
-                }
+            if (!events.isEmpty()) {
+                addToResult(events);
             }
+            reportResult();
         }
     }
 
-    public class InternalErrorListener implements ErrorListener {
+    private class InternalErrorListener implements ErrorListener {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
-            boolean call = false;
-            synchronized (MyEventsRequest.this) {
-                if (!hasErrorOccurred) {
-                    hasErrorOccurred = true;
-                    call = true;
-                }
-            }
-            if (call) {
-                errorListener.onErrorResponse(volleyError);
-            }
+            reportResult();
         }
     }
 }
