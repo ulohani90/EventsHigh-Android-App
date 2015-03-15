@@ -231,7 +231,7 @@ public class EventDetailActivity extends BaseActivity {
         reportEventAction(event, "openContest");
         IntentUtils.processContestViewIntent(this,
                 Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
-                event.contestTitle);
+                event.offerTitle);
     }
 
 
@@ -527,9 +527,9 @@ public class EventDetailActivity extends BaseActivity {
             }
 
             // Set contest.
-            if (event.contestTitle != null) {
+            if (event.offerTitle != null) {
                 contestView.setVisibility(View.VISIBLE);
-                contestView.setText(event.contestTitle);
+                contestView.setText(event.offerTitle);
                 contestView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {

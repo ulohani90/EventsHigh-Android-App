@@ -294,6 +294,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static class EventCard extends ViewHolder {
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
+        private final ImageView offerView;
         private final TextView titleView;
         private final TextView timeView;
         private final TextView venueView;
@@ -311,6 +312,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             super(cardView);
             bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
             recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
+            offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
             titleView = (TextView) cardView.findViewById(R.id.event_title);
             timeView = (TextView) cardView.findViewById(R.id.event_time);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
@@ -327,8 +329,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         private void bindEventView(final Event event, final BaseEventsActivity activity,
-                                          final int position) {
-            itemView.setTag(new Integer(position));
+                                   final int position) {
+            itemView.setTag(position);
             itemView.setVisibility(View.VISIBLE);
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
@@ -365,6 +367,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 numPeopleInterestedView.setVisibility(View.VISIBLE);
                 numPeopleInterestedView.setText(Integer.toString(event.numPeopleInterested));
             }
+
+            // Offer ?
+            offerView.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
 
             // Set actions handlers.
             setFavouriteView(activity.getEventMark(event));

@@ -83,6 +83,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
         public final TextView timeView;
         public final ImageView favouriteView;
         public final ImageView favouritedView;
+        public final ImageView offerMarker;
 
         public ExploreEventCard(View root) {
             this.root = root;
@@ -94,6 +95,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
             this.timeView = (TextView) root.findViewById(R.id.event_time);
             this.favouriteView = (ImageView) root.findViewById(R.id.action_favourite);
             this.favouritedView = (ImageView) root.findViewById(R.id.action_favourited);
+            this.offerMarker = (ImageView) root.findViewById(R.id.offer_marker);
         }
 
         public void attachTo(final Event event, final BaseActivity activity) {
@@ -104,20 +106,14 @@ public class FeaturedEventsAdapter extends PagerAdapter {
             titleView.setText(event.title);
             venueView.setText(event.getShortAddress());
 
-            String tagToShow = null;
-            for (String tag : event.tags) {
-                if (EventCategory.parseCategory(tag) != null) {
-                    tagToShow = tag;
-                    break;
-                }
-            }
-            if (tagToShow == null && event.tags.length > 0) {
-                tagToShow = event.tags[0];
-            }
+            // Category.
+            String tagToShow = event.category != EventCategory.OTHER ? event.category.categoryName :
+                    (event.tags.length > 0 ? event.tags[0] : null);
             if (tagToShow != null) {
                 categoryView.setText(tagToShow);
             }
 
+            // Event Time.
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
             if (eventTime != null) {
                 dateView.setText(eventTime.day + ", " + eventTime.date);
@@ -126,6 +122,10 @@ public class FeaturedEventsAdapter extends PagerAdapter {
                 }
             }
 
+            // Offer ?
+            offerMarker.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
+
+            // Favourite ?
             final EventsMarkerManager eventsMarkerManager = EventsMarkerManager.getInstance(activity);
             setFavouriteView(eventsMarkerManager.isFavourite(event.id));
             favouriteView.setOnClickListener(new OnClickListener() {

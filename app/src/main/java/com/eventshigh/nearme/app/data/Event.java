@@ -34,7 +34,7 @@ public class Event implements Parcelable {
     public final String title;
     public final EventCategory category;
 
-    @Nullable public final String contestTitle;
+    @Nullable public final String offerTitle;
     public final String description;
     public final String[] tags;
 
@@ -58,7 +58,7 @@ public class Event implements Parcelable {
     @Nullable public final String organizerWebsite;
 
     public Event(String id, City city, String title, EventCategory category,
-                 @Nullable String contestTitle, String description, String[] tags,
+                 @Nullable String offerTitle, String description, String[] tags,
                  @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
                  int numPeopleInterested, boolean ehRecommended, float uberScore,
                  long[] eventTimings,
@@ -70,7 +70,7 @@ public class Event implements Parcelable {
         this.title = title;
         this.category = category;
 
-        this.contestTitle = Utils.checkIfUnknown(contestTitle);
+        this.offerTitle = Utils.checkIfUnknown(offerTitle);
         this.description = description;
         this.tags = tags;
 
@@ -137,7 +137,7 @@ public class Event implements Parcelable {
         dest.writeString(title);
         dest.writeString(category.toString());
 
-        dest.writeString(emptyIfNull(contestTitle));
+        dest.writeString(emptyIfNull(offerTitle));
         dest.writeString(description);
         dest.writeStringArray(tags);
 
@@ -259,11 +259,11 @@ public class Event implements Parcelable {
             address = address.substring(venue.length()).trim();
         }
 
-        // Contest
-        String contestTitle = null;
+        // offer.
+        String offerTitle = null;
         JSONObject contest = eventJson.optJSONObject("event_contest");
         if (contest != null) {
-            contestTitle = contest.optString("title");
+            offerTitle = contest.optString("title");
         }
 
         // Tags.
@@ -328,7 +328,7 @@ public class Event implements Parcelable {
                 title,
                 category,
 
-                contestTitle,
+                offerTitle,
                 description,
                 tagsList.toArray(new String[tagsList.size()]),
 

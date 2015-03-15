@@ -52,6 +52,20 @@
             tools:ignore="ContentDescription"
         />
 
+        <ImageView
+            android:id="@+id/event_offer_marker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/event_recommended"
+            android:layout_toEndOf="@+id/event_recommended"
+            android:layout_alignBottom="@+id/event_bg"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="4dp"
+            android:src="@drawable/ic_local_offer_white_16dp"
+            tools:ignore="ContentDescription"
+        />
+
         <TextView
             android:id="@+id/num_people_interested"
             style="@style/EventCardText"
