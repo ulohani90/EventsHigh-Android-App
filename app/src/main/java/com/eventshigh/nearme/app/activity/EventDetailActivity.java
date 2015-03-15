@@ -227,8 +227,8 @@ public class EventDetailActivity extends BaseActivity {
         startActivity(intent);
     }
 
-    private void openContestSite() {
-        reportEventAction(event, "openContest");
+    private void openOfferSite() {
+        reportEventAction(event, "openOffer");
         IntentUtils.processContestViewIntent(this,
                 Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
                 event.offerTitle);
@@ -268,7 +268,7 @@ public class EventDetailActivity extends BaseActivity {
         private final FrameLayout callView;
         private final FrameLayout shareView;
 
-        private final TextView contestView;
+        private final TextView offerView;
         private final FlowLayout tagsView;
         private final TextView descriptionView;
         private final TextView readMoreView;
@@ -310,7 +310,7 @@ public class EventDetailActivity extends BaseActivity {
             callView = (FrameLayout) findViewById(R.id.call);
             shareView = (FrameLayout) findViewById(R.id.share);
 
-            contestView = (TextView) findViewById(R.id.contest);
+            offerView = (TextView) findViewById(R.id.offer_text);
             tagsView = (FlowLayout) findViewById(R.id.event_tags);
             descriptionView = (TextView) findViewById(R.id.event_description);
             readMoreView = (TextView) findViewById(R.id.read_more);
@@ -528,16 +528,16 @@ public class EventDetailActivity extends BaseActivity {
 
             // Set contest.
             if (event.offerTitle != null) {
-                contestView.setVisibility(View.VISIBLE);
-                contestView.setText(event.offerTitle);
-                contestView.setOnClickListener(new OnClickListener() {
+                offerView.setVisibility(View.VISIBLE);
+                offerView.setText(event.offerTitle);
+                offerView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        openContestSite();
+                        openOfferSite();
                     }
                 });
             } else {
-                contestView.setVisibility(View.GONE);
+                offerView.setVisibility(View.GONE);
             }
 
             // Set description.

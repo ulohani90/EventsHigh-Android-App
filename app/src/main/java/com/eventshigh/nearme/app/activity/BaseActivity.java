@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
@@ -211,8 +212,12 @@ public abstract class BaseActivity extends ActionBarActivity {
     }
 
     public void showEventDetails(Event event) {
+        showEventDetails(event.getEventDetailsURI());
+    }
+
+    public void showEventDetails(Uri eventDetailsURI) {
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
-        detailIntent.setData(event.getEventDetailsURI());
+        detailIntent.setData(eventDetailsURI);
         startActivity(detailIntent);
     }
 

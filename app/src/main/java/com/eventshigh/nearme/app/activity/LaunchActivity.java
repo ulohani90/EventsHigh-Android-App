@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -36,6 +37,7 @@ import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
+import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
@@ -152,7 +154,9 @@ public class LaunchActivity extends BaseActivity {
 
         // Set the alarm which will check the "My Events" at regular interval and fire
         // notification if user has new events in his stream.
-        AlarmUtils.setMyEventsAlarm(this);
+        if (BuildConfig.DEBUG) {
+            AlarmUtils.setMyEventsAlarm(this);
+        }
     }
 
     public void onStart() {
@@ -176,8 +180,18 @@ public class LaunchActivity extends BaseActivity {
                 return;
             }
 
+            String offerURI = pref.getOfferURI();
+            if (offerURI != null) {
+                reportActionToAnalytics("openOffer");
+                IntentUtils.processContestViewIntent(this, Uri.parse(offerURI), null);
+            }
+
             if (!isTaskRoot()) {
                 finish();
+                return;
+            }
+
+            if (offerURI != null) {
                 return;
             }
         }

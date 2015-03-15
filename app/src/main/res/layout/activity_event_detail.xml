@@ -279,7 +279,7 @@
                 android:background="#1a4d4d4d"
             />
             <TextView
-                android:id="@+id/contest"
+                android:id="@+id/offer_text"
                 style="@style/EHButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
