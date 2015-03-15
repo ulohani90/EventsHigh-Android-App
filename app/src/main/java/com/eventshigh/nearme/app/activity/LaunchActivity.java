@@ -298,7 +298,12 @@ public class LaunchActivity extends BaseActivity {
 
     public void showThisWeekend(View view) {
         reportActionToAnalytics("showThisWeekend");
-        eventsContext.query = "this weekend";
+        Calendar calendar = Calendar.getInstance();
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        if (dayOfWeek > Calendar.SUNDAY && dayOfWeek < Calendar.FRIDAY) {
+            calendar.add(Calendar.DAY_OF_MONTH, Calendar.FRIDAY - dayOfWeek);
+        }
+        eventsContext.setDateFilter(calendar);
         showNextScreen(true);
     }
 
