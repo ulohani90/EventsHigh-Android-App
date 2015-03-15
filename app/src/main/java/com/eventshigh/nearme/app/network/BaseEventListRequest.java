@@ -94,10 +94,7 @@ public abstract class BaseEventListRequest extends JsonRequest<List<Event>>  {
         }
 
         // Sort the event list to user.
-        if (eventsContext.location != null) {
-            Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
-        }
-
+        Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
         return events;
     }
 }

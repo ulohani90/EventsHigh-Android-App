@@ -13,6 +13,10 @@ public class LocationUtils {
         return new LatLng(location.getLatitude(), location.getLongitude());
     }
 
+    public static float distanceInKM(LatLng loc1, LatLng loc2) {
+        return distanceInMeters(loc1, loc2) / 1000;
+    }
+
     public static float distanceInMeters(LatLng loc1, LatLng loc2) {
         float[] distance = new float[1];
         Location.distanceBetween(loc1.latitude, loc1.longitude, loc2.latitude, loc2.longitude, distance);

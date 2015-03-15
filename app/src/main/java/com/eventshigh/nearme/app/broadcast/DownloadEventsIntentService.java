@@ -10,13 +10,16 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,12 +58,14 @@ public class DownloadEventsIntentService extends IntentService
 
     @Override
     public void onResponse(MyEventsRequest.MyEvents pairs, boolean isIntermediate) {
+        // Merge all events into one List and remove duplicates.
         Set<Event> eventSet = new HashSet<>();
         for (Pair<String, List<Event>> entry : pairs) {
             eventSet.addAll(entry.second);
         }
-
         List<Event> events = new ArrayList<>(eventSet);
+        Collections.sort(events, new EventComparator(null, EventsMarkerManager.getInstance(this)));
+
         if (events.size() == 1) {
             NotificationUtils.showNotificationAndReleaseWakeLock(this, events.get(0), intent);
         } else if (events.size() > 1) {

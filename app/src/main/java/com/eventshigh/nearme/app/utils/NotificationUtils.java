@@ -134,7 +134,7 @@ public class NotificationUtils {
     }
 
     public synchronized static void showNotificationAndReleaseWakeLock(
-            final Context context, final List<Event> events, final Intent alarmIntent) {
+            Context context, List<Event> events, Intent alarmIntent) {
         SharedPreferences myEventsNotificationPreferences = context.getSharedPreferences(
                 SHARED_PREFS_FOR_MY_EVENTS_NOTIFICATIONS, Context.MODE_PRIVATE);
         int count = 0;
