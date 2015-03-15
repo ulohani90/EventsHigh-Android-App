@@ -4,7 +4,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Parcel;
 import android.text.format.DateUtils;
 import android.util.Log;
 
@@ -30,11 +29,8 @@ public class AlarmUtils {
         }
 
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Parcel parcel = Parcel.obtain();
-        event.writeToParcel(parcel, 0);
-        parcel.setDataPosition(0);
         Intent intent = new Intent(context, EventAlarmBroadcastReceiver.class);
-        intent.putExtra(EventNotificationIntentService.BUNDLE_EVENT_KEY, parcel.marshall());
+        intent.putExtra(EventNotificationIntentService.BUNDLE_EVENT_KEY, event);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context, event.hashCode(), intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
@@ -43,7 +39,6 @@ public class AlarmUtils {
         Log.i(LOG_TAG, "Setting alarm at " +
                 DateTimeUtils.timeToFullFormat(alarmTimeMillis)  + " for " + event.title);
         alarmMgr.set(AlarmManager.RTC_WAKEUP, alarmTimeMillis, alarmIntent);
-        parcel.recycle();
     }
 
     public static void setMyEventsAlarm(Context context) {

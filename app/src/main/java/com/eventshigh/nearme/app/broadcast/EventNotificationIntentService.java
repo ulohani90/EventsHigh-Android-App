@@ -2,8 +2,6 @@ package com.eventshigh.nearme.app.broadcast;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.Parcel;
 
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -18,26 +16,19 @@ public class EventNotificationIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        boolean releaseWakeLock = true;
-        Bundle extras = intent.getExtras();
-
-        if (Preferences.getInstance(getApplicationContext()).shouldNotifyFavourited() &&
-            !extras.isEmpty()) {  // has effect of unparcelling Bundle
-            byte[] byteArrayExtra = intent.getByteArrayExtra(BUNDLE_EVENT_KEY);
-            if (byteArrayExtra != null) {
-                Parcel parcel = Parcel.obtain();
-                parcel.unmarshall(byteArrayExtra, 0, byteArrayExtra.length);
-                parcel.setDataPosition(0);
-                Event event = Event.CREATOR.createFromParcel(parcel);
+        if (Preferences.getInstance(getApplicationContext()).shouldNotifyFavourited()) {
+            Event event = intent.getParcelableExtra(BUNDLE_EVENT_KEY);
+            if (event != null) {
+                // Notify user about the Event.
                 NotificationUtils.showNotificationAndReleaseWakeLock(this, event, intent);
-                releaseWakeLock = false;
-                parcel.recycle();
+
+                // do not release the WakeLock, it will be done by
+                // NotificationUtils.showNotificationAndReleaseWakeLock called above.
+                return;
             }
         }
 
-        if (releaseWakeLock) {
-            // Release the wake lock provided by the WakefulBroadcastReceiver.
-            EventAlarmBroadcastReceiver.completeWakefulIntent(intent);
-        }
+        // Release the wake lock provided by the WakefulBroadcastReceiver.
+        EventAlarmBroadcastReceiver.completeWakefulIntent(intent);
     }
 }
