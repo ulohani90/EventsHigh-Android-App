@@ -33,8 +33,7 @@ import java.util.List;
 public class NotificationUtils {
     public static final int GCM_NOTIFICATION_ID = 1;
     public static final int MY_EVENTS_NOTIFICATION_ID = 2;
-
-    private static final int MAX__MY_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
+    private static final int MAX_MY_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
 
     private static final String SHARED_PREFS_FOR_MY_EVENTS_NOTIFICATIONS = "MyEventsNotifications";
 
@@ -43,6 +42,7 @@ public class NotificationUtils {
             // placeholder for city.
             city = City.BANGALORE;
         }
+
         Intent intent = new Intent(context, EventDetailActivity.class);
         intent.setAction(BaseActivity.NOTIFICATION_ACTION);
         intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
@@ -56,8 +56,8 @@ public class NotificationUtils {
                 .build();
     }
 
-    public static void showNotificationAndReleaseWakeLock(final Context context, final Event event,
-                                                          final Intent intent) {
+    public static void showNotificationAndReleaseWakeLock(
+            final Context context, final Event event, final Intent intent) {
         ImageRequest request = new ImageRequest(event.imgUrl,
                 new Response.Listener<Bitmap>() {
                     @Override
@@ -76,8 +76,8 @@ public class NotificationUtils {
         VolleyHelper.addToRequestQueue(context, request);
     }
 
-    private static void showNotificationAndReleaseWakeLock(final Context context, final Event event,
-                                                           Bitmap bitmap, Intent intent) {
+    private static void showNotificationAndReleaseWakeLock(
+            Context context, Event event, Bitmap bitmap, Intent intent) {
         PendingIntent pendingIntent = createPendingIntent(context, event.id, event.city);
         CharSequence relativeTime = DateUtils.getRelativeDateTimeString(
                 context, event.eventTimings[0],
@@ -87,11 +87,10 @@ public class NotificationUtils {
                 relativeTime, event.getShortAddress());
         NotificationCompat.Builder notificationBuilder = createNotificationBuilder(
                 context, event.title, message, pendingIntent)
-                .setStyle(
-                        new NotificationCompat.BigPictureStyle()
-                                .setSummaryText(message)
-                                .bigPicture(bitmap)
-                                .setBigContentTitle(event.title)
+                .setStyle(new NotificationCompat.BigPictureStyle()
+                    .setSummaryText(message)
+                    .bigPicture(bitmap)
+                    .setBigContentTitle(event.title)
                 );
 
         Intent showOnMapIntent = event.getShowOnMapIntent();
@@ -114,8 +113,7 @@ public class NotificationUtils {
     @SuppressLint("InlinedApi")
     private static NotificationCompat.Builder createNotificationBuilder(Context context,
             String title, CharSequence message, PendingIntent contentIntent) {
-        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.ic_launcher);
+        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
         return new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.notification)
                 .setContentTitle(title)
@@ -129,8 +127,7 @@ public class NotificationUtils {
                 .setContentIntent(contentIntent);
     }
 
-    public static void showNotification(Context context, Notification notification,
-                                        int notificationId) {
+    public static void showNotification(Context context, Notification notification, int notificationId) {
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(notificationId, notification);
@@ -138,21 +135,21 @@ public class NotificationUtils {
 
     public synchronized static void showNotificationAndReleaseWakeLock(
             final Context context, final List<Event> events, final Intent alarmIntent) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(
+        SharedPreferences myEventsNotificationPreferences = context.getSharedPreferences(
                 SHARED_PREFS_FOR_MY_EVENTS_NOTIFICATIONS, Context.MODE_PRIVATE);
         int count = 0;
         StringBuilder message = new StringBuilder();
         for (int i = 0; i < events.size(); i++) {
-            if (count >= MAX__MY_EVENTS_TO_SHOW_IN_NOTIFICATION) {
+            if (count >= MAX_MY_EVENTS_TO_SHOW_IN_NOTIFICATION) {
                 break;
             }
-            if (sharedPreferences.contains(events.get(i).id)) {
+            if (myEventsNotificationPreferences.contains(events.get(i).id)) {
                 continue;
             }
             count++;
             message.append(events.get(i).title);
             message.append("\n");
-            sharedPreferences.edit().putBoolean(events.get(i).id, true).apply();
+            myEventsNotificationPreferences.edit().putBoolean(events.get(i).id, true).apply();
         }
 
         Intent myEventsIntent = new Intent(context, LaunchActivity.class);
