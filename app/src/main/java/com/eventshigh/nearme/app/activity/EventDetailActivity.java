@@ -206,17 +206,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     private void shareEvent() {
-        int favouriteViewVisibility = eventCard.favouriteView.getVisibility();
-        int favouritedViewVisibility = eventCard.favouritedView.getVisibility();
-        eventCard.favouriteView.setVisibility(View.GONE);
-        eventCard.favouritedView.setVisibility(View.GONE);
-        eventCard.dismissView.setVisibility(View.GONE);
-
         shareEvent(eventCard.shareContentsView, event);
-
-        eventCard.dismissView.setVisibility(View.VISIBLE);
-        eventCard.favouriteView.setVisibility(favouriteViewVisibility);
-        eventCard.favouritedView.setVisibility(favouritedViewVisibility);
     }
 
     private void openBookingSite() {
@@ -245,9 +235,9 @@ public class EventDetailActivity extends BaseActivity {
 
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
+        private final FrameLayout favouriteParent;
         private final TextView favouriteView;
         private final TextView favouritedView;
-        private final TextView dismissView;
 
         private final TextView titleView;
         private final TextView fromView;
@@ -289,7 +279,7 @@ public class EventDetailActivity extends BaseActivity {
             bgView = (NetworkImageView) findViewById(R.id.event_bg);
             favouriteView = (TextView) findViewById(R.id.action_favourite);
             favouritedView = (TextView) findViewById(R.id.action_favourited);
-            dismissView = (TextView) findViewById(R.id.action_dismiss);
+            favouriteParent = (FrameLayout) findViewById(R.id.action_favourite_parent);
 
             titleView = (TextView) findViewById(R.id.event_title);
             fromView = (TextView) findViewById(R.id.event_from);
@@ -378,32 +368,21 @@ public class EventDetailActivity extends BaseActivity {
             // Set EH recommendation and favourite views.
             recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
             setFavouriteView(eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id));
-            favouriteView.setOnClickListener(new OnClickListener() {
+            favouriteParent.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    reportEventAction(event, "addFavourite");
-                    eventsMarkerEditor.recordEventMark(event, EventMark.FAVOURITE);
-                    setFavouriteView(EventMark.FAVOURITE);
-                    AlarmUtils.setAlarm(EventDetailActivity.this, event);
-                }
-            });
-            favouritedView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    reportEventAction(event, "removeFavourite");
-                    eventsMarkerEditor.recordEventMark(event, null);
-                    setFavouriteView(null);
-                    AlarmUtils.cancelAlarm(EventDetailActivity.this, event);
-                }
-            });
-
-            eventCard.dismissView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    reportEventAction(event, "dismiss");
-                    eventsMarkerEditor.recordEventMark(event, EventMark.DISMISSED);
-                    finish();
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                    boolean isFavourite = eventsMarkerEditor.getEventsMarkerManager().isFavourite(event.id);
+                    if (isFavourite) {
+                        reportEventAction(event, "removeFavourite");
+                        eventsMarkerEditor.recordEventMark(event, null);
+                        setFavouriteView(null);
+                        AlarmUtils.cancelAlarm(EventDetailActivity.this, event);
+                    } else {
+                        reportEventAction(event, "addFavourite");
+                        eventsMarkerEditor.recordEventMark(event, EventMark.FAVOURITE);
+                        setFavouriteView(EventMark.FAVOURITE);
+                        AlarmUtils.setAlarm(EventDetailActivity.this, event);
+                    }
                 }
             });
 
@@ -463,7 +442,7 @@ public class EventDetailActivity extends BaseActivity {
             shareView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    shareEvent();
+                    shareEvent(shareContentsView, event);
                 }
             });
 
