@@ -356,8 +356,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:drawableLeft="@drawable/ic_action_share_dark"
-                        android:drawableStart="@drawable/ic_action_share_dark"
+                        android:drawableLeft="@drawable/ic_share_grey600_32dp"
+                        android:drawableStart="@drawable/ic_share_grey600_32dp"
                         android:textColor="#CC000000"
                         android:text="@string/action_share"
                     />

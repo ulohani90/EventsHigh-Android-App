@@ -302,6 +302,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final FrameLayout favouriteView;
         private final FrameLayout favouritedView;
         private final FrameLayout dismissView;
+        private final FrameLayout shareView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(R.layout.event_card, parent, false);
@@ -320,6 +321,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             favouriteView = (FrameLayout) cardView.findViewById(R.id.action_favourite);
             favouritedView = (FrameLayout) cardView.findViewById(R.id.action_favourited);
             dismissView = (FrameLayout) cardView.findViewById(R.id.action_dismiss);
+            shareView = (FrameLayout) cardView.findViewById(R.id.share);
         }
 
         public void setFavouriteView(@Nullable EventMark eventMark) {
@@ -400,6 +402,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                         Toast.makeText(activity, R.string.message_dismiss, Toast.LENGTH_SHORT).show();
                         showDismissToast = false;
                     }
+                }
+            });
+
+            shareView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.reportEventAction(event, "dismiss", position);
+                    activity.shareEvent(itemView, event);
                 }
             });
         }
