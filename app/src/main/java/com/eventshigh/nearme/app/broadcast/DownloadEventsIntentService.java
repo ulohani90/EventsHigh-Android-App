@@ -14,6 +14,7 @@ import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
@@ -59,7 +60,10 @@ public class DownloadEventsIntentService extends IntentService {
         public void onErrorResponse(VolleyError volleyError) {
             // TODO: This could happen when user is not connected. should we retry at some other point?
             // Should we switch to SyncAdapters ?
-            WakefulBroadcastReceiver.completeWakefulIntent(intent);
+            if (!new Account(DownloadEventsIntentService.this).getFollowingInterests().isEmpty()) {
+                NotificationUtils.showNotificationAndReleaseWakeLock(
+                        DownloadEventsIntentService.this, new ArrayList<Event>(), intent);
+            }
         }
     }
 

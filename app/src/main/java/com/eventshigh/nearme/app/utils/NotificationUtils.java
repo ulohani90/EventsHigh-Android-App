@@ -152,6 +152,10 @@ public class NotificationUtils {
             myEventsNotificationPreferences.edit().putBoolean(events.get(i).id, true).apply();
         }
 
+        if (count == 0) {
+            message = new StringBuilder("Check out the amazing events for your interests!");
+        }
+
         Intent myEventsIntent = new Intent(context, LaunchActivity.class);
         myEventsIntent.putExtra(SearchManager.QUERY, EventsHighEndpoints.QUERY_MY_EVENT);
         myEventsIntent.setAction(Intent.ACTION_SEARCH);
