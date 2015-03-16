@@ -60,6 +60,7 @@
     <string name="ui_pick_interest">Pick Your Interests</string>
     <string name="ui_view_location_on_map">View location on map</string>
     <string name="ui_upcoming_events">Upcoming events</string>
+    <string name="ui_upcoming_events_msg">Check out the amazing events for your interests!</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>

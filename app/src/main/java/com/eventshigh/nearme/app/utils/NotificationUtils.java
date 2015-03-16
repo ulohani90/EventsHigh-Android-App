@@ -138,7 +138,8 @@ public class NotificationUtils {
         SharedPreferences myEventsNotificationPreferences = context.getSharedPreferences(
                 SHARED_PREFS_FOR_MY_EVENTS_NOTIFICATIONS, Context.MODE_PRIVATE);
         int count = 0;
-        StringBuilder message = new StringBuilder();
+        StringBuilder message = new StringBuilder(
+                context.getString(R.string.ui_upcoming_events_msg)).append("\n");
         for (int i = 0; i < events.size(); i++) {
             if (count >= MAX_MY_EVENTS_TO_SHOW_IN_NOTIFICATION) {
                 break;
@@ -150,10 +151,6 @@ public class NotificationUtils {
             message.append(events.get(i).title);
             message.append("\n");
             myEventsNotificationPreferences.edit().putBoolean(events.get(i).id, true).apply();
-        }
-
-        if (count == 0) {
-            message = new StringBuilder("Check out the amazing events for your interests!");
         }
 
         Intent myEventsIntent = new Intent(context, LaunchActivity.class);
