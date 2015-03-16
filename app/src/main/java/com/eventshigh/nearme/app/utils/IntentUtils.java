@@ -106,7 +106,7 @@ public class IntentUtils {
             processSearchViewIntent(inUri);
         } else if (inUri.getPath().startsWith("/detail")) {
             processDetailViewIntent(inUri);
-        } else if (inUri.getPath().startsWith("/contest")) {
+        } else if (inUri.getPath().startsWith("/get_event_contest")) {
             processContestViewIntent(activity, inUri, null);
         } else if (inUri.getPath().startsWith("/browse")) {
             processBrowseViewIntent(inUri);

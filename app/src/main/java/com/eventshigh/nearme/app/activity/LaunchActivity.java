@@ -177,18 +177,12 @@ public class LaunchActivity extends BaseActivity {
                 return;
             }
 
-            String offerURI = pref.getOfferURI();
-            if (offerURI != null) {
-                reportActionToAnalytics("openOffer");
-                IntentUtils.processContestViewIntent(this, Uri.parse(offerURI), null);
+            if (showOffer()) {
+                return;
             }
 
             if (!isTaskRoot()) {
                 finish();
-                return;
-            }
-
-            if (offerURI != null) {
                 return;
             }
         }
@@ -386,7 +380,18 @@ public class LaunchActivity extends BaseActivity {
     // Helper methods
     // ***********************
 
-    protected void askUserForLocation() {
+    private boolean showOffer() {
+        String offerURI = pref.getOfferURI();
+        if (offerURI == null) {
+            return false;
+        }
+
+        reportActionToAnalytics("openOffer");
+        IntentUtils.processContestViewIntent(this, Uri.parse(offerURI), null);
+        return true;
+    }
+
+    private void askUserForLocation() {
         reportActionToAnalytics("askUserForLocation");
         String countryCode = eventsContext.city == null ?
                 null : eventsContext.city.countryCode;
@@ -422,6 +427,10 @@ public class LaunchActivity extends BaseActivity {
 
         // If we do not have query, show explore screen.
         if (!isUserAction && eventsContext.query.isEmpty() && eventsContext.dateFilter.isEmpty()) {
+            if (showOffer()) {
+                return;
+            }
+
             lastEventsContext = new EventsContext(eventsContext);
             showExploreScreen();
             return;
