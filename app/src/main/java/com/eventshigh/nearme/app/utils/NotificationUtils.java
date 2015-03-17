@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
@@ -25,6 +24,7 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -135,22 +135,21 @@ public class NotificationUtils {
 
     public synchronized static void showNotificationAndReleaseWakeLock(
             Context context, List<Event> events, Intent alarmIntent) {
-        SharedPreferences myEventsNotificationPreferences = context.getSharedPreferences(
-                SHARED_PREFS_FOR_MY_EVENTS_NOTIFICATIONS, Context.MODE_PRIVATE);
         int count = 0;
         StringBuilder message = new StringBuilder(
                 context.getString(R.string.ui_upcoming_events_msg)).append("\n");
+        List<String> eventIds = new ArrayList<>();
         for (int i = 0; i < events.size(); i++) {
             if (count >= MAX_MY_EVENTS_TO_SHOW_IN_NOTIFICATION) {
                 break;
             }
-            if (myEventsNotificationPreferences.contains(events.get(i).id)) {
+            if (eventIds.contains(events.get(i).id)) {
                 continue;
             }
             count++;
             message.append(events.get(i).title);
             message.append("\n");
-            myEventsNotificationPreferences.edit().putBoolean(events.get(i).id, true).apply();
+            eventIds.add(events.get(i).id);
         }
 
         Intent myEventsIntent = new Intent(context, LaunchActivity.class);
