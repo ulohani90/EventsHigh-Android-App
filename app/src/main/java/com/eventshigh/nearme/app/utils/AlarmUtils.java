@@ -55,7 +55,11 @@ public class AlarmUtils {
         // Set the alarm to start at approximately between 10:00 a.m. and 2:00 p.m. to reduce load
         // on server (to make sure that not all devices contact the server at the same time).
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis() + DateUtils.DAY_IN_MILLIS);
+        calendar.setTimeInMillis(System.currentTimeMillis() + DateUtils.DAY_IN_MILLIS * 7);
+        int notificationDays[] = new int[] { Calendar.TUESDAY, Calendar.WEDNESDAY,
+                Calendar.THURSDAY, Calendar.SATURDAY, Calendar.SUNDAY };
+        calendar.set(Calendar.DAY_OF_WEEK,
+                notificationDays[new Random().nextInt(notificationDays.length)]);
         calendar.set(Calendar.HOUR_OF_DAY, 10 + new Random().nextInt(5));
         calendar.set(Calendar.MINUTE, new Random().nextInt(60));
         long alarmTimeMillis = calendar.getTimeInMillis();
@@ -66,7 +70,7 @@ public class AlarmUtils {
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
         alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, alarmTimeMillis,
-                AlarmManager.INTERVAL_DAY, alarmIntent);
+                AlarmManager.INTERVAL_DAY * 7, alarmIntent);
     }
 
     public static void cancelAlarm(Context context, Event event) {
