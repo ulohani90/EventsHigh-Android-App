@@ -442,7 +442,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     private void createShortcut() {
-        reportActionToAnalytics("createShortcut");
+        reportActionToAnalytics("createShortcut", eventsContext.query);
 
         // Create an intent the shortcut could launch.
         Intent shortcutIntent = new Intent(getApplicationContext(), getClass());

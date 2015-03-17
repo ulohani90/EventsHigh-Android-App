@@ -8,6 +8,7 @@ import android.net.Uri.Builder;
 import android.os.AsyncTask;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Pair;
 
@@ -103,11 +104,14 @@ public class Account {
     public boolean recordReferrer(String referrer) {
         if (!accountInfo.contains(PREF_REFERRER)) {
             accountInfo.edit().putString(PREF_REFERRER, referrer).apply();
-            new AccountStateRegistar().execute();
             return true;
         }
 
         return false;
+    }
+
+    public @Nullable String getReferrer() {
+        return accountInfo.getString(PREF_REFERRER, null);
     }
 
     public String getAppDownloadLink() {
