@@ -87,7 +87,7 @@ public class DownloadEventsIntentService extends IntentService {
 
             if (events.size() == 1) {
                 NotificationUtils.showNotificationAndReleaseWakeLock(
-                        DownloadEventsIntentService.this, events.get(0), intent);
+                        DownloadEventsIntentService.this, intent, events.get(0));
             } else if (events.size() > 1) {
                 NotificationUtils.showNotificationAndReleaseWakeLock(
                         DownloadEventsIntentService.this, events, intent);

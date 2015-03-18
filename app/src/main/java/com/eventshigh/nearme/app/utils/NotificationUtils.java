@@ -35,8 +35,6 @@ public class NotificationUtils {
     public static final int MY_EVENTS_NOTIFICATION_ID = 2;
     private static final int MAX_MY_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
 
-    private static final String SHARED_PREFS_FOR_MY_EVENTS_NOTIFICATIONS = "MyEventsNotifications";
-
     public static PendingIntent createPendingIntent(Context context, String eventId, City city) {
         if (city == null) {
             // placeholder for city.
@@ -50,24 +48,34 @@ public class NotificationUtils {
     }
 
     public static Notification createNotification(Context context, String title,
-            CharSequence message, PendingIntent contentIntent) {
+            CharSequence message, PendingIntent contentIntent, String imageUrl) {
         return createNotificationBuilder(context, title, message, contentIntent)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .build();
     }
 
-    public static void showNotificationAndReleaseWakeLock(
-            final Context context, final Event event, final Intent intent) {
-        ImageRequest request = new ImageRequest(event.imgUrl,
+    public static void showNotificationAndReleaseWakeLock(Context context, Intent alarmIntent,
+                                                          Event event) {
+        NotificationData notificationData = new NotificationData(context, alarmIntent, event);
+        showNotificationAndReleaseWakeLock(context, notificationData);
+    }
+
+    public static void showNotificationAndReleaseWakeLock(Context context,
+            final NotificationData notificationData) {
+        if (notificationData.imageUrl == null) {
+            showNotificationAndReleaseWakeLock(notificationData, null);
+            return;
+        }
+        ImageRequest request = new ImageRequest(notificationData.imageUrl,
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap bitmap, boolean b) {
-                        showNotificationAndReleaseWakeLock(context, event, bitmap, intent);
+                        showNotificationAndReleaseWakeLock(notificationData, bitmap);
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
-                        showNotificationAndReleaseWakeLock(context, event, null, intent);
+                        showNotificationAndReleaseWakeLock(notificationData, null);
                     }
                 }
         );
@@ -76,38 +84,32 @@ public class NotificationUtils {
         VolleyHelper.addToRequestQueue(context, request);
     }
 
-    private static void showNotificationAndReleaseWakeLock(
-            Context context, Event event, Bitmap bitmap, Intent intent) {
-        PendingIntent pendingIntent = createPendingIntent(context, event.id, event.city);
-        CharSequence relativeTime = DateUtils.getRelativeDateTimeString(
-                context, event.eventTimings[0],
-                DateUtils.DAY_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0);
-        String message = String.format(
-                context.getResources().getString(R.string.event_time_venue),
-                relativeTime, event.getShortAddress());
+    private static void showNotificationAndReleaseWakeLock(NotificationData notificationData,
+                                                           Bitmap bitmap) {
         NotificationCompat.Builder notificationBuilder = createNotificationBuilder(
-                context, event.title, message, pendingIntent)
+                notificationData.context, notificationData.title, notificationData.message,
+                notificationData.pendingIntent)
                 .setStyle(new NotificationCompat.BigPictureStyle()
-                    .setSummaryText(message)
+                    .setSummaryText(notificationData.message)
                     .bigPicture(bitmap)
-                    .setBigContentTitle(event.title)
+                    .setBigContentTitle(notificationData.title)
                 );
 
-        Intent showOnMapIntent = event.getShowOnMapIntent();
-        if (showOnMapIntent != null) {
+        if (notificationData.showOnMapIntent != null) {
             PendingIntent showOnMapPendingIntent = PendingIntent.getActivity(
-                    context, 0, showOnMapIntent, 0);
+                    notificationData.context, 0, notificationData.showOnMapIntent, 0);
             NotificationCompat.Action showOnMapAction = new NotificationCompat.Action(
                     R.drawable.ic_location_on_grey600_24dp,
-                    context.getString(R.string.ui_view_location_on_map),
+                    notificationData.context.getString(R.string.ui_view_location_on_map),
                     showOnMapPendingIntent);
             notificationBuilder.addAction(showOnMapAction);
         }
 
-        showNotification(context, notificationBuilder.build(), event.hashCode());
+        showNotification(notificationData.context, notificationBuilder.build(),
+                notificationData.notificationId);
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
-        WakefulBroadcastReceiver.completeWakefulIntent(intent);
+        WakefulBroadcastReceiver.completeWakefulIntent(notificationData.alarmIntent);
     }
 
     @SuppressLint("InlinedApi")
@@ -157,10 +159,55 @@ public class NotificationUtils {
         myEventsIntent.setAction(Intent.ACTION_SEARCH);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, myEventsIntent, 0);
         Notification notification = createNotification(context,
-                context.getString(R.string.ui_upcoming_events), message, pendingIntent);
+                context.getString(R.string.ui_upcoming_events), message, pendingIntent, null);
         showNotification(context, notification, MY_EVENTS_NOTIFICATION_ID);
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         WakefulBroadcastReceiver.completeWakefulIntent(alarmIntent);
+    }
+
+    public static class NotificationData {
+        public final Context context;
+        public final Intent alarmIntent;
+
+        public final String title;
+        public final String message;
+        public final String imageUrl;
+
+        public final PendingIntent pendingIntent;
+        public final Intent showOnMapIntent;
+        public final int notificationId;
+
+        public NotificationData(Context context, Intent alarmIntent, Event event) {
+            this.context = context;
+            this.alarmIntent = alarmIntent;
+
+            title = event.title;
+            CharSequence relativeTime = DateUtils.getRelativeDateTimeString(
+                    context, event.eventTimings[0],
+                    DateUtils.DAY_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0);
+            message = String.format(
+                    context.getResources().getString(R.string.event_time_venue),
+                    relativeTime, event.getShortAddress());
+            imageUrl = event.imgUrl;
+
+            pendingIntent = createPendingIntent(context, event.id, event.city);
+            showOnMapIntent = event.getShowOnMapIntent();
+            notificationId = event.hashCode();
+        }
+
+        public NotificationData(Context context, Intent alarmIntent, String title, String message,
+                                String imageUrl, PendingIntent pendingIntent) {
+            this.context = context;
+            this.alarmIntent = alarmIntent;
+
+            this.title = title;
+            this.message = message;
+            this.imageUrl = imageUrl;
+
+            this.pendingIntent = pendingIntent;
+            showOnMapIntent = null;
+            notificationId = NotificationUtils.GCM_NOTIFICATION_ID;
+        }
     }
 }

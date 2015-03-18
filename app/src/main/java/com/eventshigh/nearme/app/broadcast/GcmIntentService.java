@@ -54,19 +54,20 @@ public class GcmIntentService extends IntentService {
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
         String messageType = gcm.getMessageType(intent);
         if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-            ParsedBundle parsedBundle = parsedBundle(intent.getExtras());
+            ParsedBundle parsedBundle = parsedBundle(intent.getExtras(), intent);
             sendNotification(parsedBundle, intent);
         }
     }
 
     private static class ParsedBundle {
-        public final Notification notification;
+        public final NotificationUtils.NotificationData notificationData;
         @Nullable
         public final LatLng boundCenter;
         public final double radiusInMeter;
 
-        private ParsedBundle (Notification notification, @Nullable LatLng boundCenter, double radiusInMeter) {
-            this.notification = notification;
+        private ParsedBundle (NotificationUtils.NotificationData notificationData,
+                              @Nullable LatLng boundCenter, double radiusInMeter) {
+            this.notificationData = notificationData;
             this.boundCenter = boundCenter;
             this.radiusInMeter = radiusInMeter;
         }
@@ -81,7 +82,7 @@ public class GcmIntentService extends IntentService {
         }
     }
 
-    private @Nullable ParsedBundle parsedBundle(Bundle msg) {
+    private @Nullable ParsedBundle parsedBundle(Bundle msg, Intent alarmIntent) {
         String title = Utils.checkIfUnknown(msg.getString("t"));
         String message = Utils.checkIfUnknown(msg.getString("m"));
         if (message == null || title == null) {
@@ -92,6 +93,7 @@ public class GcmIntentService extends IntentService {
         String eventId = Utils.checkIfUnknown(msg.getString("id"));
         String query = Utils.checkIfUnknown(msg.getString("q"));
         String contestUrl = Utils.checkIfUnknown(msg.getString("contest"));
+        String imageUrl = Utils.checkIfUnknown(msg.getString("img"));
         if (eventId == null && query == null && contestUrl == null) {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query or contest param passed");
             return null;
@@ -132,9 +134,10 @@ public class GcmIntentService extends IntentService {
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         }
 
-        Notification notification = NotificationUtils.createNotification(
-            this, title, message, contentIntent);
-        return new ParsedBundle(notification, bounded ? new LatLng(lat, lon) : null, distance);
+        NotificationUtils.NotificationData notificationData =
+                new NotificationUtils.NotificationData(this, alarmIntent, title, message,
+                        imageUrl, contentIntent);
+        return new ParsedBundle(notificationData, bounded ? new LatLng(lat, lon) : null, distance);
     }
 
     private void sendNotification(@Nullable ParsedBundle parsedBundle, Intent intent) {
@@ -143,8 +146,8 @@ public class GcmIntentService extends IntentService {
                 new BoundsVerifier(parsedBundle, intent).checkAndNotify();
                 return;
             } else {
-                NotificationUtils.showNotification(this, parsedBundle.notification,
-                        NotificationUtils.GCM_NOTIFICATION_ID);
+                NotificationUtils.showNotificationAndReleaseWakeLock(this,
+                        parsedBundle.notificationData);
             }
         }
 
@@ -171,8 +174,8 @@ public class GcmIntentService extends IntentService {
                     public void onConnected(Bundle bundle) {
                         Location location = LocationServices.FusedLocationApi.getLastLocation(client);
                         if (parsedBundle.isInRadius(location)) {
-                            NotificationUtils.showNotification(GcmIntentService.this,
-                                    parsedBundle.notification, NotificationUtils.GCM_NOTIFICATION_ID);
+                            NotificationUtils.showNotificationAndReleaseWakeLock(
+                                    GcmIntentService.this, parsedBundle.notificationData);
                         }
 
                         client.disconnect();
