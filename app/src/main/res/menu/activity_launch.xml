@@ -4,12 +4,6 @@
       xmlns:myApp="http://schemas.android.com/apk/res-auto"
       tools:context=".activity.LaunchActivity"
 >
-    <item android:id="@+id/action_my_events"
-          android:title="@string/menu_my_events"
-          android:icon="@drawable/eh_myevents"
-          android:orderInCategory="10"
-          myApp:showAsAction="ifRoom"
-    />
     <item android:id="@+id/action_search"
           android:title="@string/abc_searchview_description_search"
           android:icon="@drawable/ic_search_white_36dp"

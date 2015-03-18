@@ -65,6 +65,9 @@
             android:value=".activity.LaunchActivity"
         />
 
+        <!-- FB -->
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+
         <!--
          Enable the file provider which will be used when we share the image
          from our local cache directory to other applications.

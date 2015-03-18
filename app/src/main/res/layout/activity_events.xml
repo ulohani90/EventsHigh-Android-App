@@ -133,4 +133,43 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
     />
+    <RelativeLayout
+        android:id="@+id/my_events_clue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#008da9"
+        android:visibility="gone"
+    >
+        <ImageView
+            android:id="@+id/my_events_cup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/eh_myevents"
+            android:layout_margin="8dp"
+        />
+        <TextView
+            style="?android:attr/textAppearanceSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/my_events_cup"
+            android:layout_toEndOf="@+id/my_events_cup"
+            android:layout_toLeftOf="@+id/my_events_clue_close"
+            android:layout_toStartOf="@+id/my_events_clue_close"
+            android:layout_centerVertical="true"
+            android:textColor="@android:color/white"
+            android:text="@string/ui_my_events_clue"
+        />
+        <ImageButton
+            android:id="@+id/my_events_clue_close"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/button_transparent_dark"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+        />
+    </RelativeLayout>
 </LinearLayout>

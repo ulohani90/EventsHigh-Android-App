@@ -23,12 +23,6 @@
           android:orderInCategory="30"
           myApp:showAsAction="ifRoom"
     />
-    <item android:id="@+id/action_refresh"
-          android:title="@string/menu_refresh"
-          android:icon="@drawable/ic_refresh_white_36dp"
-          android:orderInCategory="40"
-          myApp:showAsAction="ifRoom"
-    />
     <item android:id="@+id/action_shortcut"
           android:title="@string/menu_shortcut"
           android:icon="@drawable/ic_link_white_36dp"
