@@ -51,7 +51,6 @@ import com.eventshigh.nearme.app.ui.FeaturedEventsAdapter;
 import com.eventshigh.nearme.app.ui.LoadingAdapter;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
-import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
@@ -198,11 +197,8 @@ public class LaunchActivity extends BaseActivity {
         }
 
         // Show next screen.
+        showVerifyPhoneSnackbar();
         showNextScreen(false);
-
-        if (Account.isPhoneVerifyPending(this)) {
-            showVerifyPhoneSnackbar();
-        }
     }
 
     @Override

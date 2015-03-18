@@ -88,6 +88,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private SlidingTabLayout dateFilter;
     protected FrameLayout eventContainer;
     protected ImageButton fab;
+    private View myEventsClueView;
 
     private View followButton;
     private View followingButton;
@@ -120,6 +121,22 @@ public abstract class BaseEventsActivity extends BaseActivity {
         fab = (ImageButton) findViewById(R.id.fab_switch_view);
         followButton = findViewById(R.id.follow_button);
         followingButton = findViewById(R.id.following_button);
+        myEventsClueView = findViewById(R.id.my_events_clue);
+
+        // Setup My Events Clue
+        myEventsClueView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSearchView(EventsHighEndpoints.QUERY_MY_EVENT);
+            }
+        });
+        findViewById(R.id.my_events_clue_close).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideMyEventsClue();
+            }
+        });
+
 
         // Set the context in term of eventFetcherParam. Use Intent
         // to restore the context.
@@ -159,6 +176,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
                     reportActionToAnalytics("addFollowing", eventsContext.query);
                     account.setIsFollowing(eventsContext.query, true);
                     setFollowButtons(true);
+                    showMyEventsClue();
                 }
             });
             followingButton.setOnClickListener(new OnClickListener() {
@@ -167,6 +185,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
                     reportActionToAnalytics("removeFollowing", eventsContext.query);
                     account.setIsFollowing(eventsContext.query, false);
                     setFollowButtons(false);
+                    hideMyEventsClue();
                 }
             });
         }
@@ -214,9 +233,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         eventsMarkerEditor = EventsMarkerManager.getInstance(this).getEditor();
 
         // Show the verify phone snakbar if needed.
-        if (Account.isPhoneVerifyPending(this)) {
-            showVerifyPhoneSnackbar();
-        }
+        showVerifyPhoneSnackbar();
 
         // Set the visibility of fab icon.
         fab.setVisibility(isPlayServicesPresent ? View.VISIBLE : View.GONE);
@@ -386,6 +403,12 @@ public abstract class BaseEventsActivity extends BaseActivity {
         if (EventMark.isDismissed(mark)) {
             remove(event);
         }
+        if (EventMark.isFavourite(mark)) {
+            showMyEventsClue();
+        } else {
+            hideMyEventsClue();
+        }
+
         eventsMarkerEditor.recordEventMark(event, mark);
     }
 
@@ -435,6 +458,20 @@ public abstract class BaseEventsActivity extends BaseActivity {
                     shouldBypassCache, shouldIncludeWithoutLocation(),
                     mEventsFetcherCallBack, mErrorListener);
         }
+    }
+
+    private void showMyEventsClue() {
+        myEventsClueView.setVisibility(View.VISIBLE);
+        myEventsClueView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                hideMyEventsClue();
+            }
+        }, 5000);
+    }
+
+    private void hideMyEventsClue() {
+        myEventsClueView.setVisibility(View.GONE);
     }
 
     private void createShortcut() {

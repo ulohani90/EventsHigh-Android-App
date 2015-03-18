@@ -290,8 +290,9 @@ public abstract class BaseActivity extends ActionBarActivity {
     }
 
     protected void showVerifyPhoneSnackbar() {
+        boolean isVerificationPending = Account.isPhoneVerifyPending(this);
         final View view = findViewById(R.id.verify_phone_container);
-        view.setVisibility(View.VISIBLE);
+        view.setVisibility(isVerificationPending ? View.VISIBLE :View.GONE);
         view.findViewById(R.id.verify_phone).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
