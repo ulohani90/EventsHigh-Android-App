@@ -35,8 +35,6 @@ public class NotificationUtils {
     public static final int MY_EVENTS_NOTIFICATION_ID = 2;
     private static final int MAX_MY_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
 
-    private static final String SHARED_PREFS_FOR_MY_EVENTS_NOTIFICATIONS = "MyEventsNotifications";
-
     public static PendingIntent createPendingIntent(Context context, String eventId, City city) {
         if (city == null) {
             // placeholder for city.
@@ -138,18 +136,13 @@ public class NotificationUtils {
         int count = 0;
         StringBuilder message = new StringBuilder(
                 context.getString(R.string.ui_upcoming_events_msg)).append("\n");
-        List<String> eventIds = new ArrayList<>();
         for (int i = 0; i < events.size(); i++) {
             if (count >= MAX_MY_EVENTS_TO_SHOW_IN_NOTIFICATION) {
                 break;
             }
-            if (eventIds.contains(events.get(i).id)) {
-                continue;
-            }
             count++;
             message.append(events.get(i).title);
             message.append("\n");
-            eventIds.add(events.get(i).id);
         }
 
         Intent myEventsIntent = new Intent(context, LaunchActivity.class);
