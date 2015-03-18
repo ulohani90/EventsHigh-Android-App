@@ -258,6 +258,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         // Do not show filterByDate for search.
+        menu.findItem(R.id.action_shortcut).setVisible(!eventsContext.query.isEmpty());
         menu.findItem(R.id.action_filter_date).setVisible(eventsContext.query.isEmpty());
         menu.findItem(R.id.action_filter).setVisible(
                 eventsContext.query.isEmpty() || EventsHighEndpoints.isDateQuery(eventsContext.query));
@@ -293,11 +294,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         if (id == R.id.action_shortcut) {
             createShortcut();
             return true;
-        }
-
-        if (id == R.id.action_refresh) {
-            reportActionToAnalytics("menuRefresh");
-            fetchNewListing(true /* bypass cache*/);
         }
 
         return super.onOptionsItemSelected(item);
