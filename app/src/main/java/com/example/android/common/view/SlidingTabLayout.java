@@ -65,7 +65,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
     }
 
-    private static final int TITLE_OFFSET_DIPS = 24;
+    private static final int TITLE_OFFSET_DIPS = 150;
     private static final int TAB_VIEW_PADDING_DIPS = 16;
     private static final int TAB_VIEW_TEXT_SIZE_SP = 12;
 
@@ -156,8 +156,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
             Utils.waitForViewVisible(selectedItem, new Runnable() {
                 @Override
                 public void run() {
-                    if (selectedItem.getLeft() > 100) {
-                        scrollTo(selectedItem.getLeft() - 100, 0);
+                    if (selectedItem.getLeft() > mTitleOffset) {
+                        scrollTo(selectedItem.getLeft() - mTitleOffset, 0);
                     }
                 }
             });
