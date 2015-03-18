@@ -82,7 +82,9 @@ public class LaunchActivity extends BaseActivity {
     private static final int MIN_EXPLORE_CARD_IN_ROW = 2;
     private static final long REFRESH_FEATURED_EVENTS_INTERVAL = 3600 * 1000L;
     private static final int MARGIN_DP = android.os.Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP ? 10 : 2;
-    public static final String[] EXPLORE_TAGS = { IntentUtils.QUERY_ALL,
+    public static final String[] EXPLORE_TAGS = {
+            IntentUtils.QUERY_ALL,
+            EventsHighEndpoints.QUERY_MY_EVENT,
             EventCategory.MUSIC.categoryName,
             EventCategory.PARTIES.categoryName,
             EventCategory.THEATRE.categoryName,
@@ -91,7 +93,6 @@ public class LaunchActivity extends BaseActivity {
             EventCategory.SPORTS.categoryName,
             EventCategory.HEALTH_WELLNESS.categoryName,
             EventCategory.DANCE.categoryName,
-            EventCategory.ART.categoryName,
             EventCategory.FOOD.categoryName,
             EventCategory.LITERATURE.categoryName
     };
@@ -238,12 +239,6 @@ public class LaunchActivity extends BaseActivity {
         }
 
         int id = item.getItemId();
-        if (id == R.id.action_my_events) {
-            reportActionToAnalytics("myEvents");
-            eventsContext.query = EventsHighEndpoints.QUERY_MY_EVENT;
-            showNextScreen(true);
-            return true;
-        }
 
         if (id == R.id.action_change_location) {
             askUserForLocation();
