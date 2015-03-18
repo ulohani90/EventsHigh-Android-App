@@ -4,11 +4,9 @@
     <!-- Title -->
     <string name="app_name">EventsHigh</string>
     <string name="title_book">Book Ticket</string>
-    <string name="title_explore">Explore</string>
 
     <!-- Actions -->
     <string name="action_skip">Skip</string>
-    <string name="action_done">Done</string>
     <string name="action_share">Invite</string>
     <string name="action_share2">Invite Friends</string>
     <string name="action_book">Book</string>
@@ -50,9 +48,9 @@
     <string name="ui_also_on">also on …</string>
     <string name="ui_read_more">Read More …</string>
     <string name="ui_referrer_default">Like this app? Tell your friends!</string>
-    <string name="ui_referrer">You\'\'ve helped {0,choice,1#one friend|1&lt;{0} friends} in finding amazing events, thank you!</string>
+    <string name="ui_referrer">You\'\'ve helped {0,choice,1#one friend|1&lt;{0} friends} in finding amazing events. Thank you!</string>
     <string name="ui_enter_phone_number_hint">Your Phone Number</string>
-    <string name="ui_phone_verify_tip">Register with your phone number to get exciting new deals on your favourite events in town!</string>
+    <string name="ui_phone_verify_tip">Register with your phone number to get exciting deals for your favourite events!</string>
     <string name="ui_code">We have sent a code to %s. Please enter it below</string>
     <string name="ui_code_verified">Your phone number %s has been verified</string>
     <string name="ui_verify_phone">Verify your phone number</string>
@@ -60,7 +58,7 @@
     <string name="ui_pick_interest">Pick Your Interests</string>
     <string name="ui_view_location_on_map">View location on map</string>
     <string name="ui_upcoming_events">Upcoming events</string>
-    <string name="ui_upcoming_events_msg">Check out the amazing events for your interests!</string>
+    <string name="ui_upcoming_events_msg">See amazing events for your interests!</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>
@@ -69,24 +67,23 @@
     <string name="onboarding_follow">Follow your interests and never miss an event again!</string>
     <string name="onboarding_like">Personalize to get events that matter!</string>
     <string name="onboarding_share">Share and plan your favorite events with friends!</string>
-    <string name="onboarding_get_started">Click on Get Started to start seeing events!</string>
 
     <!-- Helper messages -->
     <string name="loading">Loading …</string>
     <string name="zoom">Please zoom in to see interesting events!</string>
-    <string name="ask_locality">Enter the locality, city</string>
+    <string name="ask_locality">Enter an area or city</string>
     <string name="message_dismiss">Event removed. This will improve your recommendations.</string>
 
     <!-- Sharing -->
-    <string name="action_share_app">Share App</string>
+    <string name="action_share_app">Share This App</string>
     <string name="share_app_text">Hey! I liked this app and I think you will too. Check it out. %s</string>
     <string name="share_event_text">Hey Check this event out. Sounds fun! %1$s (This link is best viewed in EventsHigh App. Download it here: %2$s)</string>
 
     <!-- Failed messages -->
-    <string name="failed_load">Oops! Something\'s gone wrong, lets try that again.</string>
+    <string name="failed_load">Oops! Something\'s gone wrong. Let\'s try that again.</string>
     <string name="failed_refresh">Not able to refresh, this is old info.</string>
     <string name="unsupported_city">Sorry! We are not in your city. But we will be there soon!</string>
-    <string name="failed_locality">Uh oh! Not able to find your locality. Want to try again?</string>
+    <string name="failed_locality">Uh oh! Not able to find your area. Want to try again?</string>
     <string name="failed_save">That didn\'t work out. Lets try again!</string>
     <string name="failed_share">We couldn\'t share as there is no app installed at the other end. </string>
     <string name="failed_location">Sorry! We didn\'t get your location.</string>
@@ -94,7 +91,7 @@
     <string name="no_map_app">Maps application not found!</string>
     <string name="no_cal_app">Calendar application not found!</string>
     <string name="no_events">Uh oh! No events found!</string>
-    <string name="retry">Oops! You\'ve stumped us. Lets try again.</string>
+    <string name="retry">Oops! You\'ve stumped us. Let\'s try again.</string>
 
     <!-- formatting -->
     <plurals name="people_interested">
