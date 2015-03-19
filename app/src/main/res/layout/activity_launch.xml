@@ -133,6 +133,15 @@
                         />
                     </LinearLayout>
 
+                    <include
+                        android:id="@+id/my_events"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="12dp"
+                        layout="@layout/my_event_header"
+                      />
+
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

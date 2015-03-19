@@ -30,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
@@ -83,7 +84,6 @@ public class LaunchActivity extends BaseActivity {
     private static final int MARGIN_DP = android.os.Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP ? 10 : 2;
     public static final String[] EXPLORE_TAGS = {
             IntentUtils.QUERY_ALL,
-            EventsHighEndpoints.QUERY_MY_EVENT,
             EventCategory.MUSIC.categoryName,
             EventCategory.PARTIES.categoryName,
             EventCategory.THEATRE.categoryName,
@@ -92,6 +92,7 @@ public class LaunchActivity extends BaseActivity {
             EventCategory.SPORTS.categoryName,
             EventCategory.HEALTH_WELLNESS.categoryName,
             EventCategory.DANCE.categoryName,
+            EventCategory.ART.categoryName,
             EventCategory.FOOD.categoryName,
             EventCategory.LITERATURE.categoryName
     };
@@ -118,7 +119,6 @@ public class LaunchActivity extends BaseActivity {
     // User preferences.
     protected Preferences pref;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,6 +128,21 @@ public class LaunchActivity extends BaseActivity {
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
         dotsView = (LinearLayout) findViewById(R.id.dots_parent);
         featuredEventsPager = (ViewPager) findViewById(R.id.featured_events_pager);
+
+        // Set the My Events.
+        View myEventsHeader = findViewById(R.id.my_events);
+        myEventsHeader.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reportActionToAnalytics("myEvents");
+                eventsContext.query = EventsHighEndpoints.QUERY_MY_EVENT;
+                showNextScreen(true);
+            }
+        });
+        ((ImageView) myEventsHeader.findViewById(R.id.header_bg)).setImageResource(
+                R.drawable.infograph_myeventsbar);
+        ((TextView)myEventsHeader.findViewById(R.id.header)).setText(
+                Utils.capitalize(EventsHighEndpoints.QUERY_MY_EVENT));
 
         // Setup the actionbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -317,9 +332,10 @@ public class LaunchActivity extends BaseActivity {
         public void onConnected(Bundle bundle) {
             Location location = LocationServices.FusedLocationApi.getLastLocation(client);
             if (location != null) {
-                eventsContext.changeLocation(LocationUtils.locationToLatLng(location));
+                LatLng latLng = LocationUtils.locationToLatLng(location);
+                eventsContext.changeLocation(latLng);
                 if (eventsContext.city != null) {
-                    gcmRegistration.setLastCity(eventsContext.city);
+                    gcmRegistration.setLastCity(eventsContext.city, latLng);
                 } else {
                     reportActionToAnalytics("unsupportedCity");
                 }
@@ -492,7 +508,7 @@ public class LaunchActivity extends BaseActivity {
         public void onCitySelection(City city) {
             getSupportActionBar().setSubtitle(Utils.capitalize(city.name()));
             eventsContext.changeLocation(city.cityBounds.getCenter());
-            gcmRegistration.setLastCity(city);
+            gcmRegistration.setLastCity(city, null);
             showNextScreen(false);
         }
     };

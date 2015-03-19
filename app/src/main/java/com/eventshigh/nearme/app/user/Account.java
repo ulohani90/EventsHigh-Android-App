@@ -179,7 +179,9 @@ public class Account {
             }
 
             synchronized (AccountStateRegistarLock) {
-                if (!inProgress && accountInfo.getString(PREF_SHARE_APP_LINK, null) == null) {
+                if (!inProgress &&
+                    accountInfo.getString(PREF_SHARE_APP_LINK, null) == null &&
+                    GcmRegistration.getInstance(context).getLastCity() != null) {
                     try {
                         Uri uri = AccountStateReporter.getBaseUri(context, "getReferrerLink").build();
                         String url = Signer.sign(uri).toString();
