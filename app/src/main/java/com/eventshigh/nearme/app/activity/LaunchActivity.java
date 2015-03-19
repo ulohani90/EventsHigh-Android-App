@@ -140,7 +140,7 @@ public class LaunchActivity extends BaseActivity {
             }
         });
         ((ImageView) myEventsHeader.findViewById(R.id.header_bg)).setImageResource(
-                R.drawable.eh_myevents_header5);
+                R.drawable.infograph_myeventsbar);
         ((TextView)myEventsHeader.findViewById(R.id.header)).setText(
                 Utils.capitalize(EventsHighEndpoints.QUERY_MY_EVENT));
 
