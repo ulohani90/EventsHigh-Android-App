@@ -47,8 +47,8 @@ public class NotificationUtils {
         return PendingIntent.getActivity(context, 0, intent, 0);
     }
 
-    public static Notification createNotification(Context context, String title,
-            CharSequence message, PendingIntent contentIntent, String imageUrl) {
+    private static Notification createNotification(Context context, String title,
+            CharSequence message, PendingIntent contentIntent) {
         return createNotificationBuilder(context, title, message, contentIntent)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .build();
@@ -63,7 +63,7 @@ public class NotificationUtils {
     public static void showNotificationAndReleaseWakeLock(Context context,
             final NotificationData notificationData) {
         if (notificationData.imageUrl == null) {
-            showNotificationAndReleaseWakeLock(notificationData, null);
+            showNotificationAndReleaseWakeLock(notificationData);
             return;
         }
         ImageRequest request = new ImageRequest(notificationData.imageUrl,
@@ -75,13 +75,26 @@ public class NotificationUtils {
                 }, 0, 0, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
-                        showNotificationAndReleaseWakeLock(notificationData, null);
+                        showNotificationAndReleaseWakeLock(notificationData);
                     }
                 }
         );
 
         // Access the RequestQueue through your singleton class.
         VolleyHelper.addToRequestQueue(context, request);
+    }
+
+    private static void showNotificationAndReleaseWakeLock(
+            NotificationData notificationData) {
+        Notification notification = createNotificationBuilder(notificationData.context,
+                notificationData.title, notificationData.message, notificationData.pendingIntent)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationData.message))
+                .build();
+
+        showNotification(notificationData.context, notification, notificationData.notificationId);
+
+        // Release the wake lock provided by the WakefulBroadcastReceiver.
+        WakefulBroadcastReceiver.completeWakefulIntent(notificationData.alarmIntent);
     }
 
     private static void showNotificationAndReleaseWakeLock(NotificationData notificationData,
@@ -154,7 +167,7 @@ public class NotificationUtils {
         myEventsIntent.setAction(Intent.ACTION_SEARCH);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, myEventsIntent, 0);
         Notification notification = createNotification(context,
-                context.getString(R.string.ui_upcoming_events), message, pendingIntent, null);
+                context.getString(R.string.ui_upcoming_events), message, pendingIntent);
         showNotification(context, notification, MY_EVENTS_NOTIFICATION_ID);
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
