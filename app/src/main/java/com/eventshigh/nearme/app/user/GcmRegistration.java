@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.data.City;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
 
@@ -49,9 +50,9 @@ public class GcmRegistration {
         new GcmRegistar().execute();
     }
 
-    public void setLastCity(@Nullable City city) {
+    public void setLastCity(@Nullable City city, @Nullable LatLng location) {
         if (city != null) {
-            new CityRegistar().execute(city);
+            new CityRegistar(city, location).execute();
         }
     }
 
@@ -64,25 +65,32 @@ public class GcmRegistration {
         return city;
     }
 
-    private class CityRegistar extends AsyncTask<City, Void, Void> {
+    private class CityRegistar extends AsyncTask<Void, Void, Void> {
+        private final City city;
+        @Nullable private final LatLng location;
+
+        private CityRegistar(City city, @Nullable LatLng location) {
+            this.city = city;
+            this.location = location;
+        }
+
         @Override
-        protected Void doInBackground(City... params) {
+        protected Void doInBackground(Void... params) {
             City currentLastCity = null;
             String cityName = gcmRegistrationInfo.getString(PREF_LAST_CITY, null);
             if (cityName != null) {
                 currentLastCity = City.valueOf(cityName);
             }
 
-            City lastCity = params[0];
-            if (currentLastCity == null || !lastCity.equals(currentLastCity)) {
+            if (currentLastCity == null || !city.equals(currentLastCity)) {
                 Editor editor = gcmRegistrationInfo.edit();
-                editor.putString(PREF_LAST_CITY, lastCity.toString());
+                editor.putString(PREF_LAST_CITY, city.toString());
                 editor.remove(PREF_LAST_CITY_UPLOADED);
                 editor.apply();
             }
 
             if (!gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
-                AccountStateReporter.reportLastCity(context, lastCity, new Runnable() {
+                AccountStateReporter.reportLastCity(context, city, location, new Runnable() {
                         @Override
                         public void run() {
                             gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();

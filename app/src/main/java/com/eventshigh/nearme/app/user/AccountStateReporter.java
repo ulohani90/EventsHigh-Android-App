@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.net.Uri.Builder;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.android.volley.Request.Method;
@@ -15,6 +16,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -36,9 +38,15 @@ public class AccountStateReporter {
                 .build(), onSuccess);
     }
 
-    public static void reportLastCity(Context context, City city, Runnable onSuccess) {
+    public static void reportLastCity(Context context, City city, @Nullable LatLng location, Runnable onSuccess) {
+        if (location == null) {
+            location = new LatLng(0, 0);
+        }
+
         sendSignedRequest(context, getBaseUri(context, "reportLastCity")
                 .appendQueryParameter("last_city", city.toString())
+                .appendQueryParameter("lat", Double.toString(location.latitude))
+                .appendQueryParameter("lon", Double.toString(location.longitude))
                 .build(), onSuccess);
     }
 

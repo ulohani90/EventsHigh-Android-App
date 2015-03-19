@@ -92,6 +92,7 @@ public class LaunchActivity extends BaseActivity {
             EventCategory.SPORTS.categoryName,
             EventCategory.HEALTH_WELLNESS.categoryName,
             EventCategory.DANCE.categoryName,
+            EventCategory.ART.categoryName,
             EventCategory.FOOD.categoryName,
             EventCategory.LITERATURE.categoryName
     };
@@ -317,9 +318,10 @@ public class LaunchActivity extends BaseActivity {
         public void onConnected(Bundle bundle) {
             Location location = LocationServices.FusedLocationApi.getLastLocation(client);
             if (location != null) {
-                eventsContext.changeLocation(LocationUtils.locationToLatLng(location));
+                LatLng latLng = LocationUtils.locationToLatLng(location);
+                eventsContext.changeLocation(latLng);
                 if (eventsContext.city != null) {
-                    gcmRegistration.setLastCity(eventsContext.city);
+                    gcmRegistration.setLastCity(eventsContext.city, latLng);
                 } else {
                     reportActionToAnalytics("unsupportedCity");
                 }
@@ -492,7 +494,7 @@ public class LaunchActivity extends BaseActivity {
         public void onCitySelection(City city) {
             getSupportActionBar().setSubtitle(Utils.capitalize(city.name()));
             eventsContext.changeLocation(city.cityBounds.getCenter());
-            gcmRegistration.setLastCity(city);
+            gcmRegistration.setLastCity(city, null);
             showNextScreen(false);
         }
     };
