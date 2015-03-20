@@ -33,9 +33,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.TimeZone;
 
 import io.fabric.sdk.android.Fabric;
+
+import com.kochava.android.tracker.Feature;
 
 /**
  * Base activity class which does the common things like initialization of Google Analytics.
@@ -50,6 +53,8 @@ public abstract class BaseActivity extends ActionBarActivity {
     // Google Analytics
     protected boolean isPlayServicesPresent;
     private GAHelper gaHelper;
+
+    protected static Feature kTracker;
 
 
     // ***********************
@@ -77,6 +82,11 @@ public abstract class BaseActivity extends ActionBarActivity {
                 gaHelper.setAppOptOut(true);
             }
         }
+
+        // initialize Kochava
+        HashMap<String, Object> datamap = new HashMap<String, Object>();
+        datamap.put(Feature.INPUTITEMS.KOCHAVA_APP_ID, "koeventshigh550bd0ca59845");
+        kTracker = new Feature(this, datamap);
     }
 
     @Override
