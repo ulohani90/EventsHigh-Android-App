@@ -169,6 +169,10 @@ public class LaunchActivity extends BaseActivity {
         // Set the alarm which will check the "My Events" at regular interval and fire
         // notification if user has new events in his stream.
         AlarmUtils.setMyEventsAlarm(this);
+
+        // Set the alarm which will check the "Featured Events" on fridays and fire
+        // notification if user has new events in his stream.
+        AlarmUtils.setFeaturedEventsAlarm(this);
     }
 
     public void onStart() {

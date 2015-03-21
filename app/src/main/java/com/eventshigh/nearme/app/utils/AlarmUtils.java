@@ -8,6 +8,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.eventshigh.nearme.app.broadcast.DownloadEventsBroadcastReceiver;
+import com.eventshigh.nearme.app.broadcast.DownloadEventsIntentService;
 import com.eventshigh.nearme.app.broadcast.EventAlarmBroadcastReceiver;
 import com.eventshigh.nearme.app.broadcast.EventNotificationIntentService;
 import com.eventshigh.nearme.app.data.Event;
@@ -42,16 +43,6 @@ public class AlarmUtils {
     }
 
     public static void setMyEventsAlarm(Context context) {
-        Intent intent = new Intent(context, DownloadEventsBroadcastReceiver.class);
-        boolean isAlarmAlreadySet = PendingIntent.getBroadcast(context, 0, intent,
-                PendingIntent.FLAG_NO_CREATE) != null;
-
-        // If the alarm is already set, there is nothing to do
-        if (isAlarmAlreadySet) {
-            Log.i(LOG_TAG, "My events alarm is already set");
-            return;
-        }
-
         // Set the alarm to start at approximately between 10:00 a.m. and 2:00 p.m. to reduce load
         // on server (to make sure that not all devices contact the server at the same time).
         Calendar calendar = Calendar.getInstance();
@@ -62,10 +53,37 @@ public class AlarmUtils {
                 notificationDays[new Random().nextInt(notificationDays.length)]);
         calendar.set(Calendar.HOUR_OF_DAY, 10 + new Random().nextInt(5));
         calendar.set(Calendar.MINUTE, new Random().nextInt(60));
-        long alarmTimeMillis = calendar.getTimeInMillis();
+        setWeeklyRepeatAlarm(context, DownloadEventsIntentService.ACTION_DOWNLOAD_MY_EVENTS,
+                calendar.getTimeInMillis());
+    }
+
+    public static void setFeaturedEventsAlarm(Context context) {
+        // Set the alarm to start at approximately between 10:00 a.m. and 2:00 p.m. to reduce load
+        // on server (to make sure that not all devices contact the server at the same time).
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis() + DateUtils.DAY_IN_MILLIS);
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+        calendar.set(Calendar.HOUR_OF_DAY, 10 + new Random().nextInt(5));
+        calendar.set(Calendar.MINUTE, new Random().nextInt(60));
+        setWeeklyRepeatAlarm(context, DownloadEventsIntentService.ACTION_DOWNLOAD_FEATURED_EVENTS,
+                calendar.getTimeInMillis());
+    }
+
+    private static void setWeeklyRepeatAlarm(Context context, String intentAction,
+                                             long alarmTimeMillis) {
+        Intent intent = new Intent(context, DownloadEventsBroadcastReceiver.class);
+        intent.setAction(intentAction);
+        boolean isAlarmAlreadySet = PendingIntent.getBroadcast(context, 0, intent,
+                PendingIntent.FLAG_NO_CREATE) != null;
+
+        // If the alarm is already set, there is nothing to do
+        if (isAlarmAlreadySet) {
+            Log.i(LOG_TAG, intentAction + " alarm is already set");
+            return;
+        }
 
         Log.i(LOG_TAG, "Setting alarm at " +
-                DateTimeUtils.timeToFullFormat(alarmTimeMillis) + " for my events");
+                DateTimeUtils.timeToFullFormat(alarmTimeMillis) + " for " + intentAction);
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);

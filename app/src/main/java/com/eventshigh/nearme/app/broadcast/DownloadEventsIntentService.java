@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Set;
 
 public class DownloadEventsIntentService extends IntentService {
+    public static final String ACTION_DOWNLOAD_MY_EVENTS = "downloadMyEvents";
+    public static final String ACTION_DOWNLOAD_FEATURED_EVENTS = "downloadFeaturedEvents";
+
     public DownloadEventsIntentService() {
         super("DownloadEventsIntentService");
     }
