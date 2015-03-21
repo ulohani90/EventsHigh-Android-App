@@ -28,6 +28,7 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.kochava.android.tracker.Feature;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,8 +38,6 @@ import java.util.HashMap;
 import java.util.TimeZone;
 
 import io.fabric.sdk.android.Fabric;
-
-import com.kochava.android.tracker.Feature;
 
 /**
  * Base activity class which does the common things like initialization of Google Analytics.
@@ -84,7 +83,7 @@ public abstract class BaseActivity extends ActionBarActivity {
         }
 
         // initialize Kochava
-        HashMap<String, Object> datamap = new HashMap<String, Object>();
+        HashMap<String, Object> datamap = new HashMap<>();
         datamap.put(Feature.INPUTITEMS.KOCHAVA_APP_ID, "koeventshigh550bd0ca59845");
         kTracker = new Feature(this, datamap);
     }
