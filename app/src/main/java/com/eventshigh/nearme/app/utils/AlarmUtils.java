@@ -42,6 +42,14 @@ public class AlarmUtils {
         alarmMgr.set(AlarmManager.RTC_WAKEUP, alarmTimeMillis, alarmIntent);
     }
 
+    public static void cancelAlarm(Context context, Event event) {
+        AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, EventAlarmBroadcastReceiver.class);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(context,
+                event.hashCode(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmMgr.cancel(alarmIntent);
+    }
+
     public static void setMyEventsAlarm(Context context) {
         // Set the alarm to start at approximately between 10:00 a.m. and 2:00 p.m. to reduce load
         // on server (to make sure that not all devices contact the server at the same time).
@@ -91,11 +99,14 @@ public class AlarmUtils {
                 AlarmManager.INTERVAL_DAY * 7, alarmIntent);
     }
 
-    public static void cancelAlarm(Context context, Event event) {
-        AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, EventAlarmBroadcastReceiver.class);
+    public static void cancelOldMyEventsAlarm(Context context) {
+        Intent intent = new Intent(context, DownloadEventsBroadcastReceiver.class);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context,
-                event.hashCode(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        alarmMgr.cancel(alarmIntent);
+                0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        if (alarmIntent != null) {
+            AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            alarmMgr.cancel(alarmIntent);
+            Log.i(LOG_TAG, "Canceled old my events alarm");
+        }
     }
 }
