@@ -13,6 +13,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
@@ -47,15 +48,21 @@ public class DownloadEventsIntentService extends IntentService {
             eventsContext.changeLocation(lastCity.cityBounds.getCenter());
         }
 
-        new MyEventsRequest(this, eventsContext, Request.Priority.IMMEDIATE,
-                false /* shouldBypassCache */, true /* includeWithoutLocation */,
-                new MyEventsListener(intent), new ErrorListener(intent)).execute();
+        if (ACTION_DOWNLOAD_FEATURED_EVENTS.equals(intent.getAction())) {
+            FeaturedEventsRequest.submit(this, eventsContext, Request.Priority.IMMEDIATE,
+                    false /* shouldBypassCache */, new FeaturedEventsListener(intent),
+                    new FeaturedEventsErrorListener(intent));
+        } else {
+            new MyEventsRequest(this, eventsContext, Request.Priority.IMMEDIATE,
+                    false /* shouldBypassCache */, true /* includeWithoutLocation */,
+                    new MyEventsListener(intent), new MyEventsErrorListener(intent)).execute();
+        }
     }
 
-    private class ErrorListener implements Response.ErrorListener {
+    private class MyEventsErrorListener implements Response.ErrorListener {
         private final Intent intent;
 
-        private ErrorListener(Intent intent) {
+        private MyEventsErrorListener(Intent intent) {
             this.intent = intent;
         }
 
@@ -64,8 +71,10 @@ public class DownloadEventsIntentService extends IntentService {
             // TODO: This could happen when user is not connected. should we retry at some other point?
             // Should we switch to SyncAdapters ?
             if (!new Account(DownloadEventsIntentService.this).getFollowingInterests().isEmpty()) {
-                NotificationUtils.showNotificationAndReleaseWakeLock(
+                NotificationUtils.showMyEventsNotificationAndReleaseWakeLock(
                         DownloadEventsIntentService.this, new ArrayList<Event>(), intent);
+            } else {
+                WakefulBroadcastReceiver.completeWakefulIntent(intent);
             }
         }
     }
@@ -84,19 +93,58 @@ public class DownloadEventsIntentService extends IntentService {
             for (Pair<String, List<Event>> entry : pairs) {
                 eventSet.addAll(entry.second);
             }
-            List<Event> events = new ArrayList<>(eventSet);
-            Collections.sort(events, new EventComparator(null,
-                    EventsMarkerManager.getInstance(DownloadEventsIntentService.this)));
+            showNotification(eventSet, intent, NotificationUtils.MY_EVENTS_NOTIFICATION_ID);
+        }
+    }
 
-            if (events.size() == 1) {
-                NotificationUtils.showNotificationAndReleaseWakeLock(
-                        DownloadEventsIntentService.this, intent, events.get(0));
-            } else if (events.size() > 1) {
-                NotificationUtils.showNotificationAndReleaseWakeLock(
+    private class FeaturedEventsErrorListener implements Response.ErrorListener {
+        private final Intent intent;
+
+        private FeaturedEventsErrorListener(Intent intent) {
+            this.intent = intent;
+        }
+
+        @Override
+        public void onErrorResponse(VolleyError volleyError) {
+            // TODO: This could happen when user is not connected. should we retry at some other point?
+            // Should we switch to SyncAdapters ?
+            WakefulBroadcastReceiver.completeWakefulIntent(intent);
+        }
+    }
+
+    private class FeaturedEventsListener implements Response.Listener<List<Event>> {
+        private final Intent intent;
+
+        private FeaturedEventsListener(Intent intent) {
+            this.intent = intent;
+        }
+
+        @Override
+        public void onResponse(final List<Event> featuredEvents, boolean isIntermediate) {
+            // Merge all events into one List and remove duplicates.
+            Set<Event> eventSet = new HashSet<>(featuredEvents);
+            showNotification(eventSet, intent, NotificationUtils.FEATURED_EVENTS_NOTIFICATION_ID);
+        }
+    }
+
+    private void showNotification(Set<Event> eventSet, Intent intent, int notificationId) {
+        List<Event> events = new ArrayList<>(eventSet);
+        Collections.sort(events, new EventComparator(null,
+                EventsMarkerManager.getInstance(DownloadEventsIntentService.this)));
+        if (events.size() == 1) {
+            NotificationUtils.showNotificationAndReleaseWakeLock(
+                    DownloadEventsIntentService.this, intent, events.get(0),
+                    notificationId);
+        } else if (events.size() > 1) {
+            if (notificationId == NotificationUtils.FEATURED_EVENTS_NOTIFICATION_ID) {
+                NotificationUtils.showFeaturedEventsNotificationAndReleaseWakeLock(
                         DownloadEventsIntentService.this, events, intent);
             } else {
-                WakefulBroadcastReceiver.completeWakefulIntent(intent);
+                NotificationUtils.showMyEventsNotificationAndReleaseWakeLock(
+                        DownloadEventsIntentService.this, events, intent);
             }
+        } else {
+            WakefulBroadcastReceiver.completeWakefulIntent(intent);
         }
     }
 }
