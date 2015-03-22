@@ -179,10 +179,10 @@ public class NotificationUtils {
             message.append("\n");
         }
 
-        Intent myEventsIntent = new Intent(context, LaunchActivity.class);
-        myEventsIntent.putExtra(SearchManager.QUERY, query);
-        myEventsIntent.setAction(Intent.ACTION_SEARCH);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, myEventsIntent, 0);
+        Intent launchIntent = new Intent(context, LaunchActivity.class);
+        launchIntent.putExtra(SearchManager.QUERY, query);
+        launchIntent.setAction(Intent.ACTION_SEARCH);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, 0);
         Notification notification = createNotification(context,
                 context.getString(titleResourceId), message, pendingIntent);
         showNotification(context, notification, notificationId);
