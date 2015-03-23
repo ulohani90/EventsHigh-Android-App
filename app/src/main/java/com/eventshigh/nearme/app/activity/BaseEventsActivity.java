@@ -428,7 +428,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     public void showSearchView(String query) {
-        reportActionToAnalytics("showSearchView");
+        reportActionToAnalytics("showSearchView", query);
         EventsContext param = new EventsContext(eventsContext.location, query);
         Intent intent = new Intent(this, this.getClass())
                 .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
