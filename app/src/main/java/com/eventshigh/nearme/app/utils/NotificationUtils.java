@@ -24,7 +24,6 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +32,9 @@ import java.util.List;
 public class NotificationUtils {
     public static final int GCM_NOTIFICATION_ID = 1;
     public static final int MY_EVENTS_NOTIFICATION_ID = 2;
-    private static final int MAX_MY_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
+    public static final int FEATURED_EVENTS_NOTIFICATION_ID = 3;
+
+    private static final int MAX_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
 
     public static PendingIntent createPendingIntent(Context context, String eventId, City city) {
         if (city == null) {
@@ -55,8 +56,9 @@ public class NotificationUtils {
     }
 
     public static void showNotificationAndReleaseWakeLock(Context context, Intent alarmIntent,
-                                                          Event event) {
-        NotificationData notificationData = new NotificationData(context, alarmIntent, event);
+                                                          Event event, int notificationId) {
+        NotificationData notificationData = new NotificationData(context, alarmIntent, event,
+                notificationId);
         showNotificationAndReleaseWakeLock(context, notificationData);
     }
 
@@ -103,9 +105,9 @@ public class NotificationUtils {
                 notificationData.context, notificationData.title, notificationData.message,
                 notificationData.pendingIntent)
                 .setStyle(new NotificationCompat.BigPictureStyle()
-                    .setSummaryText(notificationData.message)
-                    .bigPicture(bitmap)
-                    .setBigContentTitle(notificationData.title)
+                                .setSummaryText(notificationData.message)
+                                .bigPicture(bitmap)
+                                .setBigContentTitle(notificationData.title)
                 );
 
         if (notificationData.showOnMapIntent != null) {
@@ -148,13 +150,28 @@ public class NotificationUtils {
         notificationManager.notify(notificationId, notification);
     }
 
-    public synchronized static void showNotificationAndReleaseWakeLock(
+    public synchronized static void showMyEventsNotificationAndReleaseWakeLock(
             Context context, List<Event> events, Intent alarmIntent) {
+        showNotificationAndReleaseWakeLock(context, events, R.string.ui_upcoming_events,
+                R.string.ui_upcoming_events_msg, EventsHighEndpoints.QUERY_MY_EVENT,
+                MY_EVENTS_NOTIFICATION_ID, alarmIntent);
+    }
+
+    public synchronized static void showFeaturedEventsNotificationAndReleaseWakeLock(
+            Context context, List<Event> events, Intent alarmIntent) {
+        showNotificationAndReleaseWakeLock(context, events, R.string.ui_featured_events,
+                R.string.ui_featured_events_msg, EventsHighEndpoints.QUERY_FEATURED,
+                FEATURED_EVENTS_NOTIFICATION_ID, alarmIntent);
+    }
+
+    private synchronized static void showNotificationAndReleaseWakeLock(
+            Context context, List<Event> events, int titleResourceId, int messageResourceId,
+            String query, int notificationId, Intent alarmIntent) {
         int count = 0;
         StringBuilder message = new StringBuilder(
-                context.getString(R.string.ui_upcoming_events_msg)).append("\n");
+                context.getString(messageResourceId)).append("\n");
         for (int i = 0; i < events.size(); i++) {
-            if (count >= MAX_MY_EVENTS_TO_SHOW_IN_NOTIFICATION) {
+            if (count >= MAX_EVENTS_TO_SHOW_IN_NOTIFICATION) {
                 break;
             }
             count++;
@@ -162,13 +179,13 @@ public class NotificationUtils {
             message.append("\n");
         }
 
-        Intent myEventsIntent = new Intent(context, LaunchActivity.class);
-        myEventsIntent.putExtra(SearchManager.QUERY, EventsHighEndpoints.QUERY_MY_EVENT);
-        myEventsIntent.setAction(Intent.ACTION_SEARCH);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, myEventsIntent, 0);
+        Intent launchIntent = new Intent(context, LaunchActivity.class);
+        launchIntent.putExtra(SearchManager.QUERY, query);
+        launchIntent.setAction(Intent.ACTION_SEARCH);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, 0);
         Notification notification = createNotification(context,
-                context.getString(R.string.ui_upcoming_events), message, pendingIntent);
-        showNotification(context, notification, MY_EVENTS_NOTIFICATION_ID);
+                context.getString(titleResourceId), message, pendingIntent);
+        showNotification(context, notification, notificationId);
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         WakefulBroadcastReceiver.completeWakefulIntent(alarmIntent);
@@ -186,7 +203,8 @@ public class NotificationUtils {
         public final Intent showOnMapIntent;
         public final int notificationId;
 
-        public NotificationData(Context context, Intent alarmIntent, Event event) {
+        public NotificationData(Context context, Intent alarmIntent, Event event,
+                                int notificationId) {
             this.context = context;
             this.alarmIntent = alarmIntent;
 
@@ -201,7 +219,7 @@ public class NotificationUtils {
 
             pendingIntent = createPendingIntent(context, event.id, event.city);
             showOnMapIntent = event.getShowOnMapIntent();
-            notificationId = event.hashCode();
+            this.notificationId = notificationId;
         }
 
         public NotificationData(Context context, Intent alarmIntent, String title, String message,

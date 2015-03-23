@@ -60,6 +60,8 @@
     <string name="ui_upcoming_events">Upcoming events</string>
     <string name="ui_upcoming_events_msg">See amazing events for your interests!</string>
     <string name="ui_my_events_clue">Added to \'My Events\'.\nTap to go to \'My Events\' now.</string>
+    <string name="ui_featured_events">Featured events</string>
+    <string name="ui_featured_events_msg">See amazing events!</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>

@@ -26,6 +26,6 @@ public class EventNotificationIntentService extends IntentService {
         }
 
         // Notify user about the Event.
-        NotificationUtils.showNotificationAndReleaseWakeLock(this, intent, event);
+        NotificationUtils.showNotificationAndReleaseWakeLock(this, intent, event, event.hashCode());
     }
 }
