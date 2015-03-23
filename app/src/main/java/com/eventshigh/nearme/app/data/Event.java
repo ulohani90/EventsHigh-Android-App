@@ -330,7 +330,16 @@ public class Event implements Parcelable {
         }
 
         // Performers
-        String[] performers = new String[0];
+        JSONArray participantsInfo = eventJson.optJSONArray("participants");
+        List<String> performers = new ArrayList<>(participantsInfo == null ? 0 :participantsInfo.length());
+        if (participantsInfo != null) {
+            for (i = 0; i < participantsInfo.length(); i++) {
+                String performer = participantsInfo.getJSONObject(i).optString("name");
+                if (performer != null) {
+                    performers.add(performer);
+                }
+            }
+        }
 
         // Organizer Info.
         String organizerName = mashup == null ? null : mashup.optString("organizer_name");
@@ -361,7 +370,7 @@ public class Event implements Parcelable {
                 locality,
                 address,
 
-                performers,
+                performers.toArray(new String[performers.size()]),
 
                 organizerName,
                 organizerPhone,
