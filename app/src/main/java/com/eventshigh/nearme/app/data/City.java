@@ -10,12 +10,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
  */
 public enum City {
     BANGALORE(12.784305f, 77.352505f, 13.178402f, 77.840023f, "GMT+0530", "IN"),
-    CHENNAI(12.845130f, 80.036949f, 13.259850f, 80.358986f, "GMT+0530", "IN"),
     DELHI(28.370917f, 76.803156f, 28.882014f, 77.432123f, "GMT+0530", "IN"),
-    HYDERABAD(17.221264f, 78.208575f, 17.593416f, 78.696093f, "GMT+0530", "IN"),
-    KOLKATA(22.363021f, 88.076763f, 23.018055f, 88.590374f, "GMT+0530", "IN"),
-    MUMBAI(18.863098f, 72.750398f, 19.295282f, 73.071748f, "GMT+0530", "IN"),
-    PUNE(18.419274f, 73.731990f, 18.645184f, 74.008021f, "GMT+0530", "IN");
+    MUMBAI(18.863098f, 72.750398f, 19.295282f, 73.071748f, "GMT+0530", "IN");
 
     public final LatLngBounds cityBounds;
     public final String timeZone;

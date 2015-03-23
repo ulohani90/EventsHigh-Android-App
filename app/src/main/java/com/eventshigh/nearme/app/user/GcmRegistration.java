@@ -60,7 +60,11 @@ public class GcmRegistration {
         City city = null;
         String cityName = gcmRegistrationInfo.getString(PREF_LAST_CITY, null);
         if (cityName != null) {
-            city = City.valueOf(cityName);
+            try {
+                city = City.valueOf(cityName);
+            } catch (IllegalArgumentException e) {
+                // Ignore.
+            }
         }
         return city;
     }
@@ -79,14 +83,18 @@ public class GcmRegistration {
             City currentLastCity = null;
             String cityName = gcmRegistrationInfo.getString(PREF_LAST_CITY, null);
             if (cityName != null) {
-                currentLastCity = City.valueOf(cityName);
+                try {
+                    currentLastCity = City.valueOf(cityName);
+                } catch (IllegalArgumentException e) {
+                    // Ignore.
+                }
             }
 
             if (currentLastCity == null || !city.equals(currentLastCity)) {
-                Editor editor = gcmRegistrationInfo.edit();
-                editor.putString(PREF_LAST_CITY, city.toString());
-                editor.remove(PREF_LAST_CITY_UPLOADED);
-                editor.apply();
+                gcmRegistrationInfo.edit()
+                    .putString(PREF_LAST_CITY, city.toString())
+                    .remove(PREF_LAST_CITY_UPLOADED)
+                    .apply();
             }
 
             if (!gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
