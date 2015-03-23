@@ -53,6 +53,8 @@ public class Event implements Parcelable {
     @Nullable public final String locality;
     @Nullable public final String address;
 
+    public final String[] performers;
+
     @Nullable public final String organizerName;
     @Nullable public final String organizerPhone;
     @Nullable public final String organizerWebsite;
@@ -63,7 +65,7 @@ public class Event implements Parcelable {
                  int numPeopleInterested, boolean ehRecommended, float uberScore,
                  long[] eventTimings,
                  @Nullable LatLng location, @Nullable String venue, @Nullable String locality,
-                 @Nullable String address,
+                 @Nullable String address, String[] performers,
                  String organizerName, String organizerPhone, String organizerWebsite) {
         this.id = id;
         this.city = city;
@@ -88,6 +90,7 @@ public class Event implements Parcelable {
         this.venue = Utils.checkIfUnknown(venue);
         this.locality = Utils.checkIfUnknown(locality);
         this.address = Utils.checkIfUnknown(address);
+        this.performers = performers;
 
         this.organizerName = Utils.checkIfUnknown(organizerName);
         this.organizerPhone = Utils.checkIfUnknown(organizerPhone);
@@ -160,6 +163,8 @@ public class Event implements Parcelable {
         dest.writeString(emptyIfNull(locality));
         dest.writeString(emptyIfNull(address));
 
+        dest.writeStringArray(performers);
+
         dest.writeString(emptyIfNull(organizerName));
         dest.writeString(emptyIfNull(organizerPhone));
         dest.writeString(emptyIfNull(organizerWebsite));
@@ -193,6 +198,8 @@ public class Event implements Parcelable {
                             in.readString(),
                             in.readString(),
                             in.readString(),
+
+                            in.createStringArray(),
 
                             in.readString(),
                             in.readString(),
@@ -322,6 +329,9 @@ public class Event implements Parcelable {
             i++;
         }
 
+        // Performers
+        String[] performers = new String[0];
+
         // Organizer Info.
         String organizerName = mashup == null ? null : mashup.optString("organizer_name");
         String organizerPhone = mashup == null ? null : mashup.optString("organizer_phone");
@@ -350,6 +360,8 @@ public class Event implements Parcelable {
                 venue,
                 locality,
                 address,
+
+                performers,
 
                 organizerName,
                 organizerPhone,

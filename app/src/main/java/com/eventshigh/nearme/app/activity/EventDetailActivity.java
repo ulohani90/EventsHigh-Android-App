@@ -34,6 +34,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
@@ -205,10 +206,6 @@ public class EventDetailActivity extends BaseActivity {
         }
     }
 
-    private void shareEvent() {
-        shareEvent(eventCard.shareContentsView, event);
-    }
-
     private void openBookingSite() {
         reportEventAction(event, "bookTicket");
         Intent intent = new Intent(this, CustomUrlActivity.class);
@@ -245,6 +242,7 @@ public class EventDetailActivity extends BaseActivity {
         private final RelativeLayout venueGroupView;
         private final TextView venueView;
         private final TextView addressView;
+        private final View naviagationView;
 
         private final LinearLayout timeGroupView;
         private final RelativeLayout eventTimeFirstView;
@@ -262,6 +260,9 @@ public class EventDetailActivity extends BaseActivity {
         private final FlowLayout tagsView;
         private final TextView descriptionView;
         private final TextView readMoreView;
+
+        private final View performerHeaderView;
+        private final LinearLayout performersView;
 
         private final TextView organizerHeader;
         private final LinearLayout organizerNameRow;
@@ -287,6 +288,7 @@ public class EventDetailActivity extends BaseActivity {
             venueGroupView = (RelativeLayout) findViewById(R.id.event_venue_group);
             venueView = (TextView) findViewById(R.id.event_venue);
             addressView = (TextView) findViewById(R.id.event_address);
+            naviagationView = findViewById(R.id.navigate_icon);
 
             timeGroupView = (LinearLayout) findViewById(R.id.event_time_group);
             eventTimeFirstView = (RelativeLayout) findViewById(R.id.event_time_first);
@@ -304,6 +306,9 @@ public class EventDetailActivity extends BaseActivity {
             tagsView = (FlowLayout) findViewById(R.id.event_tags);
             descriptionView = (TextView) findViewById(R.id.event_description);
             readMoreView = (TextView) findViewById(R.id.read_more);
+
+            performerHeaderView = findViewById(R.id.performer_header);
+            performersView = (LinearLayout) findViewById(R.id.performers);
 
             organizerHeader = (TextView) findViewById(R.id.organizer_header);
             organizerNameRow = (LinearLayout) findViewById(R.id.organizer_name_row);
@@ -412,6 +417,18 @@ public class EventDetailActivity extends BaseActivity {
             venueGroupView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (event.venue != null) {
+                        reportEventAction(event, "seeVenue", event.venue);
+                        startActivity(new Intent(EventDetailActivity.this, LaunchActivity.class)
+                            .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, event.venue)));
+                    } else {
+                        showDirections(event);
+                    }
+                }
+            });
+            naviagationView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
                     showDirections(event);
                 }
             });
@@ -505,7 +522,7 @@ public class EventDetailActivity extends BaseActivity {
                 }
             }
 
-            // Set contest.
+            // Show offer if its there.
             if (event.offerTitle != null) {
                 offerView.setVisibility(View.VISIBLE);
                 offerView.setText(event.offerTitle);
@@ -517,6 +534,29 @@ public class EventDetailActivity extends BaseActivity {
                 });
             } else {
                 offerView.setVisibility(View.GONE);
+            }
+
+            // Show performers if any.
+            performersView.removeAllViews();
+            if (event.performers.length == 0) {
+                performerHeaderView.setVisibility(View.GONE);
+            } else {
+                performerHeaderView.setVisibility(View.VISIBLE);
+                for (final String performer : event.performers) {
+                    getLayoutInflater().inflate(R.layout.event_tag, tagsView);
+                    TextView performerView = (TextView) performersView.getChildAt(performersView.getChildCount() - 1);
+                    performerView.setText(performer);
+                    performerView.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            reportEventAction(event, "performerClick");
+                            Intent searchIntent = new Intent(EventDetailActivity.this, LaunchActivity.class);
+                            searchIntent.setAction(Intent.ACTION_SEARCH);
+                            searchIntent.putExtra(SearchManager.QUERY, performer);
+                            startActivity(searchIntent);
+                        }
+                    });
+                }
             }
 
             // Set description.

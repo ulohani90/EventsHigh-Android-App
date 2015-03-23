@@ -96,51 +96,66 @@
                         android:layout_height="1dp"
                         android:background="#1a4d4d4d"
                     />
-                    <RelativeLayout
-                        android:id="@+id/event_venue_group"
-                        style="@style/EHButton"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:orientation="horizontal"
                     >
-                        <ImageView
-                            android:id="@+id/event_venue_icon"
-                            android:layout_width="wrap_content"
+                        <RelativeLayout
+                            style="@style/EHButton"
+                            android:id="@+id/event_venue_group"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_location_on_grey600_24dp"
-                            android:layout_centerVertical="true"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentStart="true"
-                            android:layout_alignParentTop="true"
-                            android:layout_alignParentBottom="true"
+                            android:layout_weight="1"
+                        >
+                            <ImageView
+                                android:id="@+id/event_venue_icon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_location_on_grey600_24dp"
+                                android:layout_centerVertical="true"
+                                android:layout_alignParentLeft="true"
+                                android:layout_alignParentStart="true"
+                                tools:ignore="ContentDescription"
+                            />
+                            <TextView
+                                android:id="@+id/event_venue"
+                                style="@style/EHText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentEnd="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_toRightOf="@+id/event_venue_icon"
+                                android:layout_toEndOf="@+id/event_venue_icon"
+                                android:textColor="#A3000000"
+                                tools:text="Counter Culture"
+                            />
+                            <TextView
+                                android:id="@+id/event_address"
+                                style="@style/EHText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/event_venue"
+                                android:layout_alignParentEnd="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_toRightOf="@+id/event_venue_icon"
+                                android:layout_toEndOf="@+id/event_venue_icon"
+                                android:textColor="#999197A3"
+                                tools:text="Near Hoodi circle, Whitefield, Bangalore, 560037."
+                            />
+                        </RelativeLayout>
+                        <ImageView
+                            android:id="@+id/navigate_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/eh_button"
+                            android:src="@drawable/ic_directions_grey600_24dp"
+                            android:layout_gravity="center"
+                            android:padding="18dp"
                             tools:ignore="ContentDescription"
                         />
-                        <TextView
-                            android:id="@+id/event_venue"
-                            style="@style/EHText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentTop="true"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_toRightOf="@+id/event_venue_icon"
-                            android:layout_toEndOf="@+id/event_venue_icon"
-                            android:textColor="#A3000000"
-                            tools:text="Counter Culture"
-                        />
-                        <TextView
-                            android:id="@+id/event_address"
-                            style="@style/EHText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/event_venue"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_toRightOf="@+id/event_venue_icon"
-                            android:layout_toEndOf="@+id/event_venue_icon"
-                            android:textColor="#999197A3"
-                            tools:text="Near Hoodi circle, Whitefield, Bangalore, 560037."
-                        />
-                    </RelativeLayout>
+                    </LinearLayout>
 
                     <!-- Event Time -->
                     <View
@@ -344,6 +359,32 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="#1a4d4d4d"
+                />
+
+                <!-- Performers Info -->
+                <TextView
+                    android:id="@+id/performer_header"
+                    style="@style/EHHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginBottom="8dp"
+                    android:textAllCaps="true"
+                    android:textColor="#CC383F3F"
+                    android:text="@string/ui_performer"
+                />
+                <LinearLayout
+                    android:id="@+id/performers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="vertical"
                 />
 
                 <!-- Event tags -->
