@@ -22,9 +22,12 @@ import java.util.Random;
 public class AlarmUtils {
     private static String LOG_TAG = AlarmUtils.class.getName();
 
-    public static void setAlarm(Context context, Event event) {
+    public static void setEventAlarm(Context context, Event event) {
+        // Setup an alarm 1 day before the event.
+        long alarmTimeMillis = event.eventTimings[0] - DateUtils.DAY_IN_MILLIS;
+
         // Don't set an alarm if the event is going to happen within 1 day
-        if (event.eventTimings[0] - System.currentTimeMillis() < DateUtils.DAY_IN_MILLIS) {
+        if (alarmTimeMillis < System.currentTimeMillis()) {
             Log.i(LOG_TAG, "Not setting alarm for " + event.title);
             return;
         }
@@ -35,14 +38,12 @@ public class AlarmUtils {
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context, event.hashCode(), intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
-        // Setup an alarm 1 day before the event
-        long alarmTimeMillis = event.eventTimings[0] - DateUtils.DAY_IN_MILLIS;
         Log.i(LOG_TAG, "Setting alarm at " +
                 DateTimeUtils.timeToFullFormat(alarmTimeMillis)  + " for " + event.title);
         alarmMgr.set(AlarmManager.RTC_WAKEUP, alarmTimeMillis, alarmIntent);
     }
 
-    public static void cancelAlarm(Context context, Event event) {
+    public static void cancelEventAlarm(Context context, Event event) {
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, EventAlarmBroadcastReceiver.class);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context,
@@ -50,30 +51,35 @@ public class AlarmUtils {
         alarmMgr.cancel(alarmIntent);
     }
 
-    public static void setMyEventsAlarm(Context context) {
-        // Set the alarm to start at approximately between 10:00 a.m. and 2:00 p.m. to reduce load
-        // on server (to make sure that not all devices contact the server at the same time).
+
+    public static void setWeeklyAlarms(Context context) {
+        cancelOldMyEventsAlarm(context);
+        setMyEventsAlarm(context);
+        setWeekendEventsAlarm(context);
+    }
+
+    private static void setMyEventsAlarm(Context context) {
+        // Set the alarm to start at 3pm-4pm on a random day except Friday and Monday.
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis() + DateUtils.DAY_IN_MILLIS * 7);
         int notificationDays[] = new int[] { Calendar.TUESDAY, Calendar.WEDNESDAY,
                 Calendar.THURSDAY, Calendar.SATURDAY, Calendar.SUNDAY };
         calendar.set(Calendar.DAY_OF_WEEK,
                 notificationDays[new Random().nextInt(notificationDays.length)]);
-        calendar.set(Calendar.HOUR_OF_DAY, 10 + new Random().nextInt(5));
+        calendar.set(Calendar.HOUR_OF_DAY, 3);
         calendar.set(Calendar.MINUTE, new Random().nextInt(60));
         setWeeklyRepeatAlarm(context, DownloadEventsIntentService.ACTION_DOWNLOAD_MY_EVENTS,
                 calendar.getTimeInMillis());
     }
 
-    public static void setFeaturedEventsAlarm(Context context) {
-        // Set the alarm to start at approximately between 10:00 a.m. and 2:00 p.m. to reduce load
-        // on server (to make sure that not all devices contact the server at the same time).
+    private static void setWeekendEventsAlarm(Context context) {
+        // Set the alarm to start on Friday 3pm - 4pm.
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis() + DateUtils.DAY_IN_MILLIS);
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
-        calendar.set(Calendar.HOUR_OF_DAY, 10 + new Random().nextInt(5));
+        calendar.set(Calendar.HOUR_OF_DAY, 3);
         calendar.set(Calendar.MINUTE, new Random().nextInt(60));
-        setWeeklyRepeatAlarm(context, DownloadEventsIntentService.ACTION_DOWNLOAD_FEATURED_EVENTS,
+        setWeeklyRepeatAlarm(context, DownloadEventsIntentService.ACTION_DOWNLOAD_WEEKEND_EVENTS,
                 calendar.getTimeInMillis());
     }
 
@@ -99,7 +105,7 @@ public class AlarmUtils {
                 AlarmManager.INTERVAL_DAY * 7, alarmIntent);
     }
 
-    public static void cancelOldMyEventsAlarm(Context context) {
+    private static void cancelOldMyEventsAlarm(Context context) {
         Intent intent = new Intent(context, DownloadEventsBroadcastReceiver.class);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context,
                 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);

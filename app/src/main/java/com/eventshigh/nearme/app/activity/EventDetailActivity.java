@@ -376,12 +376,12 @@ public class EventDetailActivity extends BaseActivity {
                         reportEventAction(event, "removeFavourite");
                         eventsMarkerEditor.recordEventMark(event, null);
                         setFavouriteView(null);
-                        AlarmUtils.cancelAlarm(EventDetailActivity.this, event);
+                        AlarmUtils.cancelEventAlarm(EventDetailActivity.this, event);
                     } else {
                         reportEventAction(event, "addFavourite");
                         eventsMarkerEditor.recordEventMark(event, EventMark.FAVOURITE);
                         setFavouriteView(EventMark.FAVOURITE);
-                        AlarmUtils.setAlarm(EventDetailActivity.this, event);
+                        AlarmUtils.setEventAlarm(EventDetailActivity.this, event);
                     }
                 }
             });

@@ -90,9 +90,9 @@ public class EventsMarkerManager {
             } else {
                 eventMarkMap.put(event.id, mark);
                 if (EventMark.isFavourite(mark)) {
-                    AlarmUtils.setAlarm(context, event);
+                    AlarmUtils.setEventAlarm(context, event);
                 } else if (EventMark.isDismissed(mark)) {
-                    AlarmUtils.cancelAlarm(context, event);
+                    AlarmUtils.cancelEventAlarm(context, event);
                 }
                 threads.add(EventMarkDbHelper.addEntry(database, event.id, mark));
             }
@@ -102,7 +102,7 @@ public class EventsMarkerManager {
         public Editor removeEventMark(Event event) {
             EventMark mark = eventMarkMap.remove(event.id);
             if (EventMark.isFavourite(mark)) {
-                AlarmUtils.cancelAlarm(context, event);
+                AlarmUtils.cancelEventAlarm(context, event);
             }
             threads.add(EventMarkDbHelper.removeEntry(database, event.id));
             return this;

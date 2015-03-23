@@ -29,6 +29,7 @@ public class EventsHighEndpoints {
 
     public static final String QUERY_MY_EVENT = "my events";
     public static final String QUERY_FEATURED = "featured";
+    public static final String QUERY_WEEKEND = "this weekend";
 
     public static Uri getEventDetailsURI(Event event) {
         StringBuilder sb = new StringBuilder(event.id);

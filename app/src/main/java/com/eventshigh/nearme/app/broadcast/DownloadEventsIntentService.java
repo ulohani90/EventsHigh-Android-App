@@ -18,6 +18,7 @@ import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ import java.util.Set;
 
 public class DownloadEventsIntentService extends IntentService {
     public static final String ACTION_DOWNLOAD_MY_EVENTS = "downloadMyEvents";
-    public static final String ACTION_DOWNLOAD_FEATURED_EVENTS = "downloadFeaturedEvents";
+    public static final String ACTION_DOWNLOAD_WEEKEND_EVENTS = "downloadWeekendEvents";
 
     public DownloadEventsIntentService() {
         super("DownloadEventsIntentService");
@@ -42,16 +43,16 @@ public class DownloadEventsIntentService extends IntentService {
         }
 
         // TODO: may be get the user location from LocationClient
-        EventsContext eventsContext = new EventsContext(null, "this week");
+        EventsContext eventsContext = new EventsContext(null, EventsHighEndpoints.QUERY_WEEKEND);
         City lastCity = GcmRegistration.getInstance(this).getLastCity();
         if (lastCity != null) {
             eventsContext.changeLocation(lastCity.cityBounds.getCenter());
         }
 
-        if (ACTION_DOWNLOAD_FEATURED_EVENTS.equals(intent.getAction())) {
+        if (ACTION_DOWNLOAD_WEEKEND_EVENTS.equals(intent.getAction())) {
             FeaturedEventsRequest.submit(this, eventsContext, Request.Priority.IMMEDIATE,
-                    false /* shouldBypassCache */, new FeaturedEventsListener(intent),
-                    new FeaturedEventsErrorListener(intent));
+                    false /* shouldBypassCache */, new WeekendEventsListener(intent),
+                    new WeekendEventsErrorListener(intent));
         } else {
             new MyEventsRequest(this, eventsContext, Request.Priority.IMMEDIATE,
                     false /* shouldBypassCache */, true /* includeWithoutLocation */,
@@ -71,8 +72,7 @@ public class DownloadEventsIntentService extends IntentService {
             // TODO: This could happen when user is not connected. should we retry at some other point?
             // Should we switch to SyncAdapters ?
             if (!new Account(DownloadEventsIntentService.this).getFollowingInterests().isEmpty()) {
-                NotificationUtils.showMyEventsNotificationAndReleaseWakeLock(
-                        DownloadEventsIntentService.this, new ArrayList<Event>(), intent);
+                showNotification(new HashSet<Event>(), intent, NotificationUtils.MY_EVENTS_NOTIFICATION_ID);
             } else {
                 WakefulBroadcastReceiver.completeWakefulIntent(intent);
             }
@@ -97,10 +97,10 @@ public class DownloadEventsIntentService extends IntentService {
         }
     }
 
-    private class FeaturedEventsErrorListener implements Response.ErrorListener {
+    private class WeekendEventsErrorListener implements Response.ErrorListener {
         private final Intent intent;
 
-        private FeaturedEventsErrorListener(Intent intent) {
+        private WeekendEventsErrorListener(Intent intent) {
             this.intent = intent;
         }
 
@@ -108,14 +108,14 @@ public class DownloadEventsIntentService extends IntentService {
         public void onErrorResponse(VolleyError volleyError) {
             // TODO: This could happen when user is not connected. should we retry at some other point?
             // Should we switch to SyncAdapters ?
-            WakefulBroadcastReceiver.completeWakefulIntent(intent);
+            showNotification(new HashSet<Event>(), intent, NotificationUtils.WEEKEND_EVENTS_NOTIFICATION_ID);
         }
     }
 
-    private class FeaturedEventsListener implements Response.Listener<List<Event>> {
+    private class WeekendEventsListener implements Response.Listener<List<Event>> {
         private final Intent intent;
 
-        private FeaturedEventsListener(Intent intent) {
+        private WeekendEventsListener(Intent intent) {
             this.intent = intent;
         }
 
@@ -123,7 +123,7 @@ public class DownloadEventsIntentService extends IntentService {
         public void onResponse(final List<Event> featuredEvents, boolean isIntermediate) {
             // Merge all events into one List and remove duplicates.
             Set<Event> eventSet = new HashSet<>(featuredEvents);
-            showNotification(eventSet, intent, NotificationUtils.FEATURED_EVENTS_NOTIFICATION_ID);
+            showNotification(eventSet, intent, NotificationUtils.WEEKEND_EVENTS_NOTIFICATION_ID);
         }
     }
 
@@ -136,7 +136,7 @@ public class DownloadEventsIntentService extends IntentService {
                     DownloadEventsIntentService.this, intent, events.get(0),
                     notificationId);
         } else if (events.size() > 1) {
-            if (notificationId == NotificationUtils.FEATURED_EVENTS_NOTIFICATION_ID) {
+            if (notificationId == NotificationUtils.WEEKEND_EVENTS_NOTIFICATION_ID) {
                 NotificationUtils.showFeaturedEventsNotificationAndReleaseWakeLock(
                         DownloadEventsIntentService.this, events, intent);
             } else {

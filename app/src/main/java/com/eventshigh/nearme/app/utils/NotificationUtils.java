@@ -32,7 +32,7 @@ import java.util.List;
 public class NotificationUtils {
     public static final int GCM_NOTIFICATION_ID = 1;
     public static final int MY_EVENTS_NOTIFICATION_ID = 2;
-    public static final int FEATURED_EVENTS_NOTIFICATION_ID = 3;
+    public static final int WEEKEND_EVENTS_NOTIFICATION_ID = 3;
 
     private static final int MAX_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
 
@@ -159,29 +159,24 @@ public class NotificationUtils {
 
     public synchronized static void showFeaturedEventsNotificationAndReleaseWakeLock(
             Context context, List<Event> events, Intent alarmIntent) {
-        showNotificationAndReleaseWakeLock(context, events, R.string.ui_featured_events,
-                R.string.ui_featured_events_msg, EventsHighEndpoints.QUERY_FEATURED,
-                FEATURED_EVENTS_NOTIFICATION_ID, alarmIntent);
+        showNotificationAndReleaseWakeLock(context, events, R.string.ui_weekend_events,
+                R.string.ui_weekend_events_msg, EventsHighEndpoints.QUERY_WEEKEND,
+                WEEKEND_EVENTS_NOTIFICATION_ID, alarmIntent);
     }
 
     private synchronized static void showNotificationAndReleaseWakeLock(
             Context context, List<Event> events, int titleResourceId, int messageResourceId,
             String query, int notificationId, Intent alarmIntent) {
-        int count = 0;
         StringBuilder message = new StringBuilder(
                 context.getString(messageResourceId)).append("\n");
-        for (int i = 0; i < events.size(); i++) {
-            if (count >= MAX_EVENTS_TO_SHOW_IN_NOTIFICATION) {
-                break;
-            }
-            count++;
+        for (int i = 0; i < events.size() && i < MAX_EVENTS_TO_SHOW_IN_NOTIFICATION; i++) {
             message.append(events.get(i).title);
             message.append("\n");
         }
 
         Intent launchIntent = new Intent(context, LaunchActivity.class);
-        launchIntent.putExtra(SearchManager.QUERY, query);
         launchIntent.setAction(Intent.ACTION_SEARCH);
+        launchIntent.putExtra(SearchManager.QUERY, query);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, 0);
         Notification notification = createNotification(context,
                 context.getString(titleResourceId), message, pendingIntent);

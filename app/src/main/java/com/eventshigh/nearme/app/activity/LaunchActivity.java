@@ -166,17 +166,8 @@ public class LaunchActivity extends BaseActivity {
         // Process the incoming intent.
         eventsContext = IntentUtils.processIntent(this, getIntent());
 
-        // Since we have already setup a different regular alarm in previous version of the app
-        // cancel that alarm. We will be creating new alarms in this version of the app
-        AlarmUtils.cancelOldMyEventsAlarm(this);
-
-        // Set the alarm which will check the "My Events" at regular interval and fire
-        // notification if user has new events in his stream.
-        AlarmUtils.setMyEventsAlarm(this);
-
-        // Set the alarm which will check the "Featured Events" on fridays and fire
-        // notification if user has new events in his stream.
-        AlarmUtils.setFeaturedEventsAlarm(this);
+        // Setup the weekly alarms which are used for notification.
+        AlarmUtils.setWeeklyAlarms(this);
     }
 
     public void onStart() {
