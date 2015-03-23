@@ -171,6 +171,9 @@ public class NotificationUtils {
                 context.getString(messageResourceId)).append("\n");
         for (int i = 0; i < events.size() && i < MAX_EVENTS_TO_SHOW_IN_NOTIFICATION; i++) {
             message.append(events.get(i).title);
+            if (events.get(i).venue != null) {
+                message.append(" @ ").append(events.get(i).venue);
+            }
             message.append("\n");
         }
 

@@ -7,14 +7,12 @@
         android:summary="Shown one day before event start time"
         android:defaultValue="true"
     />
-    <!--
     <CheckBoxPreference
         android:key="notifications_weekly"
         android:title="@string/pref_title_weekly_notifications"
         android:summary="Shown twice per week, once for weekend and once for followed interests"
         android:defaultValue="true"
     />
-    -->
     <CheckBoxPreference
         android:key="notifications_eh"
         android:title="@string/pref_title_eh_notifications"

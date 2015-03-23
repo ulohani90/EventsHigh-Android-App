@@ -6,6 +6,7 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Pair;
 
 import com.android.volley.Request;
+import com.android.volley.Request.Priority;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.data.City;
@@ -13,7 +14,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
+import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
@@ -50,11 +51,11 @@ public class DownloadEventsIntentService extends IntentService {
         }
 
         if (ACTION_DOWNLOAD_WEEKEND_EVENTS.equals(intent.getAction())) {
-            FeaturedEventsRequest.submit(this, eventsContext, Request.Priority.IMMEDIATE,
-                    false /* shouldBypassCache */, new WeekendEventsListener(intent),
-                    new WeekendEventsErrorListener(intent));
+            EventCollectionRequest.submit(this, eventsContext, Priority.NORMAL,
+                    false /* shouldBypassCache */, true /* includeWithoutLocation */,
+                    new WeekendEventsListener(intent), new WeekendEventsErrorListener(intent));
         } else {
-            new MyEventsRequest(this, eventsContext, Request.Priority.IMMEDIATE,
+            new MyEventsRequest(this, eventsContext, Request.Priority.NORMAL,
                     false /* shouldBypassCache */, true /* includeWithoutLocation */,
                     new MyEventsListener(intent), new MyEventsErrorListener(intent)).execute();
         }
@@ -135,7 +136,7 @@ public class DownloadEventsIntentService extends IntentService {
             NotificationUtils.showNotificationAndReleaseWakeLock(
                     DownloadEventsIntentService.this, intent, events.get(0),
                     notificationId);
-        } else if (events.size() > 1) {
+        } else {
             if (notificationId == NotificationUtils.WEEKEND_EVENTS_NOTIFICATION_ID) {
                 NotificationUtils.showFeaturedEventsNotificationAndReleaseWakeLock(
                         DownloadEventsIntentService.this, events, intent);
@@ -143,8 +144,6 @@ public class DownloadEventsIntentService extends IntentService {
                 NotificationUtils.showMyEventsNotificationAndReleaseWakeLock(
                         DownloadEventsIntentService.this, events, intent);
             }
-        } else {
-            WakefulBroadcastReceiver.completeWakefulIntent(intent);
         }
     }
 }
