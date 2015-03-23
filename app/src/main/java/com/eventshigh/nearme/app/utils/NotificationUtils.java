@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -19,7 +18,6 @@ import com.android.volley.toolbox.ImageRequest;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
-import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -150,43 +148,28 @@ public class NotificationUtils {
         notificationManager.notify(notificationId, notification);
     }
 
-    public synchronized static void showMyEventsNotificationAndReleaseWakeLock(
-            Context context, List<Event> events, Intent alarmIntent) {
-        showNotificationAndReleaseWakeLock(context, events, R.string.ui_upcoming_events,
-                R.string.ui_upcoming_events_msg, EventsHighEndpoints.QUERY_MY_EVENT,
-                MY_EVENTS_NOTIFICATION_ID, alarmIntent);
-    }
-
-    public synchronized static void showFeaturedEventsNotificationAndReleaseWakeLock(
-            Context context, List<Event> events, Intent alarmIntent) {
-        showNotificationAndReleaseWakeLock(context, events, R.string.ui_weekend_events,
-                R.string.ui_weekend_events_msg, EventsHighEndpoints.QUERY_WEEKEND,
-                WEEKEND_EVENTS_NOTIFICATION_ID, alarmIntent);
-    }
-
-    private synchronized static void showNotificationAndReleaseWakeLock(
-            Context context, List<Event> events, int titleResourceId, int messageResourceId,
-            String query, int notificationId, Intent alarmIntent) {
-        StringBuilder message = new StringBuilder(
-                context.getString(messageResourceId)).append("\n");
+    public synchronized static void showEventsNotification(Context context, int notificationId,
+            List<Event> events, Intent launchIntent, int titleResourceId, int messageResourceId) {
+        StringBuilder messageBuilder = new StringBuilder();
         for (int i = 0; i < events.size() && i < MAX_EVENTS_TO_SHOW_IN_NOTIFICATION; i++) {
-            message.append(events.get(i).title);
+            messageBuilder.append(events.get(i).title);
             if (events.get(i).venue != null) {
-                message.append(" @ ").append(events.get(i).venue);
+                messageBuilder.append(" @ ").append(events.get(i).venue);
             }
-            message.append("\n");
+            messageBuilder.append("\n");
         }
 
-        Intent launchIntent = new Intent(context, LaunchActivity.class);
-        launchIntent.setAction(Intent.ACTION_SEARCH);
-        launchIntent.putExtra(SearchManager.QUERY, query);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, 0);
-        Notification notification = createNotification(context,
-                context.getString(titleResourceId), message, pendingIntent);
-        showNotification(context, notification, notificationId);
+        String title = context.getString(titleResourceId);
+        String message = messageBuilder.toString();
+        if (message.isEmpty()) {
+            message = context.getString(messageResourceId);
+        } else {
+            title = context.getString(messageResourceId);
+        }
 
-        // Release the wake lock provided by the WakefulBroadcastReceiver.
-        WakefulBroadcastReceiver.completeWakefulIntent(alarmIntent);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, 0);
+        Notification notification = createNotification(context, title, message, pendingIntent);
+        showNotification(context, notification, notificationId);
     }
 
     public static class NotificationData {

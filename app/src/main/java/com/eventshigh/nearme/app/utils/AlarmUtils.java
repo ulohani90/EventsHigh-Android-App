@@ -8,7 +8,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.eventshigh.nearme.app.broadcast.DownloadEventsBroadcastReceiver;
-import com.eventshigh.nearme.app.broadcast.DownloadEventsIntentService;
+import com.eventshigh.nearme.app.broadcast.DownloadEventsIntentService.IntentType;
 import com.eventshigh.nearme.app.broadcast.EventAlarmBroadcastReceiver;
 import com.eventshigh.nearme.app.broadcast.EventNotificationIntentService;
 import com.eventshigh.nearme.app.data.Event;
@@ -68,7 +68,7 @@ public class AlarmUtils {
                 notificationDays[new Random().nextInt(notificationDays.length)]);
         calendar.set(Calendar.HOUR_OF_DAY, 3);
         calendar.set(Calendar.MINUTE, new Random().nextInt(60));
-        setWeeklyRepeatAlarm(context, DownloadEventsIntentService.ACTION_DOWNLOAD_MY_EVENTS,
+        setWeeklyRepeatAlarm(context, IntentType.MY_EVENTS.intentAction,
                 calendar.getTimeInMillis());
     }
 
@@ -79,7 +79,7 @@ public class AlarmUtils {
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
         calendar.set(Calendar.HOUR_OF_DAY, 3);
         calendar.set(Calendar.MINUTE, new Random().nextInt(60));
-        setWeeklyRepeatAlarm(context, DownloadEventsIntentService.ACTION_DOWNLOAD_WEEKEND_EVENTS,
+        setWeeklyRepeatAlarm(context, IntentType.WEEKEND_EVENTS.intentAction,
                 calendar.getTimeInMillis());
     }
 

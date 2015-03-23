@@ -58,9 +58,9 @@
     <string name="ui_pick_interest">Pick Your Interests</string>
     <string name="ui_view_location_on_map">View location on map</string>
     <string name="ui_upcoming_events">Upcoming events</string>
-    <string name="ui_upcoming_events_msg">See amazing events for your interests!</string>
+    <string name="ui_upcoming_events_msg">See events for your interests!</string>
     <string name="ui_weekend_events">Explore amazing weekend</string>
-    <string name="ui_weekend_events_msg">See amazing events happening on this weekend!</string>
+    <string name="ui_weekend_events_msg">See events happening on this weekend!</string>
     <string name="ui_my_events_clue">Added to \'My Events\'.\nTap to go to \'My Events\' now.</string>
 
     <!-- Onbaording message -->

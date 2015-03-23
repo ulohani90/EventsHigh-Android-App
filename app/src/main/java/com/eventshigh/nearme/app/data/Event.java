@@ -98,6 +98,10 @@ public class Event implements Parcelable {
         return EventsHighEndpoints.getEventDetailsURI(this);
     }
 
+    public Uri getEventShareURI() {
+        return EventsHighEndpoints.getEventShareURI(this);
+    }
+
     public int getPopularityScore() {
         return ehRecommended ? Math.max(EH_RECOMMENDATION_BOOST, numPeopleInterested) : numPeopleInterested;
     }

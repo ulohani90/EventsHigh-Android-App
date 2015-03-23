@@ -9,6 +9,8 @@ import com.android.volley.Request;
 import com.android.volley.Request.Priority;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
@@ -20,6 +22,7 @@ import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
 
 import java.util.ArrayList;
@@ -29,8 +32,38 @@ import java.util.List;
 import java.util.Set;
 
 public class DownloadEventsIntentService extends IntentService {
-    public static final String ACTION_DOWNLOAD_MY_EVENTS = "downloadMyEvents";
-    public static final String ACTION_DOWNLOAD_WEEKEND_EVENTS = "downloadWeekendEvents";
+
+    public static enum IntentType {
+        MY_EVENTS("eh_my_events", EventsHighEndpoints.QUERY_MY_EVENT,
+                R.string.ui_upcoming_events, R.string.ui_upcoming_events_msg,
+                NotificationUtils.MY_EVENTS_NOTIFICATION_ID),
+        WEEKEND_EVENTS("eh_weekend_events", EventsHighEndpoints.QUERY_WEEKEND,
+                R.string.ui_weekend_events, R.string.ui_weekend_events_msg,
+                NotificationUtils.WEEKEND_EVENTS_NOTIFICATION_ID);
+
+        public final String intentAction;
+        public final String query;
+        public final int titleResId;
+        public final int messageRedId;
+        public final int notificationId;
+
+        IntentType(String intentAction, String query, int titleResId, int messageRedId,
+                   int notificationId) {
+            this.intentAction = intentAction;
+            this.query = query;
+            this.titleResId = titleResId;
+            this.messageRedId = messageRedId;
+            this.notificationId = notificationId;
+        }
+
+        public static IntentType getType(Intent intent) {
+            if (intent.getAction().equals(WEEKEND_EVENTS.intentAction)) {
+                return WEEKEND_EVENTS;
+            }
+
+            return MY_EVENTS;
+        }
+    }
 
     public DownloadEventsIntentService() {
         super("DownloadEventsIntentService");
@@ -44,13 +77,14 @@ public class DownloadEventsIntentService extends IntentService {
         }
 
         // TODO: may be get the user location from LocationClient
-        EventsContext eventsContext = new EventsContext(null, EventsHighEndpoints.QUERY_WEEKEND);
+        IntentType type = IntentType.getType(intent);
+        EventsContext eventsContext = new EventsContext(null, type.query);
         City lastCity = GcmRegistration.getInstance(this).getLastCity();
         if (lastCity != null) {
             eventsContext.changeLocation(lastCity.cityBounds.getCenter());
         }
 
-        if (ACTION_DOWNLOAD_WEEKEND_EVENTS.equals(intent.getAction())) {
+        if (type == IntentType.WEEKEND_EVENTS) {
             EventCollectionRequest.submit(this, eventsContext, Priority.NORMAL,
                     false /* shouldBypassCache */, true /* includeWithoutLocation */,
                     new WeekendEventsListener(intent), new WeekendEventsErrorListener(intent));
@@ -73,7 +107,7 @@ public class DownloadEventsIntentService extends IntentService {
             // TODO: This could happen when user is not connected. should we retry at some other point?
             // Should we switch to SyncAdapters ?
             if (!new Account(DownloadEventsIntentService.this).getFollowingInterests().isEmpty()) {
-                showNotification(new HashSet<Event>(), intent, NotificationUtils.MY_EVENTS_NOTIFICATION_ID);
+                showNotification(new HashSet<Event>(), intent);
             } else {
                 WakefulBroadcastReceiver.completeWakefulIntent(intent);
             }
@@ -94,7 +128,7 @@ public class DownloadEventsIntentService extends IntentService {
             for (Pair<String, List<Event>> entry : pairs) {
                 eventSet.addAll(entry.second);
             }
-            showNotification(eventSet, intent, NotificationUtils.MY_EVENTS_NOTIFICATION_ID);
+            showNotification(eventSet, intent);
         }
     }
 
@@ -109,7 +143,7 @@ public class DownloadEventsIntentService extends IntentService {
         public void onErrorResponse(VolleyError volleyError) {
             // TODO: This could happen when user is not connected. should we retry at some other point?
             // Should we switch to SyncAdapters ?
-            showNotification(new HashSet<Event>(), intent, NotificationUtils.WEEKEND_EVENTS_NOTIFICATION_ID);
+            showNotification(new HashSet<Event>(), intent);
         }
     }
 
@@ -124,26 +158,32 @@ public class DownloadEventsIntentService extends IntentService {
         public void onResponse(final List<Event> featuredEvents, boolean isIntermediate) {
             // Merge all events into one List and remove duplicates.
             Set<Event> eventSet = new HashSet<>(featuredEvents);
-            showNotification(eventSet, intent, NotificationUtils.WEEKEND_EVENTS_NOTIFICATION_ID);
+            showNotification(eventSet, intent);
         }
     }
 
-    private void showNotification(Set<Event> eventSet, Intent intent, int notificationId) {
+    private void showNotification(Set<Event> eventSet, Intent intent) {
+        // Sort the events for user.
         List<Event> events = new ArrayList<>(eventSet);
         Collections.sort(events, new EventComparator(null,
                 EventsMarkerManager.getInstance(DownloadEventsIntentService.this)));
+
+        // In case of single event, use Single Event Notification stack.
+        IntentType type = IntentType.getType(intent);
         if (events.size() == 1) {
-            NotificationUtils.showNotificationAndReleaseWakeLock(
-                    DownloadEventsIntentService.this, intent, events.get(0),
-                    notificationId);
-        } else {
-            if (notificationId == NotificationUtils.WEEKEND_EVENTS_NOTIFICATION_ID) {
-                NotificationUtils.showFeaturedEventsNotificationAndReleaseWakeLock(
-                        DownloadEventsIntentService.this, events, intent);
-            } else {
-                NotificationUtils.showMyEventsNotificationAndReleaseWakeLock(
-                        DownloadEventsIntentService.this, events, intent);
-            }
+            NotificationUtils.showNotificationAndReleaseWakeLock(this, intent, events.get(0),
+                    type.notificationId);
+            return;
         }
+
+        // Build the notification information.
+        Intent launchIntent = new Intent(this, LaunchActivity.class);
+        launchIntent.setAction(intent.getAction());
+        launchIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, type.query));
+        NotificationUtils.showEventsNotification(this, type.notificationId, events, launchIntent,
+                type.titleResId, type.messageRedId);
+
+        // Release the wake lock provided by the WakefulBroadcastReceiver.
+        WakefulBroadcastReceiver.completeWakefulIntent(intent);
     }
 }

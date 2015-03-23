@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.broadcast;
 
 import android.app.IntentService;
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.location.Location;

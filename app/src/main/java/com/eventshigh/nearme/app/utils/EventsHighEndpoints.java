@@ -42,6 +42,11 @@ public class EventsHighEndpoints {
         return getEventDetailsURI(event.city, sb.toString());
     }
 
+    public static Uri getEventShareURI(Event event) {
+        return getEventDetailsURI(event.city, event.id)
+                .buildUpon().appendQueryParameter("src", "ehm").build();
+    }
+
     public static String getEventSuggestURI(City city) {
         return String.format(API_EVENTS_SUGGEST_FORMAT, city.toString().toLowerCase());
     }
