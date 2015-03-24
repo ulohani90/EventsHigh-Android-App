@@ -296,6 +296,25 @@
         <!-- Receives the alarm broadcast messages, which is used for notification -->
         <receiver android:name=".broadcast.DownloadEventsBroadcastReceiver" />
         <service android:name=".broadcast.DownloadEventsIntentService" />
+
+        <!-- The AuthenticatorService used by sync adapter -->
+        <service
+            android:name="com.eventshigh.nearme.app.sync.AuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
+        <!-- Used by sync adapter -->
+        <provider
+            android:name="com.eventshigh.nearme.app.sync.StubProvider"
+            android:authorities="com.eventshigh.nearme.app.provider"
+            android:exported="false"
+            android:syncable="true"/>
+
     </application>
 
 </manifest>
