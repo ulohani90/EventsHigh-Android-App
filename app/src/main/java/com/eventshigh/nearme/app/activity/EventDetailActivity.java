@@ -563,8 +563,10 @@ public class EventDetailActivity extends BaseActivity {
             if (HTML_PATTERN.matcher(event.description).find()) {
                 descriptionView.setText(Html.fromHtml(event.description));
                 descriptionView.setMovementMethod(LinkMovementMethod.getInstance());
+                descriptionView.setTextIsSelectable(false);
             } else {
                 descriptionView.setText(event.description);
+                descriptionView.setTextIsSelectable(true);
             }
             readMoreView.setOnClickListener(new OnClickListener() {
                 @Override
@@ -632,7 +634,7 @@ public class EventDetailActivity extends BaseActivity {
                 tagView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        reportEventAction(event, "tagClick");
+                        reportEventAction(event, "tagClick", tag);
                         Intent searchIntent = new Intent(EventDetailActivity.this, LaunchActivity.class);
                         searchIntent.setAction(Intent.ACTION_SEARCH);
                         searchIntent.putExtra(SearchManager.QUERY, tag);
