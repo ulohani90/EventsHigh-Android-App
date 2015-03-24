@@ -515,8 +515,20 @@ public class LaunchActivity extends BaseActivity {
     private View getExploreCard(final String tagName, LayoutParams lp, ViewGroup parent) {
         final View view = getLayoutInflater().inflate(R.layout.explore_card, parent, false);
         view.setLayoutParams(lp);
+        int infographId = getInfoGraphId(tagName);
         ((ImageView) view.findViewById(R.id.explore_image)).setImageResource(
-                getInfoGraphId(tagName));
+                infographId);
+        if (infographId == R.drawable.eh_default_event_list) {
+            CardView cardView = (CardView) view;
+            TextView tv = new TextView(this);
+            tv.setText(tagName);
+            FrameLayout.LayoutParams tvlp = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
+                    Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
+            tvlp.bottomMargin = Utils.dpToPx(this, 10);
+            tv.setLayoutParams(tvlp);
+            cardView.addView(tv);
+        }
 
         view.setOnClickListener(new OnClickListener() {
             @Override
