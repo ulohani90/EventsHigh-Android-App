@@ -18,6 +18,11 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <!-- Required for sync adapter -->
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+
     <permission
         android:name="com.eventshigh.nearme.app.permission.C2D_MESSAGE"
         android:protectionLevel="signature"
@@ -311,9 +316,22 @@
         <!-- Used by sync adapter -->
         <provider
             android:name="com.eventshigh.nearme.app.sync.StubProvider"
-            android:authorities="com.eventshigh.nearme.app.provider"
+            android:authorities="@string/sync_adapter_provider"
             android:exported="false"
             android:syncable="true"/>
+
+        <!-- The sync adapter service -->
+        <service
+            android:name="com.eventshigh.nearme.app.sync.SyncService"
+            android:exported="true"
+            android:process=":sync">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
 
     </application>
 
