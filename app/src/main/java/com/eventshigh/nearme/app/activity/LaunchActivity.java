@@ -177,7 +177,7 @@ public class LaunchActivity extends BaseActivity {
         AlarmUtils.setWeeklyAlarms(this);
 
         // Setup daily sync
-        AlarmUtils.setSyncAlarm(this);
+        //AlarmUtils.setSyncAlarm(this);
     }
 
     public static Account createSyncAccount(Context context) {
