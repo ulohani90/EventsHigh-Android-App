@@ -20,6 +20,7 @@
     <string name="action_reset">Reset</string>
     <string name="action_apply_filter">Apply Filter</string>
     <string name="action_see_all_featured">See All Featured Events</string>
+    <string name="action_ama">Need more Info? Ask EventsHigh</string>
 
     <!-- Menu items -->
     <string name="menu_my_events">My Events</string>
@@ -42,6 +43,8 @@
     <string name="ui_dismiss">Not Interested</string>
     <string name="ui_organizer">Organizer Details</string>
     <string name="ui_performer">Performers</string>
+    <string name="ui_categories">Categories</string>
+    <string name="ui_description">Description</string>
     <string name="ui_name">Name - </string>
     <string name="ui_address">Address - </string>
     <string name="ui_phone">Phone - </string>

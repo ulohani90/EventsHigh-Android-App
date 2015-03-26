@@ -40,6 +40,7 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
@@ -48,8 +49,6 @@ import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-
-import org.apmem.tools.layouts.FlowLayout;
 
 import java.text.MessageFormat;
 import java.util.Date;
@@ -255,9 +254,11 @@ public class EventDetailActivity extends BaseActivity {
         private final FrameLayout bookView;
         private final FrameLayout callView;
         private final FrameLayout shareView;
-
         private final TextView offerView;
-        private final FlowLayout tagsView;
+
+        private final View tagsHeaderView;
+        private final LinearLayout tagsView;
+        private final View descriptionHeaderView;
         private final TextView descriptionView;
         private final TextView readMoreView;
 
@@ -271,6 +272,8 @@ public class EventDetailActivity extends BaseActivity {
         private final TextView organizerPhoneView;
         private final LinearLayout organizerWebsiteRow;
         private final TextView organizerWebsiteView;
+
+        private final View ama;
 
         private EventCard() {
             eventScrollView = (ScrollView) findViewById(R.id.event_scroll_view);
@@ -301,9 +304,11 @@ public class EventDetailActivity extends BaseActivity {
             bookView = (FrameLayout) findViewById(R.id.book_ticket);
             callView = (FrameLayout) findViewById(R.id.call);
             shareView = (FrameLayout) findViewById(R.id.share);
-
             offerView = (TextView) findViewById(R.id.offer_text);
-            tagsView = (FlowLayout) findViewById(R.id.event_tags);
+
+            tagsHeaderView = findViewById(R.id.tags_header);
+            tagsView = (LinearLayout) findViewById(R.id.event_tags);
+            descriptionHeaderView = findViewById(R.id.description_header);
             descriptionView = (TextView) findViewById(R.id.event_description);
             readMoreView = (TextView) findViewById(R.id.read_more);
 
@@ -317,8 +322,9 @@ public class EventDetailActivity extends BaseActivity {
             organizerPhoneView = (TextView) findViewById(R.id.organizer_phone);
             organizerWebsiteRow = (LinearLayout) findViewById(R.id.organizer_website_row);
             organizerWebsiteView = (TextView) findViewById(R.id.organizer_website);
-        }
 
+            ama =  findViewById(R.id.ama);
+        }
 
         private void populateView(final Event event) {
             eventScrollView.getViewTreeObserver().addOnScrollChangedListener(
@@ -543,38 +549,31 @@ public class EventDetailActivity extends BaseActivity {
             } else {
                 performerHeaderView.setVisibility(View.VISIBLE);
                 for (final String performer : event.performers) {
-                    getLayoutInflater().inflate(R.layout.event_tag, tagsView);
-                    TextView performerView = (TextView) performersView.getChildAt(performersView.getChildCount() - 1);
-                    performerView.setText(performer);
-                    performerView.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            reportEventAction(event, "performerClick");
-                            Intent searchIntent = new Intent(EventDetailActivity.this, LaunchActivity.class);
-                            searchIntent.setAction(Intent.ACTION_SEARCH);
-                            searchIntent.putExtra(SearchManager.QUERY, performer);
-                            startActivity(searchIntent);
-                        }
-                    });
+                    addTagView(performersView, performer, "performerClick");
                 }
             }
 
             // Set description.
-            if (HTML_PATTERN.matcher(event.description).find()) {
-                descriptionView.setText(Html.fromHtml(event.description));
-                descriptionView.setMovementMethod(LinkMovementMethod.getInstance());
-                descriptionView.setTextIsSelectable(false);
+            if (event.description.isEmpty()) {
+                descriptionHeaderView.setVisibility(View.GONE);
             } else {
-                descriptionView.setText(event.description);
-                descriptionView.setTextIsSelectable(true);
-            }
-            readMoreView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    descriptionView.setMaxLines(Integer.MAX_VALUE);
-                    readMoreView.setVisibility(View.GONE);
+                descriptionHeaderView.setVisibility(View.VISIBLE);
+                if (HTML_PATTERN.matcher(event.description).find()) {
+                    descriptionView.setText(Html.fromHtml(event.description));
+                    descriptionView.setMovementMethod(LinkMovementMethod.getInstance());
+                    descriptionView.setTextIsSelectable(false);
+                } else {
+                    descriptionView.setText(event.description);
+                    descriptionView.setTextIsSelectable(true);
                 }
-            });
+                readMoreView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        descriptionView.setMaxLines(Integer.MAX_VALUE);
+                        readMoreView.setVisibility(View.GONE);
+                    }
+                });
+            }
 
             // Organizer Info.
             boolean organizerInfoShown = false;
@@ -627,21 +626,74 @@ public class EventDetailActivity extends BaseActivity {
 
             // Show tags.
             tagsView.removeAllViews();
-            for (final String tag : event.tags) {
-                getLayoutInflater().inflate(R.layout.event_tag, tagsView);
-                TextView tagView = (TextView) tagsView.getChildAt(tagsView.getChildCount() - 1);
-                tagView.setText(tag);
-                tagView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        reportEventAction(event, "tagClick", tag);
-                        Intent searchIntent = new Intent(EventDetailActivity.this, LaunchActivity.class);
-                        searchIntent.setAction(Intent.ACTION_SEARCH);
-                        searchIntent.putExtra(SearchManager.QUERY, tag);
-                        startActivity(searchIntent);
-                    }
-                });
+            if (event.tags.length == 0) {
+                tagsHeaderView.setVisibility(View.GONE);
+            } else {
+                tagsHeaderView.setVisibility(View.VISIBLE);
+                for (final String tag : event.tags) {
+                    addTagView(tagsView, tag, "tagClick");
+                }
             }
+
+            // AMA.
+            ama.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    reportEventAction(event, "ama");
+                    Intent sendIntent = new Intent(
+                            Intent.ACTION_SENDTO,
+                            Uri.parse("mailto:info@eventshigh.com?subject=Need%20More%20Info"));
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, "Event: " + event.getEventDetailsURI() + "\n\nQuestion:\n<please type in your query here>" );
+                    startActivity(sendIntent);
+                }
+            });
+        }
+
+        private void addTagView(LinearLayout parent, final String tagName, final String action) {
+            getLayoutInflater().inflate(R.layout.event_tag, parent);
+            View tagView = parent.getChildAt(parent.getChildCount() - 1);
+            TextView tagNameView = (TextView) tagView.findViewById(R.id.tag_name);
+            tagNameView.setText(tagName);
+            tagNameView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    reportEventAction(event, action, tagName);
+                    Intent searchIntent = new Intent(EventDetailActivity.this, LaunchActivity.class);
+                    searchIntent.setAction(Intent.ACTION_SEARCH);
+                    searchIntent.putExtra(SearchManager.QUERY, tagName);
+                    startActivity(searchIntent);
+                }
+            });
+
+            final Account account = new Account(EventDetailActivity.this);
+            boolean isFollowing = account.isFollowing(tagName);
+            final View followView = tagView.findViewById(R.id.follow_button);
+            final View followingView = tagView.findViewById(R.id.following_button);
+            followingView.setSelected(true);
+            if (isFollowing) {
+                followView.setVisibility(View.GONE);
+            } else {
+                followingView.setVisibility(View.GONE);
+            }
+
+            followView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    reportActionToAnalytics("addFollowing");
+                    account.setIsFollowing(tagName, true);
+                    followView.setVisibility(View.GONE);
+                    followingView.setVisibility(View.VISIBLE);
+                }
+            });
+            followingView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    reportActionToAnalytics("removeFollowing");
+                    account.setIsFollowing(tagName, false);
+                    followView.setVisibility(View.VISIBLE);
+                    followingView.setVisibility(View.GONE);
+                }
+            });
         }
 
         private void setFavouriteView(@Nullable EventMark pref) {
