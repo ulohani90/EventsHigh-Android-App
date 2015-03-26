@@ -12,6 +12,7 @@ import com.eventshigh.nearme.app.broadcast.DownloadEventsIntentService.IntentTyp
 import com.eventshigh.nearme.app.broadcast.EventAlarmBroadcastReceiver;
 import com.eventshigh.nearme.app.broadcast.EventNotificationIntentService;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.sync.SyncAlarmBroadcastReceiver;
 
 import java.util.Calendar;
 import java.util.Random;
@@ -58,6 +59,17 @@ public class AlarmUtils {
         setWeekendEventsAlarm(context);
     }
 
+    public static void setSyncAlarm(Context context) {
+        // Set the alarm to start at 12am-5am
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, new Random().nextInt(5));
+        calendar.set(Calendar.MINUTE, new Random().nextInt(60));
+
+        Intent intent = new Intent(context, SyncAlarmBroadcastReceiver.class);
+        setRepeatingAlarm(context, intent, "Sync", calendar.getTimeInMillis(), 1);
+    }
+
     private static void setMyEventsAlarm(Context context) {
         // Set the alarm to start at 3pm-4pm on a random day except Friday and Monday.
         Calendar calendar = Calendar.getInstance();
@@ -68,8 +80,9 @@ public class AlarmUtils {
                 notificationDays[new Random().nextInt(notificationDays.length)]);
         calendar.set(Calendar.HOUR_OF_DAY, 3);
         calendar.set(Calendar.MINUTE, new Random().nextInt(60));
-        setWeeklyRepeatAlarm(context, IntentType.MY_EVENTS.intentAction,
-                calendar.getTimeInMillis());
+        Intent intent = new Intent(context, DownloadEventsBroadcastReceiver.class);
+        setRepeatingAlarm(context, intent, IntentType.MY_EVENTS.intentAction,
+                calendar.getTimeInMillis(), 7);
     }
 
     private static void setWeekendEventsAlarm(Context context) {
@@ -79,13 +92,13 @@ public class AlarmUtils {
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
         calendar.set(Calendar.HOUR_OF_DAY, 3);
         calendar.set(Calendar.MINUTE, new Random().nextInt(60));
-        setWeeklyRepeatAlarm(context, IntentType.WEEKEND_EVENTS.intentAction,
-                calendar.getTimeInMillis());
+        Intent intent = new Intent(context, DownloadEventsBroadcastReceiver.class);
+        setRepeatingAlarm(context, intent, IntentType.WEEKEND_EVENTS.intentAction,
+                calendar.getTimeInMillis(), 7);
     }
 
-    private static void setWeeklyRepeatAlarm(Context context, String intentAction,
-                                             long alarmTimeMillis) {
-        Intent intent = new Intent(context, DownloadEventsBroadcastReceiver.class);
+    private static void setRepeatingAlarm(Context context, Intent intent, String intentAction,
+                                          long alarmTimeMillis, int daysInterval) {
         intent.setAction(intentAction);
         boolean isAlarmAlreadySet = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_NO_CREATE) != null;
@@ -102,7 +115,7 @@ public class AlarmUtils {
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
         alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, alarmTimeMillis,
-                AlarmManager.INTERVAL_DAY * 7, alarmIntent);
+                AlarmManager.INTERVAL_DAY * daysInterval, alarmIntent);
     }
 
     private static void cancelOldMyEventsAlarm(Context context) {

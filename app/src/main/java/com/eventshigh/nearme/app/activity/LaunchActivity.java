@@ -100,6 +100,7 @@ public class LaunchActivity extends BaseActivity {
             EventCategory.LITERATURE.categoryName
     };
 
+    private static final String SYNC_ACCOUNT = "Sync_Account";
 
     // UI Elements for this activity.
     private ViewSwitcher viewSwitcher;
@@ -175,12 +176,13 @@ public class LaunchActivity extends BaseActivity {
         // Setup the weekly alarms which are used for notification.
         AlarmUtils.setWeeklyAlarms(this);
 
-        syncAccount = createSyncAccount(this);
+        // Setup daily sync
+        AlarmUtils.setSyncAlarm(this);
     }
 
     public static Account createSyncAccount(Context context) {
         // Create the account type and default account
-        Account newAccount = new Account("Sync Account",
+        Account newAccount = new Account(SYNC_ACCOUNT,
                 context.getString(R.string.sync_adapter_account_type));
         // Get an instance of the Android account manager
         AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
@@ -189,14 +191,7 @@ public class LaunchActivity extends BaseActivity {
          * Add the account and account type, no password or user data
          * If successful, return the Account object, otherwise report an error.
          */
-        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call context.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-        } else {
+        if (!accountManager.addAccountExplicitly(newAccount, null, null)) {
             // TODO: The account exists or some other error occurred. Handle it.
         }
         return newAccount;

@@ -333,6 +333,8 @@
                 android:resource="@xml/syncadapter" />
         </service>
 
+        <!-- Sync adapter receiver -->
+        <receiver android:name=".sync.SyncAlarmBroadcastReceiver" />
     </application>
 
 </manifest>
