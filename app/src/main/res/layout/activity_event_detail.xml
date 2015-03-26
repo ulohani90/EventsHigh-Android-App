@@ -544,9 +544,20 @@
                     />
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/ama"
+                    style="?android:attr/textAppearanceSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="18dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:textColor="@color/link_color"
+                    android:text="@string/action_ama"
+                />
+
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="32dp"
+                    android:layout_height="18dp"
                     android:background="@android:color/transparent"
                 />
             </LinearLayout>

@@ -273,6 +273,8 @@ public class EventDetailActivity extends BaseActivity {
         private final LinearLayout organizerWebsiteRow;
         private final TextView organizerWebsiteView;
 
+        private final View ama;
+
         private EventCard() {
             eventScrollView = (ScrollView) findViewById(R.id.event_scroll_view);
             shareContentsView = findViewById(R.id.share_view);
@@ -320,8 +322,9 @@ public class EventDetailActivity extends BaseActivity {
             organizerPhoneView = (TextView) findViewById(R.id.organizer_phone);
             organizerWebsiteRow = (LinearLayout) findViewById(R.id.organizer_website_row);
             organizerWebsiteView = (TextView) findViewById(R.id.organizer_website);
-        }
 
+            ama =  findViewById(R.id.ama);
+        }
 
         private void populateView(final Event event) {
             eventScrollView.getViewTreeObserver().addOnScrollChangedListener(
@@ -631,6 +634,19 @@ public class EventDetailActivity extends BaseActivity {
                     addTagView(tagsView, tag, "tagClick");
                 }
             }
+
+            // AMA.
+            ama.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    reportEventAction(event, "ama");
+                    Intent sendIntent = new Intent(
+                            Intent.ACTION_SENDTO,
+                            Uri.parse("mailto:info@eventshigh.com?subject=Need%20More%20Info"));
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, "Event: " + event.getEventDetailsURI() + "\n\nQuestion:\n<please type in your query here>" );
+                    startActivity(sendIntent);
+                }
+            });
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
