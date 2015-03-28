@@ -19,7 +19,12 @@ public class NetworkChangeBroadcastReceiver extends BaseWakefulBroadcastReceiver
             return;
         }
 
+        // TODO: do not upload if an upload was successful in the last 24 hrs.
+
+        // TODO: call super only if another upload is not already in progress (see TODO below)
         super.onReceive(context, intent);
+
+        // TODO: mark that upload has started, because we can receive multiple intents while we are processing one upload
     }
 
     @Override
