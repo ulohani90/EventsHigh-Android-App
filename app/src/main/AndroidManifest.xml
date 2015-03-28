@@ -302,6 +302,16 @@
         <receiver android:name=".broadcast.DownloadEventsBroadcastReceiver" />
         <service android:name=".broadcast.DownloadEventsIntentService" />
 
+        <!-- Network change receiver -->
+        <receiver android:name=".broadcast.NetworkChangeBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- The service that will upload user action data -->
+        <service android:name=".broadcast.UploadUserActionsService" />
+
         <!-- The AuthenticatorService used by sync adapter -->
         <service
             android:name="com.eventshigh.nearme.app.sync.AuthenticatorService">
