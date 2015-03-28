@@ -275,7 +275,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         // Do not show filterByDate for search.
-        menu.findItem(R.id.action_shortcut).setVisible(!eventsContext.query.isEmpty());
         menu.findItem(R.id.action_filter_date).setVisible(eventsContext.query.isEmpty());
         menu.findItem(R.id.action_filter).setVisible(
                 eventsContext.query.isEmpty() || EventsHighEndpoints.isDateQuery(eventsContext.query));
@@ -305,11 +304,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
             filterActivityIntent.putStringArrayListExtra(ShowFiltersActivity.PARAM_FILTERS,
                     eventsContext.categoryFilters);
             startActivityForResult(filterActivityIntent, 0);
-            return true;
-        }
-
-        if (id == R.id.action_shortcut) {
-            createShortcut();
             return true;
         }
 
@@ -472,39 +466,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     private void hideMyEventsClue() {
         myEventsClueView.setVisibility(View.GONE);
-    }
-
-    private void createShortcut() {
-        reportActionToAnalytics("createShortcut", eventsContext.query);
-
-        // Create an intent the shortcut could launch.
-        Intent shortcutIntent = new Intent(getApplicationContext(), getClass());
-        shortcutIntent.putExtra(SearchManager.QUERY, eventsContext.query);
-        if (eventsContext.location != null) {
-            shortcutIntent.putExtra(IntentUtils.EXTRA_LATITUDE_PARAM,
-                    eventsContext.location.latitude);
-            shortcutIntent.putExtra(IntentUtils.EXTRA_LONGITUDE_PARAM,
-                    eventsContext.location.longitude);
-        }
-        shortcutIntent.setAction(Intent.ACTION_SEARCH);
-
-        // Create an intent for creating shortcut and broadcast it.
-        Intent addIntent = new Intent();
-        addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-        addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME,
-                eventsContext.query.isEmpty() ? getString(R.string.app_name)
-                        : Utils.capitalize(eventsContext.query));
-        addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
-                Intent.ShortcutIconResource.fromContext(getApplicationContext(),
-                        R.drawable.ic_launcher));
-        addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-        getApplicationContext().sendBroadcast(addIntent);
-
-        // Go to home screen so that user can see the new icon.
-        Intent startMain = new Intent(Intent.ACTION_MAIN);
-        startMain.addCategory(Intent.CATEGORY_HOME);
-        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(startMain);
     }
 
 

@@ -23,10 +23,4 @@
           android:orderInCategory="30"
           myApp:showAsAction="ifRoom"
     />
-    <item android:id="@+id/action_shortcut"
-          android:title="@string/menu_shortcut"
-          android:icon="@drawable/ic_link_white_36dp"
-          android:orderInCategory="50"
-          myApp:showAsAction="ifRoom"
-    />
 </menu>
