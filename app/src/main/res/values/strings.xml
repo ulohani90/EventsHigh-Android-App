@@ -111,4 +111,8 @@
 
     <!-- FB -->
     <string name="facebook_app_id">196111897251952</string>
+
+    <!-- Sync adapter -->
+    <string name="sync_adapter_provider">com.example.android.datasync.provider</string>
+    <string name="sync_adapter_account_type">eventshigh.com</string>
 </resources>
