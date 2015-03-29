@@ -78,7 +78,7 @@ public class AlarmUtils {
                 Calendar.THURSDAY, Calendar.SATURDAY, Calendar.SUNDAY };
         calendar.set(Calendar.DAY_OF_WEEK,
                 notificationDays[new Random().nextInt(notificationDays.length)]);
-        calendar.set(Calendar.HOUR_OF_DAY, 3);
+        calendar.set(Calendar.HOUR_OF_DAY, 15);
         calendar.set(Calendar.MINUTE, new Random().nextInt(60));
         Intent intent = new Intent(context, DownloadEventsBroadcastReceiver.class);
         setRepeatingAlarm(context, intent, IntentType.MY_EVENTS.intentAction,
@@ -90,7 +90,7 @@ public class AlarmUtils {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis() + DateUtils.DAY_IN_MILLIS);
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
-        calendar.set(Calendar.HOUR_OF_DAY, 3);
+        calendar.set(Calendar.HOUR_OF_DAY, 15);
         calendar.set(Calendar.MINUTE, new Random().nextInt(60));
         Intent intent = new Intent(context, DownloadEventsBroadcastReceiver.class);
         setRepeatingAlarm(context, intent, IntentType.WEEKEND_EVENTS.intentAction,

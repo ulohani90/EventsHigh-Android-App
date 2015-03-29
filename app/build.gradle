@@ -24,8 +24,8 @@ android {
         applicationId "com.eventshigh.nearme.app"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 99
-        versionName "0.9.9"
+        versionCode 100
+        versionName "1.0"
     }
     buildTypes {
         release {
@@ -59,7 +59,7 @@ dependencies {
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
     compile 'org.apmem.tools:layouts:1.8@aar'
 
-    compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
         transitive = true;
     }
 }
