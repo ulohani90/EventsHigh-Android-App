@@ -22,6 +22,7 @@ import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.data.UserActionDbHelper;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -221,6 +222,8 @@ public abstract class BaseActivity extends ActionBarActivity {
     }
 
     public void showEventDetails(Event event) {
+        UserActionDbHelper.getInstance(this).recordAction(
+                UserActionDbHelper.EventAction.OPEN_EVENT_DETAIL, event.id);
         showEventDetails(event.getEventDetailsURI());
     }
 
