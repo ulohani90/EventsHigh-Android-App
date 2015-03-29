@@ -19,7 +19,14 @@ public abstract class BaseWakefulBroadcastReceiver extends WakefulBroadcastRecei
                 getIntentServiceClass().getName());
         // Start the service, keeping the device awake while it is launching.
         startWakefulService(context, (intent.setComponent(comp)));
-        setResultCode(Activity.RESULT_OK);
+        if (shouldSetResultCode()) {
+            setResultCode(Activity.RESULT_OK);
+        }
+    }
+
+
+    public boolean shouldSetResultCode() {
+        return true;
     }
 
     /**

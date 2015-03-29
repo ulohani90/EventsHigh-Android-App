@@ -2,9 +2,12 @@ package com.eventshigh.nearme.app.data;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.Settings;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,8 +25,15 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ACTION = "action";
     private static final String COLUMN_DATA = "data";
 
+    private static final String JSON_KEY_ANDROID_ID = "android_id";
+    private static final String JSON_KEY_TIMESTAMP = "timestamp";
+    private static final String JSON_KEY_CHANGES = "changes";
+    private static final String JSON_KEY_ACTION = "action";
+    private static final String JSON_KEY_DATA = "data";
     private static final String JSON_KEY_EVENT_ID = "event_id";
     private static final String JSON_KEY_INTEREST = "interest";
+
+    private static final String[] ALL_COLUMNS = { COLUMN_TIMESTAMP, COLUMN_ACTION, COLUMN_DATA };
 
     private static final String CREATE_TABLE =
             "CREATE TABLE " + USER_ACTIONS_TABLE_NAME + " ( "
@@ -46,18 +56,20 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
 
     private static UserActionDbHelper instance;
 
+    private final Context context;
     private AtomicInteger openCounter = new AtomicInteger();
     private SQLiteDatabase database;
 
     public static synchronized UserActionDbHelper getInstance(Context context) {
         if (instance == null) {
-            instance = new UserActionDbHelper(context);
+            instance = new UserActionDbHelper(context.getApplicationContext());
         }
         return instance;
     }
 
     private UserActionDbHelper(Context context) {
-        super(context.getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -121,5 +133,31 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
             }
         });
         thread.start();
+    }
+
+    public String getActionsSince(long timestamp) throws JSONException {
+        openDatabase();
+        Cursor cursor =  database.query(USER_ACTIONS_TABLE_NAME, ALL_COLUMNS,
+                COLUMN_TIMESTAMP + " > " + timestamp, null, null, null, COLUMN_TIMESTAMP);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(JSON_KEY_ANDROID_ID, Settings.Secure.getString(
+                context.getContentResolver(), Settings.Secure.ANDROID_ID));
+        jsonObject.put(JSON_KEY_TIMESTAMP, timestamp);
+        JSONArray actions = new JSONArray();
+        jsonObject.put(JSON_KEY_CHANGES, actions);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            JSONObject action = new JSONObject();
+            action.put(JSON_KEY_ACTION, cursor.getString(cursor.getColumnIndex(COLUMN_ACTION)));
+            JSONObject data = new JSONObject(cursor.getString(cursor.getColumnIndex(COLUMN_DATA)));
+            action.put(JSON_KEY_DATA, data);
+            actions.put(action);
+            cursor.moveToNext();
+        }
+        // make sure to close the cursor
+        cursor.close();
+        closeDatabase();
+        return jsonObject.toString(4);
     }
 }

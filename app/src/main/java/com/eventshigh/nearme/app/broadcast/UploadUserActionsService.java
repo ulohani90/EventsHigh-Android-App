@@ -3,17 +3,21 @@ package com.eventshigh.nearme.app.broadcast;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.eventshigh.nearme.app.data.UserActionDbHelper;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -48,18 +52,17 @@ public class UploadUserActionsService extends IntentService {
         Uri uri = AccountStateReporter.getBaseUri(context, "mobile_app_users")
                 .appendPath("record_user_action")
                 .build();
-
         try {
+            final String postBody = UserActionDbHelper.getInstance(this).getActionsSince(0);
             VolleyHelper.addToRequestQueue(context, new JsonObjectRequest(Request.Method.POST,
                             Signer.sign(uri).toString(), null, onSuccess, onFailed) {
                         @Override
                         public byte[] getBody() {
-                            String test = "This is a test";
-                            return test.getBytes();
+                            return postBody.getBytes();
                         }
                     }
             );
-        } catch (IOException | GeneralSecurityException e) {
+        } catch (IOException | GeneralSecurityException | JSONException e) {
             Log.w(AccountStateReporter.class.getSimpleName(),
                     "Failed to upload user actions: " + uri, e);
             cleanUp();
@@ -67,7 +70,9 @@ public class UploadUserActionsService extends IntentService {
     }
 
     private void cleanUp() {
-        // TODO: remove the mark that says upload is in progress
+        // Remove the mark that says upload is in progress
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences.edit().putBoolean(NetworkChangeBroadcastReceiver.PREF_IS_UPLOADING, false).apply();
         NetworkChangeBroadcastReceiver.completeWakefulIntent(intent);
     }
 }
