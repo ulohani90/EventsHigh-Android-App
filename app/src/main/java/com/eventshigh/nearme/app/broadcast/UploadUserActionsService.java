@@ -24,7 +24,10 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 public class UploadUserActionsService extends IntentService {
+    private static final String LOG_TAG = UploadUserActionsService.class.getSimpleName();
+
     private Intent intent;
+    private SharedPreferences preferences;
 
     public UploadUserActionsService() {
         super("UploadUserActionsService");
@@ -32,16 +35,23 @@ public class UploadUserActionsService extends IntentService {
 
     @Override
     protected void onHandleIntent(final Intent intent) {
+        this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
         this.intent = intent;
+        final long uploadTimestamp = System.currentTimeMillis();
         recordUserActions(this, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject jsonObject, boolean b) {
-                // TODO: mark tha location up to which the data has been uploaded
+                // Mark the location up to which the data has been uploaded
+                preferences.edit().putLong(
+                        NetworkChangeBroadcastReceiver.PREF_LAST_UPLOAD_TIMESTAMP, uploadTimestamp)
+                        .apply();
+                Log.i(LOG_TAG, "Successfully uploaded user actions");
                 cleanUp();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
+                Log.w(LOG_TAG, "Failed to uploaded user actions");
                 cleanUp();
             }
         });
@@ -49,11 +59,14 @@ public class UploadUserActionsService extends IntentService {
 
     private void recordUserActions(Context context, final Response.Listener<JSONObject> onSuccess,
                                    final Response.ErrorListener onFailed) {
-        Uri uri = AccountStateReporter.getBaseUri(context, "mobile_app_users")
+        Uri uri = AccountStateReporter.getApiUri(context, "mobile_app_users")
                 .appendPath("record_user_action")
                 .build();
         try {
-            final String postBody = UserActionDbHelper.getInstance(this).getActionsSince(0);
+            final long lastUploadTimestamp = preferences.getLong(
+                    NetworkChangeBroadcastReceiver.PREF_LAST_UPLOAD_TIMESTAMP, 0);
+            final String postBody = UserActionDbHelper.getInstance(this).getActionsSince(
+                    lastUploadTimestamp);
             VolleyHelper.addToRequestQueue(context, new JsonObjectRequest(Request.Method.POST,
                             Signer.sign(uri).toString(), null, onSuccess, onFailed) {
                         @Override
@@ -63,16 +76,15 @@ public class UploadUserActionsService extends IntentService {
                     }
             );
         } catch (IOException | GeneralSecurityException | JSONException e) {
-            Log.w(AccountStateReporter.class.getSimpleName(),
-                    "Failed to upload user actions: " + uri, e);
+            Log.w(LOG_TAG, "Failed to upload user actions: " + uri, e);
             cleanUp();
         }
     }
 
     private void cleanUp() {
         // Remove the mark that says upload is in progress
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        preferences.edit().putBoolean(NetworkChangeBroadcastReceiver.PREF_IS_UPLOADING, false).apply();
+        preferences.edit().putBoolean(NetworkChangeBroadcastReceiver.PREF_IS_UPLOADING, false)
+                .apply();
         NetworkChangeBroadcastReceiver.completeWakefulIntent(intent);
     }
 }

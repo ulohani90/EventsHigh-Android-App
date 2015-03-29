@@ -81,4 +81,11 @@ public class AccountStateReporter {
                 Settings.Secure.getString(context.getContentResolver(), Secure.ANDROID_ID));
     }
 
+    public static Builder getApiUri(Context context, String path) {
+        return Uri.parse("http://apiserver.eventshigh.com:8888/api")
+                .buildUpon()
+                .appendPath(path)
+                .appendQueryParameter("android_id",
+                        Settings.Secure.getString(context.getContentResolver(), Secure.ANDROID_ID));
+    }
 }
