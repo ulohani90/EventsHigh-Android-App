@@ -18,6 +18,7 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.eventshigh.nearme.app.data.EventCategory;
+import com.eventshigh.nearme.app.data.UserActionDbHelper;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
 
@@ -148,8 +149,12 @@ public class Account {
     public void setIsFollowing(String tag, boolean isFollowing) {
         if (isFollowing) {
             accountInfo.edit().putString(getKeyForTag(tag), tag).apply();
+            UserActionDbHelper.getInstance(context).recordAction(
+                    UserActionDbHelper.FollowingAction.ADD_INTEREST, tag);
         } else {
             accountInfo.edit().remove(getKeyForTag(tag)).apply();
+            UserActionDbHelper.getInstance(context).recordAction(
+                    UserActionDbHelper.FollowingAction.REMOVE_INTEREST, tag);
         }
     }
 
