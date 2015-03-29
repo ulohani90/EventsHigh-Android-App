@@ -29,7 +29,7 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + USER_ACTIONS_TABLE_NAME + " ( "
                     + COLUMN_TIMESTAMP + " INTEGER PRIMARY KEY, "
                     + COLUMN_ACTION + " TEXT, "
-                    + COLUMN_DATA + " TEXT, "
+                    + COLUMN_DATA + " TEXT "
                     + ");";
 
     public enum EventAction {
