@@ -422,6 +422,10 @@ service#com.eventshigh.nearme.app.broadcast.DownloadEventsIntentService
 ADDED from AndroidManifest.xml:297:9
 	android:name
 		ADDED from AndroidManifest.xml:297:18
+service#com.eventshigh.nearme.app.broadcast.UploadUserActionsService
+ADDED from AndroidManifest.xml:309:9
+	android:name
+		ADDED from AndroidManifest.xml:309:18
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from NearMe:volley:unspecified:7:5
