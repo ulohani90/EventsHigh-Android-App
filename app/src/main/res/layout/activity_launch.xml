@@ -192,7 +192,6 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
             />
-
         </LinearLayout>
 
         <ListView
@@ -214,6 +213,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/app_feature"
             android:adjustViewBounds="true"
+            tools:ignore="ContentDescription"
         />
         <fragment
             android:id="@+id/preferences_all"

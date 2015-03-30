@@ -56,13 +56,10 @@ public abstract class BaseEventListRequest extends JsonRequest<EventCollection> 
     }
 
     public static class EventCollection {
-        public final List<String> tags;
         public final List<Event> events;
         public final List<TrendingTopic> trendingTopics;
 
-        public EventCollection(List<Event> events, List<String> tags,
-                               List<TrendingTopic> trendingTopics) {
-            this.tags = tags;
+        public EventCollection(List<Event> events, List<TrendingTopic> trendingTopics) {
             this.events = events;
             this.trendingTopics = trendingTopics;
         }
@@ -138,18 +135,6 @@ public abstract class BaseEventListRequest extends JsonRequest<EventCollection> 
         // Sort the event list to user.
         Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
 
-        // Parse the categories.
-        List<String> categories = new ArrayList<>();
-        JSONArray categoriesJSON = eventsJson.optJSONArray("categories");
-        if (categoriesJSON != null) {
-            for (int i = 0; i < categoriesJSON.length(); i++) {
-                String category = categoriesJSON.optString(i);
-                if (category != null) {
-                    categories.add(category);
-                }
-            }
-        }
-
         // Parse Trending topics.
         List<TrendingTopic> trendingTopics = new ArrayList<>();
         JSONArray trendingTopicsJSON = eventsJson.optJSONArray("trending_topics");
@@ -162,6 +147,6 @@ public abstract class BaseEventListRequest extends JsonRequest<EventCollection> 
             }
         }
 
-        return new EventCollection(events, categories, trendingTopics);
+        return new EventCollection(events, trendingTopics);
     }
 }

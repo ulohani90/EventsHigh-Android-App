@@ -71,9 +71,9 @@ public class FeaturedEventsRequest extends BaseEventListRequest {
                 }
             }
 
-            return Response.success(new EventCollection(filteredEvents, eventCollection.tags,
-                            eventCollection.trendingTopics),
-                    HttpHeaderParser.parseCacheHeaders(response));
+            return Response.success(
+                new EventCollection(filteredEvents, eventCollection.trendingTopics),
+                HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JSONException e) {
