@@ -9,6 +9,7 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.network.BaseEventListRequest.EventCollection;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
@@ -89,7 +90,7 @@ public class MyEventsRequest {
         }
     }
 
-    private class EventsListener implements Listener<List<Event>> {
+    private class EventsListener implements Listener<EventCollection> {
         private final String title;
 
         public EventsListener(String title) {
@@ -103,13 +104,13 @@ public class MyEventsRequest {
         }
 
         @Override
-        public void onResponse(List<Event> events, boolean intermediate) {
+        public void onResponse(EventCollection eventCollection, boolean intermediate) {
             if (intermediate) {
                 return;
             }
 
-            if (!events.isEmpty()) {
-                addToResult(events);
+            if (!eventCollection.events.isEmpty()) {
+                addToResult(eventCollection.events);
             }
             reportResult();
         }

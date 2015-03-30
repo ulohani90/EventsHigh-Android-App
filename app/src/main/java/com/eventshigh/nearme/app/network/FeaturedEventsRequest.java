@@ -35,7 +35,7 @@ public class FeaturedEventsRequest extends BaseEventListRequest {
      */
     public static void submit(Context context, EventsContext eventsContext,
                               Priority priority, boolean shouldBypassCache,
-                              Listener<List<Event>> listener, ErrorListener errorListener) {
+                              Listener<EventCollection> listener, ErrorListener errorListener) {
         if (eventsContext.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
             return;
@@ -50,19 +50,19 @@ public class FeaturedEventsRequest extends BaseEventListRequest {
 
     public FeaturedEventsRequest(Context context, String url, EventsContext eventsContext,
                                  boolean shouldBypassCache, Priority priority,
-                                 Listener<List<Event>> listener, ErrorListener errorListener) {
+                                 Listener<EventCollection> listener, ErrorListener errorListener) {
         super(context, url, eventsContext, priority, shouldBypassCache, true, listener,
                 errorListener);
     }
 
     @Override
-    protected Response<List<Event>> parseNetworkResponse(NetworkResponse response) {
+    protected Response<EventCollection> parseNetworkResponse(NetworkResponse response) {
         try {
             // Parse the response.
-            List<Event> events = parseEventsFromNetworkResponse(response);
+            EventCollection eventCollection = parseEventsFromNetworkResponse(response);
 
             List<Event> filteredEvents = new ArrayList<>(MAX_FEATURED_EVENTS);
-            for (Event event : events) {
+            for (Event event : eventCollection.events) {
                 if (event.imgUrl != null) {
                     filteredEvents.add(event);
                     if (filteredEvents.size() == MAX_FEATURED_EVENTS) {
@@ -71,7 +71,9 @@ public class FeaturedEventsRequest extends BaseEventListRequest {
                 }
             }
 
-            return Response.success(filteredEvents, HttpHeaderParser.parseCacheHeaders(response));
+            return Response.success(new EventCollection(filteredEvents, eventCollection.tags,
+                            eventCollection.trendingTopics),
+                    HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JSONException e) {

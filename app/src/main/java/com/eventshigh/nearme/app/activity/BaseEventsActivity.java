@@ -37,6 +37,7 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.network.BaseEventListRequest.EventCollection;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
@@ -510,20 +511,20 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     // This callback is called by EventsFetcher when new set of events are available. We build the
     // markers for all events and then call method to show selected markers.
-    private Listener<List<Event>> mEventsFetcherCallBack = new Listener<List<Event>>() {
+    private Listener<EventCollection> mEventsFetcherCallBack = new Listener<EventCollection>() {
         @Override
-        public void onResponse(List<Event> events, boolean isIntermediate) {
+        public void onResponse(EventCollection eventCollection, boolean isIntermediate) {
             if (!isIntermediate) {
                 topProgressBar.setVisibility(View.GONE);
 
-                if (events.isEmpty()) {
+                if (eventCollection.events.isEmpty()) {
                     // Failed. Show toast and return empty list.
                     Toast.makeText(BaseEventsActivity.this, R.string.no_events, Toast.LENGTH_SHORT).show();
                 }
             }
 
-            if (!isIntermediate || !events.isEmpty()) {
-                updateEventsCollection(events);
+            if (!isIntermediate || !eventCollection.events.isEmpty()) {
+                updateEventsCollection(eventCollection.events);
             }
         }
     };
