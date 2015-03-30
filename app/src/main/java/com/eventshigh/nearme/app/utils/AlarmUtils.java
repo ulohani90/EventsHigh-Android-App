@@ -12,7 +12,6 @@ import com.eventshigh.nearme.app.broadcast.DownloadEventsIntentService.IntentTyp
 import com.eventshigh.nearme.app.broadcast.EventAlarmBroadcastReceiver;
 import com.eventshigh.nearme.app.broadcast.EventNotificationIntentService;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.sync.SyncAlarmBroadcastReceiver;
 
 import java.util.Calendar;
 import java.util.Random;
@@ -57,17 +56,6 @@ public class AlarmUtils {
         cancelOldMyEventsAlarm(context);
         setMyEventsAlarm(context);
         setWeekendEventsAlarm(context);
-    }
-
-    public static void setSyncAlarm(Context context) {
-        // Set the alarm to start at 12am-5am
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, new Random().nextInt(5));
-        calendar.set(Calendar.MINUTE, new Random().nextInt(60));
-
-        Intent intent = new Intent(context, SyncAlarmBroadcastReceiver.class);
-        setRepeatingAlarm(context, intent, "Sync", calendar.getTimeInMillis(), 1);
     }
 
     private static void setMyEventsAlarm(Context context) {

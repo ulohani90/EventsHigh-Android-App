@@ -17,11 +17,6 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-    <!-- Required for sync adapter -->
-    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
-    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
-
     <permission
         android:name="com.eventshigh.nearme.app.permission.C2D_MESSAGE"
         android:protectionLevel="signature"
@@ -310,40 +305,6 @@
 
         <!-- The service that will upload user action data -->
         <service android:name=".broadcast.UploadUserActionsService" />
-
-        <!-- The AuthenticatorService used by sync adapter -->
-        <service
-            android:name="com.eventshigh.nearme.app.sync.AuthenticatorService">
-            <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator"/>
-            </intent-filter>
-            <meta-data
-                android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
-        </service>
-
-        <!-- Used by sync adapter -->
-        <provider
-            android:name="com.eventshigh.nearme.app.sync.StubProvider"
-            android:authorities="@string/sync_adapter_provider"
-            android:exported="false"
-            android:syncable="true"/>
-
-        <!-- The sync adapter service -->
-        <service
-            android:name="com.eventshigh.nearme.app.sync.SyncService"
-            android:exported="true"
-            android:process=":sync">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter"/>
-            </intent-filter>
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/syncadapter" />
-        </service>
-
-        <!-- Sync adapter receiver -->
-        <receiver android:name=".sync.SyncAlarmBroadcastReceiver" />
     </application>
 
 </manifest>
