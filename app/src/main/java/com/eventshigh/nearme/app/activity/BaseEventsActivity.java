@@ -325,6 +325,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
     }
 
+    public LatLng getUserLocation() {
+        return eventsContext.location;
+    }
+
 
     // ***********************
     // Delegated methods

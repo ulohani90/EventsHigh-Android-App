@@ -25,7 +25,9 @@ import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
+import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +50,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             R.drawable.eh_myevents_header5,
             R.drawable.eh_myevents_header6
     };
-
+    private static final float RADIAL_DISTANCE_MULTIPLIER = 1.3f;
 
     // We show the dismiss toast once per session.
     private static boolean showDismissToast = true;
@@ -298,6 +300,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView titleView;
         private final TextView timeView;
         private final TextView venueView;
+        private final TextView distanceTimeView;
         private final TextView numPeopleInterestedView;
         private final FrameLayout favouriteView;
         private final FrameLayout favouritedView;
@@ -317,6 +320,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             titleView = (TextView) cardView.findViewById(R.id.event_title);
             timeView = (TextView) cardView.findViewById(R.id.event_time);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
+            distanceTimeView = (TextView) cardView.findViewById(R.id.event_distance_time);
             numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
             favouriteView = (FrameLayout) cardView.findViewById(R.id.action_favourite);
             favouritedView = (FrameLayout) cardView.findViewById(R.id.action_favourited);
@@ -361,6 +365,42 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             // Set the venue.
             venueView.setText(event.getShortAddress());
+
+            // Set the distance and time
+            LatLng userLocation = activity.getUserLocation();
+            if (userLocation != null) {
+                float radialDistance = LocationUtils.distanceInKM(userLocation, event.location);
+                float distance = radialDistance * RADIAL_DISTANCE_MULTIPLIER;
+                String distanceStr = "20+";
+                if (distance <= 2) {
+                    distanceStr = "0 km - 2 kms";
+                } else if (distance <= 5) {
+                    distanceStr = "2 kms - 5 kms";
+                } else if (distance <= 10) {
+                    distanceStr = "5 kms - 10 kms";
+                } else if (distance <= 20) {
+                    distanceStr = "10 kms - 20 kms";
+                }
+
+                float time = radialDistance * 4;
+                String timeStr = "60+";
+                if (time <= 5) {
+                    timeStr = "5";
+                } else if (time <= 15) {
+                    timeStr = "15";
+                } else if (time <= 30) {
+                    timeStr = "30";
+                } else if (time <= 60) {
+                    timeStr = "60";
+                }
+                String distanceAndTime = String.format(
+                        activity.getResources().getString(R.string.event_distance_and_time),
+                        distanceStr, timeStr);
+                distanceTimeView.setText(distanceAndTime);
+                distanceTimeView.setVisibility(View.VISIBLE);
+            } else {
+                distanceTimeView.setVisibility(View.GONE);
+            }
 
             // Set num people interested.
             if (event.numPeopleInterested <= 0) {

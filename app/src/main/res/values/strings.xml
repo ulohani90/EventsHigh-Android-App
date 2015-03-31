@@ -108,6 +108,7 @@
     <string name="event_time_details">{0,choice,0#Happening Today|1#Happening Tomorrow|1&lt;{0} days from now}</string>
     <string name="event_detail_from">Event details from: %s</string>
     <string name="event_time_venue">%1$s, %2$s</string>
+    <string name="event_distance_and_time">%1$s about %2$s mins</string>
 
     <!-- FB -->
     <string name="facebook_app_id">196111897251952</string>
