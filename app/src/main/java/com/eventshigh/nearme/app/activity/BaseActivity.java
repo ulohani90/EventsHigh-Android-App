@@ -29,13 +29,11 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.kochava.android.tracker.Feature;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.TimeZone;
 
 import io.fabric.sdk.android.Fabric;
@@ -53,8 +51,6 @@ public abstract class BaseActivity extends ActionBarActivity {
     // Google Analytics
     protected boolean isPlayServicesPresent;
     private GAHelper gaHelper;
-
-    protected static Feature kTracker;
 
 
     // ***********************
@@ -82,11 +78,6 @@ public abstract class BaseActivity extends ActionBarActivity {
                 gaHelper.setAppOptOut(true);
             }
         }
-
-        // initialize Kochava
-        HashMap<String, Object> datamap = new HashMap<>();
-        datamap.put(Feature.INPUTITEMS.KOCHAVA_APP_ID, "koeventshigh550bd0ca59845");
-        kTracker = new Feature(this, datamap);
     }
 
     @Override

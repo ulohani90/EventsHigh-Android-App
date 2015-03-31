@@ -35,7 +35,5 @@ public class InstallReferrer extends BroadcastReceiver {
 
         // Report the install referrer intent to Google Analytics.
         new CampaignTrackingReceiver().onReceive(context, intent);
-
-        new com.kochava.android.tracker.ReferralCapture().onReceive(context, intent);
     }
 }
