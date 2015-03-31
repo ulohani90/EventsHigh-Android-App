@@ -143,7 +143,7 @@
             style="@style/EventCardText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/event_travel_time"
+            android:layout_below="@id/event_venue"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_toRightOf="@+id/event_bg"

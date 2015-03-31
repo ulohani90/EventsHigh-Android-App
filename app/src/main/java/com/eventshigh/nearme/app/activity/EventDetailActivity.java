@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -48,8 +49,12 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.text.MessageFormat;
 import java.util.Date;
@@ -70,7 +75,9 @@ public class EventDetailActivity extends BaseActivity {
     private Toolbar toolbar;
     private View topProgressBar;
     private EventCard eventCard;
-    private Event event;
+    private Event event = null;
+    private LatLng userLocation = null;
+    private boolean hasSetUserLocation = false;
     private GoogleApiClient client;
     private Editor eventsMarkerEditor;
 
@@ -112,6 +119,36 @@ public class EventDetailActivity extends BaseActivity {
                         finish();
                     }
                 });
+
+        // Setup GoogleApiClient.
+        client = new GoogleApiClient.Builder(EventDetailActivity.this)
+                .addApi(AppIndex.APP_INDEX_API)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(new ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(Bundle bundle) {
+                        Location location = LocationServices.FusedLocationApi.getLastLocation(client);
+                        if (location != null) {
+                            userLocation = LocationUtils.locationToLatLng(location);
+                        }
+                        hasSetUserLocation = true;
+                        populateView();
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int i) {
+                        // do nothing.
+                    }
+                })
+                .addOnConnectionFailedListener(new OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(ConnectionResult connectionResult) {
+                        hasSetUserLocation = true;
+                        populateView();
+                    }
+                })
+                .build();
+        client.connect();
     }
 
     @Override
@@ -129,7 +166,18 @@ public class EventDetailActivity extends BaseActivity {
         }
     }
 
-    public void setScroll(int scrollValue) {
+    private void populateView() {
+        if (event != null && hasSetUserLocation) {
+            if (client != null && client.isConnected()) {
+                Uri webUri = event.getEventDetailsURI();
+                AppIndex.AppIndexApi.view(client, EventDetailActivity.this, Utils.getAppUri(webUri),
+                        event.title, webUri, null);
+            }
+            eventCard.populateView(event);
+        }
+    }
+
+    private void setScroll(int scrollValue) {
         float opacity = Math.min(1.0f, scrollValue * 3f / getResources().getDisplayMetrics().heightPixels);
         toolbar.setAlpha(opacity);
     }
@@ -148,26 +196,8 @@ public class EventDetailActivity extends BaseActivity {
             }
             toolbar.setAlpha(0f);
 
-
             EventDetailActivity.this.event = event;
-            eventCard.populateView(event);
-
-            // Setup GoogleApiClient
-            client = new GoogleApiClient.Builder(EventDetailActivity.this).addApi(AppIndex.APP_INDEX_API).build();
-            client.registerConnectionCallbacks(new ConnectionCallbacks() {
-                @Override
-                public void onConnected(Bundle bundle) {
-                    Uri webUri = event.getEventDetailsURI();
-                    AppIndex.AppIndexApi.view(client, EventDetailActivity.this, Utils.getAppUri(webUri),
-                            event.title, webUri, null);
-                }
-
-                @Override
-                public void onConnectionSuspended(int i) {
-                    // do nothing.
-                }
-            });
-            client.connect();
+            populateView();
         }
     };
 
@@ -423,8 +453,8 @@ public class EventDetailActivity extends BaseActivity {
             // Set Venue and address.
             venueView.setText(event.getShortAddress());
             addressView.setText(event.getFullAddress());
-            String eventTravelTime = LocationUtils.getTravelTime(EventDetailActivity.this, null,
-                    event.location);
+            String eventTravelTime = LocationUtils.getTravelTime(EventDetailActivity.this,
+                    userLocation, event.location);
             if (eventTravelTime != null) {
                 travelTimeView.setText(eventTravelTime);
                 travelTimeView.setVisibility(View.VISIBLE);
