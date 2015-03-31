@@ -85,7 +85,7 @@
     <!-- Sharing -->
     <string name="action_share_app">Share This App</string>
     <string name="share_app_text">Hey! I liked this EventsHigh app and I think you will too. It has a lot of weekend activities to choose from. Check it out. %s</string>
-    <string name="share_event_text">Hey Check this event out. Sounds fun! %1$s (This link is best viewed in EventsHigh App. Download it here: %2$s)</string>
+    <string name="share_event_text">Hey Check this event out. Sounds fun! %s</string>
 
     <!-- Failed messages -->
     <string name="failed_load">Oops! Something\'s gone wrong. Let\'s try that again.</string>

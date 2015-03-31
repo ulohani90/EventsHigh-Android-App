@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.data;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Parcel;
@@ -101,8 +102,8 @@ public class Event implements Parcelable {
         return EventsHighEndpoints.getEventDetailsURI(this);
     }
 
-    public Uri getEventShareURI() {
-        return EventsHighEndpoints.getEventShareURI(this);
+    public Uri getEventShareURI(Context context) {
+        return EventsHighEndpoints.getEventShareURI(this, context);
     }
 
     public int getPopularityScore() {

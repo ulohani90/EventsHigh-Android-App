@@ -206,8 +206,7 @@ public abstract class BaseActivity extends ActionBarActivity {
             sendIntent.putExtra(Intent.EXTRA_TITLE, event.title);
             sendIntent.putExtra(Intent.EXTRA_TEXT,
                 String.format(getResources().getString(R.string.share_event_text),
-                        event.getEventShareURI(),
-                        new Account(this).getAppDownloadLink())
+                        event.getEventShareURI(this))
             );
             sendIntent.setType("image/jpeg");
             sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
