@@ -45,6 +45,7 @@ import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
+import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -241,6 +242,7 @@ public class EventDetailActivity extends BaseActivity {
         private final RelativeLayout venueGroupView;
         private final TextView venueView;
         private final TextView addressView;
+        private final TextView travelTimeView;
         private final View naviagationView;
 
         private final LinearLayout timeGroupView;
@@ -291,6 +293,7 @@ public class EventDetailActivity extends BaseActivity {
             venueGroupView = (RelativeLayout) findViewById(R.id.event_venue_group);
             venueView = (TextView) findViewById(R.id.event_venue);
             addressView = (TextView) findViewById(R.id.event_address);
+            travelTimeView = (TextView) findViewById(R.id.event_travel_time);
             naviagationView = findViewById(R.id.navigate_icon);
 
             timeGroupView = (LinearLayout) findViewById(R.id.event_time_group);
@@ -420,6 +423,14 @@ public class EventDetailActivity extends BaseActivity {
             // Set Venue and address.
             venueView.setText(event.getShortAddress());
             addressView.setText(event.getFullAddress());
+            String eventTravelTime = LocationUtils.getTravelTime(EventDetailActivity.this, null,
+                    event.location);
+            if (eventTravelTime != null) {
+                travelTimeView.setText(eventTravelTime);
+                travelTimeView.setVisibility(View.VISIBLE);
+            } else {
+                travelTimeView.setVisibility(View.GONE);
+            }
             venueGroupView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -144,6 +144,22 @@
                                 android:textColor="#999197A3"
                                 tools:text="Near Hoodi circle, Whitefield, Bangalore, 560037."
                             />
+                            <TextView
+                                android:id="@+id/event_travel_time"
+                                style="@style/EHText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/event_address"
+                                android:layout_alignParentEnd="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_toRightOf="@+id/event_venue_icon"
+                                android:layout_toEndOf="@+id/event_venue_icon"
+                                android:textColor="#999197A3"
+                                android:drawableLeft="@drawable/ic_local_taxi_grey600_12dp"
+                                android:drawableStart="@drawable/ic_local_taxi_grey600_12dp"
+                                android:drawablePadding="4dp"
+                                tools:text="30 min"
+                            />
                         </RelativeLayout>
                         <ImageView
                             android:id="@+id/navigate_icon"

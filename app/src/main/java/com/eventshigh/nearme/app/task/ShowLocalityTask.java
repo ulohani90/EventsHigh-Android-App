@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.util.LruCache;
 
+import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
@@ -24,7 +25,6 @@ public class ShowLocalityTask extends AsyncTask<LatLng, Void, String> {
     private static final String LOG_TAG = ShowLocalityTask.class.getSimpleName();
     private static final Pattern INVALID_LOCALITY_PATTERN = Pattern.compile("[^a-zA-Z]+[a-zA-Z]?");
 
-    private static final String LAT_LNG_KEY_FORMAT = "%.2f-%.2f";
     private static final LruCache<String, String> LAT_LNG_TO_LOCALITY = new LruCache<>(100);
 
     private final Context context;
@@ -38,7 +38,7 @@ public class ShowLocalityTask extends AsyncTask<LatLng, Void, String> {
     @Override
     protected String doInBackground(LatLng... params) {
         // Check for Cache if entry is there.
-        String key = String.format(LAT_LNG_KEY_FORMAT, params[0].latitude, params[0].longitude);
+        String key = LocationUtils.toString(params[0]);
         String locality = LAT_LNG_TO_LOCALITY.get(key);
         if (locality != null) {
             return locality;
