@@ -1,7 +1,5 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -11,13 +9,13 @@ import android.net.Uri;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -41,12 +39,14 @@ import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.network.BaseEventListRequest.EventCollection;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
+import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.CityListAdapter;
 import com.eventshigh.nearme.app.ui.CityListAdapter.OnCitySelectionListener;
@@ -70,7 +70,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Calendar;
-import java.util.List;
 
 /**
  * A placeholder {@link android.app.Activity} which is responsible for launching
@@ -100,8 +99,6 @@ public class LaunchActivity extends BaseActivity {
             EventCategory.LITERATURE.categoryName
     };
 
-    private static final String SYNC_ACCOUNT = "Sync_Account";
-
     // UI Elements for this activity.
     private ViewSwitcher viewSwitcher;
     private LinearLayout dotsView;
@@ -122,9 +119,6 @@ public class LaunchActivity extends BaseActivity {
 
     // User preferences.
     protected Preferences pref;
-
-    // A dummy account used to sync the user data
-    private Account syncAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,26 +169,6 @@ public class LaunchActivity extends BaseActivity {
 
         // Setup the weekly alarms which are used for notification.
         AlarmUtils.setWeeklyAlarms(this);
-
-        // Setup daily sync
-        //AlarmUtils.setSyncAlarm(this);
-    }
-
-    public static Account createSyncAccount(Context context) {
-        // Create the account type and default account
-        Account newAccount = new Account(SYNC_ACCOUNT,
-                context.getString(R.string.sync_adapter_account_type));
-        // Get an instance of the Android account manager
-        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
-
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-        if (!accountManager.addAccountExplicitly(newAccount, null, null)) {
-            // TODO: The account exists or some other error occurred. Handle it.
-        }
-        return newAccount;
     }
 
     public void onStart() {
@@ -485,6 +459,11 @@ public class LaunchActivity extends BaseActivity {
     }
 
     private long exploreScreenPopulatedTimestamp = 0;
+    private LinearLayout[] featuredCatLayouts;
+    private LayoutParams FeaturedCatLP;
+    private int numColumns;
+    private View featuredCatHeader;
+
     private void showExploreScreen() {
         viewSwitcher.setDisplayedChild(0);
 
@@ -498,15 +477,26 @@ public class LaunchActivity extends BaseActivity {
 
             int spacing = Utils.dpToPx(this, MARGIN_DP);
             int widthPixels = displayMetrics.widthPixels;
-            int numColumns = Math.max(MIN_EXPLORE_CARD_IN_ROW,
+            numColumns = Math.max(MIN_EXPLORE_CARD_IN_ROW,
                     (widthPixels - spacing * 2) / Utils.dpToPx(this, EXPLORE_CARD_WIDTH_DP));
 
             int size = (widthPixels - spacing * (numColumns + 1)) / numColumns;
             LayoutParams exploreCardLP = new LayoutParams(size, size);
+            FeaturedCatLP = new LayoutParams(size, size * 3 / 4);
             exploreCardLP.setMargins(0, spacing, spacing, 0);
+            FeaturedCatLP.setMargins(0, spacing, spacing, 0);
 
             LayoutParams rowLP = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
             rowLP.setMargins(spacing, 0, 0, 0);
+
+            LinearLayout featuredCatLayout1 = (LinearLayout) findViewById(R.id.featured_cat_row1);
+            LinearLayout featuredCatLayout2 = (LinearLayout) findViewById(R.id.featured_cat_row2);
+            LinearLayout featuredCatLayout3 = (LinearLayout) findViewById(R.id.featured_cat_row3);
+            featuredCatLayout1.setLayoutParams(rowLP);
+            featuredCatLayout2.setLayoutParams(rowLP);
+            featuredCatLayout3.setLayoutParams(rowLP);
+            featuredCatLayouts = new LinearLayout[] {featuredCatLayout1, featuredCatLayout2, featuredCatLayout3};
+            featuredCatHeader = findViewById(R.id.featured_cat_header);
 
             LinearLayout exploreLayout = (LinearLayout) findViewById(R.id.explore_layout);
             LinearLayout last = new LinearLayout(this);
@@ -517,7 +507,7 @@ public class LaunchActivity extends BaseActivity {
                     exploreLayout.addView(last);
                 }
 
-                last.addView(getExploreCard(EXPLORE_TAGS[i], exploreCardLP, last));
+                addExploreCard(EXPLORE_TAGS[i], null, exploreCardLP, last);
             }
         }
 
@@ -539,22 +529,22 @@ public class LaunchActivity extends BaseActivity {
         }
     };
 
-    private View getExploreCard(final String tagName, LayoutParams lp, ViewGroup parent) {
+    private void addExploreCard(final String tagName, @Nullable String infographURL, LayoutParams lp,
+                                ViewGroup parent) {
         final View view = getLayoutInflater().inflate(R.layout.explore_card, parent, false);
         view.setLayoutParams(lp);
         int infographId = getInfoGraphId(tagName);
-        ((ImageView) view.findViewById(R.id.explore_image)).setImageResource(
-                infographId);
+        NetworkImageView imageView = (NetworkImageView) view.findViewById(R.id.explore_image);
+        imageView.setDefaultImageResId(infographId);
+        if (infographURL != null) {
+            imageView.setImageUrl(infographURL, VolleyHelper.getImageLoader(this));
+        }
+
         if (infographId == R.drawable.eh_default_event_list) {
-            CardView cardView = (CardView) view;
-            TextView tv = new TextView(this);
+            view.findViewById(R.id.explore_film).setVisibility(View.VISIBLE);
+            TextView tv = (TextView)view.findViewById(R.id.explore_cat_name);
+            tv.setVisibility(View.VISIBLE);
             tv.setText(tagName);
-            FrameLayout.LayoutParams tvlp = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
-            tvlp.bottomMargin = Utils.dpToPx(this, 10);
-            tv.setLayoutParams(tvlp);
-            cardView.addView(tv);
         }
 
         view.setOnClickListener(new OnClickListener() {
@@ -564,7 +554,7 @@ public class LaunchActivity extends BaseActivity {
                 showSearchView(tagName);
             }
         });
-        return view;
+        parent.addView(view);
     }
 
     private static int getInfoGraphId(String tag) {
@@ -578,11 +568,11 @@ public class LaunchActivity extends BaseActivity {
         return R.drawable.eh_default_event_list;
     }
 
-    private Listener<List<Event>> mFeaturedEventsListener = new Listener<List<Event>>() {
+    private Listener<EventCollection> mFeaturedEventsListener = new Listener<EventCollection>() {
         @Override
-        public void onResponse(final List<Event> events, boolean isIntermediate) {
+        public void onResponse(final EventCollection eventCollection, boolean isIntermediate) {
             FeaturedEventsAdapter featuredEventsAdapter =
-                    new FeaturedEventsAdapter(LaunchActivity.this, events);
+                    new FeaturedEventsAdapter(LaunchActivity.this, eventCollection.events);
 
             LayoutInflater layoutInflater = getLayoutInflater();
             dotsView.removeAllViews();
@@ -615,6 +605,17 @@ public class LaunchActivity extends BaseActivity {
                     // do nothing.
                 }
             });
+
+            for (LinearLayout featuredCatLayout : featuredCatLayouts) {
+                featuredCatLayout.removeAllViews();
+            }
+            featuredCatHeader.setVisibility(eventCollection.trendingTopics.isEmpty() ? View.GONE : View.VISIBLE);
+            for (int i = 0; i < eventCollection.trendingTopics.size() && i < numColumns * featuredCatLayouts.length; i++) {
+                addExploreCard(eventCollection.trendingTopics.get(i).tagName,
+                        eventCollection.trendingTopics.get(i).imgUrl,
+                        FeaturedCatLP,
+                        featuredCatLayouts[i / numColumns]);
+            }
         }
     };
 }

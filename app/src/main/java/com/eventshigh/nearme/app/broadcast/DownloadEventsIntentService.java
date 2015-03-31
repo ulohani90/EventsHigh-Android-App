@@ -16,6 +16,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.network.BaseEventListRequest.EventCollection;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.user.Account;
@@ -147,7 +148,7 @@ public class DownloadEventsIntentService extends IntentService {
         }
     }
 
-    private class WeekendEventsListener implements Response.Listener<List<Event>> {
+    private class WeekendEventsListener implements Response.Listener<EventCollection> {
         private final Intent intent;
 
         private WeekendEventsListener(Intent intent) {
@@ -155,9 +156,9 @@ public class DownloadEventsIntentService extends IntentService {
         }
 
         @Override
-        public void onResponse(final List<Event> featuredEvents, boolean isIntermediate) {
+        public void onResponse(final EventCollection featuredEvents, boolean isIntermediate) {
             // Merge all events into one List and remove duplicates.
-            Set<Event> eventSet = new HashSet<>(featuredEvents);
+            Set<Event> eventSet = new HashSet<>(featuredEvents.events);
             showNotification(eventSet, intent);
         }
     }

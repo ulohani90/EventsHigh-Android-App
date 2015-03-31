@@ -143,6 +143,36 @@
                       />
 
                     <TextView
+                        android:id="@+id/featured_cat_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"
+                        android:textColor="#4E5B60"
+                        android:textSize="14sp"
+                        android:text="@string/featured_cat"
+                        android:visibility="gone"
+                    />
+                    <LinearLayout
+                        android:id="@+id/featured_cat_row1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                    />
+                    <LinearLayout
+                        android:id="@+id/featured_cat_row2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                    />
+                    <LinearLayout
+                        android:id="@+id/featured_cat_row3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                    />
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
@@ -162,7 +192,6 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
             />
-
         </LinearLayout>
 
         <ListView
@@ -184,6 +213,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/app_feature"
             android:adjustViewBounds="true"
+            tools:ignore="ContentDescription"
         />
         <fragment
             android:id="@+id/preferences_all"

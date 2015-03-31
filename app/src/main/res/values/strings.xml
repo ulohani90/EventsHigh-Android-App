@@ -33,6 +33,7 @@
 
     <!-- Other Strings used in UI -->
     <string name="explore_cat">Explore By Categories</string>
+    <string name="featured_cat">Trending Categories</string>
     <string name="ui_follow">Follow</string>
     <string name="ui_following">Following</string>
     <string name="ui_favourite">Favourite</string>
