@@ -449,7 +449,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private static HeaderCard newInstance(final BaseActivity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(
                     R.layout.share_app_card, parent, false);
-            view.setOnClickListener(new OnClickListener() {
+            view.findViewById(R.id.share_app).setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     activity.shareApp();

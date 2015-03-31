@@ -509,11 +509,23 @@ public class LaunchActivity extends BaseActivity {
 
                 addExploreCard(EXPLORE_TAGS[i], null, exploreCardLP, last);
             }
+
+            // Share App.
+            getLayoutInflater().inflate(R.layout.share_app_card, exploreLayout);
+            LayoutParams shareAppCardLP = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            shareAppCardLP.setMargins(spacing, spacing, spacing, spacing);
+            exploreLayout.getChildAt(exploreLayout.getChildCount() - 1).setLayoutParams(shareAppCardLP);
+            findViewById(R.id.share_app).setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    shareApp();
+                }
+            });
         }
 
         // Submit the request to populate Featured Events.
         if (exploreScreenPopulatedTimestamp + REFRESH_FEATURED_EVENTS_INTERVAL <
-                System.currentTimeMillis()) {
+            System.currentTimeMillis()) {
             onRetry(null);
         }
         exploreScreenPopulatedTimestamp = System.currentTimeMillis();
