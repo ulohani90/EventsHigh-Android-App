@@ -45,6 +45,7 @@ import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
+import com.eventshigh.nearme.app.utils.DialogUtils;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -80,6 +81,7 @@ public class EventDetailActivity extends BaseActivity {
     private boolean hasSetUserLocation = false;
     private GoogleApiClient client;
     private Editor eventsMarkerEditor;
+    private boolean showRateAppDialog;  // TODO: save this in bundle and restore
 
 
     /**********************************
@@ -166,6 +168,15 @@ public class EventDetailActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (showRateAppDialog) {
+            DialogUtils.showRateAppDialog(this);
+            showRateAppDialog = false;
+        }
+    }
+
     private void populateView() {
         if (event != null && hasSetUserLocation) {
             if (client != null && client.isConnected()) {
@@ -241,6 +252,7 @@ public class EventDetailActivity extends BaseActivity {
         Intent intent = new Intent(this, CustomUrlActivity.class);
         intent.setData(Uri.parse(event.bookingUrl));
         intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, getString(R.string.title_book));
+        showRateAppDialog = true;
         startActivity(intent);
     }
 
@@ -519,6 +531,7 @@ public class EventDetailActivity extends BaseActivity {
                 timeGroupView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        showRateAppDialog = true;
                         addToCalendar(event, null);
                     }
                 });
@@ -633,6 +646,7 @@ public class EventDetailActivity extends BaseActivity {
                 organizerPhoneView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        showRateAppDialog = true;
                         call();
                     }
                 });
