@@ -44,7 +44,7 @@ import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.utils.DialogUtils;
+import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -80,7 +80,7 @@ public class EventDetailActivity extends BaseActivity {
     private boolean hasSetUserLocation = false;
     private GoogleApiClient client;
     private Editor eventsMarkerEditor;
-    private boolean showRateAppDialog;  // TODO: save this in bundle and restore
+    private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
 
 
     /**********************************
@@ -171,7 +171,7 @@ public class EventDetailActivity extends BaseActivity {
     public void onResume() {
         super.onResume();
         if (showRateAppDialog) {
-            DialogUtils.showRateAppDialog(this);
+            RateAppDialog.show(this);
             showRateAppDialog = false;
         }
     }
