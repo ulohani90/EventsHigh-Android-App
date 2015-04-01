@@ -509,6 +509,7 @@ public class EventDetailActivity extends BaseActivity {
                 callView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        showRateAppDialog = true;
                         call();
                     }
                 });
@@ -517,6 +518,7 @@ public class EventDetailActivity extends BaseActivity {
             shareView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    showRateAppDialog = true;
                     shareEvent(shareContentsView, event);
                 }
             });
