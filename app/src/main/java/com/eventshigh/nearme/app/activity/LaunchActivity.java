@@ -320,7 +320,7 @@ public class LaunchActivity extends BaseActivity {
 
 
     public void showSearchView(String query) {
-        eventsContext.query = query;
+        eventsContext.query = query.toLowerCase();
         showNextScreen(true);
     }
 

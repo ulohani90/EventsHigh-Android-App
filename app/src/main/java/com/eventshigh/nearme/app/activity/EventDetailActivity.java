@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.Dialog;
-import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.location.Location;
@@ -700,8 +699,8 @@ public class EventDetailActivity extends BaseActivity {
                 public void onClick(View v) {
                     reportEventAction(event, action, tagName);
                     Intent searchIntent = new Intent(EventDetailActivity.this, LaunchActivity.class);
-                    searchIntent.setAction(Intent.ACTION_SEARCH);
-                    searchIntent.putExtra(SearchManager.QUERY, tagName);
+                    searchIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT,
+                            new EventsContext(userLocation, tagName.toLowerCase()));
                     startActivity(searchIntent);
                 }
             });
