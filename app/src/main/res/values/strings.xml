@@ -117,4 +117,11 @@
     <!-- Sync adapter -->
     <string name="sync_adapter_provider">com.example.android.datasync.provider</string>
     <string name="sync_adapter_account_type">eventshigh.com</string>
+
+    <!-- Rating -->
+    <string name="rate_app_text">Loving EventsHigh? Help us spread the word by rating us in the playstore</string>
+    <string name="rate_app_no">No, Thanks</string>
+    <string name="rate_app_now">Now</string>
+    <string name="rate_app_later">Later</string>
+
 </resources>
