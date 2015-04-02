@@ -50,20 +50,8 @@ public class LocationUtils {
         }
 
         float radialDistance = LocationUtils.distanceInKM(userLocation, destination);
-        float time = radialDistance * RADIAL_DISTANCE_TO_TIME_MULTIPLIER;
-
-        String timeStr = "60+";
-        if (time <= 5) {
-            timeStr = "5";
-        } else if (time <= 15) {
-            timeStr = "15";
-        } else if (time <= 30) {
-            timeStr = "30";
-        } else if (time <= 60) {
-            timeStr = "60";
-        }
-
+        int travelTime = (int)(radialDistance * RADIAL_DISTANCE_TO_TIME_MULTIPLIER);
         return String.format(context.getResources().getString(R.string.event_distance_and_time),
-                timeStr);
+                travelTime);
     }
 }

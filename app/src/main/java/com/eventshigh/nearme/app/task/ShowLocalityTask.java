@@ -49,7 +49,7 @@ public class ShowLocalityTask extends AsyncTask<LatLng, Void, String> {
         try {
             addresses = new Geocoder(context)
                     .getFromLocation(params[0].latitude, params[0].longitude, 1);
-        } catch (IOException e) {
+        } catch (IOException|SecurityException e) {
             Log.w(LOG_TAG, "failed to get address", e);
         }
 
