@@ -77,7 +77,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // ***********************
     public static final int NUM_MAX_PREFETCH = 10;
     public static final int SECONDS_FOR_REFRESH = 600;
+    public static final int MAX_TIMES_TO_SHOW_MY_EVENTS_CLUE = 2;
 
+    private static int numTimesMyEventsClueShown = 0;
 
     // ***********************
     // MEMBERS
@@ -90,6 +92,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     protected FrameLayout eventContainer;
     protected ImageButton fab;
     private View myEventsClueView;
+    private TextView myEventsClueTextView;
 
     private View followButton;
     private View followingButton;
@@ -123,12 +126,17 @@ public abstract class BaseEventsActivity extends BaseActivity {
         followButton = findViewById(R.id.follow_button);
         followingButton = findViewById(R.id.following_button);
         myEventsClueView = findViewById(R.id.my_events_clue);
+        myEventsClueTextView = (TextView) myEventsClueView.findViewById(R.id.my_events_clue_text);
 
         // Setup My Events Clue
         myEventsClueView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                showSearchView(EventsHighEndpoints.QUERY_MY_EVENT);
+                if (myEventsClueTextView.getTag().equals(R.string.ui_my_events_clue)) {
+                    showSearchView(EventsHighEndpoints.QUERY_MY_EVENT);
+                } else if (myEventsClueTextView.getTag().equals(R.string.ui_share_app_clue)) {
+                    shareApp();
+                }
             }
         });
         findViewById(R.id.my_events_clue_close).setOnClickListener(new OnClickListener() {
@@ -460,6 +468,14 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     private void showMyEventsClue() {
+        if (numTimesMyEventsClueShown < MAX_TIMES_TO_SHOW_MY_EVENTS_CLUE) {
+            myEventsClueTextView.setText(R.string.ui_my_events_clue);
+            myEventsClueTextView.setTag(R.string.ui_my_events_clue);
+            numTimesMyEventsClueShown++;
+        } else {
+            myEventsClueTextView.setText(R.string.ui_share_app_clue);
+            myEventsClueTextView.setTag(R.string.ui_share_app_clue);
+        }
         myEventsClueView.setVisibility(View.VISIBLE);
         myEventsClueView.postDelayed(new Runnable() {
             @Override
