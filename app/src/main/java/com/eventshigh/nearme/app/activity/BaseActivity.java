@@ -174,6 +174,27 @@ public abstract class BaseActivity extends ActionBarActivity {
     }
 
     /**
+     * Helper method to share an Event.
+     */
+    public void shareEvent(Event event) {
+        reportEventAction(event, "shareEvent");
+        try {
+
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT,
+                    String.format(getResources().getString(R.string.share_event_text),
+                            "\n\n" + event.title + "\n\n" + event.getEventShareURI(this))
+            );
+            sendIntent.setType("text/plain");
+            startActivity(sendIntent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
+            Log.w(LOG_TAG, "failed sharing", e);
+        }
+    }
+
+    /**
      * Helper method to share an Event. This method coverts and view
      * into jpeg image which is then shared with external tool.
      */
@@ -248,7 +269,7 @@ public abstract class BaseActivity extends ActionBarActivity {
                 .putExtra(Events.TITLE, event.title)
                 .putExtra(Events.EVENT_LOCATION, event.getFullAddress())
                 .putExtra(Events.DESCRIPTION,
-                        event.getEventDetailsURI().toString() + "?src=ehm \n\n" + event.description);
+                        event.getEventShareURI(this) + "\n\n" + event.description);
 
         if (date == null && event.eventTimings.length > 0) {
             date = new Date(event.eventTimings[0]);

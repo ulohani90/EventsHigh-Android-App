@@ -67,7 +67,7 @@
     <string name="ui_weekend_events">Explore amazing weekend</string>
     <string name="ui_weekend_events_msg">See events happening on this weekend!</string>
     <string name="ui_my_events_clue">Added to \'My Events\'.\nTap to go to \'My Events\' now.</string>
-    <string name="ui_share_app_clue">Like the app? Share it with your friends!</string>
+    <string name="ui_share_event_clue">Like the event? Share it with your friends!</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>

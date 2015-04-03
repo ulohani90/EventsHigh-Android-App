@@ -131,10 +131,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
         myEventsClueView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (myEventsClueTextView.getTag().equals(R.string.ui_my_events_clue)) {
+                Event event = (Event) myEventsClueTextView.getTag();
+                if (event == null) {
                     showSearchView(EventsHighEndpoints.QUERY_MY_EVENT);
-                } else if (myEventsClueTextView.getTag().equals(R.string.ui_share_app_clue)) {
-                    shareApp();
+                } else {
+                    shareEvent(event);
                 }
             }
         });
@@ -184,7 +185,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
                     reportActionToAnalytics("addFollowing", eventsContext.query);
                     account.setIsFollowing(eventsContext.query, true);
                     setFollowButtons(true);
-                    showMyEventsClue();
+                    showMyEventsClue(null);
                 }
             });
             followingButton.setOnClickListener(new OnClickListener() {
@@ -410,7 +411,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
             remove(event);
         }
         if (EventMark.isFavourite(mark)) {
-            showMyEventsClue();
+            showMyEventsClue(event);
         } else {
             hideMyEventsClue();
         }
@@ -466,15 +467,17 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
     }
 
-    private void showMyEventsClue() {
+    private void showMyEventsClue(@Nullable Event event) {
         Preferences preferences = Preferences.getInstance(this);
-        if (preferences.getNumTimesMyEventsClueShown() < MAX_TIMES_TO_SHOW_MY_EVENTS_CLUE) {
+        if (event == null ||
+                preferences.getNumTimesMyEventsClueShown() < MAX_TIMES_TO_SHOW_MY_EVENTS_CLUE) {
             myEventsClueTextView.setText(R.string.ui_my_events_clue);
-            myEventsClueTextView.setTag(R.string.ui_my_events_clue);
-            preferences.incrementNumTimesMyEventsClueShown();
+            if (event != null) {
+                preferences.incrementNumTimesMyEventsClueShown();
+            }
         } else {
-            myEventsClueTextView.setText(R.string.ui_share_app_clue);
-            myEventsClueTextView.setTag(R.string.ui_share_app_clue);
+            myEventsClueTextView.setText(R.string.ui_share_event_clue);
+            myEventsClueTextView.setTag(event);
         }
         myEventsClueView.setVisibility(View.VISIBLE);
         myEventsClueView.postDelayed(new Runnable() {
