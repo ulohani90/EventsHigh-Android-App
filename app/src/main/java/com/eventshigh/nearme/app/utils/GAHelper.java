@@ -73,15 +73,17 @@ public class GAHelper {
 
     public void reportActionToAnalytics(String category, String actionName, String label, long value,
                                         String... customValues) {
-        EventBuilder builder = new EventBuilder()
-                .setCategory(category)
-                .setAction(actionName)
-                .setLabel(label)
-                .setValue(value);
-        for (int i = 0; i < customValues.length; i++) {
-            builder.setCustomDimension(i + 1, customValues[i]);
+        if (category != null && actionName != null && label != null) {
+            EventBuilder builder = new EventBuilder()
+                    .setCategory(category)
+                    .setAction(actionName)
+                    .setLabel(label)
+                    .setValue(value);
+            for (int i = 0; i < customValues.length; i++) {
+                builder.setCustomDimension(i + 1, customValues[i]);
+            }
+            tracker.send(builder.build());
         }
-        tracker.send(builder.build());
     }
 
     public static String getDateReportString(@Nullable Date date) {

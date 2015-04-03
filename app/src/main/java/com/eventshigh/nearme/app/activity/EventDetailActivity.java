@@ -738,7 +738,7 @@ public class EventDetailActivity extends BaseActivity {
             followView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    reportActionToAnalytics("addFollowing");
+                    reportActionToAnalytics("addFollowing", tagName);
                     account.setIsFollowing(tagName, true);
                     followView.setVisibility(View.GONE);
                     followingView.setVisibility(View.VISIBLE);
@@ -747,7 +747,7 @@ public class EventDetailActivity extends BaseActivity {
             followingView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    reportActionToAnalytics("removeFollowing");
+                    reportActionToAnalytics("removeFollowing", tagName);
                     account.setIsFollowing(tagName, false);
                     followView.setVisibility(View.VISIBLE);
                     followingView.setVisibility(View.GONE);
