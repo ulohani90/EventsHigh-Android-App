@@ -12,7 +12,6 @@ import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -23,8 +22,6 @@ import java.util.List;
  */
 public class IntentUtils {
     public static final String EXTRA_EVENT_CONTEXT = IntentUtils.class.getCanonicalName() + "_PARAM";
-    public static final String EXTRA_LATITUDE_PARAM = IntentUtils.class.getCanonicalName() + "_LAT";
-    public static final String EXTRA_LONGITUDE_PARAM = IntentUtils.class.getCanonicalName() + "_LON";
     public static final String QUERY_ALL = "All";
 
     public static EventsContext processIntent(BaseActivity activity, Intent inIntent) {
@@ -44,12 +41,6 @@ public class IntentUtils {
         param = inIntent.getParcelableExtra(EXTRA_EVENT_CONTEXT);
         if (param == null) {
             param = new EventsContext(null, "");
-        }
-
-        if (inIntent.hasExtra(EXTRA_LATITUDE_PARAM) && inIntent.hasExtra(EXTRA_LONGITUDE_PARAM)) {
-            param.changeLocation(new LatLng(
-                    inIntent.getDoubleExtra(EXTRA_LATITUDE_PARAM, 0),
-                    inIntent.getDoubleExtra(EXTRA_LONGITUDE_PARAM, 0)));
         }
 
         if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {

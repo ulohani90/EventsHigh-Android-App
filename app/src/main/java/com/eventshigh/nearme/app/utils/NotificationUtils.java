@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.text.format.DateUtils;
+import android.widget.ImageView.ScaleType;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -31,8 +32,11 @@ public class NotificationUtils {
     public static final int GCM_NOTIFICATION_ID = 1;
     public static final int MY_EVENTS_NOTIFICATION_ID = 2;
     public static final int WEEKEND_EVENTS_NOTIFICATION_ID = 3;
-
     private static final int MAX_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
+
+    // See https://code.google.com/p/android/issues/detail?id=36744.
+    private static final int NOTIFICATION_IMAGE_WIDTH_DP = 450;
+    private static final int NOTIFICATION_IMAGE_HEIGHT_DP = 225;
 
     public static PendingIntent createPendingIntent(Context context, String eventId, City city) {
         if (city == null) {
@@ -66,13 +70,18 @@ public class NotificationUtils {
             showNotificationAndReleaseWakeLock(notificationData);
             return;
         }
+
         ImageRequest request = new ImageRequest(notificationData.imageUrl,
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap bitmap, boolean b) {
                         showNotificationAndReleaseWakeLock(notificationData, bitmap);
                     }
-                }, 0, 0, null,
+                },
+                Utils.dpToPx(context, NOTIFICATION_IMAGE_WIDTH_DP),
+                Utils.dpToPx(context, NOTIFICATION_IMAGE_HEIGHT_DP),
+                ScaleType.CENTER_CROP,
+                null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
                         showNotificationAndReleaseWakeLock(notificationData);
