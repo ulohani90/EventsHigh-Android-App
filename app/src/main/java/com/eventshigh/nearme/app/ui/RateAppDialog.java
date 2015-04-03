@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,11 +10,12 @@ import android.preference.PreferenceManager;
 import android.view.View;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.BaseActivity;
 
 public class RateAppDialog {
     private static final String PREF_SHOW_RATE_APP_DIALOG = "showRateAppDialog";
 
-    public static void show(final Activity activity) {
+    public static void show(final BaseActivity activity) {
         final SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(activity);
         if (!sharedPreferences.getBoolean(PREF_SHOW_RATE_APP_DIALOG, true)) {
@@ -29,17 +29,20 @@ public class RateAppDialog {
                 .setPositiveButton(R.string.rate_app_now, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         disableRateDialog(sharedPreferences);
+                        activity.reportActionToAnalytics("rateAppAccepted");
                         Uri uri = Uri.parse("market://details?id=" + activity.getPackageName());
                         activity.startActivity(new Intent(Intent.ACTION_VIEW, uri));
                     }
                 })
                 .setNegativeButton(R.string.rate_app_no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        activity.reportActionToAnalytics("rateAppRejected");
                         disableRateDialog(sharedPreferences);
                     }
                 })
                 .setNeutralButton(R.string.rate_app_later, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        activity.reportActionToAnalytics("rateAppLater");
                         // do nothing
                         // TODO: may want to do some exponential back off
                     }
