@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -116,7 +117,9 @@ public class EventDetailActivity extends BaseActivity {
                 new ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(EventDetailActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EventDetailActivity.this, R.string.failed_load,
+                                Toast.LENGTH_SHORT).show();
+                        Log.e(EventDetailActivity.class.getSimpleName(), volleyError.getMessage());
                         finish();
                     }
                 });
@@ -157,8 +160,10 @@ public class EventDetailActivity extends BaseActivity {
         super.onStop();
 
         if (client != null && client.isConnected()) {
-            Uri webUri = event.getEventDetailsURI();
-            AppIndex.AppIndexApi.viewEnd(client, this, Utils.getAppUri(webUri));
+            if (event != null) {
+                Uri webUri = event.getEventDetailsURI();
+                AppIndex.AppIndexApi.viewEnd(client, this, Utils.getAppUri(webUri));
+            }
             client.disconnect();
         }
 
@@ -269,7 +274,6 @@ public class EventDetailActivity extends BaseActivity {
 
     private class EventCard {
         private final ScrollView eventScrollView;
-        private final View shareContentsView;
 
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
@@ -320,7 +324,6 @@ public class EventDetailActivity extends BaseActivity {
 
         private EventCard() {
             eventScrollView = (ScrollView) findViewById(R.id.event_scroll_view);
-            shareContentsView = findViewById(R.id.share_view);
 
             recommendedImageView = (ImageView) findViewById(R.id.eh_recommend_banner);
             bgView = (NetworkImageView) findViewById(R.id.event_bg);
@@ -519,7 +522,7 @@ public class EventDetailActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     showRateAppDialog = true;
-                    shareEvent(shareContentsView, event);
+                    shareEvent(bgView, event);
                 }
             });
 
@@ -735,7 +738,7 @@ public class EventDetailActivity extends BaseActivity {
             followView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    reportActionToAnalytics("addFollowing");
+                    reportActionToAnalytics("addFollowing", tagName);
                     account.setIsFollowing(tagName, true);
                     followView.setVisibility(View.GONE);
                     followingView.setVisibility(View.VISIBLE);
@@ -744,7 +747,7 @@ public class EventDetailActivity extends BaseActivity {
             followingView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    reportActionToAnalytics("removeFollowing");
+                    reportActionToAnalytics("removeFollowing", tagName);
                     account.setIsFollowing(tagName, false);
                     followView.setVisibility(View.VISIBLE);
                     followingView.setVisibility(View.GONE);

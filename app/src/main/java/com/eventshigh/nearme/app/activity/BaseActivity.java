@@ -151,7 +151,7 @@ public abstract class BaseActivity extends ActionBarActivity {
 
     public void reportActionToAnalytics(String actionName, String label, long value,
                                         String... customValues) {
-        if (isPlayServicesPresent) {
+        if (isPlayServicesPresent && gaHelper != null) {
             gaHelper.reportActionToAnalytics(getClass().getSimpleName(),
                     actionName, label, value, customValues);
         }
@@ -278,11 +278,13 @@ public abstract class BaseActivity extends ActionBarActivity {
     }
 
     public void reportEventAction(Event event, String actionName, @Nullable String label) {
-        reportActionToAnalytics(actionName,
-                label == null ? "" : label,
-                1,
-                isFavourite(event) ? "Favourite" : "No-Favourite",
-                event.ehRecommended ? "Recommended" : "Non-Recommended");
+        if (event != null) {
+            reportActionToAnalytics(actionName,
+                    label == null ? "" : label,
+                    1,
+                    isFavourite(event) ? "Favourite" : "No-Favourite",
+                    event.ehRecommended ? "Recommended" : "Non-Recommended");
+        }
     }
 
     public void reportCampaignParams(String campaignData) {
