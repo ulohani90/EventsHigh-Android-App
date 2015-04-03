@@ -45,6 +45,7 @@ import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -78,8 +79,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     public static final int NUM_MAX_PREFETCH = 10;
     public static final int SECONDS_FOR_REFRESH = 600;
     public static final int MAX_TIMES_TO_SHOW_MY_EVENTS_CLUE = 2;
-
-    private static int numTimesMyEventsClueShown = 0;
 
     // ***********************
     // MEMBERS
@@ -468,10 +467,11 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     private void showMyEventsClue() {
-        if (numTimesMyEventsClueShown < MAX_TIMES_TO_SHOW_MY_EVENTS_CLUE) {
+        Preferences preferences = Preferences.getInstance(this);
+        if (preferences.getNumTimesMyEventsClueShown() < MAX_TIMES_TO_SHOW_MY_EVENTS_CLUE) {
             myEventsClueTextView.setText(R.string.ui_my_events_clue);
             myEventsClueTextView.setTag(R.string.ui_my_events_clue);
-            numTimesMyEventsClueShown++;
+            preferences.incrementNumTimesMyEventsClueShown();
         } else {
             myEventsClueTextView.setText(R.string.ui_share_app_clue);
             myEventsClueTextView.setTag(R.string.ui_share_app_clue);
