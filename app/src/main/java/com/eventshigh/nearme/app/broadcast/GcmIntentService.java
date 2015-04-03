@@ -15,7 +15,7 @@ import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -119,7 +119,7 @@ public class GcmIntentService extends IntentService {
         } else if (query != null) {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
-            intent.setData(EventsHighEndpoints.getWebUri(new EventsContext(null, query)));
+            intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, query));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else {
             if (contestUrl.startsWith(CustomUrlActivity.OFFER_URL_PREFIX)) {

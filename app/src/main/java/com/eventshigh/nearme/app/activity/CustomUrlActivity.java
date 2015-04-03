@@ -83,6 +83,15 @@ public class CustomUrlActivity extends BaseActivity {
         String action = getIntent().getAction();
         if (action != null && action.equals(NOTIFICATION_ACTION)) {
             reportActionToAnalytics("openNotification");
+            if (!getIntent().getDataString().startsWith(OFFER_URL_PREFIX)) {
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, getIntent().getData()));
+                    finish();
+                    return;
+                } catch (Exception e) {
+                    // do nothing
+                }
+            }
         }
 
         // Load the url in the web view.

@@ -106,7 +106,7 @@ public class EventDetailActivity extends BaseActivity {
 
         String action = getIntent().getAction();
         if (BaseActivity.NOTIFICATION_ACTION.equals(action)) {
-            reportActionToAnalytics("openNotification", getIntent().getDataString());
+            reportActionToAnalytics("openNotification", getIntent().getData().getLastPathSegment());
         }
 
         findViewById(R.id.event_container).setMinimumHeight(
@@ -119,7 +119,7 @@ public class EventDetailActivity extends BaseActivity {
                     public void onErrorResponse(VolleyError volleyError) {
                         Toast.makeText(EventDetailActivity.this, R.string.failed_load,
                                 Toast.LENGTH_SHORT).show();
-                        Log.e(EventDetailActivity.class.getSimpleName(), volleyError.getMessage());
+                        Log.e(EventDetailActivity.class.getSimpleName(), volleyError.toString(), volleyError.getCause());
                         finish();
                     }
                 });

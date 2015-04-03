@@ -10,6 +10,7 @@ import com.android.volley.Request.Priority;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
@@ -34,7 +35,7 @@ import java.util.Set;
 
 public class DownloadEventsIntentService extends IntentService {
 
-    public static enum IntentType {
+    public enum IntentType {
         MY_EVENTS("eh_my_events", EventsHighEndpoints.QUERY_MY_EVENT,
                 R.string.ui_upcoming_events, R.string.ui_upcoming_events_msg,
                 NotificationUtils.MY_EVENTS_NOTIFICATION_ID),
@@ -179,7 +180,7 @@ public class DownloadEventsIntentService extends IntentService {
 
         // Build the notification information.
         Intent launchIntent = new Intent(this, LaunchActivity.class);
-        launchIntent.setAction(intent.getAction());
+        launchIntent.setAction(BaseActivity.NOTIFICATION_ACTION);
         launchIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, type.query));
         NotificationUtils.showEventsNotification(this, type.notificationId, events, launchIntent,
                 type.titleResId, type.messageRedId);

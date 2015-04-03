@@ -48,7 +48,7 @@ public class IntentUtils {
         } else if (Intent.ACTION_VIEW.equals(inIntent.getAction())) {
             processViewIntent(inIntent, true);
         } else if (BaseActivity.NOTIFICATION_ACTION.equals(inIntent.getAction())) {
-            activity.reportActionToAnalytics("openNotification");
+            activity.reportActionToAnalytics("openNotification", param.query);
             processViewIntent(inIntent, false);
         }
 
@@ -80,6 +80,9 @@ public class IntentUtils {
 
     private void processViewIntent(Intent inIntent, boolean isDeepLink) {
         Uri inUri = inIntent.getData();
+        if (inUri == null) {
+            return;
+        }
 
         if (isDeepLink) {
             String deepLinkName = "homepage";
