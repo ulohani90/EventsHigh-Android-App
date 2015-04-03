@@ -18,6 +18,7 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_NOTIFY_EH = "notifications_eh";
     public static final String PREF_SHOW_ONBOARDING = "show_onboarding";
     public static final String PREF_OFFER_TO_SHOW = "offer_to_show";
+    public static final String PREF_NUM_TIMES_MY_EVENTS_CLUE_SHOWN = "my_events_shown_count";
 
     private final Context context;
     private final SharedPreferences sharedPreferences;
@@ -70,6 +71,15 @@ public class Preferences implements OnSharedPreferenceChangeListener {
 
     public @Nullable String getOfferURI() {
         return sharedPreferences.getString(PREF_OFFER_TO_SHOW, null);
+    }
+
+    public int getNumTimesMyEventsClueShown() {
+        return sharedPreferences.getInt(PREF_NUM_TIMES_MY_EVENTS_CLUE_SHOWN, 0);
+    }
+
+    public void incrementNumTimesMyEventsClueShown() {
+        sharedPreferences.edit().putInt(PREF_NUM_TIMES_MY_EVENTS_CLUE_SHOWN,
+                getNumTimesMyEventsClueShown() + 1).apply();
     }
 
     @Override
