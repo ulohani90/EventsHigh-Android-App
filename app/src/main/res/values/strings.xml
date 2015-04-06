@@ -23,8 +23,6 @@
     <string name="action_ama">Need more Info? Ask EventsHigh</string>
 
     <!-- Menu items -->
-    <string name="menu_my_events">My Events</string>
-    <string name="menu_filter_date">Filter by date</string>
     <string name="menu_edit_location">Change Location</string>
     <string name="menu_open_in_browser">Open In Browser</string>
     <string name="menu_shortcut">Add to homescreen</string>

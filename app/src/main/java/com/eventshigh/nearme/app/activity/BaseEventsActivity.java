@@ -284,7 +284,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         // Do not show filterByDate for search.
-        menu.findItem(R.id.action_filter_date).setVisible(eventsContext.query.isEmpty());
         menu.findItem(R.id.action_filter).setVisible(
                 eventsContext.query.isEmpty() || EventsHighEndpoints.isDateQuery(eventsContext.query));
 
@@ -294,18 +293,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        if (id == R.id.action_filter_date) {
-            if (eventsContext.dateFilter.isEmpty()) {
-                eventsContext.setDateFilter(Calendar.getInstance());
-                showDateFilter();
-            } else {
-                eventsContext.dateFilter = "";
-                dateFilter.setVisibility(View.GONE);
-            }
-            fetchNewListing(false);
-            return true;
-        }
 
         if (id == R.id.action_filter) {
             reportActionToAnalytics("applyFilters");
