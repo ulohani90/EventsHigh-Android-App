@@ -19,6 +19,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -444,9 +445,7 @@ public class LaunchActivity extends BaseActivity {
         }
 
         // Launch the target activity.
-        Class target = isPlayServicesPresent && pref.isMapsViewDefault() ?
-                EventsMapsActivity.class : EventsGridActivity.class;
-        Intent outIntent = new Intent(this, target);
+        Intent outIntent = new Intent(this, EventsGridActivity.class);
         outIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
         if (lastEventsContext != null) {
             eventsContext = lastEventsContext;
@@ -573,8 +572,11 @@ public class LaunchActivity extends BaseActivity {
         try {
             return R.drawable.class.getField("infograph_" +
                     EventCategory.toCategoryParsableString(tag).toLowerCase()).getInt(null);
-        } catch (IllegalAccessException| NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
             // Ignore
+        } catch (NoSuchFieldException e) {
+            // Ignore
+            Log.d(LaunchActivity.class.getSimpleName(), "No image for: " + tag, e);
         }
 
         return R.drawable.eh_default_event_list;

@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
  * {@link android.preference.PreferenceManager#getDefaultSharedPreferences(android.content.Context)}
  */
 public class Preferences implements OnSharedPreferenceChangeListener {
-    public static final String PREF_DEFAULT_ACTIVITY = "default_activity";
     public static final String PREF_NOTIFY_FAVOURITED = "notifications_favourited";
     public static final String PREF_NOTIFY_WEEKLY = "notifications_weekly";
     public static final String PREF_NOTIFY_EH = "notifications_eh";
@@ -35,10 +34,6 @@ public class Preferences implements OnSharedPreferenceChangeListener {
             instance = new Preferences(context);
         }
         return instance;
-    }
-
-    public boolean isMapsViewDefault() {
-        return "maps".equals(sharedPreferences.getString(PREF_DEFAULT_ACTIVITY, ""));
     }
 
     public boolean shouldNotifyFavourited() {

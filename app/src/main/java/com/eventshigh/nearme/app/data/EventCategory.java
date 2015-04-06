@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.data;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -39,13 +40,14 @@ public enum EventCategory {
     THEATRE,
     OTHER;
 
+    private static final String LOG_TAG = EventCategory.class.getSimpleName();
     public final String categoryName;
 
-    private EventCategory(@Nullable String categoryName) {
+    EventCategory(@Nullable String categoryName) {
         this.categoryName = categoryName == null ? Utils.capitalize(name().replace('_', ' ')) : categoryName;
     }
 
-    private EventCategory() {
+    EventCategory() {
         this(null);
     }
 
@@ -82,8 +84,11 @@ public enum EventCategory {
         int resId = R.drawable.icon_other;
         try {
             resId = R.drawable.class.getField("icon_" + toString().toLowerCase()).getInt(null);
-        } catch (IllegalAccessException| NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
             // Ignore
+        } catch (NoSuchFieldException e) {
+            // Ignore
+            Log.d(LOG_TAG, "no icon: " + name(), e);
         }
 
         return resId;
@@ -94,8 +99,11 @@ public enum EventCategory {
         try {
             resId = R.drawable.class.getField("icon_" + toString().toLowerCase() + "_rec")
                     .getInt(null);
-        } catch (IllegalAccessException| NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
             // Ignore
+        } catch (NoSuchFieldException e) {
+            // Ignore
+            Log.d(LOG_TAG, "no icon: " + name(), e);
         }
 
         return resId;

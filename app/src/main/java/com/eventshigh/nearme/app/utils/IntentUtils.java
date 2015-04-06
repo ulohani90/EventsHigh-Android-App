@@ -64,7 +64,7 @@ public class IntentUtils {
     private void processSearchIntent(Intent inIntent) {
         String query = inIntent.getStringExtra(SearchManager.QUERY);
         activity.reportActionToAnalytics("search", query);
-        EventSearchSuggestionsProvider.saveRecentQuery(activity, query);
+        EventSearchSuggestionsProvider.saveRecentQuery(activity, query.toLowerCase());
 
         Bundle appData = inIntent.getBundleExtra(SearchManager.APP_DATA);
         if (appData != null) {
