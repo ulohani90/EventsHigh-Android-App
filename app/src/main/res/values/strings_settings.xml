@@ -39,8 +39,7 @@
         for any given day. We also notify our users whenever any event for their interest comes
         up so that they don\'t have to worry about missing an event again!
 
-        \n\n
-        As a good citizen, we always provide the attribute to the source from whom we got the
+        \n\nAs a good citizen, we always provide the attribute to the source from whom we got the
         event data.
     </string>
     <string name="privacy">Privacy</string>
@@ -48,12 +47,10 @@
         We do not collect any user identifiable information like mobile no, address or email address
         unless users gives us consent explicitly.
 
-        \n\n
-        We might share user information with third parties only if user agrees to it. e.g. We might
+        \n\nWe might share user information with third parties only if user agrees to it. e.g. We might
         share user email address with event organizer so that he can get updates on events from organizer.
 
-        \n\n
-        We do collect the user interactions at aggregate level so that we can understand user behaviour
+        \n\nWe do collect the user interactions at aggregate level so that we can understand user behaviour
         and provide them with better service.
     </string>
 
@@ -65,8 +62,7 @@
         \n
         Iconion
 
-        \n\n
-        We have used the Google Places API and Google Geocoding API for identifying places
+        \n\nWe have used the Google Places API and Google Geocoding API for identifying places
         and showing user location.
     </string>
 
