@@ -13,11 +13,4 @@
             android:action="com.eventshigh.delete_query_history"
         />
     </Preference>
-    <Preference android:title="@string/pref_title_restore_event">
-        <intent
-            android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.SettingsActivity"
-            android:action="com.eventshigh.restore_events"
-        />
-    </Preference>
 </PreferenceScreen>

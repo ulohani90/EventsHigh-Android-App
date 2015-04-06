@@ -74,18 +74,6 @@ public class EventMarkDbHelper extends SQLiteOpenHelper {
         return thread;
     }
 
-    static void restoreAll(Context context) {
-        final SQLiteDatabase database = new EventMarkDbHelper(context).getWritableDatabase();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                database.delete(EVENT_PREFS_TABLE_NAME,
-                        EVENT_PREFS_COLUMN_EVENT_MARK + " = " + EventMark.DISMISSED.value, null);
-                database.close();
-            }
-        }).start();
-    }
-
     static Iterable<Pair<String, EventMark>> fetchAllEntries(final SQLiteDatabase database) {
         return new Iterable<Pair<String, EventMark>>() {
             @Override

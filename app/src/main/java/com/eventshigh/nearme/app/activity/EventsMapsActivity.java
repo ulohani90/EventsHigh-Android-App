@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.MapMarkerManager;
@@ -92,7 +91,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
     protected void onResume() {
         super.onResume();
 
-        mapMarkerManager.removeDismissedEvents(eventsMarkerEditor.getEventsMarkerManager());
         if (lastSelectedMarker != null) {
             if (lastSelectedMarker.isVisible()) {
                 showEventCard();
@@ -117,7 +115,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
         super.updateEventsCollection(events);
 
         mOnMapClickListener.onMapClick(null);
-        mapMarkerManager.setEvents(map, EventsMarkerManager.getInstance(this), events);
+        mapMarkerManager.setEvents(map, events);
     }
 
     @Override

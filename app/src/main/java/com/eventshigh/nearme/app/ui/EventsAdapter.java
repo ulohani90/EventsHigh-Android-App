@@ -11,14 +11,12 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
@@ -49,9 +47,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             R.drawable.eh_myevents_header5,
             R.drawable.eh_myevents_header6
     };
-
-    // We show the dismiss toast once per session.
-    private static boolean showDismissToast = true;
 
     private final BaseEventsActivity activity;
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
@@ -109,22 +104,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void removeDismissedEvents(EventsMarkerManager markerManager) {
-        boolean changed = false;
-        for (Iterator<Data> it =  dataToShow.iterator(); it.hasNext(); ) {
-            Data data = it.next();
-            if (data instanceof EventData &&
-                markerManager.isDismissed(((EventData) data).event.id)) {
-                it.remove();
-                changed = true;
-            }
-        }
-
-        if (changed) {
-            notifyDataSetChanged();
-        }
-    }
-
     @Override
     public int getItemViewType(int position) {
         return dataToShow.get(position).getType().typeId;
@@ -174,7 +153,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         return eventCard.itemView;
     }
 
-    private static enum DataType {
+    private enum DataType {
         HEADER(0),
         EVENT(1),
         SHARE_APP(2);
@@ -201,10 +180,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    private static interface Data {
-        public DataType getType();
-        public void onBindViewHolder(ViewHolder card, int position);
-        public String getId();
+    private interface Data {
+        DataType getType();
+        void onBindViewHolder(ViewHolder card, int position);
+        String getId();
     }
 
     // Header Data.
@@ -302,7 +281,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView numPeopleInterestedView;
         private final FrameLayout favouriteView;
         private final FrameLayout favouritedView;
-        private final FrameLayout dismissView;
         private final FrameLayout shareView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent) {
@@ -322,7 +300,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
             favouriteView = (FrameLayout) cardView.findViewById(R.id.action_favourite);
             favouritedView = (FrameLayout) cardView.findViewById(R.id.action_favourited);
-            dismissView = (FrameLayout) cardView.findViewById(R.id.action_dismiss);
             shareView = (FrameLayout) cardView.findViewById(R.id.share);
         }
 
@@ -402,18 +379,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     activity.reportEventAction(event, "removeFavourite", position);
                     activity.recordEventMark(event, null);
                     setFavouriteView(null);
-                }
-            });
-
-            dismissView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.reportEventAction(event, "dismiss", position);
-                    activity.recordEventMark(event, EventMark.DISMISSED);
-                    if (showDismissToast) {
-                        Toast.makeText(activity, R.string.message_dismiss, Toast.LENGTH_SHORT).show();
-                        showDismissToast = false;
-                    }
                 }
             });
 

@@ -81,7 +81,6 @@
     <string name="loading">Loading …</string>
     <string name="zoom">Please zoom in to see interesting events!</string>
     <string name="ask_locality">Enter an area or city</string>
-    <string name="message_dismiss">Event removed. This will improve your recommendations.</string>
 
     <!-- Sharing -->
     <string name="action_share_app">Share This App</string>

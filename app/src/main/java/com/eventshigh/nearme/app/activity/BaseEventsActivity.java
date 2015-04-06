@@ -407,9 +407,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     }
 
     public void recordEventMark(Event event, @Nullable EventMark mark) {
-        if (EventMark.isDismissed(mark)) {
-            remove(event);
-        }
         if (EventMark.isFavourite(mark)) {
             showMyEventsClue(event);
         } else {

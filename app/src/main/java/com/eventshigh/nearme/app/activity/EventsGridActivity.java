@@ -58,13 +58,6 @@ public class EventsGridActivity extends BaseEventsActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        eventsAdapter.removeDismissedEvents(eventsMarkerEditor.getEventsMarkerManager());
-    }
-
-    @Override
     public void onBackPressed() {
         reportScrollBy();
         super.onBackPressed();

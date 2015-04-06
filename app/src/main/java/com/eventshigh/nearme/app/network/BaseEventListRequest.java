@@ -109,10 +109,6 @@ public abstract class BaseEventListRequest extends JsonRequest<EventCollection> 
         List<Event> events = Event.parseUpcomingEvents(eventsContext.city, eventsJson,
                 includeWithoutLocation);
 
-        // Filter out the events which are dismissed.
-        eventsMarkerManager.waitForLoading();
-        eventsMarkerManager.removeDismissed(events);
-
         // Filter out the event which belongs to user selected filter.
         if (!eventsContext.categoryFilters.isEmpty()) {
             Set<String> categoryFiltersSet = new HashSet<>(eventsContext.categoryFilters);
@@ -133,6 +129,7 @@ public abstract class BaseEventListRequest extends JsonRequest<EventCollection> 
         }
 
         // Sort the event list to user.
+        eventsMarkerManager.waitForLoading();
         Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
 
         // Parse Trending topics.

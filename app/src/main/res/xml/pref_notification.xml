@@ -16,7 +16,6 @@
     <CheckBoxPreference
         android:key="notifications_eh"
         android:title="@string/pref_title_eh_notifications"
-        android:summary="Approximately shown once per week"
         android:defaultValue="true"
     />
 

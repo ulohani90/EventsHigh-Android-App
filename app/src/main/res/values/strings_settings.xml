@@ -3,7 +3,6 @@
 
     <!-- General settings -->
     <string name="pref_header_general">General</string>
-    <string name="pref_title_default_activity">Default View</string>
     <string name="pref_title_refer">Refer a friend</string>
     <string name="pref_title_add_event">Add Event</string>
     <string name="pref_title_send_feedback">Send Feedback</string>
@@ -21,10 +20,8 @@
     <!-- Account Settings -->
     <string name="pref_header_account">Account</string>
     <string name="pref_title_phone_no">Register Phone No</string>
-    <string name="pref_title_delete_query_history">Delete Query History</string>
-    <string name="pref_title_restore_event">Restore All Events</string>
-    <string name="message_delete_query_history">Query history was cleared successfully!</string>
-    <string name="message_restore_event">Events marked as non interested will be restored!</string>
+    <string name="pref_title_delete_query_history">Delete Search History</string>
+    <string name="message_delete_query_history">Search history was removed successfully!</string>
 
     <!-- Notifications settings -->
     <string name="pref_header_notifications">Notifications</string>

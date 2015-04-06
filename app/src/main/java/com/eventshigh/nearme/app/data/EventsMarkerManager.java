@@ -9,10 +9,8 @@ import com.eventshigh.nearme.app.utils.AlarmUtils;
 
 import java.io.Closeable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -30,18 +28,14 @@ public class EventsMarkerManager {
      * To simplify the DB storage, each mark has int value which is used while persisting
      * to DB.
      */
-    public static enum EventMark {
+    public enum EventMark {
         FAVOURITE (1),
         DISMISSED (2);
 
         public final int value;
 
-        private EventMark(int value) {
+        EventMark(int value) {
             this.value = value;
-        }
-
-        public static boolean isDismissed(@Nullable EventMark eventMark) {
-            return eventMark != null && eventMark == DISMISSED;
         }
 
         public static boolean isFavourite(@Nullable EventMark eventMark) {
@@ -93,10 +87,6 @@ public class EventsMarkerManager {
                     AlarmUtils.setEventAlarm(context, event);
                     UserActionDbHelper.getInstance(context).recordAction(
                             UserActionDbHelper.EventAction.ADD_FAVORITE, event.id);
-                } else if (EventMark.isDismissed(mark)) {
-                    AlarmUtils.cancelEventAlarm(context, event);
-                    UserActionDbHelper.getInstance(context).recordAction(
-                            UserActionDbHelper.EventAction.DISMISSED, event.id);
                 }
                 threads.add(EventMarkDbHelper.addEntry(database, event.id, mark));
             }
@@ -174,30 +164,6 @@ public class EventsMarkerManager {
 
     public boolean isFavourite(String eventId) {
         return EventMark.isFavourite(getEventMark(eventId));
-    }
-
-    public boolean isDismissed(String eventId) {
-        return EventMark.isDismissed(getEventMark(eventId));
-    }
-
-    public void removeDismissed(List<Event> events) {
-        for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
-            Event event = it.next();
-            if (isDismissed(event.id)) {
-                it.remove();
-            }
-        }
-    }
-
-    public void restoreAll() {
-        EventMarkDbHelper.restoreAll(context);
-
-        Iterator<Entry<String, EventMark>> it = eventMarkMap.entrySet().iterator();
-        while (it.hasNext()) {
-            if (it.next().getValue() == EventMark.DISMISSED) {
-                it.remove();
-            }
-        }
     }
 
     private void refreshListingFromDb() {
