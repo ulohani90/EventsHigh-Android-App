@@ -23,6 +23,7 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.StreamUtils;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import java.io.IOException;
 import java.util.List;
@@ -76,24 +77,25 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
                 SearchManager.SUGGEST_COLUMN_INTENT_DATA);
         int columnCount = suggestionsCursor.getColumnCount();
 
+        String selectionArg = selectionArgs[0].toLowerCase();
         for (int i = 0; i < allTags.length && suggestionsCursor.getCount() < 3; i++) {
             String tag = allTags[i];
-            if (tag.contains(selectionArgs[0])) {
+            if (tag.contains(selectionArg)) {
                 Object[] newRow = new Object[columnCount];
                 newRow[idIndex] = SUGGESTION_ID_START + i;
                 newRow[queryColumnIndex] = tag;
-                newRow[titleColumnIndex] = tag;
+                newRow[titleColumnIndex] = Utils.capitalize(tag);
                 suggestionsCursor.addRow(newRow);
             }
         }
 
         for (int i = 0; i < allEvents.length && suggestionsCursor.getCount() < 5; i++) {
-            if (allEvents[i].name.contains(selectionArgs[0])) {
+            if (allEvents[i].name.contains(selectionArg)) {
                 Object[] newRow = new Object[columnCount];
                 newRow[idIndex] = EVENT_ID_START + i;
                 newRow[queryColumnIndex] = allEvents[i].name;
-                newRow[titleColumnIndex] = allEvents[i].name;
-                newRow[iconColumnIndex] = R.drawable.ic_location_on_white_36dp;
+                newRow[titleColumnIndex] = Utils.capitalize(allEvents[i].name);
+                newRow[iconColumnIndex] = R.drawable.icon_other;
                 newRow[intentActionColumnIndex] = Intent.ACTION_VIEW;
                 newRow[intentDataColumnIndex] = EventsHighEndpoints.getEventDetailsURI(
                         City.getCity(allEvents[i].city), allEvents[i].id);
