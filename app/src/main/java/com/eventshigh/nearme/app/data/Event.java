@@ -93,7 +93,7 @@ public class Event implements Parcelable {
         this.venue = Utils.checkIfUnknown(venue);
         this.locality = Utils.checkIfUnknown(locality);
         this.address = Utils.checkIfUnknown(address);
-        this.isCleanVenue = isCleanVenue;
+        this.isCleanVenue = venue != null && isCleanVenue;
 
         this.performers = performers;
 
@@ -226,7 +226,7 @@ public class Event implements Parcelable {
     public static Event fromJSON(City city, JSONObject eventJson) throws JSONException, ParseException {
         String id = eventJson.getString("id");
         String title = eventJson.getString("title");
-        String description = eventJson.optString("description", "")
+        String description = eventJson.optString("description")
                 .replaceAll("Â", "")
                 .replaceAll("\\s+\n", "\n\n");
 
@@ -262,9 +262,9 @@ public class Event implements Parcelable {
         boolean isCleanVenue = false;
         JSONObject venueJson = eventJson.optJSONObject("venue_info");
         if (venueJson != null) {
-            venue = venueJson.optString("name");
+            venue = Utils.capitalize(venueJson.optString("name"));
             address = venueJson.optString("address");
-            isCleanVenue = venue != null && venueJson.optBoolean("clean_venue", false);
+            isCleanVenue = venueJson.optBoolean("clean_venue", false);
         }
 
         String locality = null;
@@ -272,7 +272,8 @@ public class Event implements Parcelable {
             locality = localityJson.optString("locality");
         }
 
-        if (address != null && venue != null && address.startsWith(venue)) {
+        if (address != null && venue != null &&
+                address.toLowerCase().startsWith(venue.toLowerCase())) {
             address = address.substring(venue.length()).trim();
         }
 

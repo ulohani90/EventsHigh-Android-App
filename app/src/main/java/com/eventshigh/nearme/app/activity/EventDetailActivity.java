@@ -481,7 +481,8 @@ public class EventDetailActivity extends BaseActivity {
                     if (event.isCleanVenue) {
                         reportEventAction(event, "seeVenue", event.venue);
                         startActivity(new Intent(EventDetailActivity.this, LaunchActivity.class)
-                            .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, event.venue)));
+                            .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT,
+                                    new EventsContext(null, event.venue.toLowerCase())));
                     } else {
                         showDirections(event);
                     }
