@@ -79,8 +79,7 @@
             android:layout_toRightOf="@+id/plus_91"
             android:layout_toEndOf="@+id/plus_91"
             android:hint="@string/ui_enter_phone_number_hint"
-            android:inputType="numberDecimal"
-            android:digits="0123456789"
+            android:inputType="phone"
             android:maxLength="11"
             tools:ignore="TextFields"
         />
