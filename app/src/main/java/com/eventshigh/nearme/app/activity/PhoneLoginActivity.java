@@ -41,7 +41,7 @@ public class PhoneLoginActivity extends BaseActivity {
         REFERRER_MESSAGES.put(Pattern.compile("arijit$"), "Register with your phone number to get a chance to win Free Pass to Arijit Singh Live Concert");
     }
 
-    private static enum VerificationStatus {
+    private enum VerificationStatus {
         VERIFIED,
         CODE_SENT,
         RETRY

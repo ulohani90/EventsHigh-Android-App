@@ -26,7 +26,7 @@ public enum EventCategory {
     FILM,
     FOOD,
     HEALTH_WELLNESS("Health & Wellness"),
-    KIDS,
+    KIDS_ENTERTAINMENT,
     LITERATURE,
     MUSIC,
     OUTDOORS,

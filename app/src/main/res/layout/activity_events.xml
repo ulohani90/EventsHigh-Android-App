@@ -137,7 +137,7 @@
         android:id="@+id/my_events_clue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#008da9"
+        android:background="@drawable/eh_button_cta"
         android:visibility="gone"
     >
         <ImageView

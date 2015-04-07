@@ -31,6 +31,7 @@
 
 
     <!-- About US text -->
+    <string name="vision">Our Vision</string>
     <string name="eh_desc">
         At EventsHigh, our mission is to be the go to destination for finding best local events.
         We crawl the web for event related information and bring them all at one place.

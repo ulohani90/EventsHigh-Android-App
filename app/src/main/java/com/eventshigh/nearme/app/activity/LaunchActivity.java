@@ -90,7 +90,7 @@ public class LaunchActivity extends BaseActivity {
             EventCategory.MUSIC.categoryName,
             EventCategory.PARTIES.categoryName,
             EventCategory.THEATRE.categoryName,
-            EventCategory.KIDS.categoryName,
+            EventCategory.KIDS_ENTERTAINMENT.categoryName,
             EventCategory.TECH.categoryName,
             EventCategory.SPORTS.categoryName,
             EventCategory.HEALTH_WELLNESS.categoryName,
