@@ -63,4 +63,6 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
         transitive = true;
     }
+
+    compile 'com.apptentive:apptentive-android:1.7.0@aar'
 }

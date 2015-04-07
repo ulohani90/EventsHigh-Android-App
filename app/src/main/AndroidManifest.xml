@@ -67,6 +67,11 @@
         <!-- FB -->
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
 
+        <!-- apptentive -->
+        <meta-data android:name="apptentive_api_key" android:value="65d8e5330d328870f734327ddeeadf7de6ab447a6b2c6ff9a9208199aef3447b"/>
+        <activity android:name="com.apptentive.android.sdk.ViewActivity"
+            android:theme="@style/Apptentive.Theme.Transparent"/>
+
         <!--
          Enable the file provider which will be used when we share the image
          from our local cache directory to other applications.

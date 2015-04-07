@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.apptentive.android.sdk.Apptentive;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
@@ -83,6 +84,7 @@ public abstract class BaseActivity extends ActionBarActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        Apptentive.onStart(this);
 
         // Google Analytics reporting.
         if (isPlayServicesPresent) {
@@ -100,6 +102,7 @@ public abstract class BaseActivity extends ActionBarActivity {
             gaHelper.reportActivityStop(this);
         }
 
+        Apptentive.onStop(this);
         super.onStop();
     }
 
