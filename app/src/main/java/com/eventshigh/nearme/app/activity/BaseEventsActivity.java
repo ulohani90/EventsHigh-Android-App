@@ -453,16 +453,19 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     private void showMyEventsClue(@Nullable Event event) {
         Preferences preferences = Preferences.getInstance(this);
-        if (event == null ||
-                preferences.getNumTimesMyEventsClueShown() < MAX_TIMES_TO_SHOW_MY_EVENTS_CLUE) {
+        boolean showShareTip = EventsHighEndpoints.isMyEventQuery(eventsContext.query) ||
+                (event != null && preferences.getNumTimesMyEventsClueShown() >= MAX_TIMES_TO_SHOW_MY_EVENTS_CLUE);
+
+        if (showShareTip) {
+            myEventsClueTextView.setText(R.string.ui_share_event_clue);
+            myEventsClueTextView.setTag(event);
+        } else {
             myEventsClueTextView.setText(R.string.ui_my_events_clue);
             if (event != null) {
                 preferences.incrementNumTimesMyEventsClueShown();
             }
-        } else {
-            myEventsClueTextView.setText(R.string.ui_share_event_clue);
-            myEventsClueTextView.setTag(event);
         }
+
         myEventsClueView.setVisibility(View.VISIBLE);
         myEventsClueView.postDelayed(new Runnable() {
             @Override
