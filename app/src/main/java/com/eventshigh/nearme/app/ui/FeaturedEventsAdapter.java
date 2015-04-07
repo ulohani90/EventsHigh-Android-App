@@ -79,7 +79,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
         public final TextView categoryView;
         public final TextView titleView;
         public final TextView venueView;
-        public final TextView dateView;
+        public final TextView numPeopleInterestedView;
         public final TextView timeView;
         public final ImageView favouriteView;
         public final ImageView favouritedView;
@@ -91,7 +91,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
             this.categoryView = (TextView) root.findViewById(R.id.event_category);
             this.titleView = (TextView) root.findViewById(R.id.event_title);
             this.venueView = (TextView) root.findViewById(R.id.event_venue);
-            this.dateView = (TextView) root.findViewById(R.id.event_date);
+            this.numPeopleInterestedView = (TextView) root.findViewById(R.id.num_people_interested);
             this.timeView = (TextView) root.findViewById(R.id.event_time);
             this.favouriteView = (ImageView) root.findViewById(R.id.action_favourite);
             this.favouritedView = (ImageView) root.findViewById(R.id.action_favourited);
@@ -113,13 +113,18 @@ public class FeaturedEventsAdapter extends PagerAdapter {
                 categoryView.setText(tagToShow);
             }
 
+            // Num people interested.
+            numPeopleInterestedView.setText(Integer.toString(event.numPeopleInterested));
+            numPeopleInterestedView.setVisibility(
+                    event.numPeopleInterested > 0 ? View.VISIBLE : View.INVISIBLE);
+
             // Event Time.
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
             if (eventTime != null) {
-                dateView.setText(eventTime.day + ", " + eventTime.date);
-                if (eventTime.time != null) {
-                    timeView.setText(eventTime.time);
-                }
+                timeView.setVisibility(View.VISIBLE);
+                timeView.setText(eventTime.toString());
+            } else {
+                timeView.setVisibility(View.INVISIBLE);
             }
 
             // Offer ?
