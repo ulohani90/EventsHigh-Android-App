@@ -113,11 +113,11 @@ public abstract class BaseEventListRequest extends JsonRequest<EventCollection> 
                 includeWithoutLocation);
 
         // Filter out the events which has started more than two hours back.
-        long twoHoursBack = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(2);
+        long threeHoursBack = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(3);
         for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
             Event event = it.next();
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
-            if (eventTime != null && eventTime.time != null && event.eventTimings[0] < twoHoursBack) {
+            if (eventTime != null && eventTime.time != null && event.eventTimings[0] < threeHoursBack) {
                 // The event has started more than two hours back. We filter it out either if
                 // it has not future occurrences or if its a date query.
                 if (event.eventTimings.length == 1 || !eventsContext.dateFilter.isEmpty()) {
