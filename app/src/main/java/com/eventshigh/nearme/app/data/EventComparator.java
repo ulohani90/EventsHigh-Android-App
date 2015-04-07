@@ -42,11 +42,8 @@ public class EventComparator implements Comparator<Event> {
                             LocationUtils.distanceInKM(event.location, userLocation))));
 
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
-            double timePenalty = eventTime == null || eventTime.time == null ? 100 :
-                    Math.max(100, event.eventTimings[0] < System.currentTimeMillis() ?
-                                    2.31e-7 * (System.currentTimeMillis() - event.eventTimings[0]) :
-                                    2.31e-6 * (event.eventTimings[0] - System.currentTimeMillis())
-                    );
+            double timePenalty = eventTime == null || eventTime.time == null ? 30 :
+                    Math.min(30, 1e-7 * Math.abs(System.currentTimeMillis() - event.eventTimings[0]));
 
             result = event.uberScore + (eventsMarkerManager.isFavourite(event.id) ? 20 : 0)
                     - timePenalty - distancePenalty;
