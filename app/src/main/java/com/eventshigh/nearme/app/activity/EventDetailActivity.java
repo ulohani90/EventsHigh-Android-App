@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -625,6 +626,7 @@ public class EventDetailActivity extends BaseActivity {
                     descriptionView.setText(event.description);
                     descriptionView.setTextIsSelectable(true);
                 }
+                Linkify.addLinks(descriptionView, Linkify.ALL);
                 readMoreView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
