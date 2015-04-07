@@ -17,6 +17,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
@@ -49,14 +50,16 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     };
 
     private final BaseEventsActivity activity;
+    private final boolean showCategory;
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
     private final Set<Integer> usedItemIds = new HashSet<>();
     private List<Data> dataToShow;
 
-    public EventsAdapter(BaseEventsActivity activity) {
+    public EventsAdapter(BaseEventsActivity activity, boolean showCategory) {
         this.activity = activity;
-        dataToShow = new ArrayList<>();
+        this.showCategory = showCategory;
 
+        dataToShow = new ArrayList<>();
         setHasStableIds(true);
     }
 
@@ -149,7 +152,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         // Build the view, reuse existing if possible.
         final EventCard eventCard = reuseView == null ? EventCard.newInstance(activity, parent) :
                 new EventCard(reuseView);
-        eventCard.bindEventView(event, activity, 0);
+        eventCard.bindEventView(event, activity, 0, false);
         return eventCard.itemView;
     }
 
@@ -262,7 +265,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            ((EventCard) card).bindEventView(event, activity, position);
+            ((EventCard) card).bindEventView(event, activity, position, showCategory);
         }
 
         public String getId() {
@@ -275,6 +278,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final ImageView recommendedImageView;
         private final ImageView offerView;
         private final TextView titleView;
+        private final TextView categoryView;
         private final TextView eventTimeView;
         private final TextView venueView;
         private final TextView travelTimeView;
@@ -294,6 +298,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
             offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
             titleView = (TextView) cardView.findViewById(R.id.event_title);
+            categoryView = (TextView) cardView.findViewById(R.id.event_category);
             eventTimeView = (TextView) cardView.findViewById(R.id.event_time);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
@@ -310,7 +315,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         private void bindEventView(final Event event, final BaseEventsActivity activity,
-                                   final int position) {
+                                   final int position, boolean showCategory) {
             itemView.setTag(position);
             itemView.setVisibility(View.VISIBLE);
             itemView.setOnClickListener(new OnClickListener() {
@@ -328,8 +333,25 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             // Check if its a recommended event or not.
             recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.INVISIBLE);
 
-            // Set the title, time etc.
+            // Set the title.
             titleView.setText(event.title);
+
+            // Set the category.
+            String tagToShow = null;
+            if (showCategory) {
+                tagToShow = event.category != EventCategory.OTHER ? event.category.categoryName :
+                        (event.tags.length > 0 ? event.tags[0] : null);
+                categoryView.setText(tagToShow);
+            }
+            if (tagToShow == null) {
+                categoryView.setTextSize(1);
+                categoryView.setText("");
+            } else {
+                categoryView.setTextSize(12);
+                categoryView.setText(tagToShow);
+            }
+
+            // Event Time.
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
             if (eventTime == null) {
                 eventTimeView.setVisibility(View.INVISIBLE);
