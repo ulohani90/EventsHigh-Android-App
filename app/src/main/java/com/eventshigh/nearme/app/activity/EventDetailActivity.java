@@ -478,7 +478,7 @@ public class EventDetailActivity extends BaseActivity {
             venueGroupView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (event.venue != null) {
+                    if (event.isCleanVenue) {
                         reportEventAction(event, "seeVenue", event.venue);
                         startActivity(new Intent(EventDetailActivity.this, LaunchActivity.class)
                             .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, event.venue)));

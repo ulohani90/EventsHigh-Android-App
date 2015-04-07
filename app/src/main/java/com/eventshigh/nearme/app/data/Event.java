@@ -53,6 +53,7 @@ public class Event implements Parcelable {
     @Nullable public final String venue;
     @Nullable public final String locality;
     @Nullable public final String address;
+    public final boolean isCleanVenue;
 
     public final String[] performers;
 
@@ -66,7 +67,8 @@ public class Event implements Parcelable {
                  int numPeopleInterested, boolean ehRecommended, float uberScore,
                  long[] eventTimings,
                  @Nullable LatLng location, @Nullable String venue, @Nullable String locality,
-                 @Nullable String address, String[] performers,
+                 @Nullable String address, boolean isCleanVenue,
+                 String[] performers,
                  String organizerName, String organizerPhone, String organizerWebsite) {
         this.id = id;
         this.city = city;
@@ -91,6 +93,8 @@ public class Event implements Parcelable {
         this.venue = Utils.checkIfUnknown(venue);
         this.locality = Utils.checkIfUnknown(locality);
         this.address = Utils.checkIfUnknown(address);
+        this.isCleanVenue = isCleanVenue;
+
         this.performers = performers;
 
         this.organizerName = Utils.checkIfUnknown(organizerName);
@@ -163,6 +167,7 @@ public class Event implements Parcelable {
         dest.writeString(emptyIfNull(venue));
         dest.writeString(emptyIfNull(locality));
         dest.writeString(emptyIfNull(address));
+        dest.writeBooleanArray(new boolean[]{isCleanVenue});
 
         dest.writeStringArray(performers);
 
@@ -199,6 +204,7 @@ public class Event implements Parcelable {
                             in.readString(),
                             in.readString(),
                             in.readString(),
+                            in.createBooleanArray()[0],
 
                             in.createStringArray(),
 
@@ -251,15 +257,14 @@ public class Event implements Parcelable {
             lon = localityJson.optDouble("lon", 0);
         }
 
+        String venue = null;
         String address = null;
+        boolean isCleanVenue = false;
         JSONObject venueJson = eventJson.optJSONObject("venue_info");
         if (venueJson != null) {
+            venue = venueJson.optString("name");
             address = venueJson.optString("address");
-        }
-
-        String venue = null;
-        if (mashup != null) {
-            venue = Utils.checkIfUnknown(mashup.optString("venue_name"));
+            isCleanVenue = venue != null && venueJson.optBoolean("clean_venue", false);
         }
 
         String locality = null;
@@ -370,6 +375,7 @@ public class Event implements Parcelable {
                 venue,
                 locality,
                 address,
+                isCleanVenue,
 
                 performers.toArray(new String[performers.size()]),
 
@@ -405,8 +411,8 @@ public class Event implements Parcelable {
     }
 
     public Intent getShowOnMapIntent() {
-        String query = getFullAddress();
-        if (query.isEmpty()) {
+        String query = isCleanVenue ? venue : getFullAddress();
+        if (query == null || query.isEmpty()) {
             if (location == null) {
                 return null;
             }
