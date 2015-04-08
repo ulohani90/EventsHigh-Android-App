@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.user.Account;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.HitBuilders.EventBuilder;
@@ -24,6 +25,7 @@ public class GAHelper {
 
     private final GoogleAnalytics googleAnalytics;
     private final Tracker tracker;
+    private final int appInstallationVersion;
 
     private GAHelper(Context context) {
         googleAnalytics = GoogleAnalytics.getInstance(context.getApplicationContext());
@@ -34,6 +36,8 @@ public class GAHelper {
         if (BuildConfig.DEBUG) {
             googleAnalytics.setAppOptOut(true);
         }
+
+        appInstallationVersion = new Account(context).getAppInstallationVersion();
     }
 
     public static synchronized GAHelper getInstance(Context context) {
@@ -81,6 +85,9 @@ public class GAHelper {
                     .setValue(value);
             for (int i = 0; i < customValues.length; i++) {
                 builder.setCustomDimension(i + 1, customValues[i]);
+            }
+            if (appInstallationVersion > 0) {
+                builder.setCustomDimension(5, Integer.toString(appInstallationVersion));
             }
             tracker.send(builder.build());
         }

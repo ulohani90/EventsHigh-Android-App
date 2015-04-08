@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <Preference android:title="@string/pref_title_refer">
+    <Preference android:title="@string/pref_title_offers">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.ShareAppActivity"
+            android:targetClass="com.eventshigh.nearme.app.activity.OffersActivity"
         />
     </Preference>
 

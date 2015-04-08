@@ -60,16 +60,18 @@ public class Event implements Parcelable {
     @Nullable public final String organizerName;
     @Nullable public final String organizerPhone;
     @Nullable public final String organizerWebsite;
+    @Nullable public final String organizerEmail;
+    @Nullable public final String organizerLink;
 
     public Event(String id, City city, String title, EventCategory category,
                  @Nullable String offerTitle, String description, String[] tags,
                  @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
-                 int numPeopleInterested, boolean ehRecommended, float uberScore,
-                 long[] eventTimings,
+                 int numPeopleInterested, boolean ehRecommended, float uberScore, long[] eventTimings,
                  @Nullable LatLng location, @Nullable String venue, @Nullable String locality,
                  @Nullable String address, boolean isCleanVenue,
                  String[] performers,
-                 String organizerName, String organizerPhone, String organizerWebsite) {
+                 String organizerName, String organizerPhone, String organizerWebsite,
+                 String organizerEmail, String organizerLink) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -100,6 +102,8 @@ public class Event implements Parcelable {
         this.organizerName = Utils.checkIfUnknown(organizerName);
         this.organizerPhone = Utils.checkIfUnknown(organizerPhone);
         this.organizerWebsite = Utils.checkIfUnknown(organizerWebsite);
+        this.organizerEmail = Utils.checkIfUnknown(organizerEmail);
+        this.organizerLink = Utils.checkIfUnknown(organizerLink);
     }
 
     public Uri getEventDetailsURI() {
@@ -174,6 +178,8 @@ public class Event implements Parcelable {
         dest.writeString(emptyIfNull(organizerName));
         dest.writeString(emptyIfNull(organizerPhone));
         dest.writeString(emptyIfNull(organizerWebsite));
+        dest.writeString(emptyIfNull(organizerEmail));
+        dest.writeString(emptyIfNull(organizerLink));
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -208,6 +214,8 @@ public class Event implements Parcelable {
 
                             in.createStringArray(),
 
+                            in.readString(),
+                            in.readString(),
                             in.readString(),
                             in.readString(),
                             in.readString()
@@ -352,6 +360,8 @@ public class Event implements Parcelable {
         String organizerName = mashup == null ? null : mashup.optString("organizer_name");
         String organizerPhone = mashup == null ? null : mashup.optString("organizer_phone");
         String organizerWebsite = mashup == null ? null : mashup.optString("organizer_website");
+        String organizerEmail = mashup == null ? null : mashup.optString("organizer_email");
+        String organizerLink = mashup == null ? null : mashup.optString("organizer_link");
 
         return new Event(id,
                 city,
@@ -382,7 +392,9 @@ public class Event implements Parcelable {
 
                 organizerName,
                 organizerPhone,
-                organizerWebsite
+                organizerWebsite,
+                organizerEmail,
+                organizerLink
         );
     }
 

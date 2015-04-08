@@ -11,10 +11,11 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- Notification services -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-
     <permission
         android:name="com.eventshigh.nearme.app.permission.C2D_MESSAGE"
         android:protectionLevel="signature"
@@ -38,12 +39,10 @@
             android:value="@string/google_maps_key"
         />
         <!-- Setup the Google analytics -->
-        <!-- Disabled for https://code.google.com/p/android/issues/detail?id=82157
         <meta-data
             android:name="com.google.android.gms.analytics.globalConfigResource"
             android:resource="@xml/analytics"
         />
-        -->
         <!-- Setup the Crash Reporting -->
         <meta-data
             android:name="com.crashlytics.ApiKey"
@@ -66,11 +65,6 @@
 
         <!-- FB -->
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
-
-        <!-- apptentive -->
-        <meta-data android:name="apptentive_api_key" android:value="65d8e5330d328870f734327ddeeadf7de6ab447a6b2c6ff9a9208199aef3447b"/>
-        <activity android:name="com.apptentive.android.sdk.ViewActivity"
-            android:theme="@style/Apptentive.Theme.Transparent"/>
 
         <!--
          Enable the file provider which will be used when we share the image
@@ -227,10 +221,11 @@
         <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings"
+            android:theme="@style/NoActionBar"
         />
         <activity
-            android:name=".activity.ShareAppActivity"
-            android:label="@string/pref_title_refer"
+            android:name=".activity.OffersActivity"
+            android:label="@string/pref_title_offers"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:parentActivityName=".activity.LaunchActivity"
             tools:ignore="UnusedAttribute"
@@ -306,7 +301,7 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-        -->
+         -->
 
         <!-- The service that will upload user action data -->
         <service android:name=".broadcast.UploadUserActionsService" />

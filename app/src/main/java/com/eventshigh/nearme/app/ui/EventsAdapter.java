@@ -19,6 +19,7 @@ import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -83,10 +84,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         for (Event event: events) {
             dataToShow.add(new EventData("", event));
         }
-        if (events.size() > 10) {
-            dataToShow.add(10, new ShareAppData());
-        }
         notifyDataSetChanged();
+    }
+
+    public void addOffer(Offer offer) {
+        if (dataToShow.size() > 10) {
+            dataToShow.add(10, new OfferData(offer));
+            notifyDataSetChanged();
+        }
     }
 
     public void setMyEvents(MyEvents myEvents) {
@@ -159,7 +164,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private enum DataType {
         HEADER(0),
         EVENT(1),
-        SHARE_APP(2);
+        OFFER(2);
 
         public final int typeId;
         DataType (int typeId) {
@@ -175,8 +180,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 return EventCard.newInstance(activity, parent);
             }
 
-            if (typeId == SHARE_APP.typeId) {
-                return ShareAppCard.newInstance(activity, parent);
+            if (typeId == OFFER.typeId) {
+                return OfferCard.newInstance(activity, parent);
             }
 
             throw new IllegalArgumentException("invalid typeid");
@@ -413,16 +418,27 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    private static class ShareAppData implements Data {
+    private class OfferData implements Data {
+        private final Offer offer;
+
+        private OfferData(Offer offer) {
+            this.offer = offer;
+        }
 
         @Override
         public DataType getType() {
-            return DataType.SHARE_APP;
+            return DataType.OFFER;
         }
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
             // do nothing.
+            card.itemView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.shareApp();
+                }
+            });
         }
 
         @Override
@@ -431,22 +447,15 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    private static class ShareAppCard extends ViewHolder {
+    private static class OfferCard extends ViewHolder {
 
-        private static HeaderCard newInstance(final BaseActivity activity, ViewGroup parent) {
+        private static OfferCard newInstance(final BaseActivity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(
-                    R.layout.share_app_card, parent, false);
-            view.findViewById(R.id.share_app).setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.shareApp();
-                }
-            });
-
-            return new HeaderCard(view);
+                    R.layout.offer_card, parent, false);
+            return new OfferCard(view);
         }
 
-        public ShareAppCard(View itemView) {
+        public OfferCard(View itemView) {
             super(itemView);
         }
     }

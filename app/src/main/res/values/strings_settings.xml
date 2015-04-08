@@ -3,7 +3,7 @@
 
     <!-- General settings -->
     <string name="pref_header_general">General</string>
-    <string name="pref_title_refer">Refer a friend</string>
+    <string name="pref_title_offers">Offers</string>
     <string name="pref_title_add_event">Add Event</string>
     <string name="pref_title_send_feedback">Send Feedback</string>
     <string name="pref_title_about_us">About EventsHigh</string>

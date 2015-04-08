@@ -13,14 +13,14 @@ import com.eventshigh.nearme.app.user.Account;
 
 import java.text.MessageFormat;
 
-public class ShareAppActivity extends BaseActivity {
+public class OffersActivity extends BaseActivity {
 
     private TextView tv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_share_app);
+        setContentView(R.layout.activity_offers);
 
         tv = (TextView) findViewById(R.id.share_app_message);
         tv.setText(R.string.ui_referrer_default);

@@ -509,12 +509,13 @@ public class LaunchActivity extends BaseActivity {
                 addExploreCard(EXPLORE_TAGS[i], null, exploreCardLP, last);
             }
 
-            // Share App.
-            getLayoutInflater().inflate(R.layout.share_app_card, exploreLayout);
+            // Offer.
+            View offerCard = getLayoutInflater().inflate(R.layout.offer_card, exploreLayout, false);
             LayoutParams shareAppCardLP = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
             shareAppCardLP.setMargins(spacing, spacing, spacing, spacing);
-            exploreLayout.getChildAt(exploreLayout.getChildCount() - 1).setLayoutParams(shareAppCardLP);
-            findViewById(R.id.share_app).setOnClickListener(new OnClickListener() {
+            offerCard.setLayoutParams(shareAppCardLP);
+            offerCard.setVisibility(View.GONE);
+            offerCard.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     shareApp();
