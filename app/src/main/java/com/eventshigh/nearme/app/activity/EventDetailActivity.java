@@ -42,11 +42,10 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -278,7 +277,6 @@ public class EventDetailActivity extends BaseActivity {
 
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
-        private final FrameLayout favouriteParent;
         private final TextView favouriteView;
         private final TextView favouritedView;
 
@@ -330,7 +328,6 @@ public class EventDetailActivity extends BaseActivity {
             bgView = (NetworkImageView) findViewById(R.id.event_bg);
             favouriteView = (TextView) findViewById(R.id.action_favourite);
             favouritedView = (TextView) findViewById(R.id.action_favourited);
-            favouriteParent = (FrameLayout) findViewById(R.id.action_favourite_parent);
 
             titleView = (TextView) findViewById(R.id.event_title);
             fromView = (TextView) findViewById(R.id.event_from);
@@ -427,21 +424,20 @@ public class EventDetailActivity extends BaseActivity {
             // Set EH recommendation and favourite views.
             recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
             setFavouriteView(eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id));
-            favouriteParent.setOnClickListener(new OnClickListener() {
+            favouritedView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    boolean isFavourite = eventsMarkerEditor.getEventsMarkerManager().isFavourite(event.id);
-                    if (isFavourite) {
-                        reportEventAction(event, "removeFavourite");
-                        eventsMarkerEditor.recordEventMark(event, null);
-                        setFavouriteView(null);
-                        AlarmUtils.cancelEventAlarm(EventDetailActivity.this, event);
-                    } else {
-                        reportEventAction(event, "addFavourite");
-                        eventsMarkerEditor.recordEventMark(event, EventMark.FAVOURITE);
-                        setFavouriteView(EventMark.FAVOURITE);
-                        AlarmUtils.setEventAlarm(EventDetailActivity.this, event);
-                    }
+                    reportEventAction(event, "removeFavourite");
+                    eventsMarkerEditor.recordEventMark(event, null);
+                    setFavouriteView(null);
+                }
+            });
+            favouriteView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    reportEventAction(event, "addFavourite");
+                    eventsMarkerEditor.recordEventMark(event, EventMark.FAVOURITE);
+                    setFavouriteView(EventMark.FAVOURITE);
                 }
             });
 
