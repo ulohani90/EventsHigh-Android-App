@@ -343,6 +343,25 @@
                         android:text="@string/action_call"
                     />
                 </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/email"
+                    style="@style/EHButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:drawableLeft="@drawable/ic_email_grey600_32dp"
+                        android:drawableStart="@drawable/ic_email_grey600_32dp"
+                        android:textColor="#CC000000"
+                        android:text="@string/action_email"
+                    />
+                </FrameLayout>
             </LinearLayout>
             <View
                 android:layout_width="match_parent"
@@ -472,10 +491,47 @@
                     android:id="@+id/organizer_name"
                     style="@style/EHText"
                     android:layout_height="wrap_content"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
                     android:textColor="#CC222222"
                     tools:text="Counter Culture"
+                />
+                <TextView
+                    android:id="@+id/organizer_link"
+                    style="@style/EHText"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:textColor="@color/link_color"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    tools:text="parag@eventshigh.com"
+                />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/organizer_email_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+            >
+                <TextView
+                    style="@style/EHText"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:textColor="#CC222222"
+                    android:text="@string/ui_email"
+                />
+                <TextView
+                    android:id="@+id/organizer_email"
+                    style="@style/EHText"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:textColor="@color/link_color"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    tools:text="parag@eventshigh.com"
                 />
             </LinearLayout>
             <LinearLayout

@@ -11,6 +11,7 @@
     <string name="action_share2">Invite Friends</string>
     <string name="action_book">Book</string>
     <string name="action_call">Call</string>
+    <string name="action_email">Email</string>
     <string name="action_retry">Retry</string>
     <string name="action_verify_code">Verify Code</string>
     <string name="action_change_no">Change Number</string>
@@ -20,7 +21,7 @@
     <string name="action_reset">Reset</string>
     <string name="action_apply_filter">Apply Filter</string>
     <string name="action_see_all_featured">See All Featured Events</string>
-    <string name="action_ama">Need more Info? Ask EventsHigh</string>
+    <string name="action_ama">Contact EventsHigh</string>
 
     <!-- Menu items -->
     <string name="menu_edit_location">Change Location</string>
@@ -46,6 +47,7 @@
     <string name="ui_description">Description</string>
     <string name="ui_name">Name - </string>
     <string name="ui_address">Address - </string>
+    <string name="ui_email">Email - </string>
     <string name="ui_phone">Phone - </string>
     <string name="ui_website">Website - </string>
     <string name="ui_also_on">also on …</string>

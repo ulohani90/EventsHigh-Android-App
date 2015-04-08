@@ -231,13 +231,38 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     private void call() {
-        reportEventAction(event, "callOrganizer");
-        Intent intent = new Intent(Intent.ACTION_DIAL)
-                .setData(Uri.parse("tel:" + event.organizerPhone));
+        if (event.organizerPhone != null) {
+            showRateAppDialog = true;
+            Intent intent = new Intent(Intent.ACTION_DIAL)
+                    .setData(Uri.parse("tel:" + (event.organizerPhone.split(",")[0])));
+            try {
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                // No activity to call. ignore.
+            }
+        }
+    }
+
+    private void askOverEmail(String emailAddress) {
+        Intent sendIntent = new Intent(
+                Intent.ACTION_SENDTO,
+                Uri.parse("mailto:" + emailAddress + "?subject=Need%20More%20Info"));
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "Event: " + event.getEventDetailsURI() +
+                "\n\nQuestion:\n<please type in your query here>");
+        try {
+            startActivity(sendIntent);
+        } catch (ActivityNotFoundException e) {
+            // No activity to open url. ignore.
+        }
+    }
+
+    private void openOrganizerLink() {
+        reportEventAction(event, "openOrganizerLink");
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerLink));
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            // No activity to call. ignore.
+            // No activity to open url. ignore.
         }
     }
 
@@ -300,6 +325,7 @@ public class EventDetailActivity extends BaseActivity {
         private final FrameLayout bookView;
         private final FrameLayout callView;
         private final FrameLayout shareView;
+        private final FrameLayout emailView;
         private final TextView offerView;
 
         private final View tagsHeaderView;
@@ -314,6 +340,9 @@ public class EventDetailActivity extends BaseActivity {
         private final TextView organizerHeader;
         private final LinearLayout organizerNameRow;
         private final TextView organizerNameView;
+        private final TextView organizerLinkView;
+        private final LinearLayout organizerEmailRow;
+        private final TextView organizerEmailView;
         private final LinearLayout organizerPhoneRow;
         private final TextView organizerPhoneView;
         private final LinearLayout organizerWebsiteRow;
@@ -349,6 +378,7 @@ public class EventDetailActivity extends BaseActivity {
             bookView = (FrameLayout) findViewById(R.id.book_ticket);
             callView = (FrameLayout) findViewById(R.id.call);
             shareView = (FrameLayout) findViewById(R.id.share);
+            emailView = (FrameLayout) findViewById(R.id.email);
             offerView = (TextView) findViewById(R.id.offer_text);
 
             tagsHeaderView = findViewById(R.id.tags_header);
@@ -363,6 +393,9 @@ public class EventDetailActivity extends BaseActivity {
             organizerHeader = (TextView) findViewById(R.id.organizer_header);
             organizerNameRow = (LinearLayout) findViewById(R.id.organizer_name_row);
             organizerNameView = (TextView) findViewById(R.id.organizer_name);
+            organizerLinkView = (TextView) findViewById(R.id.organizer_link);
+            organizerEmailRow = (LinearLayout) findViewById(R.id.organizer_email_row);
+            organizerEmailView = (TextView) findViewById(R.id.organizer_email);
             organizerPhoneRow = (LinearLayout) findViewById(R.id.organizer_phone_row);
             organizerPhoneView = (TextView) findViewById(R.id.organizer_phone);
             organizerWebsiteRow = (LinearLayout) findViewById(R.id.organizer_website_row);
@@ -475,7 +508,7 @@ public class EventDetailActivity extends BaseActivity {
             venueGroupView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (event.isCleanVenue) {
+                    if (event.isCleanVenue && event.venue != null) {
                         reportEventAction(event, "seeVenue", event.venue);
                         startActivity(new Intent(EventDetailActivity.this, LaunchActivity.class)
                             .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT,
@@ -510,8 +543,20 @@ public class EventDetailActivity extends BaseActivity {
                 callView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showRateAppDialog = true;
+                        reportEventAction(event, "callOrganizer");
                         call();
+                    }
+                });
+            }
+
+            if (event.organizerEmail == null) {
+                emailView.setVisibility(View.GONE);
+            } else {
+                emailView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        reportEventAction(event, "emailOrganizer");
+                        askOverEmail(event.organizerEmail);
                     }
                 });
             }
@@ -621,8 +666,8 @@ public class EventDetailActivity extends BaseActivity {
                 } else {
                     descriptionView.setText(event.description);
                     descriptionView.setTextIsSelectable(true);
+                    Linkify.addLinks(descriptionView, Linkify.ALL);
                 }
-                Linkify.addLinks(descriptionView, Linkify.ALL);
                 readMoreView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -639,6 +684,29 @@ public class EventDetailActivity extends BaseActivity {
             } else {
                 organizerInfoShown = true;
                 organizerNameView.setText(event.organizerName);
+                if (event.organizerLink != null) {
+                    organizerLinkView.setText(event.organizerLink);
+                    organizerLinkView.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            openOrganizerLink();
+                        }
+                    });
+                }
+            }
+
+            if (event.organizerEmail == null) {
+                organizerEmailRow.setVisibility(View.GONE);
+            } else {
+                organizerInfoShown = true;
+                organizerEmailView.setText(event.organizerEmail);
+                organizerEmailView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        reportEventAction(event, "emailOrganizer2");
+                        askOverEmail(event.organizerEmail);
+                    }
+                });
             }
 
             if (event.organizerPhone == null) {
@@ -649,7 +717,7 @@ public class EventDetailActivity extends BaseActivity {
                 organizerPhoneView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showRateAppDialog = true;
+                        reportEventAction(event, "callOrganizer2");
                         call();
                     }
                 });
@@ -698,11 +766,7 @@ public class EventDetailActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     reportEventAction(event, "ama");
-                    Intent sendIntent = new Intent(
-                            Intent.ACTION_SENDTO,
-                            Uri.parse("mailto:info@eventshigh.com?subject=Need%20More%20Info"));
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, "Event: " + event.getEventDetailsURI() + "\n\nQuestion:\n<please type in your query here>" );
-                    startActivity(sendIntent);
+                    askOverEmail("info@eventshigh.com");
                 }
             });
         }
