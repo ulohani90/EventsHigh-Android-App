@@ -224,8 +224,8 @@
             android:theme="@style/NoActionBar"
         />
         <activity
-            android:name=".activity.ShareAppActivity"
-            android:label="@string/pref_title_refer"
+            android:name=".activity.OffersActivity"
+            android:label="@string/pref_title_offers"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:parentActivityName=".activity.LaunchActivity"
             tools:ignore="UnusedAttribute"
