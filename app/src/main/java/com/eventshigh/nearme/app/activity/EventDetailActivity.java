@@ -42,11 +42,11 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -58,6 +58,7 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
@@ -618,14 +619,23 @@ public class EventDetailActivity extends BaseActivity {
                 descriptionHeaderView.setVisibility(View.GONE);
             } else {
                 descriptionHeaderView.setVisibility(View.VISIBLE);
+                String description;
+                try {
+                    description = new String(event.description.getBytes("ISO-8859-1"), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    description = event.description;
+                    e.printStackTrace();
+                }
+
                 if (HTML_PATTERN.matcher(event.description).find()) {
-                    descriptionView.setText(Html.fromHtml(event.description));
+                    descriptionView.setText(Html.fromHtml(description));
                     descriptionView.setMovementMethod(LinkMovementMethod.getInstance());
                     descriptionView.setTextIsSelectable(false);
                 } else {
-                    descriptionView.setText(event.description);
+                    descriptionView.setText(description);
                     descriptionView.setTextIsSelectable(true);
                 }
+
                 Linkify.addLinks(descriptionView, Linkify.ALL);
                 readMoreView.setOnClickListener(new OnClickListener() {
                     @Override
