@@ -392,7 +392,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             shareView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.shareEvent(itemView, event);
+                    activity.shareEvent(event);
                 }
             });
         }

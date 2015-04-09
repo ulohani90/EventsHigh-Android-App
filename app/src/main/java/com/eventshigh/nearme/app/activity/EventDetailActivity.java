@@ -566,7 +566,7 @@ public class EventDetailActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     showRateAppDialog = true;
-                    shareEvent(bgView, event);
+                    shareEvent(event);
                 }
             });
 

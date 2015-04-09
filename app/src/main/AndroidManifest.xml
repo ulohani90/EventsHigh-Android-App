@@ -66,22 +66,6 @@
         <!-- FB -->
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
 
-        <!--
-         Enable the file provider which will be used when we share the image
-         from our local cache directory to other applications.
-        -->
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.eventshigh.nearme.app.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false"
-        >
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/filepaths"
-            />
-        </provider>
-
         <!-- Enable the search recent suggestion provider -->
         <provider
             android:authorities="com.eventshigh.nearme.app.EventSearchSuggestions"
