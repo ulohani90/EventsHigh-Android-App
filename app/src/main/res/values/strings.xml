@@ -71,6 +71,7 @@
     <string name="ui_offer_expire">Oh no! Offer is expired already. Better luck next time!</string>
     <string name="ui_offer_expired">Expired</string>
     <string name="ui_offer_tip">Invitations Accepted</string>
+    <string name="ui_offer_redeem_phone">You need to register your phone number before you can redeem the offer!</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>

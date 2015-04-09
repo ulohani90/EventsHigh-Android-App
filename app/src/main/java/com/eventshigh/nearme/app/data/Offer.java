@@ -80,7 +80,7 @@ public class Offer implements Parcelable {
             return;
         }
 
-        activity.reportActionToAnalytics("showOffer");
+        activity.reportActionToAnalytics("showOffer", id);
         switch (type) {
             case REFERRAL_INSTALL_CONTEST:
                 activity.startActivity(new Intent(activity, OffersActivity.class)
