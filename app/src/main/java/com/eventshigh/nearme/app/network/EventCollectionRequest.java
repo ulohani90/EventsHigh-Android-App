@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -42,7 +41,6 @@ public class EventCollectionRequest extends BaseEventListRequest {
         String url;
         try {
             url = EventsHighEndpoints.getApiEndpoint(eventsContext);
-            Log.w("url", url);
         } catch (IllegalArgumentException e) {
             errorListener.onErrorResponse(new VolleyError("Invalid Query", e));
             return;

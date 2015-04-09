@@ -17,7 +17,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
@@ -51,14 +50,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     };
 
     private final BaseEventsActivity activity;
-    private final boolean showCategory;
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
     private final Set<Integer> usedItemIds = new HashSet<>();
     private List<Data> dataToShow;
 
-    public EventsAdapter(BaseEventsActivity activity, boolean showCategory) {
+    public EventsAdapter(BaseEventsActivity activity) {
         this.activity = activity;
-        this.showCategory = showCategory;
 
         dataToShow = new ArrayList<>();
         setHasStableIds(true);
@@ -88,7 +85,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     public void addOffer(Offer offer) {
-        if (dataToShow.size() > 10) {
+        if (dataToShow.size() > 10 && dataToShow.get(10) instanceof EventData) {
             dataToShow.add(10, new OfferData(offer));
             notifyDataSetChanged();
         }
@@ -157,7 +154,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         // Build the view, reuse existing if possible.
         final EventCard eventCard = reuseView == null ? EventCard.newInstance(activity, parent) :
                 new EventCard(reuseView);
-        eventCard.bindEventView(event, activity, 0, false);
+        eventCard.bindEventView(event, activity, 0);
         return eventCard.itemView;
     }
 
@@ -270,7 +267,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            ((EventCard) card).bindEventView(event, activity, position, showCategory);
+            ((EventCard) card).bindEventView(event, activity, position);
         }
 
         public String getId() {
@@ -283,7 +280,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final ImageView recommendedImageView;
         private final ImageView offerView;
         private final TextView titleView;
-        private final TextView categoryView;
         private final TextView eventTimeView;
         private final TextView venueView;
         private final TextView travelTimeView;
@@ -303,7 +299,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
             offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
             titleView = (TextView) cardView.findViewById(R.id.event_title);
-            categoryView = (TextView) cardView.findViewById(R.id.event_category);
             eventTimeView = (TextView) cardView.findViewById(R.id.event_time);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
@@ -320,7 +315,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         private void bindEventView(final Event event, final BaseEventsActivity activity,
-                                   final int position, boolean showCategory) {
+                                   final int position) {
             itemView.setTag(position);
             itemView.setVisibility(View.VISIBLE);
             itemView.setOnClickListener(new OnClickListener() {
@@ -340,21 +335,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             // Set the title.
             titleView.setText(event.title);
-
-            // Set the category.
-            String tagToShow = null;
-            if (showCategory) {
-                tagToShow = event.category != EventCategory.OTHER ? event.category.categoryName :
-                        (event.tags.length > 0 ? event.tags[0] : null);
-                categoryView.setText(tagToShow);
-            }
-            if (tagToShow == null) {
-                categoryView.setTextSize(1);
-                categoryView.setText("");
-            } else {
-                categoryView.setTextSize(12);
-                categoryView.setText(tagToShow);
-            }
 
             // Event Time.
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
@@ -432,13 +412,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            // do nothing.
-            card.itemView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.shareApp();
-                }
-            });
+            offer.populateOfferCard(card.itemView, activity);
         }
 
         @Override
@@ -447,9 +421,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    private static class OfferCard extends ViewHolder {
+    static class OfferCard extends ViewHolder {
 
-        private static OfferCard newInstance(final BaseActivity activity, ViewGroup parent) {
+        static OfferCard newInstance(final BaseActivity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(
                     R.layout.offer_card, parent, false);
             return new OfferCard(view);

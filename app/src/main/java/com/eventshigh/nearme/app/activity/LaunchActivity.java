@@ -45,8 +45,10 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.BaseEventListRequest.EventCollection;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
+import com.eventshigh.nearme.app.network.OffersRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.CityListAdapter;
@@ -81,6 +83,7 @@ import java.util.Calendar;
  */
 public class LaunchActivity extends BaseActivity {
     // Constants
+    private static final String LOG_TAG = LaunchActivity.class.getSimpleName();
     private static final int EXPLORE_CARD_WIDTH_DP = 160;
     private static final int MIN_EXPLORE_CARD_IN_ROW = 2;
     private static final long REFRESH_FEATURED_EVENTS_INTERVAL = 3600 * 1000L;
@@ -510,15 +513,17 @@ public class LaunchActivity extends BaseActivity {
             }
 
             // Offer.
-            View offerCard = getLayoutInflater().inflate(R.layout.offer_card, exploreLayout, false);
-            LayoutParams shareAppCardLP = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            shareAppCardLP.setMargins(spacing, spacing, spacing, spacing);
-            offerCard.setLayoutParams(shareAppCardLP);
+            final View offerCard = getLayoutInflater().inflate(R.layout.offer_card, exploreLayout, false);
+            exploreLayout.addView(offerCard);
+            LayoutParams offerCardLP = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+            offerCardLP.setMargins(spacing, spacing, spacing, spacing);
+            offerCard.setLayoutParams(offerCardLP);
             offerCard.setVisibility(View.GONE);
-            offerCard.setOnClickListener(new OnClickListener() {
+            OffersRequest.submit(this, Priority.NORMAL, new Listener<Offer>() {
                 @Override
-                public void onClick(View v) {
-                    shareApp();
+                public void onResponse(Offer offer, boolean isIntermediate) {
+                    offerCard.setVisibility(View.VISIBLE);
+                    offer.populateOfferCard(offerCard, LaunchActivity.this);
                 }
             });
         }
@@ -577,7 +582,7 @@ public class LaunchActivity extends BaseActivity {
             // Ignore
         } catch (NoSuchFieldException e) {
             // Ignore
-            Log.d(LaunchActivity.class.getSimpleName(), "No image for: " + tag, e);
+            Log.d(LOG_TAG, "No image for: " + tag, e);
         }
 
         return R.drawable.eh_default_event_list;

@@ -108,26 +108,10 @@
 
         <TextView
             style="@style/EventCardText"
-            android:id="@+id/event_category"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/event_title"
-            android:layout_toRightOf="@+id/event_bg"
-            android:layout_toEndOf="@+id/event_bg"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:textColor="@color/link_color"
-            tools:text="Comedy"
-        />
-
-        <TextView
-            style="@style/EventCardText"
             android:id="@+id/event_venue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/event_category"
+            android:layout_below="@id/event_title"
             android:layout_toRightOf="@+id/event_bg"
             android:layout_toEndOf="@+id/event_bg"
             android:layout_toLeftOf="@+id/event_travel_time"
@@ -144,7 +128,7 @@
             android:id="@+id/event_travel_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/event_category"
+            android:layout_below="@id/event_title"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="6dp"

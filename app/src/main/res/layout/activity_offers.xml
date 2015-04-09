@@ -4,39 +4,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
+    tools:context=".activity.OffersActivity"
 >
-    <ImageView
-        android:id="@+id/eh_logo"
-        android:layout_width="wrap_content"
+    <ProgressBar
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:id="@+id/top_progress_bar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="32dp"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/eh_logo_with_text"
-        tools:ignore="ContentDescription"
+        android:layout_marginTop="-4dp"
+        android:layout_marginBottom="-4dp"
+        android:indeterminate="true"
+        android:visibility="gone"
     />
 
-    <TextView
-        android:id="@+id/share_app_message"
-        style="?android:attr/textAppearanceLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/eh_logo"
-        android:gravity="center"
-        android:text="@string/ui_referrer_default"
+    <com.eventshigh.nearme.app.view.AutofitRecyclerView
+        android:id="@+id/offers"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:columnWidth="@dimen/event_card_width"
+        android:numColumns="auto_fit"
+        android:stretchMode="columnWidth"
+        android:horizontalSpacing="4dp"
+        android:verticalSpacing="4dp"
+        android:paddingTop="4dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:paddingBottom="100dp"
+        android:clipToPadding="false"
+        android:layout_alignParentBottom="true"
     />
 
-    <TextView
-        android:id="@+id/share_app"
-        style="@style/EHButtonCTA"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/share_app_message"
-        android:text="@string/action_share_app"
-        android:textAllCaps="true"
+    <include
+        android:id="@+id/retry"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"
+        layout="@layout/view_retry"
     />
 </RelativeLayout>
