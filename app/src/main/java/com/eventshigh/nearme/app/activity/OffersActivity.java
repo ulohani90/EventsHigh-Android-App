@@ -60,7 +60,7 @@ public class OffersActivity extends BaseActivity {
         // Verify user has registered phone no.
         Account account = new Account(this);
         Pair<String, Boolean> phoneNumberStatus = account.getPhoneNumber();
-        if (phoneNumberStatus.first.isEmpty() || !phoneNumberStatus.second) {
+        if (!phoneNumberStatus.second) {
             reportActionToAnalytics("claimOfferNoPhone", offer.id);
             new AlertDialog.Builder(this)
                     .setTitle(R.string.pref_title_phone_no)
@@ -70,7 +70,7 @@ public class OffersActivity extends BaseActivity {
                             startActivity(new Intent(OffersActivity.this, PhoneLoginActivity.class));
                         }
                     })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setIconAttribute(android.R.attr.alertDialogIcon)
                     .show();
             return;
         }
