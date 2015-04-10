@@ -1,15 +1,29 @@
 package com.eventshigh.nearme.app.data;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.OffersActivity;
+import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -18,29 +32,37 @@ import java.util.concurrent.TimeUnit;
  */
 public class Offer implements Parcelable {
     public enum OfferType {
-        REFERRER_INSTALL,
+        REFERRAL_INSTALL_CONTEST,
         EVENT_CONTEST,
     }
 
     public final String id;
     public final OfferType type;
-    public final String imgUrl;
-    public final String shortMessage;
-    public final String longMessage;
+    public final Uri imgUrl;
+    public final String message;
     public final Date offerEndDate;
     public final int claimCount;
     public final String contestURL;
 
-    public Offer(String id, OfferType type, String imgUrl, String shortMessage, String longMessage,
-                 Date offerEndDate, int claimCount, String contestURL) {
-        this.id = id;
-        this.type = type;
-        this.imgUrl = imgUrl;
-        this.shortMessage = shortMessage;
-        this.longMessage = longMessage;
+    public Offer(String id, String type, String imgUrl, String message, Date offerEndDate,
+                 int claimCount, String contestURL) throws IllegalArgumentException {
+        this.id = checkNotEmptyOrNull(id);
+        this.type = OfferType.valueOf(type.toUpperCase());
+        this.imgUrl = Uri.parse(checkNotEmptyOrNull(imgUrl));
+        this.message = message;
         this.offerEndDate = offerEndDate;
         this.claimCount = claimCount;
         this.contestURL = contestURL;
+
+        if (this.type == OfferType.REFERRAL_INSTALL_CONTEST) {
+            checkNotEmptyOrNull(this.message);
+        }
+        if (this.type == OfferType.EVENT_CONTEST) {
+            checkNotEmptyOrNull(this.contestURL);
+        }
+        if (offerEndDate == null || offerEndDate.getTime() <= 0) {
+            throw new IllegalArgumentException("offerEndDate is not valid");
+        }
     }
 
     public boolean isExpired() {
@@ -48,7 +70,7 @@ public class Offer implements Parcelable {
     }
 
     public boolean isGoodToShow() {
-        return offerEndDate.getTime() + TimeUnit.HOURS.toMillis(2) < System.currentTimeMillis();
+        return offerEndDate.getTime() > System.currentTimeMillis() + TimeUnit.HOURS.toMillis(2);
     }
 
     public void launch(BaseActivity activity) {
@@ -58,16 +80,31 @@ public class Offer implements Parcelable {
             return;
         }
 
-        activity.reportActionToAnalytics("showOffer");
+        activity.reportActionToAnalytics("showOffer", id);
         switch (type) {
-            case REFERRER_INSTALL:
-                activity.shareApp();
+            case REFERRAL_INSTALL_CONTEST:
+                activity.startActivity(new Intent(activity, OffersActivity.class)
+                        .putExtra(OffersActivity.OFFER_EXTRA_PARAM, this));
                 break;
             case EVENT_CONTEST:
-                IntentUtils.processContestViewIntent(activity, Uri.parse(contestURL), shortMessage);
+                IntentUtils.processContestViewIntent(activity, Uri.parse(contestURL), null);
                 break;
         }
     }
+
+    public void populateOfferCard(View offerCard, final BaseActivity activity) {
+        NetworkImageView imageView = (NetworkImageView) offerCard.findViewById(R.id.image);
+        imageView.setImageBitmap(null);
+        imageView.setImageUrl(imgUrl.toString(), VolleyHelper.getImageLoader(activity));
+        offerCard.findViewById(R.id.expired).setVisibility(isExpired() ? View.VISIBLE : View.GONE);
+        offerCard.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launch(activity);
+            }
+        });
+    }
+
 
     /**********************************
      Parcel management methods.
@@ -81,8 +118,8 @@ public class Offer implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(type.toString());
-        dest.writeString(imgUrl);
-        dest.writeString(shortMessage);
+        dest.writeString(imgUrl.toString());
+        dest.writeString(message);
         dest.writeLong(offerEndDate.getTime());
         dest.writeInt(claimCount);
         dest.writeString(contestURL);
@@ -94,7 +131,6 @@ public class Offer implements Parcelable {
             new Parcelable.Creator<Offer>() {
                 public Offer createFromParcel(Parcel in) {
                     return new Offer(in.readString(),
-                            OfferType.valueOf(in.readString()),
                             in.readString(),
                             in.readString(),
                             in.readString(),
@@ -108,4 +144,37 @@ public class Offer implements Parcelable {
                     return new Offer[size];
                 }
             };
+
+
+    /**********************************
+     JSON Parsing.
+     *********************************/
+    public static Offer parse(JSONObject offerJSON)
+            throws JSONException, IllegalArgumentException, ParseException {
+        return new Offer(
+                offerJSON.getString("offer_id"),
+                offerJSON.getString("offer_type"),
+                offerJSON.getString("img_url"),
+                offerJSON.optString("offer_detail_message"),
+                DateTimeUtils.parseOfferDate(offerJSON.getString("offer_end_date")),
+                offerJSON.optInt("claim_count", 0),
+                offerJSON.optString("contest_url", null)
+            );
+    }
+
+    public static List<Offer> parse(JSONArray offersJSONArray)
+            throws JSONException, IllegalArgumentException, ParseException {
+        List<Offer> offers = new ArrayList<>();
+        for (int i = 0; i < offersJSONArray.length(); i++) {
+            offers.add(parse(offersJSONArray.getJSONObject(i)));
+        }
+        return offers;
+    }
+
+    private static String checkNotEmptyOrNull(String ref) throws IllegalArgumentException {
+        if (ref == null || ref.isEmpty()) {
+            throw new IllegalArgumentException("null or empty value");
+        }
+        return ref;
+    }
 }

@@ -122,10 +122,6 @@ public class GcmIntentService extends IntentService {
             intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, query));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else {
-            if (contestUrl.startsWith(CustomUrlActivity.OFFER_URL_PREFIX)) {
-                Preferences.getInstance(this).setOfferURI(contestUrl);
-            }
-
             Intent intent = new Intent(this, CustomUrlActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             intent.setData(Uri.parse(contestUrl));

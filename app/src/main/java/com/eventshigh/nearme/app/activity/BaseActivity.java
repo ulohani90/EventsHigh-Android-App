@@ -2,14 +2,11 @@ package com.eventshigh.nearme.app.activity;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.support.annotation.Nullable;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -30,9 +27,6 @@ import com.eventshigh.nearme.app.utils.GAHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -51,6 +45,10 @@ public abstract class BaseActivity extends ActionBarActivity {
     // Google Analytics
     protected boolean isPlayServicesPresent;
     private GAHelper gaHelper;
+
+    // Check out the share event timings.
+    protected long shareEventInitiatedTimestamp = 0;
+    protected long shareAppInitiatedTimestamp = 0;
 
 
     // ***********************
@@ -113,6 +111,17 @@ public abstract class BaseActivity extends ActionBarActivity {
 
         // Report app to Facebook
         com.facebook.AppEventsLogger.activateApp(this, "196111897251952");
+
+        // Find out share action result.
+        if (shareAppInitiatedTimestamp > 0) {
+            long secForShare = (System.currentTimeMillis() - shareAppInitiatedTimestamp) / 1000;
+            reportActionToAnalytics(secForShare > 5 ? "shareApp" : "appShareDismissed", Long.toString(secForShare));
+        } else if (shareEventInitiatedTimestamp > 0) {
+            long secForShare = (System.currentTimeMillis() - shareEventInitiatedTimestamp) / 1000;
+            reportActionToAnalytics(secForShare > 5 ? "shareEvent" : "eventShareDismissed", Long.toString(secForShare));
+        }
+        shareAppInitiatedTimestamp = 0;
+        shareEventInitiatedTimestamp = 0;
     }
 
     @Override
@@ -161,7 +170,9 @@ public abstract class BaseActivity extends ActionBarActivity {
      * Helper method to start activity which lets user share the app.
      */
     public void shareApp() {
-        reportActionToAnalytics("shareApp");
+        reportActionToAnalytics("appShareInitiated");
+        shareAppInitiatedTimestamp = System.currentTimeMillis();
+
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT,
@@ -177,55 +188,19 @@ public abstract class BaseActivity extends ActionBarActivity {
      * Helper method to share an Event.
      */
     public void shareEvent(Event event) {
-        reportEventAction(event, "shareEvent");
-        try {
+        reportEventAction(event, "eventShareInitiated");
+        shareEventInitiatedTimestamp = System.currentTimeMillis();
 
+        try {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT,
                     String.format(getResources().getString(R.string.share_event_text),
-                            "\n\n" + event.title + "\n\n" + event.getEventShareURI(this))
+                            event.title + (event.isCleanVenue ? " @ " + event.venue : ""),
+                            event.getEventShareURI(this))
             );
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
-            Log.w(LOG_TAG, "failed sharing", e);
-        }
-    }
-
-    /**
-     * Helper method to share an Event. This method coverts and view
-     * into jpeg image which is then shared with external tool.
-     */
-    public void shareEvent(View eventView, Event event) {
-        reportEventAction(event, "shareEvent");
-
-        eventView.setDrawingCacheEnabled(true);
-        Bitmap bitmap = eventView.getDrawingCache();
-
-        try {
-            File file = File.createTempFile("event", ".jpg", getCacheDir());
-            FileOutputStream oStream = new FileOutputStream(file);
-            bitmap.compress(CompressFormat.JPEG, 90, oStream);
-            oStream.close();
-
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_STREAM,
-                    FileProvider.getUriForFile(this,
-                            "com.eventshigh.nearme.app.fileprovider", file));
-            sendIntent.putExtra(Intent.EXTRA_TITLE, event.title);
-            sendIntent.putExtra(Intent.EXTRA_TEXT,
-                String.format(getResources().getString(R.string.share_event_text),
-                        event.getEventShareURI(this))
-            );
-            sendIntent.setType("image/jpeg");
-            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(sendIntent);
-        } catch (IOException e) {
-            Toast.makeText(this, R.string.failed_save, Toast.LENGTH_SHORT).show();
-            Log.w(LOG_TAG, "failed to create file for sharing", e);
         } catch (ActivityNotFoundException e) {
             Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
             Log.w(LOG_TAG, "failed sharing", e);

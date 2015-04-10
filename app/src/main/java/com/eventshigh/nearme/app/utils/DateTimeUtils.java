@@ -145,4 +145,11 @@ public class DateTimeUtils {
     public static String timeToFullFormat(long timeMillis) {
         return FULL_DATE_TIME_FORMAT.format(new Date(timeMillis));
     }
+
+    private static final SimpleDateFormat OFFER_DATE_TIME_FORMAT =
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+    public static Date parseOfferDate(String offerDate) throws ParseException {
+        return OFFER_DATE_TIME_FORMAT.parse(offerDate);
+    }
+
 }

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".activity.OffersActivity"
+>
+    <TextView
+        style="?android:attr/textAppearanceLarge"
+        android:id="@+id/claim_count"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="32dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/offer"
+        android:gravity="center"
+        tools:text="3"
+    />
+
+    <TextView
+        style="?android:attr/textAppearanceMedium"
+        android:id="@+id/claim_count_tip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/claim_count"
+        android:gravity="center"
+        android:text="@string/ui_offer_tip"
+    />
+
+    <TextView
+        android:id="@+id/offer_message"
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/claim_count_tip"
+        android:gravity="center"
+        tools:text="@string/ui_referrer_default"
+    />
+
+    <TextView
+        android:id="@+id/share_app"
+        style="@style/EHButtonCTA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/offer_message"
+        android:textAllCaps="true"
+        android:text="@string/action_share_app"
+        android:onClick="shareApp"
+    />
+
+    <TextView
+        android:id="@+id/claim_offer"
+        style="@style/EHButtonCTA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/offer_message"
+        android:textAllCaps="true"
+        android:text="@string/action_claim"
+        android:onClick="claimOffer"
+        android:enabled="false"
+    />
+
+</RelativeLayout>

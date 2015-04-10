@@ -16,7 +16,6 @@ import android.webkit.WebViewClient;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.Preferences;
 
 public class CustomUrlActivity extends BaseActivity {
     public static final String ADD_EVENT_URL = "http://www.eventshigh.com/add_event";
@@ -67,7 +66,6 @@ public class CustomUrlActivity extends BaseActivity {
 
         // Process the Offer request.
         if (getIntent().getDataString().startsWith(OFFER_URL_PREFIX)) {
-            Preferences.getInstance(this).deleteOfferURI();
             getIntent().setData(getIntent().getData().buildUpon()
                 .appendQueryParameter("reflink", new Account(this).getAppDownloadLink()).build());
             if (title == null) {

@@ -8,43 +8,34 @@
     android:descendantFocusability="blocksDescendants"
     card_view:cardBackgroundColor="#FF008DA9"
     card_view:cardCornerRadius="2dp"
+    tools:layout_height="200dp"
 >
-    <ImageView
+    <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-    />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#4b000000"
+        tools:background="@drawable/eh_default_event_list"
+        tools:layout_height="200dp"
     />
     <TextView
+        android:id="@+id/expired"
+        style="?android:attr/textAppearanceMedium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_gravity="center_horizontal|top"
-        android:gravity="center"
-        android:drawablePadding="8dp"
-        android:textSize="18sp"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="-40dp"
+        android:layout_marginStart="-40dp"
+        android:rotation="-45"
         android:textColor="@android:color/white"
+        android:background="@android:color/holo_red_light"
         android:fontFamily="sans-serif-medium"
-        android:text="@string/ui_referrer_default"
-        tools:ignore="UnusedAttribute"
-    />
-    <TextView
-        android:id="@+id/share_app"
-        style="@style/EHButtonCTA"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:padding="12dp"
-        android:layout_gravity="center_horizontal|bottom"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:fontFamily="sans-serif-medium"
-        android:text="@string/action_share_app"
+        android:text="@string/ui_offer_expired"
+        android:visibility="gone"
         tools:ignore="UnusedAttribute"
     />
 </android.support.v7.widget.CardView>

@@ -180,7 +180,7 @@ public class DownloadEventsIntentService extends IntentService {
 
         // Build the notification information.
         Intent launchIntent = new Intent(this, LaunchActivity.class);
-        launchIntent.setAction(BaseActivity.NOTIFICATION_ACTION);
+        launchIntent.setAction(BaseActivity.NOTIFICATION_ACTION + intent.getAction());
         launchIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, type.query));
         NotificationUtils.showEventsNotification(this, type.notificationId, events, launchIntent,
                 type.titleResId, type.messageRedId);

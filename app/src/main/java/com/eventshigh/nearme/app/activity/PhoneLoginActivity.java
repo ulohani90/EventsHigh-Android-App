@@ -25,21 +25,12 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.regex.Pattern;
 
 /**
  * This screen allows user to register and verify his phone number.
  */
 public class PhoneLoginActivity extends BaseActivity {
     public static final String EXTRA_IN_ONBOARDING_FLOW = "inOnboardingFlow";
-    private static final Map<Pattern, String> REFERRER_MESSAGES = new HashMap<>();
-    static {
-        REFERRER_MESSAGES.put(Pattern.compile("100$"), "Register with your phone number to get a chance to win BookMyShow coupon worth Rs. 100");
-        REFERRER_MESSAGES.put(Pattern.compile("arijit$"), "Register with your phone number to get a chance to win Free Pass to Arijit Singh Live Concert");
-    }
 
     private enum VerificationStatus {
         VERIFIED,
@@ -216,17 +207,6 @@ public class PhoneLoginActivity extends BaseActivity {
         // In case of OnBoarding, we show skip button. We also change the message for phone
         // registration based on the referrer used to install the app.
         findViewById(R.id.skip).setVisibility(inOnboardingFlow ? View.VISIBLE : View.GONE);
-        if (inOnboardingFlow) {
-            String referrer = account.getReferrer();
-            if (referrer != null) {
-                for (Entry<Pattern, String> referrerMessage : REFERRER_MESSAGES.entrySet()) {
-                    if(referrerMessage.getKey().matcher(referrer).find()) {
-                        ((TextView) findViewById(R.id.phone_no_info_message)).setText(referrerMessage.getValue());
-                        break;
-                    }
-                }
-            }
-        }
 
         phoneNoParent.setVisibility(View.VISIBLE);
         codeParent.setVisibility(View.GONE);
