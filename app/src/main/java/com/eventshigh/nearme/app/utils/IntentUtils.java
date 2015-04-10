@@ -43,13 +43,15 @@ public class IntentUtils {
             param = new EventsContext(null, "");
         }
 
-        if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
-            processSearchIntent(inIntent);
-        } else if (Intent.ACTION_VIEW.equals(inIntent.getAction())) {
-            processViewIntent(inIntent, true);
-        } else if (BaseActivity.NOTIFICATION_ACTION.equals(inIntent.getAction())) {
-            activity.reportActionToAnalytics("openNotification", param.query);
-            processViewIntent(inIntent, false);
+        if (inIntent.getAction() != null) {
+            if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
+                processSearchIntent(inIntent);
+            } else if (Intent.ACTION_VIEW.equals(inIntent.getAction())) {
+                processViewIntent(inIntent, true);
+            } else if (inIntent.getAction().startsWith(BaseActivity.NOTIFICATION_ACTION)) {
+                activity.reportActionToAnalytics("openNotification", param.query);
+                processViewIntent(inIntent, false);
+            }
         }
 
         if (param.query.equalsIgnoreCase(QUERY_ALL)) {

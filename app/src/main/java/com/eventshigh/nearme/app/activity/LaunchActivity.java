@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -121,9 +120,6 @@ public class LaunchActivity extends BaseActivity {
     private EventsContext eventsContext;
     private EventsContext lastEventsContext;
 
-    // User preferences.
-    protected Preferences pref;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -165,7 +161,6 @@ public class LaunchActivity extends BaseActivity {
         PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
 
         // Read Preferences
-        pref = Preferences.getInstance(this);
         gcmRegistration = GcmRegistration.getInstance(this);
 
         // Process the incoming intent.
@@ -191,12 +186,8 @@ public class LaunchActivity extends BaseActivity {
         // location/query passed through intent.
         if (eventsContext.location == null && eventsContext.query.isEmpty() &&
             eventsContext.dateFilter.isEmpty()) {
-            if (pref.shouldShowOnBoarding()) {
+            if (Preferences.getInstance(this).shouldShowOnBoarding()) {
                 startActivity(new Intent(this, OnBoardingActivity.class));
-                return;
-            }
-
-            if (showOffer()) {
                 return;
             }
 
@@ -391,17 +382,6 @@ public class LaunchActivity extends BaseActivity {
     // Helper methods
     // ***********************
 
-    private boolean showOffer() {
-        String offerURI = pref.getOfferURI();
-        if (offerURI == null) {
-            return false;
-        }
-
-        reportActionToAnalytics("openOffer");
-        IntentUtils.processContestViewIntent(this, Uri.parse(offerURI), null);
-        return true;
-    }
-
     private void askUserForLocation() {
         reportActionToAnalytics("askUserForLocation");
         String countryCode = eventsContext.city == null ?
@@ -438,10 +418,6 @@ public class LaunchActivity extends BaseActivity {
 
         // If we do not have query, show explore screen.
         if (!isUserAction && eventsContext.query.isEmpty() && eventsContext.dateFilter.isEmpty()) {
-            if (showOffer()) {
-                return;
-            }
-
             lastEventsContext = new EventsContext(eventsContext);
             showExploreScreen();
             return;

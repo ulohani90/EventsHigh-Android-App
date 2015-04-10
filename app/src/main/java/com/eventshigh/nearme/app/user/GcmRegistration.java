@@ -158,7 +158,7 @@ public class GcmRegistration {
         }
     }
 
-    private static int getAppVersion(Context context) {
+    public static int getAppVersion(Context context) {
         try {
             PackageInfo packageInfo = context.getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0);

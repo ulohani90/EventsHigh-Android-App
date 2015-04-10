@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 
 /**
  * User Preferences an simple wrapper across
@@ -16,7 +15,6 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_NOTIFY_WEEKLY = "notifications_weekly";
     public static final String PREF_NOTIFY_EH = "notifications_eh";
     public static final String PREF_SHOW_ONBOARDING = "show_onboarding";
-    public static final String PREF_OFFER_TO_SHOW = "offer_to_show";
     public static final String PREF_NUM_TIMES_MY_EVENTS_CLUE_SHOWN = "my_events_shown_count";
 
     private final Context context;
@@ -54,18 +52,6 @@ public class Preferences implements OnSharedPreferenceChangeListener {
 
     public boolean shouldShowOnBoarding() {
         return sharedPreferences.getBoolean(PREF_SHOW_ONBOARDING, true);
-    }
-
-    public void setOfferURI(String offerURI) {
-        sharedPreferences.edit().putString(PREF_OFFER_TO_SHOW, offerURI).apply();
-    }
-
-    public void deleteOfferURI() {
-        sharedPreferences.edit().remove(PREF_OFFER_TO_SHOW).apply();
-    }
-
-    public @Nullable String getOfferURI() {
-        return sharedPreferences.getString(PREF_OFFER_TO_SHOW, null);
     }
 
     public int getNumTimesMyEventsClueShown() {

@@ -1,15 +1,11 @@
 package com.eventshigh.nearme.app.user;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
-import android.net.Uri.Builder;
 import android.os.AsyncTask;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Pair;
 
@@ -50,7 +46,6 @@ public class Account {
     // The app download link for the user. Each user has unique link so that we can
     // track the number of installs.
     private static final String PREF_SHARE_APP_LINK = "app_download_link";
-    private static final String APP_INSTALL_VERSION = "app_install_version";
 
     private static boolean disableSnackBar = false;
 
@@ -61,19 +56,6 @@ public class Account {
     public Account(Context context) {
         this.context = context.getApplicationContext();
         accountInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
-
-        // Set the APP_INSTALL_VERSION
-        if (accountInfo.getInt(APP_INSTALL_VERSION, 0) == 0) {
-            try {
-                int appInstallationVersion =
-                    accountInfo.getString(PREF_SHARE_APP_LINK, null) == null ?
-                        111 :
-                        context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;
-                accountInfo.edit().putInt(APP_INSTALL_VERSION, appInstallationVersion).apply();
-            } catch (NameNotFoundException e) {
-                // Ignore.
-            }
-        }
 
         // Check if we need to upload the data.
         new AccountStateRegistar().execute();
@@ -126,39 +108,11 @@ public class Account {
         return false;
     }
 
-    public @Nullable String getReferrer() {
-        return accountInfo.getString(PREF_REFERRER, null);
-    }
-
     public String getAppDownloadLink() {
         String defaultLink =
             "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" +
             Settings.Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
         return accountInfo.getString(PREF_SHARE_APP_LINK, defaultLink);
-    }
-
-    public int getAppInstallationVersion() {
-        return accountInfo.getInt(APP_INSTALL_VERSION, 0);
-    }
-
-    public void getNumReferrerInstalls(Activity activity, final Listener<Integer> listener,
-                                       ErrorListener errorListener) {
-        Pair<String, Boolean> phoneRecord = getPhoneNumber();
-        Builder baseUri = AccountStateReporter.getBaseUri(context, "getReferrerCount");
-        if (phoneRecord.first != null && phoneRecord.second) {
-            baseUri.appendQueryParameter("mobile_no", phoneRecord.first);
-        }
-        String url = baseUri.build().toString();
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
-            new Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject jsonObject, boolean isIntermediate) {
-                    listener.onResponse(jsonObject.optInt("count"), isIntermediate);
-                }
-             }, errorListener);
-        request.setTag(activity);
-        VolleyHelper.addToRequestQueue(context, request);
     }
 
     public boolean isFollowing(String tag) {
