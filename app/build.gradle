@@ -64,5 +64,5 @@ dependencies {
         transitive = true;
     }
 
-    compile 'io.doorbell:android-sdk:0.2.0@aar'
+    // compile 'io.doorbell:android-sdk:0.2.0@aar'
 }
