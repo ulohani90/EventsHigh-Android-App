@@ -16,8 +16,6 @@ import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.utils.DateTimeUtils;
-import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 
 import java.util.List;
 
@@ -63,9 +61,6 @@ public class FeaturedEventsAdapter extends PagerAdapter {
         public final NetworkImageView imageView;
         public final TextView categoryView;
         public final TextView titleView;
-        public final TextView venueView;
-        public final TextView numPeopleInterestedView;
-        public final TextView timeView;
         public final ImageView favouriteView;
         public final ImageView favouritedView;
         public final ImageView offerMarker;
@@ -75,9 +70,6 @@ public class FeaturedEventsAdapter extends PagerAdapter {
             this.imageView = (NetworkImageView) root.findViewById(R.id.event_bg);
             this.categoryView = (TextView) root.findViewById(R.id.event_category);
             this.titleView = (TextView) root.findViewById(R.id.event_title);
-            this.venueView = (TextView) root.findViewById(R.id.event_venue);
-            this.numPeopleInterestedView = (TextView) root.findViewById(R.id.num_people_interested);
-            this.timeView = (TextView) root.findViewById(R.id.event_time);
             this.favouriteView = (ImageView) root.findViewById(R.id.action_favourite);
             this.favouritedView = (ImageView) root.findViewById(R.id.action_favourited);
             this.offerMarker = (ImageView) root.findViewById(R.id.offer_marker);
@@ -89,27 +81,12 @@ public class FeaturedEventsAdapter extends PagerAdapter {
             }
 
             titleView.setText(event.title);
-            venueView.setText(event.getShortAddress());
 
             // Category.
             String tagToShow = event.category != EventCategory.OTHER ? event.category.categoryName :
                     (event.tags.length > 0 ? event.tags[0] : null);
             if (tagToShow != null) {
                 categoryView.setText(tagToShow);
-            }
-
-            // Num people interested.
-            numPeopleInterestedView.setText(Integer.toString(event.numPeopleInterested));
-            numPeopleInterestedView.setVisibility(
-                    event.numPeopleInterested > 0 ? View.VISIBLE : View.INVISIBLE);
-
-            // Event Time.
-            EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
-            if (eventTime != null) {
-                timeView.setVisibility(View.VISIBLE);
-                timeView.setText(eventTime.toString());
-            } else {
-                timeView.setVisibility(View.INVISIBLE);
             }
 
             // Offer ?

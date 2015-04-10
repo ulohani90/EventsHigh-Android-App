@@ -433,8 +433,7 @@ public class LaunchActivity extends BaseActivity {
             DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 
             FrameLayout.LayoutParams param = (FrameLayout.LayoutParams) featuredEventsPager.getLayoutParams();
-            param.height = Math.min(displayMetrics.heightPixels,
-                    Utils.dpToPx(this, 100) + 9 * displayMetrics.widthPixels / 16);
+            param.height = Math.min(displayMetrics.heightPixels, 9 * displayMetrics.widthPixels / 16);
             featuredEventsPager.setLayoutParams(param);
 
             int spacing = Utils.dpToPx(this, MARGIN_DP);

@@ -354,7 +354,7 @@ public class EventDetailActivity extends BaseActivity {
         private EventCard() {
             eventScrollView = (ScrollView) findViewById(R.id.event_scroll_view);
 
-            recommendedImageView = (ImageView) findViewById(R.id.eh_recommend_banner);
+            recommendedImageView = (ImageView) findViewById(R.id.eh_recommends);
             bgView = (NetworkImageView) findViewById(R.id.event_bg);
             favouriteView = (TextView) findViewById(R.id.action_favourite);
             favouritedView = (TextView) findViewById(R.id.action_favourited);

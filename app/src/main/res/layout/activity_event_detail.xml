@@ -35,8 +35,13 @@
                     android:background="@drawable/shape_film"
                     tools:layout_height="200dp"
                 />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/shape_film"
+                />
                 <ImageView
-                    android:id="@+id/eh_recommend_banner"
+                    android:id="@+id/eh_recommends"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
