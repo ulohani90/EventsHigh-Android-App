@@ -69,9 +69,9 @@
     <string name="ui_my_events_clue">Added to \'My Events\'.\nTap to go to \'My Events\' now.</string>
     <string name="ui_share_event_clue">Like the event? Share it with your friends!</string>
     <string name="ui_offer_expire">Oh no! Offer is expired already. Better luck next time!</string>
-    <string name="ui_offer_expired">Expired</string>
+    <string name="ui_offer_expired">Ended</string>
     <string name="ui_offer_tip">Invitations Accepted</string>
-    <string name="ui_offer_redeem_phone">You need to register your phone number before you can redeem the offer!</string>
+    <string name="ui_offer_redeem_phone">Please register your phone number to redeem the offer!</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>
