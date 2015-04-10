@@ -110,7 +110,7 @@ public enum EventCategory {
     }
 
     public static String toCategoryParsableString(String tag) {
-        return tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "");
+        return tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "").replaceAll("'", "");
     }
 
     public static @Nullable EventCategory getCategoryFromCategoryParsableString(String tagU) {

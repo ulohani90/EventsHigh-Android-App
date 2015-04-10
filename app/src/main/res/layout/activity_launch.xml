@@ -133,14 +133,13 @@
                         />
                     </LinearLayout>
 
-                    <include
-                        android:id="@+id/my_events"
+                    <LinearLayout
+                        android:id="@+id/my_events_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="12dp"
-                        layout="@layout/my_event_header"
-                      />
+                        android:orientation="horizontal"
+                    >
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/featured_cat_header"

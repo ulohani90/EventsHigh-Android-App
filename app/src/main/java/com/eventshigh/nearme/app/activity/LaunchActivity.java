@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
@@ -129,21 +128,6 @@ public class LaunchActivity extends BaseActivity {
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
         dotsView = (LinearLayout) findViewById(R.id.dots_parent);
         featuredEventsPager = (ViewPager) findViewById(R.id.featured_events_pager);
-
-        // Set the My Events.
-        View myEventsHeader = findViewById(R.id.my_events);
-        myEventsHeader.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                reportActionToAnalytics("myEvents");
-                eventsContext.query = EventsHighEndpoints.QUERY_MY_EVENT;
-                showNextScreen(true);
-            }
-        });
-        ((ImageView) myEventsHeader.findViewById(R.id.header_bg)).setImageResource(
-                R.drawable.infograph_myeventsbar);
-        ((TextView)myEventsHeader.findViewById(R.id.header)).setText(
-                Utils.capitalize(EventsHighEndpoints.QUERY_MY_EVENT));
 
         // Setup the actionbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -438,7 +422,7 @@ public class LaunchActivity extends BaseActivity {
 
     private long exploreScreenPopulatedTimestamp = 0;
     private LinearLayout[] featuredCatLayouts;
-    private LayoutParams FeaturedCatLP;
+    private LayoutParams featuredCatLP;
     private int numColumns;
     private View featuredCatHeader;
 
@@ -460,13 +444,21 @@ public class LaunchActivity extends BaseActivity {
 
             int size = (widthPixels - spacing * (numColumns + 1)) / numColumns;
             LayoutParams exploreCardLP = new LayoutParams(size, size);
-            FeaturedCatLP = new LayoutParams(size, size * 3 / 4);
+            featuredCatLP = new LayoutParams(size, size * 3 / 4);
             exploreCardLP.setMargins(0, spacing, spacing, 0);
-            FeaturedCatLP.setMargins(0, spacing, spacing, 0);
+            featuredCatLP.setMargins(0, spacing, spacing, 0);
 
             LayoutParams rowLP = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
             rowLP.setMargins(spacing, 0, 0, 0);
 
+            // Show "My Events" and "Editor's Pick" (Featured)
+            LinearLayout myEventsRow = (LinearLayout) findViewById(R.id.my_events_row);
+            myEventsRow.setLayoutParams(rowLP);
+            addExploreCard(Utils.capitalize(EventsHighEndpoints.QUERY_MY_EVENT), null, exploreCardLP, myEventsRow);
+            addExploreCard(Utils.capitalize(EventsHighEndpoints.QUERY_FEATURED), null, exploreCardLP, myEventsRow);
+
+            // Find featured category holders and initialize them. These holders are filled
+            // after featured events are fetched.
             LinearLayout featuredCatLayout1 = (LinearLayout) findViewById(R.id.featured_cat_row1);
             LinearLayout featuredCatLayout2 = (LinearLayout) findViewById(R.id.featured_cat_row2);
             LinearLayout featuredCatLayout3 = (LinearLayout) findViewById(R.id.featured_cat_row3);
@@ -476,6 +468,7 @@ public class LaunchActivity extends BaseActivity {
             featuredCatLayouts = new LinearLayout[] {featuredCatLayout1, featuredCatLayout2, featuredCatLayout3};
             featuredCatHeader = findViewById(R.id.featured_cat_header);
 
+            // Fill up the category explorer.
             LinearLayout exploreLayout = (LinearLayout) findViewById(R.id.explore_layout);
             LinearLayout last = new LinearLayout(this);
             for (int i = 0; i < EXPLORE_TAGS.length; i++) {
@@ -605,11 +598,13 @@ public class LaunchActivity extends BaseActivity {
             for (LinearLayout featuredCatLayout : featuredCatLayouts) {
                 featuredCatLayout.removeAllViews();
             }
-            featuredCatHeader.setVisibility(eventCollection.trendingTopics.isEmpty() ? View.GONE : View.VISIBLE);
-            for (int i = 0; i < eventCollection.trendingTopics.size() && i < numColumns * featuredCatLayouts.length; i++) {
+            int numFeaturedCat = Math.min(eventCollection.trendingTopics.size(),
+                    numColumns * featuredCatLayouts.length);
+            featuredCatHeader.setVisibility(numFeaturedCat == 0 ? View.GONE : View.VISIBLE);
+            for (int i = 0; i < numFeaturedCat; i++) {
                 addExploreCard(eventCollection.trendingTopics.get(i).tagName,
                         eventCollection.trendingTopics.get(i).imgUrl,
-                        FeaturedCatLP,
+                        featuredCatLP,
                         featuredCatLayouts[i / numColumns]);
             }
         }

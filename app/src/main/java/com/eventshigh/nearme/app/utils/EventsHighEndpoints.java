@@ -29,8 +29,8 @@ public class EventsHighEndpoints {
     private static final String API_EVENTS_SUGGEST_FORMAT =
             "https://s3-ap-southeast-1.amazonaws.com/ehautocomplete/autocomplete_events_%s.json";
 
-    public static final String QUERY_MY_EVENT = "my events";
-    public static final String QUERY_FEATURED = "featured";
+    public static final String QUERY_MY_EVENT = "my favourites";
+    public static final String QUERY_FEATURED = "editor's pick";
     public static final String QUERY_WEEKEND = "this weekend";
 
     public static Uri getEventDetailsURI(Event event) {

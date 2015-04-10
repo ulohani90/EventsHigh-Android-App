@@ -18,7 +18,6 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return events.size() + 1;
+        return events.size();
     }
 
     @Override
@@ -46,26 +45,12 @@ public class FeaturedEventsAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        if (position < events.size()) {
-            View eventCard = activity.getLayoutInflater().inflate(
-                    R.layout.explore_event_card, container, false);
-            final Event event = events.get(position);
-            new ExploreEventCard(eventCard).attachTo(event, activity);
-            container.addView(eventCard);
-            return eventCard;
-        }
-
-        View showAllCard = activity.getLayoutInflater().inflate(
-                R.layout.view_show_all, container, false);
-        showAllCard.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.reportActionToAnalytics("seeAllFeatured");
-                activity.showSearchView(EventsHighEndpoints.QUERY_FEATURED);
-            }
-        });
-        container.addView(showAllCard);
-        return showAllCard;
+        View eventCard = activity.getLayoutInflater().inflate(
+                R.layout.explore_event_card, container, false);
+        final Event event = events.get(position);
+        new ExploreEventCard(eventCard).attachTo(event, activity);
+        container.addView(eventCard);
+        return eventCard;
     }
 
     @Override

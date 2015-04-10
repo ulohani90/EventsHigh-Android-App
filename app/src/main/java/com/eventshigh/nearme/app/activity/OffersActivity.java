@@ -78,7 +78,7 @@ public class OffersActivity extends BaseActivity {
         // Send email.
         try {
             startActivity(new Intent(Intent.ACTION_SENDTO,
-                    Uri.parse("mailto:contact@eventshigh.com?subject=Redeem%20offer"))
+                    Uri.parse("mailto:support@eventshigh.com?subject=Redeem%20offer"))
                 .putExtra(Intent.EXTRA_TEXT, "Offer: " + offer.id + "\nPhone No: " + phoneNumberStatus.first)
             );
             reportActionToAnalytics("claimOffer", offer.id);

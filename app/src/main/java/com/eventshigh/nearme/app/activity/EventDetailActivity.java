@@ -776,7 +776,7 @@ public class EventDetailActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     reportEventAction(event, "ama");
-                    askOverEmail("info@eventshigh.com");
+                    askOverEmail("support@eventshigh.com");
                 }
             });
         }
