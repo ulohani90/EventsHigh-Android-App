@@ -63,4 +63,6 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
         transitive = true;
     }
+
+    compile 'io.doorbell:android-sdk:0.2.0@aar'
 }
