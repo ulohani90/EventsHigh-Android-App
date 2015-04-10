@@ -19,7 +19,7 @@
 
     <!-- Account Settings -->
     <string name="pref_header_account">Account</string>
-    <string name="pref_title_phone_no">Register Phone No</string>
+    <string name="pref_title_phone_no">Register Phone Number</string>
     <string name="pref_title_delete_query_history">Delete Search History</string>
     <string name="message_delete_query_history">Search history was removed successfully!</string>
 

@@ -196,7 +196,8 @@ public abstract class BaseActivity extends ActionBarActivity {
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT,
                     String.format(getResources().getString(R.string.share_event_text),
-                            "\n\n" + event.title + "\n\n" + event.getEventShareURI(this))
+                            event.title + (event.isCleanVenue ? " @ " + event.venue : ""),
+                            event.getEventShareURI(this))
             );
             sendIntent.setType("text/plain");
             startActivity(sendIntent);

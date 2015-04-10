@@ -67,7 +67,7 @@
     <string name="ui_weekend_events">Explore amazing weekend</string>
     <string name="ui_weekend_events_msg">See events happening on this weekend!</string>
     <string name="ui_my_events_clue">Added to \'My Events\'.\nTap to go to \'My Events\' now.</string>
-    <string name="ui_share_event_clue">Like the event? Share it with your friends!</string>
+    <string name="ui_share_event_clue">Like the event? Share it!</string>
     <string name="ui_offer_expire">Oh no! Offer is expired already. Better luck next time!</string>
     <string name="ui_offer_expired">Ended</string>
     <string name="ui_offer_tip">Invitations Accepted</string>
@@ -90,7 +90,7 @@
     <string name="action_share_app">Share This App</string>
     <string name="action_claim">Redeem Offer</string>
     <string name="share_app_text">Hey! I liked this EventsHigh app and I think you will too. It has a lot of weekend activities to choose from. Check it out. %s</string>
-    <string name="share_event_text">Hey check this event out. Sounds fun! %s</string>
+    <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Sounds fun!\n\n%1$s\n\n%2$s</string>
 
     <!-- Failed messages -->
     <string name="failed_load">Oops! Something\'s gone wrong. Let\'s try that again.</string>
