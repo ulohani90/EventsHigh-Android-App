@@ -165,7 +165,7 @@ public class NotificationUtils {
             if (events.get(i).venue != null) {
                 messageBuilder.append(" @ ").append(events.get(i).venue);
             }
-            messageBuilder.append("\n");
+            messageBuilder.append("\n\n");
         }
 
         String title = context.getString(titleResourceId);
