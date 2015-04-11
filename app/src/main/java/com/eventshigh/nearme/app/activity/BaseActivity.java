@@ -169,19 +169,20 @@ public abstract class BaseActivity extends ActionBarActivity {
     /**
      * Helper method to start activity which lets user share the app.
      */
-    public void shareApp() {
+    public void shareApp(@Nullable String message) {
         reportActionToAnalytics("appShareInitiated");
         shareAppInitiatedTimestamp = System.currentTimeMillis();
 
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT,
-                String.format(
-                        getResources().getString(R.string.share_app_text),
-                        new Account(this).getAppDownloadLink())
-        );
-        sendIntent.setType("text/plain");
-        startActivity(sendIntent);
+        if (message == null) {
+            message = getString(R.string.share_app_text);
+        }
+
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_TEXT,
+                String.format(message, new Account(this).getAppDownloadLink()));
+        intent.setType("text/plain");
+        startActivity(intent);
     }
 
     /**

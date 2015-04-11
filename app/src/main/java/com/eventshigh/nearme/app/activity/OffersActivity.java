@@ -17,6 +17,7 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Offer;
+import com.eventshigh.nearme.app.data.ReferralInstallOffer;
 import com.eventshigh.nearme.app.network.OffersRequest;
 import com.eventshigh.nearme.app.ui.OffersAdapter;
 import com.eventshigh.nearme.app.user.Account;
@@ -33,7 +34,7 @@ public class OffersActivity extends BaseActivity {
     private AutofitRecyclerView offersView;
     private View retryView;
     private View progressBar;
-    private Offer offer = null;
+    private ReferralInstallOffer offer = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +47,7 @@ public class OffersActivity extends BaseActivity {
         }
 
         if (offer != null) {
-            setOfferView(offer);
+            setOfferView();
             return;
         }
 
@@ -99,7 +100,7 @@ public class OffersActivity extends BaseActivity {
     }
 
     public void shareApp(View view) {
-        shareApp();
+        shareApp(offer.shareMessage + "\n%s");
     }
 
     public void onRetry(View view) {
@@ -131,7 +132,7 @@ public class OffersActivity extends BaseActivity {
         });
     }
 
-    private void setOfferView(Offer offer) {
+    private void setOfferView() {
         setContentView(R.layout.activity_offer);
         getSupportActionBar().setTitle(offer.id);
 
