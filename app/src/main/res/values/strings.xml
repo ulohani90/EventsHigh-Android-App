@@ -73,7 +73,7 @@ M    <string name="ui_follow">Follow</string>
     <string name="ui_offer_expired">Ended</string>
     <string name="ui_offer_tip">Invitations Accepted</string>
     <string name="ui_offer_redeem_phone">Please register your phone number to redeem the offer!</string>
-    <string name="offer_email">Offer: %1$s\nRegistered Phone Number: %2$s\nOffer Code:%3$s\n\n</string>
+    <string name="offer_email">[Please send this email to redeem the offer.]\n\nOffer: %1$s\nRegistered Phone Number: %2$s\nOffer Code:%3$s\n\n</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title">Get Started</string>

@@ -482,7 +482,7 @@ public class LaunchActivity extends BaseActivity {
             final TextView offerTitleView = new TextView(this);
             offerTitleView.setTextColor(0xFF4E5B60);
             offerTitleView.setTextSize(14);
-            offerTitleView.setText("Special Offer For you");
+            offerTitleView.setText("Special offer for you!");
             exploreLayout.addView(offerTitleView);
 
             final View offerCard = getLayoutInflater().inflate(R.layout.offer_card, exploreLayout, false);
