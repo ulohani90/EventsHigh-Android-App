@@ -422,7 +422,7 @@ public class LaunchActivity extends BaseActivity {
 
     private long exploreScreenPopulatedTimestamp = 0;
     private LinearLayout[] featuredCatLayouts;
-    private LayoutParams featuredCatLP;
+    private LayoutParams exploreCardLP;
     private int numColumns;
     private View featuredCatHeader;
 
@@ -442,10 +442,8 @@ public class LaunchActivity extends BaseActivity {
                     (widthPixels - spacing * 2) / Utils.dpToPx(this, EXPLORE_CARD_WIDTH_DP));
 
             int size = (widthPixels - spacing * (numColumns + 1)) / numColumns;
-            LayoutParams exploreCardLP = new LayoutParams(size, size);
-            featuredCatLP = new LayoutParams(size, size * 3 / 4);
+            exploreCardLP = new LayoutParams(size, size);
             exploreCardLP.setMargins(0, spacing, spacing, 0);
-            featuredCatLP.setMargins(0, spacing, spacing, 0);
 
             LayoutParams rowLP = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
             rowLP.setMargins(spacing, 0, 0, 0);
@@ -453,8 +451,8 @@ public class LaunchActivity extends BaseActivity {
             // Show "My Events" and "Editor's Pick" (Featured)
             LinearLayout myEventsRow = (LinearLayout) findViewById(R.id.my_events_row);
             myEventsRow.setLayoutParams(rowLP);
-            addExploreCard(Utils.capitalize(EventsHighEndpoints.QUERY_MY_EVENT), null, exploreCardLP, myEventsRow);
-            addExploreCard(Utils.capitalize(EventsHighEndpoints.QUERY_FEATURED), null, exploreCardLP, myEventsRow);
+            addExploreCard(Utils.capitalize(EventsHighEndpoints.QUERY_MY_EVENT), null, myEventsRow);
+            addExploreCard(Utils.capitalize(EventsHighEndpoints.QUERY_FEATURED), null, myEventsRow);
 
             // Find featured category holders and initialize them. These holders are filled
             // after featured events are fetched.
@@ -477,7 +475,7 @@ public class LaunchActivity extends BaseActivity {
                     exploreLayout.addView(last);
                 }
 
-                addExploreCard(EXPLORE_TAGS[i], null, exploreCardLP, last);
+                addExploreCard(EXPLORE_TAGS[i], null, last);
             }
 
             // Offer.
@@ -514,10 +512,9 @@ public class LaunchActivity extends BaseActivity {
         }
     };
 
-    private void addExploreCard(final String tagName, @Nullable String infographURL, LayoutParams lp,
-                                ViewGroup parent) {
+    private void addExploreCard(final String tagName, @Nullable String infographURL, ViewGroup parent) {
         final View view = getLayoutInflater().inflate(R.layout.explore_card, parent, false);
-        view.setLayoutParams(lp);
+        view.setLayoutParams(exploreCardLP);
         int infographId = getInfoGraphId(tagName);
         NetworkImageView imageView = (NetworkImageView) view.findViewById(R.id.explore_image);
         imageView.setDefaultImageResId(infographId);
@@ -603,7 +600,6 @@ public class LaunchActivity extends BaseActivity {
             for (int i = 0; i < numFeaturedCat; i++) {
                 addExploreCard(eventCollection.trendingTopics.get(i).tagName,
                         eventCollection.trendingTopics.get(i).imgUrl,
-                        featuredCatLP,
                         featuredCatLayouts[i / numColumns]);
             }
         }
