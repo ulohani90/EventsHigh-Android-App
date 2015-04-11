@@ -479,16 +479,29 @@ public class LaunchActivity extends BaseActivity {
             }
 
             // Offer.
+            final TextView offerTitleView = new TextView(this);
+            offerTitleView.setTextColor(0xFF4E5B60);
+            offerTitleView.setTextSize(14);
+            offerTitleView.setText("Special Offer For you");
+            exploreLayout.addView(offerTitleView);
+
             final View offerCard = getLayoutInflater().inflate(R.layout.offer_card, exploreLayout, false);
             exploreLayout.addView(offerCard);
+
             LayoutParams offerCardLP = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
             offerCardLP.setMargins(spacing, spacing, spacing, spacing);
+
             offerCard.setLayoutParams(offerCardLP);
             offerCard.setVisibility(View.GONE);
+            offerCardLP.bottomMargin = 0;
+            offerTitleView.setLayoutParams(offerCardLP);
+            offerTitleView.setVisibility(View.GONE);
+
             OffersRequest.submit(this, Priority.NORMAL, new Listener<Offer>() {
                 @Override
                 public void onResponse(Offer offer, boolean isIntermediate) {
                     offerCard.setVisibility(View.VISIBLE);
+                    offerTitleView.setVisibility(View.VISIBLE);
                     offer.populateOfferCard(offerCard, LaunchActivity.this);
                 }
             });
