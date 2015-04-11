@@ -23,7 +23,6 @@
             android:layout_alignBottom="@+id/event_time"
             android:layout_centerVertical="true"
             android:adjustViewBounds="false"
-            android:background="@drawable/shape_film"
         />
 
         <View
