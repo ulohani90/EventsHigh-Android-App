@@ -5,7 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.Settings;
+
+import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -141,8 +142,7 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
                 COLUMN_TIMESTAMP + " > " + timestamp, null, null, null, COLUMN_TIMESTAMP);
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put(JSON_KEY_ANDROID_ID, Settings.Secure.getString(
-                context.getContentResolver(), Settings.Secure.ANDROID_ID));
+        jsonObject.put(JSON_KEY_ANDROID_ID, Utils.getAndroidId(context));
         jsonObject.put(JSON_KEY_TIMESTAMP, timestamp);
         JSONArray actions = new JSONArray();
         jsonObject.put(JSON_KEY_CHANGES, actions);

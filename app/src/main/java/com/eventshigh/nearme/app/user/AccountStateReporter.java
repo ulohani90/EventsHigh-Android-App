@@ -3,8 +3,6 @@ package com.eventshigh.nearme.app.user;
 import android.content.Context;
 import android.net.Uri;
 import android.net.Uri.Builder;
-import android.provider.Settings;
-import android.provider.Settings.Secure;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -16,6 +14,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
@@ -77,7 +76,6 @@ public class AccountStateReporter {
         return Uri.parse("http://apiserver.eventshigh.com:8888/mobileapp")
             .buildUpon()
             .appendPath(path)
-            .appendQueryParameter("android_id",
-                Settings.Secure.getString(context.getContentResolver(), Secure.ANDROID_ID));
+            .appendQueryParameter("android_id", Utils.getAndroidId(context));
     }
 }

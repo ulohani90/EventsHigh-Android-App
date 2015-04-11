@@ -69,7 +69,7 @@ public class CustomUrlActivity extends BaseActivity {
             getIntent().setData(getIntent().getData().buildUpon()
                 .appendQueryParameter("reflink", new Account(this).getAppDownloadLink()).build());
             if (title == null) {
-                title = "EventsHigh Offer";
+                title = getString(R.string.pref_title_offers);
             }
         }
 
@@ -79,7 +79,7 @@ public class CustomUrlActivity extends BaseActivity {
 
         // If its notification action, report it accordingly.
         String action = getIntent().getAction();
-        if (action != null && action.equals(NOTIFICATION_ACTION)) {
+        if (action != null && action.startsWith(NOTIFICATION_ACTION)) {
             reportActionToAnalytics("openNotification");
             if (!getIntent().getDataString().startsWith(OFFER_URL_PREFIX)) {
                 try {
@@ -146,20 +146,9 @@ public class CustomUrlActivity extends BaseActivity {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             // Returning true here means that when opening new links from this page will open
-            // the default app that can handle the link. For example clicking on a map link will
-            // open the app chooser dialog with android maps app, chrome plus any other app that
-            // the user has installed and that can handle the maps link. Returning true here also
-            // means that if during the booking process if there is a follow up link then that will
-            // be opened in the browser and no longer inside the app. Hence returning false always
-            // so that all links will open in the web view itself. May have bad side effects in
-            // some cases. ideally we should selectively open links in the web view vs launch an
-            // app chooser using some code like
-            //   if (url.startsWith("something")) {
-            //     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            //     view.getContext().startActivity(intent);
-            //     return true;
-            //   }
-            if (url.contains("eventshigh.com") || url.contains("twitter.com")) {
+            // the default app that can handle the link.
+            if (url.contains("eventshigh.com") || url.contains("twitter.com") ||
+                    url.contains("facebook.com")) {
                 reportActionToAnalytics("openLink", url);
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 view.getContext().startActivity(intent);

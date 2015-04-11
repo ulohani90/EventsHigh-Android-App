@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.provider.Settings;
-import android.provider.Settings.Secure;
 import android.util.Log;
 import android.util.Pair;
 
@@ -18,6 +16,7 @@ import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.UserActionDbHelper;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONObject;
 
@@ -109,10 +108,14 @@ public class Account {
     }
 
     public String getAppDownloadLink() {
-        String defaultLink =
-            "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" +
-            Settings.Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
-        return accountInfo.getString(PREF_SHARE_APP_LINK, defaultLink);
+        String ret = accountInfo.getString(PREF_SHARE_APP_LINK, null);
+        if (ret == null) {
+            ret = Uri.parse("https://play.google.com/store/apps/details").buildUpon()
+                        .appendQueryParameter("id", context.getPackageName())
+                        .appendQueryParameter("referrer", Utils.getAndroidId(context))
+                        .build().toString();
+        }
+        return ret;
     }
 
     public boolean isFollowing(String tag) {

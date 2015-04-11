@@ -3,6 +3,8 @@ package com.eventshigh.nearme.app.utils;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
+import android.provider.Settings;
+import android.provider.Settings.Secure;
 import android.support.annotation.Nullable;
 import android.view.View;
 
@@ -84,5 +86,9 @@ public class Utils {
 
     public static int dpToPx(Context context, float dp) {
         return (int) (dp * context.getResources().getDisplayMetrics().density);
+    }
+
+    public static String getAndroidId(Context context) {
+        return Settings.Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
     }
 }

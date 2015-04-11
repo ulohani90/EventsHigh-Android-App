@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -21,8 +20,11 @@ import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.OffersRequest;
 import com.eventshigh.nearme.app.ui.OffersAdapter;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.util.List;
 
 public class OffersActivity extends BaseActivity {
@@ -77,12 +79,19 @@ public class OffersActivity extends BaseActivity {
 
         // Send email.
         try {
+            MessageDigest mdEnc = MessageDigest.getInstance("MD5");
+            String androidId = Utils.getAndroidId(this);
+            mdEnc.update(androidId.getBytes(), 0, androidId.length());
+            String md5AndroidId = new BigInteger(1, mdEnc.digest()).toString(16);
+
+            String emailMessage = String.format(getString(R.string.offer_email),
+                    offer.id, phoneNumberStatus.first, md5AndroidId);
             startActivity(new Intent(Intent.ACTION_SENDTO,
                     Uri.parse("mailto:support@eventshigh.com?subject=Redeem%20offer"))
-                .putExtra(Intent.EXTRA_TEXT, "Offer: " + offer.id + "\nPhone No: " + phoneNumberStatus.first)
+                .putExtra(Intent.EXTRA_TEXT, emailMessage)
             );
             reportActionToAnalytics("claimOffer", offer.id);
-        } catch (ActivityNotFoundException e) {
+        } catch (Exception e) {
             reportActionToAnalytics("claimOfferNoEmail", offer.id);
             Toast.makeText(this, "Send us email at contact@eventshigh.com to redeem the offer",
                     Toast.LENGTH_LONG).show();
@@ -124,6 +133,7 @@ public class OffersActivity extends BaseActivity {
 
     private void setOfferView(Offer offer) {
         setContentView(R.layout.activity_offer);
+        getSupportActionBar().setTitle(offer.id);
 
         TextView messageView = (TextView) findViewById(R.id.offer_message);
         messageView.setText(offer.message);
