@@ -56,8 +56,13 @@ public class SettingsActivity extends BaseActivity {
 //                ZendeskConfig.INSTANCE.setContactConfiguration(new FeedbackConfiguration());
 //                Intent feedbackIntent = new Intent(this, ContactZendeskActivity.class);
 //                startActivity(feedbackIntent);
-            }
 
+//                Helpshift.install(getApplication(),
+//                    "436ada7afb6715ef004759aea5bfd506", // API Key
+//                    "eventshigh.helpshift.com", // Domain Name
+//                    "eventshigh_platform_20150412145115945-7dc2b704461dbe7"); // App ID
+//                Helpshift.showConversation(this);
+            }
             if (intent.getAction().equals("com.eventshigh.delete_query_history")) {
                 reportActionToAnalytics("deleteQueryHistory");
 

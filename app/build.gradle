@@ -67,4 +67,5 @@ dependencies {
 
     // compile 'io.doorbell:android-sdk:0.2.0@aar'
     // compile group: 'com.zendesk', name: 'sdk', version: '1.2.0.1'
+    // compile 'com.helpshift:android-aar:3.8.0'
 }
