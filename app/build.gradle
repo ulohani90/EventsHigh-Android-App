@@ -12,6 +12,7 @@ apply plugin: 'io.fabric'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    maven { url 'https://zendesk.artifactoryonline.com/zendesk/repo' }
     mavenCentral()
 }
 
@@ -65,4 +66,5 @@ dependencies {
     }
 
     // compile 'io.doorbell:android-sdk:0.2.0@aar'
+    // compile group: 'com.zendesk', name: 'sdk', version: '1.2.0.1'
 }

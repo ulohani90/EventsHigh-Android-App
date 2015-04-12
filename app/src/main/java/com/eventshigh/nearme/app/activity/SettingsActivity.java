@@ -29,6 +29,7 @@ public class SettingsActivity extends BaseActivity {
                 } catch (ActivityNotFoundException e) {
                     // Ignore.
                 }
+
 //                final AlertDialog dialog = new Doorbell(
 //                    this, 1119, "qXYpPYOzPQJ4CHtDFp2u0Kw2ZAXkPCPcd6cZ7LsLAj0NnJSqGKRI4Uy5Y7RoHmIK")
 //                    .setPoweredByVisibility(View.GONE)
@@ -40,6 +41,21 @@ public class SettingsActivity extends BaseActivity {
 //                    }
 //                });
 //                return;
+
+//                // Initialize Zendesk
+//                ZendeskConfig.INSTANCE.init(this,
+//                    "https://eventshigh.zendesk.com",
+//                    "e768bcce15686cef22667ce751438e5637c2f22957521a51",
+//                    "mobile_sdk_client_c134c9f3e705c0b37a78");
+//
+//                // Anonymous reporting
+//                Identity anonymousIdentity = new AnonymousIdentity.Builder().build();
+//                ZendeskConfig.INSTANCE.setIdentity(anonymousIdentity);
+//
+//                // Set the configuration used by the Contact Zendesk component
+//                ZendeskConfig.INSTANCE.setContactConfiguration(new FeedbackConfiguration());
+//                Intent feedbackIntent = new Intent(this, ContactZendeskActivity.class);
+//                startActivity(feedbackIntent);
             }
 
             if (intent.getAction().equals("com.eventshigh.delete_query_history")) {
@@ -52,4 +68,12 @@ public class SettingsActivity extends BaseActivity {
 
         finish();
     }
+
+//    private class FeedbackConfiguration extends BaseZendeskFeedbackConfiguration {
+//
+//        @Override
+//        public String getRequestSubject() {
+//            return "Feedback";
+//        }
+//    }
 }
