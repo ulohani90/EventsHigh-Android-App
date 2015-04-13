@@ -1,8 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -19,18 +17,6 @@ public class SettingsActivity extends BaseActivity {
 
         Intent intent = getIntent();
         if (intent != null && intent.getAction() != null) {
-            if (intent.getAction().equals("com.eventshigh.send_feedback")) {
-                reportActionToAnalytics("sendFeedback");
-                try {
-                    startActivity(new Intent(
-                            Intent.ACTION_SENDTO,
-                            Uri.parse("mailto:contact@eventshigh.com?subject=Mobile%20App%20Feedback")
-                    ));
-                } catch (ActivityNotFoundException e) {
-                    // Ignore.
-                }
-            }
-
             if (intent.getAction().equals("com.eventshigh.delete_query_history")) {
                 reportActionToAnalytics("deleteQueryHistory");
 
