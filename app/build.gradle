@@ -60,12 +60,9 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:3.23.0'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
     compile 'org.apmem.tools:layouts:1.8@aar'
+    compile group: 'com.zendesk', name: 'sdk', version: '1.2.0.1'
 
     compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
         transitive = true;
     }
-
-    // compile 'io.doorbell:android-sdk:0.2.0@aar'
-    // compile group: 'com.zendesk', name: 'sdk', version: '1.2.0.1'
-    // compile 'com.helpshift:android-aar:3.8.0'
 }

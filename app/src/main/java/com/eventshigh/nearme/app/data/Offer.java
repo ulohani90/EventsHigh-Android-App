@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.data;
 import android.net.Uri;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Toast;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
@@ -53,16 +52,7 @@ public abstract class Offer {
         return offerEndDate.getTime() > System.currentTimeMillis() + TimeUnit.HOURS.toMillis(2);
     }
 
-    public boolean launch(BaseActivity activity) {
-        if (isExpired()) {
-            activity.reportActionToAnalytics("expiredShowOffer", id);
-            Toast.makeText(activity, R.string.ui_offer_expire, Toast.LENGTH_SHORT).show();
-            return true;
-        }
-
-        activity.reportActionToAnalytics("showOffer", id);
-        return false;
-    }
+    public abstract void launch(BaseActivity activity);
 
     public void populateOfferCard(View offerCard, final BaseActivity activity) {
         NetworkImageView imageView = (NetworkImageView) offerCard.findViewById(R.id.image);

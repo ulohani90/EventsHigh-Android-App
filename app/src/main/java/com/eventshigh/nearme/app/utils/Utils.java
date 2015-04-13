@@ -8,6 +8,10 @@ import android.provider.Settings.Secure;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * Helper methods for managing strings and titles.
  */
@@ -90,5 +94,15 @@ public class Utils {
 
     public static String getAndroidId(Context context) {
         return Settings.Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+    }
+
+    public static String md5(String input) {
+        try {
+            MessageDigest mdEnc = MessageDigest.getInstance("MD5");
+            mdEnc.update(input.getBytes(), 0, input.length());
+            return new BigInteger(1, mdEnc.digest()).toString(16);
+        } catch (NoSuchAlgorithmException e) {
+            throw  new RuntimeException(e);
+        }
     }
 }

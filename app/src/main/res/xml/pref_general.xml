@@ -19,8 +19,7 @@
     <Preference android:title="@string/pref_title_send_feedback" android:summary="contact@eventshigh.com">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.SettingsActivity"
-            android:action="com.eventshigh.send_feedback"
+            android:targetClass="com.eventshigh.nearme.app.activity.FeedbackActivity"
         />
     </Preference>
     <Preference android:title="@string/pref_title_about_us">

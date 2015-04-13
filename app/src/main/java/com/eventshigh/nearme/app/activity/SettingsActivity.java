@@ -29,40 +29,8 @@ public class SettingsActivity extends BaseActivity {
                 } catch (ActivityNotFoundException e) {
                     // Ignore.
                 }
-
-//                final AlertDialog dialog = new Doorbell(
-//                    this, 1119, "qXYpPYOzPQJ4CHtDFp2u0Kw2ZAXkPCPcd6cZ7LsLAj0NnJSqGKRI4Uy5Y7RoHmIK")
-//                    .setPoweredByVisibility(View.GONE)
-//                    .show();
-//                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//                    @Override
-//                    public void onDismiss(DialogInterface dialog) {
-//                        finish();
-//                    }
-//                });
-//                return;
-
-//                // Initialize Zendesk
-//                ZendeskConfig.INSTANCE.init(this,
-//                    "https://eventshigh.zendesk.com",
-//                    "e768bcce15686cef22667ce751438e5637c2f22957521a51",
-//                    "mobile_sdk_client_c134c9f3e705c0b37a78");
-//
-//                // Anonymous reporting
-//                Identity anonymousIdentity = new AnonymousIdentity.Builder().build();
-//                ZendeskConfig.INSTANCE.setIdentity(anonymousIdentity);
-//
-//                // Set the configuration used by the Contact Zendesk component
-//                ZendeskConfig.INSTANCE.setContactConfiguration(new FeedbackConfiguration());
-//                Intent feedbackIntent = new Intent(this, ContactZendeskActivity.class);
-//                startActivity(feedbackIntent);
-
-//                Helpshift.install(getApplication(),
-//                    "436ada7afb6715ef004759aea5bfd506", // API Key
-//                    "eventshigh.helpshift.com", // Domain Name
-//                    "eventshigh_platform_20150412145115945-7dc2b704461dbe7"); // App ID
-//                Helpshift.showConversation(this);
             }
+
             if (intent.getAction().equals("com.eventshigh.delete_query_history")) {
                 reportActionToAnalytics("deleteQueryHistory");
 
@@ -73,12 +41,4 @@ public class SettingsActivity extends BaseActivity {
 
         finish();
     }
-
-//    private class FeedbackConfiguration extends BaseZendeskFeedbackConfiguration {
-//
-//        @Override
-//        public String getRequestSubject() {
-//            return "Feedback";
-//        }
-//    }
 }

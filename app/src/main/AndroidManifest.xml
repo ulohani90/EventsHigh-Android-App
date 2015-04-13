@@ -208,6 +208,17 @@
             android:theme="@style/NoActionBar"
         />
         <activity
+            android:name=".activity.FeedbackActivity"
+            android:label="@string/pref_title_send_feedback"
+            android:parentActivityName=".activity.LaunchActivity"
+            tools:ignore="UnusedAttribute"
+        >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.LaunchActivity"
+            />
+        </activity>
+        <activity
             android:name=".activity.OffersActivity"
             android:label="@string/pref_title_offers"
             android:configChanges="orientation|keyboardHidden|screenSize"

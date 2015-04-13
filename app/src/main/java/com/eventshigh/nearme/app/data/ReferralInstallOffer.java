@@ -26,12 +26,11 @@ public class ReferralInstallOffer extends Offer implements Parcelable {
         this.shareMessage = checkNotEmptyOrNull(shareMessage);
     }
 
-    public boolean launch(BaseActivity activity) {
-        if (!super.launch(activity)) {
-            activity.startActivity(new Intent(activity, OffersActivity.class)
-                    .putExtra(OffersActivity.OFFER_EXTRA_PARAM, this));
-        }
-        return true;
+    public void launch(BaseActivity activity) {
+        activity.reportActionToAnalytics("showOffer", id);
+
+        activity.startActivity(new Intent(activity, OffersActivity.class)
+                .putExtra(OffersActivity.OFFER_EXTRA_PARAM, this));
     }
 
 

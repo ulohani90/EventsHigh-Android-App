@@ -24,8 +24,6 @@ import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.util.List;
 
 public class OffersActivity extends BaseActivity {
@@ -80,13 +78,8 @@ public class OffersActivity extends BaseActivity {
 
         // Send email.
         try {
-            MessageDigest mdEnc = MessageDigest.getInstance("MD5");
-            String androidId = Utils.getAndroidId(this);
-            mdEnc.update(androidId.getBytes(), 0, androidId.length());
-            String md5AndroidId = new BigInteger(1, mdEnc.digest()).toString(16);
-
             String emailMessage = String.format(getString(R.string.offer_email),
-                    offer.id, phoneNumberStatus.first, md5AndroidId);
+                    offer.id, phoneNumberStatus.first, Utils.md5(Utils.getAndroidId(this)));
             startActivity(new Intent(Intent.ACTION_SENDTO,
                     Uri.parse("mailto:support@eventshigh.com?subject=Redeem%20offer"))
                 .putExtra(Intent.EXTRA_TEXT, emailMessage)

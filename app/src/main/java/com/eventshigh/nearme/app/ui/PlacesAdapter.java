@@ -75,6 +75,8 @@ public class PlacesAdapter extends ArrayAdapter<String> implements Filterable {
     }
 
     public static ArrayList<String> autoComplete(String input, String countryCode) {
+        ArrayList<String> resultList = new ArrayList<>();
+
         HttpURLConnection conn = null;
         StringBuilder jsonResults = new StringBuilder();
         try {
@@ -96,17 +98,16 @@ public class PlacesAdapter extends ArrayAdapter<String> implements Filterable {
             }
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, "Error processing Places API URL", e);
-            return null;
+            return resultList;
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error connecting to Places API", e);
-            return null;
+            return resultList;
         } finally {
             if (conn != null) {
                 conn.disconnect();
             }
         }
 
-        ArrayList<String> resultList = null;
         try {
             // Create a JSON object hierarchy from the results
             JSONObject jsonObj = new JSONObject(jsonResults.toString());

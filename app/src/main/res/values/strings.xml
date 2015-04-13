@@ -21,6 +21,7 @@
     <string name="action_reset">Reset</string>
     <string name="action_apply_filter">Apply Filter</string>
     <string name="action_ama">Contact EventsHigh</string>
+    <string name="action_new_feedback">Send New Feedback</string>
 
     <!-- Menu items -->
     <string name="menu_edit_location">Change Location</string>
