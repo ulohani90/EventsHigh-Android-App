@@ -28,6 +28,8 @@ public class EventsHighEndpoints {
             "http://apiserver.eventshigh.com:8888/api/get_event_uber_info/%s?mobile=1";
     private static final String API_EVENTS_SUGGEST_FORMAT =
             "https://s3-ap-southeast-1.amazonaws.com/ehautocomplete/autocomplete_events_%s.json";
+  private static final String API_TAGS_SUGGEST_URL =
+      "https://s3-ap-southeast-1.amazonaws.com/ehautocomplete/autocomplete_tags.json";
 
     public static final String QUERY_MY_EVENT = "my favourites";
     public static final String QUERY_FEATURED = "editor's picks";
@@ -55,7 +57,11 @@ public class EventsHighEndpoints {
         return String.format(API_EVENTS_SUGGEST_FORMAT, city.toString().toLowerCase());
     }
 
-    public static Uri getEventDetailsURI(City city, String eventId) {
+  public static String getTagSuggestURI() {
+    return API_TAGS_SUGGEST_URL;
+  }
+
+  public static Uri getEventDetailsURI(City city, String eventId) {
         return Uri.parse(WEB_URI_BASE).buildUpon()
                 .appendPath("detail")
                 .appendPath(Utils.capitalize(city.toString()))

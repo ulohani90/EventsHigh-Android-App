@@ -19,6 +19,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.network.EventSuggestRequest;
 import com.eventshigh.nearme.app.network.EventSuggestRequest.SuggestEvent;
+import com.eventshigh.nearme.app.network.TagsSuggestRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -39,9 +40,11 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
     private final static int SUGGESTION_ID_START = 10000;
     private final static int EVENT_ID_START = 20000;
 
-    private String[] allTags;
     private SuggestEvent[] allEvents;
-    private EventSuggestRequest request;
+    private EventSuggestRequest requestEvents;
+
+    private String[] allTags;
+    private TagsSuggestRequest requestTags;
 
     public EventSearchSuggestionsProvider() {
         setupSuggestions(AUTHORITY, MODE);
@@ -50,7 +53,7 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        readTags();
+        loadTags();
         loadEvents();
 
         if (selectionArgs.length <=0 || selectionArgs[0].isEmpty()) {
@@ -78,14 +81,16 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
         int columnCount = suggestionsCursor.getColumnCount();
 
         String selectionArg = selectionArgs[0].toLowerCase();
-        for (int i = 0; i < allTags.length && suggestionsCursor.getCount() < 3; i++) {
-            String tag = allTags[i];
-            if (tag.contains(selectionArg)) {
-                Object[] newRow = new Object[columnCount];
-                newRow[idIndex] = SUGGESTION_ID_START + i;
-                newRow[queryColumnIndex] = tag;
-                newRow[titleColumnIndex] = Utils.capitalize(tag);
-                suggestionsCursor.addRow(newRow);
+        if (allTags != null) {
+            for (int i = 0; i < allTags.length && suggestionsCursor.getCount() < 3; i++) {
+                String tag = allTags[i];
+                if (tag.contains(selectionArg)) {
+                    Object[] newRow = new Object[columnCount];
+                    newRow[idIndex] = SUGGESTION_ID_START + i;
+                    newRow[queryColumnIndex] = tag;
+                    newRow[titleColumnIndex] = Utils.capitalize(tag);
+                    suggestionsCursor.addRow(newRow);
+                }
             }
         }
 
@@ -116,20 +121,19 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
         suggestions.clearHistory();
     }
 
-    private synchronized void readTags() {
-        if (allTags == null) {
-            try {
-                allTags = StreamUtils.readAssetFile(getContext(), "all_tags.txt");
-            } catch (IOException e) {
-                Log.w(EventSearchSuggestionsProvider.class.getSimpleName(), "Failed to read tags", e);
-                allTags = new String[]{};
-            }
+    private synchronized void loadTags() {
+        // If tags are already loaded or if request is in flight then return
+        if (allTags != null || requestTags != null) {
+            return;
         }
+
+        requestTags = new TagsSuggestRequest(mTagSuggestListener, mTagErrorListener);
+        VolleyHelper.addToRequestQueue(getContext(), requestTags);
     }
 
     private synchronized void loadEvents() {
         // Request is already in flight
-        if (allEvents != null && request != null) {
+        if (allEvents != null && requestEvents != null) {
             return;
         }
 
@@ -138,26 +142,47 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
             return;
         }
 
-        request = new EventSuggestRequest(lastCity, mSuggestListener, mErrorListener);
-        VolleyHelper.addToRequestQueue(getContext(), request);
+        requestEvents = new EventSuggestRequest(lastCity, mEventSuggestListener,
+            mEventErrorListener);
+        VolleyHelper.addToRequestQueue(getContext(), requestEvents);
     }
 
-    private Listener<List<SuggestEvent>> mSuggestListener = new Listener<List<SuggestEvent>>() {
+    private Listener<List<SuggestEvent>> mEventSuggestListener = new Listener<List<SuggestEvent>>() {
         @Override
         public void onResponse(List<SuggestEvent> suggestEvents, boolean isIntermediate) {
             synchronized (EventSearchSuggestionsProvider.this) {
                 allEvents = suggestEvents.toArray(new SuggestEvent[suggestEvents.size()]);
-                request = null;
+                requestEvents = null;
             }
         }
     };
 
-    private ErrorListener mErrorListener = new ErrorListener() {
+    private ErrorListener mEventErrorListener = new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
             synchronized (EventSearchSuggestionsProvider.this) {
                 // Try again
-                request = null;
+                requestEvents = null;
+            }
+        }
+    };
+
+    private Listener<List<String>> mTagSuggestListener = new Listener<List<String>>() {
+        @Override
+        public void onResponse(List<String> tagEvents, boolean isIntermediate) {
+            synchronized (EventSearchSuggestionsProvider.this) {
+                allTags = tagEvents.toArray(new String[tagEvents.size()]);
+                requestTags = null;
+            }
+        }
+    };
+
+    private ErrorListener mTagErrorListener = new ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            synchronized (EventSearchSuggestionsProvider.this) {
+                // Try again
+                requestTags = null;
             }
         }
     };
