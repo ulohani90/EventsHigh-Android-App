@@ -9,8 +9,13 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.maps.model.LatLng;
+import com.zendesk.sdk.model.network.ErrorResponse;
+import com.zendesk.sdk.model.network.PushRegistrationResponse;
+import com.zendesk.sdk.network.impl.ZendeskCallback;
+import com.zendesk.sdk.network.impl.ZendeskConfig;
 
 import java.io.IOException;
 
@@ -24,6 +29,8 @@ public class GcmRegistration {
     private static final String PREF_REGISTRATION_ID = "registration_id";
     private static final String PREF_APP_VERSION = "app_version";
     private static final String PREF_REGISTRATION_ID_UPLOADED = "registration_id_uploaded";
+    private static final String PREF_ZENDESK_UPDATED = "zendesk_updated2";
+
     private static final String PREF_LAST_CITY = "last_city";
     private static final String PREF_LAST_CITY_UPLOADED = "last_city_uploaded";
 
@@ -99,11 +106,11 @@ public class GcmRegistration {
 
             if (!gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
                 AccountStateReporter.reportLastCity(context, city, location, new Runnable() {
-                        @Override
-                        public void run() {
-                            gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();
-                        }
-                    });
+                    @Override
+                    public void run() {
+                        gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();
+                    }
+                });
             }
             return null;
         }
@@ -139,6 +146,7 @@ public class GcmRegistration {
                     Editor editor = gcmRegistrationInfo.edit();
                     editor.remove(PREF_REGISTRATION_ID);
                     editor.remove(PREF_APP_VERSION);
+                    editor.remove(PREF_ZENDESK_UPDATED);
                     editor.remove(PREF_REGISTRATION_ID_UPLOADED);
                     editor.apply();
                 }
@@ -150,6 +158,36 @@ public class GcmRegistration {
                     @Override
                     public void run() {
                         gcmRegistrationInfo.edit().putBoolean(PREF_REGISTRATION_ID_UPLOADED, true).apply();
+                    }
+                });
+            }
+
+            // Report the GCM registration id with zendesk.
+            if (registrationId != null &&
+                !gcmRegistrationInfo.getBoolean(PREF_ZENDESK_UPDATED, false)) {
+                ZendeskUtils.initZendesk(context);
+                ZendeskConfig.INSTANCE.enablePush(registrationId,
+                        new ZendeskCallback<PushRegistrationResponse>() {
+                            @Override
+                            public void onSuccess(PushRegistrationResponse pushRegistrationResponse) {
+                                gcmRegistrationInfo.edit().putBoolean(PREF_ZENDESK_UPDATED, true).apply();
+                            }
+
+                            @Override
+                            public void onError(ErrorResponse errorResponse) {
+                                // do nothing. upload will be retried.
+                            }
+                        });
+            }
+
+            // Upload last city.
+            City city = getLastCity();
+            if (city != null &&
+                !gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
+                AccountStateReporter.reportLastCity(context, city, null, new Runnable() {
+                    @Override
+                    public void run() {
+                        gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();
                     }
                 });
             }

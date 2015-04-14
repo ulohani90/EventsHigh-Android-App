@@ -6,16 +6,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 
-import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.utils.FeedbackConfiguration;
-import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
-import com.zendesk.sdk.logger.Logger;
-import com.zendesk.sdk.model.network.AnonymousIdentity;
 import com.zendesk.sdk.model.network.ErrorResponse;
-import com.zendesk.sdk.model.network.Identity;
-import com.zendesk.sdk.network.impl.ZendeskConfig;
 import com.zendesk.sdk.network.impl.ZendeskRequestService.RequestLoadingListener;
 import com.zendesk.sdk.requests.RequestListFragment;
 
@@ -28,7 +22,7 @@ public class FeedbackActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedback);
 
-        initZenDesk();
+        ZendeskUtils.initZendesk(this);
         onRetry(null);
     }
 
@@ -71,24 +65,4 @@ public class FeedbackActivity extends BaseActivity {
         public void onLoadError(ErrorResponse errorResponse) {
         }
     };
-
-    private void initZenDesk() {
-        Logger.setLoggable(BuildConfig.DEBUG);
-
-        // Initialize ZenDesk.
-        ZendeskConfig.INSTANCE.init(this,
-                "https://eventshigh.zendesk.com",
-                "e768bcce15686cef22667ce751438e5637c2f22957521a51",
-                "mobile_sdk_client_c134c9f3e705c0b37a78");
-
-        // Anonymous reporting.
-        Identity anonymousIdentity = new AnonymousIdentity.Builder()
-                .withExternalIdentifier("user:" + Utils.md5(Utils.getAndroidId(this)))
-                .withNameIdentifier("Me")
-                .build();
-        ZendeskConfig.INSTANCE.setIdentity(anonymousIdentity);
-
-        // Set the configuration used by the Contact ZenDesk component.
-        ZendeskConfig.INSTANCE.setContactConfiguration(new FeedbackConfiguration(this));
-    }
 }
