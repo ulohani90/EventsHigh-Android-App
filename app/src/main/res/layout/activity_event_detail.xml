@@ -33,11 +33,7 @@
                     android:layout_height="wrap_content"
                     android:scaleType="centerCrop"
                     tools:layout_height="200dp"
-                />
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/shape_film"
+                    android:onClick="imagePreview"
                 />
                 <ImageView
                     android:id="@+id/eh_recommends"
@@ -48,34 +44,6 @@
                     android:src="@drawable/eh_recommend"
                     android:adjustViewBounds="true"
                     tools:ignore="ContentDescription"
-                />
-                <TextView
-                    android:id="@+id/action_favourited"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:layout_gravity="center|bottom"
-                    android:padding="16dp"
-                    android:drawableLeft="@drawable/eh_favourite_active"
-                    android:drawableStart="@drawable/eh_favourite_active"
-                    android:drawablePadding="4dp"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:textSize="12sp"
-                    android:text="@string/ui_favourited"
-                    android:textColor="@android:color/white"
-                />
-                <TextView
-                    android:id="@+id/action_favourite"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:layout_gravity="center|bottom"
-                    android:padding="16dp"
-                    android:drawableLeft="@drawable/eh_favourite_normal_white"
-                    android:drawableStart="@drawable/eh_favourite_normal_white"
-                    android:drawablePadding="4dp"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:textSize="12sp"
-                    android:text="@string/ui_favourite"
-                    android:textColor="@android:color/white"
                 />
             </FrameLayout>
 
@@ -108,8 +76,76 @@
                 android:clickable="true"
                 android:layout_gravity="end"
                 android:textColor="#99A7A9AC"
+                android:onClick="openSourceSite"
                 tools:text="Event details from: www.eventshigh.com"
             />
+
+            <!-- EH Actions -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#1a4d4d4d"
+            />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="#FFF0F1F3"
+            >
+                <TextView
+                    style="@style/EHDetailActionButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/ic_event_grey600_24dp"
+                    android:clickable="true"
+                    android:onClick="save"
+                    android:text="@string/action_calendar"
+                />
+                <TextView
+                    android:id="@+id/action_favourite"
+                    style="@style/EHDetailActionButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/ic_favorite_grey600_24dp"
+                    android:clickable="true"
+                    android:onClick="addFavourite"
+                    android:text="@string/ui_favourite"
+                />
+                <TextView
+                    android:id="@+id/action_favourited"
+                    style="@style/EHDetailActionButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/ic_favorite_red_24dp"
+                    android:clickable="true"
+                    android:onClick="removeFavourite"
+                    android:text="@string/ui_favourite"
+                    android:visibility="gone"
+                />
+                <TextView
+                    style="@style/EHDetailActionButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/ic_directions_grey600_24dp"
+                    android:clickable="true"
+                    android:onClick="showDirections"
+                    android:text="@string/action_direction"
+                />
+                <TextView
+                    style="@style/EHDetailActionButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/ic_help_grey600_24dp"
+                    android:clickable="true"
+                    android:onClick="ama"
+                    android:text="@string/action_ama"
+                />
+            </LinearLayout>
 
             <!-- Event Venue -->
             <View
@@ -119,9 +155,9 @@
             />
             <RelativeLayout
                 style="@style/EHButton"
-                android:id="@+id/event_venue_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:onClick="showVenue"
             >
                 <ImageView
                     android:id="@+id/event_venue_icon"
@@ -141,8 +177,6 @@
                     android:layout_alignParentTop="true"
                     android:layout_toRightOf="@+id/event_venue_icon"
                     android:layout_toEndOf="@+id/event_venue_icon"
-                    android:layout_toLeftOf="@+id/navigate_icon"
-                    android:layout_toStartOf="@+id/navigate_icon"
                     android:textColor="#A3000000"
                     tools:text="Counter Culture"
                 />
@@ -154,8 +188,6 @@
                     android:layout_below="@+id/event_venue"
                     android:layout_toRightOf="@+id/event_venue_icon"
                     android:layout_toEndOf="@+id/event_venue_icon"
-                    android:layout_toLeftOf="@+id/navigate_icon"
-                    android:layout_toStartOf="@+id/navigate_icon"
                     android:textColor="#999197A3"
                     tools:text="Near Hoodi circle, Whitefield, Bangalore, 560037."
                 />
@@ -167,25 +199,11 @@
                     android:layout_below="@+id/event_address"
                     android:layout_toRightOf="@+id/event_venue_icon"
                     android:layout_toEndOf="@+id/event_venue_icon"
-                    android:layout_toLeftOf="@+id/navigate_icon"
-                    android:layout_toStartOf="@+id/navigate_icon"
                     android:textColor="#999197A3"
                     android:drawableLeft="@drawable/ic_local_taxi_grey600_12dp"
                     android:drawableStart="@drawable/ic_local_taxi_grey600_12dp"
                     android:drawablePadding="4dp"
                     tools:text="30 min"
-                />
-                <ImageView
-                    android:id="@+id/navigate_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:padding="18dp"
-                    android:background="@drawable/eh_button"
-                    android:src="@drawable/ic_directions_grey600_24dp"
-                    tools:ignore="ContentDescription"
                 />
             </RelativeLayout>
 
@@ -197,19 +215,20 @@
             />
             <LinearLayout
                 android:id="@+id/event_time_group"
-                style="@style/EHButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:animateLayoutChanges="true"
+                android:background="@color/button_gray"
             >
                 <RelativeLayout
                     android:id="@+id/event_time_first"
+                    style="@style/EHButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_weight="1"
-                    android:background="@drawable/eh_button"
+                    android:onClick="save"
                 >
                     <ImageView
                         android:id="@+id/event_time_icon"
@@ -248,19 +267,18 @@
                 </RelativeLayout>
                 <TextView
                     android:id="@+id/also_on"
-                    style="@style/EHText"
+                    style="@style/EHButton"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:background="@drawable/eh_button"
-                    android:padding="6dp"
                     android:textColor="#80000000"
                     android:text="@string/ui_also_on"
+                    android:textAllCaps="false"
                 />
                 <HorizontalScrollView
                     android:id="@+id/event_future_times_hs"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:scrollbars="none"
                     android:visibility="gone"
@@ -268,7 +286,7 @@
                     <LinearLayout
                         android:id="@+id/event_future_times"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:showDividers="middle"
                         android:divider="@drawable/shape_vertical_divider"
                         android:orientation="horizontal"
@@ -293,6 +311,7 @@
                 android:textAllCaps="false"
                 android:drawableLeft="@drawable/ic_local_offer_grey600_24dp"
                 android:drawableStart="@drawable/ic_local_offer_grey600_24dp"
+                android:onClick="openOfferSite"
                 tools:text="Win Free Pass to Arijit Singh Live Concert on 5th April"
             />
 
@@ -316,6 +335,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:onClick="openBookingSite"
                 >
                     <TextView
                         android:layout_width="wrap_content"
@@ -335,6 +355,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:onClick="call"
                 >
                     <TextView
                         android:layout_width="wrap_content"
@@ -508,6 +529,7 @@
                     android:textColor="@color/link_color"
                     android:background="?android:attr/selectableItemBackground"
                     android:clickable="true"
+                    android:onClick="openOrganizerLink"
                     tools:text="parag@eventshigh.com"
                 />
             </LinearLayout>
@@ -562,6 +584,7 @@
                     android:textColor="@color/link_color"
                     android:background="?android:attr/selectableItemBackground"
                     android:clickable="true"
+                    android:onClick="call"
                     tools:text="+91-9900439770"
                 />
             </LinearLayout>
@@ -589,20 +612,10 @@
                     android:textColor="@color/link_color"
                     android:background="?android:attr/selectableItemBackground"
                     android:clickable="true"
+                    android:onClick="openOrganizerWebsite"
                     tools:text="www.eventshigh.com"
                 />
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/ama"
-                style="?android:attr/textAppearanceSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="18dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:textColor="@color/link_color"
-                android:text="@string/action_ama"
-            />
 
             <View
                 android:layout_width="match_parent"
@@ -618,6 +631,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         layout="@layout/toolbar"
+        tools:visibility="gone"
     />
     <ProgressBar
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
@@ -626,6 +640,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="?android:attr/actionBarSize"
         android:indeterminate="true"
+        tools:visibility="gone"
     />
     <FrameLayout
         android:id="@+id/share"
@@ -634,6 +649,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:onClick="shareEvent"
     >
         <TextView
             android:layout_width="wrap_content"

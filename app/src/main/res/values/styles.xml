@@ -58,6 +58,15 @@
         <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-medium"</item>
         <item name="android:background">@drawable/eh_button_cta</item>
     </style>
+    <style name="EHDetailActionButton" parent="android:style/TextAppearance.Small">
+        <item name="android:background">@drawable/button_transparent_dark</item>
+        <item name="android:drawableTop">@drawable/ic_directions_grey600_24dp</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">6dp</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
 
     <!-- Theme used for Events Cards -->
     <style name="EventCardText" parent="android:style/TextAppearance.Small">

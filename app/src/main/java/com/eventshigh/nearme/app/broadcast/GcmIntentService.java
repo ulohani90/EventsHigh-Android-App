@@ -19,6 +19,7 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -26,6 +27,7 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.zendesk.sdk.deeplinking.ZendeskDeepLinking;
 
 /**
  * See {@link com.eventshigh.nearme.app.broadcast.GcmBroadcastReceiver} for details.
@@ -53,8 +55,12 @@ public class GcmIntentService extends IntentService {
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
         String messageType = gcm.getMessageType(intent);
         if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-            ParsedBundle parsedBundle = parsedBundle(intent.getExtras(), intent);
-            sendNotification(parsedBundle, intent);
+            try {
+                ParsedBundle parsedBundle = parsedBundle(intent.getExtras(), intent);
+                sendNotification(parsedBundle, intent);
+            } catch (ClassNotFoundException e) {
+                // Ignore.
+            }
         }
     }
 
@@ -81,7 +87,7 @@ public class GcmIntentService extends IntentService {
         }
     }
 
-    private @Nullable ParsedBundle parsedBundle(Bundle msg, Intent alarmIntent) {
+    private @Nullable ParsedBundle parsedBundle(Bundle msg, Intent alarmIntent) throws ClassNotFoundException {
         String title = Utils.checkIfUnknown(msg.getString("t"));
         String message = Utils.checkIfUnknown(msg.getString("m"));
         if (message == null || title == null) {
@@ -93,8 +99,11 @@ public class GcmIntentService extends IntentService {
         String query = Utils.checkIfUnknown(msg.getString("q"));
         String contestUrl = Utils.checkIfUnknown(msg.getString("contest"));
         String imageUrl = Utils.checkIfUnknown(msg.getString("img"));
-        if (eventId == null && query == null && contestUrl == null) {
-            Log.w(LOG_TAG, "Invalid notification, nether eventId, query or contest param passed");
+        String ticket = Utils.checkIfUnknown(msg.getString("ticket"));
+        String target = Utils.checkIfUnknown(msg.getString("target"));
+
+        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null) {
+            Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
             return null;
         }
 
@@ -120,6 +129,13 @@ public class GcmIntentService extends IntentService {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, query));
+            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        } else if (ticket != null) {
+            ZendeskUtils.initZendesk(this);
+            Intent intent = ZendeskDeepLinking.INSTANCE.getRequestIntent(this, ticket, null, null, null);
+            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        } else if (target != null) {
+            Intent intent = new Intent(this, getClassLoader().loadClass(target));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else {
             Intent intent = new Intent(this, CustomUrlActivity.class);

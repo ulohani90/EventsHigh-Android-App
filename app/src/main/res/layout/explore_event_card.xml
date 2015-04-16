@@ -72,7 +72,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_above="@+id/event_title"
-            android:src="@drawable/eh_favourite_normal_white"
+            android:src="@drawable/ic_favorite_white_24dp"
             android:clickable="true"
         />
         <ImageView
@@ -83,7 +83,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_above="@+id/event_title"
-            android:src="@drawable/eh_favourite_active"
+            android:src="@drawable/ic_favorite_red_24dp"
             android:clickable="true"
         />
     </RelativeLayout>

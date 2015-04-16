@@ -182,6 +182,164 @@ public class EventDetailActivity extends BaseActivity {
         }
     }
 
+    /**********************************
+     Callbacks, action handlers
+     **********************************/
+
+    public void save(View view) {
+        showRateAppDialog = true;
+        reportEventAction(event, "addToCalendar");
+
+        addToCalendar(event, null);
+    }
+
+    public void openSourceSite(View view) {
+        reportEventAction(event, "openSource");
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.sourceUrl));
+        startActivitySafe(intent);
+    }
+
+    public  void call(View view) {
+        if (event.organizerPhone == null) {
+            return;
+        }
+
+        showRateAppDialog = true;
+        reportEventAction(event, "callOrganizer");
+
+        Intent intent = new Intent(Intent.ACTION_DIAL)
+                .setData(Uri.parse("tel:" + (event.organizerPhone.split(",")[0])));
+        startActivitySafe(intent);
+
+    }
+
+    public void openOrganizerLink(View view) {
+        reportEventAction(event, "openOrganizerLink");
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerLink));
+        startActivitySafe(intent);
+    }
+
+    public void openOrganizerWebsite(View view) {
+        reportEventAction(event, "openOrganizerWebsite");
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerWebsite));
+        startActivitySafe(intent);
+    }
+
+    public void openBookingSite(View view) {
+        showRateAppDialog = true;
+        reportEventAction(event, "bookTicket");
+
+        Intent intent = new Intent(this, CustomUrlActivity.class);
+        intent.setData(Uri.parse(event.bookingUrl));
+        intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, getString(R.string.title_book));
+        startActivitySafe(intent);
+    }
+
+    public void openOfferSite(View view) {
+        reportEventAction(event, "openOffer");
+
+        IntentUtils.processContestViewIntent(this,
+                Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
+                event.offerTitle);
+    }
+
+    public void imagePreview(View view) {
+        if (event.imgUrl == null) {
+            return;
+        }
+
+        reportEventAction(event, "imagePreview");
+
+        final Dialog nagDialog = new Dialog(this,
+                android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+        nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        nagDialog.setCancelable(true);
+        nagDialog.setContentView(R.layout.dialog_image_preview);
+
+        ImageViewTouch preview = (ImageViewTouch) nagDialog.findViewById(R.id.image_preview);
+        VolleyHelper.getImageLoader(EventDetailActivity.this).get(
+                event.imgUrl, ImageLoader.getImageListener(preview, 0, 0));
+
+        Button btnClose = (Button) nagDialog.findViewById(R.id.btn_close);
+        btnClose.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                nagDialog.dismiss();
+            }
+        });
+
+        nagDialog.show();
+    }
+
+    public void removeFavourite(View v) {
+        reportEventAction(event, "removeFavourite");
+
+        eventsMarkerEditor.recordEventMark(event, null);
+        eventCard.setFavouriteView(null);
+    }
+
+    public void addFavourite(View v) {
+        reportEventAction(event, "addFavourite");
+
+        eventsMarkerEditor.recordEventMark(event, EventMark.FAVOURITE);
+        eventCard.setFavouriteView(EventMark.FAVOURITE);
+    }
+
+    public void showDirections(View view) {
+        reportEventAction(event, "showDirections");
+
+        Intent intent = event.getShowOnMapIntent();
+        if (intent == null) {
+            reportActionToAnalytics("skipDirectionsNoLocation");
+            Toast.makeText(this, R.string.failed_event_location, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // No activity to open maps.
+            Toast.makeText(this, R.string.no_map_app, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void showVenue(View view) {
+        if (event.isCleanVenue && event.venue != null) {
+            reportEventAction(event, "seeVenue", event.venue);
+            startActivity(new Intent(EventDetailActivity.this, LaunchActivity.class)
+                    .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT,
+                            new EventsContext(null, event.venue.toLowerCase())));
+        } else {
+            showDirections(view);
+        }
+    }
+
+    public void ama(View view) {
+        reportEventAction(event, "ama");
+
+        askOverEmail("support@eventshigh.com");
+    }
+
+    public void shareEvent(View view) {
+        shareEvent(event);
+    }
+
+
+    /**********************************
+     Helper methods
+     **********************************/
+
+    private void startActivitySafe(Intent intent) {
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // No activity to open url. ignore.
+        }
+    }
+
     private void populateView() {
         if (event != null && hasSetUserLocation) {
             if (client != null && client.isConnected()) {
@@ -217,32 +375,6 @@ public class EventDetailActivity extends BaseActivity {
         }
     };
 
-    /**********************************
-     Callbacks, action handlers
-     **********************************/
-
-    private void openSourceSite() {
-        reportEventAction(event, "openSource");
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.sourceUrl));
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            // No activity to open url. ignore.
-        }
-    }
-
-    private void call() {
-        if (event.organizerPhone != null) {
-            showRateAppDialog = true;
-            Intent intent = new Intent(Intent.ACTION_DIAL)
-                    .setData(Uri.parse("tel:" + (event.organizerPhone.split(",")[0])));
-            try {
-                startActivity(intent);
-            } catch (ActivityNotFoundException e) {
-                // No activity to call. ignore.
-            }
-        }
-    }
 
     private void askOverEmail(String emailAddress) {
         Intent sendIntent = new Intent(
@@ -257,63 +389,21 @@ public class EventDetailActivity extends BaseActivity {
         }
     }
 
-    private void openOrganizerLink() {
-        reportEventAction(event, "openOrganizerLink");
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerLink));
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            // No activity to open url. ignore.
-        }
-    }
-
-    private void openOrganizerWebsite() {
-        reportEventAction(event, "openOrganizerWebsite");
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerWebsite));
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            // No activity to open url. ignore.
-        }
-    }
-
-    private void openBookingSite() {
-        reportEventAction(event, "bookTicket");
-        Intent intent = new Intent(this, CustomUrlActivity.class);
-        intent.setData(Uri.parse(event.bookingUrl));
-        intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, getString(R.string.title_book));
-        showRateAppDialog = true;
-        startActivity(intent);
-    }
-
-    private void openOfferSite() {
-        reportEventAction(event, "openOffer");
-        IntentUtils.processContestViewIntent(this,
-                Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
-                event.offerTitle);
-    }
-
-
-    /**********************************
-     Helper class to hold all UI elements.
-     **********************************/
-
     private class EventCard {
         private final ScrollView eventScrollView;
 
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
-        private final TextView favouriteView;
-        private final TextView favouritedView;
 
         private final TextView titleView;
         private final TextView fromView;
 
-        private final RelativeLayout venueGroupView;
+        private final TextView favouriteView;
+        private final TextView favouritedView;
+
         private final TextView venueView;
         private final TextView addressView;
         private final TextView travelTimeView;
-        private final View naviagationView;
 
         private final LinearLayout timeGroupView;
         private final RelativeLayout eventTimeFirstView;
@@ -349,24 +439,22 @@ public class EventDetailActivity extends BaseActivity {
         private final LinearLayout organizerWebsiteRow;
         private final TextView organizerWebsiteView;
 
-        private final View ama;
 
         private EventCard() {
             eventScrollView = (ScrollView) findViewById(R.id.event_scroll_view);
 
             recommendedImageView = (ImageView) findViewById(R.id.eh_recommends);
             bgView = (NetworkImageView) findViewById(R.id.event_bg);
+
             favouriteView = (TextView) findViewById(R.id.action_favourite);
             favouritedView = (TextView) findViewById(R.id.action_favourited);
 
             titleView = (TextView) findViewById(R.id.event_title);
             fromView = (TextView) findViewById(R.id.event_from);
 
-            venueGroupView = (RelativeLayout) findViewById(R.id.event_venue_group);
             venueView = (TextView) findViewById(R.id.event_venue);
             addressView = (TextView) findViewById(R.id.event_address);
             travelTimeView = (TextView) findViewById(R.id.event_travel_time);
-            naviagationView = findViewById(R.id.navigate_icon);
 
             timeGroupView = (LinearLayout) findViewById(R.id.event_time_group);
             eventTimeFirstView = (RelativeLayout) findViewById(R.id.event_time_first);
@@ -401,8 +489,6 @@ public class EventDetailActivity extends BaseActivity {
             organizerPhoneView = (TextView) findViewById(R.id.organizer_phone);
             organizerWebsiteRow = (LinearLayout) findViewById(R.id.organizer_website_row);
             organizerWebsiteView = (TextView) findViewById(R.id.organizer_website);
-
-            ama =  findViewById(R.id.ama);
         }
 
         private void populateView(final Event event) {
@@ -426,54 +512,6 @@ public class EventDetailActivity extends BaseActivity {
             bgView.setDefaultImageResId(R.drawable.eh_default_event_detail);
             bgView.setErrorImageResId(R.drawable.eh_default_event_detail);
             bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(EventDetailActivity.this));
-            bgView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (event.imgUrl == null) {
-                        return;
-                    }
-                    reportEventAction(event, "imagePreview");
-                    final Dialog nagDialog = new Dialog(EventDetailActivity.this,
-                            android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
-                    nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    nagDialog.setCancelable(true);
-                    nagDialog.setContentView(R.layout.dialog_image_preview);
-
-                    ImageViewTouch preview = (ImageViewTouch) nagDialog.findViewById(R.id.image_preview);
-                    VolleyHelper.getImageLoader(EventDetailActivity.this).get(
-                            event.imgUrl, ImageLoader.getImageListener(preview, 0, 0));
-
-                    Button btnClose = (Button) nagDialog.findViewById(R.id.btn_close);
-                    btnClose.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View arg0) {
-                            nagDialog.dismiss();
-                        }
-                    });
-
-                    nagDialog.show();
-                }
-            });
-
-            // Set EH recommendation and favourite views.
-            recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
-            setFavouriteView(eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id));
-            favouritedView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    reportEventAction(event, "removeFavourite");
-                    eventsMarkerEditor.recordEventMark(event, null);
-                    setFavouriteView(null);
-                }
-            });
-            favouriteView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    reportEventAction(event, "addFavourite");
-                    eventsMarkerEditor.recordEventMark(event, EventMark.FAVOURITE);
-                    setFavouriteView(EventMark.FAVOURITE);
-                }
-            });
 
             // Set title
             titleView.setText(event.title);
@@ -487,13 +525,13 @@ public class EventDetailActivity extends BaseActivity {
                         getResources().getString(R.string.event_detail_from),
                         fromUri.getHost());
                 fromView.setText(eventFrom);
-                fromView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        openSourceSite();
-                    }
-                });
             }
+
+            // Action Buttons.
+
+            // Set EH recommendation and favourite views.
+            recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
+            setFavouriteView(eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id));
 
             // Set Venue and address.
             venueView.setText(event.getShortAddress());
@@ -506,48 +544,14 @@ public class EventDetailActivity extends BaseActivity {
             } else {
                 travelTimeView.setVisibility(View.GONE);
             }
-            venueGroupView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (event.isCleanVenue && event.venue != null) {
-                        reportEventAction(event, "seeVenue", event.venue);
-                        startActivity(new Intent(EventDetailActivity.this, LaunchActivity.class)
-                            .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT,
-                                    new EventsContext(null, event.venue.toLowerCase())));
-                    } else {
-                        showDirections(event);
-                    }
-                }
-            });
-            naviagationView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showDirections(event);
-                }
-            });
 
             // Set action buttons.
             if (event.bookingUrl == null) {
                 bookView.setVisibility(View.GONE);
-            } else {
-                bookView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        openBookingSite();
-                    }
-                });
             }
 
             if (event.organizerPhone == null) {
                 callView.setVisibility(View.GONE);
-            } else {
-                callView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        reportEventAction(event, "callOrganizer");
-                        call();
-                    }
-                });
             }
 
             if (event.organizerEmail == null) {
@@ -576,14 +580,6 @@ public class EventDetailActivity extends BaseActivity {
                 timeGroupView.setVisibility(View.GONE);
             } else {
                 timeView.setText(eventTime.toString());
-                timeGroupView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showRateAppDialog = true;
-                        addToCalendar(event, null);
-                    }
-                });
-
                 int numDays = DateTimeUtils.getDaysLater(event);
                 if (numDays >= 0) {
                     timeDetailView.setText(
@@ -634,12 +630,6 @@ public class EventDetailActivity extends BaseActivity {
             if (event.offerTitle != null) {
                 offerView.setVisibility(View.VISIBLE);
                 offerView.setText(event.offerTitle);
-                offerView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        openOfferSite();
-                    }
-                });
             } else {
                 offerView.setVisibility(View.GONE);
             }
@@ -696,12 +686,6 @@ public class EventDetailActivity extends BaseActivity {
                 organizerNameView.setText(event.organizerName);
                 if (event.organizerLink != null) {
                     organizerLinkView.setText(event.organizerLink);
-                    organizerLinkView.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            openOrganizerLink();
-                        }
-                    });
                 }
             }
 
@@ -724,13 +708,6 @@ public class EventDetailActivity extends BaseActivity {
             } else {
                 organizerInfoShown = true;
                 organizerPhoneView.setText(event.organizerPhone);
-                organizerPhoneView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        reportEventAction(event, "callOrganizer2");
-                        call();
-                    }
-                });
             }
 
             if (event.organizerWebsite == null) {
@@ -738,12 +715,6 @@ public class EventDetailActivity extends BaseActivity {
             } else {
                 organizerInfoShown = true;
                 organizerWebsiteView.setText(event.organizerWebsite);
-                organizerWebsiteView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        openOrganizerWebsite();
-                    }
-                });
             }
 
             if (!organizerInfoShown) {
@@ -770,15 +741,6 @@ public class EventDetailActivity extends BaseActivity {
                     addTagView(tagsView, tag, "tagClick");
                 }
             }
-
-            // AMA.
-            ama.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    reportEventAction(event, "ama");
-                    askOverEmail("support@eventshigh.com");
-                }
-            });
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {

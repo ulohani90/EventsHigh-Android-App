@@ -51,10 +51,10 @@ public abstract class BaseActivity extends ActionBarActivity {
     protected long shareAppInitiatedTimestamp = 0;
 
 
-    // ***********************
+    // **********************************************
     // Activity lifecycle  Methods
     // See http://developer.android.com/training/basics/activity-lifecycle/starting.html
-    // ***********************
+    // **********************************************
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,23 +218,6 @@ public abstract class BaseActivity extends ActionBarActivity {
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.setData(eventDetailsURI);
         startActivity(detailIntent);
-    }
-
-    public void showDirections(Event event) {
-        reportEventAction(event, "showDirections");
-        Intent intent = event.getShowOnMapIntent();
-        if (intent == null) {
-            reportActionToAnalytics("skipDirectionsNoLocation");
-            Toast.makeText(this, R.string.failed_event_location, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            // No activity to open maps.
-            Toast.makeText(this, R.string.no_map_app, Toast.LENGTH_SHORT).show();
-        }
     }
 
     public void addToCalendar(Event event, @Nullable Date date) {

@@ -162,34 +162,38 @@ public class GcmRegistration {
                 });
             }
 
-            // Report the GCM registration id with zendesk.
-            if (registrationId != null &&
-                !gcmRegistrationInfo.getBoolean(PREF_ZENDESK_UPDATED, false)) {
-                ZendeskUtils.initZendesk(context);
-                ZendeskConfig.INSTANCE.enablePush(registrationId,
-                        new ZendeskCallback<PushRegistrationResponse>() {
-                            @Override
-                            public void onSuccess(PushRegistrationResponse pushRegistrationResponse) {
-                                gcmRegistrationInfo.edit().putBoolean(PREF_ZENDESK_UPDATED, true).apply();
-                            }
-
-                            @Override
-                            public void onError(ErrorResponse errorResponse) {
-                                // do nothing. upload will be retried.
-                            }
-                        });
-            }
-
             // Upload last city.
             City city = getLastCity();
             if (city != null &&
-                !gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
+                    !gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
                 AccountStateReporter.reportLastCity(context, city, null, new Runnable() {
                     @Override
                     public void run() {
                         gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();
                     }
                 });
+            }
+
+            // Report the GCM registration id with zendesk.
+            if (registrationId != null &&
+                !gcmRegistrationInfo.getBoolean(PREF_ZENDESK_UPDATED, false)) {
+                ZendeskUtils.initZendesk(context);
+                try {
+                    ZendeskConfig.INSTANCE.enablePush(registrationId,
+                            new ZendeskCallback<PushRegistrationResponse>() {
+                                @Override
+                                public void onSuccess(PushRegistrationResponse pushRegistrationResponse) {
+                                    gcmRegistrationInfo.edit().putBoolean(PREF_ZENDESK_UPDATED, true).apply();
+                                }
+
+                                @Override
+                                public void onError(ErrorResponse errorResponse) {
+                                    // do nothing. upload will be retried.
+                                }
+                            });
+                } catch (Exception e) {
+                    // Wait for initialization to finish and retry later.
+                }
             }
 
             return null;
