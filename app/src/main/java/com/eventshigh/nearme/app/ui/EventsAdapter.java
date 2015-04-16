@@ -284,8 +284,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView venueView;
         private final TextView travelTimeView;
         private final TextView numPeopleInterestedView;
-        private final FrameLayout favouriteView;
-        private final FrameLayout favouritedView;
+        private final View favouriteView;
+        private final View favouritedView;
         private final FrameLayout shareView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent) {
@@ -303,8 +303,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
             numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
-            favouriteView = (FrameLayout) cardView.findViewById(R.id.action_favourite);
-            favouritedView = (FrameLayout) cardView.findViewById(R.id.action_favourited);
+            favouriteView = cardView.findViewById(R.id.action_favourite);
+            favouritedView = cardView.findViewById(R.id.action_favourited);
             shareView = (FrameLayout) cardView.findViewById(R.id.share);
         }
 
@@ -389,12 +389,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 }
             });
 
-            shareView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.shareEvent(event);
-                }
-            });
+            if (shareView != null) {
+                shareView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        activity.shareEvent(event);
+                    }
+                });
+            }
         }
     }
 
