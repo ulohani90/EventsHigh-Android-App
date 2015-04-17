@@ -182,6 +182,7 @@ public class EventDetailActivity extends BaseActivity {
         }
     }
 
+
     /**********************************
      Callbacks, action handlers
      **********************************/
