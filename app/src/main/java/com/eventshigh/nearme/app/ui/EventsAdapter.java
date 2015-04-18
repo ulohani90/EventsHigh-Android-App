@@ -152,7 +152,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public static View getEventCard(final Event event, final BaseEventsActivity activity,
                                     @Nullable View reuseView, ViewGroup parent) {
         // Build the view, reuse existing if possible.
-        final EventCard eventCard = reuseView == null ? EventCard.newInstance(activity, parent) :
+        final EventCard eventCard = reuseView == null ? EventCard.newInstance(activity, parent, false) :
                 new EventCard(reuseView);
         eventCard.bindEventView(event, activity, 0);
         return eventCard.itemView;
@@ -174,7 +174,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             if (typeId == EVENT.typeId) {
-                return EventCard.newInstance(activity, parent);
+                return EventCard.newInstance(activity, parent, true);
             }
 
             if (typeId == OFFER.typeId) {
@@ -288,8 +288,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final View favouritedView;
         private final FrameLayout shareView;
 
-        private static EventCard newInstance(Activity activity, ViewGroup parent) {
-            View view = activity.getLayoutInflater().inflate(R.layout.event_card, parent, false);
+        private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
+            View view = activity.getLayoutInflater().inflate(
+                    bigLayout ? R.layout.big_event_card : R.layout.event_card, parent, false);
             return new EventCard(view);
         }
 
