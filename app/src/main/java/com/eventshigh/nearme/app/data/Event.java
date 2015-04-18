@@ -424,7 +424,11 @@ public class Event implements Parcelable {
     }
 
     public Intent getShowOnMapIntent() {
-        String query = isCleanVenue ? venue : getFullAddress();
+        String query = isCleanVenue && venue != null ?
+                (venue.toLowerCase().contains(city.toString().toLowerCase()) ?
+                        venue :
+                        venue + " " + city.toString().toLowerCase())
+                : getFullAddress();
         if (query == null || query.isEmpty()) {
             if (location == null) {
                 return null;
