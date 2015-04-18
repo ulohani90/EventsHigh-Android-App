@@ -17,4 +17,7 @@
     <color name="button_gray">#FAFAFA</color>
     <color name="link_color">#990071B8</color>
     <color name="highlight_color">#EAEAEA</color>
+
+    <color name="toolbar_big">#7E57C2</color>
+    <color name="toolbar_big_status">#5E35B1</color>
 </resources>

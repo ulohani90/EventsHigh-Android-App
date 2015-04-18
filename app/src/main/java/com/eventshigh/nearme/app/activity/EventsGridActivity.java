@@ -14,7 +14,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.OffersRequest;
-import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -88,7 +87,7 @@ public class EventsGridActivity extends BaseEventsActivity {
         if (userLocation != null) {
             ActionBar actionBar = getSupportActionBar();
             if (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0) {
-                new ShowLocalityTask(this, actionBar).execute(userLocation);
+                //new ShowLocalityTask(this, actionBar).execute(userLocation);
             }
         }
 

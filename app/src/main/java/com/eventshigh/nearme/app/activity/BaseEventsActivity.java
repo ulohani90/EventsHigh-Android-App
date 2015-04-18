@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -20,6 +22,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -85,6 +89,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // ***********************
 
     // UI elements.
+    private Toolbar toolbar;
     private ViewSwitcher viewSwitcher;
     private View topProgressBar;
     private SlidingTabLayout dateFilter;
@@ -117,6 +122,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Setup the UI.
         setContentView(R.layout.activity_events);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
         dateFilter = (SlidingTabLayout) findViewById(R.id.date_filter);
         topProgressBar = findViewById(R.id.top_progress_bar);
@@ -161,12 +169,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
             }
         }
 
-        // Show query as title.
-        if (!eventsContext.query.isEmpty()) {
-            getSupportActionBar().setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
-            eventsContext.dateFilter = "";
-        }
-
         boolean showFollowScreen = !eventsContext.query.isEmpty() &&
                 !EventsHighEndpoints.isDateQuery(eventsContext.query) &&
                 !EventsHighEndpoints.isMyEventQuery(eventsContext.query) &&
@@ -174,6 +176,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
         View followWidget = findViewById(R.id.follow_widget);
         followWidget.setVisibility(showFollowScreen ? View.VISIBLE : View.GONE);
         if (showFollowScreen) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(getResources().getColor(R.color.toolbar_big_status));
+            }
+
             final Account account = new Account(this);
             TextView followWidgetTitle = (TextView) findViewById(R.id.follow_title);
             followWidgetTitle.setText(Utils.capitalize(eventsContext.query));
@@ -197,6 +206,18 @@ public abstract class BaseEventsActivity extends BaseActivity {
                     hideMyEventsClue();
                 }
             });
+        } else {
+            toolbar.setBackgroundResource(R.color.primary);
+        }
+
+        // Show query as title.
+        if (!eventsContext.query.isEmpty()) {
+            if (showFollowScreen) {
+                getSupportActionBar().setTitle("");
+            } else {
+                getSupportActionBar().setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
+            }
+            eventsContext.dateFilter = "";
         }
 
         // See if date filter is passed.

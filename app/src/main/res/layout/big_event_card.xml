@@ -25,17 +25,6 @@
             tools:background="@color/gray400"
             />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:layout_alignLeft="@+id/event_bg"
-            android:layout_alignStart="@+id/event_bg"
-            android:layout_alignRight="@+id/event_bg"
-            android:layout_alignEnd="@+id/event_bg"
-            android:layout_alignBottom="@+id/event_bg"
-            android:background="#33000000"
-            />
-
         <ImageView
             android:id="@+id/event_recommended"
             android:layout_width="wrap_content"

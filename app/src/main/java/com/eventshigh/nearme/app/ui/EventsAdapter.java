@@ -289,7 +289,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final FrameLayout shareView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent) {
-            View view = activity.getLayoutInflater().inflate(R.layout.event_card, parent, false);
+            View view = activity.getLayoutInflater().inflate(R.layout.big_event_card, parent, false);
             return new EventCard(view);
         }
 
