@@ -66,7 +66,10 @@ public class EventsGridActivity extends BaseEventsActivity {
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
 
-        setupScrollListener();
+        View followWidget = findViewById(R.id.follow_widget);
+        if (followWidget.getVisibility() == View.VISIBLE) {
+            setupScrollListener();
+        }
     }
 
     private void setupScrollListener() {
