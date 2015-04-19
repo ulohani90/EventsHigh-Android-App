@@ -107,9 +107,11 @@ public class EventsGridActivity extends BaseEventsActivity {
                     float fontSize = initialFontSize
                         + (finalFontSize - initialFontSize) * distanceRatio;
                     followWidgetTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize);
+                    toolbar.setBackgroundResource(android.R.color.transparent);
                 } else {
                     actionBar.setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
                     followWidgetTitle.setVisibility(View.INVISIBLE);
+                    toolbar.setBackgroundResource(R.color.toolbar_big);
                 }
 
                 System.out.println("----------> " + titleOffsetY + "   " + newY + "   ");
