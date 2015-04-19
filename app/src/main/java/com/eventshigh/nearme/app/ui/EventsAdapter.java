@@ -8,6 +8,7 @@ import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -152,8 +153,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public static View getEventCard(final Event event, final BaseEventsActivity activity,
                                     @Nullable View reuseView, ViewGroup parent) {
         // Build the view, reuse existing if possible.
-        final EventCard eventCard = reuseView == null ? EventCard.newInstance(activity, parent, false) :
-                new EventCard(reuseView);
+        final EventCard eventCard = reuseView == null ?
+                EventCard.newInstance(activity, parent, false) :
+                new EventCard(reuseView, false);
         eventCard.bindEventView(event, activity, 0);
         return eventCard.itemView;
     }
@@ -276,6 +278,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     private static class EventCard extends ViewHolder {
+        private final boolean bigLayout;
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
         private final ImageView offerView;
@@ -291,11 +294,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
             View view = activity.getLayoutInflater().inflate(
                     bigLayout ? R.layout.big_event_card : R.layout.event_card, parent, false);
-            return new EventCard(view);
+            return new EventCard(view, bigLayout);
         }
 
-        public EventCard(View cardView) {
+        public EventCard(View cardView, boolean bigLayout) {
             super(cardView);
+
+            this.bigLayout = bigLayout;
             bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
             recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
             offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
@@ -327,9 +332,21 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             });
 
             // Set the background image.
-            bgView.setDefaultImageResId(R.drawable.eh_default_event_list);
-            bgView.setErrorImageResId(R.drawable.eh_default_event_list);
+            int defaultImage = bigLayout ? R.drawable.eh_default_event_detail : R.drawable.eh_default_event_list;
+            bgView.setDefaultImageResId(defaultImage);
+            bgView.setErrorImageResId(defaultImage);
             bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(activity));
+
+            if (bigLayout) {
+                Utils.waitForViewVisible(bgView, new Runnable() {
+                    @Override
+                    public void run() {
+                        LayoutParams lp = bgView.getLayoutParams();
+                        lp.height = 9 * bgView.getWidth() / 16;
+                        bgView.setLayoutParams(lp);
+                    }
+                });
+            }
 
             // Check if its a recommended event or not.
             recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.INVISIBLE);
