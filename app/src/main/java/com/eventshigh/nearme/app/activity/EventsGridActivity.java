@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -71,6 +72,10 @@ public class EventsGridActivity extends BaseEventsActivity {
     private void setupScrollListener() {
         final View followWidget = findViewById(R.id.follow_widget);
         final TextView followWidgetTitle = (TextView) findViewById(R.id.follow_title);
+        final float initialFontSize = getResources().getDimension(
+            R.dimen.big_toolbar_title_font_size);
+        final float finalFontSize = getResources().getDimension(R.dimen.toolbar_title_font_size);
+
         eventGridView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -87,16 +92,21 @@ public class EventsGridActivity extends BaseEventsActivity {
                 float newY = followWidget.getY() - dy;
                 followWidget.setY(newY);
 
-                // Move title to the left.
                 ActionBar actionBar = getSupportActionBar();
                 if (newY > titleOffsetY) {
-                    float toolbarTitleX = Utils.dpToPx(EventsGridActivity.this, 60);
-                    float bigToolbarTitleX = followWidgetTitle.getLeft();
-                    float titleOffsetX = bigToolbarTitleX - toolbarTitleX;
-                    toolbarTitleX = toolbarTitleX + titleOffsetX * (titleOffsetY - newY) / titleOffsetY;
-                    followWidgetTitle.setX(toolbarTitleX);
+                    // Move title to the left.
+                    float initialTitleX = followWidgetTitle.getLeft();
+                    float finalTitleX = Utils.dpToPx(EventsGridActivity.this, 60);
+                    float distanceRatio = newY / titleOffsetY;
+                    followWidgetTitle.setX(initialTitleX
+                        + (finalTitleX - initialTitleX) * distanceRatio);
                     actionBar.setTitle("");
                     followWidgetTitle.setVisibility(View.VISIBLE);
+
+                    // Change the font size
+                    float fontSize = initialFontSize
+                        + (finalFontSize - initialFontSize) * distanceRatio;
+                    followWidgetTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize);
                 } else {
                     actionBar.setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
                     followWidgetTitle.setVisibility(View.INVISIBLE);
