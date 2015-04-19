@@ -136,12 +136,7 @@ public class EventsGridActivity extends BaseEventsActivity {
             eventGridView.getPaddingRight(), eventGridView.getPaddingBottom());
         swipeRefreshLayout.setProgressViewOffset(false, top - Utils.dpToPx(this, 30),
             top + Utils.dpToPx(this, 30));
-        eventGridView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                eventGridView.smoothScrollToPosition(0);
-            }
-        }, 100);
+        eventGridView.scrollToPosition(0);
     }
 
     @Override
@@ -153,7 +148,7 @@ public class EventsGridActivity extends BaseEventsActivity {
     protected void updateEventsCollection(List<Event> events) {
         super.updateEventsCollection(events);
         eventsAdapter.setEvents(events);
-        eventGridView.smoothScrollToPosition(0);
+        eventGridView.scrollToPosition(0);
         OffersRequest.submit(this, Priority.NORMAL, new Listener<Offer>() {
             @Override
             public void onResponse(Offer offer, boolean isIntermediate) {
