@@ -65,7 +65,7 @@
                 android:elevation="8dp"
                 android:orientation="vertical"
                 android:paddingBottom="16dp"
-                android:paddingTop="48dp"
+                android:paddingTop="36dp"
                 tools:ignore="UnusedAttribute">
 
                 <TextView
@@ -73,13 +73,25 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginBottom="24dp"
                     android:layout_marginTop="8dp"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:textColor="#FFFFFFFF"
-                    android:textSize="32sp"
+                    android:textSize="@dimen/big_toolbar_title_font_size"
                     tools:text="Music" />
+
+                <TextView
+                    android:id="@+id/follow_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="14sp"
+                    tools:text="39 Events" />
 
                 <TextView
                     android:id="@+id/following_button"

@@ -6,12 +6,9 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.Listener;
@@ -38,6 +35,7 @@ public class EventsGridActivity extends BaseEventsActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
     private AutofitRecyclerView eventGridView;
     private EventsAdapter eventsAdapter;
+    private TextView followWidgetSubtitle;
 
     // ***********************
     // Delegated Methods from {@link BaseEventsActivity}
@@ -50,6 +48,8 @@ public class EventsGridActivity extends BaseEventsActivity {
         // Setup the UI.
         View view = getLayoutInflater().inflate(R.layout.activity_event_grid, eventContainer, false);
         eventContainer.addView(view, 0);
+
+        followWidgetSubtitle = (TextView) findViewById(R.id.follow_subtitle);
 
         eventsAdapter = new EventsAdapter(this);
         eventGridView = (AutofitRecyclerView) findViewById(R.id.event_grid);
@@ -109,17 +109,19 @@ public class EventsGridActivity extends BaseEventsActivity {
                     followWidgetTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize);
                     toolbar.setBackgroundResource(android.R.color.transparent);
 
-                    // Hide follow button
-                    followButton.setAlpha(1 - distanceRatio);
-                    followingButton.setAlpha(1 - distanceRatio);
+                    // Hide follow button and subtitle
+                    followWidgetSubtitle.setAlpha(1 - distanceRatio);
+//                    followButton.setAlpha(1 - distanceRatio);
+//                    followingButton.setAlpha(1 - distanceRatio);
                 } else {
                     actionBar.setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
                     followWidgetTitle.setVisibility(View.INVISIBLE);
                     toolbar.setBackgroundResource(R.color.toolbar_big);
 
                     // Hide follow button
-                    followButton.setAlpha(0);
-                    followingButton.setAlpha(0);
+                    followWidgetSubtitle.setAlpha(0);
+//                    followButton.setAlpha(0);
+//                    followingButton.setAlpha(0);
                 }
             }
         });
@@ -131,7 +133,12 @@ public class EventsGridActivity extends BaseEventsActivity {
             eventGridView.getPaddingRight(), eventGridView.getPaddingBottom());
         swipeRefreshLayout.setProgressViewOffset(false, top - Utils.dpToPx(this, 30),
             top + Utils.dpToPx(this, 30));
-        eventGridView.smoothScrollToPosition(0);
+        eventGridView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                eventGridView.smoothScrollToPosition(0);
+            }
+        }, 100);
     }
 
     @Override
@@ -150,6 +157,9 @@ public class EventsGridActivity extends BaseEventsActivity {
                 eventsAdapter.addOffer(offer);
             }
         });
+
+        String numEvents = getResources().getString(R.string.num_events, events.size());
+        followWidgetSubtitle.setText(numEvents);
     }
 
     @Override

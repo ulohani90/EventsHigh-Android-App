@@ -120,6 +120,7 @@ M    <string name="ui_follow">Follow</string>
     <string name="event_detail_from">Event details from: %s</string>
     <string name="event_time_venue">%1$s, %2$s</string>
     <string name="event_distance_and_time">%d mins</string>
+    <string name="num_events">%d Events</string>
 
     <!-- FB -->
     <string name="facebook_app_id">196111897251952</string>
