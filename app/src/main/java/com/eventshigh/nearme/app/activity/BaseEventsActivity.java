@@ -99,8 +99,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
     private View myEventsClueView;
     private TextView myEventsClueTextView;
 
-    private View followButton;
-    private View followingButton;
+    protected View followButton;
+    protected View followingButton;
 
     // Last city and query for which events are shown.
     protected EventsContext eventsContext;

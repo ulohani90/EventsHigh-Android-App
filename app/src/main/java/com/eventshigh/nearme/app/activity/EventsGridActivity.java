@@ -108,13 +108,19 @@ public class EventsGridActivity extends BaseEventsActivity {
                         + (finalFontSize - initialFontSize) * distanceRatio;
                     followWidgetTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize);
                     toolbar.setBackgroundResource(android.R.color.transparent);
+
+                    // Hide follow button
+                    followButton.setAlpha(1 - distanceRatio);
+                    followingButton.setAlpha(1 - distanceRatio);
                 } else {
                     actionBar.setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
                     followWidgetTitle.setVisibility(View.INVISIBLE);
                     toolbar.setBackgroundResource(R.color.toolbar_big);
-                }
 
-                System.out.println("----------> " + titleOffsetY + "   " + newY + "   ");
+                    // Hide follow button
+                    followButton.setAlpha(0);
+                    followingButton.setAlpha(0);
+                }
             }
         });
     }
