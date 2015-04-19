@@ -46,7 +46,7 @@ public class ZendeskUtils {
 
         @Override
         public String getRequestSubject() {
-            return "App Feedback";
+            return "Feedback";
         }
 
         public List<String> getTags() {

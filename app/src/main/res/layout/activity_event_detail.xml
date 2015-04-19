@@ -90,18 +90,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="#FFF0F1F3"
+                android:background="@color/button_gray"
             >
-                <TextView
-                    style="@style/EHDetailActionButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableTop="@drawable/ic_event_grey600_24dp"
-                    android:clickable="true"
-                    android:onClick="save"
-                    android:text="@string/action_calendar"
-                />
                 <TextView
                     android:id="@+id/action_favourite"
                     style="@style/EHDetailActionButton"
@@ -124,6 +114,16 @@
                     android:onClick="removeFavourite"
                     android:text="@string/ui_favourite"
                     android:visibility="gone"
+                />
+                <TextView
+                    style="@style/EHDetailActionButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/ic_event_grey600_24dp"
+                    android:clickable="true"
+                    android:onClick="save"
+                    android:text="@string/action_calendar"
                 />
                 <TextView
                     style="@style/EHDetailActionButton"
@@ -177,6 +177,8 @@
                     android:layout_alignParentTop="true"
                     android:layout_toRightOf="@+id/event_venue_icon"
                     android:layout_toEndOf="@+id/event_venue_icon"
+                    android:layout_toLeftOf="@+id/event_travel_time"
+                    android:layout_toStartOf="@+id/event_travel_time"
                     android:textColor="#A3000000"
                     tools:text="Counter Culture"
                 />
@@ -188,20 +190,21 @@
                     android:layout_below="@+id/event_venue"
                     android:layout_toRightOf="@+id/event_venue_icon"
                     android:layout_toEndOf="@+id/event_venue_icon"
+                    android:layout_toLeftOf="@+id/event_travel_time"
+                    android:layout_toStartOf="@+id/event_travel_time"
                     android:textColor="#999197A3"
                     tools:text="Near Hoodi circle, Whitefield, Bangalore, 560037."
                 />
                 <TextView
                     android:id="@+id/event_travel_time"
                     style="@style/EHText"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/event_address"
-                    android:layout_toRightOf="@+id/event_venue_icon"
-                    android:layout_toEndOf="@+id/event_venue_icon"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
                     android:textColor="#999197A3"
-                    android:drawableLeft="@drawable/ic_local_taxi_grey600_12dp"
-                    android:drawableStart="@drawable/ic_local_taxi_grey600_12dp"
+                    android:drawableTop="@drawable/ic_local_taxi_grey600_12dp"
                     android:drawablePadding="4dp"
                     tools:text="30 min"
                 />

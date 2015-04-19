@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
+import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.user.GcmRegistration;
@@ -27,7 +28,6 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.zendesk.sdk.deeplinking.ZendeskDeepLinking;
 
 /**
  * See {@link com.eventshigh.nearme.app.broadcast.GcmBroadcastReceiver} for details.
@@ -132,7 +132,8 @@ public class GcmIntentService extends IntentService {
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else if (ticket != null) {
             ZendeskUtils.initZendesk(this);
-            Intent intent = ZendeskDeepLinking.INSTANCE.getRequestIntent(this, ticket, null, null, null);
+            // Intent intent = ZendeskDeepLinking.INSTANCE.getRequestIntent(this, ticket, null, null, null);
+            Intent intent = new Intent(this, FeedbackActivity.class);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else if (target != null) {
             Intent intent = new Intent(this, getClassLoader().loadClass(target));
