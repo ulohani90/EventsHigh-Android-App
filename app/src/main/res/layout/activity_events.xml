@@ -1,106 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical"
+    android:layout_height="wrap_content"
     tools:context=".activity.EventsGridActivity">
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <LinearLayout
-            android:id="@+id/follow_widget"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:background="@color/toolbar_big"
-            android:elevation="8dp"
-            android:orientation="vertical"
-            android:paddingTop="48dp"
-            android:paddingBottom="16dp"
-            tools:ignore="UnusedAttribute">
-
-            <TextView
-                android:id="@+id/follow_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginBottom="24dp"
-                android:layout_marginTop="8dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="#FFFFFFFF"
-                android:textSize="24sp"
-                tools:text="Music" />
-
-            <TextView
-                android:id="@+id/following_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@drawable/eh_oval"
-                android:drawableLeft="@drawable/ic_done_white_12dp"
-                android:drawablePadding="4dp"
-                android:drawableStart="@drawable/ic_done_white_12dp"
-                android:paddingBottom="8dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="8dp"
-                android:text="@string/ui_following"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/follow_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@drawable/eh_oval"
-                android:drawablePadding="4dp"
-                android:paddingBottom="8dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="8dp"
-                android:text="@string/ui_follow"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <include
-            android:id="@+id/toolbar"
-            layout="@layout/toolbar_big"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </FrameLayout>
-
-    <com.example.android.common.view.SlidingTabLayout
-        android:id="@+id/date_filter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FBFBFB"
-        android:elevation="8dp"
-        tools:ignore="UnusedAttribute" />
-
-    <ProgressBar
-        android:id="@+id/top_progress_bar"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="-4dp"
-        android:layout_marginTop="-4dp"
-        android:indeterminate="true" />
 
     <ViewSwitcher
         android:id="@+id/view_switcher"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <FrameLayout
             android:id="@+id/event_container"
@@ -139,50 +47,154 @@
         </FrameLayout>
     </ViewSwitcher>
 
-    <include
-        android:id="@+id/verify_phone_container"
-        layout="@layout/view_phone_snack_bar"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <RelativeLayout
-        android:id="@+id/my_events_clue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/eh_button_cta"
-        android:visibility="gone">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/my_events_cup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_margin="8dp"
-            android:src="@drawable/eh_myevents" />
+            <LinearLayout
+                android:id="@+id/follow_widget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@color/toolbar_big"
+                android:elevation="8dp"
+                android:orientation="vertical"
+                android:paddingBottom="16dp"
+                android:paddingTop="48dp"
+                tools:ignore="UnusedAttribute">
 
-        <TextView
-            android:id="@+id/my_events_clue_text"
-            style="?android:attr/textAppearanceSmall"
+                <TextView
+                    android:id="@+id/follow_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="24dp"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="24sp"
+                    tools:text="Music" />
+
+                <TextView
+                    android:id="@+id/following_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/eh_oval"
+                    android:drawableLeft="@drawable/ic_done_white_12dp"
+                    android:drawablePadding="4dp"
+                    android:drawableStart="@drawable/ic_done_white_12dp"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="8dp"
+                    android:text="@string/ui_following"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/follow_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/eh_oval"
+                    android:drawablePadding="4dp"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="8dp"
+                    android:text="@string/ui_follow"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <include
+                android:id="@+id/toolbar"
+                layout="@layout/toolbar_big"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </FrameLayout>
+
+        <com.example.android.common.view.SlidingTabLayout
+            android:id="@+id/date_filter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/my_events_cup"
-            android:layout_toLeftOf="@+id/my_events_clue_close"
-            android:layout_toRightOf="@+id/my_events_cup"
-            android:layout_toStartOf="@+id/my_events_clue_close"
-            android:text="@string/ui_my_events_clue"
-            android:textColor="@android:color/white" />
+            android:background="#FBFBFB"
+            android:elevation="8dp"
+            tools:ignore="UnusedAttribute" />
 
-        <ImageButton
-            android:id="@+id/my_events_clue_close"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:background="@drawable/button_transparent_dark"
-            android:src="@android:drawable/ic_menu_close_clear_cancel" />
-    </RelativeLayout>
-</LinearLayout>
+        <ProgressBar
+            android:id="@+id/top_progress_bar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="-4dp"
+            android:layout_marginTop="-4dp"
+            android:indeterminate="true" />
+
+        <View
+            android:id="@+id/view_pager_space"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent" />
+
+        <include
+            android:id="@+id/verify_phone_container"
+            layout="@layout/view_phone_snack_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <RelativeLayout
+            android:id="@+id/my_events_clue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/eh_button_cta"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/my_events_cup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_margin="8dp"
+                android:src="@drawable/eh_myevents" />
+
+            <TextView
+                android:id="@+id/my_events_clue_text"
+                style="?android:attr/textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/my_events_cup"
+                android:layout_toLeftOf="@+id/my_events_clue_close"
+                android:layout_toRightOf="@+id/my_events_cup"
+                android:layout_toStartOf="@+id/my_events_clue_close"
+                android:text="@string/ui_my_events_clue"
+                android:textColor="@android:color/white" />
+
+            <ImageButton
+                android:id="@+id/my_events_clue_close"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/button_transparent_dark"
+                android:src="@android:drawable/ic_menu_close_clear_cancel" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</FrameLayout>
+

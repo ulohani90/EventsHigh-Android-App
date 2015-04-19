@@ -5,7 +5,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.Listener;
@@ -15,6 +18,7 @@ import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.OffersRequest;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
+import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
@@ -27,7 +31,7 @@ import java.util.List;
 public class EventsGridActivity extends BaseEventsActivity {
 
     private SwipeRefreshLayout swipeRefreshLayout;
-    private RecyclerView eventGridView;
+    private AutofitRecyclerView eventGridView;
     private EventsAdapter eventsAdapter;
 
     // ***********************
@@ -43,7 +47,7 @@ public class EventsGridActivity extends BaseEventsActivity {
         eventContainer.addView(view, 0);
 
         eventsAdapter = new EventsAdapter(this);
-        eventGridView = (RecyclerView) findViewById(R.id.event_grid);
+        eventGridView = (AutofitRecyclerView) findViewById(R.id.event_grid);
         eventGridView.setAdapter(eventsAdapter);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
@@ -56,6 +60,28 @@ public class EventsGridActivity extends BaseEventsActivity {
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
+
+        final View followWidget = findViewById(R.id.follow_widget);
+        eventGridView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+//                followWidget.setY(followWidget.getY() - dy);
+            }
+        });
+    }
+
+    @Override
+    protected void updateContentViewLayout(int top) {
+        eventGridView.setPadding(eventGridView.getPaddingLeft(), top,
+            eventGridView.getPaddingRight(), eventGridView.getPaddingBottom());
+        //swipeRefreshLayout.setProgressViewOffset(false, top, top + 100);
+        eventGridView.smoothScrollToPosition(0);
     }
 
     @Override
