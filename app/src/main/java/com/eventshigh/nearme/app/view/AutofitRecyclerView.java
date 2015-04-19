@@ -5,14 +5,10 @@ import android.content.res.TypedArray;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.ViewGroup;
 
 public class AutofitRecyclerView extends RecyclerView {
     private GridLayoutManager gridLayoutManager;
     private int columnWidth;
-//    private GestureDetector gestureDetector;
 
     public AutofitRecyclerView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -53,26 +49,4 @@ public class AutofitRecyclerView extends RecyclerView {
         array.recycle();
         return value;
     }
-
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        System.out.println("------------> cc " + event.getAction());
-//        if (gestureDetector != null) {
-//            gestureDetector.onTouchEvent(event);
-//        }
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onInterceptTouchEvent(MotionEvent event) {
-//        System.out.println("------------> dd " + event.getAction());
-//        if (gestureDetector != null) {
-//            gestureDetector.onTouchEvent(event);
-//        }
-//        return true;
-//    }
-//
-//    public void setGestureDetector(GestureDetector gestureDetector) {
-//        this.gestureDetector = gestureDetector;
-//    }
 }

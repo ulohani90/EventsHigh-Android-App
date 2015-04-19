@@ -90,7 +90,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // ***********************
 
     // UI elements.
-    private Toolbar toolbar;
+    protected Toolbar toolbar;
     protected ViewSwitcher viewSwitcher;
     private View topProgressBar;
     private SlidingTabLayout dateFilter;
@@ -140,32 +140,15 @@ public abstract class BaseEventsActivity extends BaseActivity {
             new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    viewSwitcher.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            View viewPagerSpace = findViewById(R.id.view_pager_space);
-                            System.out.println("------------> " + viewPagerSpace.getTop());
-                            updateContentViewLayout(viewPagerSpace.getTop());
-                        }
-                    });
+                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                        viewSwitcher.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    } else {
+                        viewSwitcher.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    }
+                    View viewPagerSpace = findViewById(R.id.view_pager_space);
+                    updateContentViewLayout(viewPagerSpace.getTop());
                 }
             });
-
-//        viewSwitcher.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-//            @Override
-//            public void onLayoutChange(View v, int left, int top, int right, int bottom,
-//                int oldLeft, int oldTop, int oldRight, int oldBottom) {
-//                viewSwitcher.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        View viewPagerSpace = findViewById(R.id.view_pager_space);
-//                        System.out.println("------------> " + viewPagerSpace.getTop());
-//                        updateContentViewLayout(viewPagerSpace.getTop());
-//                    }
-//                });
-//            }
-//        });
-
 
         // Setup My Events Clue
         myEventsClueView.setOnClickListener(new OnClickListener() {

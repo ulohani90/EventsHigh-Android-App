@@ -78,7 +78,7 @@
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:textColor="#FFFFFFFF"
-                    android:textSize="24sp"
+                    android:textSize="20sp"
                     tools:text="Music" />
 
                 <TextView

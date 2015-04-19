@@ -9,6 +9,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toolbar;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.Listener;
@@ -18,6 +20,8 @@ import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.OffersRequest;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -61,7 +65,12 @@ public class EventsGridActivity extends BaseEventsActivity {
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
 
+        setupScrollListener();
+    }
+
+    private void setupScrollListener() {
         final View followWidget = findViewById(R.id.follow_widget);
+        final TextView followWidgetTitle = (TextView) findViewById(R.id.follow_title);
         eventGridView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -71,7 +80,29 @@ public class EventsGridActivity extends BaseEventsActivity {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-//                followWidget.setY(followWidget.getY() - dy);
+
+                // Move big toolbar up
+                final int titleOffsetY = (toolbar.getBottom() - followWidgetTitle.getBottom()
+                    - Utils.dpToPx(EventsGridActivity.this, 16));
+                float newY = followWidget.getY() - dy;
+                followWidget.setY(newY);
+
+                // Move title to the left.
+                ActionBar actionBar = getSupportActionBar();
+                if (newY > titleOffsetY) {
+                    float toolbarTitleX = Utils.dpToPx(EventsGridActivity.this, 60);
+                    float bigToolbarTitleX = followWidgetTitle.getLeft();
+                    float titleOffsetX = bigToolbarTitleX - toolbarTitleX;
+                    toolbarTitleX = toolbarTitleX + titleOffsetX * (titleOffsetY - newY) / titleOffsetY;
+                    followWidgetTitle.setX(toolbarTitleX);
+                    actionBar.setTitle("");
+                    followWidgetTitle.setVisibility(View.VISIBLE);
+                } else {
+                    actionBar.setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
+                    followWidgetTitle.setVisibility(View.INVISIBLE);
+                }
+
+                System.out.println("----------> " + titleOffsetY + "   " + newY + "   ");
             }
         });
     }
@@ -80,7 +111,8 @@ public class EventsGridActivity extends BaseEventsActivity {
     protected void updateContentViewLayout(int top) {
         eventGridView.setPadding(eventGridView.getPaddingLeft(), top,
             eventGridView.getPaddingRight(), eventGridView.getPaddingBottom());
-        //swipeRefreshLayout.setProgressViewOffset(false, top, top + 100);
+        swipeRefreshLayout.setProgressViewOffset(false, top - Utils.dpToPx(this, 30),
+            top + Utils.dpToPx(this, 30));
         eventGridView.smoothScrollToPosition(0);
     }
 
