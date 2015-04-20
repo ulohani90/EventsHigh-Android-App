@@ -23,6 +23,7 @@ import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.LocationUtils;
@@ -94,6 +95,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         notifyDataSetChanged();
     }
 
+    public void addFollowCard(String title) {
+        dataToShow.add(0, new FollowData(title));
+    }
+
     @Override
     public int getItemViewType(int position) {
         return dataToShow.get(position).getType().typeId;
@@ -147,7 +152,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private enum DataType {
         HEADER(0),
         EVENT(1),
-        OFFER(2);
+        OFFER(2),
+        FOLLOW(3);
 
         public final int typeId;
         DataType (int typeId) {
@@ -165,6 +171,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             if (typeId == OFFER.typeId) {
                 return OfferCard.newInstance(activity, parent);
+            }
+
+            if (typeId == FOLLOW.typeId) {
+                return FollowCard.newInstance(activity, parent);
             }
 
             throw new IllegalArgumentException("invalid typeid");
@@ -407,7 +417,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private class OfferData implements Data {
         private final Offer offer;
 
-        private OfferData(Offer offer) {
+        private OfferData(com.eventshigh.nearme.app.data.Offer offer) {
             this.offer = offer;
         }
 
@@ -423,7 +433,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public String getId() {
-            return getType().toString();
+            return offer.id;
         }
     }
 
@@ -437,6 +447,80 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         public OfferCard(View itemView) {
             super(itemView);
+        }
+    }
+
+
+    private class FollowData implements Data {
+        private final String title;
+
+        private FollowData(String title) {
+            this.title = title;
+        }
+
+        @Override
+        public DataType getType() {
+            return DataType.FOLLOW;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder card, int position) {
+            ((FollowCard) card).populate(this, activity);
+        }
+
+        @Override
+        public String getId() {
+            return title;
+        }
+    }
+
+    static class FollowCard extends ViewHolder {
+        private TextView titleView;
+        private View followButton;
+        private View followingButton;
+
+        static FollowCard newInstance(final BaseActivity activity, ViewGroup parent) {
+            View view = activity.getLayoutInflater().inflate(R.layout.follow_card, parent, false);
+            return new FollowCard(view);
+        }
+
+        public FollowCard(View itemView) {
+            super(itemView);
+
+            titleView = (TextView) itemView.findViewById(R.id.title);
+            followButton = itemView.findViewById(R.id.follow_button);
+            followingButton = itemView.findViewById(R.id.following_button);
+        }
+
+        public void populate(final FollowData data, final BaseEventsActivity activity) {
+            titleView.setText(data.title);
+
+            final Account account = new Account(activity);
+            setFollowButtons(account.isFollowing(data.title));
+            followButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.reportActionToAnalytics("addFollowing", data.title);
+                    account.setIsFollowing(data.title, true);
+                    setFollowButtons(true);
+                    activity.showMyEventsClue(null);
+                }
+            });
+            followingButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.reportActionToAnalytics("removeFollowing", data.title);
+                    account.setIsFollowing(data.title, false);
+                    setFollowButtons(false);
+                    activity.hideMyEventsClue();
+                }
+            });
+        }
+
+        public void setFollowButtons(boolean isFollowing) {
+            followButton.setVisibility(isFollowing ? View.GONE : View.VISIBLE);
+            followingButton.setVisibility(isFollowing ? View.VISIBLE : View.GONE);
+            followingButton.setSelected(true);
         }
     }
 }

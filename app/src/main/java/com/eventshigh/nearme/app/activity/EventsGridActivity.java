@@ -14,6 +14,7 @@ import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.OffersRequest;
 import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -29,6 +30,7 @@ public class EventsGridActivity extends BaseEventsActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
     private AutofitRecyclerView eventGridView;
     private EventsAdapter eventsAdapter;
+    private boolean showFollowCard;
 
     // ***********************
     // Delegated Methods from {@link BaseEventsActivity}
@@ -56,6 +58,11 @@ public class EventsGridActivity extends BaseEventsActivity {
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
 
+        // Should we show follow widget?
+        showFollowCard = !eventsContext.query.isEmpty() &&
+                !EventsHighEndpoints.isDateQuery(eventsContext.query) &&
+                !EventsHighEndpoints.isMyEventQuery(eventsContext.query) &&
+                !EventsHighEndpoints.isFeaturedEventQuery(eventsContext.query);
     }
 
     @Override
@@ -67,6 +74,9 @@ public class EventsGridActivity extends BaseEventsActivity {
     protected void updateEventsCollection(List<Event> events) {
         super.updateEventsCollection(events);
         eventsAdapter.setEvents(events);
+        if (showFollowCard) {
+            eventsAdapter.addFollowCard(eventsContext.query);
+        }
         eventGridView.scrollToPosition(0);
         OffersRequest.submit(this, Priority.NORMAL, new Listener<Offer>() {
             @Override

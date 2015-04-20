@@ -430,7 +430,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
     }
 
-    private void showMyEventsClue(@Nullable Event event) {
+    public void showMyEventsClue(@Nullable Event event) {
         Preferences preferences = Preferences.getInstance(this);
         boolean showShareTip = EventsHighEndpoints.isMyEventQuery(eventsContext.query) ||
                 (event != null && preferences.getNumTimesMyEventsClueShown() >= MAX_TIMES_TO_SHOW_MY_EVENTS_CLUE);
@@ -454,7 +454,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }, 5000);
     }
 
-    private void hideMyEventsClue() {
+    public void hideMyEventsClue() {
         myEventsClueView.setVisibility(View.GONE);
     }
 

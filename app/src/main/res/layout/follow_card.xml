@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="156dp"
+    android:background="#FFAA66CC"
+>
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="50dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@android:color/white"
+        android:textSize="17sp"
+        android:textAllCaps="true"
+        tools:text="Music"
+    />
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:gravity="center"
+        android:layout_margin="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="#80FFFFFF"
+        android:textSize="12sp"
+        tools:text="39 Events"
+    />
+
+    <TextView
+        android:id="@+id/following_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="14sp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/eh_oval"
+        android:drawableLeft="@drawable/ic_done_white_12dp"
+        android:drawableStart="@drawable/ic_done_white_12dp"
+        android:drawablePadding="4dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:text="@string/ui_following"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:gravity="center"
+    />
+
+    <TextView
+        android:id="@+id/follow_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="14sp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/eh_oval"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:text="@string/ui_follow"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+    />
+</RelativeLayout>
