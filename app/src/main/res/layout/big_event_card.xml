@@ -22,13 +22,6 @@
             tools:background="@color/gray400"
         />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:layout_alignBottom="@+id/event_bg"
-            android:background="#33000000"
-        />
-
         <ImageView
             android:id="@+id/event_recommended"
             android:layout_width="wrap_content"
@@ -58,23 +51,7 @@
         />
 
         <TextView
-            android:id="@+id/num_people_interested"
-            style="@style/EventCardText"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_alignBottom="@+id/event_bg"
-            android:layout_alignRight="@+id/event_bg"
-            android:layout_alignEnd="@+id/event_bg"
-            android:textColor="@android:color/white"
-            android:drawableStart="@drawable/ic_person_white_12dp"
-            android:drawableLeft="@drawable/ic_person_white_12dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp"
-            tools:text="32"
-        />
-
-        <TextView
+            style="?android:attr/textAppearanceMedium"
             android:id="@+id/event_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -87,7 +64,6 @@
             android:layout_marginEnd="48dp"
             android:maxLines="1"
             android:ellipsize="end"
-            android:textSize="14sp"
             android:textColor="#CC000000"
             tools:text="My Awesome Event with a long long title!"
         />
@@ -100,6 +76,7 @@
             android:drawableStart="@drawable/ic_favorite_grey600_24dp"
             android:layout_below="@+id/event_bg"
             android:padding="8dp"
+            android:layout_marginTop="2dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:textColor="#FF595959"
@@ -113,6 +90,7 @@
             android:drawableStart="@drawable/ic_favorite_red_24dp"
             android:layout_below="@+id/event_bg"
             android:padding="8dp"
+            android:layout_marginTop="2dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:textColor="#FF595959"
@@ -131,6 +109,7 @@
             android:layout_marginEnd="48dp"
             android:drawableStart="@drawable/ic_access_time_grey600_12dp"
             android:drawableLeft="@drawable/ic_access_time_grey600_12dp"
+            android:textColor="#A3000000"
             tools:text="Sun, 29 Mar at 8:30 pm"
         />
 
@@ -147,6 +126,7 @@
             android:layout_marginBottom="4dp"
             android:drawableStart="@drawable/ic_location_on_grey600_12dp"
             android:drawableLeft="@drawable/ic_location_on_grey600_12dp"
+            android:textColor="#A3000000"
             tools:text="Jagriti theatre, Whitefield"
         />
 
@@ -162,6 +142,7 @@
             android:layout_marginRight="6dp"
             android:drawableStart="@drawable/ic_local_taxi_grey600_12dp"
             android:drawableLeft="@drawable/ic_local_taxi_grey600_12dp"
+            android:textColor="#A3000000"
             tools:text="30 mins"
         />
     </RelativeLayout>

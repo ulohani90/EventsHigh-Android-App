@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,14 +21,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewSwitcher;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
@@ -48,7 +42,6 @@ import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -91,16 +84,14 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     // UI elements.
     protected Toolbar toolbar;
-    protected ViewSwitcher viewSwitcher;
+    protected FrameLayout eventContainer;
+
     private View topProgressBar;
     private SlidingTabLayout dateFilter;
-    protected FrameLayout eventContainer;
-    protected ImageButton fab;
+    private  View noMyEventsView;
+    private View retryView;
     private View myEventsClueView;
     private TextView myEventsClueTextView;
-
-    protected View followButton;
-    protected View followingButton;
 
     // Last city and query for which events are shown.
     protected EventsContext eventsContext;
@@ -126,29 +117,13 @@ public abstract class BaseEventsActivity extends BaseActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
         dateFilter = (SlidingTabLayout) findViewById(R.id.date_filter);
         topProgressBar = findViewById(R.id.top_progress_bar);
         eventContainer = (FrameLayout) findViewById(R.id.event_container);
-        fab = (ImageButton) findViewById(R.id.fab_switch_view);
-        followButton = findViewById(R.id.follow_button);
-        followingButton = findViewById(R.id.following_button);
         myEventsClueView = findViewById(R.id.my_events_clue);
         myEventsClueTextView = (TextView) myEventsClueView.findViewById(R.id.my_events_clue_text);
-
-        viewSwitcher.getViewTreeObserver().addOnGlobalLayoutListener(
-            new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                        viewSwitcher.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    } else {
-                        viewSwitcher.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                    }
-                    View viewPagerSpace = findViewById(R.id.view_pager_space);
-                    updateContentViewLayout(viewPagerSpace.getTop());
-                }
-            });
+        noMyEventsView = findViewById(R.id.view_no_my_event);
+        retryView = findViewById(R.id.view_retry);
 
         // Setup My Events Clue
         myEventsClueView.setOnClickListener(new OnClickListener() {
@@ -184,64 +159,14 @@ public abstract class BaseEventsActivity extends BaseActivity {
             }
         }
 
-        boolean showFollowScreen = !eventsContext.query.isEmpty() &&
-                !EventsHighEndpoints.isDateQuery(eventsContext.query) &&
-                !EventsHighEndpoints.isMyEventQuery(eventsContext.query) &&
-                !EventsHighEndpoints.isFeaturedEventQuery(eventsContext.query);
-        View followWidget = findViewById(R.id.follow_widget);
-        followWidget.setVisibility(showFollowScreen ? View.VISIBLE : View.GONE);
-        if (showFollowScreen) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(getResources().getColor(R.color.toolbar_big_status));
-            }
-
-            final Account account = new Account(this);
-            TextView followWidgetTitle = (TextView) findViewById(R.id.follow_title);
-            followWidgetTitle.setText(Utils.capitalize(eventsContext.query));
-            setFollowButtons(account.isFollowing(eventsContext.query));
-
-            followButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    reportActionToAnalytics("addFollowing", eventsContext.query);
-                    account.setIsFollowing(eventsContext.query, true);
-                    setFollowButtons(true);
-                    showMyEventsClue(null);
-                }
-            });
-            followingButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    reportActionToAnalytics("removeFollowing", eventsContext.query);
-                    account.setIsFollowing(eventsContext.query, false);
-                    setFollowButtons(false);
-                    hideMyEventsClue();
-                }
-            });
-        } else {
-            toolbar.setBackgroundResource(R.color.primary);
-        }
-
         // Show query as title.
         if (!eventsContext.query.isEmpty()) {
-            if (showFollowScreen) {
-                getSupportActionBar().setTitle("");
-            } else {
-                getSupportActionBar().setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
-            }
+            getSupportActionBar().setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
             eventsContext.dateFilter = "";
         }
 
         // See if date filter is passed.
         showDateFilter();
-    }
-
-    protected void updateContentViewLayout(int top) {
-        viewSwitcher.setPadding(viewSwitcher.getPaddingLeft(), top, viewSwitcher.getPaddingRight(),
-            viewSwitcher.getPaddingBottom());
     }
 
     @Override
@@ -284,9 +209,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Show the verify phone snakbar if needed.
         showVerifyPhoneSnackbar();
-
-        // Set the visibility of fab icon.
-        fab.setVisibility(isPlayServicesPresent ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -328,6 +250,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
         menu.findItem(R.id.action_filter).setVisible(
                 eventsContext.query.isEmpty() || EventsHighEndpoints.isDateQuery(eventsContext.query));
 
+        // Set visibility.
+        menu.findItem(R.id.action_show_map).setVisible(isPlayServicesPresent);
+        menu.findItem(getDisabledMenuItem()).setVisible(false);
+
         return true;
     }
 
@@ -341,6 +267,18 @@ public abstract class BaseEventsActivity extends BaseActivity {
             filterActivityIntent.putStringArrayListExtra(ShowFiltersActivity.PARAM_FILTERS,
                     eventsContext.categoryFilters);
             startActivityForResult(filterActivityIntent, 0);
+            return true;
+        }
+
+        if (id == R.id.action_show_map) {
+            reportActionToAnalytics("switchToMaps");
+            switchTo(EventsMapsActivity.class);
+            return true;
+        }
+
+        if (id == R.id.action_show_list) {
+            reportActionToAnalytics("switchToList");
+            switchTo(EventsGridActivity.class);
             return true;
         }
 
@@ -420,10 +358,9 @@ public abstract class BaseEventsActivity extends BaseActivity {
     protected abstract boolean shouldIncludeWithoutLocation();
 
     /**
-     * Removes an event from view as it was marked as "not interested".
-     * @param event event to remove.
+     * @return the id of menu item to be disabled.
      */
-    protected abstract void remove(Event event);
+    protected abstract int getDisabledMenuItem();
 
 
     // ***********************
@@ -477,7 +414,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
     protected void fetchNewListing(boolean shouldBypassCache) {
         topProgressBar.setVisibility(View.VISIBLE);
-        viewSwitcher.setDisplayedChild(0);
+        noMyEventsView.setVisibility(View.GONE);
+        retryView.setVisibility(View.GONE);
 
         // Stop all requests associated with this activity and then submit new request.
         VolleyHelper.getRequestQueue(this).cancelAll(this);
@@ -548,9 +486,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
                 topProgressBar.setVisibility(View.GONE);
 
                 if (myEvents.isEmpty()) {
-                    viewSwitcher.setDisplayedChild(1);
-                    findViewById(R.id.view_retry).setVisibility(View.GONE);
-                    findViewById(R.id.view_no_my_event).setVisibility(View.VISIBLE);
+                    retryView.setVisibility(View.GONE);
+                    noMyEventsView.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -587,9 +524,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
             if (isDataShown) {
                 Toast.makeText(BaseEventsActivity.this, R.string.failed_refresh, Toast.LENGTH_SHORT).show();
             } else {
-                viewSwitcher.setDisplayedChild(1);
-                findViewById(R.id.view_retry).setVisibility(View.VISIBLE);
-                findViewById(R.id.view_no_my_event).setVisibility(View.GONE);
+                retryView.setVisibility(View.VISIBLE);
+                noMyEventsView.setVisibility(View.GONE);
             }
 
             Throwable cause = volleyError.getCause();
@@ -719,11 +655,5 @@ public abstract class BaseEventsActivity extends BaseActivity {
             calendar.add(Calendar.DAY_OF_MONTH, position);
             return calendar;
         }
-    }
-
-    private void setFollowButtons(boolean isFollowing) {
-        followButton.setVisibility(isFollowing ? View.GONE : View.VISIBLE);
-        followingButton.setVisibility(isFollowing ? View.VISIBLE : View.GONE);
-        followingButton.setSelected(true);
     }
 }

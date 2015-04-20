@@ -24,6 +24,8 @@
     <string name="action_direction">Directions</string>
     <string name="action_calendar">Save</string>
     <string name="action_ama">Help</string>
+    <string name="action_show_map">Show on map</string>
+    <string name="action_show_list">Show as list</string>
 
     <!-- Menu items -->
     <string name="menu_edit_location">Change Location</string>

@@ -3,138 +3,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".activity.EventsGridActivity">
-
-    <ViewSwitcher
-        android:id="@+id/view_switcher"
+    tools:context=".activity.EventsGridActivity"
+>
+    <include
+        android:id="@+id/view_no_my_event"
+        layout="@layout/view_no_my_event"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="gone"
+    />
 
-        <FrameLayout
-            android:id="@+id/event_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <ImageButton
-                android:id="@+id/fab_switch_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="16dp"
-                android:background="@drawable/selector_fab"
-                android:elevation="4dp"
-                android:onClick="onSwitchView"
-                android:padding="16dp"
-                android:src="@drawable/ic_place_white_36dp"
-                tools:ignore="UnusedAttribute" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <include
-                android:id="@+id/view_no_my_event"
-                layout="@layout/view_no_my_event"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-            <include
-                android:id="@+id/view_retry"
-                layout="@layout/view_retry"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </FrameLayout>
-    </ViewSwitcher>
+    <include
+        android:id="@+id/view_retry"
+        layout="@layout/view_retry"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+    />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <FrameLayout
+        android:orientation="vertical"
+    >
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:id="@+id/follow_widget"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:background="@color/toolbar_big"
-                android:elevation="8dp"
-                android:orientation="vertical"
-                android:paddingBottom="16dp"
-                android:paddingTop="36dp"
-                tools:ignore="UnusedAttribute">
-
-                <TextView
-                    android:id="@+id/follow_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="8dp"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:textColor="#FFFFFFFF"
-                    android:textSize="@dimen/big_toolbar_title_font_size"
-                    tools:text="Music" />
-
-                <TextView
-                    android:id="@+id/follow_subtitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="16dp"
-                    android:layout_marginTop="4dp"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:textColor="#FFFFFFFF"
-                    android:textSize="14sp"
-                    tools:text="39 Events" />
-
-                <TextView
-                    android:id="@+id/following_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@drawable/eh_oval"
-                    android:drawableLeft="@drawable/ic_done_white_12dp"
-                    android:drawablePadding="4dp"
-                    android:drawableStart="@drawable/ic_done_white_12dp"
-                    android:paddingBottom="8dp"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
-                    android:paddingTop="8dp"
-                    android:text="@string/ui_following"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/follow_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@drawable/eh_oval"
-                    android:drawablePadding="4dp"
-                    android:paddingBottom="8dp"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
-                    android:paddingTop="8dp"
-                    android:text="@string/ui_follow"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <include
-                android:id="@+id/toolbar"
-                layout="@layout/toolbar_big"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </FrameLayout>
+            android:layout_height="wrap_content"
+        />
 
         <com.example.android.common.view.SlidingTabLayout
             android:id="@+id/date_filter"
@@ -142,7 +39,8 @@
             android:layout_height="wrap_content"
             android:background="#FBFBFB"
             android:elevation="8dp"
-            tools:ignore="UnusedAttribute" />
+            tools:ignore="UnusedAttribute"
+        />
 
         <ProgressBar
             android:id="@+id/top_progress_bar"
@@ -151,29 +49,34 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="-4dp"
             android:layout_marginTop="-4dp"
-            android:indeterminate="true" />
+            android:indeterminate="true"
+        />
 
-        <View
-            android:id="@+id/view_pager_space"
+        <FrameLayout
+            android:id="@+id/event_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@android:color/transparent" />
+            android:background="@android:color/transparent"
+        />
 
         <include
             android:id="@+id/verify_phone_container"
             layout="@layout/view_phone_snack_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:visibility="visible"
+        />
 
         <RelativeLayout
             android:id="@+id/my_events_clue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/eh_button_cta"
-            android:visibility="gone">
-
+            android:visibility="gone"
+            tools:visibility="visible"
+        >
             <ImageView
                 android:id="@+id/my_events_cup"
                 android:layout_width="wrap_content"
@@ -181,8 +84,8 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_margin="8dp"
-                android:src="@drawable/eh_myevents" />
-
+                android:src="@drawable/eh_myevents"
+            />
             <TextView
                 android:id="@+id/my_events_clue_text"
                 style="?android:attr/textAppearanceSmall"
@@ -194,8 +97,8 @@
                 android:layout_toRightOf="@+id/my_events_cup"
                 android:layout_toStartOf="@+id/my_events_clue_close"
                 android:text="@string/ui_my_events_clue"
-                android:textColor="@android:color/white" />
-
+                android:textColor="@android:color/white"
+            />
             <ImageButton
                 android:id="@+id/my_events_clue_close"
                 android:layout_width="24dp"
@@ -204,9 +107,9 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:background="@drawable/button_transparent_dark"
-                android:src="@android:drawable/ic_menu_close_clear_cancel" />
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+            />
         </RelativeLayout>
     </LinearLayout>
-
 </FrameLayout>
 

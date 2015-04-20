@@ -84,7 +84,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
         setupGestureDetectorIfNeeded();
 
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
-        fab.setImageResource(R.drawable.ic_list_white_36dp);
     }
 
     @Override
@@ -141,10 +140,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
         );
     }
 
-    @Override
-    protected void remove(Event event) {
-        mapMarkerManager.removeEvent(event.id);
-        mOnMapClickListener.onMapClick(null);
+    protected  int getDisabledMenuItem() {
+        return R.id.action_show_map;
     }
 
 
@@ -237,14 +234,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
                         return gestureDetector.onTouchEvent(event);
                     }
                 });
-        eventView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom,
-                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                v.removeOnLayoutChangeListener(this);
-                fab.animate().translationY(-v.getHeight()).setDuration(300).start();
-            }
-        });
         eventCardContainer.removeAllViews();
         eventCardContainer.addView(eventView);
     }
@@ -296,7 +285,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
             if (view.getVisibility() == View.VISIBLE) {
                 fabTranslateY = -view.getHeight();
             }
-            fab.animate().translationY(fabTranslateY).setDuration(300).start();
         }
     };
 
@@ -317,9 +305,4 @@ public class EventsMapsActivity extends BaseEventsActivity {
             showEventDetails(mapMarkerManager.getEvent(marker), 0);
         }
     };
-
-    // Called when fab icon is pressed
-    public void onSwitchView(View view) {
-        switchTo(EventsGridActivity.class);
-    }
 }

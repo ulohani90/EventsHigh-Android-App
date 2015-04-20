@@ -31,7 +31,6 @@ import com.eventshigh.nearme.app.utils.Utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,21 +59,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         dataToShow = new ArrayList<>();
         setHasStableIds(true);
-    }
-
-    public void removeEvent(Event event) {
-        boolean changed = false;
-        for (Iterator<Data> it =  dataToShow.iterator(); it.hasNext(); ) {
-            Data data = it.next();
-            if (data instanceof EventData &&
-                event.id.equals(((EventData) data).event.id)) {
-                it.remove();
-                changed = true;
-            }
-        }
-        if (changed) {
-            notifyDataSetChanged();
-        }
     }
 
     public void setEvents(List<Event> events) {
