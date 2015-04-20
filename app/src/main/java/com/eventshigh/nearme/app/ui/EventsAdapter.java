@@ -361,11 +361,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             // Set num people interested.
-            if (event.numPeopleInterested <= 0) {
-                numPeopleInterestedView.setVisibility(View.INVISIBLE);
-            } else {
-                numPeopleInterestedView.setVisibility(View.VISIBLE);
-                numPeopleInterestedView.setText(Integer.toString(event.numPeopleInterested));
+            if (numPeopleInterestedView != null) {
+                if (event.numPeopleInterested <= 0) {
+                    numPeopleInterestedView.setVisibility(View.INVISIBLE);
+                } else {
+                    numPeopleInterestedView.setVisibility(View.VISIBLE);
+                    numPeopleInterestedView.setText(Integer.toString(event.numPeopleInterested));
+                }
             }
 
             // Offer ?
