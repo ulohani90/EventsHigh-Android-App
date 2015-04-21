@@ -149,6 +149,9 @@ public class LaunchActivity extends BaseActivity {
 
         // Process the incoming intent.
         eventsContext = IntentUtils.processIntent(this, getIntent());
+        if (isFinishing()) {
+            return;
+        }
 
         // Setup the weekly alarms which are used for notification.
         AlarmUtils.setWeeklyAlarms(this);
@@ -156,6 +159,10 @@ public class LaunchActivity extends BaseActivity {
 
     public void onStart() {
         super.onStart();
+
+        if (isFinishing()) {
+            return;
+        }
 
         // Register with GCM if needed. GCM is used for notifications messages.
         if (isPlayServicesPresent) {

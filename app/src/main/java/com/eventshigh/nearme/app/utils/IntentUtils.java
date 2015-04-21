@@ -152,6 +152,7 @@ public class IntentUtils {
 
     private void processDetailViewIntent(Uri webUri) {
         activity.showEventDetails(webUri);
+        activity.finish();
     }
 
     public static void processContestViewIntent(Context context, Uri webUri, @Nullable String title) {
