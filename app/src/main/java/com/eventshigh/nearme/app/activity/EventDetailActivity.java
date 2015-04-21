@@ -49,6 +49,7 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -56,6 +57,7 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
@@ -189,7 +191,7 @@ public class EventDetailActivity extends BaseActivity {
 
     public void save(View view) {
         showRateAppDialog = true;
-        reportEventAction(event, "addToCalendar");
+        reportEventAction(event, "addToCalendar" + (view instanceof TextView ? "" : "2"));
 
         addToCalendar(event, null);
     }
@@ -207,7 +209,7 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         showRateAppDialog = true;
-        reportEventAction(event, "callOrganizer");
+        reportEventAction(event, "callOrganizer" + (view instanceof TextView ? "2" : ""));
 
         Intent intent = new Intent(Intent.ACTION_DIAL)
                 .setData(Uri.parse("tel:" + (event.organizerPhone.split(",")[0])));
@@ -321,7 +323,10 @@ public class EventDetailActivity extends BaseActivity {
     public void ama(View view) {
         reportEventAction(event, "ama");
 
-        askOverEmail("support@eventshigh.com");
+        ZendeskUtils.initZendesk(this);
+        ZendeskUtils.setEventFeedbackConfiguration(this, event);
+        Intent feedbackIntent = new Intent(this, ContactZendeskActivity.class);
+        startActivity(feedbackIntent);
     }
 
     public void shareEvent(View view) {
@@ -381,6 +386,7 @@ public class EventDetailActivity extends BaseActivity {
         Intent sendIntent = new Intent(
                 Intent.ACTION_SENDTO,
                 Uri.parse("mailto:" + emailAddress + "?subject=Need%20More%20Info"));
+        sendIntent.putExtra(Intent.EXTRA_CC, "support@eventshigh.com");
         sendIntent.putExtra(Intent.EXTRA_TEXT, "Event: " + event.getEventDetailsURI() +
                 "\n\nQuestion:\n<please type in your query here>");
         try {

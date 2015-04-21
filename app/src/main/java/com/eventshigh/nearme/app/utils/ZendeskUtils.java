@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.utils;
 import android.content.Context;
 
 import com.eventshigh.nearme.app.BuildConfig;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.user.Account;
 import com.zendesk.sdk.feedback.impl.BaseZendeskFeedbackConfiguration;
 import com.zendesk.sdk.logger.Logger;
@@ -37,6 +38,10 @@ public class ZendeskUtils {
         ZendeskConfig.INSTANCE.setContactConfiguration(new FeedbackConfiguration(context));
     }
 
+    public static void setEventFeedbackConfiguration(Context context, Event event) {
+        ZendeskConfig.INSTANCE.setContactConfiguration(new EventFeedbackConfiguration(context, event));
+    }
+
     public static class FeedbackConfiguration extends BaseZendeskFeedbackConfiguration {
         private final Context context;
 
@@ -57,6 +62,26 @@ public class ZendeskUtils {
                 tags.add(phoneNo);
             }
             return tags;
+        }
+    }
+
+    public static class EventFeedbackConfiguration  extends FeedbackConfiguration {
+        private final Event event;
+
+        public EventFeedbackConfiguration(Context context, Event event) {
+            super(context);
+
+            this.event = event;
+        }
+
+        @Override
+        public String getRequestSubject() {
+            return "Event Query: " + event.title;
+        }
+
+        @Override
+        public String getAdditionalInfo() {
+            return event.getEventDetailsURI().toString();
         }
     }
 }
