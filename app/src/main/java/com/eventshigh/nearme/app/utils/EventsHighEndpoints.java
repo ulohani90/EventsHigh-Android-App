@@ -31,7 +31,7 @@ public class EventsHighEndpoints {
   private static final String API_TAGS_SUGGEST_URL =
       "https://s3-ap-southeast-1.amazonaws.com/ehautocomplete/autocomplete_tags.json";
 
-    public static final String QUERY_MY_EVENT = "my favourites";
+    public static final String QUERY_MY_EVENT = "my events";
     public static final String QUERY_FEATURED = "editor's picks";
     public static final String QUERY_WEEKEND = "this weekend";
 

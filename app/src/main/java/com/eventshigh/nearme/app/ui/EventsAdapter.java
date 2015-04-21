@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -289,7 +288,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView numPeopleInterestedView;
         private final View favouriteView;
         private final View favouritedView;
-        private final FrameLayout shareView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
             View view = activity.getLayoutInflater().inflate(
@@ -311,7 +309,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
             favouriteView = cardView.findViewById(R.id.action_favourite);
             favouritedView = cardView.findViewById(R.id.action_favourited);
-            shareView = (FrameLayout) cardView.findViewById(R.id.share);
         }
 
         public void setFavouriteView(@Nullable EventMark eventMark) {
@@ -390,31 +387,24 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             offerView.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
 
             // Set actions handlers.
-            setFavouriteView(activity.getEventMark(event));
-            favouriteView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.reportEventAction(event, "addFavourite", position);
-                    activity.recordEventMark(event, EventMark.FAVOURITE);
-                    setFavouriteView(EventMark.FAVOURITE);
-                }
-            });
-
-            favouritedView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.reportEventAction(event, "removeFavourite", position);
-                    activity.recordEventMark(event, null);
-                    setFavouriteView(null);
-                }
-            });
-
-            if (shareView != null) {
-                shareView.setOnClickListener(new OnClickListener() {
+            if (favouriteView != null) {
+                setFavouriteView(activity.getEventMark(event));
+                favouriteView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        activity.shareEvent(event);
+                        activity.reportEventAction(event, "addFavourite", position);
+                        activity.recordEventMark(event, EventMark.FAVOURITE);
+                        setFavouriteView(EventMark.FAVOURITE);
                     }
+                });
+
+                favouritedView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        activity.reportEventAction(event, "removeFavourite", position);
+                        activity.recordEventMark(event, null);
+                        setFavouriteView(null);
+                        }
                 });
             }
         }
