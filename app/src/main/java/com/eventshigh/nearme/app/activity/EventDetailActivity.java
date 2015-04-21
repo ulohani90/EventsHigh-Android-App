@@ -60,6 +60,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
@@ -381,27 +382,20 @@ public class EventDetailActivity extends BaseActivity {
         }
     };
 
-
     private void askOverEmail() {
-        Intent sendIntent = new Intent(
-                Intent.ACTION_SENDTO,
-                Uri.parse("mailto:" + event.organizerEmail + "?subject=Need%20More%20Info"));
-        sendIntent.putExtra(Intent.EXTRA_CC, "support@eventshigh.com");
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "Event: " + event.getEventDetailsURI() +
-                "\n\nQuestion:\n<please type in your query here>");
-        startActivitySafe(sendIntent);
-    }
-
-    private void askOverEmail2() {
-        Uri sendTo = Uri.parse("mailto:" + event.organizerEmail);
-        sendTo = sendTo.buildUpon().appendQueryParameter(
-                "subject", "[Via EventsHigh] Query for Event: " + event.title).build();
-        Intent sendIntent = new Intent(Intent.ACTION_SENDTO, sendTo);
-        sendIntent.putExtra(Intent.EXTRA_EMAIL, event.organizerEmail);
-        sendIntent.putExtra(Intent.EXTRA_CC, "support@eventshigh.com");
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "Event Url: " + event.getEventDetailsURI() +
-                "\n\nQuery:\n<please type in your question here>");
-        startActivitySafe(sendIntent);
+        try {
+            int pos = event.title.indexOf(' ', 30);
+            String title = pos == -1 ? event.title : event.title.substring(0, pos) + " ...";
+            Uri sendTo = Uri.parse("mailto:" + event.organizerEmail +
+                    "?cc=support@eventshigh.com&subject=" +
+                    URLEncoder.encode("Event Query: " + title, "UTF-8"));
+            Intent sendIntent = new Intent(Intent.ACTION_SENDTO, sendTo);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, "Event Link: " + event.getEventDetailsURI() +
+                    "\n\nQuery:\n<please type in your question here>");
+            startActivitySafe(sendIntent);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     private class EventCard {
