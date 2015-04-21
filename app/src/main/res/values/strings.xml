@@ -22,7 +22,7 @@
     <string name="action_apply_filter">Apply Filter</string>
     <string name="action_new_feedback">Send New Feedback</string>
     <string name="action_direction">Directions</string>
-    <string name="action_calendar">Save</string>
+    <string name="action_calendar">Calendar</string>
     <string name="action_ama">Help</string>
     <string name="action_show_map">Show on map</string>
     <string name="action_show_list">Show as list</string>
@@ -70,7 +70,7 @@ M    <string name="ui_follow">Follow</string>
     <string name="ui_upcoming_events_msg">See events for your interests!</string>
     <string name="ui_weekend_events">Explore amazing weekend</string>
     <string name="ui_weekend_events_msg">See events happening on this weekend!</string>
-    <string name="ui_my_events_clue">Added to \'My Favourites\'.\nTap to go to \'My Favourites\' now.</string>
+    <string name="ui_my_events_clue">Added to \'My Events\'.\nTap to go to \'My Events\' now.</string>
     <string name="ui_share_event_clue">Like the event? Share it!</string>
 
     <!-- Offer -->

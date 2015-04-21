@@ -16,7 +16,7 @@
             android:data="http://www.eventshigh.com/add_event"
         />
     </Preference>
-    <Preference android:title="@string/pref_title_send_feedback" android:summary="contact@eventshigh.com">
+    <Preference android:title="@string/pref_title_send_feedback" android:summary="support@eventshigh.com">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.FeedbackActivity"

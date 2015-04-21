@@ -32,7 +32,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:scaleType="centerCrop"
-                    tools:layout_height="200dp"
                     android:onClick="imagePreview"
                 />
                 <ImageView
@@ -523,19 +522,20 @@
                     android:textColor="#CC222222"
                     tools:text="Counter Culture"
                 />
-                <TextView
-                    android:id="@+id/organizer_link"
-                    style="@style/EHText"
-                    android:layout_height="wrap_content"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:textColor="@color/link_color"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:onClick="openOrganizerLink"
-                    tools:text="parag@eventshigh.com"
-                />
             </LinearLayout>
+            <TextView
+                android:id="@+id/organizer_link"
+                style="@style/EHText"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
+                android:textColor="@color/link_color"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:onClick="openOrganizerLink"
+                tools:text="parag@eventshigh.com"
+            />
             <LinearLayout
                 android:id="@+id/organizer_email_row"
                 android:layout_width="match_parent"
