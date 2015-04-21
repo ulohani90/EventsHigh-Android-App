@@ -382,18 +382,26 @@ public class EventDetailActivity extends BaseActivity {
     };
 
 
-    private void askOverEmail(String emailAddress) {
+    private void askOverEmail() {
         Intent sendIntent = new Intent(
                 Intent.ACTION_SENDTO,
-                Uri.parse("mailto:" + emailAddress + "?subject=Need%20More%20Info"));
+                Uri.parse("mailto:" + event.organizerEmail + "?subject=Need%20More%20Info"));
         sendIntent.putExtra(Intent.EXTRA_CC, "support@eventshigh.com");
         sendIntent.putExtra(Intent.EXTRA_TEXT, "Event: " + event.getEventDetailsURI() +
                 "\n\nQuestion:\n<please type in your query here>");
-        try {
-            startActivity(sendIntent);
-        } catch (ActivityNotFoundException e) {
-            // No activity to open url. ignore.
-        }
+        startActivitySafe(sendIntent);
+    }
+
+    private void askOverEmail2() {
+        Uri sendTo = Uri.parse("mailto:" + event.organizerEmail);
+        sendTo = sendTo.buildUpon().appendQueryParameter(
+                "subject", "[Via EventsHigh] Query for Event: " + event.title).build();
+        Intent sendIntent = new Intent(Intent.ACTION_SENDTO, sendTo);
+        sendIntent.putExtra(Intent.EXTRA_EMAIL, event.organizerEmail);
+        sendIntent.putExtra(Intent.EXTRA_CC, "support@eventshigh.com");
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "Event Url: " + event.getEventDetailsURI() +
+                "\n\nQuery:\n<please type in your question here>");
+        startActivitySafe(sendIntent);
     }
 
     private class EventCard {
@@ -568,7 +576,7 @@ public class EventDetailActivity extends BaseActivity {
                     @Override
                     public void onClick(View v) {
                         reportEventAction(event, "emailOrganizer");
-                        askOverEmail(event.organizerEmail);
+                        askOverEmail();
                     }
                 });
             }
@@ -693,6 +701,8 @@ public class EventDetailActivity extends BaseActivity {
                 organizerNameView.setText(event.organizerName);
                 if (event.organizerLink != null) {
                     organizerLinkView.setText(event.organizerLink);
+                } else {
+                    organizerLinkView.setVisibility(View.GONE);
                 }
             }
 
@@ -705,7 +715,7 @@ public class EventDetailActivity extends BaseActivity {
                     @Override
                     public void onClick(View v) {
                         reportEventAction(event, "emailOrganizer2");
-                        askOverEmail(event.organizerEmail);
+                        askOverEmail();
                     }
                 });
             }
