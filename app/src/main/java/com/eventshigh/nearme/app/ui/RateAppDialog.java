@@ -1,12 +1,12 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import com.eventshigh.nearme.app.R;
@@ -18,9 +18,6 @@ public class RateAppDialog {
     public static void show(final BaseActivity activity) {
         final SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(activity);
-        if (!sharedPreferences.getBoolean(PREF_SHOW_RATE_APP_DIALOG, true)) {
-            return;
-        }
 
         @SuppressLint("InflateParams")
         View view = activity.getLayoutInflater().inflate(R.layout.dialog_rate_app, null);

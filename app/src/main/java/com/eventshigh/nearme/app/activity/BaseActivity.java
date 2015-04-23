@@ -8,7 +8,7 @@ import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +36,7 @@ import io.fabric.sdk.android.Fabric;
  * Base activity class which does the common things like initialization of Google Analytics.
  * This class also provides some useful functions to be used across other activities.
  */
-public abstract class BaseActivity extends ActionBarActivity {
+public abstract class BaseActivity extends AppCompatActivity {
     private static final String LOG_TAG = BaseActivity.class.getSimpleName();
 
     // This constant defines the app specific intent action for notification.

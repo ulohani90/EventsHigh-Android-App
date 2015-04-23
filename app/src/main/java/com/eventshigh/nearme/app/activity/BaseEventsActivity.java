@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -161,7 +162,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Show query as title.
         if (!eventsContext.query.isEmpty()) {
-            getSupportActionBar().setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
+            }
             eventsContext.dateFilter = "";
         }
 

@@ -1,10 +1,11 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
@@ -127,7 +128,10 @@ public class OffersActivity extends BaseActivity {
 
     private void setOfferView() {
         setContentView(R.layout.activity_offer);
-        getSupportActionBar().setTitle(offer.id);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(offer.id);
+        }
 
         TextView messageView = (TextView) findViewById(R.id.offer_message);
         messageView.setText(offer.message);
