@@ -279,12 +279,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
             }
             lastSelectedMarker = null;
             eventCardContainer.removeAllViews();
-
-            final View view = findViewById(R.id.verify_phone_container);
-            int fabTranslateY = 0;
-            if (view.getVisibility() == View.VISIBLE) {
-                fabTranslateY = -view.getHeight();
-            }
         }
     };
 

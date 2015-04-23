@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.OnScrollListener;
+import android.view.View;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.Listener;
@@ -15,6 +18,7 @@ import com.eventshigh.nearme.app.network.OffersRequest;
 import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -76,7 +80,35 @@ public class EventsGridActivity extends BaseEventsActivity {
         eventsAdapter.setEvents(events);
         if (showFollowCard) {
             eventsAdapter.addFollowCard(eventsContext.query);
+
+            final int invisibleAt = Utils.dpToPx(this, 150);
+            final int visibleAt = Utils.dpToPx(this, 200);
+            if (eventGridView.getSpanCount() == 1) {
+                toolbar.setVisibility(View.GONE);
+
+                eventGridView.setOnScrollListener(new OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                        // do nothings.
+                    }
+
+                    @Override
+                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                        if (toolbar.getVisibility() == View.VISIBLE) {
+                            if (eventGridView.getVerticalOffset() < invisibleAt) {
+                                toolbar.setVisibility(View.GONE);
+                            }
+                        } else {
+                            if (eventGridView.findFirstVisibleItemPosition() > 1 ||
+                                eventGridView.getVerticalOffset() > visibleAt) {
+                                toolbar.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                });
+            }
         }
+
         eventGridView.scrollToPosition(0);
         OffersRequest.submit(this, Priority.NORMAL, new Listener<Offer>() {
             @Override
@@ -96,7 +128,8 @@ public class EventsGridActivity extends BaseEventsActivity {
     protected void updateUserLocation(@Nullable LatLng userLocation) {
         if (userLocation != null) {
             ActionBar actionBar = getSupportActionBar();
-            if (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0) {
+            if (actionBar != null &&
+                (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0)) {
                 new ShowLocalityTask(this, actionBar).execute(userLocation);
             }
         }
