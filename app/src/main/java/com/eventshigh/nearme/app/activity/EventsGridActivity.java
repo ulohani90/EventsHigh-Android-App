@@ -6,6 +6,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.android.volley.Request.Priority;
@@ -67,6 +68,14 @@ public class EventsGridActivity extends BaseEventsActivity {
                 !EventsHighEndpoints.isDateQuery(eventsContext.query) &&
                 !EventsHighEndpoints.isMyEventQuery(eventsContext.query) &&
                 !EventsHighEndpoints.isFeaturedEventQuery(eventsContext.query);
+
+        if (showFollowCard) {
+            // Hide the regular toolbar and show the follow toolbar
+            toolbar.setVisibility(View.GONE);
+            //setSupportActionBar(null);
+            toolbar = (Toolbar) findViewById(R.id.followToolbar);
+            setSupportActionBar(toolbar);
+        }
     }
 
     @Override
@@ -82,31 +91,30 @@ public class EventsGridActivity extends BaseEventsActivity {
             eventsAdapter.addFollowCard(eventsContext.query);
 
             final int invisibleAt = Utils.dpToPx(this, 150);
-            final int visibleAt = Utils.dpToPx(this, 200);
-            if (eventGridView.getSpanCount() == 1) {
-                toolbar.setVisibility(View.GONE);
+            final int visibleAt = Utils.dpToPx(this, 250);
+            toolbar.setVisibility(View.VISIBLE);
+            toolbar.setAlpha(0);
 
-                eventGridView.setOnScrollListener(new OnScrollListener() {
-                    @Override
-                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                        // do nothings.
-                    }
+            eventGridView.setOnScrollListener(new OnScrollListener() {
+                private int y;
 
-                    @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                        if (toolbar.getVisibility() == View.VISIBLE) {
-                            if (eventGridView.getVerticalOffset() < invisibleAt) {
-                                toolbar.setVisibility(View.GONE);
-                            }
-                        } else {
-                            if (eventGridView.findFirstVisibleItemPosition() > 1 ||
-                                eventGridView.getVerticalOffset() > visibleAt) {
-                                toolbar.setVisibility(View.VISIBLE);
-                            }
-                        }
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    // do nothings.
+                }
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    y += dy;
+                    float alpha = ((float) y - invisibleAt) / (visibleAt - invisibleAt);
+                    if (alpha < 0) {
+                        alpha = 0;
+                    } else if (alpha > 1) {
+                        alpha = 1;
                     }
-                });
-            }
+                    toolbar.setAlpha(alpha);
+                }
+            });
         }
 
         eventGridView.scrollToPosition(0);

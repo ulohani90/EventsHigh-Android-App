@@ -117,6 +117,8 @@ public abstract class BaseEventsActivity extends BaseActivity {
         setContentView(R.layout.activity_events);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        // Hide the follow toolbar initially
+        findViewById(R.id.followToolbar).setVisibility(View.GONE);
 
         dateFilter = (SlidingTabLayout) findViewById(R.id.date_filter);
         topProgressBar = findViewById(R.id.top_progress_bar);
