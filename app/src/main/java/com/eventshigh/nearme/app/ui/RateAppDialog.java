@@ -18,6 +18,9 @@ public class RateAppDialog {
     public static void show(final BaseActivity activity) {
         final SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(activity);
+        if (!sharedPreferences.getBoolean(PREF_SHOW_RATE_APP_DIALOG, true)) {
+            return;
+        }
 
         @SuppressLint("InflateParams")
         View view = activity.getLayoutInflater().inflate(R.layout.dialog_rate_app, null);
