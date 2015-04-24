@@ -72,7 +72,6 @@ public class EventsGridActivity extends BaseEventsActivity {
         if (showFollowCard) {
             // Hide the regular toolbar and show the follow toolbar
             toolbar.setVisibility(View.GONE);
-            //setSupportActionBar(null);
             toolbar = (Toolbar) findViewById(R.id.followToolbar);
             setSupportActionBar(toolbar);
         }
