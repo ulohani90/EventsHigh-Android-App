@@ -123,6 +123,7 @@
             android:layout_height="?android:attr/actionBarSize"
             android:background="@color/primary"
             android:elevation="8dp"
+            android:visibility="gone"
             />
 
         <include

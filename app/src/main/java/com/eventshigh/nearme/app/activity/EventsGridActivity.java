@@ -100,6 +100,7 @@ public class EventsGridActivity extends BaseEventsActivity {
             final int visibleAt = Utils.dpToPx(this, 250);
             final View followToolbarBackground = findViewById(R.id.follow_toolbar_background);
             followToolbarBackground.setAlpha(0);
+            followToolbarBackground.setVisibility(View.VISIBLE);
 
             eventGridView.setOnScrollListener(new OnScrollListener() {
                 private int y;
