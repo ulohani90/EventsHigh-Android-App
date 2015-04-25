@@ -117,9 +117,17 @@
             </RelativeLayout>
         </LinearLayout>
 
+        <View
+            android:id="@+id/follow_toolbar_background"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize"
+            android:background="@color/primary"
+            android:elevation="8dp"
+            />
+
         <include
-            android:id="@+id/followToolbar"
-            layout="@layout/toolbar"
+            android:id="@+id/follow_toolbar"
+            layout="@layout/follow_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />

@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -24,6 +25,8 @@ import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
+
+import pl.snowdog.material.ui.ToolbarColorizeHelper;
 
 /**
  * An {@link com.eventshigh.nearme.app.activity.BaseEventsActivity} which shows the events in Grid.
@@ -72,8 +75,12 @@ public class EventsGridActivity extends BaseEventsActivity {
         if (showFollowCard) {
             // Hide the regular toolbar and show the follow toolbar
             toolbar.setVisibility(View.GONE);
-            toolbar = (Toolbar) findViewById(R.id.followToolbar);
+            toolbar = (Toolbar) findViewById(R.id.follow_toolbar);
             setSupportActionBar(toolbar);
+            ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                getResources().getColor(android.R.color.black), this);
+            clearTitleSubTitle();
+            toolbar.setVisibility(View.VISIBLE);
         }
     }
 
@@ -91,8 +98,8 @@ public class EventsGridActivity extends BaseEventsActivity {
 
             final int invisibleAt = Utils.dpToPx(this, 150);
             final int visibleAt = Utils.dpToPx(this, 250);
-            toolbar.setVisibility(View.VISIBLE);
-            toolbar.setAlpha(0);
+            final View followToolbarBackground = findViewById(R.id.follow_toolbar_background);
+            followToolbarBackground.setAlpha(0);
 
             eventGridView.setOnScrollListener(new OnScrollListener() {
                 private int y;
@@ -111,7 +118,20 @@ public class EventsGridActivity extends BaseEventsActivity {
                     } else if (alpha > 1) {
                         alpha = 1;
                     }
-                    toolbar.setAlpha(alpha);
+                    followToolbarBackground.setAlpha(alpha);
+
+                    // Change the color of toolbar icons and text
+                    if (alpha < 0.5) {
+                        ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                            getResources().getColor(android.R.color.black),
+                            EventsGridActivity.this);
+                        clearTitleSubTitle();
+                    } else {
+                        ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                            getResources().getColor(android.R.color.white),
+                            EventsGridActivity.this);
+                        setTitle();
+                    }
                 }
             });
         }
