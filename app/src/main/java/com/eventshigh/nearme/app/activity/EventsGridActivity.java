@@ -43,6 +43,7 @@ public class EventsGridActivity extends BaseEventsActivity {
     private EventsAdapter eventsAdapter;
     private boolean showFollowCard;
     private float toolbarBackgroundAlpha;
+    private boolean searchViewExpanded;
 
     // ***********************
     // Delegated Methods from {@link BaseEventsActivity}
@@ -97,6 +98,7 @@ public class EventsGridActivity extends BaseEventsActivity {
             new MenuItemCompat.OnActionExpandListener() {
                 @Override
                 public boolean onMenuItemActionExpand(MenuItem item) {
+                    searchViewExpanded = true;
                     followToolbarBackground.setAlpha(1);
                     setLightToolbarIcons();
                     return true;
@@ -104,6 +106,7 @@ public class EventsGridActivity extends BaseEventsActivity {
 
                 @Override
                 public boolean onMenuItemActionCollapse(MenuItem item) {
+                    searchViewExpanded = false;
                     applyToolbarColors();
                     return true;
                 }
@@ -179,7 +182,9 @@ public class EventsGridActivity extends BaseEventsActivity {
                     } else if (toolbarBackgroundAlpha > 1) {
                         toolbarBackgroundAlpha = 1;
                     }
-                    applyToolbarColors();
+                    if (!searchViewExpanded) {
+                        applyToolbarColors();
+                    }
                 }
             });
         }
