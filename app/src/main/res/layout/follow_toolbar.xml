@@ -3,6 +3,7 @@
              xmlns:app="http://schemas.android.com/apk/res-auto"
              xmlns:tools="http://schemas.android.com/tools"
     app:theme="@style/EHFollowActionBar"
+    android:background="@android:color/transparent"
     app:subtitleTextAppearance="@style/EHActionBarSubtitle"
     app:navigationContentDescription="@string/abc_action_bar_up_description"
     app:navigationIcon="@drawable/ic_arrow_back_white_24dp"

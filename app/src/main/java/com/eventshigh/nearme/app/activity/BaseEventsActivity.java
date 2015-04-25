@@ -86,6 +86,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // UI elements.
     protected Toolbar toolbar;
     protected FrameLayout eventContainer;
+    protected SearchView searchView;
 
     private View topProgressBar;
     private SlidingTabLayout dateFilter;
@@ -261,7 +262,7 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
         // Search View.
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         // Do not show filterByDate for search.

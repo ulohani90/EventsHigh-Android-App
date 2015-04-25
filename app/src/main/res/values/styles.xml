@@ -13,7 +13,6 @@
         <item name="android:background">@color/primary</item>
     </style>
     <style name="EHFollowActionBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:background">@android:color/transparent</item>
     </style>
     <style name="EHActionBarBig" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:background">@android:color/transparent</item>

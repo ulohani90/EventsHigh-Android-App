@@ -1,13 +1,15 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.android.volley.Request.Priority;
@@ -37,8 +39,10 @@ public class EventsGridActivity extends BaseEventsActivity {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private AutofitRecyclerView eventGridView;
+    private View followToolbarBackground;
     private EventsAdapter eventsAdapter;
     private boolean showFollowCard;
+    private float toolbarBackgroundAlpha;
 
     // ***********************
     // Delegated Methods from {@link BaseEventsActivity}
@@ -77,10 +81,67 @@ public class EventsGridActivity extends BaseEventsActivity {
             toolbar.setVisibility(View.GONE);
             toolbar = (Toolbar) findViewById(R.id.follow_toolbar);
             setSupportActionBar(toolbar);
-            ToolbarColorizeHelper.colorizeToolbar(toolbar,
-                getResources().getColor(android.R.color.black), this);
+            setDarkToolbarIcons();
             clearTitleSubTitle();
             toolbar.setVisibility(View.VISIBLE);
+
+            followToolbarBackground = findViewById(R.id.follow_toolbar_background);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean returnValue = super.onCreateOptionsMenu(menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        MenuItemCompat.setOnActionExpandListener(item,
+            new MenuItemCompat.OnActionExpandListener() {
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    followToolbarBackground.setAlpha(1);
+                    setLightToolbarIcons();
+                    return true;
+                }
+
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    applyToolbarColors();
+                    return true;
+                }
+            });
+
+        return returnValue;
+    }
+
+    private void setDarkToolbarIcons() {
+        toolbar.post(new Runnable() {
+            @Override
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                    getResources().getColor(android.R.color.black), EventsGridActivity.this);
+            }
+        });
+    }
+
+    private void setLightToolbarIcons() {
+        toolbar.post(new Runnable() {
+            @Override
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                    getResources().getColor(android.R.color.white), EventsGridActivity.this);
+            }
+        });
+    }
+
+    private void applyToolbarColors() {
+        followToolbarBackground.setAlpha(toolbarBackgroundAlpha);
+
+        // Change the color of toolbar icons and text
+        if (toolbarBackgroundAlpha < 0.5) {
+            setDarkToolbarIcons();
+            clearTitleSubTitle();
+        } else {
+            setLightToolbarIcons();
+            setTitle();
         }
     }
 
@@ -98,7 +159,6 @@ public class EventsGridActivity extends BaseEventsActivity {
 
             final int invisibleAt = Utils.dpToPx(this, 150);
             final int visibleAt = Utils.dpToPx(this, 250);
-            final View followToolbarBackground = findViewById(R.id.follow_toolbar_background);
             followToolbarBackground.setAlpha(0);
             followToolbarBackground.setVisibility(View.VISIBLE);
 
@@ -113,26 +173,13 @@ public class EventsGridActivity extends BaseEventsActivity {
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                     y += dy;
-                    float alpha = ((float) y - invisibleAt) / (visibleAt - invisibleAt);
-                    if (alpha < 0) {
-                        alpha = 0;
-                    } else if (alpha > 1) {
-                        alpha = 1;
+                    toolbarBackgroundAlpha = ((float) y - invisibleAt) / (visibleAt - invisibleAt);
+                    if (toolbarBackgroundAlpha < 0) {
+                        toolbarBackgroundAlpha = 0;
+                    } else if (toolbarBackgroundAlpha > 1) {
+                        toolbarBackgroundAlpha = 1;
                     }
-                    followToolbarBackground.setAlpha(alpha);
-
-                    // Change the color of toolbar icons and text
-                    if (alpha < 0.5) {
-                        ToolbarColorizeHelper.colorizeToolbar(toolbar,
-                            getResources().getColor(android.R.color.black),
-                            EventsGridActivity.this);
-                        clearTitleSubTitle();
-                    } else {
-                        ToolbarColorizeHelper.colorizeToolbar(toolbar,
-                            getResources().getColor(android.R.color.white),
-                            EventsGridActivity.this);
-                        setTitle();
-                    }
+                    applyToolbarColors();
                 }
             });
         }
