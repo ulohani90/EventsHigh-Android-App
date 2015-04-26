@@ -101,9 +101,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         for (int i = 0; i < myEvents.size(); i++) {
             Pair<String, List<Event>> myEventEntry = myEvents.get(i);
-            dataToShow.add(new HeaderData(myEventEntry.first,
-                    HEADER_BG_RESOURCES[i % HEADER_BG_RESOURCES.length]));
-            dataToShow.add(new EventListData(myEventEntry.first, myEventEntry.second));
+            if (!myEventEntry.second.isEmpty()) {
+                dataToShow.add(new HeaderData(myEventEntry.first,
+                        HEADER_BG_RESOURCES[i % HEADER_BG_RESOURCES.length]));
+                dataToShow.add(new EventListData(myEventEntry.first, myEventEntry.second));
+            }
         }
         notifyDataSetChanged();
     }
