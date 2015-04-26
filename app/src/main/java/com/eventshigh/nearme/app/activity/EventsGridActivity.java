@@ -136,16 +136,19 @@ public class EventsGridActivity extends BaseEventsActivity {
     }
 
     private void applyToolbarColors() {
-        followToolbarBackground.setAlpha(toolbarBackgroundAlpha);
-
         // Change the color of toolbar icons and text
         if (toolbarBackgroundAlpha < 0.5) {
-            setDarkToolbarIcons();
             clearTitleSubTitle();
+            if (followToolbarBackground.getAlpha() >= 0.5) {
+                setDarkToolbarIcons();
+            }
         } else {
-            setLightToolbarIcons();
             setTitle();
+            if (followToolbarBackground.getAlpha() < 0.5) {
+                setLightToolbarIcons();
+            }
         }
+        followToolbarBackground.setAlpha(toolbarBackgroundAlpha);
     }
 
     @Override
