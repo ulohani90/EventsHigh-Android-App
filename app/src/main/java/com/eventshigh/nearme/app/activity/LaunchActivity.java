@@ -5,61 +5,41 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.android.volley.Request.Priority;
-import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.data.Offer;
-import com.eventshigh.nearme.app.network.BaseEventListRequest.EventCollection;
-import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
-import com.eventshigh.nearme.app.network.OffersRequest;
-import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.network.ExploreEventsRequest;
+import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.task.ShowLocalityTask;
 import com.eventshigh.nearme.app.ui.CityListAdapter;
 import com.eventshigh.nearme.app.ui.CityListAdapter.OnCitySelectionListener;
-import com.eventshigh.nearme.app.ui.FailedRetryAdapter;
-import com.eventshigh.nearme.app.ui.FeaturedEventsAdapter;
-import com.eventshigh.nearme.app.ui.LoadingAdapter;
+import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -70,41 +50,15 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.Calendar;
-
 /**
- * A placeholder {@link android.app.Activity} which is responsible for launching
- * either {@link EventsMapsActivity} or {@link EventsGridActivity} based on user preference.
- *
- * For now, this activity sets the preference 50%-50% for first time and then use this
- * preference in future.
+ * Application Main or launch activity.
  */
-public class LaunchActivity extends BaseActivity {
+public class LaunchActivity extends BaseContextActivity {
     // Constants
-    private static final String LOG_TAG = LaunchActivity.class.getSimpleName();
-    private static final int EXPLORE_CARD_WIDTH_DP = 160;
-    private static final int MIN_EXPLORE_CARD_IN_ROW = 2;
-    private static final long REFRESH_FEATURED_EVENTS_INTERVAL = 3600 * 1000L;
-    private static final int MARGIN_DP = android.os.Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP ? 10 : 2;
-    public static final String[] EXPLORE_TAGS = {
-            IntentUtils.QUERY_ALL,
-            EventCategory.MUSIC.categoryName,
-            EventCategory.PARTIES.categoryName,
-            EventCategory.THEATRE.categoryName,
-            EventCategory.KIDS_ENTERTAINMENT.categoryName,
-            EventCategory.TECH.categoryName,
-            EventCategory.SPORTS.categoryName,
-            EventCategory.HEALTH_WELLNESS.categoryName,
-            EventCategory.DANCE.categoryName,
-            EventCategory.ART.categoryName,
-            EventCategory.FOOD.categoryName,
-            EventCategory.LITERATURE.categoryName
-    };
+    private static final long REFRESH_EVENTS_INTERVAL = 3600 * 1000L;
 
     // UI Elements for this activity.
     private ViewSwitcher viewSwitcher;
-    private LinearLayout dotsView;
-    private ViewPager featuredEventsPager;
     private DrawerLayout drawer;
     private ActionBarDrawerToggle drawerToggle;
 
@@ -115,9 +69,8 @@ public class LaunchActivity extends BaseActivity {
     // GCM registration helper.
     private GcmRegistration gcmRegistration;
 
-    // Context for next activity.
-    private EventsContext eventsContext;
-    private EventsContext lastEventsContext;
+    // Adapter used to fill the eventsContainer.
+    private EventsAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,8 +79,27 @@ public class LaunchActivity extends BaseActivity {
         // Set View.
         setContentView(R.layout.activity_launch);
         viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
-        dotsView = (LinearLayout) findViewById(R.id.dots_parent);
-        featuredEventsPager = (ViewPager) findViewById(R.id.featured_events_pager);
+        topProgressBar = findViewById(R.id.top_progress_bar);
+        retryView = findViewById(R.id.view_retry);
+
+        // Set the swipe refresh settings.
+        final SwipeRefreshLayout swipeRefreshLayout =
+                (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setColorSchemeResources(R.color.primary);
+        swipeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                reportActionToAnalytics("swipeRefresh");
+                swipeRefreshLayout.setRefreshing(false);
+                onRetry(null);
+            }
+        });
+
+        // Set the events adapter.
+        RecyclerView eventsContainer = (RecyclerView) findViewById(R.id.event_container);
+        eventsContainer.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new EventsAdapter(this);
+        eventsContainer.setAdapter(adapter);
 
         // Setup the actionbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -137,8 +109,11 @@ public class LaunchActivity extends BaseActivity {
         drawer = (DrawerLayout) findViewById(R.id.nav_drawer);
         drawerToggle = new ActionBarDrawerToggle(this, drawer, R.string.app_name, R.string.title_activity_settings);
         drawer.setDrawerListener(drawerToggle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
 
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
@@ -188,18 +163,9 @@ public class LaunchActivity extends BaseActivity {
             }
         }
 
-        // Redraw the featured events module so that if event was marked as favourite
-        // it will be reflected.
-        PagerAdapter adapter = featuredEventsPager.getAdapter();
-        if (adapter != null) {
-            int currentItem = featuredEventsPager.getCurrentItem();
-            featuredEventsPager.setAdapter(adapter);
-            featuredEventsPager.setCurrentItem(currentItem);
-        }
-
         // Show next screen.
         showVerifyPhoneSnackbar();
-        showNextScreen(false);
+        showNextScreen();
     }
 
     @Override
@@ -254,6 +220,10 @@ public class LaunchActivity extends BaseActivity {
         }
     }
 
+    protected boolean isDataShown() {
+        return adapter.getItemCount() > 0;
+    }
+
 
     // ***********************
     // Callbacks
@@ -263,56 +233,19 @@ public class LaunchActivity extends BaseActivity {
         if (view != null) {
             reportActionToAnalytics("retry");
         }
-        dotsView.removeAllViews();
-        if (featuredEventsPager.getAdapter() == null ||
-            featuredEventsPager.getAdapter() instanceof FailedRetryAdapter) {
-            featuredEventsPager.setAdapter(new LoadingAdapter(this));
-        }
 
-        FeaturedEventsRequest.submit(this, eventsContext, Priority.IMMEDIATE, false, mFeaturedEventsListener,
-                new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(LaunchActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
-                        featuredEventsPager.setAdapter(new FailedRetryAdapter(LaunchActivity.this));
-                    }
-                });
+        topProgressBar.setVisibility(View.VISIBLE);
+        ExploreEventsRequest.submit(this, eventsContext, Priority.IMMEDIATE, false, mListener,
+                mErrorListener);
     }
-
-    public void showToday(View view) {
-        reportActionToAnalytics("showToday");
-        eventsContext.setDateFilter(Calendar.getInstance());
-        showNextScreen(true);
-    }
-
-    public void showTomorrow(View view) {
-        reportActionToAnalytics("showTomorrow");
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        eventsContext.setDateFilter(calendar);
-        showNextScreen(true);
-    }
-
-    public void showThisWeekend(View view) {
-        reportActionToAnalytics("showThisWeekend");
-        Calendar calendar = Calendar.getInstance();
-        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-        if (dayOfWeek > Calendar.SUNDAY && dayOfWeek < Calendar.FRIDAY) {
-            calendar.add(Calendar.DAY_OF_MONTH, Calendar.FRIDAY - dayOfWeek);
-        }
-        eventsContext.setDateFilter(calendar);
-        showNextScreen(true);
-    }
-
 
     public void showSearchView(String query) {
-        eventsContext.query = query.toLowerCase();
-        showNextScreen(true);
+        reportActionToAnalytics("showSearchView", query);
+        launch(new EventsContext(eventsContext.location, query.toLowerCase()));
     }
 
-    // Callback for GoogleClientApi. This is called when googleClientApi is
-    // ready to accept requests. We set the user location if needed and start
-    // next activity.
+    // Callback for GoogleClientApi. This is called when googleClientApi is ready to accept
+    // requests. We set the user location if needed and start next activity.
     private ConnectionCallbacks mConnectionCallbacks = new ConnectionCallbacks() {
         @Override
         public void onConnected(Bundle bundle) {
@@ -352,7 +285,7 @@ public class LaunchActivity extends BaseActivity {
 
             // If we have user location, start next activity.
             if (eventsContext.city != null) {
-                showNextScreen(false);
+                showNextScreen();
                 return;
             }
 
@@ -368,10 +301,29 @@ public class LaunchActivity extends BaseActivity {
         }
     };
 
+    private Listener<MyEvents> mListener = new Listener<MyEvents>() {
+        @Override
+        public void onResponse(MyEvents events, boolean isIntermediate) {
+            if (!isIntermediate) {
+                topProgressBar.setVisibility(View.GONE);
+            }
+            retryView.setVisibility(View.GONE);
+            lastFetchTimestamp = System.currentTimeMillis();
+            adapter.setExploreEvents(events);
+        }
+    };
+
 
     // ***********************
     // Helper methods
     // ***********************
+
+    private long lastFetchTimestamp = 0;
+    private void refreshIfOldData() {
+        if (lastFetchTimestamp + REFRESH_EVENTS_INTERVAL < System.currentTimeMillis()) {
+            onRetry(null);
+        }
+    }
 
     private void askUserForLocation() {
         reportActionToAnalytics("askUserForLocation");
@@ -380,19 +332,19 @@ public class LaunchActivity extends BaseActivity {
         new LocationPickerDialog().show(this, countryCode, new OnLocationSelection() {
             @Override
             public void onLocationSelection(String locationString, LatLng locationPoint) {
-                getSupportActionBar().setSubtitle(locationString);
+                ActionBar actionBar = getSupportActionBar();
+                if (actionBar != null) {
+                    actionBar.setSubtitle(locationString);
+                }
                 eventsContext.changeLocation(locationPoint);
-                lastEventsContext.changeLocation(locationPoint);
-                featuredEventsPager.setAdapter(new LoadingAdapter(LaunchActivity.this));
                 onRetry(null);
             }
         });
     }
 
-    private void showNextScreen(boolean isUserAction) {
+    private void showNextScreen() {
         // If we do not have user city, use GoogleLocation api to get user location.
         if (eventsContext.city == null) {
-            lastEventsContext = new EventsContext(eventsContext);
             client = new GoogleApiClient.Builder(this)
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(mConnectionCallbacks)
@@ -403,225 +355,38 @@ public class LaunchActivity extends BaseActivity {
         }
 
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0) {
+        if (actionBar != null &&
+            (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0)) {
             new ShowLocalityTask(this, actionBar).execute(eventsContext.location);
         }
 
         // If we do not have query, show explore screen.
-        if (!isUserAction && eventsContext.query.isEmpty() && eventsContext.dateFilter.isEmpty()) {
-            lastEventsContext = new EventsContext(eventsContext);
-            showExploreScreen();
-            return;
-        }
-
-        // Launch the target activity.
-        Intent outIntent = new Intent(this, EventsGridActivity.class);
-        outIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
-        if (lastEventsContext != null) {
-            eventsContext = lastEventsContext;
-        }
-
-        startActivity(outIntent);
-        if (!isUserAction) {
+        if (eventsContext.query.isEmpty() && eventsContext.dateFilter.isEmpty()) {
+            refreshIfOldData();
+        } else {
+            launch(eventsContext);
             finish();
         }
     }
 
-    private long exploreScreenPopulatedTimestamp = 0;
-    private LinearLayout[] featuredCatLayouts;
-    private LayoutParams exploreCardLP;
-    private int numColumns;
-    private View featuredCatHeader;
+    // Launch the target activity.
+    private void launch(EventsContext eventsContext) {
+        Intent outIntent = new Intent(this, EventsGridActivity.class);
+        outIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
 
-    private void showExploreScreen() {
-        viewSwitcher.setDisplayedChild(0);
-
-        if (exploreScreenPopulatedTimestamp == 0) {
-            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-
-            FrameLayout.LayoutParams param = (FrameLayout.LayoutParams) featuredEventsPager.getLayoutParams();
-            param.height = Math.min(displayMetrics.heightPixels, 9 * displayMetrics.widthPixels / 16);
-            featuredEventsPager.setLayoutParams(param);
-
-            int spacing = Utils.dpToPx(this, MARGIN_DP);
-            int widthPixels = displayMetrics.widthPixels;
-            numColumns = Math.max(MIN_EXPLORE_CARD_IN_ROW,
-                    (widthPixels - spacing * 2) / Utils.dpToPx(this, EXPLORE_CARD_WIDTH_DP));
-
-            int size = (widthPixels - spacing * (numColumns + 1)) / numColumns;
-            exploreCardLP = new LayoutParams(size, size);
-            exploreCardLP.setMargins(0, spacing, spacing, 0);
-
-            LayoutParams rowLP = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            rowLP.setMargins(spacing, 0, 0, 0);
-
-            // Show "My Events" and "Editor's Pick" (Featured)
-            LinearLayout myEventsRow = (LinearLayout) findViewById(R.id.my_events_row);
-            myEventsRow.setLayoutParams(rowLP);
-            addExploreCard(Utils.capitalize(EventsHighEndpoints.QUERY_MY_EVENT), null, myEventsRow);
-            addExploreCard(Utils.capitalize(EventsHighEndpoints.QUERY_FEATURED), null, myEventsRow);
-
-            // Find featured category holders and initialize them. These holders are filled
-            // after featured events are fetched.
-            LinearLayout featuredCatLayout1 = (LinearLayout) findViewById(R.id.featured_cat_row1);
-            LinearLayout featuredCatLayout2 = (LinearLayout) findViewById(R.id.featured_cat_row2);
-            LinearLayout featuredCatLayout3 = (LinearLayout) findViewById(R.id.featured_cat_row3);
-            featuredCatLayout1.setLayoutParams(rowLP);
-            featuredCatLayout2.setLayoutParams(rowLP);
-            featuredCatLayout3.setLayoutParams(rowLP);
-            featuredCatLayouts = new LinearLayout[] {featuredCatLayout1, featuredCatLayout2, featuredCatLayout3};
-            featuredCatHeader = findViewById(R.id.featured_cat_header);
-
-            // Fill up the category explorer.
-            LinearLayout exploreLayout = (LinearLayout) findViewById(R.id.explore_layout);
-            LinearLayout last = new LinearLayout(this);
-            for (int i = 0; i < EXPLORE_TAGS.length; i++) {
-                if (i % numColumns == 0) {
-                    last = new LinearLayout(this);
-                    last.setLayoutParams(rowLP);
-                    exploreLayout.addView(last);
-                }
-
-                addExploreCard(EXPLORE_TAGS[i], null, last);
-            }
-
-            // Offer.
-            final TextView offerTitleView = new TextView(this);
-            offerTitleView.setTextColor(0xFF4E5B60);
-            offerTitleView.setTextSize(14);
-            offerTitleView.setText("Special offer for you!");
-            exploreLayout.addView(offerTitleView);
-
-            final View offerCard = getLayoutInflater().inflate(R.layout.offer_card, exploreLayout, false);
-            exploreLayout.addView(offerCard);
-
-            LayoutParams offerCardLP = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-            offerCardLP.setMargins(spacing, spacing, spacing, spacing);
-
-            offerCard.setLayoutParams(offerCardLP);
-            offerCard.setVisibility(View.GONE);
-            offerCardLP.bottomMargin = 0;
-            offerTitleView.setLayoutParams(offerCardLP);
-            offerTitleView.setVisibility(View.GONE);
-
-            OffersRequest.submit(this, Priority.NORMAL, new Listener<Offer>() {
-                @Override
-                public void onResponse(Offer offer, boolean isIntermediate) {
-                    offerCard.setVisibility(View.VISIBLE);
-                    offerTitleView.setVisibility(View.VISIBLE);
-                    offer.populateOfferCard(offerCard, LaunchActivity.this);
-                }
-            });
-        }
-
-        // Submit the request to populate Featured Events.
-        if (exploreScreenPopulatedTimestamp + REFRESH_FEATURED_EVENTS_INTERVAL <
-            System.currentTimeMillis()) {
-            onRetry(null);
-        }
-        exploreScreenPopulatedTimestamp = System.currentTimeMillis();
+        startActivity(outIntent);
     }
 
     private final OnCitySelectionListener mCitySelectionListener = new OnCitySelectionListener() {
         @Override
         public void onCitySelection(City city) {
-            getSupportActionBar().setSubtitle(Utils.capitalize(city.name()));
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setSubtitle(Utils.capitalize(city.name()));
+            }
             eventsContext.changeLocation(city.cityBounds.getCenter());
             gcmRegistration.setLastCity(city, null);
-            showNextScreen(false);
-        }
-    };
-
-    private void addExploreCard(final String tagName, @Nullable String infographURL, ViewGroup parent) {
-        final View view = getLayoutInflater().inflate(R.layout.explore_card, parent, false);
-        view.setLayoutParams(exploreCardLP);
-        int infographId = getInfoGraphId(tagName);
-        NetworkImageView imageView = (NetworkImageView) view.findViewById(R.id.explore_image);
-        imageView.setDefaultImageResId(infographId);
-        if (infographURL != null) {
-            imageView.setImageUrl(infographURL, VolleyHelper.getImageLoader(this));
-        }
-
-        if (infographId == R.drawable.eh_default_event_list) {
-            view.findViewById(R.id.explore_film).setVisibility(View.VISIBLE);
-            TextView tv = (TextView)view.findViewById(R.id.explore_cat_name);
-            tv.setVisibility(View.VISIBLE);
-            tv.setText(tagName);
-        }
-
-        view.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                reportActionToAnalytics("exploreCategory", tagName);
-                showSearchView(tagName);
-            }
-        });
-        parent.addView(view);
-    }
-
-    private static int getInfoGraphId(String tag) {
-        try {
-            return R.drawable.class.getField("infograph_" +
-                    EventCategory.toCategoryParsableString(tag).toLowerCase()).getInt(null);
-        } catch (IllegalAccessException e) {
-            // Ignore
-        } catch (NoSuchFieldException e) {
-            // Ignore
-            Log.d(LOG_TAG, "No image for: " + tag, e);
-        }
-
-        return R.drawable.eh_default_event_list;
-    }
-
-    private Listener<EventCollection> mFeaturedEventsListener = new Listener<EventCollection>() {
-        @Override
-        public void onResponse(final EventCollection eventCollection, boolean isIntermediate) {
-            FeaturedEventsAdapter featuredEventsAdapter =
-                    new FeaturedEventsAdapter(LaunchActivity.this, eventCollection.events);
-
-            LayoutInflater layoutInflater = getLayoutInflater();
-            dotsView.removeAllViews();
-            for (int i = 0; i < featuredEventsAdapter.getCount(); i++) {
-                View view = layoutInflater.inflate(R.layout.explore_dot, dotsView, false);
-                view.setSelected(i == 0);
-                dotsView.addView(view);
-            }
-
-            featuredEventsPager.setAdapter(featuredEventsAdapter);
-            featuredEventsPager.setOnPageChangeListener(new OnPageChangeListener() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset,
-                                           int positionOffsetPixels) {
-                    // do nothing.
-                }
-
-                @Override
-                public void onPageSelected(int position) {
-                    if (position != 0) {
-                        reportActionToAnalytics("featuredSwipe");
-                    }
-                    for (int i = 0; i < dotsView.getChildCount(); i++) {
-                        dotsView.getChildAt(i).setSelected(i == position);
-                    }
-                }
-
-                @Override
-                public void onPageScrollStateChanged(int state) {
-                    // do nothing.
-                }
-            });
-
-            for (LinearLayout featuredCatLayout : featuredCatLayouts) {
-                featuredCatLayout.removeAllViews();
-            }
-            int numFeaturedCat = Math.min(eventCollection.trendingTopics.size(),
-                    numColumns * featuredCatLayouts.length);
-            featuredCatHeader.setVisibility(numFeaturedCat == 0 ? View.GONE : View.VISIBLE);
-            for (int i = 0; i < numFeaturedCat; i++) {
-                addExploreCard(eventCollection.trendingTopics.get(i).tagName,
-                        eventCollection.trendingTopics.get(i).imgUrl,
-                        featuredCatLayouts[i / numColumns]);
-            }
+            showNextScreen();
         }
     };
 }

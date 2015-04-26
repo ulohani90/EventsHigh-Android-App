@@ -23,167 +23,43 @@
                 android:layout_height="wrap_content"
                 layout="@layout/toolbar"
             />
-            <ScrollView
+            <ProgressBar
+                android:id="@+id/top_progress_bar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="-4dp"
+                android:layout_marginTop="-4dp"
+                android:indeterminate="true"
+                android:visibility="gone"
+            />
+            <FrameLayout
+                android:id="@+id/view_switcher2"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:scrollbars="none"
-                android:paddingBottom="10dp"
-                android:clipToPadding="false"
             >
-                <LinearLayout
-                    android:id="@+id/explore_layout"
+                <include
+                    android:id="@+id/view_retry"
+                    layout="@layout/view_retry"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="10dp"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                />
+                <android.support.v4.widget.SwipeRefreshLayout
+                    android:id="@+id/swipe_refresh"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                 >
-                    <FrameLayout
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/event_container"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                    >
-                        <android.support.v4.view.ViewPager
-                            android:id="@+id/featured_events_pager"
-                            android:layout_width="match_parent"
-                            android:layout_height="200dp"
-                        />
-
-                        <LinearLayout
-                            android:id="@+id/dots_parent"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:layout_gravity="bottom"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="48dp"
-                        />
-                    </FrameLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:background="#D1E1E5"
-                        android:elevation="4dp"
-                        tools:ignore="UnusedAttribute"
-                    >
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:padding="10dp"
-                            android:gravity="center"
-                            android:maxLines="1"
-                            android:background="?android:attr/selectableItemBackground"
-                            android:clickable="true"
-                            android:fontFamily="sans-serif-medium"
-                            android:textSize="15sp"
-                            android:textColor="#798082"
-                            android:text="@string/ui_today"
-                            android:onClick="showToday"
-                            tools:ignore="UnusedAttribute"
-                        />
-
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/shape_vertical_divider"
-                        />
-
-                        <TextView
-                            style="?android:attr/textAppearanceMedium"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:padding="10dp"
-                            android:gravity="center"
-                            android:maxLines="1"
-                            android:background="?android:attr/selectableItemBackground"
-                            android:clickable="true"
-                            android:fontFamily="sans-serif-medium"
-                            android:textSize="15sp"
-                            android:textColor="#798082"
-                            android:text="@string/ui_tomorrow"
-                            android:onClick="showTomorrow"
-                            tools:ignore="UnusedAttribute"
-                        />
-
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/shape_vertical_divider"
-                        />
-
-                        <TextView
-                            style="?android:attr/textAppearanceMedium"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:padding="10dp"
-                            android:gravity="center"
-                            android:maxLines="1"
-                            android:background="?android:attr/selectableItemBackground"
-                            android:clickable="true"
-                            android:fontFamily="sans-serif-medium"
-                            android:textSize="15sp"
-                            android:textColor="#798082"
-                            android:text="@string/ui_this_weekend"
-                            android:onClick="showThisWeekend"
-                            tools:ignore="UnusedAttribute"
-                        />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/my_events_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                    >
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/featured_cat_header"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="10dp"
-                        android:textColor="#4E5B60"
-                        android:textSize="14sp"
-                        android:text="@string/featured_cat"
-                        android:visibility="gone"
+                        android:layout_height="match_parent"
+                        android:paddingBottom="10dp"
+                        android:clipToPadding="false"
                     />
-                    <LinearLayout
-                        android:id="@+id/featured_cat_row1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                    />
-                    <LinearLayout
-                        android:id="@+id/featured_cat_row2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                    />
-                    <LinearLayout
-                        android:id="@+id/featured_cat_row3"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                    />
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="10dp"
-                        android:textColor="#4E5B60"
-                        android:textSize="14sp"
-                        android:text="@string/explore_cat"
-                    />
-                </LinearLayout>
-            </ScrollView>
-
+                </android.support.v4.widget.SwipeRefreshLayout>
+            </FrameLayout>
             <include
                 android:id="@+id/verify_phone_container"
                 layout="@layout/view_phone_snack_bar"
@@ -220,7 +96,6 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:name="com.eventshigh.nearme.app.activity.EHPreferenceFragment"
-            tools:layout="@layout/view_loading"
         />
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

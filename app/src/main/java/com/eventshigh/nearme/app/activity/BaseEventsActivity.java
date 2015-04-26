@@ -15,7 +15,6 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,16 +26,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request.Priority;
-import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
-import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
-import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.BaseEventListRequest.EventCollection;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
@@ -69,7 +64,7 @@ import java.util.Locale;
  *
  * This class also implements base user interactions like tabs, filters etc.
  */
-public abstract class BaseEventsActivity extends BaseActivity {
+public abstract class BaseEventsActivity extends BaseContextActivity {
     private static final String LOG_TAG = BaseEventsActivity.class.getSimpleName();
 
     // ***********************
@@ -87,21 +82,17 @@ public abstract class BaseEventsActivity extends BaseActivity {
     protected Toolbar toolbar;
     protected FrameLayout eventContainer;
 
-    private View topProgressBar;
     private SlidingTabLayout dateFilter;
     private  View noMyEventsView;
-    private View retryView;
     private View myEventsClueView;
     private TextView myEventsClueTextView;
 
     // Last city and query for which events are shown.
-    protected EventsContext eventsContext;
     private boolean isDataShown = false;
     // when was this activity last started on.
     private long lastStartedAt;
     // GoogleApiClient to report the page view.
     private GoogleApiClient client;
-    protected Editor eventsMarkerEditor;
 
 
     // ***********************
@@ -233,6 +224,10 @@ public abstract class BaseEventsActivity extends BaseActivity {
         super.onStop();
     }
 
+    protected boolean isDataShown() {
+        return isDataShown;
+    }
+
     @Override
     public boolean onSearchRequested() {
         reportActionToAnalytics("onSearchRequested");
@@ -306,11 +301,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
         }
     }
 
-    public LatLng getUserLocation() {
-        return eventsContext.location;
-    }
-
-
     // ***********************
     // Delegated methods
     // ***********************
@@ -372,43 +362,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
     // ***********************
     // Helper methods
     // ***********************
-
-    public @Nullable EventMark getEventMark(Event event) {
-        return eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id);
-    }
-
-    public void recordEventMark(Event event, @Nullable EventMark mark) {
-        if (EventMark.isFavourite(mark)) {
-            showMyEventsClue(event);
-        } else {
-            hideMyEventsClue();
-        }
-
-        eventsMarkerEditor.recordEventMark(event, mark);
-    }
-
-    public void reportEventAction(Event event, String actionName, int position) {
-        reportActionToAnalytics(actionName,
-                eventsContext.dateFilter,
-                1,
-                isFavourite(event) ? "Favourite" : "No-Favourite",
-                event.ehRecommended ? "Recommended" : "Non-Recommended",
-                eventsContext.query.isEmpty() ? " " : eventsContext.query,
-                Integer.toString(position));
-    }
-
-    public void showEventDetails(Event event, int position) {
-        reportEventAction(event, "showEventDetails", position);
-        showEventDetails(event);
-    }
-
-    public void showSearchView(String query) {
-        reportActionToAnalytics("showSearchView", query);
-        EventsContext param = new EventsContext(eventsContext.location, query);
-        Intent intent = new Intent(this, this.getClass())
-                .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
-        startActivity(intent);
-    }
 
     protected void switchTo(Class<?> cls) {
         reportActionToAnalytics("switchView");
@@ -519,28 +472,6 @@ public abstract class BaseEventsActivity extends BaseActivity {
 
             if (!isIntermediate || !eventCollection.events.isEmpty()) {
                 updateEventsCollection(eventCollection.events);
-            }
-        }
-    };
-
-    private ErrorListener mErrorListener = new ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError volleyError) {
-            topProgressBar.setVisibility(View.GONE);
-            if (isDataShown) {
-                Toast.makeText(BaseEventsActivity.this, R.string.failed_refresh, Toast.LENGTH_SHORT).show();
-            } else {
-                retryView.setVisibility(View.VISIBLE);
-                noMyEventsView.setVisibility(View.GONE);
-            }
-
-            Throwable cause = volleyError.getCause();
-            if (cause != null) {
-                Log.w(LOG_TAG, "Volley Error: " + volleyError.getMessage(), cause);
-                reportActionToAnalytics("failedRequest", cause.getClass().getSimpleName());
-            } else {
-                Log.w(LOG_TAG, "Volley Error: " + volleyError.getMessage());
-                reportActionToAnalytics("failedRequest");
             }
         }
     };

@@ -111,20 +111,7 @@ public abstract class BaseEventListRequest extends JsonRequest<EventCollection> 
         JSONObject eventsJson = new JSONObject(jsonString);
         List<Event> events = Event.parseUpcomingEvents(eventsContext.city, eventsJson,
                 includeWithoutLocation);
-
-        // Filter out the events which has started more than two hours back.
-        long threeHoursBack = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(3);
-        for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
-            Event event = it.next();
-            EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
-            if (eventTime != null && eventTime.time != null && event.eventTimings[0] < threeHoursBack) {
-                // The event has started more than two hours back. We filter it out either if
-                // it has not future occurrences or if its a date query.
-                if (event.eventTimings.length == 1 || !eventsContext.dateFilter.isEmpty()) {
-                    it.remove();
-                }
-            }
-        }
+        filterOldEvents(events, !eventsContext.dateFilter.isEmpty());
 
         // Filter out the event which belongs to user selected filter.
         if (!eventsContext.categoryFilters.isEmpty()) {
@@ -162,5 +149,21 @@ public abstract class BaseEventListRequest extends JsonRequest<EventCollection> 
         }
 
         return new EventCollection(events, trendingTopics);
+    }
+
+    // Filter out the events which has started more than three hours back.
+    public static void filterOldEvents(List<Event> events, boolean isDateQuery) {
+        long threeHoursBack = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(3);
+        for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
+            Event event = it.next();
+            EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
+            if (eventTime != null && eventTime.time != null && event.eventTimings[0] < threeHoursBack) {
+                // The event has started more than two hours back. We filter it out either if
+                // it has not future occurrences or if its a date query.
+                if (event.eventTimings.length == 1 || isDateQuery) {
+                    it.remove();
+                }
+            }
+        }
     }
 }

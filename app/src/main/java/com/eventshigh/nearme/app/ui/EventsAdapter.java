@@ -10,11 +10,13 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
@@ -49,12 +51,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             R.drawable.eh_myevents_header6
     };
 
-    private final BaseEventsActivity activity;
+    private final BaseContextActivity activity;
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
     private final Set<Integer> usedItemIds = new HashSet<>();
     private List<Data> dataToShow;
 
-    public EventsAdapter(BaseEventsActivity activity) {
+    public EventsAdapter(BaseContextActivity activity) {
         this.activity = activity;
 
         dataToShow = new ArrayList<>();
@@ -90,6 +92,18 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             for (Event event : events) {
                 dataToShow.add(new EventData(myEventEntry.first, event));
             }
+        }
+        notifyDataSetChanged();
+    }
+
+    public void setExploreEvents(MyEvents myEvents) {
+        dataToShow.clear();
+
+        for (int i = 0; i < myEvents.size(); i++) {
+            Pair<String, List<Event>> myEventEntry = myEvents.get(i);
+            dataToShow.add(new HeaderData(myEventEntry.first,
+                    HEADER_BG_RESOURCES[i % HEADER_BG_RESOURCES.length]));
+            dataToShow.add(new EventListData(myEventEntry.first, myEventEntry.second));
         }
         notifyDataSetChanged();
     }
@@ -152,7 +166,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         HEADER(0),
         EVENT(1),
         OFFER(2),
-        FOLLOW(3);
+        FOLLOW(3),
+        EVENT_LIST(4);
 
         public final int typeId;
         DataType (int typeId) {
@@ -174,6 +189,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             if (typeId == FOLLOW.typeId) {
                 return FollowCard.newInstance(activity, parent);
+            }
+
+            if (typeId == EVENT_LIST.typeId) {
+                return EventListCard.newInstance(activity, parent);
             }
 
             throw new IllegalArgumentException("invalid typeid");
@@ -229,7 +248,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             this.arrowView = (ImageView) cardView.findViewById(R.id.header_arrow);
         }
 
-        private void bindHeaderView(final BaseEventsActivity activity, final HeaderData header) {
+        private void bindHeaderView(final BaseContextActivity activity, final HeaderData header) {
             headerBg.setImageResource(header.bgResourceId);
             titleView.setText(Utils.capitalize(header.header));
             boolean isFavourite = header.header.equals(MyEventsRequest.FAVOURITES_NAME);
@@ -311,7 +330,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             favouriteView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
         }
 
-        private void bindEventView(final Event event, final BaseEventsActivity activity,
+        private void bindEventView(final Event event, final BaseContextActivity activity,
                                    final int position) {
             itemView.setTag(position);
             itemView.setVisibility(View.VISIBLE);
@@ -339,32 +358,39 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 });
             }
 
-            // Check if its a recommended event or not.
+            // recommended ? Offer ?
             recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.INVISIBLE);
+            offerView.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
 
             // Set the title.
             titleView.setText(event.title);
 
             // Event Time.
-            EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
-            if (eventTime == null) {
-                eventTimeView.setVisibility(View.INVISIBLE);
-            } else {
-                eventTimeView.setVisibility(View.VISIBLE);
-                eventTimeView.setText(eventTime.toString());
+            if (eventTimeView != null) {
+                EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
+                if (eventTime == null) {
+                    eventTimeView.setVisibility(View.INVISIBLE);
+                } else {
+                    eventTimeView.setVisibility(View.VISIBLE);
+                    eventTimeView.setText(eventTime.toString());
+                }
             }
 
             // Set the venue.
-            venueView.setText(event.getShortAddress());
+            if (venueView != null) {
+                venueView.setText(event.getShortAddress());
+            }
 
-            // Set the time.
-            String travelTime = LocationUtils.getTravelTime(activity, activity.getUserLocation(),
-                    event.location);
-            if (travelTime != null) {
-                travelTimeView.setText(travelTime);
-                travelTimeView.setVisibility(View.VISIBLE);
-            } else {
-                travelTimeView.setVisibility(View.GONE);
+            // Set the travel time.
+            if (travelTimeView != null) {
+                String travelTime = LocationUtils.getTravelTime(activity, activity.getUserLocation(),
+                        event.location);
+                if (travelTime != null) {
+                    travelTimeView.setText(travelTime);
+                    travelTimeView.setVisibility(View.VISIBLE);
+                } else {
+                    travelTimeView.setVisibility(View.GONE);
+                }
             }
 
             // Set num people interested.
@@ -376,9 +402,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     numPeopleInterestedView.setText(Integer.toString(event.numPeopleInterested));
                 }
             }
-
-            // Offer ?
-            offerView.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
 
             // Set actions handlers.
             if (favouriteView != null) {
@@ -482,7 +505,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             followingButton = itemView.findViewById(R.id.following_button);
         }
 
-        public void populate(final FollowData data, final BaseEventsActivity activity) {
+        public void populate(final FollowData data, final BaseContextActivity activity) {
             titleView.setText(data.title);
 
             final Account account = new Account(activity);
@@ -511,6 +534,53 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             followButton.setVisibility(isFollowing ? View.GONE : View.VISIBLE);
             followingButton.setVisibility(isFollowing ? View.VISIBLE : View.GONE);
             followingButton.setSelected(true);
+        }
+    }
+
+    private class EventListData implements Data {
+        private final String header;
+        private final List<Event> events;
+
+        public EventListData(String header, List<Event> events) {
+            this.header = header;
+            this.events = events;
+        }
+
+        @Override
+        public DataType getType() {
+            return DataType.EVENT_LIST;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder card, int position) {
+            ((EventListCard) card).bindEventsView(events, activity);
+        }
+
+        public String getId() {
+            return header + ":" + events.get(0).id;
+        }
+    }
+
+    private static class EventListCard extends ViewHolder {
+        static EventListCard newInstance(final BaseActivity activity, ViewGroup parent) {
+            View view = activity.getLayoutInflater().inflate(R.layout.explore_events_list, parent, false);
+            return new EventListCard(view);
+        }
+
+        private LinearLayout eventContainer;
+        public EventListCard(View itemView) {
+            super(itemView);
+
+            eventContainer = (LinearLayout) itemView.findViewById(R.id.event_container);
+        }
+
+        public void bindEventsView(List<Event> events, BaseContextActivity activity) {
+            eventContainer.removeAllViews();
+            for (Event event : events) {
+                View cardView = activity.getLayoutInflater().inflate(R.layout.explore_event_card, eventContainer, false);
+                eventContainer.addView(cardView);
+                new EventCard(cardView, true).bindEventView(event, activity, 0);
+            }
         }
     }
 }

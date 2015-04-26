@@ -1,51 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
                                     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="@dimen/event_card_width"
+    android:layout_height="wrap_content"
     android:foreground="?android:attr/selectableItemBackground"
-    tools:layout_height="200dp"
 >
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
     >
         <com.android.volley.toolbox.NetworkImageView
             android:id="@+id/event_bg"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="200dp"
             android:scaleType="centerCrop"
             android:adjustViewBounds="false"
         />
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_alignTop="@+id/event_bg"
+            android:layout_alignBottom="@+id/event_bg"
             android:background="@drawable/shape_film"
         />
         <ImageView
-            android:id="@+id/offer_marker"
+            android:id="@+id/event_recommended"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_above="@+id/event_title"
+            android:layout_margin="8dp"
+            android:src="@drawable/eh_recommend"
+            tools:ignore="ContentDescription"
+        />
+        <ImageView
+            android:id="@+id/event_offer_marker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_local_offer_white_24dp"
-            android:layout_above="@+id/event_category"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="@+id/event_bg"
-            android:layout_margin="8dp"
-        />
-        <TextView
-            android:id="@+id/event_category"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="2dp"
             android:layout_above="@+id/event_title"
-            android:textSize="13sp"
-            android:minLines="1"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textColor="@android:color/white"
-            tools:text="Outdoors"
+            android:layout_toRightOf="@+id/event_recommended"
+            android:layout_toEndOf="@+id/event_recommended"
+            android:layout_margin="8dp"
         />
         <TextView
             android:id="@+id/event_title"
@@ -57,7 +54,7 @@
             android:layout_marginEnd="36dp"
             android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
-            android:layout_alignParentBottom="true"
+            android:layout_alignBottom="@+id/event_bg"
             android:textStyle="bold"
             android:textSize="17sp"
             android:minLines="1"
@@ -73,7 +70,7 @@
             android:padding="6dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
+            android:layout_alignBottom="@+id/event_bg"
             android:src="@drawable/ic_favorite_white_24dp"
             android:clickable="true"
         />
@@ -84,7 +81,7 @@
             android:padding="6dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
+            android:layout_alignBottom="@+id/event_bg"
             android:src="@drawable/ic_favorite_red_24dp"
             android:clickable="true"
         />
