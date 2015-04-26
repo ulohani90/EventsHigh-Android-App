@@ -12,6 +12,12 @@
     <style name="EHActionBarDark" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:background">@color/primary</item>
     </style>
+    <style name="EHFollowActionBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:dropDownListViewStyle">@style/DropDownListView</item>
+    </style>
+    <style name="DropDownListView" parent="@android:style/Widget.Holo.ListView.DropDown">
+        <item name="android:background">@color/primary</item>
+    </style>
     <style name="EHActionBarBig" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:background">@android:color/transparent</item>
     </style>

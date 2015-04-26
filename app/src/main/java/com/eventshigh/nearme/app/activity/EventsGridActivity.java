@@ -2,11 +2,14 @@ package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.android.volley.Request.Priority;
@@ -25,6 +28,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
+import pl.snowdog.material.ui.ToolbarColorizeHelper;
+
 /**
  * An {@link com.eventshigh.nearme.app.activity.BaseEventsActivity} which shows the events in Grid.
  * On Phone, we have one column in portrait mode and two columns in landscape mode. On Tablet,
@@ -34,8 +39,11 @@ public class EventsGridActivity extends BaseEventsActivity {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private AutofitRecyclerView eventGridView;
+    private View followToolbarBackground;
     private EventsAdapter eventsAdapter;
     private boolean showFollowCard;
+    private float toolbarBackgroundAlpha;
+    private boolean searchViewExpanded;
 
     // ***********************
     // Delegated Methods from {@link BaseEventsActivity}
@@ -72,9 +80,75 @@ public class EventsGridActivity extends BaseEventsActivity {
         if (showFollowCard) {
             // Hide the regular toolbar and show the follow toolbar
             toolbar.setVisibility(View.GONE);
-            toolbar = (Toolbar) findViewById(R.id.followToolbar);
+            toolbar = (Toolbar) findViewById(R.id.follow_toolbar);
             setSupportActionBar(toolbar);
+            setDarkToolbarIcons();
+            clearTitleSubTitle();
+            toolbar.setVisibility(View.VISIBLE);
+
+            followToolbarBackground = findViewById(R.id.follow_toolbar_background);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean returnValue = super.onCreateOptionsMenu(menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        MenuItemCompat.setOnActionExpandListener(item,
+            new MenuItemCompat.OnActionExpandListener() {
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    searchViewExpanded = true;
+                    followToolbarBackground.setAlpha(1);
+                    setLightToolbarIcons();
+                    return true;
+                }
+
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    searchViewExpanded = false;
+                    applyToolbarColors();
+                    return true;
+                }
+            });
+
+        return returnValue;
+    }
+
+    private void setDarkToolbarIcons() {
+        toolbar.post(new Runnable() {
+            @Override
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                    getResources().getColor(android.R.color.black), EventsGridActivity.this);
+            }
+        });
+    }
+
+    private void setLightToolbarIcons() {
+        toolbar.post(new Runnable() {
+            @Override
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                    getResources().getColor(android.R.color.white), EventsGridActivity.this);
+            }
+        });
+    }
+
+    private void applyToolbarColors() {
+        // Change the color of toolbar icons and text
+        if (toolbarBackgroundAlpha < 0.5) {
+            clearTitleSubTitle();
+            if (followToolbarBackground.getAlpha() >= 0.5) {
+                setDarkToolbarIcons();
+            }
+        } else {
+            setTitle();
+            if (followToolbarBackground.getAlpha() < 0.5) {
+                setLightToolbarIcons();
+            }
+        }
+        followToolbarBackground.setAlpha(toolbarBackgroundAlpha);
     }
 
     @Override
@@ -89,10 +163,10 @@ public class EventsGridActivity extends BaseEventsActivity {
         if (showFollowCard) {
             eventsAdapter.addFollowCard(eventsContext.query);
 
-            final int invisibleAt = Utils.dpToPx(this, 150);
-            final int visibleAt = Utils.dpToPx(this, 250);
-            toolbar.setVisibility(View.VISIBLE);
-            toolbar.setAlpha(0);
+            final int invisibleAt = Utils.dpToPx(this, 50);
+            final int visibleAt = Utils.dpToPx(this, 150);
+            followToolbarBackground.setAlpha(0);
+            followToolbarBackground.setVisibility(View.VISIBLE);
 
             eventGridView.setOnScrollListener(new OnScrollListener() {
                 private int y;
@@ -105,13 +179,15 @@ public class EventsGridActivity extends BaseEventsActivity {
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                     y += dy;
-                    float alpha = ((float) y - invisibleAt) / (visibleAt - invisibleAt);
-                    if (alpha < 0) {
-                        alpha = 0;
-                    } else if (alpha > 1) {
-                        alpha = 1;
+                    toolbarBackgroundAlpha = ((float) y - invisibleAt) / (visibleAt - invisibleAt);
+                    if (toolbarBackgroundAlpha < 0) {
+                        toolbarBackgroundAlpha = 0;
+                    } else if (toolbarBackgroundAlpha > 1) {
+                        toolbarBackgroundAlpha = 1;
                     }
-                    toolbar.setAlpha(alpha);
+                    if (!searchViewExpanded) {
+                        applyToolbarColors();
+                    }
                 }
             });
         }

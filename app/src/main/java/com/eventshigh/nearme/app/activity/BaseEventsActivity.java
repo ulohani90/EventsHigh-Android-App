@@ -81,6 +81,7 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
     // UI elements.
     protected Toolbar toolbar;
     protected FrameLayout eventContainer;
+    protected SearchView searchView;
 
     private SlidingTabLayout dateFilter;
     private  View noMyEventsView;
@@ -109,7 +110,7 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Hide the follow toolbar initially
-        findViewById(R.id.followToolbar).setVisibility(View.GONE);
+        findViewById(R.id.follow_toolbar).setVisibility(View.GONE);
 
         dateFilter = (SlidingTabLayout) findViewById(R.id.date_filter);
         topProgressBar = findViewById(R.id.top_progress_bar);
@@ -155,15 +156,27 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
 
         // Show query as title.
         if (!eventsContext.query.isEmpty()) {
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
-            }
             eventsContext.dateFilter = "";
+            setTitle();
         }
 
         // See if date filter is passed.
         showDateFilter();
+    }
+
+    protected void clearTitleSubTitle() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle("");
+            actionBar.setSubtitle("");
+        }
+    }
+
+    protected void setTitle() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
+        }
     }
 
     @Override
@@ -244,7 +257,7 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
 
         // Search View.
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         // Do not show filterByDate for search.
