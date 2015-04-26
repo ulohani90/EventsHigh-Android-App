@@ -160,8 +160,8 @@ public class EventsGridActivity extends BaseEventsActivity {
         if (showFollowCard) {
             eventsAdapter.addFollowCard(eventsContext.query);
 
-            final int invisibleAt = Utils.dpToPx(this, 150);
-            final int visibleAt = Utils.dpToPx(this, 250);
+            final int invisibleAt = Utils.dpToPx(this, 50);
+            final int visibleAt = Utils.dpToPx(this, 150);
             followToolbarBackground.setAlpha(0);
             followToolbarBackground.setVisibility(View.VISIBLE);
 
