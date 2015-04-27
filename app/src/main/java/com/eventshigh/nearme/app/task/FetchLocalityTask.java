@@ -5,7 +5,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.util.LruCache;
 
@@ -18,21 +17,25 @@ import java.util.regex.Pattern;
 
 /**
  * {@link android.os.AsyncTask} which can be used to fetch the locality from LatLng and then
- * update the {@link android.support.v7.app.ActionBar} subtitle with locality.
+ * calls {@link FetchLocalityTask.Listener#onLocationUpdated(String)}.
 */
-public class ShowLocalityTask extends AsyncTask<LatLng, Void, String> {
+public class FetchLocalityTask extends AsyncTask<LatLng, Void, String> {
+    public interface Listener {
+        void onLocationUpdated(String locality);
+    }
+
     // Constants
-    private static final String LOG_TAG = ShowLocalityTask.class.getSimpleName();
+    private static final String LOG_TAG = FetchLocalityTask.class.getSimpleName();
     private static final Pattern INVALID_LOCALITY_PATTERN = Pattern.compile("[^a-zA-Z]+[a-zA-Z]?");
 
     private static final LruCache<String, String> LAT_LNG_TO_LOCALITY = new LruCache<>(100);
 
     private final Context context;
-    private final ActionBar actionBar;
+    private final Listener listener;
 
-    public ShowLocalityTask(Context context, ActionBar actionBar) {
+    public FetchLocalityTask(Context context, Listener listener) {
         this.context = context;
-        this.actionBar = actionBar;
+        this.listener = listener;
     }
 
     @Override
@@ -79,9 +82,7 @@ public class ShowLocalityTask extends AsyncTask<LatLng, Void, String> {
 
     @Override
     protected void onPostExecute(@Nullable String locality) {
-        if (locality != null && !locality.isEmpty()) {
-            actionBar.setSubtitle(locality);
-        }
+        listener.onLocationUpdated(locality);
     }
 
     private String checkLocality(String locality) {

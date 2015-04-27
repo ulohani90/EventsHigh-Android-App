@@ -19,7 +19,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.OffersRequest;
-import com.eventshigh.nearme.app.task.ShowLocalityTask;
+import com.eventshigh.nearme.app.task.FetchLocalityTask;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -44,6 +44,7 @@ public class EventsGridActivity extends BaseEventsActivity {
     private boolean showFollowCard;
     private float toolbarBackgroundAlpha;
     private boolean searchViewExpanded;
+    private String subtitle;
 
     // ***********************
     // Delegated Methods from {@link BaseEventsActivity}
@@ -107,7 +108,7 @@ public class EventsGridActivity extends BaseEventsActivity {
                 @Override
                 public boolean onMenuItemActionCollapse(MenuItem item) {
                     searchViewExpanded = false;
-                    applyToolbarColors();
+                    updateToolbar();
                     return true;
                 }
             });
@@ -135,7 +136,7 @@ public class EventsGridActivity extends BaseEventsActivity {
         });
     }
 
-    private void applyToolbarColors() {
+    private void updateToolbar() {
         // Change the color of toolbar icons and text
         if (toolbarBackgroundAlpha < 0.5) {
             clearTitleSubTitle();
@@ -144,6 +145,7 @@ public class EventsGridActivity extends BaseEventsActivity {
             }
         } else {
             setTitle();
+            setSubtitle();
             if (followToolbarBackground.getAlpha() < 0.5) {
                 setLightToolbarIcons();
             }
@@ -186,7 +188,7 @@ public class EventsGridActivity extends BaseEventsActivity {
                         toolbarBackgroundAlpha = 1;
                     }
                     if (!searchViewExpanded) {
-                        applyToolbarColors();
+                        updateToolbar();
                     }
                 }
             });
@@ -213,7 +215,7 @@ public class EventsGridActivity extends BaseEventsActivity {
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null &&
                 (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0)) {
-                new ShowLocalityTask(this, actionBar).execute(userLocation);
+                new FetchLocalityTask(this, this).execute(userLocation);
             }
         }
 
@@ -222,5 +224,19 @@ public class EventsGridActivity extends BaseEventsActivity {
 
     protected  int getDisabledMenuItem() {
         return R.id.action_show_list;
+    }
+
+    public void setSubtitle() {
+        super.onLocationUpdated(subtitle);
+    }
+
+    @Override
+    public void onLocationUpdated(String locality) {
+        if (showFollowCard) {
+            subtitle = locality;
+            updateToolbar();
+        } else {
+            super.onLocationUpdated(locality);
+        }
     }
 }

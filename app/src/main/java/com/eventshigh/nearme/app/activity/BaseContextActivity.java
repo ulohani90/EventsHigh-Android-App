@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.activity;
 
 import android.content.Intent;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -14,13 +15,15 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.task.FetchLocalityTask;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
  * An abstact class for activity with context.
  */
-public abstract class BaseContextActivity extends BaseActivity {
+public abstract class BaseContextActivity extends BaseActivity
+        implements FetchLocalityTask.Listener {
     private static final String LOG_TAG = BaseContextActivity.class.getSimpleName();
 
     protected EventsContext eventsContext;
@@ -116,4 +119,12 @@ public abstract class BaseContextActivity extends BaseActivity {
             }
         }
     };
+
+    @Override
+    public void onLocationUpdated(String locality) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null && locality != null && !locality.isEmpty()) {
+            actionBar.setSubtitle(locality);
+        }
+    }
 }

@@ -31,7 +31,7 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.ExploreEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
-import com.eventshigh.nearme.app.task.ShowLocalityTask;
+import com.eventshigh.nearme.app.task.FetchLocalityTask;
 import com.eventshigh.nearme.app.ui.CityListAdapter;
 import com.eventshigh.nearme.app.ui.CityListAdapter.OnCitySelectionListener;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
@@ -357,7 +357,7 @@ public class LaunchActivity extends BaseContextActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null &&
             (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0)) {
-            new ShowLocalityTask(this, actionBar).execute(eventsContext.location);
+            new FetchLocalityTask(this, this).execute(eventsContext.location);
         }
 
         // If we do not have query, show explore screen.
