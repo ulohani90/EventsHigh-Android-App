@@ -188,8 +188,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     /**
      * Helper method to share an Event.
      */
-    public void shareEvent(Event event) {
-        reportEventAction(event, "eventShareInitiated");
+    public void shareEvent(Event event, @Nullable String packageName) {
+        reportEventAction(event, "eventShareInitiated", packageName);
         shareEventInitiatedTimestamp = System.currentTimeMillis();
 
         try {
@@ -201,6 +201,9 @@ public abstract class BaseActivity extends AppCompatActivity {
                             event.getEventShareURI(this))
             );
             sendIntent.setType("text/plain");
+            if (packageName != null) {
+                sendIntent.setPackage(packageName);
+            }
             startActivity(sendIntent);
         } catch (ActivityNotFoundException e) {
             Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
