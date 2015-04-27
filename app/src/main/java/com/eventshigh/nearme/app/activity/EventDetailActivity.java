@@ -330,7 +330,15 @@ public class EventDetailActivity extends BaseActivity {
         startActivity(feedbackIntent);
     }
 
-    public void shareEvent(View view) {
+    public void facebook(View view) {
+        shareEvent(event);
+    }
+
+    public void email(View view) {
+        shareEvent(event);
+    }
+
+    public void whatsapp(View view) {
         shareEvent(event);
     }
 
@@ -424,7 +432,6 @@ public class EventDetailActivity extends BaseActivity {
 
         private final FrameLayout bookView;
         private final FrameLayout callView;
-        private final FrameLayout shareView;
         private final TextView offerView;
 
         private final View tagsHeaderView;
@@ -474,7 +481,6 @@ public class EventDetailActivity extends BaseActivity {
 
             bookView = (FrameLayout) findViewById(R.id.book_ticket);
             callView = (FrameLayout) findViewById(R.id.call);
-            shareView = (FrameLayout) findViewById(R.id.share);
             offerView = (TextView) findViewById(R.id.offer_text);
 
             tagsHeaderView = findViewById(R.id.tags_header);
@@ -560,14 +566,6 @@ public class EventDetailActivity extends BaseActivity {
             if (event.organizerPhone == null) {
                 callView.setVisibility(View.GONE);
             }
-
-            shareView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showRateAppDialog = true;
-                    shareEvent(event);
-                }
-            });
 
             // Set time.
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);

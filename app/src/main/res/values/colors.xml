@@ -20,4 +20,11 @@
 
     <color name="toolbar_big">#7E57C2</color>
     <color name="toolbar_big_status">#5E35B1</color>
+
+    <color name="red">#FF4444</color>
+    <color name="red_dark">#CC0000</color>
+    <color name="green">#69BE5A</color>
+    <color name="green_dark">#0B9F4E</color>
+    <color name="blue">#526DBF</color>
+    <color name="blue_dark">#496AAB</color>
 </resources>

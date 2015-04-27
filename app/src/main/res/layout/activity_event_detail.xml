@@ -323,25 +323,55 @@
                 android:layout_height="1dp"
                 android:background="#1a4d4d4d"
             />
-            <FrameLayout
-                android:id="@+id/share"
-                style="@style/EHButton"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="shareEvent"
+                android:orientation="horizontal"
             >
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_weight="1"
                     android:gravity="center"
-                    android:drawableLeft="@drawable/ic_share_grey600_24dp"
-                    android:drawableStart="@drawable/ic_share_grey600_24dp"
-                    android:drawablePadding="4dp"
-                    android:textColor="#CC000000"
-                    android:text="@string/action_share"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="8dp"
+                    android:drawableTop="@drawable/com_facebook_inverse_icon"
+                    android:drawablePadding="6dp"
+                    android:background="@drawable/button_fb"
+                    android:textColor="@android:color/white"
+                    android:text="@string/share_fb"
+                    android:onClick="facebook"
                 />
-            </FrameLayout>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:fontFamily="sans-serif-medium"
+                    android:padding="8dp"
+                    android:drawableTop="@drawable/ic_email_white_24dp"
+                    android:drawablePadding="4dp"
+                    android:background="@drawable/button_email"
+                    android:textColor="@android:color/white"
+                    android:text="@string/share_email"
+                    android:onClick="email"
+                />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:fontFamily="sans-serif-medium"
+                    android:padding="8dp"
+                    android:drawableTop="@drawable/whatsapp_24dp"
+                    android:drawablePadding="4dp"
+                    android:background="@drawable/button_whatsapp"
+                    android:textColor="@android:color/white"
+                    android:text="@string/share_whatsapp"
+                    android:onClick="whatsapp"
+                />
+            </LinearLayout>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
