@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:foreground="?android:attr/selectableItemBackground"
     android:descendantFocusability="blocksDescendants"
-    card_view:cardCornerRadius="2dp"
+    card_view:cardCornerRadius="4dp"
     card_view:cardElevation="4dp"
 >
     <RelativeLayout
