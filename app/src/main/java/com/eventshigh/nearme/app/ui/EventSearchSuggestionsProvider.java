@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.SearchRecentSuggestions;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
@@ -23,10 +22,8 @@ import com.eventshigh.nearme.app.network.TagsSuggestRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
-import com.eventshigh.nearme.app.utils.StreamUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -100,7 +97,7 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
                 newRow[idIndex] = EVENT_ID_START + i;
                 newRow[queryColumnIndex] = allEvents[i].name;
                 newRow[titleColumnIndex] = Utils.capitalize(allEvents[i].name);
-                newRow[iconColumnIndex] = R.drawable.icon_other;
+                newRow[iconColumnIndex] = R.drawable.ic_event_white_24dp;
                 newRow[intentActionColumnIndex] = Intent.ACTION_VIEW;
                 newRow[intentDataColumnIndex] = EventsHighEndpoints.getEventDetailsURI(
                         City.getCity(allEvents[i].city), allEvents[i].id);
