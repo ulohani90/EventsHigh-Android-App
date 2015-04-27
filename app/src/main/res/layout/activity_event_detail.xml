@@ -316,62 +316,6 @@
                 android:onClick="openOfferSite"
                 tools:text="Win Free Pass to Arijit Singh Live Concert on 5th April"
             />
-
-            <!-- Share -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#1a4d4d4d"
-            />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-            >
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:fontFamily="sans-serif-medium"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="8dp"
-                    android:drawableTop="@drawable/com_facebook_inverse_icon"
-                    android:drawablePadding="6dp"
-                    android:background="@drawable/button_fb"
-                    android:textColor="@android:color/white"
-                    android:text="@string/share_fb"
-                    android:onClick="facebook"
-                />
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:fontFamily="sans-serif-medium"
-                    android:padding="8dp"
-                    android:drawableTop="@drawable/ic_email_white_24dp"
-                    android:drawablePadding="4dp"
-                    android:background="@drawable/button_email"
-                    android:textColor="@android:color/white"
-                    android:text="@string/share_email"
-                    android:onClick="email"
-                />
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:fontFamily="sans-serif-medium"
-                    android:padding="8dp"
-                    android:drawableTop="@drawable/whatsapp_24dp"
-                    android:drawablePadding="4dp"
-                    android:background="@drawable/button_whatsapp"
-                    android:textColor="@android:color/white"
-                    android:text="@string/share_whatsapp"
-                    android:onClick="whatsapp"
-                />
-            </LinearLayout>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -601,12 +545,59 @@
                     tools:text="www.eventshigh.com"
                 />
             </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="18dp"
                 android:background="@android:color/transparent"
             />
+
+            <!-- Share -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+            >
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:src="@drawable/com_facebook_inverse_icon"
+                    android:background="@drawable/button_fb"
+                    android:onClick="facebook"
+                />
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:src="@drawable/twitter_white"
+                    android:background="@drawable/button_twitter"
+                    android:onClick="twitter"
+                />
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_email_white_24dp"
+                    android:background="@drawable/button_email"
+                    android:onClick="email"
+                />
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:src="@drawable/whatsapp_24dp"
+                    android:background="@drawable/button_whatsapp"
+                    android:onClick="whatsapp"
+                />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

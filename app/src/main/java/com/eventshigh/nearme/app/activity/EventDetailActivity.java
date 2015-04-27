@@ -88,9 +88,9 @@ public class EventDetailActivity extends BaseActivity {
     private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
 
 
-    /**********************************
+    /*****************************************
      Activity lifecycle management utilities
-     **********************************/
+     ***************************************/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -331,6 +331,10 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void facebook(View view) {
+        shareEvent(event);
+    }
+
+    public void twitter(View view) {
         shareEvent(event);
     }
 

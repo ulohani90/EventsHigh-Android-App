@@ -42,14 +42,6 @@ import java.util.Set;
  */
 public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static final int NUM_MAX_EVENTS_PER_INTEREST = 3;
-    private static final int HEADER_BG_RESOURCES[] = new int [] {
-            R.drawable.eh_myevents_header1,
-            R.drawable.eh_myevents_header2,
-            R.drawable.eh_myevents_header3,
-            R.drawable.eh_myevents_header4,
-            R.drawable.eh_myevents_header5,
-            R.drawable.eh_myevents_header6
-    };
 
     private final BaseContextActivity activity;
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
@@ -81,11 +73,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public void setMyEvents(MyEvents myEvents) {
         dataToShow.clear();
 
-        for (int i = 0; i < myEvents.size(); i++) {
-            Pair<String, List<Event>> myEventEntry = myEvents.get(i);
+        for (Pair<String, List<Event>> myEventEntry : myEvents) {
             boolean isFavourite = myEventEntry.first.equals(MyEventsRequest.FAVOURITES_NAME);
-            dataToShow.add(new HeaderData(myEventEntry.first,
-                    HEADER_BG_RESOURCES[i % HEADER_BG_RESOURCES.length]));
+            dataToShow.add(new HeaderData(myEventEntry.first));
             List<Event> events = isFavourite ? myEventEntry.second :
                     myEventEntry.second.subList(0,
                             Math.min(NUM_MAX_EVENTS_PER_INTEREST, myEventEntry.second.size()));
@@ -99,11 +89,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public void setExploreEvents(MyEvents myEvents) {
         dataToShow.clear();
 
-        for (int i = 0; i < myEvents.size(); i++) {
-            Pair<String, List<Event>> myEventEntry = myEvents.get(i);
+        for (Pair<String, List<Event>> myEventEntry : myEvents) {
             if (!myEventEntry.second.isEmpty()) {
-                dataToShow.add(new HeaderData(myEventEntry.first,
-                        HEADER_BG_RESOURCES[i % HEADER_BG_RESOURCES.length]));
+                dataToShow.add(new HeaderData(myEventEntry.first));
                 dataToShow.add(new EventListData(myEventEntry.first, myEventEntry.second));
             }
         }
@@ -215,11 +203,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     // Header Data.
     private class HeaderData implements Data {
         private final String header;
-        private final int bgResourceId;
 
-        private HeaderData(String header, int bgResourceId) {
+        private HeaderData(String header) {
             this.header = header;
-            this.bgResourceId = bgResourceId;
         }
 
         @Override
@@ -239,9 +225,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     private static class HeaderCard extends ViewHolder {
-        private final ImageView headerBg;
         private final TextView titleView;
-        private final ImageView arrowView;
+        private final View moreView;
 
         private static HeaderCard newInstance(Activity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(R.layout.my_event_header, parent, false);
@@ -250,16 +235,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private HeaderCard(View cardView) {
             super(cardView);
-            this.headerBg = (ImageView) cardView.findViewById(R.id.header_bg);
             this.titleView = (TextView) cardView.findViewById(R.id.header);
-            this.arrowView = (ImageView) cardView.findViewById(R.id.header_arrow);
+            this.moreView = cardView.findViewById(R.id.header_more);
         }
 
         private void bindHeaderView(final BaseContextActivity activity, final HeaderData header) {
-            headerBg.setImageResource(header.bgResourceId);
             titleView.setText(Utils.capitalize(header.header));
             boolean isFavourite = header.header.equals(MyEventsRequest.FAVOURITES_NAME);
-            arrowView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
+            moreView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
             if (!isFavourite) {
                 itemView.setOnClickListener(new OnClickListener() {
                     @Override

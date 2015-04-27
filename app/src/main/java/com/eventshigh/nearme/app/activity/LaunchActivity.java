@@ -301,7 +301,6 @@ public class LaunchActivity extends BaseContextActivity {
         }
     };
 
-    private boolean showSmallCards = false;
     private Listener<MyEvents> mListener = new Listener<MyEvents>() {
         @Override
         public void onResponse(MyEvents events, boolean isIntermediate) {
@@ -310,13 +309,7 @@ public class LaunchActivity extends BaseContextActivity {
             }
             retryView.setVisibility(View.GONE);
             lastFetchTimestamp = System.currentTimeMillis();
-            if (showSmallCards) {
-                adapter.setMyEvents(events);
-                showSmallCards = false;
-            } else {
-                adapter.setExploreEvents(events);
-                showSmallCards = true;
-            }
+            adapter.setExploreEvents(events);
         }
     };
 
