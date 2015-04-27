@@ -65,8 +65,6 @@ import java.util.Locale;
  * This class also implements base user interactions like tabs, filters etc.
  */
 public abstract class BaseEventsActivity extends BaseContextActivity {
-    private static final String LOG_TAG = BaseEventsActivity.class.getSimpleName();
-
     // ***********************
     // CONSTANTS
     // ***********************
@@ -128,7 +126,7 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
                 if (event == null) {
                     showSearchView(EventsHighEndpoints.QUERY_MY_EVENT);
                 } else {
-                    shareEvent(event);
+                    shareEvent(event, null);
                 }
             }
         });

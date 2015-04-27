@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -63,6 +64,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
@@ -76,6 +79,11 @@ public class EventDetailActivity extends BaseActivity {
     // Regex to check if description is plane text or html.
     private static final Pattern HTML_PATTERN = Pattern.compile(
             "<[A-Za-z].*</[A-Za-z]|<[A-Za-z].*/>");
+
+    private static final String PACKAGE_NAME_FACEBOOK = "com.facebook.katana";
+    private static final String PACKAGE_NAME_TWITTER = "com.twitter.android";
+    private static final String PACKAGE_NAME_EMAIL = "com.google.android.gm";
+    private static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
 
     private Toolbar toolbar;
     private View topProgressBar;
@@ -331,19 +339,19 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void facebook(View view) {
-        shareEvent(event);
+        shareEvent(event, PACKAGE_NAME_FACEBOOK);
     }
 
     public void twitter(View view) {
-        shareEvent(event);
+        shareEvent(event, PACKAGE_NAME_TWITTER);
     }
 
     public void email(View view) {
-        shareEvent(event);
+        shareEvent(event, PACKAGE_NAME_EMAIL);
     }
 
     public void whatsapp(View view) {
-        shareEvent(event);
+        shareEvent(event, PACKAGE_NAME_WHATSAPP);
     }
 
 
@@ -740,6 +748,12 @@ public class EventDetailActivity extends BaseActivity {
                     addTagView(tagsView, tag, "tagClick");
                 }
             }
+
+            // Share Buttons.
+            findViewById(R.id.share_fb).setVisibility(isInstalled(PACKAGE_NAME_FACEBOOK) ? View.VISIBLE : View.GONE);
+            findViewById(R.id.share_twitter).setVisibility(isInstalled(PACKAGE_NAME_TWITTER) ? View.VISIBLE : View.GONE);
+            findViewById(R.id.share_email).setVisibility(isInstalled(PACKAGE_NAME_EMAIL) ? View.VISIBLE : View.GONE);
+            findViewById(R.id.share_whatsapp).setVisibility(isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
@@ -795,5 +809,27 @@ public class EventDetailActivity extends BaseActivity {
             favouriteView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
         }
     }
+
+    private static final Set<String> INSTALLED_PACKAGES = new HashSet<>();
+    private boolean isInstalled(String packageName) {
+        synchronized (INSTALLED_PACKAGES) {
+            if (INSTALLED_PACKAGES.isEmpty()) {
+                getInstalledApps();
+            }
+        }
+
+        return INSTALLED_PACKAGES.contains(packageName);
+    }
+
+    private void getInstalledApps() {
+        for(PackageInfo packageInfo : getPackageManager().getInstalledPackages(0)) {
+            if (packageInfo.versionName == null) {
+                continue ;
+            }
+            INSTALLED_PACKAGES.add(packageInfo.packageName);
+        }
+    }
+
+
 }
 
