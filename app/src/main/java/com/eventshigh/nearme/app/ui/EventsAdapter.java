@@ -90,7 +90,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     myEventEntry.second.subList(0,
                             Math.min(NUM_MAX_EVENTS_PER_INTEREST, myEventEntry.second.size()));
             for (Event event : events) {
-                dataToShow.add(new EventData(myEventEntry.first, event));
+                dataToShow.add(new MyEventData(myEventEntry.first, event));
             }
         }
         notifyDataSetChanged();
@@ -169,7 +169,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         EVENT(1),
         OFFER(2),
         FOLLOW(3),
-        EVENT_LIST(4);
+        EVENT_LIST(4),
+        MY_EVENT(5);
 
         public final int typeId;
         DataType (int typeId) {
@@ -195,6 +196,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             if (typeId == EVENT_LIST.typeId) {
                 return EventListCard.newInstance(activity, parent);
+            }
+
+            if (typeId == MY_EVENT.typeId) {
+                return MyEventCard.newInstance(activity, parent);
             }
 
             throw new IllegalArgumentException("invalid typeid");
@@ -582,6 +587,45 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 eventContainer.addView(cardView);
                 new EventCard(cardView, true).bindEventView(event, activity, 0);
             }
+        }
+    }
+
+    private class MyEventData implements Data {
+        private final String header;
+        private final Event event;
+
+        public MyEventData(String header, Event event) {
+            this.header = header;
+            this.event = event;
+        }
+
+        @Override
+        public DataType getType() {
+            return DataType.MY_EVENT;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder card, int position) {
+            ((MyEventCard) card).bindEventsView(event, activity, position);
+        }
+
+        public String getId() {
+            return header + ":" + event.id;
+        }
+    }
+
+    private static class MyEventCard extends ViewHolder {
+        static MyEventCard newInstance(final BaseActivity activity, ViewGroup parent) {
+            View view = activity.getLayoutInflater().inflate(R.layout.event_card, parent, false);
+            return new MyEventCard(view);
+        }
+
+        public MyEventCard(View itemView) {
+            super(itemView);
+        }
+
+        public void bindEventsView(Event event, BaseContextActivity activity, int position) {
+            new EventCard(itemView, false).bindEventView(event, activity, position);
         }
     }
 }
