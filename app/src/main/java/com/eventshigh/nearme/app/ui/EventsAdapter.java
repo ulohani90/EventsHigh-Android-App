@@ -344,9 +344,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             });
 
             // Set the background image.
-            int defaultImage = bigLayout ? R.drawable.eh_default_event_detail : R.drawable.eh_default_event_list;
-            bgView.setDefaultImageResId(defaultImage);
-            bgView.setErrorImageResId(defaultImage);
+            bgView.setDefaultImageResId(R.drawable.eh_default_event);
+            bgView.setErrorImageResId(R.drawable.eh_default_event);
             bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(activity));
 
             if (bigLayout) {

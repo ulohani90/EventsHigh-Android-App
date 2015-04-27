@@ -425,7 +425,6 @@ public class EventDetailActivity extends BaseActivity {
         private final FrameLayout bookView;
         private final FrameLayout callView;
         private final FrameLayout shareView;
-        private final FrameLayout emailView;
         private final TextView offerView;
 
         private final View tagsHeaderView;
@@ -476,7 +475,6 @@ public class EventDetailActivity extends BaseActivity {
             bookView = (FrameLayout) findViewById(R.id.book_ticket);
             callView = (FrameLayout) findViewById(R.id.call);
             shareView = (FrameLayout) findViewById(R.id.share);
-            emailView = (FrameLayout) findViewById(R.id.email);
             offerView = (TextView) findViewById(R.id.offer_text);
 
             tagsHeaderView = findViewById(R.id.tags_header);
@@ -518,8 +516,8 @@ public class EventDetailActivity extends BaseActivity {
             params.height = (int) (0.3 * metrics.heightPixels);
             bgView.setLayoutParams(params);
 
-            bgView.setDefaultImageResId(R.drawable.eh_default_event_detail);
-            bgView.setErrorImageResId(R.drawable.eh_default_event_detail);
+            bgView.setDefaultImageResId(R.drawable.eh_default_event);
+            bgView.setErrorImageResId(R.drawable.eh_default_event);
             bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(EventDetailActivity.this));
 
             // Set title
@@ -561,18 +559,6 @@ public class EventDetailActivity extends BaseActivity {
 
             if (event.organizerPhone == null) {
                 callView.setVisibility(View.GONE);
-            }
-
-            if (event.organizerEmail == null) {
-                emailView.setVisibility(View.GONE);
-            } else {
-                emailView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        reportEventAction(event, "emailOrganizer");
-                        askOverEmail();
-                    }
-                });
             }
 
             shareView.setOnClickListener(new OnClickListener() {
