@@ -107,8 +107,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
         setContentView(R.layout.activity_events);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Hide the follow toolbar initially
-        findViewById(R.id.follow_toolbar).setVisibility(View.GONE);
 
         dateFilter = (SlidingTabLayout) findViewById(R.id.date_filter);
         topProgressBar = findViewById(R.id.top_progress_bar);
@@ -160,14 +158,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
 
         // See if date filter is passed.
         showDateFilter();
-    }
-
-    protected void clearTitleSubTitle() {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle("");
-            actionBar.setSubtitle("");
-        }
     }
 
     protected void setTitle() {
@@ -441,11 +431,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
     public void onFindEvents(View view) {
         reportActionToAnalytics("findEvents");
         showSearchView("");
-        finish();
-    }
-
-    public void onExploreCategories(View view) {
-        reportActionToAnalytics("exploreCategories");
         finish();
     }
 

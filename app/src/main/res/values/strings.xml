@@ -13,8 +13,7 @@
     <string name="action_verify_code">Verify Code</string>
     <string name="action_change_no">Change Number</string>
     <string name="action_register">Register</string>
-    <string name="action_find_event">Find Events</string>
-    <string name="action_explore_categories">Explore Categories</string>
+    <string name="action_find_event">Show Events</string>
     <string name="action_reset">Reset</string>
     <string name="action_apply_filter">Apply Filter</string>
     <string name="action_new_feedback">Send New Feedback</string>
@@ -60,7 +59,7 @@
     <string name="ui_code">We have sent a code to %s. Please enter it below</string>
     <string name="ui_code_verified">Your phone number %s has been verified</string>
     <string name="ui_verify_phone">Verify your phone number</string>
-    <string name="ui_no_my_event">This looks so empty! Want to choose some favourites?</string>
+    <string name="ui_no_my_event">This looks so empty!\n\nShow your love by clicking on heart icon and those events will appear here.\n\n Also when you follow a category or performer, it will appear here.</string>
     <string name="ui_pick_interest">Pick Your Interests</string>
     <string name="ui_view_location_on_map">View location on map</string>
     <string name="ui_upcoming_events">Upcoming events</string>

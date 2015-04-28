@@ -85,8 +85,8 @@ public class ToolbarColorizeHelper {
             }
 
             //Step 3: Changing the color of title and subtitle.
-            toolbarView.setTitleTextColor(toolbarIconsColor);
-            toolbarView.setSubtitleTextColor(toolbarIconsColor);
+            // toolbarView.setTitleTextColor(toolbarIconsColor);
+            // toolbarView.setSubtitleTextColor(toolbarIconsColor);
 
             //Step 4: Changing the color of the Overflow Menu icon.
             setOverflowButtonColor(activity, colorFilter);

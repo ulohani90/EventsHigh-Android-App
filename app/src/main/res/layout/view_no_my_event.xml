@@ -25,23 +25,10 @@
         style="@style/EHButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_margin="24dp"
         android:text="@string/action_find_event"
         android:onClick="onFindEvents"
-    />
-    <TextView
-        android:id="@+id/see_categories"
-        style="@style/EHButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="24dp"
-        android:text="@string/action_explore_categories"
-        android:onClick="onExploreCategories"
     />
 </RelativeLayout>

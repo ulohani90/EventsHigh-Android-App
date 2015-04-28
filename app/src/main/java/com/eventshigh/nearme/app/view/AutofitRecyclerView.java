@@ -50,15 +50,7 @@ public class AutofitRecyclerView extends RecyclerView {
         return value;
     }
 
-    public int findFirstVisibleItemPosition() {
-        return gridLayoutManager.findFirstVisibleItemPosition();
-    }
-
     public int getSpanCount() {
         return gridLayoutManager.getSpanCount();
-    }
-
-    public int getVerticalOffset() {
-        return super.computeVerticalScrollOffset();
     }
 }

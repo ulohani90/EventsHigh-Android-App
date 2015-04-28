@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
@@ -22,7 +23,6 @@ import com.eventshigh.nearme.app.network.OffersRequest;
 import com.eventshigh.nearme.app.task.FetchLocalityTask;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
-import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -39,12 +39,9 @@ public class EventsGridActivity extends BaseEventsActivity {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private AutofitRecyclerView eventGridView;
-    private View followToolbarBackground;
     private EventsAdapter eventsAdapter;
     private boolean showFollowCard;
-    private float toolbarBackgroundAlpha;
     private boolean searchViewExpanded;
-    private String subtitle;
 
     // ***********************
     // Delegated Methods from {@link BaseEventsActivity}
@@ -76,18 +73,15 @@ public class EventsGridActivity extends BaseEventsActivity {
         showFollowCard = !eventsContext.query.isEmpty() &&
                 !EventsHighEndpoints.isDateQuery(eventsContext.query) &&
                 !EventsHighEndpoints.isMyEventQuery(eventsContext.query) &&
-                !EventsHighEndpoints.isFeaturedEventQuery(eventsContext.query);
-
+                !EventsHighEndpoints.isFeaturedEventQuery(eventsContext.query) &&
+                eventGridView.getSpanCount() == 1;
         if (showFollowCard) {
             // Hide the regular toolbar and show the follow toolbar
             toolbar.setVisibility(View.GONE);
             toolbar = (Toolbar) findViewById(R.id.follow_toolbar);
-            setSupportActionBar(toolbar);
-            setDarkToolbarIcons();
-            clearTitleSubTitle();
             toolbar.setVisibility(View.VISIBLE);
-
-            followToolbarBackground = findViewById(R.id.follow_toolbar_background);
+            setSupportActionBar(toolbar);
+            setTitle();
         }
     }
 
@@ -96,61 +90,26 @@ public class EventsGridActivity extends BaseEventsActivity {
         boolean returnValue = super.onCreateOptionsMenu(menu);
         MenuItem item = menu.findItem(R.id.action_search);
         MenuItemCompat.setOnActionExpandListener(item,
-            new MenuItemCompat.OnActionExpandListener() {
-                @Override
-                public boolean onMenuItemActionExpand(MenuItem item) {
-                    searchViewExpanded = true;
-                    followToolbarBackground.setAlpha(1);
-                    setLightToolbarIcons();
-                    return true;
-                }
+                new MenuItemCompat.OnActionExpandListener() {
+                    int oldToolbarAlpha;
 
-                @Override
-                public boolean onMenuItemActionCollapse(MenuItem item) {
-                    searchViewExpanded = false;
-                    updateToolbar();
-                    return true;
-                }
-            });
+                    @Override
+                    public boolean onMenuItemActionExpand(MenuItem item) {
+                        searchViewExpanded = true;
+                        oldToolbarAlpha = currentToolBarAlpha;
+                        updateToolbar(255);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onMenuItemActionCollapse(MenuItem item) {
+                        searchViewExpanded = false;
+                        updateToolbar(oldToolbarAlpha);
+                        return true;
+                    }
+                });
 
         return returnValue;
-    }
-
-    private void setDarkToolbarIcons() {
-        toolbar.post(new Runnable() {
-            @Override
-            public void run() {
-                ToolbarColorizeHelper.colorizeToolbar(toolbar,
-                    getResources().getColor(android.R.color.black), EventsGridActivity.this);
-            }
-        });
-    }
-
-    private void setLightToolbarIcons() {
-        toolbar.post(new Runnable() {
-            @Override
-            public void run() {
-                ToolbarColorizeHelper.colorizeToolbar(toolbar,
-                    getResources().getColor(android.R.color.white), EventsGridActivity.this);
-            }
-        });
-    }
-
-    private void updateToolbar() {
-        // Change the color of toolbar icons and text
-        if (toolbarBackgroundAlpha < 0.5) {
-            clearTitleSubTitle();
-            if (followToolbarBackground.getAlpha() >= 0.5) {
-                setDarkToolbarIcons();
-            }
-        } else {
-            setTitle();
-            setSubtitle();
-            if (followToolbarBackground.getAlpha() < 0.5) {
-                setLightToolbarIcons();
-            }
-        }
-        followToolbarBackground.setAlpha(toolbarBackgroundAlpha);
     }
 
     @Override
@@ -163,13 +122,8 @@ public class EventsGridActivity extends BaseEventsActivity {
         super.updateEventsCollection(events);
         eventsAdapter.setEvents(events);
         if (showFollowCard) {
-            eventsAdapter.addFollowCard(eventsContext.query);
-
-            final int invisibleAt = Utils.dpToPx(this, 50);
-            final int visibleAt = Utils.dpToPx(this, 150);
-            followToolbarBackground.setAlpha(0);
-            followToolbarBackground.setVisibility(View.VISIBLE);
-
+            updateToolbar(0);
+            eventsAdapter.addFollowCard(eventsContext.query, events.size());
             eventGridView.setOnScrollListener(new OnScrollListener() {
                 private int y;
 
@@ -181,14 +135,8 @@ public class EventsGridActivity extends BaseEventsActivity {
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                     y += dy;
-                    toolbarBackgroundAlpha = ((float) y - invisibleAt) / (visibleAt - invisibleAt);
-                    if (toolbarBackgroundAlpha < 0) {
-                        toolbarBackgroundAlpha = 0;
-                    } else if (toolbarBackgroundAlpha > 1) {
-                        toolbarBackgroundAlpha = 1;
-                    }
                     if (!searchViewExpanded) {
-                        updateToolbar();
+                        updateToolbar(Math.min(y, 255));
                     }
                 }
             });
@@ -226,17 +174,47 @@ public class EventsGridActivity extends BaseEventsActivity {
         return R.id.action_show_list;
     }
 
-    public void setSubtitle() {
-        super.onLocationUpdated(subtitle);
+    private int currentToolBarAlpha = 255;
+    private void updateToolbar(int toolbarAlpha) {
+        if (toolbarAlpha == currentToolBarAlpha) {
+            // do nothing
+            return;
+        }
+
+        // Change the color of toolbar icons and text if needed.
+        if (toolbarAlpha < 100) {
+            if (currentToolBarAlpha >= 100) {
+                setDarkToolbarIcons();
+            }
+        } else {
+            if (currentToolBarAlpha < 100) {
+                setLightToolbarIcons();
+            }
+        }
+
+        currentToolBarAlpha = toolbarAlpha;
+        toolbar.setBackgroundColor(Color.argb(toolbarAlpha, 0x15, 0xA9, 0xD1));
+        toolbar.setTitleTextColor(Color.argb(toolbarAlpha, 255, 255, 255));
+        toolbar.setSubtitleTextColor(Color.argb(toolbarAlpha, 255, 255, 255));
     }
 
-    @Override
-    public void onLocationUpdated(String locality) {
-        if (showFollowCard) {
-            subtitle = locality;
-            updateToolbar();
-        } else {
-            super.onLocationUpdated(locality);
-        }
+    private void setDarkToolbarIcons() {
+        toolbar.post(new Runnable() {
+            @Override
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                        getResources().getColor(android.R.color.black), EventsGridActivity.this);
+            }
+        });
+    }
+
+    private void setLightToolbarIcons() {
+        toolbar.post(new Runnable() {
+            @Override
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                        getResources().getColor(android.R.color.white), EventsGridActivity.this);
+            }
+        });
     }
 }

@@ -98,8 +98,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void addFollowCard(String title) {
-        dataToShow.add(0, new FollowData(title));
+    public void addFollowCard(String title, int numEvents) {
+        dataToShow.add(0, new FollowData(title, numEvents));
     }
 
     @Override
@@ -455,9 +455,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private class FollowData implements Data {
         private final String title;
+        private final int numEvents;
 
-        private FollowData(String title) {
+        private FollowData(String title, int numEvents) {
             this.title = title;
+            this.numEvents = numEvents;
         }
 
         @Override
@@ -478,6 +480,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     static class FollowCard extends ViewHolder {
         private TextView titleView;
+        private TextView subtitleView;
         private View followButton;
         private View followingButton;
 
@@ -490,12 +493,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             super(itemView);
 
             titleView = (TextView) itemView.findViewById(R.id.title);
+            subtitleView = (TextView) itemView.findViewById(R.id.subtitle);
             followButton = itemView.findViewById(R.id.follow_button);
             followingButton = itemView.findViewById(R.id.following_button);
         }
 
         public void populate(final FollowData data, final BaseContextActivity activity) {
             titleView.setText(data.title);
+            subtitleView.setText(data.numEvents + " events");
 
             final Account account = new Account(activity);
             setFollowButtons(account.isFollowing(data.title));
