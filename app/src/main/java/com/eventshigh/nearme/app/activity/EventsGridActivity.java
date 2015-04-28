@@ -58,6 +58,7 @@ public class EventsGridActivity extends BaseEventsActivity {
         eventGridView = (AutofitRecyclerView) findViewById(R.id.event_grid);
         eventGridView.setEventsAdapter(eventsAdapter);
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
+            eventGridView.setSpacing((int) getResources().getDimension(R.dimen.small_card_spacing));
             eventGridView.setColumnWidth((int) getResources().getDimension(R.dimen.small_event_card_width));
         }
 

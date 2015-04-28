@@ -385,6 +385,7 @@ public class LaunchActivity extends BaseContextActivity {
             }
             eventsContext.changeLocation(city.cityBounds.getCenter());
             gcmRegistration.setLastCity(city, null);
+            viewSwitcher.setDisplayedChild(0);
             showNextScreen();
         }
     };

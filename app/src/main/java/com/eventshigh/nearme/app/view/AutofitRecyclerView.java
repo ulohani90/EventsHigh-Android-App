@@ -13,6 +13,7 @@ public class AutofitRecyclerView extends RecyclerView {
     private GridLayoutManager gridLayoutManager;
     private int columnWidth;
     private EventsAdapter eventsAdapter;
+    private SpacesItemDecoration spacesItemDecoration;
 
     public AutofitRecyclerView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -26,6 +27,7 @@ public class AutofitRecyclerView extends RecyclerView {
             verticalSpacing = getDimensionPixelSize(context, attrs,
                     android.R.attr.verticalSpacing, -1);
         }
+        spacesItemDecoration = new SpacesItemDecoration(horizontalSpacing, verticalSpacing);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -34,7 +36,7 @@ public class AutofitRecyclerView extends RecyclerView {
         // use a grid layout manager
         gridLayoutManager = new GridLayoutManager(context, 1);
         setLayoutManager(gridLayoutManager);
-        addItemDecoration(new SpacesItemDecoration(horizontalSpacing, verticalSpacing));
+        addItemDecoration(spacesItemDecoration);
     }
 
     protected void onMeasure(int widthSpec, int heightSpec) {
@@ -43,6 +45,12 @@ public class AutofitRecyclerView extends RecyclerView {
             int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
             gridLayoutManager.setSpanCount(spanCount);
         }
+    }
+
+    public void setSpacing(int spacing) {
+        removeItemDecoration(spacesItemDecoration);
+        spacesItemDecoration = new SpacesItemDecoration(spacing, spacing);
+        addItemDecoration(spacesItemDecoration);
     }
 
     public void setColumnWidth(int width) {
