@@ -571,13 +571,8 @@ public class EventDetailActivity extends BaseActivity {
             }
 
             // Set action buttons.
-            if (event.bookingUrl == null) {
-                bookView.setVisibility(View.GONE);
-            }
-
-            if (event.organizerPhone == null) {
-                callView.setVisibility(View.GONE);
-            }
+            bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
+            callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
 
             // Set time.
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
@@ -823,13 +818,9 @@ public class EventDetailActivity extends BaseActivity {
 
     private void getInstalledApps() {
         for(PackageInfo packageInfo : getPackageManager().getInstalledPackages(0)) {
-            if (packageInfo.versionName == null) {
-                continue ;
+            if (packageInfo.versionName != null && packageInfo.applicationInfo.enabled) {
+                INSTALLED_PACKAGES.add(packageInfo.packageName);
             }
-            INSTALLED_PACKAGES.add(packageInfo.packageName);
         }
     }
-
-
 }
-

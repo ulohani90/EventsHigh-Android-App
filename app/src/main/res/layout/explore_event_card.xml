@@ -6,7 +6,7 @@
     android:layout_height="@dimen/event_card_height"
     android:foreground="?android:attr/selectableItemBackground"
     android:layout_marginTop="2dp"
-    android:layout_marginBottom="20dp"
+    android:layout_marginBottom="2dp"
     android:layout_marginLeft="2dp"
     android:layout_marginStart="2dp"
     android:layout_marginRight="10dp"
