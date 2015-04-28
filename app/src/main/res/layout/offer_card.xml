@@ -15,7 +15,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-        tools:background="@drawable/eh_default_event_list"
         tools:layout_height="200dp"
     />
     <TextView

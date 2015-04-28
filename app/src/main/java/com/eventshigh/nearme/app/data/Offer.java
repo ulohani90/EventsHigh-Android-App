@@ -56,7 +56,8 @@ public abstract class Offer {
 
     public void populateOfferCard(View offerCard, final BaseActivity activity) {
         NetworkImageView imageView = (NetworkImageView) offerCard.findViewById(R.id.image);
-        imageView.setImageBitmap(null);
+        imageView.setDefaultImageResId(R.drawable.eh_default_event);
+        imageView.setDefaultImageResId(R.drawable.eh_default_event);
         imageView.setImageUrl(imgUrl.toString(), VolleyHelper.getImageLoader(activity));
         offerCard.findViewById(R.id.expired).setVisibility(isExpired() ? View.VISIBLE : View.GONE);
         offerCard.setOnClickListener(new OnClickListener() {
