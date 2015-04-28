@@ -63,6 +63,10 @@ public class Event implements Parcelable {
     @Nullable public final String organizerEmail;
     @Nullable public final String organizerLink;
 
+    public final int minPrice;
+    public final int maxPrice;
+    @Nullable public final String currency;
+
     public Event(String id, City city, String title, EventCategory category,
                  @Nullable String offerTitle, String description, String[] tags,
                  @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
@@ -71,7 +75,8 @@ public class Event implements Parcelable {
                  @Nullable String address, boolean isCleanVenue,
                  String[] performers,
                  String organizerName, String organizerPhone, String organizerWebsite,
-                 String organizerEmail, String organizerLink) {
+                 String organizerEmail, String organizerLink,
+                 int minPrice, int maxPrice, @Nullable String currency) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -104,6 +109,10 @@ public class Event implements Parcelable {
         this.organizerWebsite = Utils.checkIfUnknown(organizerWebsite);
         this.organizerEmail = Utils.checkIfUnknown(organizerEmail);
         this.organizerLink = Utils.checkIfUnknown(organizerLink);
+
+        this.minPrice = minPrice;
+        this.maxPrice = maxPrice;
+        this.currency = Utils.checkIfUnknown(currency);
     }
 
     public Uri getEventDetailsURI() {
@@ -125,6 +134,22 @@ public class Event implements Parcelable {
     public String getShortAddress() {
         String shortAddress = (venue == null ? "" : venue + " " ) + (locality == null ? "" : "(" + locality +")").trim();
         return shortAddress.isEmpty() ? Utils.capitalize(city.name()) : shortAddress;
+    }
+
+    public @Nullable String getPriceString() {
+        if (minPrice < 0 || maxPrice < 0) {
+            return null;
+        }
+
+        if (minPrice == 0 && maxPrice == 0) {
+            return  "Free";
+        }
+
+        if (minPrice == maxPrice) {
+            return currency + " " + minPrice;
+        }
+
+        return currency + " " + minPrice + " - " + maxPrice;
     }
 
     @Override
@@ -180,6 +205,10 @@ public class Event implements Parcelable {
         dest.writeString(emptyIfNull(organizerWebsite));
         dest.writeString(emptyIfNull(organizerEmail));
         dest.writeString(emptyIfNull(organizerLink));
+
+        dest.writeInt(minPrice);
+        dest.writeInt(maxPrice);
+        dest.writeString(emptyIfNull(currency));
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -218,6 +247,10 @@ public class Event implements Parcelable {
                             in.readString(),
                             in.readString(),
                             in.readString(),
+                            in.readString(),
+
+                            in.readInt(),
+                            in.readInt(),
                             in.readString()
                     );
                 }
@@ -363,6 +396,32 @@ public class Event implements Parcelable {
         String organizerEmail = mashup == null ? null : mashup.optString("organizer_email");
         String organizerLink = mashup == null ? null : mashup.optString("organizer_link");
 
+        // Price.
+        int minPrice = -1, maxPrice = -1;
+        String currency = "\u20B9";
+        if (mashup != null) {
+            JSONObject priceInfo = mashup.optJSONObject("price_info");
+            if (priceInfo != null) {
+                if (priceInfo.optBoolean("is_free_event", false)) {
+                    minPrice = 0;
+                    maxPrice = 0;
+                } else {
+                    currency = priceInfo.optString("currency", "\u20B9");
+                    if (currency.equalsIgnoreCase("INR")) {
+                        currency = "\u20B9";
+                    }
+                    int value = priceInfo.optInt("value", -1);
+                    if (value >= 0) {
+                        minPrice = value;
+                        maxPrice = value;
+                    } else {
+                        minPrice = priceInfo.optInt("min", -1);
+                        maxPrice = priceInfo.optInt("min", -1);
+                    }
+                }
+            }
+        }
+
         return new Event(id,
                 city,
                 title,
@@ -394,7 +453,11 @@ public class Event implements Parcelable {
                 organizerPhone,
                 organizerWebsite,
                 organizerEmail,
-                organizerLink
+                organizerLink,
+
+                minPrice,
+                maxPrice,
+                currency
         );
     }
 
