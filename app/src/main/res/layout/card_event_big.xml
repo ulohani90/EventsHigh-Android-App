@@ -11,6 +11,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/white"
     >
         <com.android.volley.toolbox.NetworkImageView
             android:id="@+id/event_bg"
@@ -62,44 +63,41 @@
             android:layout_marginBottom="14dp"
             android:layout_marginRight="64dp"
             android:layout_marginEnd="64dp"
+            android:background="@android:color/white"
             android:maxLines="1"
             android:ellipsize="end"
             android:textColor="#CC000000"
             tools:text="My Awesome Event with a long long title!"
         />
 
-        <TextView
+        <ImageView
             android:id="@+id/action_favourite"
-            android:background="@drawable/fab"
-            android:layout_marginTop="-16dp"
-            android:layout_marginRight="10dp"
-            android:elevation="4dp"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:drawableLeft="@drawable/ic_favorite_white_18dp"
-            android:drawableStart="@drawable/ic_favorite_white_18dp"
-            android:layout_below="@+id/event_bg"
-            android:padding="16dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:textColor="#FF595959"
+            android:layout_below="@+id/event_bg"
+            android:layout_marginTop="-16dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/fab_white"
+            android:padding="8dp"
+            android:src="@drawable/ic_favorite_grey600_24dp"
         />
 
-        <TextView
+        <ImageView
             android:id="@+id/action_favourited"
-            android:background="@drawable/fab_white"
-            android:layout_marginTop="-16dp"
-            android:layout_marginRight="10dp"
-            android:elevation="4dp"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:drawableLeft="@drawable/ic_favorite_red_18dp"
-            android:drawableStart="@drawable/ic_favorite_red_18dp"
-            android:layout_below="@+id/event_bg"
-            android:padding="16dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:textColor="#FF595959"
+            android:layout_below="@+id/event_bg"
+            android:layout_marginTop="-16dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/fab_white"
+            android:padding="8dp"
+            android:src="@drawable/ic_favorite_red_24dp"
         />
 
         <TextView
