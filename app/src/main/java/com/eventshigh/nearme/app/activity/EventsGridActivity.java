@@ -158,7 +158,7 @@ public class EventsGridActivity extends BaseEventsActivity {
     @Override
     protected void updateMyEvents(MyEvents myEvents) {
         super.updateMyEvents(myEvents);
-        eventsAdapter.setMyEvents(myEvents, eventGridView.getSpanCount() * 2);
+        eventsAdapter.setMyEvents(myEvents, false, eventGridView.getSpanCount() * 2);
     }
 
     @Override

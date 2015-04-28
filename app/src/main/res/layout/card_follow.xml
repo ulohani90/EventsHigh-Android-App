@@ -30,8 +30,8 @@
         android:layout_margin="8dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="#80000000"
-        android:textSize="12sp"
+        android:textColor="#99212121"
+        android:textSize="14sp"
         tools:text="39 Events"
     />
 

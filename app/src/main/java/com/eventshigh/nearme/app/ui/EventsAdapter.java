@@ -26,6 +26,7 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
@@ -67,19 +68,31 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    public void setMyEvents(MyEvents myEvents, int maxPerCategory) {
+    public void setMyEvents(MyEvents myEvents, boolean addMyEventHeader, int maxPerCategory) {
         dataToShow.clear();
 
         for (Pair<String, List<Event>> myEventEntry : myEvents) {
+            if (addMyEventHeader && !dataToShow.isEmpty()) {
+                dataToShow.add(new MyEventHeaderData());
+                addMyEventHeader = false;
+            }
+
+            List<Event> events = myEventEntry.second;
+            if (events.isEmpty()) {
+                continue;
+            }
+
             boolean isFavourite = myEventEntry.first.equals(MyEventsRequest.FAVOURITES_NAME);
+            if (!isFavourite && events.size() > maxPerCategory) {
+                events = events.subList(0, maxPerCategory);
+            }
+
             dataToShow.add(new HeaderData(myEventEntry.first));
-            List<Event> events = isFavourite ? myEventEntry.second :
-                    myEventEntry.second.subList(0,
-                            Math.min(maxPerCategory, myEventEntry.second.size()));
             for (Event event : events) {
                 dataToShow.add(new MyEventData(myEventEntry.first, event));
             }
         }
+
         notifyDataSetChanged();
     }
 
@@ -88,7 +101,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     public boolean spanAllColumns(int position) {
-        return getItemViewType(position) == DataType.HEADER.typeId;
+        return DataType.spanAllColumns(getItemViewType(position));
     }
 
     @Override
@@ -144,11 +157,16 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         EVENT(1),
         OFFER(2),
         FOLLOW(3),
-        MY_EVENT(4);
+        MY_EVENT(4),
+        MY_EVENT_HEADER(5);
 
         public final int typeId;
         DataType (int typeId) {
             this.typeId = typeId;
+        }
+
+        public static boolean spanAllColumns (int typeId) {
+            return  typeId == HEADER.typeId || typeId == MY_EVENT_HEADER.typeId;
         }
 
         public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
@@ -170,6 +188,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             if (typeId == MY_EVENT.typeId) {
                 return EventCard.newInstance(activity, parent, false);
+            }
+
+            if (typeId == MY_EVENT_HEADER.typeId) {
+                View view = activity.getLayoutInflater().inflate(
+                        R.layout.card_my_events_header, parent, false);
+                return new HeaderCard(view);
             }
 
             throw new IllegalArgumentException("invalid typeid");
@@ -236,7 +260,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    // EventData.
+    // Event Data.
     private class EventData implements Data {
         private final String header;
         private final Event event;
@@ -399,6 +423,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
+    // Offer Data.
     private class OfferData implements Data {
         private final Offer offer;
 
@@ -436,6 +461,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
 
+    // Follow Data.
     private class FollowData implements Data {
         private final String title;
         private final int numEvents;
@@ -483,7 +509,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         public void populate(final FollowData data, final BaseContextActivity activity) {
             titleView.setText(data.title);
-            subtitleView.setText(data.numEvents + " events");
+            subtitleView.setText(
+                String.format(activity.getString(R.string.num_events), data.numEvents));
 
             final Account account = new Account(activity);
             setFollowButtons(account.isFollowing(data.title));
@@ -514,6 +541,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
+    // My Event Data.
     private class MyEventData implements Data {
         private final String header;
         private final Event event;
@@ -535,6 +563,30 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         public String getId() {
             return header + ":" + event.id;
+        }
+    }
+
+    // My Event Header Data.
+    private class MyEventHeaderData implements Data {
+
+        @Override
+        public DataType getType() {
+            return DataType.MY_EVENT_HEADER;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder card, int position) {
+            card.itemView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.reportActionToAnalytics("showMyEvents");
+                    activity.showSearchView(EventsHighEndpoints.QUERY_MY_EVENT);
+                }
+            });
+        }
+
+        public String getId() {
+            return MyEventHeaderData.class.getSimpleName();
         }
     }
 }

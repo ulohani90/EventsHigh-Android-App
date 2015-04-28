@@ -308,7 +308,7 @@ public class LaunchActivity extends BaseContextActivity {
             }
             retryView.setVisibility(View.GONE);
             lastFetchTimestamp = System.currentTimeMillis();
-            adapter.setMyEvents(events, 2 * gridView.getSpanCount());
+            adapter.setMyEvents(events, true, 2 * gridView.getSpanCount());
         }
     };
 
