@@ -195,10 +195,15 @@ public abstract class BaseActivity extends AppCompatActivity {
         try {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
+            String src = null;
+            if (packageName != null) {
+                src = packageName.split("\\.")[1];
+            }
+
             sendIntent.putExtra(Intent.EXTRA_TEXT,
                     String.format(getResources().getString(R.string.share_event_text),
                             event.title + (event.isCleanVenue ? " @ " + event.venue : ""),
-                            event.getEventShareURI(this))
+                            event.getEventShareURI(this, src))
             );
             sendIntent.setType("text/plain");
             if (packageName != null) {

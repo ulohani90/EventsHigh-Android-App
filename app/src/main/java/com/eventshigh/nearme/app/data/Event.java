@@ -120,7 +120,11 @@ public class Event implements Parcelable {
     }
 
     public Uri getEventShareURI(Context context) {
-        return EventsHighEndpoints.getEventShareURI(this, context);
+        return getEventShareURI(context, null);
+    }
+
+    public Uri getEventShareURI(Context context, @Nullable String src) {
+        return EventsHighEndpoints.getEventShareURI(this, src, context);
     }
 
     public int getPopularityScore() {
