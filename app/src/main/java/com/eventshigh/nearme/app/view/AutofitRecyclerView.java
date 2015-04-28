@@ -3,12 +3,16 @@ package com.eventshigh.nearme.app.view;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.GridLayoutManager.SpanSizeLookup;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+
+import com.eventshigh.nearme.app.ui.EventsAdapter;
 
 public class AutofitRecyclerView extends RecyclerView {
     private GridLayoutManager gridLayoutManager;
     private int columnWidth;
+    private EventsAdapter eventsAdapter;
 
     public AutofitRecyclerView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -53,4 +57,18 @@ public class AutofitRecyclerView extends RecyclerView {
     public int getSpanCount() {
         return gridLayoutManager.getSpanCount();
     }
+
+    public void setEventsAdapter(EventsAdapter eventsAdapter) {
+        this.eventsAdapter = eventsAdapter;
+
+        gridLayoutManager.setSpanSizeLookup(mSpanSizeLookup);
+        setAdapter(eventsAdapter);
+    }
+
+    private SpanSizeLookup mSpanSizeLookup = new SpanSizeLookup() {
+        @Override
+        public int getSpanSize(int position) {
+            return (eventsAdapter != null && eventsAdapter.spanAllColumns(position)) ? getSpanCount() : 1;
+        }
+    };
 }

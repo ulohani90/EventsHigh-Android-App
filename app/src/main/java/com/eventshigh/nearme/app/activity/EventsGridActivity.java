@@ -56,7 +56,7 @@ public class EventsGridActivity extends BaseEventsActivity {
 
         eventsAdapter = new EventsAdapter(this);
         eventGridView = (AutofitRecyclerView) findViewById(R.id.event_grid);
-        eventGridView.setAdapter(eventsAdapter);
+        eventGridView.setEventsAdapter(eventsAdapter);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

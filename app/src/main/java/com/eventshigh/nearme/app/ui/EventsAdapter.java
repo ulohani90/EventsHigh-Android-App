@@ -102,6 +102,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         dataToShow.add(0, new FollowData(title, numEvents));
     }
 
+    public boolean spanAllColumns(int position) {
+        return getItemViewType(position) == DataType.HEADER.typeId;
+    }
+
     @Override
     public int getItemViewType(int position) {
         return dataToShow.get(position).getType().typeId;
