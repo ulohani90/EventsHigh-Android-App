@@ -133,12 +133,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     // Build the view, reuse existing if possible.
     public static View getEventCard(final Event event, final BaseEventsActivity activity,
                                     @Nullable View reuseView, ViewGroup parent) {
-        // Build the view, reuse existing if possible.
-        final EventCard eventCard = reuseView == null ?
-                EventCard.newInstance(activity, parent, false) :
-                new EventCard(reuseView, false);
-        eventCard.bindEventView(event, activity, 0);
-        return eventCard.itemView;
+        View view = reuseView != null ? reuseView :
+                activity.getLayoutInflater().inflate(R.layout.explore_event_card, parent, false);
+        new EventCard(view, true).bindEventView(event, activity, -1);
+        return view;
     }
 
     private enum DataType {
