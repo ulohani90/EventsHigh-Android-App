@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="event_card_width">120dp</dimen>
-    <dimen name="event_card_height">67dp</dimen>
-    <dimen name="big_event_card_image_height">200dp</dimen>
+    <dimen name="big_event_card_width">120dp</dimen>
+    <dimen name="big_event_card_height">70dp</dimen>
+    <dimen name="small_event_card_width">160dp</dimen>
+    <dimen name="small_event_card_height">100dp</dimen>
 </resources>

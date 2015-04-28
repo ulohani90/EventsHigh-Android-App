@@ -15,7 +15,7 @@
         <com.android.volley.toolbox.NetworkImageView
             android:id="@+id/event_bg"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/big_event_card_image_height"
+            android:layout_height="@dimen/big_event_card_height"
             android:scaleType="centerCrop"
             android:layout_alignParentTop="true"
             android:adjustViewBounds="false"

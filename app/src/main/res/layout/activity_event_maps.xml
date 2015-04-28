@@ -13,7 +13,7 @@
     />
     <FrameLayout
         android:id="@+id/event_card_container"
-        android:layout_width="@dimen/event_card_width"
+        android:layout_width="@dimen/small_event_card_width"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
         android:animateLayoutChanges="true"

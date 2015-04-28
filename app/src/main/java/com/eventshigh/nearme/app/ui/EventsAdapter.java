@@ -10,7 +10,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
@@ -41,8 +40,6 @@ import java.util.Set;
  * An adapter which can be used to populate the Event card.
  */
 public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
-    private static final int NUM_MAX_EVENTS_PER_INTEREST = 3;
-
     private final BaseContextActivity activity;
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
     private final Set<Integer> usedItemIds = new HashSet<>();
@@ -70,7 +67,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    public void setMyEvents(MyEvents myEvents) {
+    public void setMyEvents(MyEvents myEvents, int maxPerCategory) {
         dataToShow.clear();
 
         for (Pair<String, List<Event>> myEventEntry : myEvents) {
@@ -78,21 +75,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             dataToShow.add(new HeaderData(myEventEntry.first));
             List<Event> events = isFavourite ? myEventEntry.second :
                     myEventEntry.second.subList(0,
-                            Math.min(NUM_MAX_EVENTS_PER_INTEREST, myEventEntry.second.size()));
+                            Math.min(maxPerCategory, myEventEntry.second.size()));
             for (Event event : events) {
                 dataToShow.add(new MyEventData(myEventEntry.first, event));
-            }
-        }
-        notifyDataSetChanged();
-    }
-
-    public void setExploreEvents(MyEvents myEvents) {
-        dataToShow.clear();
-
-        for (Pair<String, List<Event>> myEventEntry : myEvents) {
-            if (!myEventEntry.second.isEmpty()) {
-                dataToShow.add(new HeaderData(myEventEntry.first));
-                dataToShow.add(new EventListData(myEventEntry.first, myEventEntry.second));
             }
         }
         notifyDataSetChanged();
@@ -161,8 +146,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         EVENT(1),
         OFFER(2),
         FOLLOW(3),
-        EVENT_LIST(4),
-        MY_EVENT(5);
+        MY_EVENT(4);
 
         public final int typeId;
         DataType (int typeId) {
@@ -184,10 +168,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             if (typeId == FOLLOW.typeId) {
                 return FollowCard.newInstance(activity, parent);
-            }
-
-            if (typeId == EVENT_LIST.typeId) {
-                return EventListCard.newInstance(activity, parent);
             }
 
             if (typeId == MY_EVENT.typeId) {
@@ -298,7 +278,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
             View view = activity.getLayoutInflater().inflate(
-                    bigLayout ? R.layout.big_event_card : R.layout.event_card, parent, false);
+                    bigLayout ? R.layout.big_event_card : R.layout.explore_event_card, parent, false);
             return new EventCard(view, bigLayout);
         }
 
@@ -532,54 +512,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             followButton.setVisibility(isFollowing ? View.GONE : View.VISIBLE);
             followingButton.setVisibility(isFollowing ? View.VISIBLE : View.GONE);
             followingButton.setSelected(true);
-        }
-    }
-
-    private class EventListData implements Data {
-        private final String header;
-        private final List<Event> events;
-
-        public EventListData(String header, List<Event> events) {
-            this.header = header;
-            this.events = events;
-        }
-
-        @Override
-        public DataType getType() {
-            return DataType.EVENT_LIST;
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder card, int position) {
-            ((EventListCard) card).bindEventsView(events, activity);
-        }
-
-        public String getId() {
-            return header + ":" + events.get(0).id;
-        }
-    }
-
-    private static class EventListCard extends ViewHolder {
-        static EventListCard newInstance(final BaseActivity activity, ViewGroup parent) {
-            View view = activity.getLayoutInflater().inflate(R.layout.explore_events_list, parent, false);
-            return new EventListCard(view);
-        }
-
-        private LinearLayout eventContainer;
-        public EventListCard(View itemView) {
-            super(itemView);
-
-            eventContainer = (LinearLayout) itemView.findViewById(R.id.event_container);
-        }
-
-        public void bindEventsView(List<Event> events, BaseContextActivity activity) {
-            itemView.scrollTo(0, 0);
-            eventContainer.removeAllViews();
-            for (Event event : events) {
-                View cardView = activity.getLayoutInflater().inflate(R.layout.explore_event_card, eventContainer, false);
-                eventContainer.addView(cardView);
-                new EventCard(cardView, false).bindEventView(event, activity, 0);
-            }
         }
     }
 

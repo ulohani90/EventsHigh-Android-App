@@ -45,6 +45,10 @@ public class AutofitRecyclerView extends RecyclerView {
         }
     }
 
+    public void setColumnWidth(int width) {
+        columnWidth = width;
+    }
+
     private int getDimensionPixelSize(Context context, AttributeSet attributeSet, int attr,
                                       int defaultValue) {
         int[] attrsArray = { attr };

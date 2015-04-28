@@ -12,8 +12,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -43,6 +41,7 @@ import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -61,6 +60,7 @@ public class LaunchActivity extends BaseContextActivity {
     private ViewSwitcher viewSwitcher;
     private DrawerLayout drawer;
     private ActionBarDrawerToggle drawerToggle;
+    private AutofitRecyclerView gridView;
 
     // Client to Google api so that we can fetch the user location if
     // its not passed in intent.
@@ -96,10 +96,9 @@ public class LaunchActivity extends BaseContextActivity {
         });
 
         // Set the events adapter.
-        RecyclerView eventsContainer = (RecyclerView) findViewById(R.id.event_container);
-        eventsContainer.setLayoutManager(new LinearLayoutManager(this));
+        gridView = (AutofitRecyclerView) findViewById(R.id.event_grid);
         adapter = new EventsAdapter(this);
-        eventsContainer.setAdapter(adapter);
+        gridView.setEventsAdapter(adapter);
 
         // Setup the actionbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -309,7 +308,7 @@ public class LaunchActivity extends BaseContextActivity {
             }
             retryView.setVisibility(View.GONE);
             lastFetchTimestamp = System.currentTimeMillis();
-            adapter.setExploreEvents(events);
+            adapter.setMyEvents(events, 2 * gridView.getSpanCount());
         }
     };
 
