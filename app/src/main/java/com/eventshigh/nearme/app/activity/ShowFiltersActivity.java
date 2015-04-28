@@ -39,7 +39,7 @@ public class ShowFiltersActivity extends BaseActivity {
             }
 
             FrameLayout card = (FrameLayout) getLayoutInflater().inflate(
-                    R.layout.filter_card, categoryContainer, false);
+                    R.layout.view_filter_tag, categoryContainer, false);
             final TextView textView = (TextView) card.getChildAt(0);
             textView.setText(category.categoryName);
             textView.setSelected(selectedTags.contains(category.categoryName));

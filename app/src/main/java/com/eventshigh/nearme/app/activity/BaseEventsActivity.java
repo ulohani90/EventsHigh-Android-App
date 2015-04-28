@@ -562,7 +562,7 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
         public View getView(int position, ViewGroup parent) {
             Calendar calendar = getDate(position);
             DateTabView dateTabView = new DateTabView(
-                    getLayoutInflater().inflate(R.layout.tab_date, parent, false));
+                    getLayoutInflater().inflate(R.layout.view_tab_date, parent, false));
             dateTabView.weekDayView.setText(
                     calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US));
             dateTabView.dayOfMonthView.setText(

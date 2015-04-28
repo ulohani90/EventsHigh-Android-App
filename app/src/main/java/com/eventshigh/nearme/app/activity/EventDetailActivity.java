@@ -603,7 +603,7 @@ public class EventDetailActivity extends BaseActivity {
 
                         final Date eventDateCurr = new Date(event.eventTimings[i]);
                         View timeView = getLayoutInflater().inflate(
-                                R.layout.event_time, futureTimesView, false);
+                                R.layout.view_event_time, futureTimesView, false);
                         ((TextView) timeView.findViewById(R.id.event_day)).setText(
                                 eventTime.day + ", " + eventTime.date);
                         ((TextView) timeView.findViewById(R.id.event_time)).setText(eventTime.time);
@@ -759,7 +759,7 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
-            getLayoutInflater().inflate(R.layout.event_tag, parent);
+            getLayoutInflater().inflate(R.layout.view_event_tag, parent);
             View tagView = parent.getChildAt(parent.getChildCount() - 1);
             TextView tagNameView = (TextView) tagView.findViewById(R.id.tag_name);
             tagNameView.setText(tagName);

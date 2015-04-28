@@ -134,7 +134,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public static View getEventCard(final Event event, final BaseEventsActivity activity,
                                     @Nullable View reuseView, ViewGroup parent) {
         View view = reuseView != null ? reuseView :
-                activity.getLayoutInflater().inflate(R.layout.explore_event_card, parent, false);
+                activity.getLayoutInflater().inflate(R.layout.card_event_small, parent, false);
         new EventCard(view, true).bindEventView(event, activity, -1);
         return view;
     }
@@ -211,7 +211,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final View moreView;
 
         private static HeaderCard newInstance(Activity activity, ViewGroup parent) {
-            View view = activity.getLayoutInflater().inflate(R.layout.my_event_header, parent, false);
+            View view = activity.getLayoutInflater().inflate(R.layout.card_header, parent, false);
             return new HeaderCard(view);
         }
 
@@ -276,7 +276,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
             View view = activity.getLayoutInflater().inflate(
-                    bigLayout ? R.layout.big_event_card : R.layout.explore_event_card, parent, false);
+                    bigLayout ? R.layout.card_event_big : R.layout.card_event_small, parent, false);
             return new EventCard(view, bigLayout);
         }
 
@@ -426,7 +426,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         static OfferCard newInstance(final BaseActivity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(
-                    R.layout.offer_card, parent, false);
+                    R.layout.card_offer, parent, false);
             return new OfferCard(view);
         }
 
@@ -468,7 +468,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private View followingButton;
 
         static FollowCard newInstance(final BaseActivity activity, ViewGroup parent) {
-            View view = activity.getLayoutInflater().inflate(R.layout.follow_card, parent, false);
+            View view = activity.getLayoutInflater().inflate(R.layout.card_follow, parent, false);
             return new FollowCard(view);
         }
 
