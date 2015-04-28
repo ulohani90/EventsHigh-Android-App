@@ -187,7 +187,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             if (typeId == MY_EVENT.typeId) {
-                return MyEventCard.newInstance(activity, parent);
+                return EventCard.newInstance(activity, parent, false);
             }
 
             throw new IllegalArgumentException("invalid typeid");
@@ -280,7 +280,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     private static class EventCard extends ViewHolder {
-        private final boolean bigLayout;
+        private final boolean shouldAdjustImageHeight;
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
         private final ImageView offerView;
@@ -298,10 +298,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             return new EventCard(view, bigLayout);
         }
 
-        public EventCard(View cardView, boolean bigLayout) {
+        public EventCard(View cardView, boolean shouldAdjustImageHeight) {
             super(cardView);
 
-            this.bigLayout = bigLayout;
+            this.shouldAdjustImageHeight = shouldAdjustImageHeight;
             bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
             recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
             offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
@@ -336,7 +336,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             bgView.setErrorImageResId(R.drawable.eh_default_event);
             bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(activity));
 
-            if (bigLayout) {
+            if (shouldAdjustImageHeight) {
                 Utils.waitForViewVisible(bgView, new Runnable() {
                     @Override
                     public void run() {
@@ -564,11 +564,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public void bindEventsView(List<Event> events, BaseContextActivity activity) {
+            itemView.scrollTo(0, 0);
             eventContainer.removeAllViews();
             for (Event event : events) {
                 View cardView = activity.getLayoutInflater().inflate(R.layout.explore_event_card, eventContainer, false);
                 eventContainer.addView(cardView);
-                new EventCard(cardView, true).bindEventView(event, activity, 0);
+                new EventCard(cardView, false).bindEventView(event, activity, 0);
             }
         }
     }
@@ -589,26 +590,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            ((MyEventCard) card).bindEventsView(event, activity, position);
+            ((EventCard) card).bindEventView(event, activity, position);
         }
 
         public String getId() {
             return header + ":" + event.id;
-        }
-    }
-
-    private static class MyEventCard extends ViewHolder {
-        static MyEventCard newInstance(final BaseActivity activity, ViewGroup parent) {
-            View view = activity.getLayoutInflater().inflate(R.layout.event_card, parent, false);
-            return new MyEventCard(view);
-        }
-
-        public MyEventCard(View itemView) {
-            super(itemView);
-        }
-
-        public void bindEventsView(Event event, BaseContextActivity activity, int position) {
-            new EventCard(itemView, false).bindEventView(event, activity, position);
         }
     }
 }
