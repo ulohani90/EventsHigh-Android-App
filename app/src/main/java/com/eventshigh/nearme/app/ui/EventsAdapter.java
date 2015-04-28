@@ -270,9 +270,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final ImageView offerView;
         private final TextView titleView;
         private final TextView eventTimeView;
+        private final TextView priceView;
         private final TextView venueView;
         private final TextView travelTimeView;
-        private final TextView numPeopleInterestedView;
         private final View favouriteView;
         private final View favouritedView;
 
@@ -291,9 +291,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
             titleView = (TextView) cardView.findViewById(R.id.event_title);
             eventTimeView = (TextView) cardView.findViewById(R.id.event_time);
+            priceView = (TextView) cardView.findViewById(R.id.event_price);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
-            numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
             favouriteView = cardView.findViewById(R.id.action_favourite);
             favouritedView = cardView.findViewById(R.id.action_favourited);
         }
@@ -349,6 +349,17 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 }
             }
 
+            // Set the price.
+            if (priceView != null) {
+                String priceString = event.getPriceString();
+                if (priceString == null) {
+                    priceView.setVisibility(View.GONE);
+                } else {
+                    priceView.setVisibility(View.VISIBLE);
+                    priceView.setText(priceString);
+                }
+            }
+
             // Set the venue.
             if (venueView != null) {
                 venueView.setText(event.getShortAddress());
@@ -363,16 +374,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     travelTimeView.setVisibility(View.VISIBLE);
                 } else {
                     travelTimeView.setVisibility(View.GONE);
-                }
-            }
-
-            // Set num people interested.
-            if (numPeopleInterestedView != null) {
-                if (event.numPeopleInterested <= 0) {
-                    numPeopleInterestedView.setVisibility(View.INVISIBLE);
-                } else {
-                    numPeopleInterestedView.setVisibility(View.VISIBLE);
-                    numPeopleInterestedView.setText(Integer.toString(event.numPeopleInterested));
                 }
             }
 

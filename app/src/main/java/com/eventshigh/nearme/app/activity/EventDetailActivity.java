@@ -444,6 +444,7 @@ public class EventDetailActivity extends BaseActivity {
 
         private final FrameLayout bookView;
         private final FrameLayout callView;
+        private final TextView priceView;
         private final TextView offerView;
 
         private final View tagsHeaderView;
@@ -493,6 +494,7 @@ public class EventDetailActivity extends BaseActivity {
 
             bookView = (FrameLayout) findViewById(R.id.book_ticket);
             callView = (FrameLayout) findViewById(R.id.call);
+            priceView = (TextView) findViewById(R.id.event_price);
             offerView = (TextView) findViewById(R.id.offer_text);
 
             tagsHeaderView = findViewById(R.id.tags_header);
@@ -552,8 +554,6 @@ public class EventDetailActivity extends BaseActivity {
                 fromView.setText(eventFrom);
             }
 
-            // Action Buttons.
-
             // Set EH recommendation and favourite views.
             recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
             setFavouriteView(eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id));
@@ -573,6 +573,13 @@ public class EventDetailActivity extends BaseActivity {
             // Set action buttons.
             bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
             callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
+            String priceString = event.getPriceString();
+            if (priceString == null) {
+                priceView.setVisibility(View.GONE);
+            } else {
+                priceView.setVisibility(View.VISIBLE);
+                priceView.setText(priceString);
+            }
 
             // Set time.
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);

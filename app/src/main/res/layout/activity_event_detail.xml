@@ -638,15 +638,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="12dp"
+            android:padding="2dp"
             android:onClick="openBookingSite"
             android:visibility="gone"
+            tools:visibility="visible"
         >
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:gravity="center"
+                android:padding="14dp"
                 android:drawableLeft="@drawable/action_book"
                 android:drawableStart="@drawable/action_book"
                 android:drawablePadding="4dp"
@@ -654,6 +655,17 @@
                 android:textSize="16sp"
                 android:textColor="@android:color/white"
                 android:text="@string/action_book"
+            />
+            <TextView
+                android:id="@+id/event_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|bottom"
+                android:layout_marginBottom="-2dp"
+                android:textColor="@android:color/white"
+                android:textSize="11sp"
+                tools:text="₹ 200 - 500"
+                tools:ignore="SmallSp"
             />
         </FrameLayout>
 
@@ -663,9 +675,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="12dp"
+            android:padding="16dp"
             android:onClick="call"
             android:visibility="gone"
+            tools:visibility="visible"
         >
             <TextView
                 android:layout_width="wrap_content"
