@@ -19,6 +19,7 @@ import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.Offer;
+import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvent;
@@ -41,6 +42,8 @@ import java.util.Set;
  * An adapter which can be used to populate the Event card.
  */
 public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
+    private static final String TRENDING_TOPIC_TITLE = "Trending Topics";
+
     private final BaseContextActivity activity;
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
     private final Set<Integer> usedItemIds = new HashSet<>();
@@ -70,11 +73,20 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     public void setMyEvents(MyEvents myEvents, boolean addMyEventHeader, int maxPerCategory) {
         dataToShow.clear();
+        boolean showTrendingTopics = !myEvents.trendingTopics.isEmpty();
 
         for (TopicEvent topicEvent : myEvents.topicEvents) {
             if (addMyEventHeader && !dataToShow.isEmpty()) {
                 dataToShow.add(new MyEventHeaderData());
                 addMyEventHeader = false;
+            }
+
+            if (showTrendingTopics && dataToShow.size() > 12) {
+                dataToShow.add(new HeaderData(TRENDING_TOPIC_TITLE));
+                for (TrendingTopic trendingTopic : myEvents.trendingTopics) {
+                    dataToShow.add(new TrendingCategoryData(trendingTopic));
+                }
+                showTrendingTopics = false;
             }
 
             List<Event> events = topicEvent.events;
@@ -158,7 +170,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         OFFER(2),
         FOLLOW(3),
         MY_EVENT(4),
-        MY_EVENT_HEADER(5);
+        MY_EVENT_HEADER(5),
+        TRENDING_CATEGORY(6);
 
         public final int typeId;
         DataType (int typeId) {
@@ -194,6 +207,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 View view = activity.getLayoutInflater().inflate(
                         R.layout.card_my_events_header, parent, false);
                 return new HeaderCard(view);
+            }
+
+            if (typeId == TRENDING_CATEGORY.typeId) {
+                return EventCard.newInstance(activity, parent, false);
             }
 
             throw new IllegalArgumentException("invalid typeid");
@@ -247,9 +264,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private void bindHeaderView(final BaseContextActivity activity, final HeaderData header) {
             titleView.setText(Utils.capitalize(header.header));
-            boolean isFavourite = header.header.equals(MyEventsRequest.FAVOURITES_NAME);
-            moreView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
-            if (!isFavourite) {
+            boolean hasNoMore = header.header.equals(MyEventsRequest.FAVOURITES_NAME) ||
+                    header.header.equals(TRENDING_TOPIC_TITLE);
+            moreView.setVisibility(hasNoMore ? View.GONE : View.VISIBLE);
+            if (!hasNoMore) {
                 itemView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -583,7 +601,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             card.itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.reportActionToAnalytics("showMyEvents");
                     activity.showSearchView(EventsHighEndpoints.QUERY_MY_EVENT);
                 }
             });
@@ -593,4 +610,37 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             return MyEventHeaderData.class.getSimpleName();
         }
     }
+
+    // Trending Category data.
+    private class TrendingCategoryData implements Data {
+        private final TrendingTopic trendingTopic;
+
+        private TrendingCategoryData(TrendingTopic trendingTopic) {
+            this.trendingTopic = trendingTopic;
+        }
+
+        @Override
+        public DataType getType() {
+            return DataType.TRENDING_CATEGORY;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder card, final int position) {
+            ((NetworkImageView)card.itemView.findViewById(R.id.event_bg)).setImageUrl(
+                    trendingTopic.imgUrl, VolleyHelper.getImageLoader(activity));
+            ((TextView)card.itemView.findViewById(R.id.event_title)).setText(trendingTopic.tagName);
+            card.itemView.findViewById(R.id.event_offer_marker).setVisibility(View.GONE);
+            card.itemView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.showSearchView(trendingTopic.tagName);
+                }
+            });
+        }
+
+        public String getId() {
+            return MyEventHeaderData.class.getSimpleName();
+        }
+    }
+
 }
