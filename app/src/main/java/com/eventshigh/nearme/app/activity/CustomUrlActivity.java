@@ -151,8 +151,14 @@ public class CustomUrlActivity extends BaseActivity {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             // Returning true here means that when opening new links from this page will open
             // the default app that can handle the link.
-            if ((url.contains("eventshigh.com") || url.contains("twitter.com") ||
-                    url.contains("facebook.com")) && ! url.contains("ticketing")) {
+            if (url.contains("www.eventshigh.com")) {
+                reportActionToAnalytics("openEhLink", url);
+                Intent intent = new Intent(view.getContext(), LaunchActivity.class);
+                intent.setData(Uri.parse(url));
+                view.getContext().startActivity(intent);
+                CustomUrlActivity.this.finish();
+                return true;
+            } else if (url.contains("twitter.com") || url.contains("facebook.com")) {
                 reportActionToAnalytics("openLink", url);
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 view.getContext().startActivity(intent);

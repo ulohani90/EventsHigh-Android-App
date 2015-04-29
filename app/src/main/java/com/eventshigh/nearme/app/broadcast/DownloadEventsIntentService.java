@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.broadcast;
 import android.app.IntentService;
 import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
-import android.util.Pair;
 
 import com.android.volley.Request;
 import com.android.volley.Request.Priority;
@@ -17,9 +16,10 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.network.BaseEventListRequest.EventCollection;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
+import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
+import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvent;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -116,7 +116,7 @@ public class DownloadEventsIntentService extends IntentService {
         }
     }
 
-    private class MyEventsListener implements Response.Listener<MyEventsRequest.MyEvents> {
+    private class MyEventsListener implements Response.Listener<MyEvents> {
         private final Intent intent;
 
         private MyEventsListener(Intent intent) {
@@ -124,11 +124,11 @@ public class DownloadEventsIntentService extends IntentService {
         }
 
         @Override
-        public void onResponse(MyEventsRequest.MyEvents pairs, boolean isIntermediate) {
+        public void onResponse(MyEvents myEvents, boolean isIntermediate) {
             // Merge all events into one List and remove duplicates.
             Set<Event> eventSet = new HashSet<>();
-            for (Pair<String, List<Event>> entry : pairs) {
-                eventSet.addAll(entry.second);
+            for (TopicEvent topicEvent : myEvents.topicEvents) {
+                eventSet.addAll(topicEvent.events);
             }
             showNotification(eventSet, intent);
         }
@@ -149,7 +149,7 @@ public class DownloadEventsIntentService extends IntentService {
         }
     }
 
-    private class WeekendEventsListener implements Response.Listener<EventCollection> {
+    private class WeekendEventsListener implements Response.Listener<List<Event>> {
         private final Intent intent;
 
         private WeekendEventsListener(Intent intent) {
@@ -157,9 +157,9 @@ public class DownloadEventsIntentService extends IntentService {
         }
 
         @Override
-        public void onResponse(final EventCollection featuredEvents, boolean isIntermediate) {
+        public void onResponse(final List<Event> featuredEvents, boolean isIntermediate) {
             // Merge all events into one List and remove duplicates.
-            Set<Event> eventSet = new HashSet<>(featuredEvents.events);
+            Set<Event> eventSet = new HashSet<>(featuredEvents);
             showNotification(eventSet, intent);
         }
     }

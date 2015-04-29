@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
-import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,6 +12,7 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
+import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvent;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.MapMarkerManager;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -120,8 +120,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
     @Override
     protected void updateMyEvents(MyEvents myEvents) {
         Set<Event> events = new HashSet<>();
-        for (Pair<String, List<Event>> myEventEntry : myEvents) {
-            events.addAll(myEventEntry.second);
+        for (TopicEvent topicEvent : myEvents.topicEvents) {
+            events.addAll(topicEvent.events);
         }
 
         this.updateEventsCollection(new ArrayList<>(events));

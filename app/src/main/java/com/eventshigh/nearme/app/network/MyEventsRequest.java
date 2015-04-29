@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
-import android.util.Pair;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
@@ -9,7 +8,7 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.network.BaseEventListRequest.EventCollection;
+import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
@@ -22,7 +21,29 @@ import java.util.List;
  */
 public class MyEventsRequest {
     public static String FAVOURITES_NAME = "favourites";
-    public static class MyEvents extends ArrayList<Pair<String, List<Event>>> {
+
+    public static class TopicEvent {
+        public final String topicName;
+        public final List<Event> events;
+
+        public TopicEvent(String topicName, List<Event> events) {
+            this.topicName = topicName;
+            this.events = events;
+        }
+    }
+
+    public static class MyEvents {
+        public final List<TopicEvent> topicEvents;
+        public final List<TrendingTopic> trendingTopics;
+
+        public MyEvents(List<TopicEvent> topicEvents, List<TrendingTopic> trendingTopics) {
+            this.topicEvents = topicEvents;
+            this.trendingTopics = trendingTopics;
+        }
+
+        public boolean isEmpty() {
+            return topicEvents.isEmpty();
+        }
     }
 
     private final Context context;
@@ -34,7 +55,7 @@ public class MyEventsRequest {
     private final ErrorListener errorListener;
 
     private int numPendingRequests;
-    private final MyEvents result = new MyEvents();
+    private final List<TopicEvent> result = new ArrayList<>();
 
     public MyEventsRequest(Context context, EventsContext eventsContext, Priority priority,
                            boolean shouldBypassCache, boolean includeWithoutLocation,
@@ -76,7 +97,7 @@ public class MyEventsRequest {
         numPendingRequests --;
 
         if (numPendingRequests == 0) {
-            listener.onResponse(result, false);
+            listener.onResponse(new MyEvents(result, new ArrayList<TrendingTopic>()), false);
         }
     }
 
@@ -86,11 +107,11 @@ public class MyEventsRequest {
         }
 
         public void addToResult(List<Event> events) {
-            result.add(0, Pair.create(FAVOURITES_NAME, events));
+            result.add(0, new TopicEvent(FAVOURITES_NAME, events));
         }
     }
 
-    private class EventsListener implements Listener<EventCollection> {
+    private class EventsListener implements Listener<List<Event>> {
         private final String title;
 
         public EventsListener(String title) {
@@ -99,18 +120,18 @@ public class MyEventsRequest {
 
         public void addToResult(List<Event> events) {
             synchronized (result) {
-                result.add(Pair.create(title, events));
+                result.add(new TopicEvent(title, events));
             }
         }
 
         @Override
-        public void onResponse(EventCollection eventCollection, boolean intermediate) {
+        public void onResponse(List<Event> events, boolean intermediate) {
             if (intermediate) {
                 return;
             }
 
-            if (!eventCollection.events.isEmpty()) {
-                addToResult(eventCollection.events);
+            if (!events.isEmpty()) {
+                addToResult(events);
             }
             reportResult();
         }

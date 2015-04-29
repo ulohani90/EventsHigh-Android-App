@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -22,6 +21,7 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
+import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvent;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -71,25 +71,25 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public void setMyEvents(MyEvents myEvents, boolean addMyEventHeader, int maxPerCategory) {
         dataToShow.clear();
 
-        for (Pair<String, List<Event>> myEventEntry : myEvents) {
+        for (TopicEvent topicEvent : myEvents.topicEvents) {
             if (addMyEventHeader && !dataToShow.isEmpty()) {
                 dataToShow.add(new MyEventHeaderData());
                 addMyEventHeader = false;
             }
 
-            List<Event> events = myEventEntry.second;
+            List<Event> events = topicEvent.events;
             if (events.isEmpty()) {
                 continue;
             }
 
-            boolean isFavourite = myEventEntry.first.equals(MyEventsRequest.FAVOURITES_NAME);
+            boolean isFavourite = topicEvent.topicName.equals(MyEventsRequest.FAVOURITES_NAME);
             if (!isFavourite && events.size() > maxPerCategory) {
                 events = events.subList(0, maxPerCategory);
             }
 
-            dataToShow.add(new HeaderData(myEventEntry.first));
+            dataToShow.add(new HeaderData(topicEvent.topicName));
             for (Event event : events) {
-                dataToShow.add(new MyEventData(myEventEntry.first, event));
+                dataToShow.add(new MyEventData(topicEvent.topicName, event));
             }
         }
 

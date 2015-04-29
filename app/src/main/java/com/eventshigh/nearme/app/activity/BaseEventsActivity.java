@@ -15,7 +15,6 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,11 +31,11 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.network.BaseEventListRequest.EventCollection;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
+import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvent;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -338,8 +337,8 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
 
         // Prefetch first 10 events.
         int numPrefetched = 0;
-        for (Pair<String, List<Event>> myEventEntry : myEvents) {
-            for (Event event : myEventEntry.second) {
+        for (TopicEvent topicEvent : myEvents.topicEvents) {
+            for (Event event : topicEvent.events) {
                 if (numPrefetched >= NUM_MAX_PREFETCH) {
                     break;
                 }
@@ -454,20 +453,20 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
 
     // This callback is called by EventsFetcher when new set of events are available. We build the
     // markers for all events and then call method to show selected markers.
-    private Listener<EventCollection> mEventsFetcherCallBack = new Listener<EventCollection>() {
+    private Listener<List<Event>> mEventsFetcherCallBack = new Listener<List<Event>>() {
         @Override
-        public void onResponse(EventCollection eventCollection, boolean isIntermediate) {
+        public void onResponse(List<Event> events, boolean isIntermediate) {
             if (!isIntermediate) {
                 topProgressBar.setVisibility(View.GONE);
 
-                if (eventCollection.events.isEmpty()) {
+                if (events.isEmpty()) {
                     // Failed. Show toast and return empty list.
                     Toast.makeText(BaseEventsActivity.this, R.string.no_events, Toast.LENGTH_SHORT).show();
                 }
             }
 
-            if (!isIntermediate || !eventCollection.events.isEmpty()) {
-                updateEventsCollection(eventCollection.events);
+            if (!isIntermediate || !events.isEmpty()) {
+                updateEventsCollection(events);
             }
         }
     };

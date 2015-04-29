@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
-import android.util.Pair;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -11,11 +10,14 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
+import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvent;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONArray;
@@ -23,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -89,10 +92,11 @@ public class ExploreEventsRequest extends JsonRequest<MyEvents>  {
     @Override
     protected Response<MyEvents> parseNetworkResponse(NetworkResponse response) {
         try {
-            MyEvents myEvents = new MyEvents();
-
             String jsonString = new String(response.data, "UTF-8");
             JSONObject exploreEventsJson = new JSONObject(jsonString);
+
+            // Parse the topic events.
+            List<TopicEvent> topicEvents = new ArrayList<>();
             JSONArray exploreTags = exploreEventsJson.getJSONArray("explore");
             for (int i = 0; i < exploreTags.length(); i++) {
                 // Parse events.
@@ -106,10 +110,23 @@ public class ExploreEventsRequest extends JsonRequest<MyEvents>  {
                 eventsMarkerManager.waitForLoading();
                 Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
 
-                myEvents.add(Pair.create(tag, events));
+                topicEvents.add(new TopicEvent(tag, events));
             }
 
-            return Response.success(myEvents, HttpHeaderParser.parseCacheHeaders(response));
+            // Parse Trending topics.
+            List<TrendingTopic> trendingTopics = new ArrayList<>();
+            JSONArray trendingTopicsJSON = exploreEventsJson.optJSONArray("topics");
+            if (eventsContext.city == City.BANGALORE && trendingTopicsJSON != null) {
+                for (int i = 0; i < trendingTopicsJSON.length(); i++) {
+                    TrendingTopic trendingTopic = TrendingTopic.parse(trendingTopicsJSON.optJSONObject(i));
+                    if (trendingTopic != null) {
+                        trendingTopics.add(trendingTopic);
+                    }
+                }
+            }
+
+            return Response.success(new MyEvents(topicEvents, trendingTopics),
+                    HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JSONException e) {

@@ -17,6 +17,7 @@ import org.json.JSONException;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Volley Request to fetch Events collections.
@@ -32,7 +33,7 @@ public class EventCollectionRequest extends BaseEventListRequest {
      */
     public static void submit(Context context, EventsContext eventsContext, Priority priority,
                               boolean shouldBypassCache, boolean includeWithoutLocation,
-                              Listener<EventCollection> listener, ErrorListener errorListener) {
+                              Listener<List<Event>> listener, ErrorListener errorListener) {
         if (eventsContext.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
             return;
@@ -54,21 +55,21 @@ public class EventCollectionRequest extends BaseEventListRequest {
     }
 
     public EventCollectionRequest(Context context, String url, EventsContext eventsContext,
-                                  Priority priority, boolean shouldBypassCache, boolean includeWithoutLocation,
-                                  Listener<EventCollection> listener, ErrorListener errorListener) {
+          Priority priority, boolean shouldBypassCache, boolean includeWithoutLocation,
+          Listener<List<Event>> listener, ErrorListener errorListener) {
         super(context, url, eventsContext, priority, shouldBypassCache, includeWithoutLocation,
                 listener, errorListener);
     }
 
     @Override
-    protected Response<EventCollection> parseNetworkResponse(NetworkResponse response) {
+    protected Response<List<Event>> parseNetworkResponse(NetworkResponse response) {
         try {
             // Parse the response.
-            EventCollection eventCollection = parseEventsFromNetworkResponse(response);
+            List<Event> events = parseEventsFromNetworkResponse(response);
 
             // In case of MyEvents request, filter out the events which user has favourited.
             if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-                for (Iterator<Event> it =  eventCollection.events.iterator(); it.hasNext(); ) {
+                for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
                     Event event = it.next();
                     if (! eventsMarkerManager.isFavourite(event.id)) {
                         it.remove();
@@ -76,7 +77,7 @@ public class EventCollectionRequest extends BaseEventListRequest {
                 }
             }
 
-            return Response.success(eventCollection, HttpHeaderParser.parseCacheHeaders(response));
+            return Response.success(events, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JSONException e) {
