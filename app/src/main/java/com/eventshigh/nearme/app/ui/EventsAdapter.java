@@ -82,7 +82,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             if (showTrendingTopics && dataToShow.size() > 12) {
-                dataToShow.add(new HeaderData(TRENDING_TOPIC_TITLE));
+                dataToShow.add(new HeaderData(TRENDING_TOPIC_TITLE, false));
                 for (TrendingTopic trendingTopic : myEvents.trendingTopics) {
                     dataToShow.add(new TrendingCategoryData(trendingTopic));
                 }
@@ -95,11 +95,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             boolean isFavourite = topicEvent.topicName.equals(MyEventsRequest.FAVOURITES_NAME);
+            boolean showMore = false;
             if (!isFavourite && events.size() > maxPerCategory) {
+                showMore = true;
                 events = events.subList(0, maxPerCategory);
             }
 
-            dataToShow.add(new HeaderData(topicEvent.topicName));
+            dataToShow.add(new HeaderData(topicEvent.topicName, showMore));
             for (Event event : events) {
                 dataToShow.add(new MyEventData(topicEvent.topicName, event));
             }
@@ -226,9 +228,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     // Header Data.
     private class HeaderData implements Data {
         private final String header;
+        private final boolean showMore;
 
-        private HeaderData(String header) {
+        private HeaderData(String header, boolean showMore) {
             this.header = header;
+            this.showMore = showMore;
         }
 
         @Override
@@ -264,10 +268,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private void bindHeaderView(final BaseContextActivity activity, final HeaderData header) {
             titleView.setText(Utils.capitalize(header.header));
-            boolean hasNoMore = header.header.equals(MyEventsRequest.FAVOURITES_NAME) ||
-                    header.header.equals(TRENDING_TOPIC_TITLE);
-            moreView.setVisibility(hasNoMore ? View.GONE : View.VISIBLE);
-            if (!hasNoMore) {
+            moreView.setVisibility(header.showMore ? View.VISIBLE: View.GONE);
+            if (header.showMore) {
                 itemView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
