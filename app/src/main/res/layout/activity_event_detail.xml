@@ -322,6 +322,37 @@
                 android:background="#1a4d4d4d"
             />
 
+            <!-- Price -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+            >
+                <TextView
+                    style="@style/EHHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="18dp"
+                    android:textAllCaps="true"
+                    android:textColor="#CC383F3F"
+                    android:text="@string/ui_price"
+                />
+                <TextView
+                    style="@style/EHText"
+                    android:id="@+id/event_price2"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="18dp"
+                    android:gravity="start"
+                    tools:text="₹ 200 - 500"
+                />
+            </LinearLayout>
+
             <!-- Performers Info -->
             <TextView
                 android:id="@+id/performer_header"

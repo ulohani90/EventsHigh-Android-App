@@ -65,6 +65,7 @@
     <string name="ui_more">More</string>
     <string name="ui_my_events">My Events</string>
     <string name="ui_my_events_help">Events marked as favourite (♥) &amp;\nevents for interests and performers you follow!</string>
+    <string name="ui_price">Price</string>
 
     <!-- Offer -->
     <string name="ui_offer_expire">Oh no! Offer is expired already. Better luck next time!</string>
@@ -106,6 +107,7 @@
     <string name="no_cal_app">Calendar application not found!</string>
     <string name="no_events">Uh oh! No events found!</string>
     <string name="retry">Oops! You\'ve stumped us. Let\'s try again.</string>
+    <string name="no_price">Contact Organizer for Price.</string>
 
     <!-- formatting -->
     <plurals name="people_interested">
