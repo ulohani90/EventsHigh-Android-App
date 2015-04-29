@@ -43,8 +43,6 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.ui.NumberPickerDialog;
-import com.eventshigh.nearme.app.ui.NumberPickerDialog.Callback;
 import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -249,17 +247,6 @@ public class EventDetailActivity extends BaseActivity {
         final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
         if (event.bookingUrl != null && event.bookingUrl.contains("ticketing.eventshigh.com")) {
             bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
-            if (event.maxPrice == event.minPrice) {
-                // show dialog box to select num tickets.
-                NumberPickerDialog.show(this, R.string.title_num_tickets, new Callback() {
-                    @Override
-                    public void onSelection(int num) {
-                        bookingUriBuilder.appendQueryParameter("c", Integer.toString(num));
-                        openBookingSite(bookingUriBuilder.build());
-                    }
-                });
-                return;
-            }
         }
 
         openBookingSite(bookingUriBuilder.build());
