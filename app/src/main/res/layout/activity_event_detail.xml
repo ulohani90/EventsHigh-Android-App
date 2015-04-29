@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_above="@+id/action_bar_bottom"
+        android:layout_above="@+id/share_row"
         android:visibility="gone"
         tools:visibility="visible"
     >
@@ -316,6 +316,61 @@
                 android:onClick="openOfferSite"
                 tools:text="Win Free Pass to Arijit Singh Live Concert on 5th April"
             />
+
+            <!-- Action Items -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#1a4d4d4d"
+            />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:showDividers="middle"
+                android:divider="@drawable/shape_vertical_divider"
+                android:baselineAligned="false"
+            >
+                <FrameLayout
+                    android:id="@+id/book_ticket"
+                    style="@style/EHButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="openBookingSite"
+                >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:drawableLeft="@drawable/action_book"
+                        android:drawableStart="@drawable/action_book"
+                        android:textColor="#CC000000"
+                        android:text="@string/action_book"
+                    />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/call"
+                    style="@style/EHButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="call"
+                >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:drawableLeft="@drawable/action_call"
+                        android:drawableStart="@drawable/action_call"
+                        android:textColor="#CC000000"
+                        android:text="@string/action_call"
+                    />
+                </FrameLayout>
+            </LinearLayout>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -341,7 +396,7 @@
                 />
                 <TextView
                     style="@style/EHText"
-                    android:id="@+id/event_price2"
+                    android:id="@+id/event_price"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
@@ -349,6 +404,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="18dp"
                     android:gravity="start"
+                    android:textColor="#CC383F3F"
                     tools:text="₹ 200 - 500"
                 />
             </LinearLayout>
@@ -582,59 +638,70 @@
                 android:background="@android:color/transparent"
             />
 
-            <!-- Share -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-            >
-                <ImageView
-                    android:id="@+id/share_fb"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:src="@drawable/com_facebook_inverse_icon"
-                    android:background="@drawable/button_fb"
-                    android:onClick="facebook"
-                />
-                <ImageView
-                    android:id="@+id/share_twitter"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:src="@drawable/twitter_white"
-                    android:background="@drawable/button_twitter"
-                    android:onClick="twitter"
-                />
-                <ImageView
-                    android:id="@+id/share_email"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_email_white_24dp"
-                    android:background="@drawable/button_email"
-                    android:onClick="email"
-                />
-                <ImageView
-                    android:id="@+id/share_whatsapp"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:src="@drawable/whatsapp_24dp"
-                    android:background="@drawable/button_whatsapp"
-                    android:onClick="whatsapp"
-                />
-            </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
+    <!-- Share -->
+    <LinearLayout
+        android:id="@+id/share_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+    >
+        <ImageView
+            android:id="@+id/share_fb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="10dp"
+            android:src="@drawable/com_facebook_inverse_icon"
+            android:background="@drawable/button_fb"
+            android:onClick="facebook"
+            android:visibility="gone"
+            tools:visibility="visible"
+        />
+        <ImageView
+            android:id="@+id/share_twitter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:src="@drawable/twitter_white"
+            android:background="@drawable/button_twitter"
+            android:onClick="twitter"
+            android:visibility="gone"
+            tools:visibility="visible"
+        />
+        <ImageView
+            android:id="@+id/share_email"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:src="@drawable/ic_email_white_24dp"
+            android:background="@drawable/button_email"
+            android:onClick="email"
+            android:visibility="gone"
+            tools:visibility="visible"
+        />
+        <ImageView
+            android:id="@+id/share_whatsapp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:src="@drawable/whatsapp_24dp"
+            android:background="@drawable/button_whatsapp"
+            android:onClick="whatsapp"
+            android:visibility="gone"
+            tools:visibility="visible"
+        />
+    </LinearLayout>
 
     <include
         android:id="@+id/toolbar"
@@ -653,77 +720,4 @@
         android:indeterminate="true"
         tools:visibility="gone"
     />
-    <LinearLayout
-        android:id="@+id/action_bar_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:showDividers="middle"
-        android:divider="@drawable/shape_vertical_divider"
-        android:baselineAligned="false"
-    >
-        <FrameLayout
-            android:id="@+id/book_ticket"
-            style="@style/EHButtonCTA"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="2dp"
-            android:onClick="openBookingSite"
-            android:visibility="gone"
-            tools:visibility="visible"
-        >
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:padding="14dp"
-                android:drawableLeft="@drawable/action_book"
-                android:drawableStart="@drawable/action_book"
-                android:drawablePadding="4dp"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="16sp"
-                android:textColor="@android:color/white"
-                android:text="@string/action_book"
-            />
-            <TextView
-                android:id="@+id/event_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|bottom"
-                android:layout_marginBottom="-2dp"
-                android:textColor="@android:color/white"
-                android:textSize="11sp"
-                tools:text="₹ 200 - 500"
-                tools:ignore="SmallSp"
-            />
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/call"
-            style="@style/EHButtonCTA"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="16dp"
-            android:onClick="call"
-            android:visibility="gone"
-            tools:visibility="visible"
-        >
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:drawableLeft="@drawable/action_call"
-                android:drawableStart="@drawable/action_call"
-                android:drawablePadding="4dp"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="16sp"
-                android:textColor="@android:color/white"
-                android:text="@string/action_call"
-            />
-        </FrameLayout>
-    </LinearLayout>
 </RelativeLayout>

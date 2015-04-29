@@ -447,7 +447,6 @@ public class EventDetailActivity extends BaseActivity {
         private final FrameLayout bookView;
         private final FrameLayout callView;
         private final TextView priceView;
-        private final TextView price2View;
         private final TextView offerView;
 
         private final View tagsHeaderView;
@@ -498,7 +497,6 @@ public class EventDetailActivity extends BaseActivity {
             bookView = (FrameLayout) findViewById(R.id.book_ticket);
             callView = (FrameLayout) findViewById(R.id.call);
             priceView = (TextView) findViewById(R.id.event_price);
-            price2View = (TextView) findViewById(R.id.event_price2);
             offerView = (TextView) findViewById(R.id.offer_text);
 
             tagsHeaderView = findViewById(R.id.tags_header);
@@ -577,15 +575,10 @@ public class EventDetailActivity extends BaseActivity {
             // Set action buttons.
             bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
             callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
+
+            // Show price.
             String priceString = event.getPriceString();
-            if (priceString == null) {
-                priceView.setVisibility(View.GONE);
-                price2View.setText(getString(R.string.no_price));
-            } else {
-                priceView.setVisibility(View.VISIBLE);
-                priceView.setText(priceString);
-                price2View.setText(priceString);
-            }
+            priceView.setText(priceString == null ? getString(R.string.no_price) : priceString);
 
             // Set time.
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);

@@ -127,20 +127,21 @@ public class GcmIntentService extends IntentService {
                     gcmRegistration.getLastCity());
         } else if (query != null) {
             Intent intent = new Intent(this, LaunchActivity.class);
-            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION + query);
             intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, query));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else if (ticket != null) {
             ZendeskUtils.initZendesk(this);
-            // Intent intent = ZendeskDeepLinking.INSTANCE.getRequestIntent(this, ticket, null, null, null);
             Intent intent = new Intent(this, FeedbackActivity.class);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else if (target != null) {
             Intent intent = new Intent(this, getClassLoader().loadClass(target));
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else {
             Intent intent = new Intent(this, CustomUrlActivity.class);
-            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION + title);
             intent.setData(Uri.parse(contestUrl));
             intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
