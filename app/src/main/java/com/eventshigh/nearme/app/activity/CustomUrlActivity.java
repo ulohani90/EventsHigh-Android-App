@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,7 +75,10 @@ public class CustomUrlActivity extends BaseActivity {
         }
 
         if (title != null) {
-            getSupportActionBar().setTitle(title);
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(title);
+            }
         }
 
         // If its notification action, report it accordingly.
@@ -147,8 +151,8 @@ public class CustomUrlActivity extends BaseActivity {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             // Returning true here means that when opening new links from this page will open
             // the default app that can handle the link.
-            if (url.contains("eventshigh.com") || url.contains("twitter.com") ||
-                    url.contains("facebook.com")) {
+            if ((url.contains("eventshigh.com") || url.contains("twitter.com") ||
+                    url.contains("facebook.com")) && ! url.contains("ticketing")) {
                 reportActionToAnalytics("openLink", url);
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 view.getContext().startActivity(intent);

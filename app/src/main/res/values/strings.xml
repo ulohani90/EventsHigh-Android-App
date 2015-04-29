@@ -4,6 +4,7 @@
     <!-- Title -->
     <string name="app_name">EventsHigh</string>
     <string name="title_book">Book Ticket</string>
+    <string name="title_num_tickets">Select Number of Tickets</string>
     <string name="title_pick_interest">Pick Your Interests</string>
 
     <!-- Actions -->

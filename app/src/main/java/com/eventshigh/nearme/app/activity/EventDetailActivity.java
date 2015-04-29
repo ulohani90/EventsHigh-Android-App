@@ -43,6 +43,8 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.ui.NumberPickerDialog;
+import com.eventshigh.nearme.app.ui.NumberPickerDialog.Callback;
 import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -244,10 +246,23 @@ public class EventDetailActivity extends BaseActivity {
         showRateAppDialog = true;
         reportEventAction(event, "bookTicket");
 
-        Intent intent = new Intent(this, CustomUrlActivity.class);
-        intent.setData(Uri.parse(event.bookingUrl));
-        intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, getString(R.string.title_book));
-        startActivitySafe(intent);
+        final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
+        if (event.bookingUrl != null && event.bookingUrl.contains("ticketing.eventshigh.com")) {
+            bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
+            if (event.maxPrice == event.minPrice) {
+                // show dialog box to select num tickets.
+                NumberPickerDialog.show(this, R.string.title_num_tickets, new Callback() {
+                    @Override
+                    public void onSelection(int num) {
+                        bookingUriBuilder.appendQueryParameter("c", Integer.toString(num));
+                        openBookingSite(bookingUriBuilder.build());
+                    }
+                });
+                return;
+            }
+        }
+
+        openBookingSite(bookingUriBuilder.build());
     }
 
     public void openOfferSite(View view) {
@@ -829,5 +844,12 @@ public class EventDetailActivity extends BaseActivity {
                 INSTALLED_PACKAGES.add(packageInfo.packageName);
             }
         }
+    }
+
+    private void openBookingSite(Uri bookingUri) {
+        Intent intent = new Intent(this, CustomUrlActivity.class);
+        intent.setData(bookingUri);
+        intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, getString(R.string.title_book));
+        startActivitySafe(intent);
     }
 }
