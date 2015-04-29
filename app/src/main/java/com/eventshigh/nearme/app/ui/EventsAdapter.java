@@ -288,7 +288,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static class EventCard extends ViewHolder {
         private final boolean shouldAdjustImageHeight;
         private final NetworkImageView bgView;
-        private final ImageView recommendedImageView;
+        private final ImageView recommendedView;
         private final ImageView offerView;
         private final TextView titleView;
         private final TextView eventTimeView;
@@ -309,7 +309,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             this.shouldAdjustImageHeight = shouldAdjustImageHeight;
             bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
-            recommendedImageView = (ImageView) cardView.findViewById(R.id.event_recommended);
+            recommendedView = (ImageView) cardView.findViewById(R.id.event_recommended);
             offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
             titleView = (TextView) cardView.findViewById(R.id.event_title);
             eventTimeView = (TextView) cardView.findViewById(R.id.event_time);
@@ -354,8 +354,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             // recommended ? Offer ?
-            recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.INVISIBLE);
-            offerView.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
+            if (recommendedView != null) {
+                recommendedView.setVisibility(event.ehRecommended ? View.VISIBLE : View.INVISIBLE);
+            }
+            if (offerView != null) {
+                offerView.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
+            }
 
             // Set the title.
             titleView.setText(event.title);

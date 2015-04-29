@@ -24,7 +24,7 @@
     <string name="action_ama">Help</string>
     <string name="action_show_map">Show on map</string>
     <string name="action_show_list">Show as list</string>
-    <string name="action_check_out">Check it out</string>
+    <string name="action_check_out">Check out</string>
 
     <!-- Menu items -->
     <string name="menu_edit_location">Change Location</string>
