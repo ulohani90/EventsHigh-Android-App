@@ -30,6 +30,7 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.melnykov.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -276,6 +277,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                         activity.showSearchView(header.header);
                     }
                 });
+            } else {
+                itemView.setClickable(false);
             }
         }
     }
@@ -315,8 +318,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView priceView;
         private final TextView venueView;
         private final TextView travelTimeView;
-        private final View favouriteView;
-        private final View favouritedView;
+        private final FloatingActionButton favouriteView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
             View view = activity.getLayoutInflater().inflate(
@@ -336,14 +338,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             priceView = (TextView) cardView.findViewById(R.id.event_price);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
-            favouriteView = cardView.findViewById(R.id.action_favourite);
-            favouritedView = cardView.findViewById(R.id.action_favourited);
+            favouriteView = (FloatingActionButton) cardView.findViewById(R.id.action_favourite);
         }
 
         public void setFavouriteView(@Nullable EventMark eventMark) {
-            boolean isFavourite = EventMark.isFavourite(eventMark);
-            favouritedView.setVisibility(isFavourite ? View.VISIBLE : View.GONE);
-            favouriteView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
+            favouriteView.setTag(eventMark);
+            favouriteView.setImageResource(EventMark.isFavourite(eventMark) ?
+                    R.drawable.ic_favorite_red_24dp : R.drawable.ic_favorite_grey600_24dp);
         }
 
         private void bindEventView(final Event event, final BaseContextActivity activity,
@@ -429,19 +430,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 favouriteView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        activity.reportEventAction(event, "addFavourite", position);
-                        activity.recordEventMark(event, EventMark.FAVOURITE);
-                        setFavouriteView(EventMark.FAVOURITE);
+                        EventMark oldMark = (EventMark) favouriteView.getTag();
+                        EventMark newMark = EventMark.isFavourite(oldMark) ? null : EventMark.FAVOURITE;
+                        activity.reportEventAction(event,
+                            EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
+                            position);
+                        activity.recordEventMark(event, newMark);
+                        setFavouriteView(newMark);
                     }
-                });
-
-                favouritedView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        activity.reportEventAction(event, "removeFavourite", position);
-                        activity.recordEventMark(event, null);
-                        setFavouriteView(null);
-                        }
                 });
             }
         }
