@@ -11,6 +11,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
@@ -30,7 +31,7 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.melnykov.fab.FloatingActionButton;
+import com.eventshigh.nearme.app.view.PaletteImageView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -341,6 +342,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
             favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
+
+            if (bgView instanceof PaletteImageView) {
+                ((PaletteImageView) bgView).setHeaderView(headerView);
+            }
         }
 
         public void setFavouriteView(@Nullable EventMark eventMark) {

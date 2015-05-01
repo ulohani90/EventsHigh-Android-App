@@ -29,7 +29,7 @@
             android:textColor="@android:color/white"
             tools:text="Tue, Apr 5" />
 
-        <com.android.volley.toolbox.NetworkImageView
+        <com.eventshigh.nearme.app.view.PaletteImageView
             android:id="@+id/event_bg"
             android:layout_width="@dimen/event_card_eb_width"
             android:layout_height="@dimen/event_card_eb_height"
