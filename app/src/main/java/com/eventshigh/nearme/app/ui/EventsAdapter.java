@@ -310,6 +310,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private static class EventCard extends ViewHolder {
         private final boolean shouldAdjustImageHeight;
+        private final TextView headerView;
         private final NetworkImageView bgView;
         private final ImageView recommendedView;
         private final ImageView offerView;
@@ -322,14 +323,15 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
             View view = activity.getLayoutInflater().inflate(
-                    bigLayout ? R.layout.card_event_big : R.layout.card_event_small, parent, false);
-            return new EventCard(view, bigLayout);
+                    bigLayout ? R.layout.card_event_eb : R.layout.card_event_small, parent, false);
+            return new EventCard(view, false);
         }
 
         public EventCard(View cardView, boolean shouldAdjustImageHeight) {
             super(cardView);
 
             this.shouldAdjustImageHeight = shouldAdjustImageHeight;
+            headerView = (TextView) cardView.findViewById(R.id.event_header);
             bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
             recommendedView = (ImageView) cardView.findViewById(R.id.event_recommended);
             offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
@@ -392,7 +394,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     eventTimeView.setVisibility(View.INVISIBLE);
                 } else {
                     eventTimeView.setVisibility(View.VISIBLE);
-                    eventTimeView.setText(eventTime.toString());
+                    if (headerView == null) {
+                        eventTimeView.setText(eventTime.toString());
+                    } else {
+                        headerView.setText(eventTime.getDate());
+                        eventTimeView.setText(eventTime.time);
+                    }
                 }
             }
 
