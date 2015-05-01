@@ -319,7 +319,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView priceView;
         private final TextView venueView;
         private final TextView travelTimeView;
-        private final FloatingActionButton favouriteView;
+        private final ImageView favouriteView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
             View view = activity.getLayoutInflater().inflate(
@@ -340,7 +340,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             priceView = (TextView) cardView.findViewById(R.id.event_price);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
-            favouriteView = (FloatingActionButton) cardView.findViewById(R.id.action_favourite);
+            favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
         }
 
         public void setFavouriteView(@Nullable EventMark eventMark) {
