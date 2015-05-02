@@ -39,6 +39,7 @@ import com.eventshigh.nearme.app.view.PaletteImageView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +48,7 @@ import java.util.Set;
  * An adapter which can be used to populate the Event card.
  */
 public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
-    private static final String TRENDING_TOPIC_TITLE = "Trending Topics";
+    private static final String TRENDING_TOPIC_TITLE = "What's Trending";
 
     private final BaseContextActivity activity;
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
@@ -86,10 +87,15 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 addMyEventHeader = false;
             }
 
-            if (showTrendingTopics && dataToShow.size() > 12) {
+            if (showTrendingTopics && dataToShow.size() > 10) {
                 dataToShow.add(new HeaderData(TRENDING_TOPIC_TITLE, false));
-                for (TrendingTopic trendingTopic : myEvents.trendingTopics) {
-                    dataToShow.add(new TrendingCategoryData(trendingTopic));
+                Iterator<TrendingTopic> trendingTopicIterator = myEvents.trendingTopics.iterator();
+                while (trendingTopicIterator.hasNext()) {
+                    TrendingTopic topic1 = trendingTopicIterator.next();
+                    if (trendingTopicIterator.hasNext()) {
+                        TrendingTopic topic2 = trendingTopicIterator.next();
+                        dataToShow.add(new TrendingCategoryData(topic1, topic2));
+                    }
                 }
                 showTrendingTopics = false;
             }
@@ -217,7 +223,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             if (typeId == TRENDING_CATEGORY.typeId) {
-                return EventCard.newInstance(activity, parent, false);
+                return TrendingCategoryCard.newInstance(activity, parent);
             }
 
             throw new IllegalArgumentException("invalid typeid");
@@ -329,7 +335,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
             View view = activity.getLayoutInflater().inflate(
-                    bigLayout ? R.layout.card_event_eb : R.layout.card_event_small, parent, false);
+                    bigLayout ? R.layout.card_event_big : R.layout.card_event_small, parent, false);
             return new EventCard(view, false);
         }
 
@@ -651,10 +657,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     // Trending Category data.
     private class TrendingCategoryData implements Data {
-        private final TrendingTopic trendingTopic;
+        private final TrendingTopic trendingTopic1;
+        private final TrendingTopic trendingTopic2;
 
-        private TrendingCategoryData(TrendingTopic trendingTopic) {
-            this.trendingTopic = trendingTopic;
+        private TrendingCategoryData(TrendingTopic trendingTopic1, TrendingTopic trendingTopic2) {
+            this.trendingTopic1 = trendingTopic1;
+            this.trendingTopic2 = trendingTopic2;
         }
 
         @Override
@@ -664,16 +672,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, final int position) {
-            ((NetworkImageView)card.itemView.findViewById(R.id.event_bg)).setImageUrl(
-                    trendingTopic.imgUrl, VolleyHelper.getImageLoader(activity));
-            ((TextView)card.itemView.findViewById(R.id.event_title)).setText(trendingTopic.tagName);
-            card.itemView.findViewById(R.id.event_offer_marker).setVisibility(View.GONE);
-            card.itemView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.showSearchView(trendingTopic.tagName);
-                }
-            });
+            ((TrendingCategoryCard) card).populate(this, activity);
         }
 
         public String getId() {
@@ -681,4 +680,51 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
+    private static class TrendingCategoryCard extends ViewHolder {
+        private View trending1Card;
+        private NetworkImageView trending1Image;
+        private TextView trending1Title;
+        private View trending2Card;
+        private NetworkImageView trending2Image;
+        private TextView trending2Title;
+
+        static TrendingCategoryCard newInstance(final BaseActivity activity, ViewGroup parent) {
+            View view = activity.getLayoutInflater().inflate(R.layout.card_trending, parent, false);
+            return new TrendingCategoryCard(view);
+        }
+
+        public TrendingCategoryCard(View itemView) {
+            super(itemView);
+
+            trending1Card = itemView.findViewById(R.id.trending1_card);
+            trending1Image = (NetworkImageView) itemView.findViewById(R.id.trending1_image);
+            trending1Title = (TextView) itemView.findViewById(R.id.trending1_title);
+
+            trending2Card = itemView.findViewById(R.id.trending2_card);
+            trending2Image = (NetworkImageView) itemView.findViewById(R.id.trending2_image);
+            trending2Title = (TextView) itemView.findViewById(R.id.trending2_title);
+        }
+
+        public void populate(final TrendingCategoryData data, final BaseContextActivity activity) {
+            trending1Image.setImageUrl(data.trendingTopic1.imgUrl,
+                    VolleyHelper.getImageLoader(activity));
+            trending1Title.setText(data.trendingTopic1.tagName);
+            trending1Card.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.showSearchView(data.trendingTopic1.tagName);
+                }
+            });
+
+            trending2Image.setImageUrl(data.trendingTopic2.imgUrl,
+                    VolleyHelper.getImageLoader(activity));
+            trending2Title.setText(data.trendingTopic2.tagName);
+            trending2Card.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.showSearchView(data.trendingTopic2.tagName);
+                }
+            });
+        }
+    }
 }
