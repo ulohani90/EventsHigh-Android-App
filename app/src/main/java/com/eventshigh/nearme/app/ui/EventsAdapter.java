@@ -14,6 +14,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
@@ -33,7 +34,7 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.melnykov.fab.FloatingActionButton;
+import com.eventshigh.nearme.app.view.PaletteImageView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -313,6 +314,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private static class EventCard extends ViewHolder {
         private final boolean shouldAdjustImageHeight;
+        private final TextView headerView;
         private final NetworkImageView bgView;
         private final ImageView recommendedView;
         private final ImageView offerView;
@@ -321,18 +323,19 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView priceView;
         private final TextView venueView;
         private final TextView travelTimeView;
-        private final FloatingActionButton favouriteView;
+        private final ImageView favouriteView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
             View view = activity.getLayoutInflater().inflate(
-                    bigLayout ? R.layout.card_event_big : R.layout.card_event_small, parent, false);
-            return new EventCard(view, bigLayout);
+                    bigLayout ? R.layout.card_event_eb : R.layout.card_event_small, parent, false);
+            return new EventCard(view, false);
         }
 
         public EventCard(View cardView, boolean shouldAdjustImageHeight) {
             super(cardView);
 
             this.shouldAdjustImageHeight = shouldAdjustImageHeight;
+            headerView = (TextView) cardView.findViewById(R.id.event_header);
             bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
             recommendedView = (ImageView) cardView.findViewById(R.id.event_recommended);
             offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
@@ -341,7 +344,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             priceView = (TextView) cardView.findViewById(R.id.event_price);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
-            favouriteView = (FloatingActionButton) cardView.findViewById(R.id.action_favourite);
+            favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
+
+            if (bgView instanceof PaletteImageView) {
+                ((PaletteImageView) bgView).setHeaderView(headerView);
+            }
         }
 
         public void setFavouriteView(@Nullable EventMark eventMark) {
@@ -399,7 +406,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     eventTimeView.setVisibility(View.INVISIBLE);
                 } else {
                     eventTimeView.setVisibility(View.VISIBLE);
-                    eventTimeView.setText(eventTime.toString());
+                    if (headerView == null) {
+                        eventTimeView.setText(eventTime.toString());
+                    } else {
+                        headerView.setText(eventTime.getDate());
+                        eventTimeView.setText(eventTime.time);
+                    }
                 }
             }
 

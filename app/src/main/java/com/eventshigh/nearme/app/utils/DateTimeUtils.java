@@ -31,6 +31,10 @@ public class DateTimeUtils {
         public String toString() {
             return day + ", " + date + (time == null ? "" : " at " + time);
         }
+
+        public String getDate() {
+            return day + ", " + date;
+        }
     }
 
     private static final SimpleDateFormat FULL_DATE_TIME_FORMAT =

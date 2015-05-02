@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:foreground="?android:attr/selectableItemBackground"
+    card_view:cardCornerRadius="0dp"
+    card_view:cardElevation="1dp"
+    tools:context=".activity.LaunchActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white">
+
+        <TextView
+            android:id="@+id/event_header"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:background="@color/gray400"
+            android:gravity="center_vertical|right"
+            android:paddingRight="16dp"
+            android:textAllCaps="true"
+            android:textSize="12sp"
+            android:textColor="@android:color/white"
+            tools:text="Tue, Apr 5" />
+
+        <com.eventshigh.nearme.app.view.PaletteImageView
+            android:id="@+id/event_bg"
+            android:layout_width="@dimen/event_card_eb_width"
+            android:layout_height="@dimen/event_card_eb_height"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:adjustViewBounds="false"
+            android:scaleType="centerCrop"
+            tools:background="@color/gray200" />
+
+        <ImageView
+            android:id="@+id/event_recommended"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/event_bg"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/eh_recommend"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/event_offer_marker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/event_bg"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@+id/event_recommended"
+            android:layout_toRightOf="@+id/event_recommended"
+            android:src="@drawable/ic_local_offer_white_16dp"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/event_title"
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/event_bg"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
+            android:maxLines="2"
+            android:textColor="#AA000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="My Awesome Event with a long long title which spans two lines!" />
+
+        <TextView
+            android:id="@+id/event_time"
+            style="@style/EventCardEbText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/event_title"
+            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="48dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="48dp"
+            android:layout_marginStart="16dp"
+            android:drawableLeft="@drawable/ic_access_time_grey600_12dp"
+            android:drawableStart="@drawable/ic_access_time_grey600_12dp"
+            android:textColor="#A3000000"
+            tools:text="Sun, 29 Mar at 8:30 pm" />
+
+        <TextView
+            android:id="@+id/event_venue"
+            style="@style/EventCardEbText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/event_time"
+            android:layout_marginBottom="6dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_toLeftOf="@+id/event_travel_time"
+            android:layout_toStartOf="@+id/event_travel_time"
+            android:drawableLeft="@drawable/ic_location_on_grey600_12dp"
+            android:drawableStart="@drawable/ic_location_on_grey600_12dp"
+            android:textColor="#A3000000"
+            tools:text="Jagriti theatre, Whitefield" />
+
+        <TextView
+            android:id="@+id/event_price"
+            style="@style/EventCardEbText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/event_title"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:textColor="#A3000000"
+            tools:text="₹ 200 - 500" />
+
+        <TextView
+            android:id="@+id/event_travel_time"
+            style="@style/EventCardEbText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/event_time"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:drawableLeft="@drawable/ic_local_taxi_grey600_12dp"
+            android:drawableStart="@drawable/ic_local_taxi_grey600_12dp"
+            android:textColor="#A3000000"
+            tools:text="30 mins" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_below="@+id/event_venue"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_width="match_parent"
+            android:background="@color/gray400"
+            android:layout_height="1dp" />
+
+        <ImageView
+            android:id="@+id/action_favourite"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/divider"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="12dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/eh_circle_button"
+            android:padding="10dp"
+            android:src="@drawable/ic_favorite_red_18dp"
+            />
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

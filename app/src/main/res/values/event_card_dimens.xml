@@ -9,4 +9,7 @@
     <dimen name="small_card_spacing">0dp</dimen>
 
     <dimen name="maps_event_card_width">100dp</dimen>
+
+    <dimen name="event_card_eb_width">70dp</dimen>
+    <dimen name="event_card_eb_height">70dp</dimen>
 </resources>
