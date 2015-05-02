@@ -32,10 +32,8 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
-import com.eventshigh.nearme.app.network.EventUberPrefetcher;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
-import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvent;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -67,7 +65,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
     // ***********************
     // CONSTANTS
     // ***********************
-    public static final int NUM_MAX_PREFETCH = 10;
     public static final int SECONDS_FOR_REFRESH = 600;
     public static final int MAX_TIMES_TO_SHOW_MY_EVENTS_CLUE = 2;
 
@@ -325,27 +322,10 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
 
     protected void updateEventsCollection(List<Event> events) {
         isDataShown = true;
-
-        // Prefetch first 10 events.
-        for (Event event : events.subList(0, Math.min(events.size(), NUM_MAX_PREFETCH))) {
-            EventUberPrefetcher.getInstance(this).prefetch(event.id);
-        }
     }
 
     protected void updateMyEvents(MyEvents myEvents) {
         isDataShown = true;
-
-        // Prefetch first 10 events.
-        int numPrefetched = 0;
-        for (TopicEvent topicEvent : myEvents.topicEvents) {
-            for (Event event : topicEvent.events) {
-                if (numPrefetched >= NUM_MAX_PREFETCH) {
-                    break;
-                }
-                EventUberPrefetcher.getInstance(this).prefetch(event.id);
-                numPrefetched ++;
-            }
-        }
     }
 
     /**

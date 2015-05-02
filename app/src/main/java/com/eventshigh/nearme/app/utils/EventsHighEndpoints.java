@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -20,13 +19,13 @@ import java.util.regex.Pattern;
 public class EventsHighEndpoints {
     private static final String WEB_URI_BASE = "http://www.eventshigh.com/";
     private static final String API_ENDPOINT_DATE_FORMAT =
-            "http://apiserver.eventshigh.com:8888/api/date/%s/%s?limit=500&mobile=%d";
+            "http://apiserver.eventshigh.com:8888/api/date/%s/%s?limit=100&mobile=1";
     private static final String API_ENDPOINT_QUERY_FORMAT =
-            "http://apiserver.eventshigh.com:8888/api/events/%s/%s?limit=200&mobile=%d";
+            "http://apiserver.eventshigh.com:8888/api/events/%s/%s?limit=100&mobile=1";
     private static final String API_ENDPOINT_FEATURED_FORMAT =
-            "http://apiserver.eventshigh.com:8888/api/get_featured_events/%s?mobile=%d";
+            "http://apiserver.eventshigh.com:8888/api/get_featured_events/%s?mobile=1";
     private static final String API_ENDPOINT_EXPLORE_FORMAT =
-            "http://apiserver.eventshigh.com:8888/api/get_mobile_explore_screen/%s?mobile=%d";
+            "http://apiserver.eventshigh.com:8888/api/get_mobile_explore_screen/%s?mobile=1";
     private static final String API_ENDPOINT_EVENT_UBER_FORMAT =
             "http://apiserver.eventshigh.com:8888/api/get_event_uber_info/%s?mobile=1";
     private static final String API_EVENTS_SUGGEST_FORMAT =
@@ -89,14 +88,11 @@ public class EventsHighEndpoints {
     }
 
     public static String getFeaturedEventsEndpoint(City city) {
-        return String.format(API_ENDPOINT_FEATURED_FORMAT,
-                city.toString().toLowerCase(), BuildConfig.VERSION_CODE);
-
+        return String.format(API_ENDPOINT_FEATURED_FORMAT,  city.toString().toLowerCase());
     }
 
     public static String getExploreEventsEndpoint(City city) {
-        return String.format(API_ENDPOINT_EXPLORE_FORMAT,
-                city.toString().toLowerCase(), BuildConfig.VERSION_CODE);
+        return String.format(API_ENDPOINT_EXPLORE_FORMAT, city.toString().toLowerCase());
     }
 
     public static String getApiEndpoint(EventsContext eventsContext) throws IllegalArgumentException {
@@ -107,15 +103,14 @@ public class EventsHighEndpoints {
         if (eventsContext.query.isEmpty() || isMyEventQuery(eventsContext.query)) {
             return String.format(API_ENDPOINT_DATE_FORMAT,
                     eventsContext.city.toString().toLowerCase(),
-                    eventsContext.dateFilter.isEmpty() ? "this%20week" : eventsContext.dateFilter,
-                    BuildConfig.VERSION_CODE);
+                    eventsContext.dateFilter.isEmpty() ? "this%20week" : eventsContext.dateFilter);
         }
 
         try {
             if (isDateQuery(eventsContext.query)) {
                 return String.format(API_ENDPOINT_DATE_FORMAT,
                         eventsContext.city.toString().toLowerCase(),
-                        URLEncoder.encode(eventsContext.query, "UTF-8"), BuildConfig.VERSION_CODE);
+                        URLEncoder.encode(eventsContext.query, "UTF-8"));
             }
 
             if (isFeaturedEventQuery(eventsContext.query)) {
@@ -124,7 +119,7 @@ public class EventsHighEndpoints {
 
             String url = String.format(API_ENDPOINT_QUERY_FORMAT,
                         eventsContext.city.toString().toLowerCase(),
-                        URLEncoder.encode(eventsContext.query, "UTF-8"), BuildConfig.VERSION_CODE);
+                        URLEncoder.encode(eventsContext.query, "UTF-8"));
             if (!eventsContext.dateFilter.isEmpty()) {
                 url += "&date=" + eventsContext.dateFilter;
             }

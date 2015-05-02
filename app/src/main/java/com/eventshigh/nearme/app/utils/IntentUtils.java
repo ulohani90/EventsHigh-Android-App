@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -32,16 +33,16 @@ public class IntentUtils {
         days.add("today");
     }
 
-    public static EventsContext processIntent(BaseActivity activity, Intent inIntent) {
+    public static EventsContext processIntent(BaseContextActivity activity, Intent inIntent) {
         IntentUtils utils = new IntentUtils(activity);
         utils.processIntent(inIntent);
         return utils.param;
     }
 
-    private final BaseActivity activity;
+    private final BaseContextActivity activity;
     private EventsContext param;
 
-    private IntentUtils(BaseActivity activity) {
+    private IntentUtils(BaseContextActivity activity) {
         this.activity = activity;
     }
 

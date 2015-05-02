@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.activity;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
@@ -19,7 +18,6 @@ import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.data.UserActionDbHelper;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -214,18 +212,6 @@ public abstract class BaseActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
             Log.w(LOG_TAG, "failed sharing", e);
         }
-    }
-
-    public void showEventDetails(Event event) {
-        UserActionDbHelper.getInstance(this).recordAction(
-                UserActionDbHelper.EventAction.OPEN_EVENT_DETAIL, event.id);
-        showEventDetails(event.getEventDetailsURI());
-    }
-
-    public void showEventDetails(Uri eventDetailsURI) {
-        Intent detailIntent = new Intent(this, EventDetailActivity.class);
-        detailIntent.setData(eventDetailsURI);
-        startActivity(detailIntent);
     }
 
     public void addToCalendar(Event event, @Nullable Date date) {

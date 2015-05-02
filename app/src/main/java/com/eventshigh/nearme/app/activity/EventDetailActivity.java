@@ -7,7 +7,6 @@ import android.content.pm.PackageInfo;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -39,7 +38,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -52,10 +50,8 @@ import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
@@ -76,6 +72,8 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
  * this activity fetches the event data and shows it using the EventDetailFragment.
  */
 public class EventDetailActivity extends BaseActivity {
+    public static final String EXTRA_EVENT_PARAM = EventDetailActivity.class.getSimpleName() + "_event";
+
     // Regex to check if description is plane text or html.
     private static final Pattern HTML_PATTERN = Pattern.compile(
             "<[A-Za-z].*</[A-Za-z]|<[A-Za-z].*/>");
@@ -88,11 +86,9 @@ public class EventDetailActivity extends BaseActivity {
     private Toolbar toolbar;
     private View topProgressBar;
     private EventCard eventCard;
-    private Event event = null;
     private LatLng userLocation = null;
-    private boolean hasSetUserLocation = false;
+    private Event event = null;
     private GoogleApiClient client;
-    private Editor eventsMarkerEditor;
     private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
 
 
@@ -125,7 +121,11 @@ public class EventDetailActivity extends BaseActivity {
                 (int) (1.33 * getResources().getDisplayMetrics().heightPixels));
 
         // Get the event from Intent.
-        EventRequest.submit(this, getIntent().getData(), Priority.IMMEDIATE, mEventListener,
+        if (getIntent().hasExtra(EXTRA_EVENT_PARAM)) {
+            Event event = getIntent().getParcelableExtra(EXTRA_EVENT_PARAM);
+            populateView(event);
+        } else {
+            EventRequest.submit(this, getIntent().getData(), Priority.IMMEDIATE, mEventListener,
                 new ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
@@ -135,36 +135,7 @@ public class EventDetailActivity extends BaseActivity {
                         finish();
                     }
                 });
-
-        // Setup GoogleApiClient.
-        client = new GoogleApiClient.Builder(EventDetailActivity.this)
-                .addApi(AppIndex.APP_INDEX_API)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(new ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(Bundle bundle) {
-                        Location location = LocationServices.FusedLocationApi.getLastLocation(client);
-                        if (location != null) {
-                            userLocation = LocationUtils.locationToLatLng(location);
-                        }
-                        hasSetUserLocation = true;
-                        populateView();
-                    }
-
-                    @Override
-                    public void onConnectionSuspended(int i) {
-                        // do nothing.
-                    }
-                })
-                .addOnConnectionFailedListener(new OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(ConnectionResult connectionResult) {
-                        hasSetUserLocation = true;
-                        populateView();
-                    }
-                })
-                .build();
-        client.connect();
+        }
     }
 
     @Override
@@ -177,10 +148,6 @@ public class EventDetailActivity extends BaseActivity {
                 AppIndex.AppIndexApi.viewEnd(client, this, Utils.getAppUri(webUri));
             }
             client.disconnect();
-        }
-
-        if (eventsMarkerEditor != null) {
-            eventsMarkerEditor.close();
         }
     }
 
@@ -291,15 +258,21 @@ public class EventDetailActivity extends BaseActivity {
     public void removeFavourite(View v) {
         reportEventAction(event, "removeFavourite");
 
+        EventsMarkerManager.Editor eventsMarkerEditor =
+                EventsMarkerManager.getInstance(this).getEditor();
         eventsMarkerEditor.recordEventMark(event, null);
-        eventCard.setFavouriteView(null);
+        eventCard.setFavouriteView(false);
+        eventsMarkerEditor.close();
     }
 
     public void addFavourite(View v) {
         reportEventAction(event, "addFavourite");
 
+        EventsMarkerManager.Editor eventsMarkerEditor =
+                EventsMarkerManager.getInstance(this).getEditor();
         eventsMarkerEditor.recordEventMark(event, EventMark.FAVOURITE);
-        eventCard.setFavouriteView(EventMark.FAVOURITE);
+        eventCard.setFavouriteView(true);
+        eventsMarkerEditor.close();
     }
 
     public void showDirections(View view) {
@@ -369,15 +342,25 @@ public class EventDetailActivity extends BaseActivity {
         }
     }
 
-    private void populateView() {
-        if (event != null && hasSetUserLocation) {
-            if (client != null && client.isConnected()) {
-                Uri webUri = event.getEventDetailsURI();
-                AppIndex.AppIndexApi.view(client, EventDetailActivity.this, Utils.getAppUri(webUri),
-                        event.title, webUri, null);
-            }
-            eventCard.populateView(event);
+    private void populateView(Event event) {
+        this.event = event;
+
+        // Set Toolbar.
+        toolbar.setTitle(event.title);
+        if (event.numPeopleInterested <= 0) {
+            toolbar.setSubtitle("");
+        } else {
+            String text = getResources().getQuantityString(R.plurals.people_interested,
+                    event.numPeopleInterested, event.numPeopleInterested);
+            toolbar.setSubtitle(text);
         }
+        toolbar.setAlpha(0f);
+
+        // Populate event details.
+        eventCard.populateView(event);
+
+        // Connect to Google API client to notify the view.
+        getGoogleApiClient();
     }
 
     private void setScroll(int scrollValue) {
@@ -388,19 +371,7 @@ public class EventDetailActivity extends BaseActivity {
     private Listener<Event> mEventListener = new Listener<Event>() {
         @Override
         public void onResponse(final Event event, boolean isIntermediate) {
-            eventsMarkerEditor =  EventsMarkerManager.getInstance(EventDetailActivity.this).getEditor();
-            toolbar.setTitle(event.title);
-            if (event.numPeopleInterested <= 0) {
-                toolbar.setSubtitle("");
-            } else {
-                String text = getResources().getQuantityString(R.plurals.people_interested,
-                        event.numPeopleInterested, event.numPeopleInterested);
-                toolbar.setSubtitle(text);
-            }
-            toolbar.setAlpha(0f);
-
-            EventDetailActivity.this.event = event;
-            populateView();
+            populateView(event);
         }
     };
 
@@ -558,33 +529,19 @@ public class EventDetailActivity extends BaseActivity {
 
             // Set EH recommendation and favourite views.
             recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
-            setFavouriteView(eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id));
+            setFavouriteView(EventsMarkerManager.getInstance(EventDetailActivity.this)
+                    .isFavourite(event.id));
 
             // Set Venue and address.
+            findViewById(R.id.venue_group).setVisibility(View.VISIBLE);
             venueView.setText(event.getShortAddress());
             addressView.setText(event.getFullAddress());
-            String eventTravelTime = LocationUtils.getTravelTime(EventDetailActivity.this,
-                    userLocation, event.location);
-            if (eventTravelTime != null) {
-                travelTimeView.setText(eventTravelTime);
-                travelTimeView.setVisibility(View.VISIBLE);
-            } else {
-                travelTimeView.setVisibility(View.GONE);
-            }
-
-            // Set action buttons.
-            bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
-            callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
-
-            // Show price.
-            String priceString = event.getPriceString();
-            priceView.setText(priceString == null ? getString(R.string.no_price) : priceString);
+            travelTimeView.setVisibility(View.GONE);
 
             // Set time.
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
-            if (eventTime == null) {
-                timeGroupView.setVisibility(View.GONE);
-            } else {
+            timeGroupView.setVisibility(eventTime == null ? View.GONE : View.VISIBLE);
+            if (eventTime != null) {
                 timeView.setText(eventTime.toString());
                 int numDays = DateTimeUtils.getDaysLater(event);
                 if (numDays >= 0) {
@@ -633,28 +590,44 @@ public class EventDetailActivity extends BaseActivity {
             }
 
             // Show offer if its there.
+            offerView.setVisibility(event.offerTitle == null ? View.GONE : View.VISIBLE);
             if (event.offerTitle != null) {
                 offerView.setVisibility(View.VISIBLE);
                 offerView.setText(event.offerTitle);
-            } else {
-                offerView.setVisibility(View.GONE);
             }
+
+            // Set action buttons.
+            findViewById(R.id.action_button_group).setVisibility(View.VISIBLE);
+            bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
+            callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
+
+            // Show price.
+            findViewById(R.id.price_row).setVisibility(View.VISIBLE);
+            String priceString = event.getPriceString();
+            priceView.setText(priceString == null ? getString(R.string.no_price) : priceString);
 
             // Show performers if any.
             performersView.removeAllViews();
-            if (event.performers.length == 0) {
-                performerHeaderView.setVisibility(View.GONE);
-            } else {
-                performerHeaderView.setVisibility(View.VISIBLE);
+            performerHeaderView.setVisibility(event.performers.length == 0 ? View.GONE : View.VISIBLE);
+            if (event.performers.length > 0) {
                 for (final String performer : event.performers) {
                     addTagView(performersView, performer, "performerClick");
                 }
             }
 
+            // Show tags.
+            tagsView.removeAllViews();
+            tagsHeaderView.setVisibility(event.tags.length == 0 ? View.GONE : View.VISIBLE);
+            if (event.tags.length > 0) {
+                tagsHeaderView.setVisibility(View.VISIBLE);
+                for (final String tag : event.tags) {
+                    addTagView(tagsView, tag, "tagClick");
+                }
+            }
+
             // Set description.
-            if (event.description.isEmpty()) {
-                descriptionHeaderView.setVisibility(View.GONE);
-            } else {
+            descriptionHeaderView.setVisibility(event.description.isEmpty() ? View.GONE : View.VISIBLE);
+            if (!event.description.isEmpty()) {
                 descriptionHeaderView.setVisibility(View.VISIBLE);
                 String description;
                 try {
@@ -685,9 +658,8 @@ public class EventDetailActivity extends BaseActivity {
 
             // Organizer Info.
             boolean organizerInfoShown = false;
-            if (event.organizerName == null) {
-                organizerNameRow.setVisibility(View.GONE);
-            } else {
+            organizerNameRow.setVisibility(event.organizerName == null ? View.GONE :View.VISIBLE);
+            if (event.organizerName != null) {
                 organizerInfoShown = true;
                 organizerNameView.setText(event.organizerName);
                 if (event.organizerLink != null) {
@@ -697,9 +669,8 @@ public class EventDetailActivity extends BaseActivity {
                 }
             }
 
-            if (event.organizerEmail == null) {
-                organizerEmailRow.setVisibility(View.GONE);
-            } else {
+            organizerEmailRow.setVisibility(event.organizerEmail == null ? View.GONE : View.VISIBLE);
+            if (event.organizerEmail != null) {
                 organizerInfoShown = true;
                 organizerEmailView.setText(event.organizerEmail);
                 organizerEmailView.setOnClickListener(new OnClickListener() {
@@ -711,23 +682,20 @@ public class EventDetailActivity extends BaseActivity {
                 });
             }
 
-            if (event.organizerPhone == null) {
-                organizerPhoneRow.setVisibility(View.GONE);
-            } else {
+            organizerPhoneRow.setVisibility(event.organizerPhone == null ? View.GONE : View.VISIBLE);
+            if (event.organizerPhone != null) {
                 organizerInfoShown = true;
                 organizerPhoneView.setText(event.organizerPhone);
             }
 
-            if (event.organizerWebsite == null) {
-                organizerWebsiteRow.setVisibility(View.GONE);
-            } else {
+            organizerWebsiteRow.setVisibility(event.organizerWebsite == null ? View.GONE : View.VISIBLE);
+            if (event.organizerWebsite != null) {
                 organizerInfoShown = true;
                 organizerWebsiteView.setText(event.organizerWebsite);
             }
 
-            if (!organizerInfoShown) {
-                organizerHeader.setVisibility(View.GONE);
-            } else {
+            organizerHeader.setVisibility(organizerInfoShown ? View.VISIBLE : View.GONE);
+            if (organizerInfoShown) {
                 Utils.waitForViewVisible(descriptionView, new Runnable() {
                     @Override
                     public void run() {
@@ -737,17 +705,6 @@ public class EventDetailActivity extends BaseActivity {
                         }
                     }
                 });
-            }
-
-            // Show tags.
-            tagsView.removeAllViews();
-            if (event.tags.length == 0) {
-                tagsHeaderView.setVisibility(View.GONE);
-            } else {
-                tagsHeaderView.setVisibility(View.VISIBLE);
-                for (final String tag : event.tags) {
-                    addTagView(tagsView, tag, "tagClick");
-                }
             }
 
             // Share Buttons.
@@ -804,8 +761,7 @@ public class EventDetailActivity extends BaseActivity {
             });
         }
 
-        private void setFavouriteView(@Nullable EventMark pref) {
-            boolean isFavourite = EventMark.isFavourite(pref);
+        private void setFavouriteView(boolean isFavourite) {
             favouritedView.setVisibility(isFavourite ? View.VISIBLE : View.GONE);
             favouriteView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
         }
@@ -835,5 +791,47 @@ public class EventDetailActivity extends BaseActivity {
         intent.setData(bookingUri);
         intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, getString(R.string.title_book));
         startActivitySafe(intent);
+    }
+
+    private void populateEventTravelTime() {
+        Location location = LocationServices.FusedLocationApi.getLastLocation(client);
+        if (location != null) {
+            userLocation = LocationUtils.locationToLatLng(location);
+        }
+
+        String eventTravelTime = LocationUtils.getTravelTime(EventDetailActivity.this,
+                userLocation, event.location);
+        eventCard.travelTimeView.setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
+        if (eventTravelTime != null) {
+            eventCard.travelTimeView.setText(eventTravelTime);
+        }
+    }
+
+    private void getGoogleApiClient() {
+        if (client != null && client.isConnected()) {
+            populateEventTravelTime();
+            return;
+        }
+
+        client = new GoogleApiClient.Builder(this)
+                    .addApi(AppIndex.APP_INDEX_API)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(new ConnectionCallbacks() {
+                        @Override
+                        public void onConnected(Bundle bundle) {
+                            populateEventTravelTime();
+
+                            Uri webUri = event.getEventDetailsURI();
+                            AppIndex.AppIndexApi.view(client, EventDetailActivity.this,
+                                    Utils.getAppUri(webUri), event.title, webUri, null);
+                        }
+
+                        @Override
+                        public void onConnectionSuspended(int i) {
+                            // do nothing.
+                        }
+                    })
+                    .build();
+        client.connect();
     }
 }

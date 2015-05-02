@@ -1,7 +1,10 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
@@ -354,7 +357,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.showEventDetails(event, position);
+                    Pair<View, String> pair1 = Pair.<View, String>create(bgView, "event_bg");
+                    Pair<View, String> pair2 = Pair.<View, String>create(titleView, "event_title");
+                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            activity, pair1, pair2).toBundle();
+                    activity.showEventDetails(event, bundle);
                 }
             });
 

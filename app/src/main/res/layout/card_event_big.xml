@@ -23,7 +23,6 @@
             android:scaleType="centerCrop"
             android:layout_alignParentTop="true"
             android:adjustViewBounds="false"
-            tools:background="@color/gray400"
         />
 
         <ImageView
@@ -66,7 +65,6 @@
             android:layout_marginBottom="14dp"
             android:layout_marginRight="48dp"
             android:layout_marginEnd="48dp"
-            android:background="@android:color/white"
             android:maxLines="1"
             android:ellipsize="end"
             android:textColor="#CC000000"
