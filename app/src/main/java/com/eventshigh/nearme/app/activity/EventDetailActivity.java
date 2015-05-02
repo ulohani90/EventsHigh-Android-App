@@ -78,10 +78,10 @@ public class EventDetailActivity extends BaseActivity {
     private static final Pattern HTML_PATTERN = Pattern.compile(
             "<[A-Za-z].*</[A-Za-z]|<[A-Za-z].*/>");
 
-    private static final String PACKAGE_NAME_FACEBOOK = "com.facebook.katana";
-    private static final String PACKAGE_NAME_TWITTER = "com.twitter.android";
-    private static final String PACKAGE_NAME_EMAIL = "com.google.android.gm";
-    private static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
+    public static final String PACKAGE_NAME_FACEBOOK = "com.facebook.katana";
+    public static final String PACKAGE_NAME_TWITTER = "com.twitter.android";
+    public static final String PACKAGE_NAME_EMAIL = "com.google.android.gm";
+    public static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
 
     private Toolbar toolbar;
     private View topProgressBar;

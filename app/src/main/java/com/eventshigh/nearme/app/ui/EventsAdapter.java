@@ -14,12 +14,12 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
+import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.Offer;
@@ -324,6 +324,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView venueView;
         private final TextView travelTimeView;
         private final ImageView favouriteView;
+        private final View fbShareView;
+        private final View whatsappShareView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
             View view = activity.getLayoutInflater().inflate(
@@ -345,6 +347,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
             favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
+            fbShareView = cardView.findViewById(R.id.share_fb);
+            whatsappShareView = cardView.findViewById(R.id.share_whatsapp);
 
             if (bgView instanceof PaletteImageView) {
                 ((PaletteImageView) bgView).setHeaderView(headerView);
@@ -456,6 +460,23 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                             position);
                         activity.recordEventMark(event, newMark);
                         setFavouriteView(newMark);
+                    }
+                });
+            }
+
+            if (fbShareView != null) {
+                fbShareView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        activity.shareEvent(event, EventDetailActivity.PACKAGE_NAME_FACEBOOK);
+                    }
+                });
+            }
+            if (whatsappShareView != null) {
+                whatsappShareView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        activity.shareEvent(event, EventDetailActivity.PACKAGE_NAME_WHATSAPP);
                     }
                 });
             }
