@@ -25,13 +25,21 @@
             android:adjustViewBounds="false"
         />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignTop="@+id/event_bg"
+            android:layout_alignBottom="@+id/event_bg"
+            android:background="@drawable/shape_film"
+        />
+
         <ImageView
             android:id="@+id/event_recommended"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_alignBottom="@+id/event_bg"
+            android:layout_above="@id/event_title"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginBottom="4dp"
@@ -45,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/event_recommended"
             android:layout_toEndOf="@+id/event_recommended"
-            android:layout_alignBottom="@+id/event_bg"
+            android:layout_above="@id/event_title"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginBottom="4dp"
@@ -58,16 +66,16 @@
             android:id="@+id/event_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/event_bg"
+            android:layout_alignBottom="@+id/event_bg"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="14dp"
             android:layout_marginRight="48dp"
             android:layout_marginEnd="48dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:maxLines="1"
             android:ellipsize="end"
-            android:textColor="#CC000000"
+            android:textColor="@android:color/white"
             tools:text="My Awesome Event with a long long title!"
         />
 
@@ -79,12 +87,12 @@
             android:layout_below="@id/event_title"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="4dp"
             android:layout_marginRight="48dp"
             android:layout_marginEnd="48dp"
             android:drawableStart="@drawable/ic_access_time_grey600_12dp"
             android:drawableLeft="@drawable/ic_access_time_grey600_12dp"
-            android:textColor="#A3000000"
             tools:text="Sun, 29 Mar at 8:30 pm"
         />
 
@@ -101,7 +109,6 @@
             android:layout_marginBottom="6dp"
             android:drawableStart="@drawable/ic_location_on_grey600_12dp"
             android:drawableLeft="@drawable/ic_location_on_grey600_12dp"
-            android:textColor="#A3000000"
             tools:text="Jagriti theatre, Whitefield"
         />
 
@@ -113,9 +120,9 @@
             android:layout_below="@id/event_title"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="6dp"
-            android:layout_marginRight="6dp"
-            android:textColor="#A3000000"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="48dp"
+            android:layout_marginEnd="48dp"
             tools:text="₹ 200 - 500"
         />
         <TextView
@@ -130,7 +137,6 @@
             android:layout_marginRight="6dp"
             android:drawableStart="@drawable/ic_local_taxi_grey600_12dp"
             android:drawableLeft="@drawable/ic_local_taxi_grey600_12dp"
-            android:textColor="#A3000000"
             tools:text="30 mins"
         />
 

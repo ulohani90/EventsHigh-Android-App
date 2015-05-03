@@ -49,7 +49,7 @@
     <android.support.v7.widget.CardView
         android:id="@+id/trending2_card"
         android:layout_width="0dp"
-        android:layout_height="@dimen/offer_card_height"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:foreground="?android:attr/selectableItemBackground"
         card_view:cardCornerRadius="4dp"

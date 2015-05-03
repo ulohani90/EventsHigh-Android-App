@@ -82,17 +82,9 @@
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:textSize">11sp</item>
-        <item name="android:drawablePadding">2dp</item>
-        <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-medium</item>
-        <item name="android:textColor">#99212121</item>
-    </style>
-
-    <!-- Theme used for EB Events Cards -->
-    <style name="EventCardEbText" parent="EventCardText">
-        <item name="android:gravity">center_vertical</item>
         <item name="android:textSize">13sp</item>
         <item name="android:drawablePadding">4dp</item>
+        <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-medium</item>
         <item name="android:textColor">#A3000000</item>
     </style>
 

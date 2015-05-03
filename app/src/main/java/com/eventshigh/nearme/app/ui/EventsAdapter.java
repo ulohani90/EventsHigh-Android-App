@@ -213,7 +213,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             if (typeId == MY_EVENT.typeId) {
-                return EventCard.newInstance(activity, parent, false);
+                return EventCard.newInstance(activity, parent, true);
             }
 
             if (typeId == MY_EVENT_HEADER.typeId) {
