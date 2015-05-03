@@ -26,13 +26,17 @@ public class OnBoardingActivity extends BaseActivity {
      * The model that stores the resources for each onboarding step.
      */
     private class OnBoardingStepResource {
+        // The title to be shown below the image
+        private final int titleId;
+
         // The text to be shown below the image in onboarding step
         private final int captionResId;
 
         // The image to be shown in onboarding step
         private final int imageResId;
 
-        private OnBoardingStepResource(int captionResId, int imageResId) {
+        private OnBoardingStepResource(int titleId, int captionResId, int imageResId) {
+            this.titleId = titleId;
             this.captionResId = captionResId;
             this.imageResId = imageResId;
         }
@@ -44,11 +48,12 @@ public class OnBoardingActivity extends BaseActivity {
     // ***********************
 
     private final OnBoardingStepResource[] ON_BOARDING_STEP_RESOURCES = new OnBoardingStepResource[]{
-            new OnBoardingStepResource(R.string.onboarding_city, R.drawable.onboarding_city),
-            new OnBoardingStepResource(R.string.onboarding_map, R.drawable.onboarding_map),
-            new OnBoardingStepResource(R.string.onboarding_follow, R.drawable.onboarding_follow),
-            new OnBoardingStepResource(R.string.onboarding_like, R.drawable.onboarding_like),
-            new OnBoardingStepResource(R.string.onboarding_share, R.drawable.onboarding_share),
+            new OnBoardingStepResource(R.string.onboarding_title_details,
+                R.string.onboarding_details, R.drawable.onboarding_city),
+            new OnBoardingStepResource(R.string.onboarding_title_favorites,
+                R.string.onboarding_favorites, R.drawable.onboarding_map),
+            new OnBoardingStepResource(R.string.onboarding_title_notification,
+                R.string.onboarding_notification, R.drawable.onboarding_follow),
     };
 
     private final int NUM_ON_BOARDING_STEPS = ON_BOARDING_STEP_RESOURCES.length;
@@ -157,8 +162,8 @@ public class OnBoardingActivity extends BaseActivity {
         public Object instantiateItem(ViewGroup container, int position) {
             View view = getLayoutInflater().inflate(R.layout.viewpager_onboarding, container, false);
             container.addView(view);
-            ImageView imageView = (ImageView) view.findViewById(R.id.image);
-            imageView.setImageResource(ON_BOARDING_STEP_RESOURCES[position].imageResId);
+            TextView title = (TextView) view.findViewById(R.id.title);
+            title.setText(ON_BOARDING_STEP_RESOURCES[position].titleId);
             TextView caption = (TextView) view.findViewById(R.id.caption);
             caption.setText(ON_BOARDING_STEP_RESOURCES[position].captionResId);
             return view;

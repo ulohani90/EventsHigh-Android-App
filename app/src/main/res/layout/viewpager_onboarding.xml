@@ -4,26 +4,24 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="32dp"
-    android:layout_marginRight="32dp"
+    android:padding="16dp"
 >
-    <ImageView
-        android:id="@+id/image"
+    <TextView
+        android:id="@+id/title"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:scaleType="centerInside"
-        tools:src="@drawable/onboarding_city"
-    />
+        android:layout_height="wrap_content"
+        tools:text="@string/onboarding_title_details"
+        android:textColor="@color/primary_dark"
+        android:textSize="20sp"
+        android:fontFamily="sans-serif-light"
+        />
     <TextView
         android:id="@+id/caption"
         style="?android:attr/textAppearanceSmall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        tools:text="@string/onboarding_city"
-        android:textColor="#444444"
+        tools:text="@string/onboarding_details"
+        android:textColor="#666666"
     />
 </LinearLayout>
