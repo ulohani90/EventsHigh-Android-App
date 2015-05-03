@@ -51,7 +51,7 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     }
 
     public boolean shouldShowOnBoarding() {
-        return sharedPreferences.getBoolean(PREF_SHOW_ONBOARDING, true);
+        return true; //sharedPreferences.getBoolean(PREF_SHOW_ONBOARDING, true);
     }
 
     public int getNumTimesMyEventsClueShown() {

@@ -8,11 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.animation.FakeDragAnimation;
 import com.eventshigh.nearme.app.user.Preferences;
 
 /**
@@ -75,12 +77,12 @@ public class OnBoardingActivity extends BaseActivity {
         }
 
         // Initialize the The view pager which shows the onboarding steps
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(mOnBoardingStepsAdapter);
         viewPager.setOnPageChangeListener(mOnPageChangeListener);
 
         // Set action handler for skip and getting started button.
-        findViewById(R.id.get_started).setOnClickListener(new OnClickListener() {
+        findViewById(R.id.skip).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent phoneLoginIntent = new Intent(OnBoardingActivity.this,
@@ -88,6 +90,16 @@ public class OnBoardingActivity extends BaseActivity {
                 phoneLoginIntent.putExtra(PhoneLoginActivity.EXTRA_IN_ONBOARDING_FLOW, true);
                 startActivity(phoneLoginIntent);
                 finish();
+            }
+        });
+
+        findViewById(R.id.next).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Animation animation = new FakeDragAnimation(viewPager,
+                    -viewPager.getMeasuredWidth());
+                animation.setDuration(300);
+                viewPager.startAnimation(animation);
             }
         });
 
