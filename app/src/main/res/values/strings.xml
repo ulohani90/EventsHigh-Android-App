@@ -81,6 +81,8 @@
     <string name="onboarding_follow">Follow your interests and never miss an event again!</string>
     <string name="onboarding_like">Personalize to get events that matter!</string>
     <string name="onboarding_share">Share and plan your favorite events with friends!</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_skip">Skip</string>
 
     <!-- Helper messages -->
     <string name="loading">Loading …</string>
