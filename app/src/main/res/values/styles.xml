@@ -68,6 +68,7 @@
         <item name="android:background">@drawable/eh_button_cta</item>
     </style>
     <style name="EHButtonCTATransparent" parent="EHButton">
+        <item name="android:textColor">@color/primary_dark</item>
         <item name="android:background">@drawable/button_transparent_dark</item>
     </style>
     <style name="EHDetailActionButton" parent="android:style/TextAppearance.Small">

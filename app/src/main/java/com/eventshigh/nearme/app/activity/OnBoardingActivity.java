@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.animation.FakeDragAnimation;
 import com.eventshigh.nearme.app.user.Preferences;
+import com.eventshigh.nearme.app.utils.ImageUtils;
 
 /**
  * Onboarding activity for first time users. This activity is shown to a user when the app is
@@ -49,11 +50,11 @@ public class OnBoardingActivity extends BaseActivity {
 
     private final OnBoardingStepResource[] ON_BOARDING_STEP_RESOURCES = new OnBoardingStepResource[]{
             new OnBoardingStepResource(R.string.onboarding_title_details,
-                R.string.onboarding_details, R.drawable.onboarding_city),
+                R.string.onboarding_details, R.drawable.onboarding_details),
             new OnBoardingStepResource(R.string.onboarding_title_favorites,
-                R.string.onboarding_favorites, R.drawable.onboarding_map),
+                R.string.onboarding_favorites, R.drawable.onboarding_favorites),
             new OnBoardingStepResource(R.string.onboarding_title_notification,
-                R.string.onboarding_notification, R.drawable.onboarding_follow),
+                R.string.onboarding_notification, R.drawable.onboarding_notification),
     };
 
     private final int NUM_ON_BOARDING_STEPS = ON_BOARDING_STEP_RESOURCES.length;
@@ -66,6 +67,10 @@ public class OnBoardingActivity extends BaseActivity {
 
     // User preferences.
     protected Preferences pref;
+
+    private ImageView imageView;
+
+    private int imageWidth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +85,11 @@ public class OnBoardingActivity extends BaseActivity {
             view.setSelected(i == 0);
             dotsView.addView(view);
         }
+
+        imageView = (ImageView) findViewById(R.id.screenshot);
+        imageWidth = 250;
+        imageView.setImageBitmap(ImageUtils.decodeSampledBitmapFromResource(getResources(),
+            ON_BOARDING_STEP_RESOURCES[0].imageResId, imageWidth, imageWidth * 2));
 
         // Initialize the The view pager which shows the onboarding steps
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
@@ -138,6 +148,8 @@ public class OnBoardingActivity extends BaseActivity {
             for (int i = 0 ; i < dotsView.getChildCount(); i++) {
                 dotsView.getChildAt(i).setSelected(i == position);
             }
+            imageView.setImageBitmap(ImageUtils.decodeSampledBitmapFromResource(getResources(),
+                ON_BOARDING_STEP_RESOURCES[position].imageResId, imageWidth, imageWidth * 2));
         }
 
         @Override
