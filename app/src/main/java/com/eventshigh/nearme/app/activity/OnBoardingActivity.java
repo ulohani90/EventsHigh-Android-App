@@ -1,9 +1,11 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,12 +36,17 @@ public class OnBoardingActivity extends BaseActivity {
         private final int captionResId;
 
         // The image to be shown in onboarding step
-        private final int imageResId;
+        private final Bitmap imageBitmap;
 
         private OnBoardingStepResource(int titleId, int captionResId, int imageResId) {
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            int imageWidth = displayMetrics.widthPixels / 4;
+            int imageHeight = displayMetrics.heightPixels / 4;
+
             this.titleId = titleId;
             this.captionResId = captionResId;
-            this.imageResId = imageResId;
+            this.imageBitmap = ImageUtils.decodeSampledBitmapFromResource(getResources(),
+                imageResId, imageWidth, imageHeight);
         }
     }
 
@@ -48,16 +55,9 @@ public class OnBoardingActivity extends BaseActivity {
     // Constants
     // ***********************
 
-    private final OnBoardingStepResource[] ON_BOARDING_STEP_RESOURCES = new OnBoardingStepResource[]{
-            new OnBoardingStepResource(R.string.onboarding_title_details,
-                R.string.onboarding_details, R.drawable.onboarding_details),
-            new OnBoardingStepResource(R.string.onboarding_title_favorites,
-                R.string.onboarding_favorites, R.drawable.onboarding_favorites),
-            new OnBoardingStepResource(R.string.onboarding_title_notification,
-                R.string.onboarding_notification, R.drawable.onboarding_notification),
-    };
+    private OnBoardingStepResource[] onBoardingStepResources;
 
-    private final int NUM_ON_BOARDING_STEPS = ON_BOARDING_STEP_RESOURCES.length;
+    private int numOnBoardingSteps;
 
     /**
      * The view pager navigation dots shown below the view pager. A big dot indicates the step
@@ -70,26 +70,31 @@ public class OnBoardingActivity extends BaseActivity {
 
     private ImageView imageView;
 
-    private int imageWidth;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_onboarding);
 
+        onBoardingStepResources = new OnBoardingStepResource[]{
+            new OnBoardingStepResource(R.string.onboarding_title_details,
+                R.string.onboarding_details, R.drawable.onboarding_details),
+            new OnBoardingStepResource(R.string.onboarding_title_favorites,
+                R.string.onboarding_favorites, R.drawable.onboarding_favorites),
+            new OnBoardingStepResource(R.string.onboarding_title_notification,
+                R.string.onboarding_notification, R.drawable.onboarding_notification),
+        };
+        numOnBoardingSteps = onBoardingStepResources.length;
+
         // Initialize the dotsView. Add dots to indicate the number of pages in view pager.
         dotsView = (LinearLayout) findViewById(R.id.dots_parent);
         LayoutInflater layoutInflater = getLayoutInflater();
-        for (int i = 0; i < NUM_ON_BOARDING_STEPS; i++) {
+        for (int i = 0; i < numOnBoardingSteps; i++) {
             View view = layoutInflater.inflate(R.layout.viewpager_dot, dotsView, false);
             view.setSelected(i == 0);
             dotsView.addView(view);
         }
 
         imageView = (ImageView) findViewById(R.id.screenshot);
-        imageWidth = 250;
-        imageView.setImageBitmap(ImageUtils.decodeSampledBitmapFromResource(getResources(),
-            ON_BOARDING_STEP_RESOURCES[0].imageResId, imageWidth, imageWidth * 2));
 
         // Initialize the The view pager which shows the onboarding steps
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
@@ -100,26 +105,34 @@ public class OnBoardingActivity extends BaseActivity {
         findViewById(R.id.skip).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent phoneLoginIntent = new Intent(OnBoardingActivity.this,
-                        PhoneLoginActivity.class);
-                phoneLoginIntent.putExtra(PhoneLoginActivity.EXTRA_IN_ONBOARDING_FLOW, true);
-                startActivity(phoneLoginIntent);
-                finish();
+                launchNextActivity();
             }
         });
 
         findViewById(R.id.next).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Animation animation = new FakeDragAnimation(viewPager,
-                    -viewPager.getMeasuredWidth());
-                animation.setDuration(300);
-                viewPager.startAnimation(animation);
+                if (viewPager.getCurrentItem() == numOnBoardingSteps - 1) {
+                    launchNextActivity();
+                } else {
+                    Animation animation = new FakeDragAnimation(viewPager,
+                        -viewPager.getMeasuredWidth());
+                    animation.setDuration(500);
+                    viewPager.startAnimation(animation);
+                }
             }
         });
 
         // Read Preferences
         pref = Preferences.getInstance(this);
+    }
+
+    private void launchNextActivity() {
+        Intent phoneLoginIntent = new Intent(OnBoardingActivity.this,
+            PhoneLoginActivity.class);
+        phoneLoginIntent.putExtra(PhoneLoginActivity.EXTRA_IN_ONBOARDING_FLOW, true);
+        startActivity(phoneLoginIntent);
+        finish();
     }
 
     @Override
@@ -138,9 +151,19 @@ public class OnBoardingActivity extends BaseActivity {
     // ***********************
 
     private ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
+        private int currentImageIndex = -1;
+
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             // do nothing.
+            int imageIndex = (int) (position + 2 * positionOffset);
+            float ratio = Math.abs(2 * positionOffset - 1);
+            imageView.setAlpha(ratio);
+            imageView.setTranslationY(100 * (1 - ratio));
+            if (imageIndex != currentImageIndex) {
+                imageView.setImageBitmap(onBoardingStepResources[imageIndex].imageBitmap);
+                currentImageIndex = imageIndex;
+            }
         }
 
         @Override
@@ -148,8 +171,6 @@ public class OnBoardingActivity extends BaseActivity {
             for (int i = 0 ; i < dotsView.getChildCount(); i++) {
                 dotsView.getChildAt(i).setSelected(i == position);
             }
-            imageView.setImageBitmap(ImageUtils.decodeSampledBitmapFromResource(getResources(),
-                ON_BOARDING_STEP_RESOURCES[position].imageResId, imageWidth, imageWidth * 2));
         }
 
         @Override
@@ -162,7 +183,7 @@ public class OnBoardingActivity extends BaseActivity {
     private PagerAdapter mOnBoardingStepsAdapter = new PagerAdapter() {
         @Override
         public int getCount() {
-            return NUM_ON_BOARDING_STEPS;
+            return numOnBoardingSteps;
         }
 
         @Override
@@ -175,9 +196,9 @@ public class OnBoardingActivity extends BaseActivity {
             View view = getLayoutInflater().inflate(R.layout.viewpager_onboarding, container, false);
             container.addView(view);
             TextView title = (TextView) view.findViewById(R.id.title);
-            title.setText(ON_BOARDING_STEP_RESOURCES[position].titleId);
+            title.setText(onBoardingStepResources[position].titleId);
             TextView caption = (TextView) view.findViewById(R.id.caption);
-            caption.setText(ON_BOARDING_STEP_RESOURCES[position].captionResId);
+            caption.setText(onBoardingStepResources[position].captionResId);
             return view;
         }
 

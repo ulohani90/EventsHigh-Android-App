@@ -1,8 +1,8 @@
 package com.eventshigh.nearme.app.animation;
 
 import android.support.v4.view.ViewPager;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 
 /**
@@ -20,7 +20,7 @@ public class FakeDragAnimation extends Animation {
     this.viewPager = viewPager;
     this.dragAmount = dragAmount;
 
-    setInterpolator(new AccelerateDecelerateInterpolator());
+    setInterpolator(new DecelerateInterpolator());
   }
 
   @Override
