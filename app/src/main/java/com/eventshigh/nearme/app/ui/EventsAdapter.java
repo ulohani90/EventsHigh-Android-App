@@ -81,13 +81,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         dataToShow.clear();
         boolean showTrendingTopics = !myEvents.trendingTopics.isEmpty();
 
-        for (TopicEvent topicEvent : myEvents.topicEvents) {
-            if (addMyEventHeader && !dataToShow.isEmpty()) {
+        for (int i = 0; i < myEvents.topicEvents.size(); i++) {
+            if (addMyEventHeader && i == 1) {
                 dataToShow.add(new MyEventHeaderData());
                 addMyEventHeader = false;
             }
 
-            if (showTrendingTopics && dataToShow.size() > 10) {
+            if (showTrendingTopics && i == 3) {
                 dataToShow.add(new HeaderData(TRENDING_TOPIC_TITLE, false));
                 Iterator<TrendingTopic> trendingTopicIterator = myEvents.trendingTopics.iterator();
                 while (trendingTopicIterator.hasNext()) {
@@ -100,6 +100,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 showTrendingTopics = false;
             }
 
+            TopicEvent topicEvent = myEvents.topicEvents.get(i);
             List<Event> events = topicEvent.events;
             if (events.isEmpty()) {
                 continue;
@@ -364,7 +365,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         public void setFavouriteView(@Nullable EventMark eventMark) {
             favouriteView.setTag(eventMark);
             favouriteView.setImageResource(EventMark.isFavourite(eventMark) ?
-                    R.drawable.ic_favorite_red_24dp : R.drawable.ic_favorite_grey600_24dp);
+                    R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
         }
 
         private void bindEventView(final Event event, final BaseContextActivity activity,
@@ -392,7 +393,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     @Override
                     public void run() {
                         LayoutParams lp = bgView.getLayoutParams();
-                        lp.height = 9 * bgView.getWidth() / 16;
+                        lp.height = 3 * bgView.getWidth() / 4;
                         bgView.setLayoutParams(lp);
                     }
                 });

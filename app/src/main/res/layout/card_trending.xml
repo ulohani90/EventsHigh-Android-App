@@ -42,10 +42,6 @@
             tools:text="Hip Hop Music"
         />
     </android.support.v7.widget.CardView>
-    <Space
-        android:layout_width="@dimen/small_card_spacing"
-        android:layout_height="match_parent"
-    />
     <android.support.v7.widget.CardView
         android:id="@+id/trending2_card"
         android:layout_width="0dp"

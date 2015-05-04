@@ -34,7 +34,6 @@
                 android:visibility="gone"
             />
             <FrameLayout
-                android:id="@+id/view_switcher2"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -50,14 +49,15 @@
                     android:id="@+id/swipe_refresh"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginTop="-90dp"
                 >
                     <com.eventshigh.nearme.app.view.AutofitRecyclerView
                         android:id="@+id/event_grid"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:columnWidth="@dimen/big_event_card_width"
-                        android:horizontalSpacing="@dimen/big_card_spacing"
-                        android:verticalSpacing="@dimen/big_card_spacing"
+                        android:horizontalSpacing="0dp"
+                        android:verticalSpacing="0dp"
                         android:paddingBottom="48dp"
                         android:clipToPadding="false"
                         tools:listitem="@layout/event_card"
