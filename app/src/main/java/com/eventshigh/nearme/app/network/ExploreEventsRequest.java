@@ -97,6 +97,7 @@ public class ExploreEventsRequest extends JsonRequest<MyEvents>  {
 
             // Parse the topic events.
             List<TopicEvents> topicEvents = new ArrayList<>();
+            JSONObject countsJSON = exploreEventsJson.getJSONObject("counts");
             JSONArray exploreTags = exploreEventsJson.getJSONArray("explore");
             for (int i = 0; i < exploreTags.length(); i++) {
                 // Parse events.
@@ -110,7 +111,11 @@ public class ExploreEventsRequest extends JsonRequest<MyEvents>  {
                 eventsMarkerManager.waitForLoading();
                 Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
 
-                topicEvents.add(new TopicEvents(tag, events));
+                int count = events.size();
+                if (countsJSON != null) {
+                    count = countsJSON.optInt(tag.toLowerCase(), events.size());
+                }
+                topicEvents.add(new TopicEvents(tag, events, count));
             }
 
             // Parse Trending topics.

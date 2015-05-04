@@ -28,9 +28,13 @@ public class MyEventsRequest {
         public final int numEvents;
 
         public TopicEvents(String topicName, List<Event> events) {
+            this(topicName, events, events.size());
+        }
+
+        public TopicEvents(String topicName, List<Event> events, int numEvents) {
             this.topicName = topicName;
             this.events = events;
-            this.numEvents = events.size();
+            this.numEvents = numEvents;
         }
     }
 
