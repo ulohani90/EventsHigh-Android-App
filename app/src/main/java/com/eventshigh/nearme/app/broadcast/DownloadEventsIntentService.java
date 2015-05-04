@@ -19,7 +19,7 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
-import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvent;
+import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -127,8 +127,8 @@ public class DownloadEventsIntentService extends IntentService {
         public void onResponse(MyEvents myEvents, boolean isIntermediate) {
             // Merge all events into one List and remove duplicates.
             Set<Event> eventSet = new HashSet<>();
-            for (TopicEvent topicEvent : myEvents.topicEvents) {
-                eventSet.addAll(topicEvent.events);
+            for (TopicEvents topicEvents : myEvents.topicEvents) {
+                eventSet.addAll(topicEvents.events);
             }
             showNotification(eventSet, intent);
         }

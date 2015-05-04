@@ -17,7 +17,7 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
-import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvent;
+import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONArray;
@@ -96,7 +96,7 @@ public class ExploreEventsRequest extends JsonRequest<MyEvents>  {
             JSONObject exploreEventsJson = new JSONObject(jsonString);
 
             // Parse the topic events.
-            List<TopicEvent> topicEvents = new ArrayList<>();
+            List<TopicEvents> topicEvents = new ArrayList<>();
             JSONArray exploreTags = exploreEventsJson.getJSONArray("explore");
             for (int i = 0; i < exploreTags.length(); i++) {
                 // Parse events.
@@ -110,7 +110,7 @@ public class ExploreEventsRequest extends JsonRequest<MyEvents>  {
                 eventsMarkerManager.waitForLoading();
                 Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
 
-                topicEvents.add(new TopicEvent(tag, events));
+                topicEvents.add(new TopicEvents(tag, events));
             }
 
             // Parse Trending topics.

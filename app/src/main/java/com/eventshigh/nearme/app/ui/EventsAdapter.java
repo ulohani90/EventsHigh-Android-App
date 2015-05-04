@@ -26,7 +26,7 @@ import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
-import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvent;
+import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -100,21 +100,21 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 showTrendingTopics = false;
             }
 
-            TopicEvent topicEvent = myEvents.topicEvents.get(i);
-            List<Event> events = topicEvent.events;
+            TopicEvents topicEvents = myEvents.topicEvents.get(i);
+            List<Event> events = topicEvents.events;
             if (events.isEmpty()) {
                 continue;
             }
 
-            boolean isFavourite = topicEvent.topicName.equals(MyEventsRequest.FAVOURITES_NAME);
+            boolean isFavourite = topicEvents.topicName.equals(MyEventsRequest.FAVOURITES_NAME);
             if (!isFavourite && events.size() > maxPerCategory) {
                 events = events.subList(0, maxPerCategory);
             }
 
-            dataToShow.add(new HeaderData(topicEvent.topicName, topicEvent.events.size()));
+            dataToShow.add(new HeaderData(topicEvents.topicName, topicEvents.numEvents));
             boolean isFirstEvent = true;
             for (Event event : events) {
-                dataToShow.add(new EventData(topicEvent.topicName, event, isFirstEvent));
+                dataToShow.add(new EventData(topicEvents.topicName, event, isFirstEvent));
                 isFirstEvent = false;
             }
         }
@@ -382,6 +382,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
         }
 
+        private void addView(List<Pair<View, String>> sharedElements, @Nullable View view,
+                             String shareName) {
+            if (view != null && view.getVisibility() == View.VISIBLE) {
+                sharedElements.add(Pair.create(view, shareName));
+            }
+        }
+
         private void bindEventView(final Event event, boolean isFirstEvent,
                                    final BaseContextActivity activity, final int position) {
             itemView.setTag(position);
@@ -389,16 +396,19 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Pair<View, String> pair1 = Pair.<View, String>create(bgView, "event_bg");
-                    Pair<View, String> pair2 = Pair.<View, String>create(titleView, "event_title");
-                    Pair<View, String> pair3 = Pair.<View, String>create(eventTimeView, "event_time");
-                    Pair<View, String> pair4 = Pair.<View, String>create(venueView, "event_venue");
-                    Pair<View, String> pair5 = Pair.<View, String>create(travelTimeView, "event_travel_time");
-                    Pair<View, String> pair6 = Pair.<View, String>create(priceView, "event_price");
-                    Pair<View, String> pair7 = Pair.<View, String>create(favouriteView, "action_favourite");
-                    Pair<View, String> pair8 = Pair.<View, String>create(recommendedView, "eh_recommends");
+                    List<Pair<View, String>> sharedElements = new ArrayList<Pair<View, String>>();
+                    addView(sharedElements, bgView, "event_bg");
+                    addView(sharedElements, titleView, "event_title");
+                    addView(sharedElements, eventTimeView, "event_time");
+                    addView(sharedElements, venueView, "event_venue");
+                    addView(sharedElements, travelTimeView, "event_travel_time");
+                    addView(sharedElements, priceView, "event_price");
+                    addView(sharedElements, favouriteView, "action_favourite");
+                    addView(sharedElements, recommendedView, "eh_recommends");
+                    Pair shareEles[] = new Pair[sharedElements.size()];
+                    shareEles = sharedElements.toArray(shareEles);
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            activity, pair1, pair2, pair3, pair4, pair5, pair6, pair7, pair8).toBundle();
+                            activity, shareEles).toBundle();
                     activity.showEventDetails(event, bundle);
                 }
             });

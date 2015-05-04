@@ -12,7 +12,7 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
-import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvent;
+import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.MapMarkerManager;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -120,8 +120,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
     @Override
     protected void updateMyEvents(MyEvents myEvents) {
         Set<Event> events = new HashSet<>();
-        for (TopicEvent topicEvent : myEvents.topicEvents) {
-            events.addAll(topicEvent.events);
+        for (TopicEvents topicEvents : myEvents.topicEvents) {
+            events.addAll(topicEvents.events);
         }
 
         this.updateEventsCollection(new ArrayList<>(events));
