@@ -24,6 +24,14 @@
         android:background="@drawable/shape_film"
     />
 
+    <View
+        android:id="@+id/arrow"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/shape_triangle"
+        android:layout_centerHorizontal="true"
+    />
+
     <ImageView
         android:id="@+id/event_recommended"
         android:layout_width="wrap_content"

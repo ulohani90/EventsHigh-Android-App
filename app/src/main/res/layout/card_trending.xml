@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/offer_card_height"
+    android:layout_height="@dimen/trending_card_height"
     android:orientation="horizontal"
 >
     <FrameLayout

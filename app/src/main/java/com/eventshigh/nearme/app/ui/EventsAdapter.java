@@ -65,7 +65,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public void setEvents(List<Event> events) {
         dataToShow.clear();
         for (Event event: events) {
-            dataToShow.add(new EventData("", event));
+            dataToShow.add(new EventData("", event, false));
         }
         notifyDataSetChanged();
     }
@@ -88,7 +88,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             if (showTrendingTopics && i == 3) {
-                dataToShow.add(new HeaderData(TRENDING_TOPIC_TITLE, false));
+                dataToShow.add(new HeaderData(TRENDING_TOPIC_TITLE, 0));
                 Iterator<TrendingTopic> trendingTopicIterator = myEvents.trendingTopics.iterator();
                 while (trendingTopicIterator.hasNext()) {
                     TrendingTopic topic1 = trendingTopicIterator.next();
@@ -107,15 +107,15 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             boolean isFavourite = topicEvent.topicName.equals(MyEventsRequest.FAVOURITES_NAME);
-            boolean showMore = false;
             if (!isFavourite && events.size() > maxPerCategory) {
-                showMore = true;
                 events = events.subList(0, maxPerCategory);
             }
 
-            dataToShow.add(new HeaderData(topicEvent.topicName, showMore));
+            dataToShow.add(new HeaderData(topicEvent.topicName, topicEvent.events.size()));
+            boolean isFirstEvent = true;
             for (Event event : events) {
-                dataToShow.add(new EventData(topicEvent.topicName, event));
+                dataToShow.add(new EventData(topicEvent.topicName, event, isFirstEvent));
+                isFirstEvent = false;
             }
         }
 
@@ -174,7 +174,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                                     @Nullable View reuseView, ViewGroup parent) {
         View view = reuseView != null ? reuseView :
                 activity.getLayoutInflater().inflate(R.layout.card_event_maps, parent, false);
-        new EventCard(view, true).bindEventView(event, activity, -1);
+        new EventCard(view, true).bindEventView(event, false, activity, -1);
         return view;
     }
 
@@ -235,11 +235,15 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     // Header Data.
     private class HeaderData implements Data {
         private final String header;
-        private final boolean showMore;
+        private final int numEvents;
 
-        private HeaderData(String header, boolean showMore) {
+        private HeaderData(String header, int numEvents) {
             this.header = header;
-            this.showMore = showMore;
+            this.numEvents = numEvents;
+        }
+
+        public boolean showMore() {
+            return numEvents > 0 && !header.equals(MyEventsRequest.FAVOURITES_NAME);
         }
 
         @Override
@@ -260,6 +264,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private static class HeaderCard extends ViewHolder {
         private final TextView titleView;
+        private final TextView numEventsView;
         private final View moreView;
 
         private static HeaderCard newInstance(Activity activity, ViewGroup parent) {
@@ -270,13 +275,22 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private HeaderCard(View cardView) {
             super(cardView);
             this.titleView = (TextView) cardView.findViewById(R.id.header);
+            this.numEventsView = (TextView) cardView.findViewById(R.id.num_events);
             this.moreView = cardView.findViewById(R.id.header_more);
         }
 
         private void bindHeaderView(final BaseContextActivity activity, final HeaderData header) {
             titleView.setText(Utils.capitalize(header.header));
-            moreView.setVisibility(header.showMore ? View.VISIBLE: View.GONE);
-            if (header.showMore) {
+            if (header.numEvents <= 0) {
+                numEventsView.setVisibility(View.GONE);
+            } else {
+                numEventsView.setVisibility(View.VISIBLE);
+                numEventsView.setText(
+                        String.format(activity.getString(R.string.num_events), header.numEvents));
+            }
+
+            if (header.showMore()) {
+                moreView.setVisibility(View.VISIBLE);
                 itemView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -284,6 +298,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     }
                 });
             } else {
+                moreView.setVisibility(View.GONE);
                 itemView.setClickable(false);
             }
         }
@@ -293,10 +308,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private class EventData implements Data {
         private final String header;
         private final Event event;
+        private final boolean isFirstEvent;
 
-        public EventData(String header, Event event) {
+        public EventData(String header, Event event, boolean isFirstEvent) {
             this.header = header;
             this.event = event;
+            this.isFirstEvent = isFirstEvent;
         }
 
         @Override
@@ -306,7 +323,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            ((EventCard) card).bindEventView(event, activity, position);
+            ((EventCard) card).bindEventView(event, isFirstEvent, activity, position);
         }
 
         public String getId() {
@@ -328,6 +345,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final ImageView favouriteView;
         private final View fbShareView;
         private final View whatsappShareView;
+        private final View arrowView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
             View view = activity.getLayoutInflater().inflate(
@@ -351,6 +369,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
             fbShareView = cardView.findViewById(R.id.share_fb);
             whatsappShareView = cardView.findViewById(R.id.share_whatsapp);
+            arrowView = cardView.findViewById(R.id.arrow);
 
             if (bgView instanceof PaletteImageView) {
                 ((PaletteImageView) bgView).setHeaderView(headerView);
@@ -363,8 +382,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
         }
 
-        private void bindEventView(final Event event, final BaseContextActivity activity,
-                                   final int position) {
+        private void bindEventView(final Event event, boolean isFirstEvent,
+                                   final BaseContextActivity activity, final int position) {
             itemView.setTag(position);
             itemView.setVisibility(View.VISIBLE);
             itemView.setOnClickListener(new OnClickListener() {
@@ -384,6 +403,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 }
             });
 
+
             // Set the background image.
             bgView.setDefaultImageResId(R.drawable.eh_default_event);
             bgView.setErrorImageResId(R.drawable.eh_default_event);
@@ -398,6 +418,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                         bgView.setLayoutParams(lp);
                     }
                 });
+            }
+
+            if (arrowView != null) {
+                arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
             }
 
             // recommended ? Offer ?
@@ -611,7 +635,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     // My Event Header Data.
     private class MyEventHeaderData implements Data {
-
         @Override
         public DataType getType() {
             return DataType.MY_EVENT_HEADER;
