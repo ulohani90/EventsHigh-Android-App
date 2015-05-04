@@ -57,10 +57,6 @@ public class EventsGridActivity extends BaseEventsActivity {
         eventsAdapter = new EventsAdapter(this);
         eventGridView = (AutofitRecyclerView) findViewById(R.id.event_grid);
         eventGridView.setEventsAdapter(eventsAdapter);
-        if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-            eventGridView.setSpacing((int) getResources().getDimension(R.dimen.small_card_spacing));
-            eventGridView.setColumnWidth((int) getResources().getDimension(R.dimen.small_event_card_width));
-        }
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

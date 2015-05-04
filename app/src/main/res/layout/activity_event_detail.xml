@@ -44,7 +44,8 @@
                     android:layout_margin="16dp"
                     android:src="@drawable/eh_recommend"
                     android:adjustViewBounds="true"
-                    tools:ignore="ContentDescription"
+                    android:transitionName="eh_recommends"
+                    tools:ignore="UnusedAttribute, ContentDescription"
                 />
             </FrameLayout>
 
@@ -60,10 +61,10 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginEnd="16dp"
-                android:transitionName="event_title"
-                tools:ignore="UnusedAttribute"
                 android:textIsSelectable="true"
                 android:textColor="#CC000000"
+                android:transitionName="event_title"
+                tools:ignore="UnusedAttribute"
                 tools:text="The Awesome Event"
             />
             <TextView
@@ -108,6 +109,8 @@
                     android:clickable="true"
                     android:onClick="addFavourite"
                     android:text="@string/ui_favourite"
+                    android:transitionName="action_favourite"
+                    tools:ignore="UnusedAttribute"
                 />
                 <TextView
                     android:id="@+id/action_favourited"
@@ -189,6 +192,8 @@
                     android:layout_toLeftOf="@+id/event_travel_time"
                     android:layout_toStartOf="@+id/event_travel_time"
                     android:textColor="#A3000000"
+                    android:transitionName="event_venue"
+                    tools:ignore="UnusedAttribute"
                     tools:text="Counter Culture"
                 />
                 <TextView
@@ -215,6 +220,8 @@
                     android:textColor="#999197A3"
                     android:drawableTop="@drawable/ic_local_taxi_grey600_12dp"
                     android:drawablePadding="4dp"
+                    android:transitionName="event_travel_time"
+                    tools:ignore="UnusedAttribute"
                     tools:text="30 min"
                 />
             </RelativeLayout>
@@ -265,6 +272,8 @@
                         android:layout_toRightOf="@+id/event_time_icon"
                         android:layout_toEndOf="@+id/event_time_icon"
                         android:textColor="#A3000000"
+                        android:transitionName="event_time"
+                        tools:ignore="UnusedAttribute"
                         tools:text="Wed, 14 Jan at 9:30 AM"
                     />
                     <TextView
@@ -344,8 +353,6 @@
                 android:showDividers="middle"
                 android:divider="@drawable/shape_vertical_divider"
                 android:baselineAligned="false"
-                android:visibility="gone"
-                tools:visibility="visible"
             >
                 <FrameLayout
                     android:id="@+id/book_ticket"
@@ -354,6 +361,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="openBookingSite"
+                    android:visibility="gone"
+                    tools:visibility="visible"
                 >
                     <TextView
                         android:layout_width="wrap_content"
@@ -426,6 +435,8 @@
                     android:layout_marginTop="18dp"
                     android:gravity="start"
                     android:textColor="#CC383F3F"
+                    android:transitionName="event_price"
+                    tools:ignore="UnusedAttribute"
                     tools:text="₹ 200 - 500"
                 />
             </LinearLayout>

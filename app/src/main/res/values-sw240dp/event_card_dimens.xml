@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="big_event_card_width">210dp</dimen>
-    <dimen name="big_event_card_height">110dp</dimen>
-
-    <dimen name="offer_card_height">75dp</dimen>
+    <dimen name="big_event_card_height">150dp</dimen>
 
     <dimen name="maps_event_card_width">180dp</dimen>
+    <dimen name="maps_event_card_height">135dp</dimen>
+
+    <dimen name="trending_card_height">75dp</dimen>
 </resources>

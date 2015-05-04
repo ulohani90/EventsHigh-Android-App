@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                                    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:foreground="?android:attr/selectableItemBackground"
     android:descendantFocusability="blocksDescendants"
-    card_view:cardBackgroundColor="#FF008DA9"
-    card_view:cardCornerRadius="2dp"
     tools:layout_height="200dp"
 >
     <com.android.volley.toolbox.NetworkImageView
@@ -37,4 +34,4 @@
         android:visibility="gone"
         tools:ignore="UnusedAttribute"
     />
-</android.support.v7.widget.CardView>
+</FrameLayout>

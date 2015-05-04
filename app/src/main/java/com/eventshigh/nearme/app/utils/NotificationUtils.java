@@ -159,6 +159,10 @@ public class NotificationUtils {
 
     public synchronized static void showEventsNotification(Context context, int notificationId,
             List<Event> events, Intent launchIntent, int titleResourceId, int messageResourceId) {
+        if (events.isEmpty()) {
+            return;
+        }
+
         StringBuilder messageBuilder = new StringBuilder();
         for (int i = 0; i < events.size() && i < MAX_EVENTS_TO_SHOW_IN_NOTIFICATION; i++) {
             messageBuilder.append(events.get(i).title);

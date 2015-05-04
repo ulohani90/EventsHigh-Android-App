@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -126,15 +127,15 @@ public class EventDetailActivity extends BaseActivity {
             populateView(event);
         } else {
             EventRequest.submit(this, getIntent().getData(), Priority.IMMEDIATE, mEventListener,
-                new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(EventDetailActivity.this, R.string.failed_load,
-                                Toast.LENGTH_SHORT).show();
-                        Log.e(EventDetailActivity.class.getSimpleName(), volleyError.toString(), volleyError.getCause());
-                        finish();
-                    }
-                });
+                    new ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            Toast.makeText(EventDetailActivity.this, R.string.failed_load,
+                                    Toast.LENGTH_SHORT).show();
+                            Log.e(EventDetailActivity.class.getSimpleName(), volleyError.toString(), volleyError.getCause());
+                            finish();
+                        }
+                    });
         }
     }
 
@@ -216,13 +217,13 @@ public class EventDetailActivity extends BaseActivity {
             bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
         }
 
-        openBookingSite(bookingUriBuilder.build());
+        CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
+                getString(R.string.title_book));
     }
 
     public void openOfferSite(View view) {
         reportEventAction(event, "openOffer");
-
-        IntentUtils.processContestViewIntent(this,
+        CustomUrlActivity.launchCustomUrl(this,
                 Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
                 event.offerTitle);
     }
@@ -345,18 +346,21 @@ public class EventDetailActivity extends BaseActivity {
     private void populateView(Event event) {
         this.event = event;
 
-        // Set Toolbar.
-        toolbar.setTitle(event.title);
-        if (event.numPeopleInterested <= 0) {
-            toolbar.setSubtitle("");
-        } else {
-            String text = getResources().getQuantityString(R.plurals.people_interested,
-                    event.numPeopleInterested, event.numPeopleInterested);
-            toolbar.setSubtitle(text);
+        // Set Title.
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(event.title);
+            if (event.numPeopleInterested <= 0) {
+                actionBar.setSubtitle("");
+            } else {
+                String text = getResources().getQuantityString(R.plurals.people_interested,
+                        event.numPeopleInterested, event.numPeopleInterested);
+                actionBar.setSubtitle(text);
+            }
         }
-        toolbar.setAlpha(0f);
 
         // Populate event details.
+        toolbar.setAlpha(0f);
         eventCard.populateView(event);
 
         // Connect to Google API client to notify the view.
@@ -784,13 +788,6 @@ public class EventDetailActivity extends BaseActivity {
                 INSTALLED_PACKAGES.add(packageInfo.packageName);
             }
         }
-    }
-
-    private void openBookingSite(Uri bookingUri) {
-        Intent intent = new Intent(this, CustomUrlActivity.class);
-        intent.setData(bookingUri);
-        intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, getString(R.string.title_book));
-        startActivitySafe(intent);
     }
 
     private void populateEventTravelTime() {

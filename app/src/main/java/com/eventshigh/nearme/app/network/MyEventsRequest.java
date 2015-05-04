@@ -22,21 +22,27 @@ import java.util.List;
 public class MyEventsRequest {
     public static String FAVOURITES_NAME = "favourites";
 
-    public static class TopicEvent {
+    public static class TopicEvents {
         public final String topicName;
         public final List<Event> events;
+        public final int numEvents;
 
-        public TopicEvent(String topicName, List<Event> events) {
+        public TopicEvents(String topicName, List<Event> events) {
+            this(topicName, events, events.size());
+        }
+
+        public TopicEvents(String topicName, List<Event> events, int numEvents) {
             this.topicName = topicName;
             this.events = events;
+            this.numEvents = numEvents;
         }
     }
 
     public static class MyEvents {
-        public final List<TopicEvent> topicEvents;
+        public final List<TopicEvents> topicEvents;
         public final List<TrendingTopic> trendingTopics;
 
-        public MyEvents(List<TopicEvent> topicEvents, List<TrendingTopic> trendingTopics) {
+        public MyEvents(List<TopicEvents> topicEvents, List<TrendingTopic> trendingTopics) {
             this.topicEvents = topicEvents;
             this.trendingTopics = trendingTopics;
         }
@@ -55,7 +61,7 @@ public class MyEventsRequest {
     private final ErrorListener errorListener;
 
     private int numPendingRequests;
-    private final List<TopicEvent> result = new ArrayList<>();
+    private final List<TopicEvents> result = new ArrayList<>();
 
     public MyEventsRequest(Context context, EventsContext eventsContext, Priority priority,
                            boolean shouldBypassCache, boolean includeWithoutLocation,
@@ -107,7 +113,7 @@ public class MyEventsRequest {
         }
 
         public void addToResult(List<Event> events) {
-            result.add(0, new TopicEvent(FAVOURITES_NAME, events));
+            result.add(0, new TopicEvents(FAVOURITES_NAME, events));
         }
     }
 
@@ -120,7 +126,7 @@ public class MyEventsRequest {
 
         public void addToResult(List<Event> events) {
             synchronized (result) {
-                result.add(new TopicEvent(title, events));
+                result.add(new TopicEvents(title, events));
             }
         }
 

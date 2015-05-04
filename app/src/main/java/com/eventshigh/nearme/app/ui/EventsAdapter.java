@@ -26,7 +26,7 @@ import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
-import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvent;
+import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -65,7 +65,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public void setEvents(List<Event> events) {
         dataToShow.clear();
         for (Event event: events) {
-            dataToShow.add(new EventData("", event));
+            dataToShow.add(new EventData("", event, false));
         }
         notifyDataSetChanged();
     }
@@ -81,14 +81,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         dataToShow.clear();
         boolean showTrendingTopics = !myEvents.trendingTopics.isEmpty();
 
-        for (TopicEvent topicEvent : myEvents.topicEvents) {
-            if (addMyEventHeader && !dataToShow.isEmpty()) {
+        for (int i = 0; i < myEvents.topicEvents.size(); i++) {
+            if (addMyEventHeader && i == 1) {
                 dataToShow.add(new MyEventHeaderData());
                 addMyEventHeader = false;
             }
 
-            if (showTrendingTopics && dataToShow.size() > 10) {
-                dataToShow.add(new HeaderData(TRENDING_TOPIC_TITLE, false));
+            if (showTrendingTopics && i == 3) {
+                dataToShow.add(new HeaderData(TRENDING_TOPIC_TITLE, 0));
                 Iterator<TrendingTopic> trendingTopicIterator = myEvents.trendingTopics.iterator();
                 while (trendingTopicIterator.hasNext()) {
                     TrendingTopic topic1 = trendingTopicIterator.next();
@@ -100,21 +100,22 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 showTrendingTopics = false;
             }
 
-            List<Event> events = topicEvent.events;
+            TopicEvents topicEvents = myEvents.topicEvents.get(i);
+            List<Event> events = topicEvents.events;
             if (events.isEmpty()) {
                 continue;
             }
 
-            boolean isFavourite = topicEvent.topicName.equals(MyEventsRequest.FAVOURITES_NAME);
-            boolean showMore = false;
+            boolean isFavourite = topicEvents.topicName.equals(MyEventsRequest.FAVOURITES_NAME);
             if (!isFavourite && events.size() > maxPerCategory) {
-                showMore = true;
                 events = events.subList(0, maxPerCategory);
             }
 
-            dataToShow.add(new HeaderData(topicEvent.topicName, showMore));
+            dataToShow.add(new HeaderData(topicEvents.topicName, topicEvents.numEvents));
+            boolean isFirstEvent = true;
             for (Event event : events) {
-                dataToShow.add(new MyEventData(topicEvent.topicName, event));
+                dataToShow.add(new EventData(topicEvents.topicName, event, isFirstEvent));
+                isFirstEvent = false;
             }
         }
 
@@ -172,8 +173,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public static View getEventCard(final Event event, final BaseEventsActivity activity,
                                     @Nullable View reuseView, ViewGroup parent) {
         View view = reuseView != null ? reuseView :
-                activity.getLayoutInflater().inflate(R.layout.card_event_small, parent, false);
-        new EventCard(view, true).bindEventView(event, activity, -1);
+                activity.getLayoutInflater().inflate(R.layout.card_event_maps, parent, false);
+        new EventCard(view, true).bindEventView(event, false, activity, -1);
         return view;
     }
 
@@ -182,7 +183,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         EVENT(1),
         OFFER(2),
         FOLLOW(3),
-        MY_EVENT(4),
         MY_EVENT_HEADER(5),
         TRENDING_CATEGORY(6);
 
@@ -212,10 +212,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 return FollowCard.newInstance(activity, parent);
             }
 
-            if (typeId == MY_EVENT.typeId) {
-                return EventCard.newInstance(activity, parent, true);
-            }
-
             if (typeId == MY_EVENT_HEADER.typeId) {
                 View view = activity.getLayoutInflater().inflate(
                         R.layout.card_my_events_header, parent, false);
@@ -239,11 +235,15 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     // Header Data.
     private class HeaderData implements Data {
         private final String header;
-        private final boolean showMore;
+        private final int numEvents;
 
-        private HeaderData(String header, boolean showMore) {
+        private HeaderData(String header, int numEvents) {
             this.header = header;
-            this.showMore = showMore;
+            this.numEvents = numEvents;
+        }
+
+        public boolean showMore() {
+            return numEvents > 0 && !header.equals(MyEventsRequest.FAVOURITES_NAME);
         }
 
         @Override
@@ -264,6 +264,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private static class HeaderCard extends ViewHolder {
         private final TextView titleView;
+        private final TextView numEventsView;
         private final View moreView;
 
         private static HeaderCard newInstance(Activity activity, ViewGroup parent) {
@@ -274,13 +275,22 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private HeaderCard(View cardView) {
             super(cardView);
             this.titleView = (TextView) cardView.findViewById(R.id.header);
+            this.numEventsView = (TextView) cardView.findViewById(R.id.num_events);
             this.moreView = cardView.findViewById(R.id.header_more);
         }
 
         private void bindHeaderView(final BaseContextActivity activity, final HeaderData header) {
             titleView.setText(Utils.capitalize(header.header));
-            moreView.setVisibility(header.showMore ? View.VISIBLE: View.GONE);
-            if (header.showMore) {
+            if (header.numEvents <= 0) {
+                numEventsView.setVisibility(View.GONE);
+            } else {
+                numEventsView.setVisibility(View.VISIBLE);
+                numEventsView.setText(
+                        String.format(activity.getString(R.string.num_events), header.numEvents));
+            }
+
+            if (header.showMore()) {
+                moreView.setVisibility(View.VISIBLE);
                 itemView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -288,6 +298,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     }
                 });
             } else {
+                moreView.setVisibility(View.GONE);
                 itemView.setClickable(false);
             }
         }
@@ -297,10 +308,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private class EventData implements Data {
         private final String header;
         private final Event event;
+        private final boolean isFirstEvent;
 
-        public EventData(String header, Event event) {
+        public EventData(String header, Event event, boolean isFirstEvent) {
             this.header = header;
             this.event = event;
+            this.isFirstEvent = isFirstEvent;
         }
 
         @Override
@@ -310,7 +323,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            ((EventCard) card).bindEventView(event, activity, position);
+            ((EventCard) card).bindEventView(event, isFirstEvent, activity, position);
         }
 
         public String getId() {
@@ -332,10 +345,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final ImageView favouriteView;
         private final View fbShareView;
         private final View whatsappShareView;
+        private final View arrowView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
             View view = activity.getLayoutInflater().inflate(
-                    bigLayout ? R.layout.card_event_big : R.layout.card_event_small, parent, false);
+                    bigLayout ? R.layout.card_event_big : R.layout.card_event_maps, parent, false);
             return new EventCard(view, false);
         }
 
@@ -355,6 +369,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
             fbShareView = cardView.findViewById(R.id.share_fb);
             whatsappShareView = cardView.findViewById(R.id.share_whatsapp);
+            arrowView = cardView.findViewById(R.id.arrow);
 
             if (bgView instanceof PaletteImageView) {
                 ((PaletteImageView) bgView).setHeaderView(headerView);
@@ -364,23 +379,40 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         public void setFavouriteView(@Nullable EventMark eventMark) {
             favouriteView.setTag(eventMark);
             favouriteView.setImageResource(EventMark.isFavourite(eventMark) ?
-                    R.drawable.ic_favorite_red_24dp : R.drawable.ic_favorite_grey600_24dp);
+                    R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
         }
 
-        private void bindEventView(final Event event, final BaseContextActivity activity,
-                                   final int position) {
+        private void addView(List<Pair<View, String>> sharedElements, @Nullable View view,
+                             String shareName) {
+            if (view != null && view.getVisibility() == View.VISIBLE) {
+                sharedElements.add(Pair.create(view, shareName));
+            }
+        }
+
+        private void bindEventView(final Event event, boolean isFirstEvent,
+                                   final BaseContextActivity activity, final int position) {
             itemView.setTag(position);
             itemView.setVisibility(View.VISIBLE);
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Pair<View, String> pair1 = Pair.<View, String>create(bgView, "event_bg");
-                    Pair<View, String> pair2 = Pair.<View, String>create(titleView, "event_title");
+                    List<Pair<View, String>> sharedElements = new ArrayList<>();
+                    addView(sharedElements, bgView, "event_bg");
+                    addView(sharedElements, titleView, "event_title");
+                    addView(sharedElements, eventTimeView, "event_time");
+                    addView(sharedElements, venueView, "event_venue");
+                    addView(sharedElements, travelTimeView, "event_travel_time");
+                    addView(sharedElements, priceView, "event_price");
+                    addView(sharedElements, favouriteView, "action_favourite");
+                    addView(sharedElements, recommendedView, "eh_recommends");
+                    Pair shareEles[] = new Pair[sharedElements.size()];
+                    shareEles = sharedElements.toArray(shareEles);
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            activity, pair1, pair2).toBundle();
+                            activity, shareEles).toBundle();
                     activity.showEventDetails(event, bundle);
                 }
             });
+
 
             // Set the background image.
             bgView.setDefaultImageResId(R.drawable.eh_default_event);
@@ -392,10 +424,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     @Override
                     public void run() {
                         LayoutParams lp = bgView.getLayoutParams();
-                        lp.height = 9 * bgView.getWidth() / 16;
+                        lp.height = 3 * bgView.getWidth() / 4;
                         bgView.setLayoutParams(lp);
                     }
                 });
+            }
+
+            if (arrowView != null) {
+                arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
             }
 
             // recommended ? Offer ?
@@ -607,34 +643,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    // My Event Data.
-    private class MyEventData implements Data {
-        private final String header;
-        private final Event event;
-
-        public MyEventData(String header, Event event) {
-            this.header = header;
-            this.event = event;
-        }
-
-        @Override
-        public DataType getType() {
-            return DataType.MY_EVENT;
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder card, int position) {
-            ((EventCard) card).bindEventView(event, activity, position);
-        }
-
-        public String getId() {
-            return header + ":" + event.id;
-        }
-    }
-
     // My Event Header Data.
     private class MyEventHeaderData implements Data {
-
         @Override
         public DataType getType() {
             return DataType.MY_EVENT_HEADER;
@@ -712,7 +722,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             trending1Card.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.showSearchView(data.trendingTopic1.tagName);
+                    data.trendingTopic1.launch(activity);
                 }
             });
 
@@ -722,7 +732,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             trending2Card.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.showSearchView(data.trendingTopic2.tagName);
+                    data.trendingTopic2.launch(activity);
                 }
             });
         }

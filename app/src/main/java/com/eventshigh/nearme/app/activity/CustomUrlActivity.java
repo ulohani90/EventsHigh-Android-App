@@ -2,10 +2,12 @@ package com.eventshigh.nearme.app.activity;
 
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +27,15 @@ public class CustomUrlActivity extends BaseActivity {
 
     private WebView webView;
     private View progressBar;
+
+    public static void launchCustomUrl(Context context, Uri webUri, @Nullable String title) {
+        Intent intent = new Intent(context, CustomUrlActivity.class);
+        intent.setData(webUri);
+        if (title != null) {
+            intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);
+        }
+        context.startActivity(intent);
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
