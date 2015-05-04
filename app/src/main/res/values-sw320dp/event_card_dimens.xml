@@ -3,7 +3,8 @@
     <dimen name="big_event_card_width">280dp</dimen>
     <dimen name="big_event_card_height">210dp</dimen>
 
-    <dimen name="offer_card_height">100dp</dimen>
-
     <dimen name="maps_event_card_width">240dp</dimen>
+    <dimen name="maps_event_card_height">180dp</dimen>
+
+    <dimen name="offer_card_height">100dp</dimen>
 </resources>

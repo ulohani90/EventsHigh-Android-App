@@ -2,15 +2,11 @@
 <resources>
     <dimen name="big_event_card_width">120dp</dimen>
     <dimen name="big_event_card_height">90dp</dimen>
-    <dimen name="big_card_spacing">4dp</dimen>
-
-    <dimen name="small_event_card_width">160dp</dimen>
-    <dimen name="small_event_card_height">100dp</dimen>
-    <dimen name="small_card_spacing">0dp</dimen>
-
-    <dimen name="offer_card_height">50dp</dimen>
 
     <dimen name="maps_event_card_width">100dp</dimen>
+    <dimen name="maps_event_card_height">75dp</dimen>
+
+    <dimen name="offer_card_height">50dp</dimen>
 
     <dimen name="event_card_eb_width">70dp</dimen>
     <dimen name="event_card_eb_height">70dp</dimen>

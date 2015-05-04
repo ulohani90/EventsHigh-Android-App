@@ -2,10 +2,12 @@ package com.eventshigh.nearme.app.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Rect;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.GridLayoutManager.SpanSizeLookup;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.View;
 
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 
@@ -13,13 +15,12 @@ public class AutofitRecyclerView extends RecyclerView {
     private GridLayoutManager gridLayoutManager;
     private int columnWidth;
     private EventsAdapter eventsAdapter;
-    private SpacesItemDecoration spacesItemDecoration;
+    private int horizontalSpacing = 0;
+    private int verticalSpacing = 0;
 
     public AutofitRecyclerView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        int horizontalSpacing = 0;
-        int verticalSpacing = 0;
         if (attrs != null) {
             columnWidth = getDimensionPixelSize(context, attrs, android.R.attr.columnWidth, -1);
             horizontalSpacing = getDimensionPixelSize(context, attrs,
@@ -27,7 +28,6 @@ public class AutofitRecyclerView extends RecyclerView {
             verticalSpacing = getDimensionPixelSize(context, attrs,
                     android.R.attr.verticalSpacing, -1);
         }
-        spacesItemDecoration = new SpacesItemDecoration(horizontalSpacing, verticalSpacing);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -45,16 +45,6 @@ public class AutofitRecyclerView extends RecyclerView {
             int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
             gridLayoutManager.setSpanCount(spanCount);
         }
-    }
-
-    public void setSpacing(int spacing) {
-        removeItemDecoration(spacesItemDecoration);
-        spacesItemDecoration = new SpacesItemDecoration(spacing, spacing);
-        addItemDecoration(spacesItemDecoration);
-    }
-
-    public void setColumnWidth(int width) {
-        columnWidth = width;
     }
 
     private int getDimensionPixelSize(Context context, AttributeSet attributeSet, int attr,
@@ -81,6 +71,16 @@ public class AutofitRecyclerView extends RecyclerView {
         @Override
         public int getSpanSize(int position) {
             return (eventsAdapter != null && eventsAdapter.spanAllColumns(position)) ? getSpanCount() : 1;
+        }
+    };
+
+    private RecyclerView.ItemDecoration spacesItemDecoration = new RecyclerView.ItemDecoration() {
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            outRect.left = 0;
+            outRect.right = getSpanCount() > 1 ? horizontalSpacing : 0;
+            outRect.bottom = verticalSpacing;
+            outRect.top = 0;
         }
     };
 }

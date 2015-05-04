@@ -115,7 +115,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             dataToShow.add(new HeaderData(topicEvent.topicName, showMore));
             for (Event event : events) {
-                dataToShow.add(new MyEventData(topicEvent.topicName, event));
+                dataToShow.add(new EventData(topicEvent.topicName, event));
             }
         }
 
@@ -173,7 +173,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public static View getEventCard(final Event event, final BaseEventsActivity activity,
                                     @Nullable View reuseView, ViewGroup parent) {
         View view = reuseView != null ? reuseView :
-                activity.getLayoutInflater().inflate(R.layout.card_event_small, parent, false);
+                activity.getLayoutInflater().inflate(R.layout.card_event_maps, parent, false);
         new EventCard(view, true).bindEventView(event, activity, -1);
         return view;
     }
@@ -183,7 +183,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         EVENT(1),
         OFFER(2),
         FOLLOW(3),
-        MY_EVENT(4),
         MY_EVENT_HEADER(5),
         TRENDING_CATEGORY(6);
 
@@ -211,10 +210,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             if (typeId == FOLLOW.typeId) {
                 return FollowCard.newInstance(activity, parent);
-            }
-
-            if (typeId == MY_EVENT.typeId) {
-                return EventCard.newInstance(activity, parent, true);
             }
 
             if (typeId == MY_EVENT_HEADER.typeId) {
@@ -336,7 +331,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
             View view = activity.getLayoutInflater().inflate(
-                    bigLayout ? R.layout.card_event_big : R.layout.card_event_small, parent, false);
+                    bigLayout ? R.layout.card_event_big : R.layout.card_event_maps, parent, false);
             return new EventCard(view, false);
         }
 
@@ -611,31 +606,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             followButton.setVisibility(isFollowing ? View.GONE : View.VISIBLE);
             followingButton.setVisibility(isFollowing ? View.VISIBLE : View.GONE);
             followingButton.setSelected(true);
-        }
-    }
-
-    // My Event Data.
-    private class MyEventData implements Data {
-        private final String header;
-        private final Event event;
-
-        public MyEventData(String header, Event event) {
-            this.header = header;
-            this.event = event;
-        }
-
-        @Override
-        public DataType getType() {
-            return DataType.MY_EVENT;
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder card, int position) {
-            ((EventCard) card).bindEventView(event, activity, position);
-        }
-
-        public String getId() {
-            return header + ":" + event.id;
         }
     }
 
