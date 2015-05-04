@@ -377,8 +377,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 public void onClick(View v) {
                     Pair<View, String> pair1 = Pair.<View, String>create(bgView, "event_bg");
                     Pair<View, String> pair2 = Pair.<View, String>create(titleView, "event_title");
+                    Pair<View, String> pair3 = Pair.<View, String>create(eventTimeView, "event_time");
+                    Pair<View, String> pair4 = Pair.<View, String>create(venueView, "event_venue");
+                    Pair<View, String> pair5 = Pair.<View, String>create(travelTimeView, "event_travel_time");
+                    Pair<View, String> pair6 = Pair.<View, String>create(priceView, "event_price");
+                    Pair<View, String> pair7 = Pair.<View, String>create(favouriteView, "action_favourite");
+                    Pair<View, String> pair8 = Pair.<View, String>create(recommendedView, "eh_recommends");
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            activity, pair1, pair2).toBundle();
+                            activity, pair1, pair2, pair3, pair4, pair5, pair6, pair7, pair8).toBundle();
                     activity.showEventDetails(event, bundle);
                 }
             });

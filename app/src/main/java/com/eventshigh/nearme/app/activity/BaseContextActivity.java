@@ -110,7 +110,7 @@ public abstract class BaseContextActivity extends BaseActivity
             UserActionDbHelper.EventAction.OPEN_EVENT_DETAIL, event.id);
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.putExtra(EventDetailActivity.EXTRA_EVENT_PARAM, event);
-        startActivity(detailIntent, bundle);
+        startActivity(detailIntent, null);
     }
 
     protected ErrorListener mErrorListener = new ErrorListener() {
