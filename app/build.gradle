@@ -54,15 +54,12 @@ dependencies {
 
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.android.support:support-v4:22.1.1'
-    compile 'com.android.support:cardview-v7:21.0.3'
     compile 'com.android.support:recyclerview-v7:21.0.3'
-    compile 'com.android.support:palette-v7:22.1.1'
 
     compile 'com.facebook.android:facebook-android-sdk:3.23.0'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
     compile 'org.apmem.tools:layouts:1.8@aar'
     compile 'com.zendesk:sdk:1.2.0.1'
-    compile 'com.melnykov:floatingactionbutton:1.3.0'
 
     compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
         transitive = true;

@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -31,7 +30,8 @@ public class PaletteImageView extends NetworkImageView {
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
-                return Palette.from(bitmap).generate().getVibrantColor(defaultColor);
+                // return Palette.from(bitmap).generate().getVibrantColor(defaultColor);
+                return defaultColor;
             }
 
             @Override
