@@ -5,7 +5,7 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.utils.IntentUtils;
+import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 
 import java.util.Date;
 
@@ -28,7 +28,7 @@ public class EventContestOffer  extends Offer {
             activity.reportActionToAnalytics("expiredShowOffer", id);
             Toast.makeText(activity, R.string.ui_offer_expire, Toast.LENGTH_SHORT).show();
         } else {
-            IntentUtils.processContestViewIntent(activity, Uri.parse(contestURL), id);
+            CustomUrlActivity.launchCustomUrl(activity, Uri.parse(contestURL), id);
         }
     }
 }

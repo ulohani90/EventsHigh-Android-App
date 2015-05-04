@@ -396,7 +396,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    List<Pair<View, String>> sharedElements = new ArrayList<Pair<View, String>>();
+                    List<Pair<View, String>> sharedElements = new ArrayList<>();
                     addView(sharedElements, bgView, "event_bg");
                     addView(sharedElements, titleView, "event_title");
                     addView(sharedElements, eventTimeView, "event_time");
@@ -722,7 +722,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             trending1Card.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.showSearchView(data.trendingTopic1.tagName);
+                    data.trendingTopic1.launch(activity);
                 }
             });
 
@@ -732,7 +732,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             trending2Card.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.showSearchView(data.trendingTopic2.tagName);
+                    data.trendingTopic2.launch(activity);
                 }
             });
         }

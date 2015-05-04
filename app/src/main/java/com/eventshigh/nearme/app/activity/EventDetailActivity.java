@@ -217,13 +217,13 @@ public class EventDetailActivity extends BaseActivity {
             bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
         }
 
-        openBookingSite(bookingUriBuilder.build());
+        CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
+                getString(R.string.title_book));
     }
 
     public void openOfferSite(View view) {
         reportEventAction(event, "openOffer");
-
-        IntentUtils.processContestViewIntent(this,
+        CustomUrlActivity.launchCustomUrl(this,
                 Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
                 event.offerTitle);
     }
@@ -788,13 +788,6 @@ public class EventDetailActivity extends BaseActivity {
                 INSTALLED_PACKAGES.add(packageInfo.packageName);
             }
         }
-    }
-
-    private void openBookingSite(Uri bookingUri) {
-        Intent intent = new Intent(this, CustomUrlActivity.class);
-        intent.setData(bookingUri);
-        intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, getString(R.string.title_book));
-        startActivitySafe(intent);
     }
 
     private void populateEventTravelTime() {

@@ -98,7 +98,7 @@ public abstract class BaseContextActivity extends BaseActivity
     }
 
     public void showEventDetails(Uri eventDetailsURI) {
-        reportActionToAnalytics("showEventDetails");
+        reportActionToAnalytics("showEventDetails", eventDetailsURI.getLastPathSegment());
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.setData(eventDetailsURI);
         startActivity(detailIntent);

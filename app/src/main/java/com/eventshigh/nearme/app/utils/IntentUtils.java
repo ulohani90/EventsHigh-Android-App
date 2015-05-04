@@ -1,11 +1,9 @@
 package com.eventshigh.nearme.app.utils;
 
 import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
@@ -128,7 +126,8 @@ public class IntentUtils {
         } else if (inUri.getPath().startsWith("/detail")) {
             processDetailViewIntent(inUri);
         } else if (inUri.getPath().startsWith("/get_event_contest")) {
-            processContestViewIntent(activity, inUri, null);
+            CustomUrlActivity.launchCustomUrl(activity, inUri, null);
+            activity.finish();
         } else if (inUri.getPath().startsWith("/browse")) {
             processBrowseViewIntent(inUri);
         }
@@ -178,14 +177,5 @@ public class IntentUtils {
     private void processDetailViewIntent(Uri webUri) {
         activity.showEventDetails(webUri);
         activity.finish();
-    }
-
-    public static void processContestViewIntent(Context context, Uri webUri, @Nullable String title) {
-        Intent intent = new Intent(context, CustomUrlActivity.class);
-        intent.setData(webUri);
-        if (title != null) {
-            intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);
-        }
-        context.startActivity(intent);
     }
 }
