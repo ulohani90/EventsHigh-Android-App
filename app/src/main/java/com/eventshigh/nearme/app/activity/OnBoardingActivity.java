@@ -19,6 +19,8 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.animation.FakeDragAnimation;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.ImageUtils;
+import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.view.SlantedDrawable;
 
 /**
  * Onboarding activity for first time users. This activity is shown to a user when the app is
@@ -68,6 +70,7 @@ public class OnBoardingActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_onboarding);
+        imageView = (ImageView) findViewById(R.id.screenshot);
 
         onBoardingStepResources = new OnBoardingStepResource[]{
             new OnBoardingStepResource(R.string.onboarding_title_details,
@@ -87,7 +90,12 @@ public class OnBoardingActivity extends BaseActivity {
             dotsView.addView(view);
         }
 
-        imageView = (ImageView) findViewById(R.id.screenshot);
+        // Set Slanted Background.
+        View view = findViewById(R.id.info_container);
+        SlantedDrawable bg = new SlantedDrawable();
+        bg.setColor(getResources().getColor(android.R.color.white));
+        bg.setOffsetY(Utils.dpToPx(this, 30));
+        view.setBackground(bg);
 
         // Initialize the The view pager which shows the onboarding steps
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
