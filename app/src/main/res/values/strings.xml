@@ -78,9 +78,9 @@
     <string name="onboarding_title_details">One Stop Shop</string>
     <string name="onboarding_title_favorites">Personlized Feed</string>
     <string name="onboarding_title_notification">Never Miss Out</string>
-    <string name="onboarding_details">There are hundreds of places to buy tickets online. We search them all at once so you don\'t have to. See every ticket on the market, ranked from best to worst.</string>
-    <string name="onboarding_favorites">Customize your feed by tracking your favorite performers and teams, letting you browse when all your favorites are in town.</string>
-    <string name="onboarding_notification">Be the first to know about newly announced &amp; upcoming events by tracking artists and teams. Out handy notifications will keep you in the loop.</string>
+    <string name="onboarding_details">There are hundreds of places to see events online. We search them all at once so you don\'t have to. See every event in the city, ranked from best to worst.</string>
+    <string name="onboarding_favorites">Customize your feed by tracking your favorite performers and venues, letting you browse when all your favorites are in town.</string>
+    <string name="onboarding_notification">Be the first to know about newly announced &amp; upcoming events by tracking artists and venues. Our handy notifications will keep you in the loop.</string>
     <string name="onboarding_next">Next</string>
     <string name="onboarding_skip">Skip</string>
 

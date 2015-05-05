@@ -1,16 +1,18 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+             xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/gray800"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="match_parent"
+    tools:context=".activity.OnBoardingActivity"
+>
     <ImageView
         android:id="@+id/screenshot"
         android:layout_width="match_parent"
-        android:layout_height="10000dp"
+        android:layout_height="match_parent"
         android:layout_margin="24dp"
-        android:scaleType="fitStart"
-        tools:src="@drawable/onboarding_details" />
+        android:scaleType="fitCenter"
+        tools:src="@drawable/onboarding_details"
+    />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,12 +20,12 @@
         android:layout_gravity="bottom"
         android:background="@android:color/white"
         android:orientation="vertical"
-        tools:context=".activity.OnBoardingActivity">
-
+    >
         <android.support.v4.view.ViewPager
             android:id="@+id/pager"
             android:layout_width="match_parent"
-            android:layout_height="150dp" />
+            android:layout_height="150dp"
+        />
 
         <View
             android:id="@+id/divider"
@@ -31,13 +33,14 @@
             android:layout_height="1dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:background="@color/gray400" />
+            android:background="@color/gray400"
+        />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
+            android:orientation="horizontal"
+        >
             <TextView
                 android:id="@+id/skip"
                 style="@style/EHButtonCTATransparent"
@@ -46,7 +49,8 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:text="@string/onboarding_skip" />
+                android:text="@string/onboarding_skip"
+            />
 
             <LinearLayout
                 android:id="@+id/dots_parent"
@@ -55,7 +59,8 @@
                 android:layout_marginTop="24dp"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="horizontal" />
+                android:orientation="horizontal"
+            />
 
             <TextView
                 android:id="@+id/next"
@@ -65,8 +70,8 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_weight="1"
-                android:text="@string/onboarding_next" />
-
+                android:text="@string/onboarding_next"
+            />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

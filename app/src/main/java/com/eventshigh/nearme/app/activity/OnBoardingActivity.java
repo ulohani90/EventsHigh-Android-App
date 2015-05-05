@@ -51,24 +51,18 @@ public class OnBoardingActivity extends BaseActivity {
     }
 
 
-    // ***********************
-    // Constants
-    // ***********************
-
     private OnBoardingStepResource[] onBoardingStepResources;
-
-    private int numOnBoardingSteps;
 
     /**
      * The view pager navigation dots shown below the view pager. A big dot indicates the step
      * that the user is currently on when swiping through the view pager content.
      */
     private LinearLayout dotsView;
+    private ImageView imageView;
 
     // User preferences.
     protected Preferences pref;
 
-    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,12 +77,11 @@ public class OnBoardingActivity extends BaseActivity {
             new OnBoardingStepResource(R.string.onboarding_title_notification,
                 R.string.onboarding_notification, R.drawable.onboarding_notification),
         };
-        numOnBoardingSteps = onBoardingStepResources.length;
 
         // Initialize the dotsView. Add dots to indicate the number of pages in view pager.
         dotsView = (LinearLayout) findViewById(R.id.dots_parent);
         LayoutInflater layoutInflater = getLayoutInflater();
-        for (int i = 0; i < numOnBoardingSteps; i++) {
+        for (int i = 0; i < onBoardingStepResources.length; i++) {
             View view = layoutInflater.inflate(R.layout.viewpager_dot, dotsView, false);
             view.setSelected(i == 0);
             dotsView.addView(view);
@@ -112,7 +105,7 @@ public class OnBoardingActivity extends BaseActivity {
         findViewById(R.id.next).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (viewPager.getCurrentItem() == numOnBoardingSteps - 1) {
+                if (viewPager.getCurrentItem() == onBoardingStepResources.length - 1) {
                     launchNextActivity();
                 } else {
                     Animation animation = new FakeDragAnimation(viewPager,
@@ -155,7 +148,6 @@ public class OnBoardingActivity extends BaseActivity {
 
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            // do nothing.
             int imageIndex = (int) (position + 2 * positionOffset);
             float ratio = Math.abs(2 * positionOffset - 1);
             imageView.setAlpha(ratio);
@@ -183,7 +175,7 @@ public class OnBoardingActivity extends BaseActivity {
     private PagerAdapter mOnBoardingStepsAdapter = new PagerAdapter() {
         @Override
         public int getCount() {
-            return numOnBoardingSteps;
+            return  onBoardingStepResources.length;
         }
 
         @Override

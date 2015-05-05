@@ -14,7 +14,7 @@
         android:textColor="@color/primary_dark"
         android:textSize="20sp"
         android:fontFamily="sans-serif-light"
-        />
+    />
     <TextView
         android:id="@+id/caption"
         style="?android:attr/textAppearanceSmall"
@@ -22,6 +22,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         tools:text="@string/onboarding_details"
-        android:textColor="#666666"
+        android:textColor="#CC212121"
     />
 </LinearLayout>
