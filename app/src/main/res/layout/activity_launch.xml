@@ -7,79 +7,48 @@
     android:background="@color/gray200"
     tools:context=".activity.LaunchActivity"
 >
-    <ViewSwitcher
-        android:id="@+id/view_switcher"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
     >
-        <LinearLayout
+        <include
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-        >
-            <include
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                layout="@layout/toolbar"
-            />
-            <ProgressBar
-                android:id="@+id/top_progress_bar"
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="-4dp"
-                android:layout_marginTop="-4dp"
-                android:indeterminate="true"
-                android:visibility="gone"
-            />
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-            >
-                <include
-                    android:id="@+id/view_retry"
-                    layout="@layout/view_retry"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="gone"
-                />
-                <android.support.v4.widget.SwipeRefreshLayout
-                    android:id="@+id/swipe_refresh"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="-20dp"
-                >
-                    <com.eventshigh.nearme.app.view.AutofitRecyclerView
-                        android:id="@+id/event_grid"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:columnWidth="@dimen/big_event_card_width"
-                        android:horizontalSpacing="2dp"
-                        android:verticalSpacing="2dp"
-                        android:paddingBottom="48dp"
-                        android:clipToPadding="false"
-                        tools:listitem="@layout/event_card"
-                    />
-                </android.support.v4.widget.SwipeRefreshLayout>
-            </FrameLayout>
-            <include
-                android:id="@+id/verify_phone_container"
-                layout="@layout/view_phone_snack_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-            />
-        </LinearLayout>
-
+            android:layout_height="wrap_content"
+            layout="@layout/toolbar"
+        />
+        <com.example.android.common.view.SlidingTabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primary"
+            android:elevation="8dp"
+            tools:ignore="UnusedAttribute"
+        />
+        <android.support.v4.view.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+        />
         <ListView
             android:id="@+id/city_selector"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             tools:listitem="@android:layout/simple_list_item_1"
+            android:visibility="gone"
         />
-    </ViewSwitcher>
+        <include
+            android:id="@+id/verify_phone_container"
+            layout="@layout/view_phone_snack_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+        />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="@dimen/big_event_card_width"
         android:layout_height="match_parent"

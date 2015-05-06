@@ -5,13 +5,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.VolleyError;
-import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
@@ -27,8 +22,6 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public abstract class BaseContextActivity extends BaseActivity
         implements FetchLocalityTask.Listener {
-    private static final String LOG_TAG = BaseContextActivity.class.getSimpleName();
-
     protected EventsContext eventsContext;
     protected Editor eventsMarkerEditor;
 
@@ -49,8 +42,6 @@ public abstract class BaseContextActivity extends BaseActivity
 
         super.onStop();
     }
-
-    protected abstract boolean isDataShown();
 
     public LatLng getUserLocation() {
         return eventsContext.location;
@@ -112,27 +103,6 @@ public abstract class BaseContextActivity extends BaseActivity
         detailIntent.putExtra(EventDetailActivity.EXTRA_EVENT_PARAM, event);
         startActivity(detailIntent, bundle);
     }
-
-    protected ErrorListener mErrorListener = new ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError volleyError) {
-            topProgressBar.setVisibility(View.GONE);
-            if (isDataShown()) {
-                Toast.makeText(BaseContextActivity.this, R.string.failed_refresh, Toast.LENGTH_SHORT).show();
-            } else {
-                retryView.setVisibility(View.VISIBLE);
-            }
-
-            Throwable cause = volleyError.getCause();
-            if (cause != null) {
-                Log.w(LOG_TAG, "Volley Error: " + volleyError.getMessage(), cause);
-                reportActionToAnalytics("failedRequest", cause.getClass().getSimpleName());
-            } else {
-                Log.w(LOG_TAG, "Volley Error: " + volleyError.getMessage());
-                reportActionToAnalytics("failedRequest");
-            }
-        }
-    };
 
     @Override
     public void onLocationUpdated(String locality) {

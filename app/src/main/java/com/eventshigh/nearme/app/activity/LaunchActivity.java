@@ -4,12 +4,14 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
@@ -18,30 +20,29 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewSwitcher;
 
-import com.android.volley.Request.Priority;
-import com.android.volley.Response.Listener;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.network.ExploreEventsRequest;
-import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.task.FetchLocalityTask;
 import com.eventshigh.nearme.app.ui.CityListAdapter;
 import com.eventshigh.nearme.app.ui.CityListAdapter.OnCitySelectionListener;
-import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog;
 import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.eventshigh.nearme.app.view.AutofitRecyclerView;
+import com.example.android.common.view.SlidingTabLayout;
+import com.example.android.common.view.SlidingTabLayout.TabColorizer;
+import com.example.android.common.view.SlidingTabPagerAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -57,10 +58,12 @@ public class LaunchActivity extends BaseContextActivity {
     private static final long REFRESH_EVENTS_INTERVAL = 3600 * 1000L;
 
     // UI Elements for this activity.
-    private ViewSwitcher viewSwitcher;
     private DrawerLayout drawer;
+    private SlidingTabLayout tabsView;
+    private ViewPager viewPager;
+    private ListView citySelector;
+
     private ActionBarDrawerToggle drawerToggle;
-    private AutofitRecyclerView gridView;
 
     // Client to Google api so that we can fetch the user location if
     // its not passed in intent.
@@ -69,43 +72,22 @@ public class LaunchActivity extends BaseContextActivity {
     // GCM registration helper.
     private GcmRegistration gcmRegistration;
 
-    // Adapter used to fill the eventsContainer.
-    private EventsAdapter adapter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Set View.
         setContentView(R.layout.activity_launch);
-        viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
-        topProgressBar = findViewById(R.id.top_progress_bar);
-        retryView = findViewById(R.id.view_retry);
-
-        // Set the swipe refresh settings.
-        final SwipeRefreshLayout swipeRefreshLayout =
-                (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
-        swipeRefreshLayout.setColorSchemeResources(R.color.primary);
-        swipeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                reportActionToAnalytics("swipeRefresh");
-                swipeRefreshLayout.setRefreshing(false);
-                onRetry(null);
-            }
-        });
-
-        // Set the events adapter.
-        gridView = (AutofitRecyclerView) findViewById(R.id.event_grid);
-        adapter = new EventsAdapter(this);
-        gridView.setEventsAdapter(adapter);
+        drawer = (DrawerLayout) findViewById(R.id.nav_drawer);
+        tabsView = (SlidingTabLayout) findViewById(R.id.tabs);
+        viewPager = (ViewPager) findViewById(R.id.view_pager);
+        citySelector = (ListView) findViewById(R.id.city_selector);
 
         // Setup the actionbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Setup the Drawer Layout.
-        drawer = (DrawerLayout) findViewById(R.id.nav_drawer);
         drawerToggle = new ActionBarDrawerToggle(this, drawer, R.string.app_name, R.string.title_activity_settings);
         drawer.setDrawerListener(drawerToggle);
         ActionBar actionBar = getSupportActionBar();
@@ -113,6 +95,10 @@ public class LaunchActivity extends BaseContextActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
         }
+
+        // Setup Tabs.
+
+        // Setup City Selector.
 
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
@@ -219,24 +205,9 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
-    protected boolean isDataShown() {
-        return adapter.getItemCount() > 0;
-    }
-
-
     // ***********************
     // Callbacks
     // ***********************
-
-    public void onRetry(View view) {
-        if (view != null) {
-            reportActionToAnalytics("retry");
-        }
-
-        topProgressBar.setVisibility(View.VISIBLE);
-        ExploreEventsRequest.submit(this, eventsContext, Priority.IMMEDIATE, false, mListener,
-                mErrorListener);
-    }
 
     public void showSearchView(String query) {
         reportActionToAnalytics("showSearchView", query);
@@ -291,27 +262,14 @@ public class LaunchActivity extends BaseContextActivity {
             // We do not have user location. Lets populate the City chooser and let user
             // select the city.
             reportActionToAnalytics("locationFailed");
-            viewSwitcher.setDisplayedChild(1);
-            ListView citySelector = (ListView) findViewById(R.id.city_selector);
+            tabsView.setVisibility(View.GONE);
+            viewPager.setVisibility(View.GONE);
             citySelector.setAdapter(new CityListAdapter(LaunchActivity.this, mCitySelectionListener));
             if (connectionResult != null) {
                 Toast.makeText(LaunchActivity.this, R.string.failed_location, Toast.LENGTH_SHORT).show();
             }
         }
     };
-
-    private Listener<MyEvents> mListener = new Listener<MyEvents>() {
-        @Override
-        public void onResponse(MyEvents events, boolean isIntermediate) {
-            if (!isIntermediate) {
-                topProgressBar.setVisibility(View.GONE);
-            }
-            retryView.setVisibility(View.GONE);
-            lastFetchTimestamp = System.currentTimeMillis();
-            adapter.setMyEvents(events, true, 2 * gridView.getSpanCount());
-        }
-    };
-
 
     // ***********************
     // Helper methods
@@ -320,8 +278,18 @@ public class LaunchActivity extends BaseContextActivity {
     private long lastFetchTimestamp = 0;
     private void refreshIfOldData() {
         if (lastFetchTimestamp + REFRESH_EVENTS_INTERVAL < System.currentTimeMillis()) {
-            onRetry(null);
+            showExploreScreen();
         }
+    }
+
+    private void showExploreScreen() {
+        ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
+        viewPager.setAdapter(adapter);
+        tabsView.setViewPager(viewPager);
+        tabsView.setOnPageChangeListener(adapter);
+        tabsView.setCustomTabColorizer(adapter);
+        adapter.onPageSelected(0);
+        lastFetchTimestamp = System.currentTimeMillis();
     }
 
     private void askUserForLocation() {
@@ -336,7 +304,7 @@ public class LaunchActivity extends BaseContextActivity {
                     actionBar.setSubtitle(locationString);
                 }
                 eventsContext.changeLocation(locationPoint);
-                onRetry(null);
+                showExploreScreen();
             }
         });
     }
@@ -385,8 +353,95 @@ public class LaunchActivity extends BaseContextActivity {
             }
             eventsContext.changeLocation(city.cityBounds.getCenter());
             gcmRegistration.setLastCity(city, null);
-            viewSwitcher.setDisplayedChild(0);
+
+            citySelector.setVisibility(View.GONE);
+            tabsView.setVisibility(View.VISIBLE);
+            viewPager.setVisibility(View.VISIBLE);
             showNextScreen();
         }
     };
+
+    /**
+     * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
+     */
+    enum ExploreScreenTab {
+        WEEK("this week", R.color.red),
+        EXPLORE("explore", R.color.red),
+        My_EVENTS(EventsHighEndpoints.QUERY_MY_EVENT, R.color.red);
+
+        private final String title;
+        private final int colorId;
+
+        ExploreScreenTab(String title, int colorId) {
+            this.title = title;
+            this.colorId = colorId;
+        }
+    }
+
+    private class ExploreScreenPagerAdapter extends SlidingTabPagerAdapter
+            implements OnPageChangeListener, TabColorizer {
+        private final ExploreScreenTab[] tabs = {ExploreScreenTab.WEEK, ExploreScreenTab.EXPLORE,
+                ExploreScreenTab.My_EVENTS};
+        private final TextView[] tabViews = new TextView[tabs.length];
+
+        public ExploreScreenPagerAdapter() {
+            super(getSupportFragmentManager());
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            if (position == 0) {
+                return EventsFragment.getInstance(new EventsContext(eventsContext.location, ""));
+            }
+
+            if (position == 1) {
+                return EventsFragment.getInstance(new EventsContext(eventsContext.location,
+                        EventsHighEndpoints.QUERY_FEATURED));
+            }
+
+            return EventsFragment.getInstance(new EventsContext(eventsContext.location,
+                    EventsHighEndpoints.QUERY_MY_EVENT));
+        }
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            // do nothing.
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            for (int i = 0; i < tabViews.length; i++) {
+                tabViews[i].setTypeface(null, i == position ? Typeface.BOLD : Typeface.NORMAL);
+            }
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+            // do nothing.
+        }
+
+        @Override
+        public View getView(int position, ViewGroup parent) {
+            TextView textView = (TextView) getLayoutInflater().inflate(
+                    R.layout.view_explore_tab, parent, false);
+            tabViews[position] = textView;
+            textView.setText(Utils.capitalize(tabs[position].title));
+            return textView;
+        }
+
+        @Override
+        public int getCount() {
+            return tabs.length;
+        }
+
+        @Override
+        public int getIndicatorColor(int position) {
+            return tabs[position].colorId;
+        }
+
+        @Override
+        public int getDividerColor(int position) {
+            return getResources().getColor(android.R.color.transparent);
+        }
+    }
 }

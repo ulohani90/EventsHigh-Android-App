@@ -15,6 +15,7 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +26,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request.Priority;
+import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
@@ -65,6 +68,8 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
     // ***********************
     // CONSTANTS
     // ***********************
+    private static final String LOG_TAG = BaseContextActivity.class.getSimpleName();
+
     public static final int SECONDS_FOR_REFRESH = 600;
     public static final int MAX_TIMES_TO_SHOW_MY_EVENTS_CLUE = 2;
 
@@ -219,10 +224,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
         }
 
         super.onStop();
-    }
-
-    protected boolean isDataShown() {
-        return isDataShown;
     }
 
     @Override
@@ -568,4 +569,26 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
             return calendar;
         }
     }
+
+    protected ErrorListener mErrorListener = new ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError volleyError) {
+            topProgressBar.setVisibility(View.GONE);
+            if (isDataShown) {
+                Toast.makeText(BaseEventsActivity.this, R.string.failed_refresh, Toast.LENGTH_SHORT).show();
+            } else {
+                retryView.setVisibility(View.VISIBLE);
+            }
+
+            Throwable cause = volleyError.getCause();
+            if (cause != null) {
+                Log.w(LOG_TAG, "Volley Error: " + volleyError.getMessage(), cause);
+                reportActionToAnalytics("failedRequest", cause.getClass().getSimpleName());
+            } else {
+                Log.w(LOG_TAG, "Volley Error: " + volleyError.getMessage());
+                reportActionToAnalytics("failedRequest");
+            }
+        }
+    };
+
 }
