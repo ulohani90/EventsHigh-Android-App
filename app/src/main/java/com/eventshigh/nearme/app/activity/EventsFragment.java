@@ -29,7 +29,7 @@ import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import java.util.List;
 
 /**
- * Fragment to show today events.
+ * Fragment to show events.
  */
 public class EventsFragment extends Fragment {
     private static final String LOG_TAG = EventsFragment.class.getSimpleName();

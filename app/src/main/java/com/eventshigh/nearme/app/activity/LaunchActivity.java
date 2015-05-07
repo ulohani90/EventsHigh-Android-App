@@ -395,8 +395,7 @@ public class LaunchActivity extends BaseContextActivity {
             }
 
             if (position == 1) {
-                return EventsFragment.getInstance(new EventsContext(eventsContext.location,
-                        EventsHighEndpoints.QUERY_FEATURED));
+                return new ExploreFragment();
             }
 
             return EventsFragment.getInstance(new EventsContext(eventsContext.location,

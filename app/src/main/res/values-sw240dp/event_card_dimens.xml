@@ -5,6 +5,4 @@
 
     <dimen name="maps_event_card_width">180dp</dimen>
     <dimen name="maps_event_card_height">135dp</dimen>
-
-    <dimen name="trending_card_height">75dp</dimen>
 </resources>
