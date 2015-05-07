@@ -15,7 +15,7 @@
         android:horizontalSpacing="2dp"
         android:verticalSpacing="2dp"
         android:paddingTop="4dp"
-        android:paddingBottom="100dp"
+        android:paddingBottom="50dp"
         android:clipToPadding="false"
         tools:listitem="@layout/event_card"
     />
