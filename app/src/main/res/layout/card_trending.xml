@@ -40,7 +40,7 @@
         />
     </FrameLayout>
     <Space
-        android:layout_width="2dp"
+        android:layout_width="8dp"
         android:layout_height="match_parent"
     />
     <FrameLayout

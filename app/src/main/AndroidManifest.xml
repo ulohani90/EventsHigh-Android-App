@@ -172,6 +172,7 @@
             android:name=".activity.EventDetailActivity"
             android:label="@string/loading"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait"
             android:theme="@style/NoActionBar"
         />
 
