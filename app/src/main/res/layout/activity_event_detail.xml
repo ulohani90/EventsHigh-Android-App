@@ -377,6 +377,28 @@
                 </FrameLayout>
 
                 <FrameLayout
+                    android:id="@+id/check_in"
+                    style="@style/EHButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="openCheckIn"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:drawableLeft="@drawable/action_book"
+                        android:drawableStart="@drawable/action_book"
+                        android:textColor="#CC000000"
+                        android:text="@string/action_check_in"
+                        />
+                </FrameLayout>
+
+                <FrameLayout
                     android:id="@+id/call"
                     style="@style/EHButton"
                     android:layout_width="0dp"

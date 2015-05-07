@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.DisplayMetrics;
@@ -420,6 +421,7 @@ public class EventDetailActivity extends BaseActivity {
         private final LinearLayout futureTimesView;
 
         private final FrameLayout bookView;
+        private final FrameLayout checkInView;
         private final FrameLayout callView;
         private final TextView priceView;
         private final TextView offerView;
@@ -470,6 +472,7 @@ public class EventDetailActivity extends BaseActivity {
             futureTimesView = (LinearLayout) findViewById(R.id.event_future_times);
 
             bookView = (FrameLayout) findViewById(R.id.book_ticket);
+            checkInView = (FrameLayout) findViewById(R.id.check_in);
             callView = (FrameLayout) findViewById(R.id.call);
             priceView = (TextView) findViewById(R.id.event_price);
             offerView = (TextView) findViewById(R.id.offer_text);
@@ -603,6 +606,7 @@ public class EventDetailActivity extends BaseActivity {
             // Set action buttons.
             findViewById(R.id.action_button_group).setVisibility(View.VISIBLE);
             bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
+            mayBeShowCheckInButton(event);
             callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
 
             // Show price.
@@ -716,6 +720,19 @@ public class EventDetailActivity extends BaseActivity {
             findViewById(R.id.share_twitter).setVisibility(isInstalled(PACKAGE_NAME_TWITTER) ? View.VISIBLE : View.GONE);
             findViewById(R.id.share_email).setVisibility(isInstalled(PACKAGE_NAME_EMAIL) ? View.VISIBLE : View.GONE);
             findViewById(R.id.share_whatsapp).setVisibility(isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
+        }
+
+        private void mayBeShowCheckInButton(Event event) {
+            long currentTimeMillis = System.currentTimeMillis();
+            // Check in starts 30 mins before event start time
+            long checkInStartTimeMillis = event.eventTimings[0] - DateUtils.MINUTE_IN_MILLIS * 30;
+            long checkInEndTimeMillis = event.eventTimings[0] + DateUtils.MINUTE_IN_MILLIS * 120;
+            if (checkInStartTimeMillis < currentTimeMillis  && currentTimeMillis < checkInEndTimeMillis) {
+                // We have establised that the time is right
+                checkInView.setVisibility(View.VISIBLE);
+            } else {
+                checkInView.setVisibility(View.GONE);
+            }
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
