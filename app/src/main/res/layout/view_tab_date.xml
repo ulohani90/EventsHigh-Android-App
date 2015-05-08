@@ -4,10 +4,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
-    android:padding="10dp"
-    android:clickable="true"
-    android:descendantFocusability="blocksDescendants"
-    tools:background="#FBFBFB"
+    android:padding="6dp"
+    tools:background="@color/primary"
 >
     <TextView
         android:id="@+id/weekday"
@@ -15,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:textColor="#797979"
+        android:textColor="#EEFFFFFF"
         android:textSize="9sp"
         android:textAllCaps="true"
         tools:text="mon"
@@ -30,11 +28,10 @@
         android:layout_below="@+id/weekday"
         android:layout_marginTop="2dp"
         android:layout_marginBottom="2dp"
-        android:padding="4dp"
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:textSize="14sp"
-        android:textColor="#797979"
+        android:textColor="#EEFFFFFF"
         tools:text="12"
     />
 </RelativeLayout>

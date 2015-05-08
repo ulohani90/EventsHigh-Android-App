@@ -163,7 +163,7 @@ public class EventsFragment extends Fragment {
             }
 
             if (!isIntermediate || !myEvents.isEmpty()) {
-                eventsAdapter.setMyEvents(myEvents, false, eventGridView.getSpanCount() * 2);
+                eventsAdapter.setMyEvents(myEvents, eventGridView.getSpanCount() * 2);
             }
         }
     };

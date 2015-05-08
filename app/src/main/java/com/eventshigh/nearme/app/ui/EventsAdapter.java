@@ -33,14 +33,12 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -78,22 +76,15 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    public void setMyEvents(MyEvents myEvents, boolean addMyEventHeader, int maxPerCategory) {
+    public void setMyEvents(MyEvents myEvents, int maxPerCategory) {
         dataToShow.clear();
         boolean showTrendingTopics = !myEvents.trendingTopics.isEmpty();
 
         for (int i = 0; i < myEvents.topicEvents.size(); i++) {
-            if (addMyEventHeader && i == 1) {
-                dataToShow.add(new MyEventHeaderData());
-                addMyEventHeader = false;
-            }
-
             if (showTrendingTopics && i == 3) {
                 dataToShow.add(new HeaderData(TRENDING_TOPIC_TITLE, 0));
-                Iterator<TrendingTopic> trendingTopicIterator = myEvents.trendingTopics.iterator();
-                while (trendingTopicIterator.hasNext()) {
-                    TrendingTopic topic1 = trendingTopicIterator.next();
-                    dataToShow.add(new TrendingCategoryData(topic1));
+                for (TrendingTopic trendingTopic : myEvents.trendingTopics) {
+                    dataToShow.add(new TrendingCategoryData(trendingTopic));
                 }
                 showTrendingTopics = false;
             }
@@ -189,9 +180,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         EVENT(1),
         OFFER(2),
         FOLLOW(3),
-        MY_EVENT_HEADER(5),
-        TRENDING_CATEGORY(6),
-        EXPLORE_CATEGORY(7);
+        TRENDING_CATEGORY(4),
+        EXPLORE_CATEGORY(5);
 
         public final int typeId;
         DataType (int typeId) {
@@ -199,7 +189,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public static boolean spanAllColumns (int typeId) {
-            return  typeId == HEADER.typeId || typeId == MY_EVENT_HEADER.typeId;
+            return  typeId == HEADER.typeId;
         }
 
         public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
@@ -217,12 +207,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             if (typeId == FOLLOW.typeId) {
                 return FollowCard.newInstance(activity, parent);
-            }
-
-            if (typeId == MY_EVENT_HEADER.typeId) {
-                View view = activity.getLayoutInflater().inflate(
-                        R.layout.card_my_events_header, parent, false);
-                return new HeaderCard(view);
             }
 
             if (typeId == TRENDING_CATEGORY.typeId) {
@@ -642,28 +626,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             followButton.setVisibility(isFollowing ? View.GONE : View.VISIBLE);
             followingButton.setVisibility(isFollowing ? View.VISIBLE : View.GONE);
             followingButton.setSelected(true);
-        }
-    }
-
-    // My Event Header Data.
-    private class MyEventHeaderData implements Data {
-        @Override
-        public DataType getType() {
-            return DataType.MY_EVENT_HEADER;
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder card, int position) {
-            card.itemView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.showSearchView(EventsHighEndpoints.QUERY_MY_EVENT);
-                }
-            });
-        }
-
-        public String getId() {
-            return MyEventHeaderData.class.getSimpleName();
         }
     }
 

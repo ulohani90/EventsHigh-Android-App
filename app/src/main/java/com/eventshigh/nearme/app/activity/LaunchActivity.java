@@ -365,16 +365,14 @@ public class LaunchActivity extends BaseContextActivity {
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
     enum ExploreScreenTab {
-        WEEK("this week", R.color.red),
-        EXPLORE("explore", R.color.red),
-        My_EVENTS(EventsHighEndpoints.QUERY_MY_EVENT, R.color.red);
+        WEEK("this week"),
+        EXPLORE("explore"),
+        My_EVENTS(EventsHighEndpoints.QUERY_MY_EVENT);
 
         private final String title;
-        private final int colorId;
 
-        ExploreScreenTab(String title, int colorId) {
+        ExploreScreenTab(String title) {
             this.title = title;
-            this.colorId = colorId;
         }
     }
 
@@ -391,7 +389,7 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public Fragment getItem(int position) {
             if (position == 0) {
-                return EventsFragment.getInstance(new EventsContext(eventsContext.location, ""));
+                return ThisWeekFragment.getInstance(new EventsContext(eventsContext.location, ""));
             }
 
             if (position == 1) {
@@ -435,7 +433,7 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public int getIndicatorColor(int position) {
-            return tabs[position].colorId;
+            return getResources().getColor(android.R.color.white);
         }
 
         @Override
