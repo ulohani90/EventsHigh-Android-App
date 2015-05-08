@@ -193,7 +193,7 @@ public class EventsGridActivity extends BaseEventsActivity {
         }
 
         currentToolBarAlpha = toolbarAlpha;
-        toolbar.setBackgroundColor(Color.argb(toolbarAlpha, 0x15, 0xA9, 0xD1));
+        toolbar.setBackgroundColor(Color.argb(toolbarAlpha, 0xEA, 0x5D, 0x4B));
         toolbar.setTitleTextColor(Color.argb(toolbarAlpha, 255, 255, 255));
         toolbar.setSubtitleTextColor(Color.argb(toolbarAlpha, 255, 255, 255));
     }

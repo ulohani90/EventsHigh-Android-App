@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="12dp"
-    android:drawableTop="@drawable/eh_logo_with_text"
+    android:drawableTop="@drawable/ic_launcher"
     android:drawablePadding="24dp"
     android:gravity="center"
     android:lineSpacingExtra="2dp"
