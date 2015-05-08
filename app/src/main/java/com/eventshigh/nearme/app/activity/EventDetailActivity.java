@@ -2,12 +2,17 @@ package com.eventshigh.nearme.app.activity;
 
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.format.DateUtils;
@@ -227,6 +232,37 @@ public class EventDetailActivity extends BaseActivity {
         CustomUrlActivity.launchCustomUrl(this,
                 Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
                 event.offerTitle);
+    }
+
+    public void onCheckIn(View view) {
+        reportEventAction(event, "openCheckIn");
+        getGoogleApiClient();
+        Location location = LocationServices.FusedLocationApi.getLastLocation(client);
+        if (location == null) {
+            LocationManager locationManager = (LocationManager) getSystemService(
+                Context.LOCATION_SERVICE);
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                showEnableGpsDialog();
+            } else {
+                Toast.makeText(this, R.string.failed_location, Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+    }
+
+    private void showEnableGpsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setPositiveButton(R.string.action_settings, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            }
+        });
+        builder
+            .setTitle(R.string.title_enable_gps)
+            .setMessage(R.string.ui_enable_location)
+            .create()
+            .show();
     }
 
     public void imagePreview(View view) {
@@ -507,8 +543,8 @@ public class EventDetailActivity extends BaseActivity {
 
         private void populateView(final Event event) {
             eventScrollView.getViewTreeObserver().addOnScrollChangedListener(
-                    new OnScrollChangedListener() {
-                        @Override
+                new OnScrollChangedListener() {
+                    @Override
                         public void onScrollChanged() {
                             setScroll(eventScrollView.getScrollY());
                         }
