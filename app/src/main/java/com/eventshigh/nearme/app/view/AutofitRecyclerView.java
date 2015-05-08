@@ -36,7 +36,17 @@ public class AutofitRecyclerView extends RecyclerView {
         // use a grid layout manager
         gridLayoutManager = new GridLayoutManager(context, 1);
         setLayoutManager(gridLayoutManager);
-        addItemDecoration(spacesItemDecoration);
+
+        // Set the proper spacing.
+        addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                outRect.left = 0;
+                outRect.right = getSpanCount() > 1 ? horizontalSpacing : 0;
+                outRect.bottom = verticalSpacing;
+                outRect.top = 0;
+            }
+        });
     }
 
     protected void onMeasure(int widthSpec, int heightSpec) {
@@ -71,16 +81,6 @@ public class AutofitRecyclerView extends RecyclerView {
         @Override
         public int getSpanSize(int position) {
             return (eventsAdapter != null && eventsAdapter.spanAllColumns(position)) ? getSpanCount() : 1;
-        }
-    };
-
-    private RecyclerView.ItemDecoration spacesItemDecoration = new RecyclerView.ItemDecoration() {
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-            outRect.left = 0;
-            outRect.right = getSpanCount() > 1 ? horizontalSpacing : 0;
-            outRect.bottom = verticalSpacing;
-            outRect.top = 0;
         }
     };
 }

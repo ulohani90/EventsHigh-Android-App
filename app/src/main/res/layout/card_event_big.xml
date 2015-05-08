@@ -100,7 +100,6 @@
         android:drawableLeft="@drawable/ic_access_time_white_12dp"
         android:textSize="12sp"
         android:textColor="#CCFFFFFF"
-        android:fontFamily="sans-serif"
         tools:text="Sun, 29 Mar at 8:30 pm"
     />
 
@@ -116,7 +115,6 @@
         android:layout_marginRight="6dp"
         android:textSize="12sp"
         android:textColor="#CCFFFFFF"
-        android:fontFamily="sans-serif"
         tools:text="₹ 200 - 500"
     />
 
@@ -135,7 +133,6 @@
         android:drawableLeft="@drawable/ic_location_on_white_12dp"
         android:textSize="12sp"
         android:textColor="#CCFFFFFF"
-        android:fontFamily="sans-serif"
         tools:text="Jagriti theatre, Whitefield"
     />
 
@@ -154,7 +151,6 @@
         android:drawableLeft="@drawable/ic_local_taxi_white_12dp"
         android:textSize="12sp"
         android:textColor="#CCFFFFFF"
-        android:fontFamily="sans-serif"
         tools:text="30 mins"
     />
 </RelativeLayout>

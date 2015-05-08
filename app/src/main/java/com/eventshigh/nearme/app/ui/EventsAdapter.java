@@ -36,7 +36,6 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.eventshigh.nearme.app.view.PaletteImageView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -345,7 +344,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private static class EventCard extends ViewHolder {
         private final boolean shouldAdjustImageHeight;
-        private final TextView headerView;
         private final NetworkImageView bgView;
         private final ImageView recommendedView;
         private final ImageView offerView;
@@ -369,7 +367,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             super(cardView);
 
             this.shouldAdjustImageHeight = shouldAdjustImageHeight;
-            headerView = (TextView) cardView.findViewById(R.id.event_header);
             bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
             recommendedView = (ImageView) cardView.findViewById(R.id.event_recommended);
             offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
@@ -382,16 +379,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             fbShareView = cardView.findViewById(R.id.share_fb);
             whatsappShareView = cardView.findViewById(R.id.share_whatsapp);
             arrowView = cardView.findViewById(R.id.arrow);
-
-            if (bgView instanceof PaletteImageView) {
-                ((PaletteImageView) bgView).setHeaderView(headerView);
-            }
         }
 
         public void setFavouriteView(@Nullable EventMark eventMark) {
             favouriteView.setTag(eventMark);
             favouriteView.setImageResource(EventMark.isFavourite(eventMark) ?
-                    R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
+                    R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_grey600_24dp);
         }
 
         private void addView(List<Pair<View, String>> sharedElements, @Nullable View view,
@@ -414,9 +407,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     addView(sharedElements, eventTimeView, "event_time");
                     addView(sharedElements, venueView, "event_venue");
                     addView(sharedElements, travelTimeView, "event_travel_time");
-                    addView(sharedElements, priceView, "event_price");
-                    addView(sharedElements, favouriteView, "action_favourite");
+                    // addView(sharedElements, priceView, "event_price");
+                    // addView(sharedElements, favouriteView, "action_favourite");
                     addView(sharedElements, recommendedView, "eh_recommends");
+                    addView(sharedElements, fbShareView, "share_fb");
+                    addView(sharedElements, whatsappShareView, "share_whatsapp");
                     Pair shareEles[] = new Pair[sharedElements.size()];
                     shareEles = sharedElements.toArray(shareEles);
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
@@ -436,7 +431,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     @Override
                     public void run() {
                         LayoutParams lp = bgView.getLayoutParams();
-                        lp.height = 3 * bgView.getWidth() / 4;
+                        lp.height = 9 * bgView.getWidth() / 16;
                         bgView.setLayoutParams(lp);
                     }
                 });
@@ -464,12 +459,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     eventTimeView.setVisibility(View.INVISIBLE);
                 } else {
                     eventTimeView.setVisibility(View.VISIBLE);
-                    if (headerView == null) {
-                        eventTimeView.setText(eventTime.toString());
-                    } else {
-                        headerView.setText(eventTime.getDate());
-                        eventTimeView.setText(eventTime.time);
-                    }
+                    eventTimeView.setText(eventTime.toString());
                 }
             }
 

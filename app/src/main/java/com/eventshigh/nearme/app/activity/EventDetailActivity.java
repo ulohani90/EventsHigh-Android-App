@@ -496,25 +496,25 @@ public class EventDetailActivity extends BaseActivity {
             organizerPhoneView = (TextView) findViewById(R.id.organizer_phone);
             organizerWebsiteRow = (LinearLayout) findViewById(R.id.organizer_website_row);
             organizerWebsiteView = (TextView) findViewById(R.id.organizer_website);
+
+            // Set Image view dimensions.
+            final DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            ViewGroup.LayoutParams params = bgView.getLayoutParams();
+            params.height = 9 * metrics.widthPixels / 16;
+            bgView.setLayoutParams(params);
         }
 
         private void populateView(final Event event) {
             eventScrollView.getViewTreeObserver().addOnScrollChangedListener(
-               new OnScrollChangedListener() {
-                    @Override
-                    public void onScrollChanged() {
-                        setScroll(eventScrollView.getScrollY());
-                    }
-                });
+                    new OnScrollChangedListener() {
+                        @Override
+                        public void onScrollChanged() {
+                            setScroll(eventScrollView.getScrollY());
+                        }
+                    });
             eventScrollView.setVisibility(View.VISIBLE);
             topProgressBar.setVisibility(View.GONE);
-
-            // Set Image
-            final DisplayMetrics metrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            ViewGroup.LayoutParams params = bgView.getLayoutParams();
-            params.height = (int) (0.3 * metrics.heightPixels);
-            bgView.setLayoutParams(params);
 
             bgView.setDefaultImageResId(R.drawable.eh_default_event);
             bgView.setErrorImageResId(R.drawable.eh_default_event);
