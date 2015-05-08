@@ -9,9 +9,9 @@
     <color name="gray300">#e0e0e0</color>
     <color name="gray200">#eeeeee</color>
 
-    <color name="primary">#15A9D1</color>
-    <color name="primary_dark">#0589B1</color>
-    <color name="accent">#15A9D1</color>
+    <color name="primary">#EA5D4B</color>
+    <color name="primary_dark">#DA4D3B</color>
+    <color name="accent">#EA5D4B</color>
 
     <color name="card_gray">#F2F2F2</color>
     <color name="button_gray">#FAFAFA</color>
