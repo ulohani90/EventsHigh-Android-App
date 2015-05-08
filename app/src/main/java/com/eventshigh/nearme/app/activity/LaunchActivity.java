@@ -96,10 +96,6 @@ public class LaunchActivity extends BaseContextActivity {
             actionBar.setHomeButtonEnabled(true);
         }
 
-        // Setup Tabs.
-
-        // Setup City Selector.
-
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
