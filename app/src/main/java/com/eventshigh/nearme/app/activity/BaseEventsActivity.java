@@ -408,12 +408,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
         fetchNewListing(false /* bypass cache*/);
     }
 
-    public void onFindEvents(View view) {
-        reportActionToAnalytics("findEvents");
-        showSearchView("");
-        finish();
-    }
-
     private Listener<MyEvents> mMyEventsFetcherCallBack = new Listener<MyEvents>() {
         @Override
         public void onResponse(MyEvents myEvents, boolean isIntermediate) {
