@@ -18,20 +18,126 @@
             android:layout_height="wrap_content"
             layout="@layout/toolbar"
         />
-        <com.example.android.common.view.SlidingTabLayout
+        <LinearLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/primary"
+            android:orientation="horizontal"
             android:elevation="8dp"
             tools:ignore="UnusedAttribute"
-        />
-        <android.support.v4.view.ViewPager
-            android:id="@+id/view_pager"
+        >
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:id="@+id/tab_this_week"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:text="@string/ui_this_week"
+            />
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:id="@+id/tab_explore"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:text="@string/ui_explore"
+            />
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:id="@+id/tab_my_event"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:text="@string/ui_my_events"
+            />
+        </LinearLayout>
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-        />
+        >
+            <LinearLayout
+                android:id="@+id/date_tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:ignore="UnusedAttribute"
+                android:baselineAligned="false"
+                tools:visibility="visible"
+            >
+                <include
+                    android:id="@+id/date1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    layout="@layout/view_tab_date"
+                />
+                <include
+                    android:id="@+id/date2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    layout="@layout/view_tab_date"
+                />
+                <include
+                    android:id="@+id/date3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    layout="@layout/view_tab_date"
+                />
+                <include
+                    android:id="@+id/date4"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    layout="@layout/view_tab_date"
+                />
+                <include
+                    android:id="@+id/date5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    layout="@layout/view_tab_date"
+                />
+                <include
+                    android:id="@+id/date6"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    layout="@layout/view_tab_date"
+                />
+                <include
+                    android:id="@+id/date7"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    layout="@layout/view_tab_date"
+                />
+            </LinearLayout>
+            <android.support.v4.view.ViewPager
+                android:id="@+id/view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+            />
+        </FrameLayout>
         <ListView
             android:id="@+id/city_selector"
             android:layout_width="match_parent"
@@ -69,6 +175,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:name="com.eventshigh.nearme.app.activity.EHPreferenceFragment"
+            tools:layout="@layout/view_retry"
         />
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

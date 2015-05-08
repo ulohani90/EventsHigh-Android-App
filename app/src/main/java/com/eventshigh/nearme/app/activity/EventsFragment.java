@@ -40,6 +40,7 @@ public class EventsFragment extends Fragment {
 
     private BaseContextActivity activity;
     private EventsAdapter eventsAdapter;
+    private EventsContext eventsContext;
 
     private AutofitRecyclerView eventGridView;
     private View topProgressBar;
@@ -93,6 +94,10 @@ public class EventsFragment extends Fragment {
                 fetchNewListing(false /* bypass cache*/);
             }
         });
+
+        // Hide events context.
+        eventsContext = getArguments().getParcelable(EVENT_CONTEXT_PARAM);
+        view.findViewById(R.id.space).setVisibility(eventsContext.dateFilter.isEmpty() ? View.GONE : View.VISIBLE);
 
         // Setup the actionbar hide/show on scroll.
         final ActionBar actionBar = activity.getSupportActionBar();

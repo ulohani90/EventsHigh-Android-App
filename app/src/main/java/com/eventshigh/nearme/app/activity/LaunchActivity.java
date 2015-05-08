@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.DrawerLayout;
@@ -20,6 +21,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,19 +38,20 @@ import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.example.android.common.view.SlidingTabLayout;
-import com.example.android.common.view.SlidingTabLayout.TabColorizer;
-import com.example.android.common.view.SlidingTabPagerAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Application Main or launch activity.
@@ -59,11 +62,18 @@ public class LaunchActivity extends BaseContextActivity {
 
     // UI Elements for this activity.
     private DrawerLayout drawer;
-    private SlidingTabLayout tabsView;
+    private View tabsView;
     private ViewPager viewPager;
     private ListView citySelector;
 
     private ActionBarDrawerToggle drawerToggle;
+
+    // Tab Views.
+    private TextView thisWeekTab;
+    private TextView exploreTab;
+    private TextView myEventsTab;
+    private View dateTabs;
+    private View[] dateViews;
 
     // Client to Google api so that we can fetch the user location if
     // its not passed in intent.
@@ -79,7 +89,7 @@ public class LaunchActivity extends BaseContextActivity {
         // Set View.
         setContentView(R.layout.activity_launch);
         drawer = (DrawerLayout) findViewById(R.id.nav_drawer);
-        tabsView = (SlidingTabLayout) findViewById(R.id.tabs);
+        tabsView = findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         citySelector = (ListView) findViewById(R.id.city_selector);
 
@@ -97,8 +107,15 @@ public class LaunchActivity extends BaseContextActivity {
         }
 
         // Setup Tabs.
-
-        // Setup City Selector.
+        thisWeekTab = (TextView) findViewById(R.id.tab_this_week);
+        exploreTab = (TextView) findViewById(R.id.tab_explore);
+        myEventsTab = (TextView) findViewById(R.id.tab_my_event);
+        dateTabs = findViewById(R.id.date_tabs);
+        dateViews = new View[] {
+                findViewById(R.id.date1), findViewById(R.id.date2), findViewById(R.id.date3),
+                findViewById(R.id.date4), findViewById(R.id.date5), findViewById(R.id.date6),
+                findViewById(R.id.date7)
+        };
 
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
@@ -283,13 +300,42 @@ public class LaunchActivity extends BaseContextActivity {
     }
 
     private void showExploreScreen() {
-        ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
+        final ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
         viewPager.setAdapter(adapter);
-        tabsView.setViewPager(viewPager);
-        tabsView.setOnPageChangeListener(adapter);
-        tabsView.setCustomTabColorizer(adapter);
+        viewPager.setOnPageChangeListener(adapter);
         adapter.onPageSelected(0);
         lastFetchTimestamp = System.currentTimeMillis();
+
+        thisWeekTab.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(0, true);
+            }
+        });
+        exploreTab.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(dateViews.length, true);
+            }
+        });
+        myEventsTab.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(dateViews.length + 1, true);
+            }
+        });
+
+        for (int i = 0; i < dateViews.length; i++) {
+            final int index = i;
+            dateViews[index].setClickable(true);
+            ((ViewGroup)dateViews[index]).setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+            dateViews[index].setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewPager.setCurrentItem(index, true);
+                }
+            });
+        }
     }
 
     private void askUserForLocation() {
@@ -364,37 +410,29 @@ public class LaunchActivity extends BaseContextActivity {
     /**
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
-    enum ExploreScreenTab {
-        WEEK("this week", R.color.red),
-        EXPLORE("explore", R.color.red),
-        My_EVENTS(EventsHighEndpoints.QUERY_MY_EVENT, R.color.red);
-
-        private final String title;
-        private final int colorId;
-
-        ExploreScreenTab(String title, int colorId) {
-            this.title = title;
-            this.colorId = colorId;
-        }
-    }
-
-    private class ExploreScreenPagerAdapter extends SlidingTabPagerAdapter
-            implements OnPageChangeListener, TabColorizer {
-        private final ExploreScreenTab[] tabs = {ExploreScreenTab.WEEK, ExploreScreenTab.EXPLORE,
-                ExploreScreenTab.My_EVENTS};
-        private final TextView[] tabViews = new TextView[tabs.length];
-
+    private class ExploreScreenPagerAdapter extends FragmentStatePagerAdapter
+            implements OnPageChangeListener {
         public ExploreScreenPagerAdapter() {
             super(getSupportFragmentManager());
+
+            for (int i = 0; i < dateViews.length; i++) {
+                Calendar calendar = getDate(i);
+                ((TextView) dateViews[i].findViewById(R.id.weekday)).setText(
+                        calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US));
+                ((TextView) dateViews[i].findViewById(R.id.dayofmonth)).setText(
+                        Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));
+            }
         }
 
         @Override
         public Fragment getItem(int position) {
-            if (position == 0) {
-                return EventsFragment.getInstance(new EventsContext(eventsContext.location, ""));
+            if (position < dateViews.length) {
+                EventsContext dateEventContext = new EventsContext(eventsContext.location, "");
+                dateEventContext.setDateFilter(getDate(position));
+                return EventsFragment.getInstance(dateEventContext);
             }
 
-            if (position == 1) {
+            if (position == dateViews.length) {
                 return new ExploreFragment();
             }
 
@@ -403,14 +441,41 @@ public class LaunchActivity extends BaseContextActivity {
         }
 
         @Override
+        public int getCount() {
+            return dateViews.length + 2;
+        }
+
+        @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             // do nothing.
         }
 
+        private int lastPosition = -1;
         @Override
         public void onPageSelected(int position) {
-            for (int i = 0; i < tabViews.length; i++) {
-                tabViews[i].setTypeface(null, i == position ? Typeface.BOLD : Typeface.NORMAL);
+            if (position < dateViews.length) {
+                dateTabs.setVisibility(View.VISIBLE);
+                if (lastPosition >= 0) {
+                    TextView last = (TextView) dateViews[lastPosition].findViewById(R.id.dayofmonth);
+                    last.setTextColor(0xff797979);
+                    last.setBackgroundResource(android.R.color.transparent);
+                    last.setTypeface(null, Typeface.NORMAL);
+                }
+
+                TextView selected = (TextView) dateViews[position].findViewById(R.id.dayofmonth);
+                selected.setTextColor(getResources().getColor(android.R.color.white));
+                selected.setBackgroundResource(R.drawable.eh_oval);
+                selected.setTypeface(null, Typeface.BOLD);
+                lastPosition = position;
+
+                thisWeekTab.setTypeface(null, Typeface.BOLD);
+                exploreTab.setTypeface(null, Typeface.NORMAL);
+                myEventsTab.setTypeface(null, Typeface.NORMAL);
+            } else {
+                dateTabs.setVisibility(View.GONE);
+                thisWeekTab.setTypeface(null, Typeface.NORMAL);
+                exploreTab.setTypeface(null, position == dateViews.length ? Typeface.BOLD : Typeface.NORMAL);
+                myEventsTab.setTypeface(null, position == dateViews.length ? Typeface.NORMAL : Typeface.BOLD);
             }
         }
 
@@ -419,28 +484,12 @@ public class LaunchActivity extends BaseContextActivity {
             // do nothing.
         }
 
-        @Override
-        public View getView(int position, ViewGroup parent) {
-            TextView textView = (TextView) getLayoutInflater().inflate(
-                    R.layout.view_explore_tab, parent, false);
-            tabViews[position] = textView;
-            textView.setText(Utils.capitalize(tabs[position].title));
-            return textView;
-        }
-
-        @Override
-        public int getCount() {
-            return tabs.length;
-        }
-
-        @Override
-        public int getIndicatorColor(int position) {
-            return tabs[position].colorId;
-        }
-
-        @Override
-        public int getDividerColor(int position) {
-            return getResources().getColor(android.R.color.transparent);
+        private final Calendar today = DateTimeUtils.toMidnight(Calendar.getInstance(), null);
+        private Calendar getDate(int position) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(today.getTime());
+            calendar.add(Calendar.DAY_OF_MONTH, position);
+            return calendar;
         }
     }
 }
