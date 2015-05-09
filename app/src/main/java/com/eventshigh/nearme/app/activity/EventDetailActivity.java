@@ -20,6 +20,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -122,8 +123,8 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         onNewIntent(getIntent());
 
         locationRequest = new LocationRequest();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
+        locationRequest.setInterval(3000);
+        locationRequest.setFastestInterval(1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -247,18 +248,35 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     public void onCheckIn(View view) {
-        reportEventAction(event, "openCheckIn");
+        reportEventAction(event, "onCheckIn");
+
+        // Check if the user is logged in
+        Pair<String, Boolean> phoneNumberStatus = new Account(this).getPhoneNumber();
+        if (!phoneNumberStatus.second) {
+            new AlertDialog.Builder(this)
+                .setTitle(R.string.pref_title_phone_no)
+                .setMessage(R.string.ui_register_for_check_in)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(EventDetailActivity.this, PhoneLoginActivity.class));
+                    }
+                })
+                .show();
+            return;
+        }
+
+        // Check if we have GPS location
         needGpsLocation = true;
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             showEnableGpsDialog();
+            return;
         }
 
         if (client.isConnected()) {
             System.out.println("-----------> requesting 2");
             LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
         }
-
         detectingLocationDialog = new AlertDialog.Builder(this).setOnDismissListener(
             new DialogInterface.OnDismissListener() {
                 @Override
