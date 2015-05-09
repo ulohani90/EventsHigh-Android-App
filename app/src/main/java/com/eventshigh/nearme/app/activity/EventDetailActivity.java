@@ -59,6 +59,8 @@ import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
@@ -78,7 +80,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
  * link or from Events{Grid,Maps}Activity. In both cases, event data is not available so
  * this activity fetches the event data and shows it using the EventDetailFragment.
  */
-public class EventDetailActivity extends BaseActivity {
+public class EventDetailActivity extends BaseActivity implements LocationListener {
     public static final String EXTRA_EVENT_PARAM = EventDetailActivity.class.getSimpleName() + "_event";
 
     // Regex to check if description is plane text or html.
@@ -98,6 +100,10 @@ public class EventDetailActivity extends BaseActivity {
     private GoogleApiClient client;
     private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
 
+    private LocationRequest locationRequest;
+    private boolean needGpsLocation;
+    private AlertDialog detectingLocationDialog;
+
 
     /*****************************************
      Activity lifecycle management utilities
@@ -114,6 +120,11 @@ public class EventDetailActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
         onNewIntent(getIntent());
+
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     protected void onStart() {
@@ -125,7 +136,7 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         findViewById(R.id.event_container).setMinimumHeight(
-                (int) (1.33 * getResources().getDisplayMetrics().heightPixels));
+            (int) (1.33 * getResources().getDisplayMetrics().heightPixels));
 
         // Get the event from Intent.
         if (getIntent().hasExtra(EXTRA_EVENT_PARAM)) {
@@ -133,15 +144,16 @@ public class EventDetailActivity extends BaseActivity {
             populateView(event);
         } else {
             EventRequest.submit(this, getIntent().getData(), Priority.IMMEDIATE, mEventListener,
-                    new ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            Toast.makeText(EventDetailActivity.this, R.string.failed_load,
-                                    Toast.LENGTH_SHORT).show();
-                            Log.e(EventDetailActivity.class.getSimpleName(), volleyError.toString(), volleyError.getCause());
-                            finish();
-                        }
-                    });
+                new ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Toast.makeText(EventDetailActivity.this, R.string.failed_load,
+                            Toast.LENGTH_SHORT).show();
+                        Log.e(EventDetailActivity.class.getSimpleName(), volleyError.toString(),
+                            volleyError.getCause());
+                        finish();
+                    }
+                });
         }
     }
 
@@ -224,29 +236,45 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
-                getString(R.string.title_book));
+            getString(R.string.title_book));
     }
 
     public void openOfferSite(View view) {
         reportEventAction(event, "openOffer");
         CustomUrlActivity.launchCustomUrl(this,
-                Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
-                event.offerTitle);
+            Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
+            event.offerTitle);
     }
 
     public void onCheckIn(View view) {
         reportEventAction(event, "openCheckIn");
-        getGoogleApiClient();
-        Location location = LocationServices.FusedLocationApi.getLastLocation(client);
-        if (location == null) {
-            LocationManager locationManager = (LocationManager) getSystemService(
-                Context.LOCATION_SERVICE);
-            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                showEnableGpsDialog();
-            } else {
-                Toast.makeText(this, R.string.failed_location, Toast.LENGTH_SHORT).show();
+        needGpsLocation = true;
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            showEnableGpsDialog();
+        }
+
+        if (client.isConnected()) {
+            System.out.println("-----------> requesting 2");
+            LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
+        }
+
+        detectingLocationDialog = new AlertDialog.Builder(this).setOnDismissListener(
+            new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    stopDetectingLocation();
+                }
             }
-            return;
+        ).setView(R.layout.dialog_detecting_location).create();
+        detectingLocationDialog.show();
+    }
+
+    private void stopDetectingLocation() {
+        needGpsLocation = false;
+        if (client.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(client,
+                EventDetailActivity.this);
         }
     }
 
@@ -430,6 +458,11 @@ public class EventDetailActivity extends BaseActivity {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        stopDetectingLocation();
     }
 
     private class EventCard {
@@ -759,16 +792,17 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         private void mayBeShowCheckInButton(Event event) {
-            long currentTimeMillis = System.currentTimeMillis();
-            // Check in starts 30 mins before event start time
-            long checkInStartTimeMillis = event.eventTimings[0] - DateUtils.MINUTE_IN_MILLIS * 30;
-            long checkInEndTimeMillis = event.eventTimings[0] + DateUtils.MINUTE_IN_MILLIS * 120;
-            if (checkInStartTimeMillis < currentTimeMillis  && currentTimeMillis < checkInEndTimeMillis) {
-                // We have establised that the time is right
-                checkInView.setVisibility(View.VISIBLE);
-            } else {
-                checkInView.setVisibility(View.GONE);
-            }
+            checkInView.setVisibility(View.VISIBLE);
+//            long currentTimeMillis = System.currentTimeMillis();
+//            // Check in starts 30 mins before event start time
+//            long checkInStartTimeMillis = event.eventTimings[0] - DateUtils.MINUTE_IN_MILLIS * 30;
+//            long checkInEndTimeMillis = event.eventTimings[0] + DateUtils.MINUTE_IN_MILLIS * 120;
+//            if (checkInStartTimeMillis < currentTimeMillis  && currentTimeMillis < checkInEndTimeMillis) {
+//                // We have establised that the time is right
+//                checkInView.setVisibility(View.VISIBLE);
+//            } else {
+//                checkInView.setVisibility(View.GONE);
+//            }
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
@@ -850,7 +884,7 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         String eventTravelTime = LocationUtils.getTravelTime(EventDetailActivity.this,
-                userLocation, event.location);
+            userLocation, event.location);
         eventCard.travelTimeView.setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
         if (eventTravelTime != null) {
             eventCard.travelTimeView.setText(eventTravelTime);
@@ -869,11 +903,19 @@ public class EventDetailActivity extends BaseActivity {
                     .addConnectionCallbacks(new ConnectionCallbacks() {
                         @Override
                         public void onConnected(Bundle bundle) {
+                            System.out.println("-----------> connected");
                             populateEventTravelTime();
 
                             Uri webUri = event.getEventDetailsURI();
                             AppIndex.AppIndexApi.view(client, EventDetailActivity.this,
                                     Utils.getAppUri(webUri), event.title, webUri, null);
+
+                            if (needGpsLocation) {
+                                System.out.println("-----------> requesting 1");
+                                LocationServices.FusedLocationApi.requestLocationUpdates(
+                                    client, locationRequest, EventDetailActivity.this);
+                            }
+
                         }
 
                         @Override
@@ -883,5 +925,6 @@ public class EventDetailActivity extends BaseActivity {
                     })
                     .build();
         client.connect();
+        System.out.println("-----------> connecting");
     }
 }
