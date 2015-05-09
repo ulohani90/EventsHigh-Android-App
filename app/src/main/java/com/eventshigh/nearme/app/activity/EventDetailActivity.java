@@ -93,6 +93,10 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     public static final String PACKAGE_NAME_EMAIL = "com.google.android.gm";
     public static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
 
+    private static final long LOCATION_LOCK_MAX_TIME_MILLIS = 10 * DateUtils.SECOND_IN_MILLIS;
+    private static final float LOCATION_ACCURACY_REQUIRED_METERS = 300;
+    private static final float ALLOWED_USER_DISTANCE_FROM_EVENT_FOR_CHECK_IN_METERS = 300;
+
     private Toolbar toolbar;
     private View topProgressBar;
     private EventCard eventCard;
@@ -104,6 +108,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     private LocationRequest locationRequest;
     private boolean needGpsLocation;
     private AlertDialog detectingLocationDialog;
+    private long locationRequestStartTime;
 
 
     /*****************************************
@@ -274,22 +279,27 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         }
 
         if (client.isConnected()) {
-            System.out.println("-----------> requesting 2");
-            LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
+            startLocationDetection();
         }
         detectingLocationDialog = new AlertDialog.Builder(this).setOnDismissListener(
             new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    stopDetectingLocation();
+                    stopLocationDetection();
                 }
             }
         ).setView(R.layout.dialog_detecting_location).create();
         detectingLocationDialog.show();
     }
 
-    private void stopDetectingLocation() {
+    private void startLocationDetection() {
+        locationRequestStartTime = System.currentTimeMillis();
+        LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
+    }
+
+    private void stopLocationDetection() {
         needGpsLocation = false;
+        detectingLocationDialog.dismiss();
         if (client.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(client,
                 EventDetailActivity.this);
@@ -480,7 +490,28 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
     @Override
     public void onLocationChanged(Location location) {
-        stopDetectingLocation();
+        if (location.hasAccuracy() && location.getAccuracy() < LOCATION_ACCURACY_REQUIRED_METERS) {
+            // We have enough location accuracy. Lets check if the user is near the event
+            LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            if (LocationUtils.distanceInMeters(event.location, userLocation)
+                < ALLOWED_USER_DISTANCE_FROM_EVENT_FOR_CHECK_IN_METERS) {
+                // Yes, user is near the event, start the check in flow
+                // TODO: start check in flow
+            } else {
+                // The user is not near the location, let the user know
+                Toast.makeText(this, R.string.ui_not_at_event, Toast.LENGTH_LONG).show();
+            }
+            // Stop detecting location, and close dialog
+            stopLocationDetection();
+        } else {
+            // Location is not accurate enough. Wait for some more time until the timeout has
+            // reached, and then let the user know that the location could not be detected
+            if (System.currentTimeMillis() - locationRequestStartTime >
+                LOCATION_LOCK_MAX_TIME_MILLIS) {
+                stopLocationDetection();
+                Toast.makeText(this, R.string.failed_location, Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     private class EventCard {
@@ -810,17 +841,16 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         }
 
         private void mayBeShowCheckInButton(Event event) {
-            checkInView.setVisibility(View.VISIBLE);
-//            long currentTimeMillis = System.currentTimeMillis();
-//            // Check in starts 30 mins before event start time
-//            long checkInStartTimeMillis = event.eventTimings[0] - DateUtils.MINUTE_IN_MILLIS * 30;
-//            long checkInEndTimeMillis = event.eventTimings[0] + DateUtils.MINUTE_IN_MILLIS * 120;
-//            if (checkInStartTimeMillis < currentTimeMillis  && currentTimeMillis < checkInEndTimeMillis) {
-//                // We have establised that the time is right
-//                checkInView.setVisibility(View.VISIBLE);
-//            } else {
-//                checkInView.setVisibility(View.GONE);
-//            }
+            long currentTimeMillis = System.currentTimeMillis();
+            // Check in starts 30 mins before event start time
+            long checkInStartTimeMillis = event.eventTimings[0] - DateUtils.MINUTE_IN_MILLIS * 30;
+            long checkInEndTimeMillis = event.eventTimings[0] + DateUtils.MINUTE_IN_MILLIS * 120;
+            if (checkInStartTimeMillis < currentTimeMillis  && currentTimeMillis < checkInEndTimeMillis) {
+                // We have establised that the time is right
+                checkInView.setVisibility(View.VISIBLE);
+            } else {
+                checkInView.setVisibility(View.GONE);
+            }
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
@@ -921,7 +951,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                     .addConnectionCallbacks(new ConnectionCallbacks() {
                         @Override
                         public void onConnected(Bundle bundle) {
-                            System.out.println("-----------> connected");
                             populateEventTravelTime();
 
                             Uri webUri = event.getEventDetailsURI();
@@ -929,9 +958,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                                     Utils.getAppUri(webUri), event.title, webUri, null);
 
                             if (needGpsLocation) {
-                                System.out.println("-----------> requesting 1");
-                                LocationServices.FusedLocationApi.requestLocationUpdates(
-                                    client, locationRequest, EventDetailActivity.this);
+                                startLocationDetection();
                             }
 
                         }
@@ -943,6 +970,5 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                     })
                     .build();
         client.connect();
-        System.out.println("-----------> connecting");
     }
 }

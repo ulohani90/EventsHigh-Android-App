@@ -74,6 +74,7 @@
     <string name="ui_enable_location">Unable to detect your location. Turn on GPS location source in Settings</string>
     <string name="ui_detecting_location">Detecting your location</string>
     <string name="ui_register_for_check_in">Please register your phone number to check in!</string>
+    <string name="ui_not_at_event">We could not detect that you are at the event</string>
 
     <!-- Offer -->
     <string name="ui_offer_expire">Oh no! Offer is expired already. Better luck next time!</string>
