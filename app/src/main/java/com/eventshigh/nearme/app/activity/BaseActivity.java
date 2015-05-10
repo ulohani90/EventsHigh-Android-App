@@ -22,6 +22,7 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
+import com.facebook.FacebookSdk;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
@@ -108,7 +109,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
 
         // Report app to Facebook
-        com.facebook.AppEventsLogger.activateApp(this, "196111897251952");
+        FacebookSdk.sdkInitialize(getApplicationContext());
 
         // Find out share action result.
         if (shareAppInitiatedTimestamp > 0) {

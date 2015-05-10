@@ -19,10 +19,6 @@
 -include ../proguard-com.twitter.sdk.android.twitter.txt
 -include ../proguard-zendesk.txt
 
-# FB
--keep class com.facebook.** { *; }
--keepattributes Signature
-
 # Google Play Services
 -keep class * extends java.util.ListResourceBundle {
     protected Object[][] getContents();
