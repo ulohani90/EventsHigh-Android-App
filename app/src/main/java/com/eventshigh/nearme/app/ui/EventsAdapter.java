@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,9 +18,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
-import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
@@ -171,10 +168,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     // Build the view, reuse existing if possible.
     public static View getEventCard(final Event event, final BaseEventsActivity activity,
                                     @Nullable View reuseView, ViewGroup parent) {
-        View view = reuseView != null ? reuseView :
-                activity.getLayoutInflater().inflate(R.layout.card_event_maps, parent, false);
-        new EventCard(view, true).bindEventView(event, false, activity, -1);
-        return view;
+        EventCard eventCard;
+        if (reuseView == null) {
+            eventCard = EventCard.newInstance(activity, parent);
+        } else {
+            eventCard = new EventCard(reuseView);
+        }
+        eventCard.bindEventView(event, false, activity, -1);
+        return eventCard.itemView;
     }
 
     private enum DataType {
@@ -182,8 +183,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         EVENT(1),
         OFFER(2),
         FOLLOW(3),
-        MY_EVENT_HEADER(5),
-        TRENDING_CATEGORY(6);
+        MY_EVENT_HEADER(4),
+        TRENDING_CATEGORY(5);
 
         public final int typeId;
         DataType (int typeId) {
@@ -200,7 +201,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             if (typeId == EVENT.typeId) {
-                return EventCard.newInstance(activity, parent, true);
+                return EventCard.newInstance(activity, parent);
             }
 
             if (typeId == OFFER.typeId) {
@@ -331,7 +332,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     private static class EventCard extends ViewHolder {
-        private final boolean shouldAdjustImageHeight;
         private final NetworkImageView bgView;
         private final ImageView recommendedView;
         private final ImageView offerView;
@@ -340,21 +340,16 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView priceView;
         private final TextView venueView;
         private final TextView travelTimeView;
-        private final ImageView favouriteView;
-        private final View fbShareView;
-        private final View whatsappShareView;
-        private final View arrowView;
+        private final TextView numPeopleInterestedView;
 
-        private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
-            View view = activity.getLayoutInflater().inflate(
-                    bigLayout ? R.layout.card_event_eb : R.layout.card_event_maps, parent, false);
-            return new EventCard(view, true);
+        private static EventCard newInstance(Activity activity, ViewGroup parent) {
+            View view = activity.getLayoutInflater().inflate(R.layout.card_event, parent, false);
+            return new EventCard(view);
         }
 
-        public EventCard(View cardView, boolean shouldAdjustImageHeight) {
+        public EventCard(View cardView) {
             super(cardView);
 
-            this.shouldAdjustImageHeight = shouldAdjustImageHeight;
             bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
             recommendedView = (ImageView) cardView.findViewById(R.id.event_recommended);
             offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
@@ -363,16 +358,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             priceView = (TextView) cardView.findViewById(R.id.event_price);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
-            favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
-            fbShareView = cardView.findViewById(R.id.share_fb);
-            whatsappShareView = cardView.findViewById(R.id.share_whatsapp);
-            arrowView = cardView.findViewById(R.id.arrow);
-        }
-
-        public void setFavouriteView(@Nullable EventMark eventMark) {
-            favouriteView.setTag(eventMark);
-            favouriteView.setImageResource(EventMark.isFavourite(eventMark) ?
-                    R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_grey600_24dp);
+            numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
         }
 
         private void addView(List<Pair<View, String>> sharedElements, @Nullable View view,
@@ -396,10 +382,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     addView(sharedElements, venueView, "event_venue");
                     addView(sharedElements, travelTimeView, "event_travel_time");
                     // addView(sharedElements, priceView, "event_price");
-                    // addView(sharedElements, favouriteView, "action_favourite");
                     addView(sharedElements, recommendedView, "eh_recommends");
-                    addView(sharedElements, fbShareView, "share_fb");
-                    addView(sharedElements, whatsappShareView, "share_whatsapp");
                     Pair shareEles[] = new Pair[sharedElements.size()];
                     shareEles = sharedElements.toArray(shareEles);
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
@@ -414,27 +397,22 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             bgView.setErrorImageResId(R.drawable.eh_default_event);
             bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(activity));
 
-            if (shouldAdjustImageHeight) {
-                Utils.waitForViewVisible(bgView, new Runnable() {
-                    @Override
-                    public void run() {
-                        LayoutParams lp = bgView.getLayoutParams();
-                        lp.height = 9 * bgView.getWidth() / 16;
-                        bgView.setLayoutParams(lp);
-                    }
-                });
-            }
-
-            if (arrowView != null) {
-                arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
-            }
-
             // recommended ? Offer ?
             if (recommendedView != null) {
                 recommendedView.setVisibility(event.ehRecommended ? View.VISIBLE : View.INVISIBLE);
             }
             if (offerView != null) {
                 offerView.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
+            }
+
+            // Num people interested ?
+            if (numPeopleInterestedView != null) {
+                if (event.numPeopleInterested > 1) {
+                    numPeopleInterestedView.setVisibility(View.VISIBLE);
+                    numPeopleInterestedView.setText(Integer.toString(event.numPeopleInterested));
+                } else {
+                    numPeopleInterestedView.setVisibility(View.GONE);
+                }
             }
 
             // Set the title.
@@ -477,40 +455,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 } else {
                     travelTimeView.setVisibility(View.GONE);
                 }
-            }
-
-            // Set actions handlers.
-            if (favouriteView != null) {
-                setFavouriteView(activity.getEventMark(event));
-                favouriteView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        EventMark oldMark = (EventMark) favouriteView.getTag();
-                        EventMark newMark = EventMark.isFavourite(oldMark) ? null : EventMark.FAVOURITE;
-                        activity.reportEventAction(event,
-                            EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
-                            position);
-                        activity.recordEventMark(event, newMark);
-                        setFavouriteView(newMark);
-                    }
-                });
-            }
-
-            if (fbShareView != null) {
-                fbShareView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        activity.shareEvent(event, EventDetailActivity.PACKAGE_NAME_FACEBOOK);
-                    }
-                });
-            }
-            if (whatsappShareView != null) {
-                whatsappShareView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        activity.shareEvent(event, EventDetailActivity.PACKAGE_NAME_WHATSAPP);
-                    }
-                });
             }
         }
     }
