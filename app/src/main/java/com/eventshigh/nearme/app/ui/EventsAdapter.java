@@ -20,7 +20,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
-import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
@@ -170,7 +169,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public static View getEventCard(final Event event, final BaseEventsActivity activity,
                                     @Nullable View reuseView, ViewGroup parent) {
         View view = reuseView != null ? reuseView :
-                activity.getLayoutInflater().inflate(R.layout.card_event_maps, parent, false);
+                activity.getLayoutInflater().inflate(R.layout.card_event, parent, false);
         new EventCard(view, true).bindEventView(event, false, activity, -1);
         return view;
     }
@@ -198,7 +197,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             if (typeId == EVENT.typeId) {
-                return EventCard.newInstance(activity, parent, true);
+                return EventCard.newInstance(activity, parent);
             }
 
             if (typeId == OFFER.typeId) {
@@ -336,15 +335,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView priceView;
         private final TextView venueView;
         private final TextView travelTimeView;
+        private final TextView numPeopleInterestedView;
         private final ImageView favouriteView;
-        private final View fbShareView;
-        private final View whatsappShareView;
         private final View arrowView;
 
-        private static EventCard newInstance(Activity activity, ViewGroup parent, boolean bigLayout) {
-            View view = activity.getLayoutInflater().inflate(
-                    bigLayout ? R.layout.card_event_big : R.layout.card_event_maps, parent, false);
-            return new EventCard(view, false);
+        private static EventCard newInstance(Activity activity, ViewGroup parent) {
+            View view = activity.getLayoutInflater().inflate(R.layout.card_event_big, parent, false);
+            return new EventCard(view, true);
         }
 
         public EventCard(View cardView, boolean shouldAdjustImageHeight) {
@@ -359,9 +356,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             priceView = (TextView) cardView.findViewById(R.id.event_price);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
+            numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
             favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
-            fbShareView = cardView.findViewById(R.id.share_fb);
-            whatsappShareView = cardView.findViewById(R.id.share_whatsapp);
             arrowView = cardView.findViewById(R.id.arrow);
         }
 
@@ -392,10 +388,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     addView(sharedElements, venueView, "event_venue");
                     addView(sharedElements, travelTimeView, "event_travel_time");
                     // addView(sharedElements, priceView, "event_price");
-                    // addView(sharedElements, favouriteView, "action_favourite");
                     addView(sharedElements, recommendedView, "eh_recommends");
-                    addView(sharedElements, fbShareView, "share_fb");
-                    addView(sharedElements, whatsappShareView, "share_whatsapp");
                     Pair shareEles[] = new Pair[sharedElements.size()];
                     shareEles = sharedElements.toArray(shareEles);
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
@@ -431,6 +424,16 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
             if (offerView != null) {
                 offerView.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
+            }
+
+            // Num people interested ?
+            if (numPeopleInterestedView != null) {
+                if (event.numPeopleInterested > 1) {
+                    numPeopleInterestedView.setVisibility(View.VISIBLE);
+                    numPeopleInterestedView.setText(Integer.toString(event.numPeopleInterested));
+                } else {
+                    numPeopleInterestedView.setVisibility(View.GONE);
+                }
             }
 
             // Set the title.
@@ -492,22 +495,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 });
             }
 
-            if (fbShareView != null) {
-                fbShareView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        activity.shareEvent(event, EventDetailActivity.PACKAGE_NAME_FACEBOOK);
-                    }
-                });
-            }
-            if (whatsappShareView != null) {
-                whatsappShareView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        activity.shareEvent(event, EventDetailActivity.PACKAGE_NAME_WHATSAPP);
-                    }
-                });
-            }
         }
     }
 

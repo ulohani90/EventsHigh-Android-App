@@ -4,5 +4,4 @@
     <dimen name="big_event_card_height">100dp</dimen>
 
     <dimen name="maps_event_card_width">120dp</dimen>
-    <dimen name="maps_event_card_height">90dp</dimen>
 </resources>

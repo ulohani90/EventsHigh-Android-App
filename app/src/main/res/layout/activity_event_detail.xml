@@ -702,7 +702,6 @@
             android:background="@drawable/button_fb"
             android:onClick="facebook"
             android:visibility="gone"
-            android:transitionName="share_fb"
             tools:ignore="UnusedAttribute"
             tools:visibility="visible"
         />
@@ -743,7 +742,6 @@
             android:background="@drawable/button_whatsapp"
             android:onClick="whatsapp"
             android:visibility="gone"
-            android:transitionName="share_whatsapp"
             tools:ignore="UnusedAttribute"
             tools:visibility="visible"
         />
