@@ -14,6 +14,5 @@
     <screenName name="com.eventshigh.nearme.app.activity.PhoneLoginActivity">PhoneLogin</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.SettingsActivity">Settings</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.AboutUsActivity">AboutUs</screenName>
-    <screenName name="com.eventshigh.nearme.app.activity.ShowFiltersActivity">ShowFilters</screenName>
 
 </resources>

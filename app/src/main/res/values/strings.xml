@@ -31,7 +31,6 @@
     <string name="menu_open_in_browser">Open In Browser</string>
     <string name="menu_shortcut">Add to homescreen</string>
     <string name="menu_refresh">Refresh</string>
-    <string name="menu_filter">Filter</string>
 
     <!-- Other Strings used in UI -->
     <string name="ui_follow">Follow</string>

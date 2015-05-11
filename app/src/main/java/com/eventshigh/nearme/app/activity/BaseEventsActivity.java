@@ -246,10 +246,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
         searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
-        // Do not show filterByDate for search.
-        menu.findItem(R.id.action_filter).setVisible(
-                eventsContext.query.isEmpty() || EventsHighEndpoints.isDateQuery(eventsContext.query));
-
         // Set visibility.
         menu.findItem(R.id.action_show_map).setVisible(isPlayServicesPresent);
         menu.findItem(getDisabledMenuItem()).setVisible(false);
@@ -260,15 +256,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        if (id == R.id.action_filter) {
-            reportActionToAnalytics("applyFilters");
-            Intent filterActivityIntent = new Intent(this, ShowFiltersActivity.class);
-            filterActivityIntent.putStringArrayListExtra(ShowFiltersActivity.PARAM_FILTERS,
-                    eventsContext.categoryFilters);
-            startActivityForResult(filterActivityIntent, 0);
-            return true;
-        }
 
         if (id == R.id.action_show_map) {
             reportActionToAnalytics("switchToMaps");
@@ -291,14 +278,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
         showDateFilter();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && data.hasExtra(ShowFiltersActivity.PARAM_FILTERS)) {
-            eventsContext.categoryFilters =
-                    data.getStringArrayListExtra(ShowFiltersActivity.PARAM_FILTERS);
-            fetchNewListing(false);
-        }
-    }
 
     // ***********************
     // Delegated methods

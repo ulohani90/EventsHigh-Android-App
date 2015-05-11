@@ -19,10 +19,8 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -73,25 +71,6 @@ public abstract class BaseEventListRequest extends JsonRequest<List<Event>>  {
         List<Event> events = Event.parseUpcomingEvents(eventsContext.city, eventsJson,
                 includeWithoutLocation);
         filterOldEvents(events, !eventsContext.dateFilter.isEmpty());
-
-        // Filter out the event which belongs to user selected filter.
-        if (!eventsContext.categoryFilters.isEmpty()) {
-            Set<String> categoryFiltersSet = new HashSet<>(eventsContext.categoryFilters);
-            for (Iterator<Event> iterator  = events.iterator(); iterator.hasNext(); ) {
-                Event event = iterator.next();
-                boolean found = false;
-                for (String tag : event.tags) {
-                    if (categoryFiltersSet.contains(tag)) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    iterator.remove();
-                }
-            }
-        }
 
         // Sort the event list to user.
         eventsMarkerManager.waitForLoading();
