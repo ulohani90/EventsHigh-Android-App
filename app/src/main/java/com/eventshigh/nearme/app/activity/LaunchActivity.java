@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.DrawerLayout;
@@ -42,7 +43,7 @@ import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.example.android.common.view.SlidingTabLayout;
 import com.example.android.common.view.SlidingTabLayout.TabColorizer;
-import com.example.android.common.view.SlidingTabPagerAdapter;
+import com.example.android.common.view.TabViewAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -281,10 +282,11 @@ public class LaunchActivity extends BaseContextActivity {
     private void showExploreScreen() {
         ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
         viewPager.setAdapter(adapter);
+        tabsView.setTabViewAdapter(adapter);
         tabsView.setViewPager(viewPager);
         tabsView.setOnPageChangeListener(adapter);
         tabsView.setCustomTabColorizer(adapter);
-        adapter.onPageSelected(0);
+        viewPager.setCurrentItem(1, false);
         lastFetchTimestamp = System.currentTimeMillis();
     }
 
@@ -372,10 +374,10 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
-    private class ExploreScreenPagerAdapter extends SlidingTabPagerAdapter
-            implements OnPageChangeListener, TabColorizer {
-        private final ExploreScreenTab[] tabs = {ExploreScreenTab.WEEK, ExploreScreenTab.EXPLORE,
-                ExploreScreenTab.My_EVENTS};
+    private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
+            implements TabViewAdapter, OnPageChangeListener, TabColorizer {
+        private final ExploreScreenTab[] tabs = {ExploreScreenTab.My_EVENTS, ExploreScreenTab.EXPLORE,
+                ExploreScreenTab.WEEK};
         private final TextView[] tabViews = new TextView[tabs.length];
 
         public ExploreScreenPagerAdapter() {
@@ -385,15 +387,15 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public Fragment getItem(int position) {
             if (position == 0) {
-                return ThisWeekFragment.getInstance(new EventsContext(eventsContext.location, ""));
+                return EventsFragment.getInstance(new EventsContext(eventsContext.location,
+                        EventsHighEndpoints.QUERY_MY_EVENT));
             }
 
             if (position == 1) {
                 return new ExploreFragment();
             }
 
-            return EventsFragment.getInstance(new EventsContext(eventsContext.location,
-                    EventsHighEndpoints.QUERY_MY_EVENT));
+            return ThisWeekFragment.getInstance(new EventsContext(eventsContext.location, ""));
         }
 
         @Override
@@ -403,6 +405,11 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public void onPageSelected(int position) {
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null && !actionBar.isShowing()) {
+                actionBar.show();
+            }
+
             for (int i = 0; i < tabViews.length; i++) {
                 tabViews[i].setTypeface(null, i == position ? Typeface.BOLD : Typeface.NORMAL);
             }

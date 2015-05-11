@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +18,7 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.example.android.common.view.SlidingTabLayout;
 import com.example.android.common.view.SlidingTabLayout.TabColorizer;
-import com.example.android.common.view.SlidingTabPagerAdapter;
+import com.example.android.common.view.TabViewAdapter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,6 +29,7 @@ import java.util.Locale;
  * Fragment to show this weeks events by date.
  */
 public class ThisWeekFragment extends Fragment {
+    private final int NUM_DAYS = 14;
     private static final String EVENT_CONTEXT_PARAM = EventsFragment.class.getName() + "_event_context";
 
     public static ThisWeekFragment getInstance(EventsContext eventsContext) {
@@ -60,6 +63,7 @@ public class ThisWeekFragment extends Fragment {
         viewPager.setAdapter(adapter);
 
         SlidingTabLayout tabsView = (SlidingTabLayout) view.findViewById(R.id.date_filter);
+        tabsView.setTabViewAdapter(adapter);
         tabsView.setViewPager(viewPager);
         tabsView.setOnPageChangeListener(adapter);
         tabsView.setCustomTabColorizer(adapter);
@@ -78,9 +82,8 @@ public class ThisWeekFragment extends Fragment {
         }
     }
 
-    private class ThisWeekPagerAdapter extends SlidingTabPagerAdapter
-            implements OnPageChangeListener, TabColorizer {
-        private final int NUM_DAYS = 7;
+    private class ThisWeekPagerAdapter extends FragmentStatePagerAdapter
+            implements TabViewAdapter, OnPageChangeListener, TabColorizer {
         private final List<DateTabView> dateTabViews = new ArrayList<>(NUM_DAYS);
 
         private int lastPosition = -1;
@@ -104,6 +107,11 @@ public class ThisWeekFragment extends Fragment {
 
         @Override
         public void onPageSelected(int position) {
+            ActionBar actionBar = activity.getSupportActionBar();
+            if (actionBar != null && !actionBar.isShowing()) {
+                actionBar.show();
+            }
+
             if (lastPosition >= 0) {
                 TextView last = dateTabViews.get(lastPosition).dayOfMonthView;
                 last.setTypeface(null, Typeface.NORMAL);

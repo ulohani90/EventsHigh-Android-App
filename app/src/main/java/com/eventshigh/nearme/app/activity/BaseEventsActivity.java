@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
@@ -46,7 +47,7 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.example.android.common.view.SlidingTabLayout;
 import com.example.android.common.view.SlidingTabLayout.TabColorizer;
-import com.example.android.common.view.SlidingTabPagerAdapter;
+import com.example.android.common.view.TabViewAdapter;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -454,6 +455,7 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
             dummyViewPager.setAdapter(adapter);
 
             dateFilter.setVisibility(View.VISIBLE);
+            dateFilter.setTabViewAdapter(adapter);
             dateFilter.setViewPager(dummyViewPager);
             dateFilter.setOnPageChangeListener(adapter);
             dateFilter.setCustomTabColorizer(adapter);
@@ -461,8 +463,8 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
         }
     }
 
-    private class DatesPagerAdapter extends SlidingTabPagerAdapter
-            implements OnPageChangeListener, TabColorizer {
+    private class DatesPagerAdapter extends FragmentStatePagerAdapter
+            implements TabViewAdapter, OnPageChangeListener, TabColorizer {
         private static final int NUM_DAYS = 14;
 
         private class DateTabView {

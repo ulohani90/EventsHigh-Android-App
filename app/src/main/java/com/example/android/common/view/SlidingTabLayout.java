@@ -217,6 +217,12 @@ public class SlidingTabLayout extends HorizontalScrollView {
         return textView;
     }
 
+
+    private TabViewAdapter tabViewAdapter = null;
+    public void setTabViewAdapter(TabViewAdapter tabViewAdapter) {
+        this.tabViewAdapter = tabViewAdapter;
+    }
+
     private void populateTabStrip() {
         PagerAdapter adapter =  mViewPager.getAdapter();
         final View.OnClickListener tabClickListener = new TabClickListener();
@@ -225,11 +231,10 @@ public class SlidingTabLayout extends HorizontalScrollView {
             return;
         }
 
-        boolean customView = adapter instanceof SlidingTabPagerAdapter;
+        boolean customView = tabViewAdapter != null;
         int minWidth = getContext().getResources().getDisplayMetrics().widthPixels / adapter.getCount() + 1;
         for (int i = 0; i < adapter.getCount(); i++) {
-            View tabView = customView ?
-                    ((SlidingTabPagerAdapter) adapter).getView(i, mTabStrip) :
+            View tabView = customView ? tabViewAdapter.getView(i, mTabStrip) :
                     createDefaultTabView(getContext());
             if (!customView) {
                 ((TextView)tabView).setText(adapter.getPageTitle(i));
