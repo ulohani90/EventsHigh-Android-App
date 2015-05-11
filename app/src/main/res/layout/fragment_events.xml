@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activity.LaunchActivity"
+    android:elevation="0dp"
+    tools:ignore="UnusedAttribute"
 >
     <ProgressBar
         android:id="@+id/top_progress_bar"

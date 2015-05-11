@@ -63,7 +63,6 @@ public class LaunchActivity extends BaseContextActivity {
     private SlidingTabLayout tabsView;
     private ViewPager viewPager;
     private ListView citySelector;
-
     private ActionBarDrawerToggle drawerToggle;
 
     // Client to Google api so that we can fetch the user location if
@@ -374,11 +373,16 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
+
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
             implements TabViewAdapter, OnPageChangeListener, TabColorizer {
         private final ExploreScreenTab[] tabs = {ExploreScreenTab.My_EVENTS, ExploreScreenTab.EXPLORE,
                 ExploreScreenTab.WEEK};
         private final TextView[] tabViews = new TextView[tabs.length];
+
+        // Fragment for this week tab.
+        private ThisWeekFragment thisWeekFragment;
+
 
         public ExploreScreenPagerAdapter() {
             super(getSupportFragmentManager());
@@ -395,7 +399,8 @@ public class LaunchActivity extends BaseContextActivity {
                 return new ExploreFragment();
             }
 
-            return ThisWeekFragment.getInstance(new EventsContext(eventsContext.location, ""), false);
+            thisWeekFragment = ThisWeekFragment.getInstance(eventsContext, false);
+            return thisWeekFragment;
         }
 
         @Override
@@ -412,6 +417,10 @@ public class LaunchActivity extends BaseContextActivity {
 
             for (int i = 0; i < tabViews.length; i++) {
                 tabViews[i].setTypeface(null, i == position ? Typeface.BOLD : Typeface.NORMAL);
+            }
+
+            if (position == 2) {
+                thisWeekFragment.refresh();
             }
         }
 

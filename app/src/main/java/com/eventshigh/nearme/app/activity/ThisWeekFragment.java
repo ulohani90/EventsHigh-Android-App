@@ -47,6 +47,10 @@ public class ThisWeekFragment extends Fragment {
     private EventsContext eventsContext;
     private boolean showOffer;
 
+    private ViewPager viewPager;
+    private ThisWeekPagerAdapter adapter;
+    private SlidingTabLayout tabsView;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -63,17 +67,22 @@ public class ThisWeekFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        ThisWeekPagerAdapter adapter = new ThisWeekPagerAdapter();
+        adapter = new ThisWeekPagerAdapter();
 
-        ViewPager viewPager = (ViewPager) view.findViewById(R.id.view_pager_date);
+        viewPager = (ViewPager) view.findViewById(R.id.view_pager_date);
         viewPager.setAdapter(adapter);
 
-        SlidingTabLayout tabsView = (SlidingTabLayout) view.findViewById(R.id.date_filter);
+        tabsView = (SlidingTabLayout) view.findViewById(R.id.date_filter);
         tabsView.setTabViewAdapter(adapter);
         tabsView.setViewPager(viewPager);
         tabsView.setOnPageChangeListener(adapter);
         tabsView.setCustomTabColorizer(adapter);
         tabsView.scrollTo(eventsContext.dateFilter);
+    }
+
+    public void refresh() {
+        viewPager.setAdapter(adapter);
+        tabsView.scrollTo(0);
     }
 
     private static class DateTabView {

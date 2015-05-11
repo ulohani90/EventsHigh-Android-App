@@ -31,12 +31,14 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:elevation="8dp"
+            tools:ignore="UnusedAttribute"
         />
         <ListView
             android:id="@+id/city_selector"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="1000"
             tools:listitem="@android:layout/simple_list_item_1"
             android:visibility="gone"
         />

@@ -4,17 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:elevation="8dp"
+    tools:ignore="UnusedAttribute"
 >
     <com.example.android.common.view.SlidingTabLayout
         android:id="@+id/date_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/primary"
+        android:elevation="8dp"
+        tools:ignore="UnusedAttribute"
     />
     <android.support.v4.view.ViewPager
         android:id="@+id/view_pager_date"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:elevation="0dp"
+        tools:ignore="UnusedAttribute"
     />
 </LinearLayout>
