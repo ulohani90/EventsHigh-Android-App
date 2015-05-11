@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -126,10 +125,7 @@ public class ThisWeekFragment extends Fragment {
 
         @Override
         public void onPageSelected(int position) {
-            ActionBar actionBar = activity.getSupportActionBar();
-            if (actionBar != null && !actionBar.isShowing()) {
-                actionBar.show();
-            }
+            activity.showActionBar();
 
             if (lastPosition >= 0) {
                 TextView last = dateTabViews.get(lastPosition).dayOfMonthView;

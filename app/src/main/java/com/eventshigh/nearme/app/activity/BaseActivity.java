@@ -10,7 +10,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -268,23 +267,4 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    protected void showVerifyPhoneSnackbar() {
-        boolean isVerificationPending = Account.isPhoneVerifyPending(this);
-        final View view = findViewById(R.id.verify_phone_container);
-        view.setVisibility(isVerificationPending ? View.VISIBLE :View.GONE);
-        view.findViewById(R.id.verify_phone).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(BaseActivity.this, PhoneLoginActivity.class));
-                view.setVisibility(View.GONE);
-            }
-        });
-        view.findViewById(R.id.verify_phone_close).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Account.disablePhoneVerifySnackbar();
-                view.setVisibility(View.GONE);
-            }
-        });
-    }
 }

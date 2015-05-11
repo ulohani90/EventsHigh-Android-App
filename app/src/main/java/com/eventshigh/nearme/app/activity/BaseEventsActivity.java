@@ -35,7 +35,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
     // ***********************
 
     // UI elements.
-    protected Toolbar toolbar;
     protected FrameLayout eventContainer;
     protected SearchView searchView;
 
@@ -93,9 +92,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
             showEvents();
             lastStartedAt = System.currentTimeMillis();
         }
-
-        // Show the verify phone snakbar if needed.
-        showVerifyPhoneSnackbar();
     }
 
     @Override

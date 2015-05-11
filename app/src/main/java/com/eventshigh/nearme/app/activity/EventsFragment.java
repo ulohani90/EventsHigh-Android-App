@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.util.Log;
@@ -54,7 +53,7 @@ public class EventsFragment extends Fragment {
     private EventsContext eventsContext;
     private boolean showOfferCard;
     private boolean showFollowCard;
-    private OnScrollListener onScrollListener;
+    private OnScrollListener onScrollListener = new HideActionBarOnScroll();
 
     public static EventsFragment getInstance(EventsContext eventsContext,
             boolean showFollowCard, boolean showOffer) {
@@ -112,46 +111,7 @@ public class EventsFragment extends Fragment {
         });
 
         // Setup the actionbar hide/show on scroll.
-        if (onScrollListener != null) {
-            eventGridView.setOnScrollListener(onScrollListener);
-        } else {
-            final ActionBar actionBar = activity.getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setShowHideAnimationEnabled(true);
-                eventGridView.setOnScrollListener(new OnScrollListener() {
-                    int currentY;
-
-                    @Override
-                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                        super.onScrollStateChanged(recyclerView, newState);
-                    }
-
-                    @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                        super.onScrolled(recyclerView, dx, dy);
-
-                        if (currentY * dy > 0) {
-                            currentY += dy;
-                        } else {
-                            currentY = dy;
-                        }
-
-                        if (currentY > 250 || currentY < -250) {
-                            boolean isDown = dy > 0;
-                            if (isDown && actionBar.isShowing()) {
-                                actionBar.hide();
-                            }
-
-                            if (!isDown && !actionBar.isShowing()) {
-                                actionBar.show();
-                            }
-
-                            currentY = 0;
-                        }
-                    }
-                });
-            }
-        }
+        eventGridView.setOnScrollListener(onScrollListener);
 
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         noMyEventsView = view.findViewById(R.id.view_no_my_event);
@@ -236,7 +196,7 @@ public class EventsFragment extends Fragment {
         }
     };
 
-    protected ErrorListener mErrorListener = new ErrorListener() {
+    private ErrorListener mErrorListener = new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
             if (isDetached()) {
@@ -260,4 +220,38 @@ public class EventsFragment extends Fragment {
             }
         }
     };
+
+    private class HideActionBarOnScroll extends OnScrollListener {
+        private int currentY;
+        private boolean actionBarShown = true;
+
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+
+            if (currentY * dy > 0) {
+                currentY += dy;
+            } else {
+                currentY = dy;
+            }
+
+            if (currentY > 250 || currentY < -250) {
+                boolean isDown = dy > 0;
+                if (isDown && actionBarShown) {
+                    activity.hideActionBar();
+                    actionBarShown = false;
+                }
+
+                if (!isDown && !actionBarShown) {
+                    activity.showActionBar();
+                    actionBarShown = true;
+                }
+            }
+        }
+    }
 }

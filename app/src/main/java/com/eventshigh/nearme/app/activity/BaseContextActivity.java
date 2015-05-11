@@ -4,15 +4,20 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 
+import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.UserActionDbHelper;
-import com.eventshigh.nearme.app.task.FetchLocalityTask;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -24,10 +29,11 @@ import com.google.android.gms.maps.model.LatLng;
 /**
  * An abstact class for activity with context.
  */
-public abstract class BaseContextActivity extends BaseActivity
-        implements FetchLocalityTask.Listener {
+public abstract class BaseContextActivity extends BaseActivity {
     protected EventsContext eventsContext;
     protected Editor eventsMarkerEditor;
+
+    protected Toolbar toolbar;
 
     // GoogleApiClient to report the page view.
     private GoogleApiClient client;
@@ -57,6 +63,9 @@ public abstract class BaseContextActivity extends BaseActivity
                 // do nothing.
             }
         });
+
+        // Show the verify phone snakbar if needed.
+        showVerifyPhoneSnackbar();
     }
 
     @Override
@@ -85,6 +94,84 @@ public abstract class BaseContextActivity extends BaseActivity
 
     public LatLng getUserLocation() {
         return eventsContext.location;
+    }
+
+    public void showActionBar() {
+        if (toolbar.getVisibility() == View.VISIBLE) {
+            return;
+        }
+
+        toolbar.measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        final int targetHeight = toolbar.getMeasuredHeight();
+
+        toolbar.getLayoutParams().height = 0;
+        toolbar.setVisibility(View.VISIBLE);
+        Animation animation = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                toolbar.getLayoutParams().height = interpolatedTime == 1
+                        ? LayoutParams.WRAP_CONTENT
+                        : (int)(targetHeight * interpolatedTime);
+                toolbar.requestLayout();
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        animation.setDuration(200);
+        toolbar.startAnimation(animation);
+    }
+
+    public void hideActionBar() {
+        if (toolbar.getVisibility() == View.GONE) {
+            return;
+        }
+
+        final int initialHeight = toolbar.getMeasuredHeight();
+        Animation animation = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                if(interpolatedTime == 1){
+                    toolbar.setVisibility(View.GONE);
+                }else{
+                    toolbar.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
+                    toolbar.requestLayout();
+                }
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        animation.setDuration(200);
+        toolbar.startAnimation(animation);
+    }
+
+    protected void showVerifyPhoneSnackbar() {
+        boolean isVerificationPending = Account.isPhoneVerifyPending(this);
+        final View view = findViewById(R.id.verify_phone_container);
+        view.setVisibility(isVerificationPending ? View.VISIBLE :View.GONE);
+        view.findViewById(R.id.verify_phone).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(BaseContextActivity.this, PhoneLoginActivity.class));
+                view.setVisibility(View.GONE);
+            }
+        });
+        view.findViewById(R.id.verify_phone_close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Account.disablePhoneVerifySnackbar();
+                view.setVisibility(View.GONE);
+            }
+        });
     }
 
     public @Nullable
@@ -128,13 +215,5 @@ public abstract class BaseContextActivity extends BaseActivity
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.putExtra(EventDetailActivity.EXTRA_EVENT_PARAM, event);
         startActivity(detailIntent, bundle);
-    }
-
-    @Override
-    public void onLocationUpdated(String locality) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null && locality != null && !locality.isEmpty()) {
-            actionBar.setSubtitle(locality);
-        }
     }
 }

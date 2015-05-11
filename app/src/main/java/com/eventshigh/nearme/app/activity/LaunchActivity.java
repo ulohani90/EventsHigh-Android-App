@@ -84,7 +84,7 @@ public class LaunchActivity extends BaseContextActivity {
         citySelector = (ListView) findViewById(R.id.city_selector);
 
         // Setup the actionbar.
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Setup the Drawer Layout.
@@ -145,7 +145,6 @@ public class LaunchActivity extends BaseContextActivity {
         }
 
         // Show next screen.
-        showVerifyPhoneSnackbar();
         showNextScreen();
     }
 
@@ -321,7 +320,7 @@ public class LaunchActivity extends BaseContextActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null &&
             (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0)) {
-            new FetchLocalityTask(this, this).execute(eventsContext.location);
+            new FetchLocalityTask(this).execute(eventsContext.location);
         }
 
         // If we do not have query, show explore screen.
@@ -410,10 +409,7 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public void onPageSelected(int position) {
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null && !actionBar.isShowing()) {
-                actionBar.show();
-            }
+            showActionBar();
 
             for (int i = 0; i < tabViews.length; i++) {
                 tabViews[i].setTypeface(null, i == position ? Typeface.BOLD : Typeface.NORMAL);
