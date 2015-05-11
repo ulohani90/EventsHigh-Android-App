@@ -130,8 +130,13 @@ public class EventsFragment extends Fragment {
                     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                         super.onScrolled(recyclerView, dx, dy);
 
-                        currentY += dy;
-                        if (currentY > 150 || currentY < -150) {
+                        if (currentY * dy > 0) {
+                            currentY += dy;
+                        } else {
+                            currentY = dy;
+                        }
+
+                        if (currentY > 250 || currentY < -250) {
                             boolean isDown = dy > 0;
                             if (isDown && actionBar.isShowing()) {
                                 actionBar.hide();
