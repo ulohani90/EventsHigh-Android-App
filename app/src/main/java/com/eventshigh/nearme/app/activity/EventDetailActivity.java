@@ -2,18 +2,25 @@ package com.eventshigh.nearme.app.activity;
 
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -53,6 +60,8 @@ import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
@@ -72,7 +81,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
  * link or from Events{Grid,Maps}Activity. In both cases, event data is not available so
  * this activity fetches the event data and shows it using the EventDetailFragment.
  */
-public class EventDetailActivity extends BaseActivity {
+public class EventDetailActivity extends BaseActivity implements LocationListener {
     public static final String EXTRA_EVENT_PARAM = EventDetailActivity.class.getSimpleName() + "_event";
 
     // Regex to check if description is plane text or html.
@@ -84,6 +93,10 @@ public class EventDetailActivity extends BaseActivity {
     public static final String PACKAGE_NAME_EMAIL = "com.google.android.gm";
     public static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
 
+    private static final long LOCATION_LOCK_MAX_TIME_MILLIS = 10 * DateUtils.SECOND_IN_MILLIS;
+    private static final float LOCATION_ACCURACY_REQUIRED_METERS = 300;
+    private static final float ALLOWED_USER_DISTANCE_FROM_EVENT_FOR_CHECK_IN_METERS = 300;
+
     private Toolbar toolbar;
     private View topProgressBar;
     private EventCard eventCard;
@@ -91,6 +104,11 @@ public class EventDetailActivity extends BaseActivity {
     private Event event = null;
     private GoogleApiClient client;
     private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
+
+    private LocationRequest locationRequest;
+    private boolean needGpsLocation;
+    private AlertDialog detectingLocationDialog;
+    private long locationRequestStartTime;
 
 
     /*****************************************
@@ -108,6 +126,11 @@ public class EventDetailActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
         onNewIntent(getIntent());
+
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(3000);
+        locationRequest.setFastestInterval(1000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     protected void onStart() {
@@ -119,7 +142,7 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         findViewById(R.id.event_container).setMinimumHeight(
-                (int) (1.33 * getResources().getDisplayMetrics().heightPixels));
+            (int) (1.33 * getResources().getDisplayMetrics().heightPixels));
 
         // Get the event from Intent.
         if (getIntent().hasExtra(EXTRA_EVENT_PARAM)) {
@@ -127,15 +150,16 @@ public class EventDetailActivity extends BaseActivity {
             populateView(event);
         } else {
             EventRequest.submit(this, getIntent().getData(), Priority.IMMEDIATE, mEventListener,
-                    new ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            Toast.makeText(EventDetailActivity.this, R.string.failed_load,
-                                    Toast.LENGTH_SHORT).show();
-                            Log.e(EventDetailActivity.class.getSimpleName(), volleyError.toString(), volleyError.getCause());
-                            finish();
-                        }
-                    });
+                new ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Toast.makeText(EventDetailActivity.this, R.string.failed_load,
+                            Toast.LENGTH_SHORT).show();
+                        Log.e(EventDetailActivity.class.getSimpleName(), volleyError.toString(),
+                            volleyError.getCause());
+                        finish();
+                    }
+                });
         }
     }
 
@@ -218,14 +242,83 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
-                getString(R.string.title_book));
+            getString(R.string.title_book));
     }
 
     public void openOfferSite(View view) {
         reportEventAction(event, "openOffer");
         CustomUrlActivity.launchCustomUrl(this,
-                Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
-                event.offerTitle);
+            Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
+            event.offerTitle);
+    }
+
+    public void onCheckIn(View view) {
+        reportEventAction(event, "onCheckIn");
+
+        // Check if the user is logged in
+        Pair<String, Boolean> phoneNumberStatus = new Account(this).getPhoneNumber();
+        if (!phoneNumberStatus.second) {
+            new AlertDialog.Builder(this)
+                .setTitle(R.string.pref_title_phone_no)
+                .setMessage(R.string.ui_register_for_check_in)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(EventDetailActivity.this, PhoneLoginActivity.class));
+                    }
+                })
+                .show();
+            return;
+        }
+
+        // Check if we have GPS location
+        needGpsLocation = true;
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            showEnableGpsDialog();
+            return;
+        }
+
+        if (client.isConnected()) {
+            startLocationDetection();
+        }
+        detectingLocationDialog = new AlertDialog.Builder(this).setOnDismissListener(
+            new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    stopLocationDetection();
+                }
+            }
+        ).setView(R.layout.dialog_detecting_location).create();
+        detectingLocationDialog.show();
+    }
+
+    private void startLocationDetection() {
+        locationRequestStartTime = System.currentTimeMillis();
+        LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
+    }
+
+    private void stopLocationDetection() {
+        needGpsLocation = false;
+        detectingLocationDialog.dismiss();
+        if (client.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(client,
+                EventDetailActivity.this);
+        }
+    }
+
+    private void showEnableGpsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setPositiveButton(R.string.action_settings, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            }
+        });
+        builder
+            .setTitle(R.string.title_enable_gps)
+            .setMessage(R.string.ui_enable_location)
+            .create()
+            .show();
     }
 
     public void imagePreview(View view) {
@@ -395,6 +488,32 @@ public class EventDetailActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        if (location.hasAccuracy() && location.getAccuracy() < LOCATION_ACCURACY_REQUIRED_METERS) {
+            // We have enough location accuracy. Lets check if the user is near the event
+            LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            if (LocationUtils.distanceInMeters(event.location, userLocation)
+                < ALLOWED_USER_DISTANCE_FROM_EVENT_FOR_CHECK_IN_METERS) {
+                // Yes, user is near the event, start the check in flow
+                // TODO: start check in flow
+            } else {
+                // The user is not near the location, let the user know
+                Toast.makeText(this, R.string.ui_not_at_event, Toast.LENGTH_LONG).show();
+            }
+            // Stop detecting location, and close dialog
+            stopLocationDetection();
+        } else {
+            // Location is not accurate enough. Wait for some more time until the timeout has
+            // reached, and then let the user know that the location could not be detected
+            if (System.currentTimeMillis() - locationRequestStartTime >
+                LOCATION_LOCK_MAX_TIME_MILLIS) {
+                stopLocationDetection();
+                Toast.makeText(this, R.string.failed_location, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     private class EventCard {
         private final ScrollView eventScrollView;
 
@@ -420,6 +539,7 @@ public class EventDetailActivity extends BaseActivity {
         private final LinearLayout futureTimesView;
 
         private final FrameLayout bookView;
+        private final FrameLayout checkInView;
         private final FrameLayout callView;
         private final TextView priceView;
         private final TextView offerView;
@@ -470,6 +590,7 @@ public class EventDetailActivity extends BaseActivity {
             futureTimesView = (LinearLayout) findViewById(R.id.event_future_times);
 
             bookView = (FrameLayout) findViewById(R.id.book_ticket);
+            checkInView = (FrameLayout) findViewById(R.id.check_in);
             callView = (FrameLayout) findViewById(R.id.call);
             priceView = (TextView) findViewById(R.id.event_price);
             offerView = (TextView) findViewById(R.id.offer_text);
@@ -504,8 +625,8 @@ public class EventDetailActivity extends BaseActivity {
 
         private void populateView(final Event event) {
             eventScrollView.getViewTreeObserver().addOnScrollChangedListener(
-                    new OnScrollChangedListener() {
-                        @Override
+                new OnScrollChangedListener() {
+                    @Override
                         public void onScrollChanged() {
                             setScroll(eventScrollView.getScrollY());
                         }
@@ -603,6 +724,7 @@ public class EventDetailActivity extends BaseActivity {
             // Set action buttons.
             findViewById(R.id.action_button_group).setVisibility(View.VISIBLE);
             bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
+            mayBeShowCheckInButton(event);
             callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
 
             // Show price.
@@ -718,6 +840,19 @@ public class EventDetailActivity extends BaseActivity {
             findViewById(R.id.share_whatsapp).setVisibility(isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
         }
 
+        private void mayBeShowCheckInButton(Event event) {
+            long currentTimeMillis = System.currentTimeMillis();
+            // Check in starts 30 mins before event start time
+            long checkInStartTimeMillis = event.eventTimings[0] - DateUtils.MINUTE_IN_MILLIS * 30;
+            long checkInEndTimeMillis = event.eventTimings[0] + DateUtils.MINUTE_IN_MILLIS * 120;
+            if (checkInStartTimeMillis < currentTimeMillis  && currentTimeMillis < checkInEndTimeMillis) {
+                // We have establised that the time is right
+                checkInView.setVisibility(View.VISIBLE);
+            } else {
+                checkInView.setVisibility(View.GONE);
+            }
+        }
+
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
             getLayoutInflater().inflate(R.layout.view_event_tag, parent);
             View tagView = parent.getChildAt(parent.getChildCount() - 1);
@@ -797,7 +932,7 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         String eventTravelTime = LocationUtils.getTravelTime(EventDetailActivity.this,
-                userLocation, event.location);
+            userLocation, event.location);
         eventCard.travelTimeView.setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
         if (eventTravelTime != null) {
             eventCard.travelTimeView.setText(eventTravelTime);
@@ -821,6 +956,11 @@ public class EventDetailActivity extends BaseActivity {
                             Uri webUri = event.getEventDetailsURI();
                             AppIndex.AppIndexApi.view(client, EventDetailActivity.this,
                                     Utils.getAppUri(webUri), event.title, webUri, null);
+
+                            if (needGpsLocation) {
+                                startLocationDetection();
+                            }
+
                         }
 
                         @Override
