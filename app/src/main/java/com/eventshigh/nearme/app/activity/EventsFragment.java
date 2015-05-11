@@ -21,9 +21,11 @@ import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
+import com.eventshigh.nearme.app.network.OffersRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -36,7 +38,10 @@ import java.util.List;
  */
 public class EventsFragment extends Fragment {
     private static final String LOG_TAG = EventsFragment.class.getSimpleName();
-    private static final String EVENT_CONTEXT_PARAM = EventsFragment.class.getName() + "_event_context";
+
+    public static final String EVENT_CONTEXT_PARAM = EventsFragment.class.getName() + "_event_context";
+    public static final String SHOW_FOLLOW_PARAM = EventsFragment.class.getName() + "_add_follow_card";
+    public static final String SHOW_OFFER_PARAM = EventsFragment.class.getName() + "_add_offer";
 
     private BaseContextActivity activity;
     private EventsAdapter eventsAdapter;
@@ -46,11 +51,19 @@ public class EventsFragment extends Fragment {
     private View noMyEventsView;
     private View retryView;
 
-    public static EventsFragment getInstance(EventsContext eventsContext) {
+    private EventsContext eventsContext;
+    private boolean showOfferCard;
+    private boolean showFollowCard;
+    private OnScrollListener onScrollListener;
+
+    public static EventsFragment getInstance(EventsContext eventsContext,
+            boolean showFollowCard, boolean showOffer) {
         EventsFragment fragment = new EventsFragment();
 
         Bundle args = new Bundle();
         args.putParcelable(EVENT_CONTEXT_PARAM, eventsContext);
+        args.putBoolean(SHOW_FOLLOW_PARAM, showFollowCard);
+        args.putBoolean(SHOW_OFFER_PARAM, showOffer);
         fragment.setArguments(args);
 
         return fragment;
@@ -60,6 +73,10 @@ public class EventsFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.activity = (BaseContextActivity) activity;
+
+        eventsContext = getArguments().getParcelable(EVENT_CONTEXT_PARAM);
+        showFollowCard = getArguments().getBoolean(SHOW_FOLLOW_PARAM);
+        showOfferCard = getArguments().getBoolean(SHOW_OFFER_PARAM);
     }
 
     @Override
@@ -95,36 +112,40 @@ public class EventsFragment extends Fragment {
         });
 
         // Setup the actionbar hide/show on scroll.
-        final ActionBar actionBar = activity.getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setShowHideAnimationEnabled(true);
-            eventGridView.setOnScrollListener(new OnScrollListener() {
-                int currentY;
+        if (onScrollListener != null) {
+            eventGridView.setOnScrollListener(onScrollListener);
+        } else {
+            final ActionBar actionBar = activity.getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setShowHideAnimationEnabled(true);
+                eventGridView.setOnScrollListener(new OnScrollListener() {
+                    int currentY;
 
-                @Override
-                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                    super.onScrollStateChanged(recyclerView, newState);
-                }
-
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-
-                    currentY += dy;
-                    if (currentY > 150 || currentY < -150) {
-                        boolean isDown = dy > 0;
-                        if (isDown && actionBar.isShowing()) {
-                            actionBar.hide();
-                        }
-
-                        if (!isDown && !actionBar.isShowing()) {
-                            actionBar.show();
-                        }
-
-                        currentY = 0;
+                    @Override
+                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                        super.onScrollStateChanged(recyclerView, newState);
                     }
-                }
-            });
+
+                    @Override
+                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                        super.onScrolled(recyclerView, dx, dy);
+
+                        currentY += dy;
+                        if (currentY > 150 || currentY < -150) {
+                            boolean isDown = dy > 0;
+                            if (isDown && actionBar.isShowing()) {
+                                actionBar.hide();
+                            }
+
+                            if (!isDown && !actionBar.isShowing()) {
+                                actionBar.show();
+                            }
+
+                            currentY = 0;
+                        }
+                    }
+                });
+            }
         }
 
         topProgressBar = view.findViewById(R.id.top_progress_bar);
@@ -134,13 +155,16 @@ public class EventsFragment extends Fragment {
         fetchNewListing(false);
     }
 
+    public void setOnScrollListener (OnScrollListener onScrollListener) {
+        this.onScrollListener = onScrollListener;
+    }
+
     private void fetchNewListing(boolean shouldBypassCache) {
         topProgressBar.setVisibility(View.VISIBLE);
         noMyEventsView.setVisibility(View.GONE);
         retryView.setVisibility(View.GONE);
 
         // Stop all requests associated with this activity and then submit new request.
-        EventsContext eventsContext = getArguments().getParcelable(EVENT_CONTEXT_PARAM);
         VolleyHelper.getRequestQueue(activity).cancelAll(this);
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
             new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE,
@@ -173,6 +197,10 @@ public class EventsFragment extends Fragment {
     private Listener<List<Event>> mEventsFetcherCallBack = new Listener<List<Event>>() {
         @Override
         public void onResponse(List<Event> events, boolean isIntermediate) {
+            if (isDetached()) {
+                return;
+            }
+
             if (!isIntermediate) {
                 topProgressBar.setVisibility(View.GONE);
 
@@ -184,6 +212,21 @@ public class EventsFragment extends Fragment {
 
             if (!isIntermediate || !events.isEmpty()) {
                 eventsAdapter.setEvents(events);
+                if (showFollowCard) {
+                    eventsAdapter.addFollowCard(eventsContext.query, events.size());
+                }
+
+                if (!isIntermediate && events.size() > 10 && showOfferCard) {
+                    OffersRequest.submit(activity, Priority.NORMAL, new Listener<Offer>() {
+                        @Override
+                        public void onResponse(Offer offer, boolean isIntermediate) {
+                            if (isDetached()) {
+                                return;
+                            }
+                            eventsAdapter.addOffer(offer);
+                        }
+                    });
+                }
             }
         }
     };
@@ -191,6 +234,10 @@ public class EventsFragment extends Fragment {
     protected ErrorListener mErrorListener = new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
+            if (isDetached()) {
+                return;
+            }
+
             topProgressBar.setVisibility(View.GONE);
             if (eventsAdapter.getItemCount() > 0) {
                 Toast.makeText(activity, R.string.failed_refresh, Toast.LENGTH_SHORT).show();

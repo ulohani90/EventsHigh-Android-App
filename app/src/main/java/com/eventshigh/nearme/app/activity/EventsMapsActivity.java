@@ -9,12 +9,20 @@ import android.view.View.OnTouchListener;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.android.volley.Request.Priority;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.network.EventCollectionRequest;
+import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
+import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.MapMarkerManager;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
@@ -23,6 +31,7 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -53,6 +62,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
 
     // Google Map View shows to user using MapFragment.
     private GoogleMap map;
+    // ProgressBar.
+    private View topProgressBar;
     // Gesture detector.
     private GestureDetectorCompat gestureDetector;
     // Manager for all markers drawn on map. Manager is responsible for hiding/showing markers
@@ -64,10 +75,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private Marker lastSelectedMarker;
     // is the movement in camera position is because of app ?
     private boolean isAppMovement = true;
-    // We show the helper toast asking user to zoom in to see events.
-    // We show them only once application lifetime.
-    private boolean showZoomToast = true;
-
+    private boolean fetchListings = false;
 
     // ***********************
     // Delegated Methods from {@link BaseEventsActivity}
@@ -78,8 +86,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
         super.onCreate(savedInstanceState);
 
         // Setup the UI.
-        View view = getLayoutInflater().inflate(R.layout.activity_event_maps, eventContainer, false);
-        eventContainer.addView(view, 0);
+        getLayoutInflater().inflate(R.layout.activity_event_maps, eventContainer);
+        topProgressBar = findViewById(R.id.top_progress_bar);
         setUpMap();
         setupGestureDetectorIfNeeded();
 
@@ -87,48 +95,37 @@ public class EventsMapsActivity extends BaseEventsActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected  int getDisabledMenuItem() {
+        return R.id.action_show_map;
+    }
 
-        if (lastSelectedMarker != null) {
-            if (lastSelectedMarker.isVisible()) {
-                showEventCard();
-            } else {
-                mOnMapClickListener.onMapClick(null);
-            }
+    @Override
+    protected void showEvents() {
+        // Stop all requests associated with this activity and then submit new request.
+        VolleyHelper.getRequestQueue(this).cancelAll(this);
+
+        if (map == null) {
+            fetchListings = true;
+            return;
+        }
+
+        updateUserLocation(eventsContext.location);
+        topProgressBar.setVisibility(View.VISIBLE);
+        if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
+            new MyEventsRequest(this, eventsContext, Priority.IMMEDIATE,
+                    false, true, mMyEventsFetcherCallBack, mErrorListener).execute();
+        } else {
+            EventCollectionRequest.submit(this, eventsContext, Priority.IMMEDIATE,
+                    false, true, mEventsFetcherCallBack, mErrorListener);
         }
     }
 
 
     // ***********************
-    // Delegated Methods from {@link BaseEventsActivity}
+    // Helper Methods
     // ***********************
 
-    @Override
-    protected boolean shouldIncludeWithoutLocation() {
-        return false;
-    }
-
-    @Override
-    protected void updateEventsCollection(List<Event> events) {
-        super.updateEventsCollection(events);
-
-        mOnMapClickListener.onMapClick(null);
-        mapMarkerManager.setEvents(map, events);
-    }
-
-    @Override
-    protected void updateMyEvents(MyEvents myEvents) {
-        Set<Event> events = new HashSet<>();
-        for (TopicEvents topicEvents : myEvents.topicEvents) {
-            events.addAll(topicEvents.events);
-        }
-
-        this.updateEventsCollection(new ArrayList<>(events));
-    }
-
-    @Override
-    protected void updateUserLocation(LatLng userLocation) {
+    private void updateUserLocation(LatLng userLocation) {
         isAppMovement = true;
         map.animateCamera(
                 CameraUpdateFactory.newCameraPosition(
@@ -140,29 +137,24 @@ public class EventsMapsActivity extends BaseEventsActivity {
         );
     }
 
-    protected  int getDisabledMenuItem() {
-        return R.id.action_show_map;
-    }
-
-
-    // ***********************
-    // Setup Helper Methods
-    // ***********************
-
     private void setUpMap() {
         // Try to obtain the map from the SupportMapFragment.
-        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+        ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                map = googleMap;
+                map.setMyLocationEnabled(true);
+                map.setOnCameraChangeListener(mOnCameraChangeListener);
+                map.setOnMarkerClickListener(mOnMarkerClickListener);
+                map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
+                map.setOnMapClickListener(mOnMapClickListener);
 
-        // Check if we were successful in obtaining the map.
-        if (map != null) {
-            map.setMyLocationEnabled(true);
-            map.setOnCameraChangeListener(mOnCameraChangeListener);
-            map.setOnMarkerClickListener(mOnMarkerClickListener);
-            map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
-            map.setOnMapClickListener(mOnMapClickListener);
-
-            MapsInitializer.initialize(this);
-        }
+                MapsInitializer.initialize(EventsMapsActivity.this);
+                if (fetchListings) {
+                    showEvents();
+                }
+            }
+        });
     }
 
     private void setupGestureDetectorIfNeeded() {
@@ -205,23 +197,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
         }
     }
 
-    /**
-     * Refresh the event listings if user city has changed as per new location.
-     * Parent activity can pass {@code NULL} to cleanup any state like {@code lastCity}.
-     *
-     * @param userLocation location of user.
-     * @return true if city was updated as per new location and request for
-     * fetching new events was submitted.
-     */
-    private boolean refreshListingsIfNeeded(LatLng userLocation) {
-        if (!eventsContext.changeLocation(userLocation)) {
-            super.updateUserLocation(userLocation);
-            return true;
-        }
-
-        return false;
-    }
-
     private void showEventCard() {
         View eventView = eventCardContainer.getChildAt(0);
         Event event = mapMarkerManager.getEvent(lastSelectedMarker);
@@ -238,6 +213,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
         eventCardContainer.addView(eventView);
     }
 
+
     // ***********************
     // Callbacks
     // ***********************
@@ -248,23 +224,12 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private OnCameraChangeListener mOnCameraChangeListener = new OnCameraChangeListener() {
         @Override
         public void onCameraChange(CameraPosition cameraPosition) {
-            // If user has zoomed out too much, do not show events marker.
-            // We also show helper toast once per application runtime.
-            if (cameraPosition.zoom < MIN_ZOOM_LEVEL) {
-                if (!isAppMovement && showZoomToast) {
-                    Toast.makeText(EventsMapsActivity.this, R.string.zoom, Toast.LENGTH_SHORT).show();
-                    showZoomToast = false;
-                }
-
-                updateEventsCollection(new ArrayList<Event>());
-            } else if (!refreshListingsIfNeeded(cameraPosition.target)) {
-                if (!isAppMovement && lastSelectedMarker == null) {
-                    reportActionToAnalytics("onCameraChange");
-                }
-                boolean isInfoWindowShown = mapMarkerManager.updateListingForProjection(map.getProjection());
-                if (!isInfoWindowShown) {
-                    mOnMapClickListener.onMapClick(null);
-                }
+            if (!isAppMovement && lastSelectedMarker == null) {
+                reportActionToAnalytics("onCameraChange");
+            }
+            boolean isInfoWindowShown = mapMarkerManager.updateListingForProjection(map.getProjection());
+            if (!isInfoWindowShown) {
+                mOnMapClickListener.onMapClick(null);
             }
 
             isAppMovement = false;
@@ -297,6 +262,34 @@ public class EventsMapsActivity extends BaseEventsActivity {
         @Override
         public void onInfoWindowClick(Marker marker) {
             showEventDetails(mapMarkerManager.getEvent(marker), null);
+        }
+    };
+
+    private ErrorListener mErrorListener = new ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError volleyError) {
+            Toast.makeText(EventsMapsActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    private Listener<List<Event>> mEventsFetcherCallBack = new Listener<List<Event>>() {
+        @Override
+        public void onResponse(List<Event> events, boolean isIntermediate) {
+            topProgressBar.setVisibility(isIntermediate ? View.VISIBLE :View.GONE);
+            mOnMapClickListener.onMapClick(null);
+            mapMarkerManager.setEvents(map, events);
+        }
+    };
+
+    private Listener<MyEvents> mMyEventsFetcherCallBack = new Listener<MyEvents>() {
+        @Override
+        public void onResponse(MyEvents myEvents, boolean isIntermediate) {
+            Set<Event> events = new HashSet<>();
+            for (TopicEvents topicEvents : myEvents.topicEvents) {
+                events.addAll(topicEvents.events);
+            }
+
+            mEventsFetcherCallBack.onResponse(new ArrayList<>(events), isIntermediate);
         }
     };
 }

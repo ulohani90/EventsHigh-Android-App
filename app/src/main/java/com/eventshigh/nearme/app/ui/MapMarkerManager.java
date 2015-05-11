@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Manages the markers on {@link com.google.android.gms.maps.GoogleMap} for events.
@@ -82,17 +81,6 @@ public class MapMarkerManager {
 
     public Event getEvent(Marker marker) {
         return markers.get(marker).event;
-    }
-
-    public void removeEvent(String eventId) {
-        for (Map.Entry<Marker, MarkerInfo> entry : markers.entrySet()) {
-            if (entry.getValue().event.id.equals(eventId)) {
-                entry.getKey().setVisible(false);
-                entry.getKey().remove();
-                markers.remove(entry.getKey());
-                break;
-            }
-        }
     }
 
     public void setEvents(GoogleMap map, List<Event> events) {

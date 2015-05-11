@@ -32,22 +32,28 @@ public class ThisWeekFragment extends Fragment {
     private final int NUM_DAYS = 14;
     private static final String EVENT_CONTEXT_PARAM = EventsFragment.class.getName() + "_event_context";
 
-    public static ThisWeekFragment getInstance(EventsContext eventsContext) {
+    public static ThisWeekFragment getInstance(EventsContext eventsContext, boolean showOffer) {
         ThisWeekFragment fragment = new ThisWeekFragment();
 
         Bundle args = new Bundle();
         args.putParcelable(EVENT_CONTEXT_PARAM, eventsContext);
+        args.putBoolean(EventsFragment.SHOW_OFFER_PARAM, showOffer);
         fragment.setArguments(args);
 
         return fragment;
     }
 
     private BaseContextActivity activity;
+    private EventsContext eventsContext;
+    private boolean showOffer;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.activity = (BaseContextActivity) activity;
+
+        eventsContext = getArguments().getParcelable(EVENT_CONTEXT_PARAM);
+        showOffer = getArguments().getBoolean(EventsFragment.SHOW_OFFER_PARAM);
     }
 
     @Override
@@ -67,7 +73,7 @@ public class ThisWeekFragment extends Fragment {
         tabsView.setViewPager(viewPager);
         tabsView.setOnPageChangeListener(adapter);
         tabsView.setCustomTabColorizer(adapter);
-        adapter.onPageSelected(0);
+        tabsView.scrollTo(eventsContext.dateFilter);
     }
 
     private static class DateTabView {
@@ -94,10 +100,14 @@ public class ThisWeekFragment extends Fragment {
 
         @Override
         public Fragment getItem(int position) {
-            EventsContext eventsContext = getArguments().getParcelable(EVENT_CONTEXT_PARAM);
             EventsContext dateContext = new EventsContext(eventsContext.location, "");
             dateContext.setDateFilter(getDate(position));
-            return EventsFragment.getInstance(dateContext);
+            return EventsFragment.getInstance(dateContext, false, showOffer);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return EventsContext.formatDateFilter(getDate(position));
         }
 
         @Override

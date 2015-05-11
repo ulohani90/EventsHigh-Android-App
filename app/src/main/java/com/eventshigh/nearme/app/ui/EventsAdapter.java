@@ -1,10 +1,7 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.util.Log;
@@ -367,13 +364,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_grey600_24dp);
         }
 
-        private void addView(List<Pair<View, String>> sharedElements, @Nullable View view,
-                             String shareName) {
-            if (view != null && view.getVisibility() == View.VISIBLE) {
-                sharedElements.add(Pair.create(view, shareName));
-            }
-        }
-
         private void bindEventView(final Event event, boolean isFirstEvent,
                                    final BaseContextActivity activity, final int position) {
             itemView.setTag(position);
@@ -381,22 +371,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    List<Pair<View, String>> sharedElements = new ArrayList<>();
-                    addView(sharedElements, bgView, "event_bg");
-                    addView(sharedElements, titleView, "event_title");
-                    addView(sharedElements, eventTimeView, "event_time");
-                    addView(sharedElements, venueView, "event_venue");
-                    addView(sharedElements, travelTimeView, "event_travel_time");
-                    // addView(sharedElements, priceView, "event_price");
-                    addView(sharedElements, recommendedView, "eh_recommends");
-                    Pair shareEles[] = new Pair[sharedElements.size()];
-                    shareEles = sharedElements.toArray(shareEles);
-                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            activity, shareEles).toBundle();
-                    activity.showEventDetails(event, bundle);
+                    activity.showEventDetails(event, null);
                 }
             });
-
 
             // Set the background image.
             bgView.setDefaultImageResId(R.drawable.eh_default_event);
@@ -595,7 +572,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     activity.reportActionToAnalytics("addFollowing", data.title);
                     account.setIsFollowing(data.title, true);
                     setFollowButtons(true);
-                    activity.showMyEventsClue(null);
                 }
             });
             followingButton.setOnClickListener(new OnClickListener() {
@@ -604,7 +580,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     activity.reportActionToAnalytics("removeFollowing", data.title);
                     account.setIsFollowing(data.title, false);
                     setFollowButtons(false);
-                    activity.hideMyEventsClue();
                 }
             });
         }

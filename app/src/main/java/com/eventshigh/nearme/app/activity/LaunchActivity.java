@@ -388,14 +388,14 @@ public class LaunchActivity extends BaseContextActivity {
         public Fragment getItem(int position) {
             if (position == 0) {
                 return EventsFragment.getInstance(new EventsContext(eventsContext.location,
-                        EventsHighEndpoints.QUERY_MY_EVENT));
+                        EventsHighEndpoints.QUERY_MY_EVENT), false, false);
             }
 
             if (position == 1) {
                 return new ExploreFragment();
             }
 
-            return ThisWeekFragment.getInstance(new EventsContext(eventsContext.location, ""));
+            return ThisWeekFragment.getInstance(new EventsContext(eventsContext.location, ""), false);
         }
 
         @Override
