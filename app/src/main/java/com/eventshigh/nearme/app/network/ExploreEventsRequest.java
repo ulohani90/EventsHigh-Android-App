@@ -10,12 +10,10 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -118,20 +116,9 @@ public class ExploreEventsRequest extends JsonRequest<MyEvents>  {
                 topicEvents.add(new TopicEvents(tag, events, count));
             }
 
-            // Parse Trending topics.
-            List<TrendingTopic> trendingTopics = new ArrayList<>();
-            JSONArray trendingTopicsJSON = exploreEventsJson.optJSONArray("topics");
-            if (eventsContext.city == City.BANGALORE && trendingTopicsJSON != null) {
-                for (int i = 0; i < trendingTopicsJSON.length(); i++) {
-                    TrendingTopic trendingTopic = TrendingTopic.parse(trendingTopicsJSON.optJSONObject(i));
-                    if (trendingTopic != null) {
-                        trendingTopics.add(trendingTopic);
-                    }
-                }
-            }
-
-            return Response.success(new MyEvents(topicEvents, trendingTopics),
+            return Response.success(new MyEvents(topicEvents),
                     HttpHeaderParser.parseCacheHeaders(response));
+
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JSONException e) {

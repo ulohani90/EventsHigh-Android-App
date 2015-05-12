@@ -1,14 +1,19 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.volley.Request.Priority;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.EventCategory;
+import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
+import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
@@ -16,9 +21,7 @@ import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 /**
  * Fragment to show explore by categories.
  */
-public class ExploreFragment extends Fragment {
-    private BaseContextActivity activity;
-
+public class ExploreFragment extends BaseEventsFragment {
     public static final String[] EXPLORE_TAGS = {
             IntentUtils.QUERY_ALL,
             EventCategory.MUSIC.categoryName,
@@ -34,11 +37,14 @@ public class ExploreFragment extends Fragment {
             EventCategory.LITERATURE.categoryName
     };
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.activity = (BaseContextActivity) activity;
+    public static ExploreFragment getInstance(EventsContext eventsContext) {
+        ExploreFragment fragment = new ExploreFragment();
+        fragment.setArguments(getArgs(eventsContext, false, false));
+        return fragment;
     }
+
+    private EventsAdapter eventsAdapter;
+    private boolean trendingShown = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,9 +53,29 @@ public class ExploreFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        EventsAdapter eventsAdapter = new EventsAdapter(activity);
+        eventsAdapter = new EventsAdapter(activity);
         AutofitRecyclerView exploreGridView = (AutofitRecyclerView) view.findViewById(R.id.explore_grid);
         exploreGridView.setEventsAdapter(eventsAdapter);
         eventsAdapter.setExploreCategories(EXPLORE_TAGS);
+
+        FeaturedEventsRequest.submit(activity, eventsContext, Priority.IMMEDIATE,
+                false, mFetcherCallBack, mErrorListener);
     }
+
+    private Listener<EventCollection> mFetcherCallBack = new Listener<EventCollection>() {
+        @Override
+        public void onResponse(EventCollection eventCollection, boolean isIntermediate) {
+            if (!trendingShown && !eventCollection.trendingTopics.isEmpty()) {
+                eventsAdapter.addTrendingTopics(eventCollection.trendingTopics);
+                trendingShown = true;
+            }
+        }
+    };
+
+    private ErrorListener mErrorListener = new ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError volleyError) {
+            // do nothing.
+        }
+    };
 }

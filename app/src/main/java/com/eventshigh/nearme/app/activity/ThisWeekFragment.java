@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,37 +26,18 @@ import java.util.Locale;
 /**
  * Fragment to show this weeks events by date.
  */
-public class ThisWeekFragment extends Fragment {
-    private final int NUM_DAYS = 14;
-    private static final String EVENT_CONTEXT_PARAM = EventsFragment.class.getName() + "_event_context";
+public class ThisWeekFragment extends BaseEventsFragment {
+    private final int NUM_DAYS = 7;
 
     public static ThisWeekFragment getInstance(EventsContext eventsContext, boolean showOffer) {
         ThisWeekFragment fragment = new ThisWeekFragment();
-
-        Bundle args = new Bundle();
-        args.putParcelable(EVENT_CONTEXT_PARAM, eventsContext);
-        args.putBoolean(EventsFragment.SHOW_OFFER_PARAM, showOffer);
-        fragment.setArguments(args);
-
+        fragment.setArguments(getArgs(eventsContext, false, showOffer));
         return fragment;
     }
-
-    private BaseContextActivity activity;
-    private EventsContext eventsContext;
-    private boolean showOffer;
 
     private ViewPager viewPager;
     private ThisWeekPagerAdapter adapter;
     private SlidingTabLayout tabsView;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.activity = (BaseContextActivity) activity;
-
-        eventsContext = getArguments().getParcelable(EVENT_CONTEXT_PARAM);
-        showOffer = getArguments().getBoolean(EventsFragment.SHOW_OFFER_PARAM);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -110,7 +90,7 @@ public class ThisWeekFragment extends Fragment {
         public Fragment getItem(int position) {
             EventsContext dateContext = new EventsContext(eventsContext.location, "");
             dateContext.setDateFilter(getDate(position));
-            return EventsFragment.getInstance(dateContext, false, showOffer);
+            return EventsFragment.getInstance(dateContext, false, showOfferCard);
         }
 
         @Override

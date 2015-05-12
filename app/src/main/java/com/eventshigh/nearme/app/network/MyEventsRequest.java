@@ -8,7 +8,6 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
@@ -40,11 +39,9 @@ public class MyEventsRequest {
 
     public static class MyEvents {
         public final List<TopicEvents> topicEvents;
-        public final List<TrendingTopic> trendingTopics;
 
-        public MyEvents(List<TopicEvents> topicEvents, List<TrendingTopic> trendingTopics) {
+        public MyEvents(List<TopicEvents> topicEvents) {
             this.topicEvents = topicEvents;
-            this.trendingTopics = trendingTopics;
         }
 
         public boolean isEmpty() {
@@ -103,7 +100,7 @@ public class MyEventsRequest {
         numPendingRequests --;
 
         if (numPendingRequests == 0) {
-            listener.onResponse(new MyEvents(result, new ArrayList<TrendingTopic>()), false);
+            listener.onResponse(new MyEvents(result), false);
         }
     }
 

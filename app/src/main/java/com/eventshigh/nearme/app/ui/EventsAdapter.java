@@ -74,17 +74,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     public void setMyEvents(MyEvents myEvents, int maxPerCategory) {
         dataToShow.clear();
-        boolean showTrendingTopics = !myEvents.trendingTopics.isEmpty();
 
         for (int i = 0; i < myEvents.topicEvents.size(); i++) {
-            if (showTrendingTopics && i == 3) {
-                dataToShow.add(new HeaderData(TRENDING_TOPIC_TITLE, 0));
-                for (TrendingTopic trendingTopic : myEvents.trendingTopics) {
-                    dataToShow.add(new TrendingCategoryData(trendingTopic));
-                }
-                showTrendingTopics = false;
-            }
-
             TopicEvents topicEvents = myEvents.topicEvents.get(i);
             List<Event> events = topicEvents.events;
             if (events.isEmpty()) {
@@ -109,8 +100,19 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     public void setExploreCategories(String[] tags) {
         dataToShow.clear();
+        dataToShow.add(new HeaderData("Browse By Category", 0));
         for (String tag : tags) {
             dataToShow.add(new ExploreCategoryData(tag));
+        }
+        notifyDataSetChanged();
+    }
+
+    public void addTrendingTopics(Iterable<TrendingTopic> trendingTopics) {
+        dataToShow.add(0, new HeaderData(TRENDING_TOPIC_TITLE, 0));
+        int index = 1;
+        for (TrendingTopic trendingTopic : trendingTopics) {
+            dataToShow.add(index, new TrendingCategoryData(trendingTopic));
+            index ++;
         }
         notifyDataSetChanged();
     }

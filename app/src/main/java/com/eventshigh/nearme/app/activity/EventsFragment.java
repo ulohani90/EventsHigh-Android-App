@@ -1,8 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
@@ -35,14 +33,9 @@ import java.util.List;
 /**
  * Fragment to show events.
  */
-public class EventsFragment extends Fragment {
+public class EventsFragment extends BaseEventsFragment {
     private static final String LOG_TAG = EventsFragment.class.getSimpleName();
 
-    public static final String EVENT_CONTEXT_PARAM = EventsFragment.class.getName() + "_event_context";
-    public static final String SHOW_FOLLOW_PARAM = EventsFragment.class.getName() + "_add_follow_card";
-    public static final String SHOW_OFFER_PARAM = EventsFragment.class.getName() + "_add_offer";
-
-    private BaseContextActivity activity;
     private EventsAdapter eventsAdapter;
 
     private AutofitRecyclerView eventGridView;
@@ -50,32 +43,13 @@ public class EventsFragment extends Fragment {
     private View noMyEventsView;
     private View retryView;
 
-    private EventsContext eventsContext;
-    private boolean showOfferCard;
-    private boolean showFollowCard;
     private OnScrollListener onScrollListener = new HideActionBarOnScroll();
 
     public static EventsFragment getInstance(EventsContext eventsContext,
             boolean showFollowCard, boolean showOffer) {
         EventsFragment fragment = new EventsFragment();
-
-        Bundle args = new Bundle();
-        args.putParcelable(EVENT_CONTEXT_PARAM, eventsContext);
-        args.putBoolean(SHOW_FOLLOW_PARAM, showFollowCard);
-        args.putBoolean(SHOW_OFFER_PARAM, showOffer);
-        fragment.setArguments(args);
-
+        fragment.setArguments(getArgs(eventsContext, showFollowCard, showOffer));
         return fragment;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.activity = (BaseContextActivity) activity;
-
-        eventsContext = getArguments().getParcelable(EVENT_CONTEXT_PARAM);
-        showFollowCard = getArguments().getBoolean(SHOW_FOLLOW_PARAM);
-        showOfferCard = getArguments().getBoolean(SHOW_OFFER_PARAM);
     }
 
     @Override
