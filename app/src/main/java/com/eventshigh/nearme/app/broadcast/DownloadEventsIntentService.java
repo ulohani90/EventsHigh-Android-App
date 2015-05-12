@@ -87,11 +87,11 @@ public class DownloadEventsIntentService extends IntentService {
         }
 
         if (type == IntentType.WEEKEND_EVENTS) {
-            EventCollectionRequest.submit(this, eventsContext, Priority.NORMAL,
+            EventCollectionRequest.submit(this, eventsContext, Priority.NORMAL, this,
                     false /* shouldBypassCache */, true /* includeWithoutLocation */,
                     new WeekendEventsListener(intent), new WeekendEventsErrorListener(intent));
         } else {
-            new MyEventsRequest(this, eventsContext, Request.Priority.NORMAL,
+            new MyEventsRequest(this, eventsContext, Request.Priority.NORMAL, this,
                     false /* shouldBypassCache */, true /* includeWithoutLocation */,
                     new MyEventsListener(intent), new MyEventsErrorListener(intent)).execute();
         }

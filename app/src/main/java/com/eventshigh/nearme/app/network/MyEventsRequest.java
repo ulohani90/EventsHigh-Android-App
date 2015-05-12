@@ -56,12 +56,13 @@ public class MyEventsRequest {
     private final boolean includeWithoutLocation;
     private final Listener<MyEvents> listener;
     private final ErrorListener errorListener;
+    private final Object tag;
 
     private int numPendingRequests;
     private final List<TopicEvents> result = new ArrayList<>();
 
     public MyEventsRequest(Context context, EventsContext eventsContext, Priority priority,
-                           boolean shouldBypassCache, boolean includeWithoutLocation,
+                           Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
                            Listener<MyEvents> listener, ErrorListener errorListener) {
         this.context = context;
         this.eventsContext = eventsContext;
@@ -70,6 +71,7 @@ public class MyEventsRequest {
         this.includeWithoutLocation = includeWithoutLocation;
         this.listener = listener;
         this.errorListener = errorListener;
+        this.tag = tag;
     }
 
     public void execute() {
@@ -85,14 +87,15 @@ public class MyEventsRequest {
         // Favourites event requests.
         EventCollectionRequest.submit(context,
                 new EventsContext(eventsContext.location, EventsHighEndpoints.QUERY_MY_EVENT),
-                priority, shouldBypassCache, includeWithoutLocation, new FavouritedEventsListener(),
-                errorListener);
+                priority, tag, shouldBypassCache, includeWithoutLocation,
+                new FavouritedEventsListener(), errorListener);
+
 
         // Interest based requests.
         for (String interest : interests) {
             EventCollectionRequest.submit(context, new EventsContext(eventsContext.location, interest),
-                    priority, shouldBypassCache, includeWithoutLocation, new EventsListener(interest),
-                    errorListener);
+                    priority, tag, shouldBypassCache, includeWithoutLocation,
+                    new EventsListener(interest), errorListener);
         }
     }
 

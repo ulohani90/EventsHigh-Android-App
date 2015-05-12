@@ -75,7 +75,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
 
         // Show query as title.
         if (!eventsContext.query.isEmpty()) {
-            eventsContext.dateFilter = "";
             setTitle();
         }
     }
@@ -161,7 +160,11 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
     protected void setTitle() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle(DateTimeUtils.queryToTitle(eventsContext.query));
+            String title = DateTimeUtils.queryToTitle(eventsContext.query);
+            if (!eventsContext.dateFilter.isEmpty()) {
+                title += " on " +  DateTimeUtils.queryToTitle(eventsContext.dateFilter);
+            }
+            actionBar.setTitle(title);
         }
     }
 }

@@ -32,7 +32,7 @@ public class EventCollectionRequest extends BaseEventListRequest {
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, EventsContext eventsContext, Priority priority,
-                              boolean shouldBypassCache, boolean includeWithoutLocation,
+                              Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
                               Listener<List<Event>> listener, ErrorListener errorListener) {
         if (eventsContext.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
@@ -50,7 +50,7 @@ public class EventCollectionRequest extends BaseEventListRequest {
         EventCollectionRequest request = new EventCollectionRequest(
                 context, url, eventsContext, priority, shouldBypassCache, includeWithoutLocation,
                 listener, errorListener);
-        request.setTag(context);
+        request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
 

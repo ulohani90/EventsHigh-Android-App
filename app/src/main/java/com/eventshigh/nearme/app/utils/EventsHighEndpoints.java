@@ -22,6 +22,8 @@ public class EventsHighEndpoints {
             "http://apiserver.eventshigh.com:8888/api/date/%s/%s?limit=100&mobile=1";
     private static final String API_ENDPOINT_QUERY_FORMAT =
             "http://apiserver.eventshigh.com:8888/api/events/%s/%s?limit=100&mobile=1";
+    private static final String API_ENDPOINT_QUERY_DATE_FORMAT =
+            "http://apiserver.eventshigh.com:8888/api/events_for_interest_by_date/%s/%s/%s?limit=100&mobile=1";
     private static final String API_ENDPOINT_FEATURED_FORMAT =
             "http://apiserver.eventshigh.com:8888/api/get_featured_events/%s?mobile=1";
     private static final String API_ENDPOINT_EVENT_UBER_FORMAT =
@@ -96,28 +98,31 @@ public class EventsHighEndpoints {
 
         if (eventsContext.query.isEmpty() || isMyEventQuery(eventsContext.query)) {
             return String.format(API_ENDPOINT_DATE_FORMAT,
-                    eventsContext.city.toString().toLowerCase(),
-                    eventsContext.dateFilter.isEmpty() ? "this%20week" : eventsContext.dateFilter);
+                eventsContext.city.toString().toLowerCase(),
+                eventsContext.dateFilter.isEmpty() ? "this%20week" : eventsContext.dateFilter);
+        }
+
+        if (isFeaturedEventQuery(eventsContext.query)) {
+            return getFeaturedEventsEndpoint(eventsContext.city);
         }
 
         try {
             if (isDateQuery(eventsContext.query)) {
                 return String.format(API_ENDPOINT_DATE_FORMAT,
-                        eventsContext.city.toString().toLowerCase(),
-                        URLEncoder.encode(eventsContext.query, "UTF-8"));
+                    eventsContext.city.toString().toLowerCase(),
+                    URLEncoder.encode(eventsContext.query, "UTF-8"));
             }
 
-            if (isFeaturedEventQuery(eventsContext.query)) {
-                return getFeaturedEventsEndpoint(eventsContext.city);
+            if (eventsContext.dateFilter.isEmpty()) {
+                return String.format(API_ENDPOINT_QUERY_FORMAT,
+                    eventsContext.city.toString().toLowerCase(),
+                    URLEncoder.encode(eventsContext.query, "UTF-8"));
             }
 
-            String url = String.format(API_ENDPOINT_QUERY_FORMAT,
-                        eventsContext.city.toString().toLowerCase(),
-                        URLEncoder.encode(eventsContext.query, "UTF-8"));
-            if (!eventsContext.dateFilter.isEmpty()) {
-                url += "&date=" + eventsContext.dateFilter;
-            }
-            return url;
+            return String.format(API_ENDPOINT_QUERY_DATE_FORMAT,
+                eventsContext.city.toString().toLowerCase(),
+                URLEncoder.encode(eventsContext.query, "UTF-8"),
+                eventsContext.dateFilter);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalArgumentException(e);
         }

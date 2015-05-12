@@ -51,7 +51,7 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, EventsContext eventsContext,
-                              Priority priority, boolean shouldBypassCache,
+                              Priority priority, Object tag, boolean shouldBypassCache,
                               Listener<EventCollection> listener, ErrorListener errorListener) {
         if (eventsContext.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
@@ -61,7 +61,7 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
         String url = EventsHighEndpoints.getFeaturedEventsEndpoint(eventsContext.city);
         FeaturedEventsRequest request = new FeaturedEventsRequest(
                 context, url, eventsContext, shouldBypassCache, priority, listener, errorListener);
-        request.setTag(context);
+        request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
 

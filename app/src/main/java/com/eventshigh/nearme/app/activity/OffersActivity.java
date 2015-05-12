@@ -103,7 +103,7 @@ public class OffersActivity extends BaseActivity {
         }
 
         progressBar.setVisibility(View.VISIBLE);
-        OffersRequest.submit(this, Priority.IMMEDIATE, false, new Listener<List<Offer>>() {
+        OffersRequest.submit(this, Priority.IMMEDIATE, this, false, new Listener<List<Offer>>() {
             @Override
             public void onResponse(List<Offer> offers, boolean isIntermediate) {
                 progressBar.setVisibility(View.GONE);
@@ -148,7 +148,7 @@ public class OffersActivity extends BaseActivity {
         // Refresh the claim count.
         progressBar = findViewById(R.id.top_progress_bar);
         progressBar.setVisibility(View.VISIBLE);
-        OffersRequest.submit(this, Priority.IMMEDIATE, true, new Listener<List<Offer>>() {
+        OffersRequest.submit(this, Priority.IMMEDIATE, this, true, new Listener<List<Offer>>() {
             @Override
             public void onResponse(List<Offer> offers, boolean isIntermediate) {
                 progressBar.setVisibility(View.GONE);

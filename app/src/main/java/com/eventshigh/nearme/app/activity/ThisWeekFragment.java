@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,17 +28,31 @@ import java.util.Locale;
  * Fragment to show this weeks events by date.
  */
 public class ThisWeekFragment extends BaseEventsFragment {
-    private final int NUM_DAYS = 7;
+    public static final String NUM_DAYS_PARAM = ThisWeekFragment.class.getName() + "_num_days";
 
-    public static ThisWeekFragment getInstance(EventsContext eventsContext, boolean showOffer) {
+    public static ThisWeekFragment getInstance(EventsContext eventsContext, boolean showOffer,
+            int numDays) {
         ThisWeekFragment fragment = new ThisWeekFragment();
-        fragment.setArguments(getArgs(eventsContext, false, showOffer));
+
+        Bundle args = getArgs(eventsContext, false, showOffer);
+        args.putInt(NUM_DAYS_PARAM, numDays);
+        fragment.setArguments(args);
         return fragment;
     }
 
     private ViewPager viewPager;
     private ThisWeekPagerAdapter adapter;
     private SlidingTabLayout tabsView;
+
+    private  int numDays;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        this.activity = (BaseContextActivity) activity;
+
+        numDays = getArguments().getInt(NUM_DAYS_PARAM);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,7 +93,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
 
     private class ThisWeekPagerAdapter extends FragmentStatePagerAdapter
             implements TabViewAdapter, OnPageChangeListener, TabColorizer {
-        private final List<DateTabView> dateTabViews = new ArrayList<>(NUM_DAYS);
+        private final List<DateTabView> dateTabViews = new ArrayList<>(numDays);
 
         private int lastPosition = -1;
 
@@ -138,7 +153,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
 
         @Override
         public int getCount() {
-            return NUM_DAYS;
+            return numDays;
         }
 
         @Override

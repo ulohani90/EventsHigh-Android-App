@@ -16,7 +16,7 @@ import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
-import com.eventshigh.nearme.app.utils.IntentUtils;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 import java.util.ArrayList;
@@ -26,10 +26,10 @@ import java.util.ArrayList;
  */
 public class ExploreFragment extends BaseEventsFragment {
     public static final String[] EXPLORE_TAGS = {
-            IntentUtils.QUERY_ALL,
-            EventCategory.MUSIC.categoryName,
+            EventsHighEndpoints.QUERY_FEATURED,
             EventCategory.PARTIES.categoryName,
             EventCategory.THEATRE.categoryName,
+            EventCategory.MUSIC.categoryName,
             EventCategory.KIDS_ENTERTAINMENT.categoryName,
             EventCategory.TECH.categoryName,
             EventCategory.SPORTS.categoryName,
@@ -55,12 +55,12 @@ public class ExploreFragment extends BaseEventsFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        eventsAdapter = new EventsAdapter(activity);
+        eventsAdapter = new EventsAdapter(this);
         AutofitRecyclerView exploreGridView = (AutofitRecyclerView) view.findViewById(R.id.explore_grid);
         exploreGridView.setEventsAdapter(eventsAdapter);
         eventsAdapter.setExploreCategories(new ArrayList<TrendingTopic>(), EXPLORE_TAGS);
 
-        FeaturedEventsRequest.submit(activity, eventsContext, Priority.IMMEDIATE,
+        FeaturedEventsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                 false, mFetcherCallBack, mErrorListener);
     }
 

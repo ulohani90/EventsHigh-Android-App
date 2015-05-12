@@ -38,6 +38,7 @@ public class EventsGridActivity extends BaseEventsActivity {
 
         // Should we show follow widget?
         showFollowCard = !eventsContext.query.isEmpty() &&
+                eventsContext.dateFilter.isEmpty() &&
                 !EventsHighEndpoints.isDateQuery(eventsContext.query) &&
                 !EventsHighEndpoints.isMyEventQuery(eventsContext.query) &&
                 !EventsHighEndpoints.isFeaturedEventQuery(eventsContext.query);
@@ -93,7 +94,7 @@ public class EventsGridActivity extends BaseEventsActivity {
             }
             eventFragment = eventFragment1;
         } else {
-            eventFragment = ThisWeekFragment.getInstance(eventsContext, true);
+            eventFragment = ThisWeekFragment.getInstance(eventsContext, true, 14);
         }
 
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();

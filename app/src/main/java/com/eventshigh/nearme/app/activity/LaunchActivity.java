@@ -398,7 +398,7 @@ public class LaunchActivity extends BaseContextActivity {
                 return ExploreFragment.getInstance(eventsContext);
             }
 
-            thisWeekFragment = ThisWeekFragment.getInstance(eventsContext, false);
+            thisWeekFragment = ThisWeekFragment.getInstance(eventsContext, false, 7);
             return thisWeekFragment;
         }
 

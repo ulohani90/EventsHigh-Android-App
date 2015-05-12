@@ -17,6 +17,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.BaseEventsActivity;
+import com.eventshigh.nearme.app.activity.BaseEventsFragment;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
@@ -45,13 +46,13 @@ import java.util.Set;
 public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static final String TRENDING_TOPIC_TITLE = "What's Trending";
 
-    private final BaseContextActivity activity;
+    private final BaseEventsFragment eventsFragment;
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
     private final Set<Integer> usedItemIds = new HashSet<>();
     private List<Data> dataToShow;
 
-    public EventsAdapter(BaseContextActivity activity) {
-        this.activity = activity;
+    public EventsAdapter(BaseEventsFragment eventsFragment) {
+        this.eventsFragment = eventsFragment;
 
         dataToShow = new ArrayList<>();
         setHasStableIds(true);
@@ -130,7 +131,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int type) {
-        return DataType.onCreateViewHolder(activity, viewGroup, type);
+        return DataType.onCreateViewHolder(eventsFragment.getContextActivity(), viewGroup, type);
     }
 
     @Override
@@ -244,7 +245,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            ((HeaderCard) card).bindHeaderView(activity, this);
+            ((HeaderCard) card).bindHeaderView(eventsFragment, this);
         }
 
         @Override
@@ -270,14 +271,15 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             this.moreView = cardView.findViewById(R.id.header_more);
         }
 
-        private void bindHeaderView(final BaseContextActivity activity, final HeaderData header) {
+        private void bindHeaderView(final BaseEventsFragment eventsFragment, final HeaderData header) {
             titleView.setText(Utils.capitalize(header.header));
             if (header.numEvents <= 0) {
                 numEventsView.setVisibility(View.GONE);
             } else {
                 numEventsView.setVisibility(View.VISIBLE);
-                numEventsView.setText(
-                        String.format(activity.getString(R.string.num_events), header.numEvents));
+                numEventsView.setText(String.format(
+                    eventsFragment.getContextActivity().getString(R.string.num_events),
+                    header.numEvents));
             }
 
             if (header.showMore()) {
@@ -285,7 +287,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 itemView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        activity.showSearchView(header.header);
+                        eventsFragment.showSearchView(header.header);
                     }
                 });
             } else {
@@ -314,7 +316,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            ((EventCard) card).bindEventView(event, isFirstEvent, activity, position);
+            ((EventCard) card).bindEventView(event, isFirstEvent,
+                    eventsFragment.getContextActivity(), position);
         }
 
         public String getId() {
@@ -490,7 +493,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            offer.populateOfferCard(card.itemView, activity);
+            offer.populateOfferCard(card.itemView, eventsFragment.getContextActivity());
         }
 
         @Override
@@ -530,7 +533,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            ((FollowCard) card).populate(this, activity);
+            ((FollowCard) card).populate(this, eventsFragment.getContextActivity());
         }
 
         @Override
@@ -606,7 +609,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, final int position) {
-            ((TrendingCategoryCard) card).populateTrendingCategoryData(this, activity);
+            ((TrendingCategoryCard) card).populateTrendingCategoryData(this,
+                    eventsFragment.getContextActivity());
         }
 
         public String getId() {
@@ -628,7 +632,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, final int position) {
-            ((TrendingCategoryCard) card).populateExploreCategoryData(this, activity);
+            ((TrendingCategoryCard) card).populateExploreCategoryData(this, eventsFragment);
+
         }
 
         public String getId() {
@@ -688,13 +693,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public void populateExploreCategoryData(final ExploreCategoryData data,
-                                                final BaseContextActivity activity) {
+                                                final BaseEventsFragment eventsFragment) {
             imageView.setDefaultImageResId(data.getInfoGraphId());
             titleView.setVisibility(View.GONE);
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.showSearchView(data.tag);
+                    eventsFragment.showSearchView(data.tag);
                 }
             });
 

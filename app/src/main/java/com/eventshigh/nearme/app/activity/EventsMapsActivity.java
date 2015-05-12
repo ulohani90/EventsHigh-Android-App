@@ -112,10 +112,10 @@ public class EventsMapsActivity extends BaseEventsActivity {
         updateUserLocation(eventsContext.location);
         topProgressBar.setVisibility(View.VISIBLE);
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-            new MyEventsRequest(this, eventsContext, Priority.IMMEDIATE,
+            new MyEventsRequest(this, eventsContext, Priority.IMMEDIATE, this,
                     false, true, mMyEventsFetcherCallBack, mErrorListener).execute();
         } else {
-            EventCollectionRequest.submit(this, eventsContext, Priority.IMMEDIATE,
+            EventCollectionRequest.submit(this, eventsContext, Priority.IMMEDIATE, this,
                     false, true, mEventsFetcherCallBack, mErrorListener);
         }
     }

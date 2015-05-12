@@ -60,7 +60,7 @@ public class EventsFragment extends BaseEventsFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         // Setup the events adapter to show data.
-        eventsAdapter = new EventsAdapter(activity);
+        eventsAdapter = new EventsAdapter(this);
         eventGridView = (AutofitRecyclerView) view.findViewById(R.id.event_grid);
         eventGridView.setEventsAdapter(eventsAdapter);
 
@@ -106,10 +106,10 @@ public class EventsFragment extends BaseEventsFragment {
         // Stop all requests associated with this activity and then submit new request.
         VolleyHelper.getRequestQueue(activity).cancelAll(this);
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-            new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE,
+            new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mMyEventsFetcherCallBack, mErrorListener).execute();
         } else {
-            EventCollectionRequest.submit(activity, eventsContext, Priority.IMMEDIATE,
+            EventCollectionRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
         }
     }
@@ -156,15 +156,16 @@ public class EventsFragment extends BaseEventsFragment {
                 }
 
                 if (!isIntermediate && events.size() > 10 && showOfferCard) {
-                    OffersRequest.submit(activity, Priority.NORMAL, new Listener<Offer>() {
-                        @Override
-                        public void onResponse(Offer offer, boolean isIntermediate) {
-                            if (isDetached()) {
-                                return;
+                    OffersRequest.submit(activity, Priority.NORMAL, EventsFragment.this,
+                        new Listener<Offer>() {
+                            @Override
+                            public void onResponse(Offer offer, boolean isIntermediate) {
+                                if (isDetached()) {
+                                    return;
+                                }
+                                eventsAdapter.addOffer(offer);
                             }
-                            eventsAdapter.addOffer(offer);
-                        }
-                    });
+                        });
                 }
             }
         }

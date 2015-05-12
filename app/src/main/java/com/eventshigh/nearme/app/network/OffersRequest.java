@@ -37,8 +37,9 @@ public class OffersRequest extends JsonRequest<List<Offer>> {
      * @param context an application eventsContext to initiate the volley.
      * @param listener callback on success.
      */
-    public static void submit(Context context, Priority priority, final Listener<Offer> listener) {
-        submit(context, priority, false, new Listener<List<Offer>>() {
+    public static void submit(Context context, Priority priority, Object tag,
+                              final Listener<Offer> listener) {
+        submit(context, priority, tag, false, new Listener<List<Offer>>() {
             @Override
             public void onResponse(List<Offer> offers, boolean isIntermediate) {
                 for (final Offer offer : offers) {
@@ -64,13 +65,13 @@ public class OffersRequest extends JsonRequest<List<Offer>> {
      * @param listener callback on success.
      * @param errorListener callback on failures.
      */
-    public static void submit(Context context, Priority priority, boolean shouldBypassCache,
+    public static void submit(Context context, Priority priority, Object tag, boolean shouldBypassCache,
                               Listener<List<Offer>> listener, ErrorListener errorListener) {
         try {
             OffersRequest request = new OffersRequest(context,
                     AccountStateReporter.getBaseUri(context, "getOffers").build(),
                     priority, shouldBypassCache, listener, errorListener);
-            request.setTag(context);
+            request.setTag(tag);
             VolleyHelper.addToRequestQueue(context, request);
         } catch (Exception e) {
             errorListener.onErrorResponse(new VolleyError(e));

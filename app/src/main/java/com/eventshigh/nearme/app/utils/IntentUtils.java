@@ -15,9 +15,7 @@ import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Helper to process the intent in EventsHigh app.
@@ -25,11 +23,6 @@ import java.util.Set;
 public class IntentUtils {
     public static final String EXTRA_EVENT_CONTEXT = IntentUtils.class.getCanonicalName() + "_PARAM";
     public static final String QUERY_ALL = "All";
-    public static final Set<String> days = new HashSet<>(8);
-    static {
-        days.add("today");
-        days.add("today");
-    }
 
     public static EventsContext processIntent(BaseContextActivity activity, Intent inIntent) {
         IntentUtils utils = new IntentUtils(activity);
