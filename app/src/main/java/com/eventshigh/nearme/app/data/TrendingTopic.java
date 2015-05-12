@@ -1,10 +1,11 @@
 package com.eventshigh.nearme.app.data;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-import com.eventshigh.nearme.app.activity.BaseContextActivity;
+import com.eventshigh.nearme.app.activity.BaseEventsFragment;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
@@ -38,34 +39,35 @@ public final class TrendingTopic {
         return new TrendingTopic(name, imgUrl, json.optString("action"));
     }
 
-    public void launch(BaseContextActivity activity) {
+    public void launch(BaseEventsFragment eventsFragment) {
         if (action != null) {
             if (action.startsWith("view:")) {
                 String[] actionParts = action.split(":", 3);
                 if (actionParts.length == 3) {
-                    CustomUrlActivity.launchCustomUrl(activity, Uri.parse(actionParts[2]),
-                            actionParts[1]);
+                    CustomUrlActivity.launchCustomUrl(eventsFragment.getContextActivity(),
+                            Uri.parse(actionParts[2]), actionParts[1]);
                     return;
                 }
             }
             if (action.startsWith("event:")) {
                 String[] actionParts = action.split(":", 2);
                 if (actionParts.length == 2) {
-                    activity.showEventDetails(EventsHighEndpoints.getEventDetailsURI(
-                            City.BANGALORE, actionParts[1]));
+                    eventsFragment.getContextActivity().showEventDetails(
+                            EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, actionParts[1]));
                     return;
                 }
             }
             if (action.startsWith("q:")) {
                 String[] actionParts = action.split(":", 2);
                 if (actionParts.length == 2) {
-                    activity.showSearchView(actionParts[1]);
+                    eventsFragment.showSearchView(actionParts[1]);
                     return;
                 }
             }
             if (action.startsWith("target:")) {
                 String[] actionParts = action.split(":", 2);
                 try {
+                    Activity activity = eventsFragment.getContextActivity();
                     Class<?> cls = activity.getClassLoader().loadClass(actionParts[1]);
                     Intent intent = new Intent(activity, cls);
                     activity.startActivity(intent);
@@ -76,6 +78,6 @@ public final class TrendingTopic {
             }
         }
 
-        activity.showSearchView(tagName);
+        eventsFragment.showSearchView(tagName);
     }
 }

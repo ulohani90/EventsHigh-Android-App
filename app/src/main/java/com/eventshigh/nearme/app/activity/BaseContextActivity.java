@@ -193,14 +193,6 @@ public abstract class BaseContextActivity extends BaseActivity {
                 Integer.toString(position));
     }
 
-    public void showSearchView(String query) {
-        reportActionToAnalytics("showSearchView", query);
-        EventsContext param = new EventsContext(eventsContext.location, query);
-        Intent intent = new Intent(this, this.getClass())
-                .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
-        startActivity(intent);
-    }
-
     public void showEventDetails(Uri eventDetailsURI) {
         reportActionToAnalytics("showEventDetails", eventDetailsURI.getLastPathSegment());
         Intent detailIntent = new Intent(this, EventDetailActivity.class);

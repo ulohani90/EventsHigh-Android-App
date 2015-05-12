@@ -204,11 +204,6 @@ public class LaunchActivity extends BaseContextActivity {
     // Callbacks
     // ***********************
 
-    public void showSearchView(String query) {
-        reportActionToAnalytics("showSearchView", query);
-        launch(new EventsContext(eventsContext.location, query.toLowerCase()));
-    }
-
     // Callback for GoogleClientApi. This is called when googleClientApi is ready to accept
     // requests. We set the user location if needed and start next activity.
     private ConnectionCallbacks mConnectionCallbacks = new ConnectionCallbacks() {

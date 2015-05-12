@@ -609,8 +609,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, final int position) {
-            ((TrendingCategoryCard) card).populateTrendingCategoryData(this,
-                    eventsFragment.getContextActivity());
+            ((TrendingCategoryCard) card).populateTrendingCategoryData(this, eventsFragment);
         }
 
         public String getId() {
@@ -672,13 +671,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public void populateTrendingCategoryData(final TrendingCategoryData data,
-                                                 final BaseContextActivity activity) {
-            imageView.setImageUrl(data.trendingTopic.imgUrl, VolleyHelper.getImageLoader(activity));
+                                                 final BaseEventsFragment eventsFragment) {
+            imageView.setImageUrl(data.trendingTopic.imgUrl,
+                    VolleyHelper.getImageLoader(eventsFragment.getContextActivity()));
             titleView.setText(data.trendingTopic.tagName);
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    data.trendingTopic.launch(activity);
+                    data.trendingTopic.launch(eventsFragment);
                 }
             });
 
