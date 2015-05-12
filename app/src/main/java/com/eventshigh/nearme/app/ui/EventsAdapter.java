@@ -98,21 +98,19 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void setExploreCategories(String[] tags) {
+    public void setExploreCategories(List<TrendingTopic> trendingTopics, String[] tags) {
         dataToShow.clear();
+
+        if (!trendingTopics.isEmpty()) {
+            dataToShow.add(new HeaderData(TRENDING_TOPIC_TITLE, 0));
+            for (TrendingTopic trendingTopic : trendingTopics) {
+                dataToShow.add(new TrendingCategoryData(trendingTopic));
+            }
+        }
+
         dataToShow.add(new HeaderData("Browse By Category", 0));
         for (String tag : tags) {
             dataToShow.add(new ExploreCategoryData(tag));
-        }
-        notifyDataSetChanged();
-    }
-
-    public void addTrendingTopics(Iterable<TrendingTopic> trendingTopics) {
-        dataToShow.add(0, new HeaderData(TRENDING_TOPIC_TITLE, 0));
-        int index = 1;
-        for (TrendingTopic trendingTopic : trendingTopics) {
-            dataToShow.add(index, new TrendingCategoryData(trendingTopic));
-            index ++;
         }
         notifyDataSetChanged();
     }
