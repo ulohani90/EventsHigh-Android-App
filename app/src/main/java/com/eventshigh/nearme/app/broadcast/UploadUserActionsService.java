@@ -60,8 +60,7 @@ public class UploadUserActionsService extends IntentService {
 
     private void recordUserActions(Context context, final Response.Listener<JSONObject> onSuccess,
                                    final Response.ErrorListener onFailed) {
-        Uri uri = AccountStateReporter.getBaseUri(context, "record_user_action")
-                .build();
+        Uri uri = AccountStateReporter.getBaseUri(context, "record_user_action").build();
         try {
             long lastUploadTimestamp = preferences.getLong(
                     NetworkChangeBroadcastReceiver.PREF_LAST_UPLOAD_TIMESTAMP, 0);

@@ -103,7 +103,7 @@ public class OffersActivity extends BaseActivity {
         }
 
         progressBar.setVisibility(View.VISIBLE);
-        OffersRequest.submit(this, Priority.IMMEDIATE, new Listener<List<Offer>>() {
+        OffersRequest.submit(this, Priority.IMMEDIATE, false, new Listener<List<Offer>>() {
             @Override
             public void onResponse(List<Offer> offers, boolean isIntermediate) {
                 progressBar.setVisibility(View.GONE);
@@ -139,10 +139,34 @@ public class OffersActivity extends BaseActivity {
         View shareAppButton = findViewById(R.id.share_app);
         shareAppButton.setVisibility(offer.isExpired() ? View.GONE : View.VISIBLE);
 
-        TextView claimCountView = (TextView) findViewById(R.id.claim_count);
+        final TextView claimCountView = (TextView) findViewById(R.id.claim_count);
         claimCountView.setText(Integer.toString(offer.claimCount));
 
-        View claimButton = findViewById(R.id.claim_offer);
+        final View claimButton = findViewById(R.id.claim_offer);
         claimButton.setEnabled(offer.claimCount > 0);
+
+        // Refresh the claim count.
+        progressBar = findViewById(R.id.top_progress_bar);
+        progressBar.setVisibility(View.VISIBLE);
+        OffersRequest.submit(this, Priority.IMMEDIATE, true, new Listener<List<Offer>>() {
+            @Override
+            public void onResponse(List<Offer> offers, boolean isIntermediate) {
+                progressBar.setVisibility(View.GONE);
+                for (Offer o : offers) {
+                    if (o instanceof ReferralInstallOffer && o.id.equals(offer.id)) {
+                        ReferralInstallOffer currentOffer = (ReferralInstallOffer) o;
+
+                        claimCountView.setText(Integer.toString(currentOffer.claimCount));
+                        claimButton.setEnabled(currentOffer.claimCount > 0);
+                        break;
+                    }
+                }
+            }
+        }, new ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                progressBar.setVisibility(View.GONE);
+            }
+        });
     }
 }

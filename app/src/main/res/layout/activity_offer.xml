@@ -6,6 +6,19 @@
     android:background="@android:color/white"
     tools:context=".activity.OffersActivity"
 >
+    <ProgressBar
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:id="@+id/top_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="-4dp"
+        android:layout_marginBottom="-4dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        tools:visibility="visible"
+    />
+
     <TextView
         style="?android:attr/textAppearanceLarge"
         android:id="@+id/claim_count"
@@ -71,5 +84,4 @@
         android:onClick="claimOffer"
         android:enabled="false"
     />
-
 </RelativeLayout>

@@ -38,7 +38,7 @@ public class OffersRequest extends JsonRequest<List<Offer>> {
      * @param listener callback on success.
      */
     public static void submit(Context context, Priority priority, final Listener<Offer> listener) {
-        submit(context, priority, new Listener<List<Offer>>() {
+        submit(context, priority, false, new Listener<List<Offer>>() {
             @Override
             public void onResponse(List<Offer> offers, boolean isIntermediate) {
                 for (final Offer offer : offers) {
@@ -64,12 +64,12 @@ public class OffersRequest extends JsonRequest<List<Offer>> {
      * @param listener callback on success.
      * @param errorListener callback on failures.
      */
-    public static void submit(Context context, Priority priority,
+    public static void submit(Context context, Priority priority, boolean shouldBypassCache,
                               Listener<List<Offer>> listener, ErrorListener errorListener) {
         try {
             OffersRequest request = new OffersRequest(context,
                     AccountStateReporter.getBaseUri(context, "getOffers").build(),
-                    priority, listener, errorListener);
+                    priority, shouldBypassCache, listener, errorListener);
             request.setTag(context);
             VolleyHelper.addToRequestQueue(context, request);
         } catch (Exception e) {
@@ -85,10 +85,11 @@ public class OffersRequest extends JsonRequest<List<Offer>> {
      * @param listener Listener to receive the JSON response
      * @param errorListener Error listener, or null to ignore errors.
      */
-    public OffersRequest(Context context, Uri offerUri, Priority priority,
+    public OffersRequest(Context context, Uri offerUri, Priority priority, boolean shouldBypassCache,
                          Listener<List<Offer>> listener, ErrorListener errorListener)
             throws GeneralSecurityException, UnsupportedEncodingException {
         super(Method.GET, Signer.sign(offerUri).toString(), null, listener, errorListener);
+        setShouldBypassCache(shouldBypassCache);
 
         this.context = context;
         this.offerUri = offerUri;
