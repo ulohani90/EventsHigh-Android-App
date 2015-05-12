@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -62,8 +63,13 @@ public class UploadUserActionsService extends IntentService {
         Uri uri = AccountStateReporter.getBaseUri(context, "record_user_action")
                 .build();
         try {
-            final long lastUploadTimestamp = preferences.getLong(
+            long lastUploadTimestamp = preferences.getLong(
                     NetworkChangeBroadcastReceiver.PREF_LAST_UPLOAD_TIMESTAMP, 0);
+            long aWeekBack = System.currentTimeMillis() - DateUtils.DAY_IN_MILLIS * 7;
+            if (lastUploadTimestamp < aWeekBack) {
+                lastUploadTimestamp = aWeekBack;
+            }
+
             final String postBody = UserActionDbHelper.getInstance(this).getActionsSince(
                     lastUploadTimestamp);
             VolleyHelper.addToRequestQueue(context, new JsonObjectRequest(Request.Method.POST,
