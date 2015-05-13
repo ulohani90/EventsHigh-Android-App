@@ -1,11 +1,13 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageInfo;
 import android.location.Location;
 import android.location.LocationManager;
@@ -66,9 +68,16 @@ import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.model.LatLng;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 
@@ -97,6 +106,9 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     // Regex to check if description is plane text or html.
     private static final Pattern HTML_PATTERN = Pattern.compile(
             "<[A-Za-z].*</[A-Za-z]|<[A-Za-z].*/>");
+
+    // Request code for location settings check intent
+    private static final int REQUEST_CHECK_SETTINGS = 1020;
 
     public static final String PACKAGE_NAME_FACEBOOK = "com.facebook.katana";
     public static final String PACKAGE_NAME_TWITTER = "com.twitter.android";
@@ -282,15 +294,41 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
         // Check if we have GPS location
         needGpsLocation = true;
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            showEnableGpsDialog();
-            return;
-        }
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+            .addLocationRequest(locationRequest);
+        PendingResult<LocationSettingsResult> result =
+            LocationServices.SettingsApi.checkLocationSettings(client, builder.build());
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult result) {
+                final Status status = result.getStatus();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        // All location settings are satisfied. The client can initialize location
+                        // requests here.
+                        startLocationDetection();
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied. But could be fixed by showing the user
+                        // a dialog.
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            status.startResolutionForResult(EventDetailActivity.this,
+                                REQUEST_CHECK_SETTINGS);
+                        } catch (IntentSender.SendIntentException e) {
+                            locationDetectionFailed();
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way to fix the
+                        // settings so we won't show the dialog.
+                        locationDetectionFailed();
+                        break;
+                }
+            }
+        });
 
-        if (client.isConnected()) {
-            startLocationDetection();
-        }
         createAlertDialog(R.string.ui_detecting_location);
         alertDialog.setOnDismissListener(
             new DialogInterface.OnDismissListener() {
@@ -302,6 +340,33 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             }
         );
         alertDialog.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        final LocationSettingsStates states = LocationSettingsStates.fromIntent(data);
+        switch (requestCode) {
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        // All required changes were successfully made
+                        startLocationDetection();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        // The user was asked to change settings, but chose not to
+                        locationDetectionFailed();
+                        break;
+                    default:
+                        break;
+                }
+                break;
+        }
+    }
+
+    private void locationDetectionFailed() {
+        stopLocationDetection();
+        Toast.makeText(this, R.string.failed_location, Toast.LENGTH_LONG).show();
+        alertDialog.dismiss();
     }
 
     private void createAlertDialog(int messageResourceId) {
@@ -323,21 +388,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             LocationServices.FusedLocationApi.removeLocationUpdates(client,
                 EventDetailActivity.this);
         }
-    }
-
-    private void showEnableGpsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setPositiveButton(R.string.action_settings, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-            }
-        });
-        builder
-            .setTitle(R.string.title_enable_gps)
-            .setMessage(R.string.ui_enable_location)
-            .create()
-            .show();
     }
 
     public void imagePreview(View view) {
@@ -530,8 +580,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             // reached, and then let the user know that the location could not be detected
             if (System.currentTimeMillis() - locationRequestStartTime >
                 LOCATION_LOCK_MAX_TIME_MILLIS) {
-                stopLocationDetection();
-                Toast.makeText(this, R.string.failed_location, Toast.LENGTH_LONG).show();
+                locationDetectionFailed();
             }
         }
     }
@@ -1032,11 +1081,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                             Uri webUri = event.getEventDetailsURI();
                             AppIndex.AppIndexApi.view(client, EventDetailActivity.this,
                                     Utils.getAppUri(webUri), event.title, webUri, null);
-
-                            if (needGpsLocation) {
-                                startLocationDetection();
-                            }
-
                         }
 
                         @Override
