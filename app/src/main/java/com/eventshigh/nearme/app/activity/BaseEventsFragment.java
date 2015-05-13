@@ -48,7 +48,7 @@ public abstract class BaseEventsFragment extends Fragment {
         args.putParcelable(EVENT_CONTEXT_PARAM, eventsContext);
         args.putBoolean(SHOW_FOLLOW_PARAM, showFollowCard);
         args.putBoolean(SHOW_OFFER_PARAM, showOffer);
-        args.putBoolean(SHOW_OFFER_PARAM, showCategories);
+        args.putBoolean(SHOW_CATEGORIES_PARAM, showCategories);
         return args;
     }
 

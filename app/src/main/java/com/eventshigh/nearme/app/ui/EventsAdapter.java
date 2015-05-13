@@ -24,7 +24,6 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
-import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
@@ -73,25 +72,25 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    public void setMyEvents(MyEvents myEvents, int maxPerCategory) {
+    public void setTopicEvents(List<TopicEvents> topicEvents, int maxPerCategory) {
         dataToShow.clear();
 
-        for (int i = 0; i < myEvents.topicEvents.size(); i++) {
-            TopicEvents topicEvents = myEvents.topicEvents.get(i);
-            List<Event> events = topicEvents.events;
+        for (int i = 0; i < topicEvents.size(); i++) {
+            TopicEvents topicEvent = topicEvents.get(i);
+            List<Event> events = topicEvent.events;
             if (events.isEmpty()) {
                 continue;
             }
 
-            boolean isFavourite = topicEvents.topicName.equals(MyEventsRequest.FAVOURITES_NAME);
+            boolean isFavourite = topicEvent.topicName.equals(MyEventsRequest.FAVOURITES_NAME);
             if (!isFavourite && events.size() > maxPerCategory) {
                 events = events.subList(0, maxPerCategory);
             }
 
-            dataToShow.add(new HeaderData(topicEvents.topicName, topicEvents.numEvents));
+            dataToShow.add(new HeaderData(topicEvent.topicName, topicEvent.numEvents));
             boolean isFirstEvent = true;
             for (Event event : events) {
-                dataToShow.add(new EventData(topicEvents.topicName, event, isFirstEvent));
+                dataToShow.add(new EventData(topicEvent.topicName, event, isFirstEvent));
                 isFirstEvent = false;
             }
         }

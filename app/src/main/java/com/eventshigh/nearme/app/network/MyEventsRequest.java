@@ -37,24 +37,12 @@ public class MyEventsRequest {
         }
     }
 
-    public static class MyEvents {
-        public final List<TopicEvents> topicEvents;
-
-        public MyEvents(List<TopicEvents> topicEvents) {
-            this.topicEvents = topicEvents;
-        }
-
-        public boolean isEmpty() {
-            return topicEvents.isEmpty();
-        }
-    }
-
     private final Context context;
     private final EventsContext eventsContext;
     private final Priority priority;
     private final boolean shouldBypassCache;
     private final boolean includeWithoutLocation;
-    private final Listener<MyEvents> listener;
+    private final Listener<List<TopicEvents>> listener;
     private final ErrorListener errorListener;
     private final Object tag;
 
@@ -63,7 +51,7 @@ public class MyEventsRequest {
 
     public MyEventsRequest(Context context, EventsContext eventsContext, Priority priority,
                            Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
-                           Listener<MyEvents> listener, ErrorListener errorListener) {
+                           Listener<List<TopicEvents>> listener, ErrorListener errorListener) {
         this.context = context;
         this.eventsContext = eventsContext;
         this.priority = priority;
@@ -103,7 +91,7 @@ public class MyEventsRequest {
         numPendingRequests --;
 
         if (numPendingRequests == 0) {
-            listener.onResponse(new MyEvents(result), false);
+            listener.onResponse(result, false);
         }
     }
 

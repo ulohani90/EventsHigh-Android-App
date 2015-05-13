@@ -20,6 +20,8 @@ public class EventsHighEndpoints {
     private static final String WEB_URI_BASE = "http://www.eventshigh.com/";
     private static final String API_ENDPOINT_DATE_FORMAT =
             "http://apiserver.eventshigh.com:8888/api/date/%s/%s?limit=100&mobile=1";
+    private static final String API_ENDPOINT_DATE_CATEGORY_FORMAT =
+            "http://apiserver.eventshigh.com:8888/api/get_mobile_date_explore_screen/%s/%s?mobile=1";
     private static final String API_ENDPOINT_QUERY_FORMAT =
             "http://apiserver.eventshigh.com:8888/api/events/%s/%s?limit=100&mobile=1";
     private static final String API_ENDPOINT_QUERY_DATE_FORMAT =
@@ -30,8 +32,8 @@ public class EventsHighEndpoints {
             "http://apiserver.eventshigh.com:8888/api/get_event_uber_info/%s?mobile=1";
     private static final String API_EVENTS_SUGGEST_FORMAT =
             "https://s3-ap-southeast-1.amazonaws.com/ehautocomplete/autocomplete_events_%s.json";
-  private static final String API_TAGS_SUGGEST_URL =
-      "https://s3-ap-southeast-1.amazonaws.com/ehautocomplete/autocomplete_tags.json";
+    private static final String API_TAGS_SUGGEST_URL =
+          "https://s3-ap-southeast-1.amazonaws.com/ehautocomplete/autocomplete_tags.json";
 
     public static final String QUERY_MY_EVENT = "my events";
     public static final String QUERY_FEATURED = "editor's picks";
@@ -88,7 +90,11 @@ public class EventsHighEndpoints {
     }
 
     public static String getFeaturedEventsEndpoint(City city) {
-        return String.format(API_ENDPOINT_FEATURED_FORMAT,  city.toString().toLowerCase());
+        return String.format(API_ENDPOINT_FEATURED_FORMAT, city.toString().toLowerCase());
+    }
+
+    public static String getDateCategoryEndpoint(City city, String date) {
+        return String.format(API_ENDPOINT_DATE_CATEGORY_FORMAT, city.toString().toLowerCase(), date);
     }
 
     public static String getApiEndpoint(EventsContext eventsContext) throws IllegalArgumentException {

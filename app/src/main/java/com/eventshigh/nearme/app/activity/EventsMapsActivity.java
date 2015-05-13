@@ -17,7 +17,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
-import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
@@ -281,11 +280,11 @@ public class EventsMapsActivity extends BaseEventsActivity {
         }
     };
 
-    private Listener<MyEvents> mMyEventsFetcherCallBack = new Listener<MyEvents>() {
+    private Listener<List<TopicEvents>> mMyEventsFetcherCallBack = new Listener<List<TopicEvents>>() {
         @Override
-        public void onResponse(MyEvents myEvents, boolean isIntermediate) {
+        public void onResponse(List<TopicEvents> myEvents, boolean isIntermediate) {
             Set<Event> events = new HashSet<>();
-            for (TopicEvents topicEvents : myEvents.topicEvents) {
+            for (TopicEvents topicEvents : myEvents) {
                 events.addAll(topicEvents.events);
             }
 

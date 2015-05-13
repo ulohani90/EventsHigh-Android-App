@@ -19,9 +19,10 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Offer;
+import com.eventshigh.nearme.app.network.DateCategoryRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
-import com.eventshigh.nearme.app.network.MyEventsRequest.MyEvents;
+import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.OffersRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
@@ -108,15 +109,18 @@ public class EventsFragment extends BaseEventsFragment {
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
             new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mMyEventsFetcherCallBack, mErrorListener).execute();
+        } else if (eventsContext.query.isEmpty() && !eventsContext.dateFilter.isEmpty() && showCategories) {
+            DateCategoryRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
+                    shouldBypassCache, mMyEventsFetcherCallBack, mErrorListener);
         } else {
             EventCollectionRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
         }
     }
 
-    private Listener<MyEvents> mMyEventsFetcherCallBack = new Listener<MyEvents>() {
+    private Listener<List<TopicEvents>> mMyEventsFetcherCallBack = new Listener<List<TopicEvents>>() {
         @Override
-        public void onResponse(MyEvents myEvents, boolean isIntermediate) {
+        public void onResponse(List<TopicEvents> myEvents, boolean isIntermediate) {
             if (!isIntermediate) {
                 topProgressBar.setVisibility(View.GONE);
 
@@ -126,7 +130,7 @@ public class EventsFragment extends BaseEventsFragment {
             }
 
             if (!isIntermediate || !myEvents.isEmpty()) {
-                eventsAdapter.setMyEvents(myEvents, eventGridView.getSpanCount() * 2);
+                eventsAdapter.setTopicEvents(myEvents, eventGridView.getSpanCount() * 2);
             }
         }
     };
