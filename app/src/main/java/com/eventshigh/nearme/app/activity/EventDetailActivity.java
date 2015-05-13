@@ -513,7 +513,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
             // Lets check if the user is near the event
             userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            userLocation = event.location;
             if (LocationUtils.distanceInMeters(event.location, userLocation)
                 < ALLOWED_USER_DISTANCE_FROM_EVENT_FOR_CHECK_IN_METERS) {
                 // Yes, user is near the event, start the check in flow
