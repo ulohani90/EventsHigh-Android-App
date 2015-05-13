@@ -16,11 +16,13 @@ public abstract class BaseEventsFragment extends Fragment {
     public static final String EVENT_CONTEXT_PARAM = BaseEventsFragment.class.getName() + "_event_context";
     public static final String SHOW_FOLLOW_PARAM = BaseEventsFragment.class.getName() + "_add_follow_card";
     public static final String SHOW_OFFER_PARAM = BaseEventsFragment.class.getName() + "_add_offer";
+    public static final String SHOW_CATEGORIES_PARAM = BaseEventsFragment.class.getName() + "_show_categories";
 
     protected BaseContextActivity activity;
     protected EventsContext eventsContext;
     protected boolean showOfferCard;
     protected boolean showFollowCard;
+    protected boolean showCategories;
 
     @Override
     public void onAttach(Activity activity) {
@@ -30,6 +32,7 @@ public abstract class BaseEventsFragment extends Fragment {
         eventsContext = getArguments().getParcelable(EVENT_CONTEXT_PARAM);
         showFollowCard = getArguments().getBoolean(SHOW_FOLLOW_PARAM);
         showOfferCard = getArguments().getBoolean(SHOW_OFFER_PARAM);
+        showCategories = getArguments().getBoolean(SHOW_CATEGORIES_PARAM);
     }
 
     @Override
@@ -40,11 +43,12 @@ public abstract class BaseEventsFragment extends Fragment {
     }
 
     protected static Bundle getArgs(EventsContext eventsContext,
-            boolean showFollowCard, boolean showOffer) {
+            boolean showFollowCard, boolean showOffer, boolean showCategories) {
         Bundle args = new Bundle();
         args.putParcelable(EVENT_CONTEXT_PARAM, eventsContext);
         args.putBoolean(SHOW_FOLLOW_PARAM, showFollowCard);
         args.putBoolean(SHOW_OFFER_PARAM, showOffer);
+        args.putBoolean(SHOW_OFFER_PARAM, showCategories);
         return args;
     }
 

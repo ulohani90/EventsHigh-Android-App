@@ -46,9 +46,9 @@ public class EventsFragment extends BaseEventsFragment {
     private OnScrollListener onScrollListener = new HideActionBarOnScroll();
 
     public static EventsFragment getInstance(EventsContext eventsContext,
-            boolean showFollowCard, boolean showOffer) {
+            boolean showFollowCard, boolean showOffer, boolean showCategories) {
         EventsFragment fragment = new EventsFragment();
-        fragment.setArguments(getArgs(eventsContext, showFollowCard, showOffer));
+        fragment.setArguments(getArgs(eventsContext, showFollowCard, showOffer, showCategories));
         return fragment;
     }
 

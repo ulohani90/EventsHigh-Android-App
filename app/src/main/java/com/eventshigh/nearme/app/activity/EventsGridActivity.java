@@ -28,6 +28,7 @@ public class EventsGridActivity extends BaseEventsActivity {
     private boolean showFollowCard;
     private boolean searchViewExpanded;
 
+
     // ***********************
     // Delegated Methods from {@link BaseEventsActivity}
     // ***********************
@@ -88,13 +89,13 @@ public class EventsGridActivity extends BaseEventsActivity {
         Fragment eventFragment;
         if (!eventsContext.query.isEmpty()) {
             EventsFragment eventFragment1 = EventsFragment.getInstance(
-                    eventsContext, showFollowCard, true);
+                    eventsContext, showFollowCard, true, false);
             if (showFollowCard) {
                 eventFragment1.setOnScrollListener(followCardScrollListener);
             }
             eventFragment = eventFragment1;
         } else {
-            eventFragment = ThisWeekFragment.getInstance(eventsContext, true, 14);
+            eventFragment = ThisWeekFragment.getInstance(eventsContext, true, false, 14);
         }
 
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();

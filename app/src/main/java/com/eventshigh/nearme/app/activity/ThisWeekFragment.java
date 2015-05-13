@@ -31,10 +31,10 @@ public class ThisWeekFragment extends BaseEventsFragment {
     public static final String NUM_DAYS_PARAM = ThisWeekFragment.class.getName() + "_num_days";
 
     public static ThisWeekFragment getInstance(EventsContext eventsContext, boolean showOffer,
-            int numDays) {
+            boolean showCategories, int numDays) {
         ThisWeekFragment fragment = new ThisWeekFragment();
 
-        Bundle args = getArgs(eventsContext, false, showOffer);
+        Bundle args = getArgs(eventsContext, false, showOffer, showCategories);
         args.putInt(NUM_DAYS_PARAM, numDays);
         fragment.setArguments(args);
         return fragment;
@@ -105,7 +105,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
         public Fragment getItem(int position) {
             EventsContext dateContext = new EventsContext(eventsContext.location, "");
             dateContext.setDateFilter(getDate(position));
-            return EventsFragment.getInstance(dateContext, false, showOfferCard);
+            return EventsFragment.getInstance(dateContext, false, showOfferCard, showCategories);
         }
 
         @Override

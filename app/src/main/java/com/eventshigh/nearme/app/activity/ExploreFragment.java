@@ -42,7 +42,7 @@ public class ExploreFragment extends BaseEventsFragment {
 
     public static ExploreFragment getInstance(EventsContext eventsContext) {
         ExploreFragment fragment = new ExploreFragment();
-        fragment.setArguments(getArgs(eventsContext, false, false));
+        fragment.setArguments(getArgs(eventsContext, false, false, false));
         return fragment;
     }
 
