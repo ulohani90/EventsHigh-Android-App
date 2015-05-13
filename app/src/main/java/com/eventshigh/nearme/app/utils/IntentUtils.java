@@ -54,12 +54,12 @@ public class IntentUtils {
             }
         }
 
-        if (param.query.equalsIgnoreCase(QUERY_ALL)) {
-            param.query = "";
-        }
-        if (param.query.isEmpty() && !param.dateFilter.isEmpty()) {
+        if (param.query.equalsIgnoreCase(QUERY_ALL) && !param.dateFilter.isEmpty()) {
             param.query = param.dateFilter;
             param.dateFilter = "";
+        }
+        if (param.query.equalsIgnoreCase(QUERY_ALL)) {
+            param.query = "";
         }
         if (param.query.endsWith("day")) {
             if (param.query.equalsIgnoreCase("today")) {

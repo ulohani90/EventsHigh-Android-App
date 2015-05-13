@@ -90,9 +90,8 @@ public class EventsGridActivity extends BaseEventsActivity {
         if (!eventsContext.query.isEmpty()) {
             EventsFragment eventFragment1 = EventsFragment.getInstance(
                     eventsContext, showFollowCard, true, false);
-            if (showFollowCard) {
-                eventFragment1.setOnScrollListener(followCardScrollListener);
-            }
+            eventFragment1.setOnScrollListener(
+                    showFollowCard ? followCardScrollListener : doNothingScrollListener);
             eventFragment = eventFragment1;
         } else {
             eventFragment = ThisWeekFragment.getInstance(eventsContext, true, false, 14);
@@ -104,6 +103,18 @@ public class EventsGridActivity extends BaseEventsActivity {
 
         new FetchLocalityTask(this).execute(eventsContext.location);
     }
+
+    private OnScrollListener doNothingScrollListener = new OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+        }
+    };
 
     private OnScrollListener followCardScrollListener = new OnScrollListener() {
         private int y;
