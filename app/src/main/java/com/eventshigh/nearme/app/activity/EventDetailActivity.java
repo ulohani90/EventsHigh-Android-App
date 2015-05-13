@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -44,6 +45,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
+import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -304,6 +306,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
     private void createAlertDialog(int messageResourceId) {
         alertDialog = new AlertDialog.Builder(this).create();
+        @SuppressLint("InflateParams")
         View dialogView = alertDialog.getLayoutInflater().inflate(R.layout.dialog_busy, null);
         ((TextView) dialogView.findViewById(R.id.message)).setText(messageResourceId);
         alertDialog.setView(dialogView);
@@ -513,8 +516,9 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
             // Lets check if the user is near the event
             userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            if (LocationUtils.distanceInMeters(event.location, userLocation)
-                < ALLOWED_USER_DISTANCE_FROM_EVENT_FOR_CHECK_IN_METERS) {
+            if (BuildConfig.DEBUG ||
+                LocationUtils.distanceInMeters(event.location, userLocation)
+                    < ALLOWED_USER_DISTANCE_FROM_EVENT_FOR_CHECK_IN_METERS) {
                 // Yes, user is near the event, start the check in flow
                 checkIn();
             } else {
@@ -910,11 +914,18 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             // Check in starts 30 mins before event start time
             long checkInStartTimeMillis = event.eventTimings[0] - DateUtils.MINUTE_IN_MILLIS * 30;
             long checkInEndTimeMillis = event.eventTimings[0] + DateUtils.MINUTE_IN_MILLIS * 120;
-            if (checkInStartTimeMillis < currentTimeMillis  && currentTimeMillis < checkInEndTimeMillis) {
-                // We have establised that the time is right
+            if (BuildConfig.DEBUG ||
+                (checkInStartTimeMillis < currentTimeMillis  && currentTimeMillis < checkInEndTimeMillis)) {
+                // We have established that the time is right
                 checkInView.setVisibility(View.VISIBLE);
             } else {
                 checkInView.setVisibility(View.GONE);
+            }
+
+            // All three action buttons are not good to show. Hide call in such case.
+            if (!BuildConfig.DEBUG && checkInView.getVisibility() == View.VISIBLE &&
+                bookView.getVisibility() == View.VISIBLE && callView.getVisibility() == View.VISIBLE) {
+                callView.setVisibility(View.GONE);
             }
         }
 

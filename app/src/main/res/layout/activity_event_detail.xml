@@ -385,7 +385,7 @@
                     android:onClick="onCheckIn"
                     android:visibility="gone"
                     tools:visibility="visible"
-                    >
+                >
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -395,7 +395,7 @@
                         android:drawableStart="@drawable/action_book"
                         android:textColor="#CC000000"
                         android:text="@string/action_check_in"
-                        />
+                    />
                 </FrameLayout>
 
                 <FrameLayout
