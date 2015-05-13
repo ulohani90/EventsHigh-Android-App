@@ -74,6 +74,9 @@
     <string name="ui_detecting_location">Detecting your location</string>
     <string name="ui_register_for_check_in">Please register your phone number to check in!</string>
     <string name="ui_not_at_event">We could not detect that you are at the event</string>
+    <string name="ui_checking_in">Checking in</string>
+    <string name="check_in_failed">Unable to check in. Please try again.</string>
+    <string name="check_in_success">Successfully checked in!</string>
 
     <!-- Offer -->
     <string name="ui_offer_expire">Oh no! Offer is expired already. Better luck next time!</string>

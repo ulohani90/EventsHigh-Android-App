@@ -36,11 +36,13 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
@@ -49,8 +51,10 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -66,8 +70,12 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -107,7 +115,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
     private LocationRequest locationRequest;
     private boolean needGpsLocation;
-    private AlertDialog detectingLocationDialog;
+    private AlertDialog alertDialog;
     private long locationRequestStartTime;
 
 
@@ -281,15 +289,24 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         if (client.isConnected()) {
             startLocationDetection();
         }
-        detectingLocationDialog = new AlertDialog.Builder(this).setOnDismissListener(
+        createAlertDialog(R.string.ui_detecting_location);
+        alertDialog.setOnDismissListener(
             new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
                     stopLocationDetection();
+                    dialog.dismiss();
                 }
             }
-        ).setView(R.layout.dialog_detecting_location).create();
-        detectingLocationDialog.show();
+        );
+        alertDialog.show();
+    }
+
+    private void createAlertDialog(int messageResourceId) {
+        alertDialog = new AlertDialog.Builder(this).create();
+        View dialogView = alertDialog.getLayoutInflater().inflate(R.layout.dialog_busy, null);
+        ((TextView) dialogView.findViewById(R.id.message)).setText(messageResourceId);
+        alertDialog.setView(dialogView);
     }
 
     private void startLocationDetection() {
@@ -299,7 +316,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
     private void stopLocationDetection() {
         needGpsLocation = false;
-        detectingLocationDialog.dismiss();
         if (client.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(client,
                 EventDetailActivity.this);
@@ -491,18 +507,20 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     @Override
     public void onLocationChanged(Location location) {
         if (location.hasAccuracy() && location.getAccuracy() < LOCATION_ACCURACY_REQUIRED_METERS) {
-            // We have enough location accuracy. Lets check if the user is near the event
-            LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            // We have enough location accuracy. Stop detecting location, and close dialog
+            stopLocationDetection();
+            alertDialog.dismiss();
+
+            // Lets check if the user is near the event
+            userLocation = new LatLng(location.getLatitude(), location.getLongitude());
             if (LocationUtils.distanceInMeters(event.location, userLocation)
                 < ALLOWED_USER_DISTANCE_FROM_EVENT_FOR_CHECK_IN_METERS) {
                 // Yes, user is near the event, start the check in flow
-                // TODO: start check in flow
+                checkIn();
             } else {
                 // The user is not near the location, let the user know
                 Toast.makeText(this, R.string.ui_not_at_event, Toast.LENGTH_LONG).show();
             }
-            // Stop detecting location, and close dialog
-            stopLocationDetection();
         } else {
             // Location is not accurate enough. Wait for some more time until the timeout has
             // reached, and then let the user know that the location could not be detected
@@ -512,6 +530,53 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 Toast.makeText(this, R.string.failed_location, Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private void checkIn() {
+        try {
+            Uri requestUrl = AccountStateReporter.getBaseUri(this, "event_checkin")
+                .appendQueryParameter("event_id", event.id)
+                .appendQueryParameter("timestamp", "" + System.currentTimeMillis())
+                .appendQueryParameter("location",
+                    URLEncoder.encode(userLocation.toString(), "UTF-8"))
+                .build();
+
+            createAlertDialog(R.string.ui_checking_in);
+            alertDialog.show();
+
+            VolleyHelper.addToRequestQueue(this,
+                new JsonObjectRequest(Request.Method.GET, Signer.sign(requestUrl).toString(), null,
+                    new Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject s, boolean isIntermediate) {
+                            checkInSuccess();
+                        }
+                    },
+                    new ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            checkInFailed();
+                        }
+                    }
+                )
+            );
+        } catch (IOException | GeneralSecurityException e) {
+            checkInFailed();
+        }
+    }
+
+    private void checkInFailed() {
+        alertDialog.dismiss();
+        reportActionToAnalytics("checkInFailed");
+        Toast.makeText(EventDetailActivity.this, R.string.check_in_failed,
+            Toast.LENGTH_SHORT).show();
+    }
+
+    private void checkInSuccess() {
+        alertDialog.dismiss();
+        reportActionToAnalytics("checkInSuccess");
+        Toast.makeText(EventDetailActivity.this, R.string.check_in_success,
+            Toast.LENGTH_SHORT).show();
     }
 
     private class EventCard {
