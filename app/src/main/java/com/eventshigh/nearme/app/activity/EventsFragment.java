@@ -153,7 +153,8 @@ public class EventsFragment extends BaseEventsFragment {
             }
 
             if (!isIntermediate || !events.isEmpty()) {
-                eventsAdapter.setEvents(events);
+                eventsAdapter.setEvents(events,
+                    (eventsContext.query.isEmpty() || eventsContext.dateFilter.isEmpty() ? null : eventsContext.query));
                 if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, events.size());
                 }

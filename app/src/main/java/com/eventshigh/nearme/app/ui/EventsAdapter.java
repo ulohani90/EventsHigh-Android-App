@@ -58,10 +58,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         setHasStableIds(true);
     }
 
-    public void setEvents(List<Event> events) {
+    public void setEvents(List<Event> events, @Nullable String categoryForSeeAll) {
         dataToShow.clear();
         for (Event event: events) {
             dataToShow.add(new EventData("", event, false));
+        }
+        if (categoryForSeeAll != null) {
+            dataToShow.add(new SeeAllData(categoryForSeeAll));
         }
         notifyDataSetChanged();
     }
@@ -187,7 +190,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         TRENDING_CATEGORY(4),
         EXPLORE_CATEGORY(5),
         SMALL_HEADER(6),
-        EVENT_PAGER(7);
+        EVENT_PAGER(7),
+        SEE_ALL(8);
 
         public final int typeId;
         DataType (int typeId) {
@@ -196,7 +200,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         public static boolean spanAllColumns (int typeId) {
             return  typeId == HEADER.typeId || typeId == SMALL_HEADER.typeId
-                    || typeId == EVENT_PAGER.typeId;
+                    || typeId == EVENT_PAGER.typeId || typeId == SEE_ALL.typeId;
         }
 
         public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
@@ -230,6 +234,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             if (typeId == EVENT_PAGER.typeId) {
                 return EventPagerCard.newInstance(activity, parent);
+            }
+
+            if (typeId == SEE_ALL.typeId) {
+                return SeeAllCard.newInstance(activity, parent);
             }
 
             throw new IllegalArgumentException("invalid typeid");
@@ -354,6 +362,54 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private void bindHeaderView(final SmallHeaderData header) {
             titleView.setText(header.header);
+        }
+    }
+
+    // Small Header.
+    private class SeeAllData implements Data {
+        private final String category;
+
+        private SeeAllData(String category) {
+            this.category = category;
+        }
+
+        @Override
+        public DataType getType() {
+            return DataType.SEE_ALL;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder card, int position) {
+            ((SeeAllCard) card).bindHeaderView(eventsFragment, this);
+        }
+
+        @Override
+        public String getId() {
+            return category;
+        }
+    }
+
+    private static class SeeAllCard extends ViewHolder {
+        private final TextView seeAllView;
+
+        private static SeeAllCard newInstance(Activity activity, ViewGroup parent) {
+            View view = activity.getLayoutInflater().inflate(R.layout.card_see_all, parent, false);
+            return new SeeAllCard(view);
+        }
+
+        private SeeAllCard(View cardView) {
+            super(cardView);
+            this.seeAllView = (TextView) cardView.findViewById(R.id.see_all);
+        }
+
+        private void bindHeaderView(final BaseEventsFragment eventsFragment, final SeeAllData seeAllData) {
+            seeAllView.setText("See All " + Utils.capitalize(seeAllData.category) + " Events");
+            seeAllView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    eventsFragment.seeAll();
+                }
+            });
         }
     }
 

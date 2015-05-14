@@ -63,6 +63,14 @@ public abstract class BaseEventsFragment extends Fragment {
         startActivity(intent);
     }
 
+    public void seeAll() {
+        activity.reportActionToAnalytics("seeAll", eventsContext.query);
+        EventsContext param = new EventsContext(eventsContext.location, eventsContext.query);
+        Intent intent = new Intent(activity, activity.getClass())
+                .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
+        startActivity(intent);
+    }
+
     protected class HideActionBarOnScroll extends OnScrollListener {
         private int currentY;
         private boolean actionBarShown = true;
