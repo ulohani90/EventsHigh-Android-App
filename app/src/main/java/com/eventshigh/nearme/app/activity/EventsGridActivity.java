@@ -89,12 +89,12 @@ public class EventsGridActivity extends BaseEventsActivity {
         Fragment eventFragment;
         if (!eventsContext.query.isEmpty()) {
             EventsFragment eventFragment1 = EventsFragment.getInstance(
-                    eventsContext, showFollowCard, true, false);
+                    eventsContext, showFollowCard, false);
             eventFragment1.setOnScrollListener(
                     showFollowCard ? followCardScrollListener : doNothingScrollListener);
             eventFragment = eventFragment1;
         } else {
-            eventFragment = ThisWeekFragment.getInstance(eventsContext, true, false, 14);
+            eventFragment = ThisWeekFragment.getInstance(eventsContext, false, 14);
         }
 
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();

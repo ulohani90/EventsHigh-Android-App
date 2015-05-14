@@ -30,11 +30,11 @@ import java.util.Locale;
 public class ThisWeekFragment extends BaseEventsFragment {
     public static final String NUM_DAYS_PARAM = ThisWeekFragment.class.getName() + "_num_days";
 
-    public static ThisWeekFragment getInstance(EventsContext eventsContext, boolean showOffer,
-            boolean showCategories, int numDays) {
+    public static ThisWeekFragment getInstance(EventsContext eventsContext,  boolean showCategories,
+            int numDays) {
         ThisWeekFragment fragment = new ThisWeekFragment();
 
-        Bundle args = getArgs(eventsContext, false, showOffer, showCategories);
+        Bundle args = getArgs(eventsContext, false, showCategories);
         args.putInt(NUM_DAYS_PARAM, numDays);
         fragment.setArguments(args);
         return fragment;
@@ -116,7 +116,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
         public Fragment getItem(int position) {
             EventsContext dateContext = new EventsContext(eventsContext.location, "");
             dateContext.setDateFilter(getDate(position));
-            return EventsFragment.getInstance(dateContext, false, showOfferCard, showCategories);
+            return EventsFragment.getInstance(dateContext, false, showCategories);
         }
 
         @Override

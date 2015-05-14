@@ -45,10 +45,10 @@ public class EventsFragment extends BaseEventsFragment {
 
     private OnScrollListener onScrollListener = new HideActionBarOnScroll();
 
-    public static EventsFragment getInstance(EventsContext eventsContext,
-            boolean showFollowCard, boolean showOffer, boolean showCategories) {
+    public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
+                                             boolean showCategories) {
         EventsFragment fragment = new EventsFragment();
-        fragment.setArguments(getArgs(eventsContext, showFollowCard, showOffer, showCategories));
+        fragment.setArguments(getArgs(eventsContext, showFollowCard, showCategories));
         return fragment;
     }
 
@@ -158,7 +158,7 @@ public class EventsFragment extends BaseEventsFragment {
                     eventsAdapter.addFollowCard(eventsContext.query, events.size());
                 }
 
-                if (!isIntermediate && events.size() > 10 && showOfferCard) {
+                if (!isIntermediate && events.size() > 10) {
                     OffersRequest.submit(activity, Priority.NORMAL, EventsFragment.this,
                         new Listener<Offer>() {
                             @Override
