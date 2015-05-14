@@ -16,6 +16,7 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_NOTIFY_EH = "notifications_eh";
     public static final String PREF_SHOW_ONBOARDING = "show_onboarding";
     public static final String PREF_NUM_TIMES_MY_EVENTS_CLUE_SHOWN = "my_events_shown_count";
+    public static final String PREF_POINTS = "points";
 
     private final Context context;
     private final SharedPreferences sharedPreferences;
@@ -61,6 +62,14 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public void incrementNumTimesMyEventsClueShown() {
         sharedPreferences.edit().putInt(PREF_NUM_TIMES_MY_EVENTS_CLUE_SHOWN,
                 getNumTimesMyEventsClueShown() + 1).apply();
+    }
+
+    public void setPoints(String points) {
+        sharedPreferences.edit().putString(PREF_POINTS, points).apply();
+    }
+
+    public String getPoints() {
+        return sharedPreferences.getString(PREF_POINTS, "0");
     }
 
     @Override
