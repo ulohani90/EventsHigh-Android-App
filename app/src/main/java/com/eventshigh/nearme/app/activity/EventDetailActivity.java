@@ -825,8 +825,8 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             // Set action buttons.
             findViewById(R.id.action_button_group).setVisibility(View.VISIBLE);
             bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
-            mayBeShowCheckInButton(event);
             callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
+            mayBeShowCheckInButton(event);
 
             // Show price.
             findViewById(R.id.price_row).setVisibility(View.VISIBLE);
@@ -914,8 +914,8 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             // Check in starts 30 mins before event start time
             long checkInStartTimeMillis = event.eventTimings[0] - DateUtils.MINUTE_IN_MILLIS * 30;
             long checkInEndTimeMillis = event.eventTimings[0] + DateUtils.MINUTE_IN_MILLIS * 120;
-            if (Utils.isDebug(EventDetailActivity.this) ||
-                (checkInStartTimeMillis < currentTimeMillis  && currentTimeMillis < checkInEndTimeMillis)) {
+            if (Utils.isDebug(EventDetailActivity.this) || (isPlayServicesPresent &&
+                checkInStartTimeMillis < currentTimeMillis  && currentTimeMillis < checkInEndTimeMillis)) {
                 // We have established that the time is right
                 checkInView.setVisibility(View.VISIBLE);
             } else {
