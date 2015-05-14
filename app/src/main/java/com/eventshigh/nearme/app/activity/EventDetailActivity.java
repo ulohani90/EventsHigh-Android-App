@@ -268,6 +268,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         // Check if the user is logged in
         Pair<String, Boolean> phoneNumberStatus = new Account(this).getPhoneNumber();
         if (!phoneNumberStatus.second) {
+            reportEventAction(event, "checkInPhoneNoRequired");
             new AlertDialog.Builder(this)
                 .setTitle(R.string.pref_title_phone_no)
                 .setMessage(R.string.ui_register_for_check_in)
@@ -350,6 +351,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     private void locationDetectionFailed() {
+        reportEventAction(event, "checkInFailedLocation");
         stopLocationDetection();
         Toast.makeText(this, R.string.failed_location, Toast.LENGTH_LONG).show();
         alertDialog.dismiss();
@@ -558,6 +560,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 checkIn();
             } else {
                 // The user is not near the location, let the user know
+                reportEventAction(event, "checkInFailedNotAtLocation");
                 Toast.makeText(this, R.string.ui_not_at_event, Toast.LENGTH_LONG).show();
             }
         } else {
@@ -571,6 +574,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     private void checkIn() {
+        reportEventAction(event, "checkInSubmit");
         try {
             Uri requestUrl = AccountStateReporter.getBaseUri(this, "event_checkin")
                 .appendQueryParameter("event_id", event.id)
