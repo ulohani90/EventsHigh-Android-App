@@ -45,7 +45,7 @@
             android:id="@+id/event_grid"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:columnWidth="@dimen/big_event_card_width"
+            android:columnWidth="@dimen/event_card_width"
             android:horizontalSpacing="4dp"
             android:verticalSpacing="4dp"
             android:paddingTop="4dp"
