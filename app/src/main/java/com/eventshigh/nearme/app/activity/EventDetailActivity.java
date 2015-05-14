@@ -919,9 +919,9 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             // Check in starts 30 mins before event start time and till 2 hours after event
             // start time.
             long checkInStartTimeMillis = event.eventTimings[0] -
-                    (DateUtils.MINUTE_IN_MILLIS * 30 * (isDebug ? 1 : 2));
+                    (DateUtils.MINUTE_IN_MILLIS * 30 * (isDebug ? 2 : 1));
             long checkInEndTimeMillis = event.eventTimings[0] +
-                    (DateUtils.MINUTE_IN_MILLIS * 120 * (isDebug ? 1 : 2));
+                    (DateUtils.MINUTE_IN_MILLIS * 120 * (isDebug ? 2 : 1));
 
             long currentTimeMillis = System.currentTimeMillis();
             if (isPlayServicesPresent && checkInStartTimeMillis < currentTimeMillis &&
