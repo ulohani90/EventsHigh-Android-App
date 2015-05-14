@@ -9,6 +9,8 @@ import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 
+import com.eventshigh.nearme.app.utils.Utils;
+
 public class NetworkChangeBroadcastReceiver extends BaseWakefulBroadcastReceiver {
     public static final String PREF_IS_UPLOADING = "isUploading";
     public static final String PREF_LAST_UPLOAD_TIMESTAMP = "lastUploadTimestamp";
@@ -28,10 +30,12 @@ public class NetworkChangeBroadcastReceiver extends BaseWakefulBroadcastReceiver
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Do not upload if an upload was successful in the last 24 hrs.
-        long timeSinceLastUpload = System.currentTimeMillis()
-                - preferences.getLong(PREF_LAST_UPLOAD_TIMESTAMP, 0);
-        if (timeSinceLastUpload < DateUtils.DAY_IN_MILLIS) {
-            return;
+        if (!Utils.isDebug(context)) {
+            long timeSinceLastUpload = System.currentTimeMillis()
+                    - preferences.getLong(PREF_LAST_UPLOAD_TIMESTAMP, 0);
+            if (timeSinceLastUpload < DateUtils.DAY_IN_MILLIS) {
+                return;
+            }
         }
 
         // Return if another upload is already in progress (see below)

@@ -8,9 +8,13 @@ import android.provider.Settings.Secure;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import com.eventshigh.nearme.app.BuildConfig;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Helper methods for managing strings and titles.
@@ -104,5 +108,22 @@ public class Utils {
         } catch (NoSuchAlgorithmException e) {
             throw  new RuntimeException(e);
         }
+    }
+
+
+    private static final Set<String> DEBUG_ANDROID_ID = new HashSet<>();
+    static {
+        DEBUG_ANDROID_ID.add("75c19f7ac14abdcd");
+        DEBUG_ANDROID_ID.add("5151a4342221f321");
+        DEBUG_ANDROID_ID.add("5f0f51994cb15c85");
+        DEBUG_ANDROID_ID.add("8fb904e56e6b643f");
+        DEBUG_ANDROID_ID.add("a35df83d1a37a83c");
+        DEBUG_ANDROID_ID.add("186a598b82f6fe8");
+        DEBUG_ANDROID_ID.add("56a538060a00eaa6");
+        DEBUG_ANDROID_ID.add("8fa00ccd84f6351b");
+    }
+
+    public static boolean isDebug(Context context) {
+        return BuildConfig.DEBUG || DEBUG_ANDROID_ID.contains(getAndroidId(context));
     }
 }

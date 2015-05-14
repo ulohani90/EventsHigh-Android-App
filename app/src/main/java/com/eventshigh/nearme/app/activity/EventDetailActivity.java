@@ -4,25 +4,17 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageInfo;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.format.DateUtils;
-import android.text.method.LinkMovementMethod;
-import android.text.util.Linkify;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Pair;
@@ -51,7 +43,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
-import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -95,7 +86,6 @@ import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
@@ -106,10 +96,6 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
  */
 public class EventDetailActivity extends BaseActivity implements LocationListener {
     public static final String EXTRA_EVENT_PARAM = EventDetailActivity.class.getSimpleName() + "_event";
-
-    // Regex to check if description is plane text or html.
-    private static final Pattern HTML_PATTERN = Pattern.compile(
-            "<[A-Za-z].*</[A-Za-z]|<[A-Za-z].*/>");
 
     // Request code for location settings check intent
     private static final int REQUEST_CHECK_SETTINGS = 1020;
@@ -132,7 +118,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
 
     private LocationRequest locationRequest;
-    private boolean needGpsLocation;
     private AlertDialog alertDialog;
     private long locationRequestStartTime;
 
@@ -297,7 +282,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         }
 
         // Check if we have GPS location
-        needGpsLocation = true;
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
             .addLocationRequest(locationRequest);
         PendingResult<LocationSettingsResult> result =
@@ -348,7 +332,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        final LocationSettingsStates states = LocationSettingsStates.fromIntent(data);
         switch (requestCode) {
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
@@ -387,7 +370,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     private void stopLocationDetection() {
-        needGpsLocation = false;
         if (client.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(client,
                 EventDetailActivity.this);
@@ -570,7 +552,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
             // Lets check if the user is near the event
             userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            if (BuildConfig.DEBUG ||
+            if (Utils.isDebug(this) ||
                 LocationUtils.distanceInMeters(event.location, userLocation)
                     < ALLOWED_USER_DISTANCE_FROM_EVENT_FOR_CHECK_IN_METERS) {
                 // Yes, user is near the event, start the check in flow
@@ -670,7 +652,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         private final LinearLayout tagsView;
         private final View descriptionHeaderView;
         private final WebView descriptionView;
-        private final TextView readMoreView;
 
         private final View performerHeaderView;
         private final LinearLayout performersView;
@@ -721,7 +702,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             tagsView = (LinearLayout) findViewById(R.id.event_tags);
             descriptionHeaderView = findViewById(R.id.description_header);
             descriptionView = (WebView) findViewById(R.id.event_description);
-            readMoreView = (TextView) findViewById(R.id.read_more);
 
             performerHeaderView = findViewById(R.id.performer_header);
             performersView = (LinearLayout) findViewById(R.id.performers);
@@ -876,9 +856,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             // Set description.
             descriptionHeaderView.setVisibility(event.description.isEmpty() ? View.GONE : View.VISIBLE);
             if (!event.description.isEmpty()) {
-                Spannable sp = new SpannableString(Html.fromHtml(event.description));
-                Linkify.addLinks(sp, Linkify.ALL);
-                final String html = "<body>" + Html.toHtml(sp) + "</body>";
+                final String html = "<body>" + event.description + "</body>";
                 descriptionView.loadData(html, "text/html; charset=UTF-8", null);
                 WebSettings webSettings = descriptionView.getSettings();
                 webSettings.setDefaultFontSize(12);
@@ -924,17 +902,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             }
 
             organizerHeader.setVisibility(organizerInfoShown ? View.VISIBLE : View.GONE);
-            if (organizerInfoShown) {
-                Utils.waitForViewVisible(descriptionView, new Runnable() {
-                    @Override
-                    public void run() {
-//                        if (descriptionView.getLineCount() > 8) {
-//                            descriptionView.setMaxLines(5);
-//                            readMoreView.setVisibility(View.VISIBLE);
-//                        }
-                    }
-                });
-            }
 
             // Share Buttons.
             findViewById(R.id.share_fb).setVisibility(isInstalled(PACKAGE_NAME_FACEBOOK) ? View.VISIBLE : View.GONE);
@@ -948,7 +915,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             // Check in starts 30 mins before event start time
             long checkInStartTimeMillis = event.eventTimings[0] - DateUtils.MINUTE_IN_MILLIS * 30;
             long checkInEndTimeMillis = event.eventTimings[0] + DateUtils.MINUTE_IN_MILLIS * 120;
-            if (BuildConfig.DEBUG ||
+            if (Utils.isDebug(EventDetailActivity.this) ||
                 (checkInStartTimeMillis < currentTimeMillis  && currentTimeMillis < checkInEndTimeMillis)) {
                 // We have established that the time is right
                 checkInView.setVisibility(View.VISIBLE);
@@ -957,7 +924,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             }
 
             // All three action buttons are not good to show. Hide call in such case.
-            if (!BuildConfig.DEBUG && checkInView.getVisibility() == View.VISIBLE &&
+            if (!Utils.isDebug(EventDetailActivity.this) && checkInView.getVisibility() == View.VISIBLE &&
                 bookView.getVisibility() == View.VISIBLE && callView.getVisibility() == View.VISIBLE) {
                 callView.setVisibility(View.GONE);
             }

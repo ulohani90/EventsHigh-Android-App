@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
@@ -21,6 +20,7 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.facebook.FacebookSdk;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -62,7 +62,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_translate);
 
         // Twitter CrashAnalytics
-        if (!BuildConfig.DEBUG) {
+        if (!Utils.isDebug(this)) {
             Fabric.with(this, new Crashlytics());
         }
 
@@ -70,9 +70,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         isPlayServicesPresent = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS;
         if (isPlayServicesPresent) {
             gaHelper = GAHelper.getInstance(this);
-            if (BuildConfig.DEBUG) {
-                gaHelper.setAppOptOut(true);
-            }
         }
     }
 

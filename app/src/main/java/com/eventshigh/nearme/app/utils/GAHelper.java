@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
-import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -31,7 +30,7 @@ public class GAHelper {
         tracker.enableAdvertisingIdCollection(true);
 
         // Disable GA reporting in debug build.
-        if (BuildConfig.DEBUG) {
+        if (Utils.isDebug(context)) {
             googleAnalytics.setAppOptOut(true);
         }
     }
