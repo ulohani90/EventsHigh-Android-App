@@ -3,7 +3,6 @@
              xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="200dp"
-    android:background="#FF766D9B"
     android:foreground="?android:attr/selectableItemBackground"
     android:descendantFocusability="blocksDescendants"
 >
@@ -14,8 +13,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="36dp"
-        android:textColor="@android:color/white"
+        android:paddingBottom="24dp"
+        android:textColor="@android:color/black"
         android:fontFamily="sans-serif-medium"
+        android:textAllCaps="true"
         tools:text="Music"
     />
     <TextView
@@ -24,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
         android:layout_margin="64dp"
-        android:textColor="#CCFFFFFF"
+        android:textColor="#99212121"
         android:textSize="14sp"
         tools:text="12 events"
     />
@@ -32,7 +33,7 @@
         android:id="@+id/header_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_chevron_right_white_36dp"
+        android:src="@drawable/ic_chevron_right_black_36dp"
         android:layout_gravity="center_vertical|end"
         android:layout_margin="6dp"
     />
