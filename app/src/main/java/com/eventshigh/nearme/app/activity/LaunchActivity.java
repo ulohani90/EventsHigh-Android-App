@@ -374,10 +374,6 @@ public class LaunchActivity extends BaseContextActivity {
                 ExploreScreenTab.WEEK};
         private final TextView[] tabViews = new TextView[tabs.length];
 
-        // Fragment for this week tab.
-        private ThisWeekFragment thisWeekFragment;
-
-
         public ExploreScreenPagerAdapter() {
             super(getSupportFragmentManager());
         }
@@ -393,8 +389,7 @@ public class LaunchActivity extends BaseContextActivity {
                 return ExploreFragment.getInstance(eventsContext);
             }
 
-            thisWeekFragment = ThisWeekFragment.getInstance(eventsContext, false, true, 7);
-            return thisWeekFragment;
+            return ThisWeekFragment.getInstance(eventsContext, false, true, 7);
         }
 
         @Override
@@ -408,10 +403,6 @@ public class LaunchActivity extends BaseContextActivity {
 
             for (int i = 0; i < tabViews.length; i++) {
                 tabViews[i].setTypeface(null, i == position ? Typeface.BOLD : Typeface.NORMAL);
-            }
-
-            if (position == 2) {
-                thisWeekFragment.refresh();
             }
         }
 

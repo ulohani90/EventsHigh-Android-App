@@ -60,6 +60,12 @@ public class ThisWeekFragment extends BaseEventsFragment {
     }
 
     @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        refresh();
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         adapter = new ThisWeekPagerAdapter();
 
@@ -74,9 +80,14 @@ public class ThisWeekFragment extends BaseEventsFragment {
         tabsView.scrollTo(eventsContext.dateFilter);
     }
 
-    public void refresh() {
-        viewPager.setAdapter(adapter);
-        tabsView.scrollTo(0);
+    private void refresh() {
+        viewPager.post(new Runnable() {
+            @Override
+            public void run() {
+                viewPager.setAdapter(adapter);
+                tabsView.scrollTo(0);
+            }
+        });
     }
 
     private static class DateTabView {

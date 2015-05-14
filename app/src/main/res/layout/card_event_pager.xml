@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/events_pager"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/big_event_card_height"
+    />
+
+    <LinearLayout
+        android:id="@+id/dots_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="top"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp"
+    />
+</FrameLayout>

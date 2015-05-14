@@ -12,14 +12,11 @@ import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
-
-import java.util.ArrayList;
 
 /**
  * Fragment to show explore by categories.
@@ -47,6 +44,7 @@ public class ExploreFragment extends BaseEventsFragment {
     }
 
     private EventsAdapter eventsAdapter;
+    private View topProgressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,8 +56,10 @@ public class ExploreFragment extends BaseEventsFragment {
         eventsAdapter = new EventsAdapter(this);
         AutofitRecyclerView exploreGridView = (AutofitRecyclerView) view.findViewById(R.id.explore_grid);
         exploreGridView.setEventsAdapter(eventsAdapter);
-        eventsAdapter.setExploreCategories(new ArrayList<TrendingTopic>(), EXPLORE_TAGS);
+        exploreGridView.setOnScrollListener(new HideActionBarOnScroll());
 
+        topProgressBar = view.findViewById(R.id.top_progress_bar);
+        topProgressBar.setVisibility(View.VISIBLE);
         FeaturedEventsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                 false, mFetcherCallBack, mErrorListener);
     }
@@ -67,8 +67,9 @@ public class ExploreFragment extends BaseEventsFragment {
     private Listener<EventCollection> mFetcherCallBack = new Listener<EventCollection>() {
         @Override
         public void onResponse(EventCollection eventCollection, boolean isIntermediate) {
+            topProgressBar.setVisibility(isIntermediate ? View.VISIBLE : View.GONE);
             if (!eventCollection.trendingTopics.isEmpty()) {
-                eventsAdapter.setExploreCategories(eventCollection.trendingTopics, EXPLORE_TAGS);
+                eventsAdapter.setExploreCategories(eventCollection, EXPLORE_TAGS);
             }
         }
     };
@@ -76,7 +77,8 @@ public class ExploreFragment extends BaseEventsFragment {
     private ErrorListener mErrorListener = new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
-            // do nothing.
+            topProgressBar.setVisibility(View.GONE);
+            eventsAdapter.setExploreCategories(null, EXPLORE_TAGS);
         }
     };
 }

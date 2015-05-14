@@ -2,6 +2,8 @@ package com.eventshigh.nearme.app.ui;
 
 import android.app.Activity;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.util.Log;
@@ -10,19 +12,20 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
-import com.eventshigh.nearme.app.activity.BaseEventsActivity;
 import com.eventshigh.nearme.app.activity.BaseEventsFragment;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.data.TrendingTopic;
+import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -43,8 +46,6 @@ import java.util.Set;
  * An adapter which can be used to populate the Event card.
  */
 public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
-    private static final String TRENDING_TOPIC_TITLE = "What's Trending";
-
     private final BaseEventsFragment eventsFragment;
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
     private final Set<Integer> usedItemIds = new HashSet<>();
@@ -98,17 +99,24 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void setExploreCategories(List<TrendingTopic> trendingTopics, String[] tags) {
+    public void setExploreCategories(@Nullable EventCollection eventCollection, String[] tags) {
         dataToShow.clear();
 
-        if (!trendingTopics.isEmpty()) {
-            dataToShow.add(new HeaderData(TRENDING_TOPIC_TITLE, 0));
-            for (TrendingTopic trendingTopic : trendingTopics) {
-                dataToShow.add(new TrendingCategoryData(trendingTopic));
+        if (eventCollection != null) {
+            if (!eventCollection.events.isEmpty()) {
+                dataToShow.add(new EventPagerData(eventCollection.events));
+            }
+            if (!eventCollection.trendingTopics.isEmpty()) {
+                dataToShow.add(new SmallHeaderData(
+                        eventsFragment.getContextActivity().getString(R.string.ui_browse_featured)));
+                for (TrendingTopic trendingTopic : eventCollection.trendingTopics) {
+                    dataToShow.add(new TrendingCategoryData(trendingTopic));
+                }
             }
         }
 
-        dataToShow.add(new HeaderData("Browse By Category", 0));
+        dataToShow.add(new SmallHeaderData(
+        eventsFragment.getContextActivity().getString(R.string.ui_browse_cat)));
         for (String tag : tags) {
             dataToShow.add(new ExploreCategoryData(tag));
         }
@@ -163,10 +171,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     // Build the view, reuse existing if possible.
-    public static View getEventCard(final Event event, final BaseEventsActivity activity,
+    public static View getEventCard(final Event event, final BaseContextActivity activity,
                                     @Nullable View reuseView, ViewGroup parent) {
         View view = reuseView != null ? reuseView :
-                activity.getLayoutInflater().inflate(R.layout.card_event, parent, false);
+                activity.getLayoutInflater().inflate(R.layout.card_event_big, parent, false);
         new EventCard(view, true).bindEventView(event, false, activity, -1);
         return view;
     }
@@ -177,7 +185,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         OFFER(2),
         FOLLOW(3),
         TRENDING_CATEGORY(4),
-        EXPLORE_CATEGORY(5);
+        EXPLORE_CATEGORY(5),
+        SMALL_HEADER(6),
+        EVENT_PAGER(7);
 
         public final int typeId;
         DataType (int typeId) {
@@ -185,7 +195,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public static boolean spanAllColumns (int typeId) {
-            return  typeId == HEADER.typeId;
+            return  typeId == HEADER.typeId || typeId == SMALL_HEADER.typeId
+                    || typeId == EVENT_PAGER.typeId;
         }
 
         public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
@@ -211,6 +222,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             if (typeId == EXPLORE_CATEGORY.typeId) {
                 return TrendingCategoryCard.newInstance(activity, parent);
+            }
+
+            if (typeId == SMALL_HEADER.typeId) {
+                return SmallHeaderCard.newInstance(activity, parent);
+            }
+
+            if (typeId == EVENT_PAGER.typeId) {
+                return EventPagerCard.newInstance(activity, parent);
             }
 
             throw new IllegalArgumentException("invalid typeid");
@@ -271,7 +290,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         private void bindHeaderView(final BaseEventsFragment eventsFragment, final HeaderData header) {
-            titleView.setText(Utils.capitalize(header.header));
+            titleView.setText(header.header);
             if (header.numEvents <= 0) {
                 numEventsView.setVisibility(View.GONE);
             } else {
@@ -292,6 +311,129 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             } else {
                 moreView.setVisibility(View.GONE);
                 itemView.setClickable(false);
+            }
+        }
+    }
+
+    // Small Header.
+    private class SmallHeaderData implements Data {
+        private final String header;
+
+        private SmallHeaderData(String header) {
+            this.header = header;
+        }
+
+        @Override
+        public DataType getType() {
+            return DataType.SMALL_HEADER;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder card, int position) {
+            ((SmallHeaderCard) card).bindHeaderView(this);
+        }
+
+        @Override
+        public String getId() {
+            return header;
+        }
+    }
+
+    private static class SmallHeaderCard extends ViewHolder {
+        private final TextView titleView;
+
+        private static SmallHeaderCard newInstance(Activity activity, ViewGroup parent) {
+            View view = activity.getLayoutInflater().inflate(R.layout.card_header_small, parent, false);
+            return new SmallHeaderCard(view);
+        }
+
+        private SmallHeaderCard(View cardView) {
+            super(cardView);
+            this.titleView = (TextView) cardView.findViewById(R.id.header);
+        }
+
+        private void bindHeaderView(final SmallHeaderData header) {
+            titleView.setText(header.header);
+        }
+    }
+
+    // Event Pager.
+    private class EventPagerData implements Data {
+        private final List<Event> events;
+
+        private EventPagerData(List<Event> events) {
+            this.events = events;
+        }
+
+        @Override
+        public DataType getType() {
+            return DataType.EVENT_PAGER;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder card, int position) {
+            ((EventPagerCard) card).bindHeaderView(eventsFragment.getContextActivity(), this);
+        }
+
+        @Override
+        public String getId() {
+            return events.get(0).id;
+        }
+    }
+
+    private static class EventPagerCard extends ViewHolder {
+        private final ViewPager viewPager;
+        private final LinearLayout dotsView;
+
+        private static EventPagerCard newInstance(Activity activity, ViewGroup parent) {
+            View view = activity.getLayoutInflater().inflate(R.layout.card_event_pager, parent, false);
+            return new EventPagerCard(view);
+        }
+
+        private EventPagerCard(View cardView) {
+            super(cardView);
+            viewPager =  (ViewPager) cardView.findViewById(R.id.events_pager);
+            dotsView = (LinearLayout) cardView.findViewById(R.id.dots_parent);
+        }
+
+        private void bindHeaderView(BaseContextActivity activity, EventPagerData eventPagerData) {
+            viewPager.setAdapter(new FeaturedEventsAdapter(activity, eventPagerData.events));
+
+            dotsView.removeAllViews();
+            for (int i = 0; i < eventPagerData.events.size(); i++) {
+                View view = activity.getLayoutInflater().inflate(R.layout.viewpager_dot, dotsView, false);
+                view.setSelected(i == 0);
+                dotsView.addView(view);
+            }
+
+            viewPager.setOnPageChangeListener(new DotsSelector(activity));
+        }
+
+        private class DotsSelector implements OnPageChangeListener {
+            private final BaseContextActivity activity;
+
+            private DotsSelector(BaseContextActivity activity) {
+                this.activity = activity;
+            }
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                // do nothing.
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position != 0) {
+                    activity.reportActionToAnalytics("featuredSwipe");
+                }
+                for (int i = 0; i < dotsView.getChildCount(); i++) {
+                    dotsView.getChildAt(i).setSelected(i == position);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                // do nothing.
             }
         }
     }

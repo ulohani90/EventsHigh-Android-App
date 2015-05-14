@@ -66,6 +66,8 @@
     <string name="ui_my_events">My Events</string>
     <string name="ui_my_events_help">Events marked as favourite (♥) &amp;\nevents for interests and performers you follow!</string>
     <string name="ui_price">Price</string>
+    <string name="ui_browse_featured">What\'s Trending</string>
+    <string name="ui_browse_cat">Browse By Category</string>
 
     <!-- Check in -->
     <string name="action_check_in">Check In</string>
