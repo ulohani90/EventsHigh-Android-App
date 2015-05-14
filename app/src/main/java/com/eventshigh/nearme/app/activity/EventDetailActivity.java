@@ -927,7 +927,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             }
 
             // All three action buttons are not good to show. Hide call in such case.
-            if (!Utils.isDebug(EventDetailActivity.this) && checkInView.getVisibility() == View.VISIBLE &&
+            if (checkInView.getVisibility() == View.VISIBLE &&
                 bookView.getVisibility() == View.VISIBLE && callView.getVisibility() == View.VISIBLE) {
                 callView.setVisibility(View.GONE);
             }
