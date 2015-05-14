@@ -537,8 +537,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final View arrowView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent) {
-            View view = activity.getLayoutInflater().inflate(R.layout.card_event_big, parent, false);
-            return new EventCard(view, true);
+            View view = activity.getLayoutInflater().inflate(R.layout.card_event, parent, false);
+            return new EventCard(view, false);
         }
 
         public EventCard(View cardView, boolean shouldAdjustImageHeight) {

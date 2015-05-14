@@ -106,8 +106,7 @@ public abstract class BaseContextActivity extends BaseActivity {
 
         toolbar.getLayoutParams().height = 0;
         toolbar.setVisibility(View.VISIBLE);
-        Animation animation = new Animation()
-        {
+        Animation animation = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
                 toolbar.getLayoutParams().height = interpolatedTime == 1
@@ -132,8 +131,7 @@ public abstract class BaseContextActivity extends BaseActivity {
         }
 
         final int initialHeight = toolbar.getMeasuredHeight();
-        Animation animation = new Animation()
-        {
+        Animation animation = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
                 if(interpolatedTime == 1){
