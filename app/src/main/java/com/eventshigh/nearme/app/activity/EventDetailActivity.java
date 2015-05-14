@@ -18,6 +18,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
@@ -29,6 +31,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnScrollChangedListener;
 import android.view.Window;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
@@ -665,7 +669,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         private final View tagsHeaderView;
         private final LinearLayout tagsView;
         private final View descriptionHeaderView;
-        private final TextView descriptionView;
+        private final WebView descriptionView;
         private final TextView readMoreView;
 
         private final View performerHeaderView;
@@ -716,7 +720,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             tagsHeaderView = findViewById(R.id.tags_header);
             tagsView = (LinearLayout) findViewById(R.id.event_tags);
             descriptionHeaderView = findViewById(R.id.description_header);
-            descriptionView = (TextView) findViewById(R.id.event_description);
+            descriptionView = (WebView) findViewById(R.id.event_description);
             readMoreView = (TextView) findViewById(R.id.read_more);
 
             performerHeaderView = findViewById(R.id.performer_header);
@@ -872,32 +876,13 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             // Set description.
             descriptionHeaderView.setVisibility(event.description.isEmpty() ? View.GONE : View.VISIBLE);
             if (!event.description.isEmpty()) {
+                Spannable sp = new SpannableString(Html.fromHtml(event.description));
+                Linkify.addLinks(sp, Linkify.ALL);
+                final String html = "<body>" + Html.toHtml(sp) + "</body>";
+                descriptionView.loadData(html, "text/html; charset=UTF-8", null);
+                WebSettings webSettings = descriptionView.getSettings();
+                webSettings.setDefaultFontSize(12);
                 descriptionHeaderView.setVisibility(View.VISIBLE);
-                String description;
-                try {
-                    description = new String(event.description.getBytes("ISO-8859-1"), "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    description = event.description;
-                    e.printStackTrace();
-                }
-
-                if (HTML_PATTERN.matcher(event.description).find()) {
-                    descriptionView.setText(Html.fromHtml(description));
-                    descriptionView.setMovementMethod(LinkMovementMethod.getInstance());
-                    descriptionView.setTextIsSelectable(false);
-                } else {
-                    descriptionView.setText(description);
-                    descriptionView.setTextIsSelectable(true);
-                    Linkify.addLinks(descriptionView, Linkify.ALL);
-                }
-
-                readMoreView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        descriptionView.setMaxLines(Integer.MAX_VALUE);
-                        readMoreView.setVisibility(View.GONE);
-                    }
-                });
             }
 
             // Organizer Info.
@@ -943,10 +928,10 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 Utils.waitForViewVisible(descriptionView, new Runnable() {
                     @Override
                     public void run() {
-                        if (descriptionView.getLineCount() > 8) {
-                            descriptionView.setMaxLines(5);
-                            readMoreView.setVisibility(View.VISIBLE);
-                        }
+//                        if (descriptionView.getLineCount() > 8) {
+//                            descriptionView.setMaxLines(5);
+//                            readMoreView.setVisibility(View.VISIBLE);
+//                        }
                     }
                 });
             }

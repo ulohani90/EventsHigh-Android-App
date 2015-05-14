@@ -531,7 +531,7 @@
                 android:visibility="gone"
                 tools:visibility="visible"
             />
-            <TextView
+            <WebView
                 android:id="@+id/event_description"
                 style="@style/EHText"
                 android:layout_width="match_parent"
