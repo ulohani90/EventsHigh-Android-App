@@ -914,12 +914,18 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         }
 
         private void mayBeShowCheckInButton(Event event) {
+            boolean isDebug = Utils.isDebug(EventDetailActivity.this);
+
+            // Check in starts 30 mins before event start time and till 2 hours after event
+            // start time.
+            long checkInStartTimeMillis = event.eventTimings[0] -
+                    (DateUtils.MINUTE_IN_MILLIS * 30 * (isDebug ? 1 : 2));
+            long checkInEndTimeMillis = event.eventTimings[0] +
+                    (DateUtils.MINUTE_IN_MILLIS * 120 * (isDebug ? 1 : 2));
+
             long currentTimeMillis = System.currentTimeMillis();
-            // Check in starts 30 mins before event start time
-            long checkInStartTimeMillis = event.eventTimings[0] - DateUtils.MINUTE_IN_MILLIS * 30;
-            long checkInEndTimeMillis = event.eventTimings[0] + DateUtils.MINUTE_IN_MILLIS * 120;
-            if (Utils.isDebug(EventDetailActivity.this) || (isPlayServicesPresent &&
-                checkInStartTimeMillis < currentTimeMillis  && currentTimeMillis < checkInEndTimeMillis)) {
+            if (isPlayServicesPresent && checkInStartTimeMillis < currentTimeMillis &&
+                    currentTimeMillis < checkInEndTimeMillis) {
                 // We have established that the time is right
                 checkInView.setVisibility(View.VISIBLE);
             } else {
