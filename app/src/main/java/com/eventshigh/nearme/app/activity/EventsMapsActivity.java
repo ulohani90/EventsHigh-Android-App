@@ -18,7 +18,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
-import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.MapMarkerManager;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -29,7 +28,6 @@ import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -74,7 +72,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private Marker lastSelectedMarker;
     // is the movement in camera position is because of app ?
     private boolean isAppMovement = true;
-    private boolean fetchListings = false;
 
     // ***********************
     // Delegated Methods from {@link BaseEventsActivity}
@@ -100,15 +97,15 @@ public class EventsMapsActivity extends BaseEventsActivity {
 
     @Override
     protected void showEvents() {
-        // Stop all requests associated with this activity and then submit new request.
-        VolleyHelper.getRequestQueue(this).cancelAll(this);
+        // do nothing.
+    }
 
-        if (map == null) {
-            fetchListings = true;
-            return;
-        }
 
-        updateUserLocation(eventsContext.location);
+    // ***********************
+    // Helper Methods
+    // ***********************
+
+    private void fetchEvents() {
         topProgressBar.setVisibility(View.VISIBLE);
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
             new MyEventsRequest(this, eventsContext, Priority.IMMEDIATE, this,
@@ -118,11 +115,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
                     false, true, mEventsFetcherCallBack, mErrorListener);
         }
     }
-
-
-    // ***********************
-    // Helper Methods
-    // ***********************
 
     private void updateUserLocation(LatLng userLocation) {
         isAppMovement = true;
@@ -148,10 +140,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
                 map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
                 map.setOnMapClickListener(mOnMapClickListener);
 
-                MapsInitializer.initialize(EventsMapsActivity.this);
-                if (fetchListings) {
-                    showEvents();
-                }
+                updateUserLocation(eventsContext.location);
+                eventsContext.changeLocation(null);
             }
         });
     }
@@ -231,6 +221,9 @@ public class EventsMapsActivity extends BaseEventsActivity {
                 mOnMapClickListener.onMapClick(null);
             }
 
+            if (!eventsContext.changeLocation(cameraPosition.target)) {
+                fetchEvents();
+            }
             isAppMovement = false;
         }
     };
@@ -267,6 +260,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private ErrorListener mErrorListener = new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
+            topProgressBar.setVisibility(View.GONE);
             Toast.makeText(EventsMapsActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
         }
     };
@@ -274,7 +268,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private Listener<List<Event>> mEventsFetcherCallBack = new Listener<List<Event>>() {
         @Override
         public void onResponse(List<Event> events, boolean isIntermediate) {
-            topProgressBar.setVisibility(isIntermediate ? View.VISIBLE :View.GONE);
+            topProgressBar.setVisibility(isIntermediate ? View.VISIBLE : View.GONE);
             mOnMapClickListener.onMapClick(null);
             mapMarkerManager.setEvents(map, events);
         }
