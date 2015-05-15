@@ -1,29 +1,10 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.net.Uri;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
-import android.util.Pair;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.security.Signer;
-import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.AccountStateReporter;
-import com.eventshigh.nearme.app.user.Preferences;
-import com.eventshigh.nearme.app.utils.Utils;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
 
 public class EHPreferenceFragment extends PreferenceFragment {
     @Override
@@ -45,6 +26,8 @@ public class EHPreferenceFragment extends PreferenceFragment {
         getPreferenceScreen().addPreference(notificationHeader);
         addPreferencesFromResource(R.xml.pref_notification);
 
+        // Disabled for now ... we need to build a screen to show points information.
+        /**
         final Preference pointsView = getPreferenceScreen().findPreference("points_key");
         pointsView.setSummary(Preferences.getInstance(getActivity()).getPoints());
 
@@ -80,5 +63,6 @@ public class EHPreferenceFragment extends PreferenceFragment {
                 e.printStackTrace();
             }
         }
+       **/
     }
 }
