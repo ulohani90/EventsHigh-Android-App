@@ -1,6 +1,8 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -22,6 +24,19 @@ public class SettingsActivity extends BaseActivity {
 
                 EventSearchSuggestionsProvider.clearHistory(this);
                 Toast.makeText(this, R.string.message_delete_query_history, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (intent != null && intent.getAction() != null) {
+            if (intent.getAction().equals("com.eventshigh.add_event")) {
+                reportActionToAnalytics("addEvent");
+
+                try {
+                    startActivity(new Intent(Intent.ACTION_SENDTO,
+                            Uri.parse("mailto:listings@eventshigh.com")));
+                } catch (ActivityNotFoundException e) {
+                    // No activity to open url. ignore.
+                }
             }
         }
 

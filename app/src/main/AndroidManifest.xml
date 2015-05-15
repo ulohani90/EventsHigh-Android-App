@@ -65,6 +65,18 @@
 
         <!-- FB -->
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <provider
+            android:authorities="com.facebook.app.FacebookContentProvider196111897251952"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true"
+            tools:ignore="ExportedContentProvider"
+        />
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:label="@string/app_name"
+        />
 
         <!-- Enable the search recent suggestion provider -->
         <provider

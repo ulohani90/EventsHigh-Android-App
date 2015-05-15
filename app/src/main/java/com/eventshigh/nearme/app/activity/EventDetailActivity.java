@@ -60,6 +60,8 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -162,16 +164,16 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             populateView(event);
         } else {
             EventRequest.submit(this, getIntent().getData(), Priority.IMMEDIATE, mEventListener,
-                new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(EventDetailActivity.this, R.string.failed_load,
-                            Toast.LENGTH_SHORT).show();
-                        Log.e(EventDetailActivity.class.getSimpleName(), volleyError.toString(),
-                            volleyError.getCause());
-                        finish();
-                    }
-                });
+                    new ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            Toast.makeText(EventDetailActivity.this, R.string.failed_load,
+                                    Toast.LENGTH_SHORT).show();
+                            Log.e(EventDetailActivity.class.getSimpleName(), volleyError.toString(),
+                                    volleyError.getCause());
+                            finish();
+                        }
+                    });
         }
     }
 
@@ -440,6 +442,14 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
     public void facebook(View view) {
         shareEvent(event, PACKAGE_NAME_FACEBOOK);
+        if (ShareDialog.canShow(ShareLinkContent.class)) {
+            ShareLinkContent content = new ShareLinkContent.Builder()
+                    .setContentUrl(event.getEventShareURI(this, "fb"))
+                    .build();
+            ShareDialog.show(this, content);
+        } else {
+            shareEvent(event, PACKAGE_NAME_FACEBOOK);
+        }
     }
 
     public void twitter(View view) {

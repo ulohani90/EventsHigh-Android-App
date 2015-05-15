@@ -32,8 +32,6 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.task.FetchLocalityTask;
 import com.eventshigh.nearme.app.ui.CityListAdapter;
 import com.eventshigh.nearme.app.ui.CityListAdapter.OnCitySelectionListener;
-import com.eventshigh.nearme.app.ui.LocationPickerDialog;
-import com.eventshigh.nearme.app.ui.LocationPickerDialog.OnLocationSelection;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
@@ -177,18 +175,7 @@ public class LaunchActivity extends BaseContextActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
-        int id = item.getItemId();
-
-        if (id == R.id.action_change_location) {
-            askUserForLocation();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+        return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -281,23 +268,6 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.setCustomTabColorizer(adapter);
         viewPager.setCurrentItem(1, false);
         lastFetchTimestamp = System.currentTimeMillis();
-    }
-
-    private void askUserForLocation() {
-        reportActionToAnalytics("askUserForLocation");
-        String countryCode = eventsContext.city == null ?
-                null : eventsContext.city.countryCode;
-        new LocationPickerDialog().show(this, countryCode, new OnLocationSelection() {
-            @Override
-            public void onLocationSelection(String locationString, LatLng locationPoint) {
-                ActionBar actionBar = getSupportActionBar();
-                if (actionBar != null) {
-                    actionBar.setSubtitle(locationString);
-                }
-                eventsContext.changeLocation(locationPoint);
-                showExploreScreen();
-            }
-        });
     }
 
     private void showNextScreen() {

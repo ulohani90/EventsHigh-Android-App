@@ -21,7 +21,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.user.Account;
 
 public class CustomUrlActivity extends BaseActivity {
-    public static final String ADD_EVENT_URL = "http://www.eventshigh.com/add_event";
     public static final String OFFER_URL_PREFIX = "http://www.eventshigh.com/get_event_contest/";
     public static final String EXTRA_TITLE_KEY =  CustomUrlActivity.class.getName() + ".title";
 
@@ -62,19 +61,13 @@ public class CustomUrlActivity extends BaseActivity {
         webSettings.setDomStorageEnabled(true);
         webSettings.setLoadsImagesAutomatically(true);
 
-        // Setup a new web view client so we can listen in on events and also customize web view
-        // behavior.
+        // Setup a new web view client so we can listen in on events and also customize
+        // web view behavior.
         webView.setWebViewClient(new EHWebViewClient());
         webView.setWebChromeClient(new EHWebChromeClient());
 
         // Set title.
         String title = getIntent().getStringExtra(EXTRA_TITLE_KEY);
-
-        // Process Add Event request.
-        if (getIntent().getDataString().equals(ADD_EVENT_URL)) {
-            reportActionToAnalytics("addEvent");
-            title = getString(R.string.pref_title_add_event);
-        }
 
         // Process the Offer request.
         if (getIntent().getDataString().startsWith(OFFER_URL_PREFIX)) {

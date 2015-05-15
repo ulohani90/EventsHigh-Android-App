@@ -561,7 +561,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         public void setFavouriteView(@Nullable EventMark eventMark) {
             favouriteView.setTag(eventMark);
             favouriteView.setImageResource(EventMark.isFavourite(eventMark) ?
-                    R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_grey600_24dp);
+                    R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
         }
 
         private void bindEventView(final Event event, boolean isFirstEvent,

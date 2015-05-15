@@ -11,9 +11,8 @@
     <Preference android:title="@string/pref_title_add_event" android:summary="listings@eventshigh.com">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.CustomUrlActivity"
-            android:action="android.intent.action.VIEW"
-            android:data="http://www.eventshigh.com/add_event"
+            android:targetClass="com.eventshigh.nearme.app.activity.SettingsActivity"
+            android:action="com.eventshigh.add_event"
         />
     </Preference>
     <Preference android:title="@string/pref_title_send_feedback" android:summary="support@eventshigh.com">
