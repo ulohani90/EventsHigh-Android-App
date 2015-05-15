@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -25,7 +26,10 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 
-public class EHPreferenceFragment extends PreferenceFragment {
+public class EHPreferenceFragment extends PreferenceFragment
+    implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private Preference pointsView;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +50,7 @@ public class EHPreferenceFragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.pref_notification);
 
         // Num Points preference.
-        final Preference pointsView = getPreferenceScreen().findPreference("points_key");
+        pointsView = getPreferenceScreen().findPreference("points_key");
         pointsView.setSummary(Preferences.getInstance(getActivity()).getPoints());
 
         Pair<String, Boolean> phoneNumberStatus = new Account(getActivity()).getPhoneNumber();
@@ -62,9 +66,7 @@ public class EHPreferenceFragment extends PreferenceFragment {
                                     public void onResponse(JSONObject response, boolean isIntermediate) {
                                         try {
                                             Preferences.getInstance(getActivity()).setPoints(
-                                                    response.getString("total_points"));
-                                            pointsView.setSummary(Preferences.getInstance(
-                                                    getActivity()).getPoints());
+                                                response.getString("total_points"));
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
@@ -80,6 +82,15 @@ public class EHPreferenceFragment extends PreferenceFragment {
             } catch (GeneralSecurityException | UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
+        }
+
+        Preferences.getInstance(getActivity()).registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (Preferences.PREF_POINTS.equals(key)) {
+            pointsView.setSummary(Preferences.getInstance(getActivity()).getPoints());
         }
     }
 }
