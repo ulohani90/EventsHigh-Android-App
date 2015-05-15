@@ -55,7 +55,7 @@
     <string name="ui_code">We have sent a code to %s. Please enter it below</string>
     <string name="ui_code_verified">Your phone number %s has been verified</string>
     <string name="ui_verify_phone">Verify your phone number</string>
-    <string name="ui_no_my_event">This looks so empty!\n\nShow your love by clicking on ♥ and those events will appear here.\n\n Also when you follow a category or performer, it will appear here.</string>
+    <string name="ui_no_my_event">Personalize this section by clicking on ♥ to favourite events or follow categories and performers.\n\nNever miss events for\nyour interests again!</string>
     <string name="ui_view_location_on_map">View location on map</string>
     <string name="ui_upcoming_events">Upcoming events</string>
     <string name="ui_upcoming_events_msg">See events for your interests!</string>

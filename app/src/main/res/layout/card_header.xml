@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="18dp"
         android:textColor="#99212121"
         android:textSize="14sp"
         tools:text="12 events"
