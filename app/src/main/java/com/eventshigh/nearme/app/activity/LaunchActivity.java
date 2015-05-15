@@ -338,7 +338,6 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
-
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
             implements TabViewAdapter, OnPageChangeListener, TabColorizer {
         private final ExploreScreenTab[] tabs = {ExploreScreenTab.My_EVENTS, ExploreScreenTab.EXPLORE,
@@ -360,7 +359,7 @@ public class LaunchActivity extends BaseContextActivity {
                 return ExploreFragment.getInstance(eventsContext);
             }
 
-            return ThisWeekFragment.getInstance(eventsContext, true, 7);
+            return ThisWeekFragment.getInstance(eventsContext, false, 7);
         }
 
         @Override

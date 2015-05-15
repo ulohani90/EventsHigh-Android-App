@@ -106,9 +106,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         dataToShow.clear();
 
         if (eventCollection != null) {
-            if (!eventCollection.events.isEmpty()) {
-                dataToShow.add(new EventPagerData(eventCollection.events));
-            }
+//            if (!eventCollection.events.isEmpty()) {
+//                dataToShow.add(new EventPagerData(eventCollection.events));
+//            }
             if (!eventCollection.trendingTopics.isEmpty()) {
                 dataToShow.add(new SmallHeaderData(
                         eventsFragment.getContextActivity().getString(R.string.ui_browse_featured)));
