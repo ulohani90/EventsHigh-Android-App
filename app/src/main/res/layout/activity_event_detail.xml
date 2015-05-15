@@ -392,8 +392,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:drawableLeft="@drawable/action_book"
-                        android:drawableStart="@drawable/action_book"
+                        android:drawableLeft="@drawable/action_check_in"
+                        android:drawableStart="@drawable/action_check_in"
                         android:textColor="#CC000000"
                         android:text="@string/action_check_in"
                     />
