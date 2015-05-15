@@ -58,6 +58,20 @@ public class EventsFragment extends BaseEventsFragment {
     }
 
     @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
+            eventGridView.post(new Runnable() {
+                @Override
+                public void run() {
+                    fetchNewListing(false);
+                }
+            });
+        }
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         // Setup the events adapter to show data.
         eventsAdapter = new EventsAdapter(this);
@@ -75,6 +89,14 @@ public class EventsFragment extends BaseEventsFragment {
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
+
+        // Actions Buttons.
+        view.findViewById(R.id.explore_events).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSearchView("today");
+            }
+        });
 
         view.findViewById(R.id.retry).setOnClickListener(new OnClickListener() {
             @Override
