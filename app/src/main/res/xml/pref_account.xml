@@ -6,13 +6,11 @@
             android:targetClass="com.eventshigh.nearme.app.activity.PhoneLoginActivity"
         />
     </Preference>
-    <!--
     <Preference
         android:key="points_key"
         android:title="@string/pref_title_points"
         android:summary="0"
     />
-    -->
     <Preference android:title="@string/pref_title_delete_query_history">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"

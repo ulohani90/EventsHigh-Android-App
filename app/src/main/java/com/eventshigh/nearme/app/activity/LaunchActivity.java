@@ -359,7 +359,7 @@ public class LaunchActivity extends BaseContextActivity {
                 return ExploreFragment.getInstance(eventsContext);
             }
 
-            return ThisWeekFragment.getInstance(eventsContext, false, 7);
+            return ThisWeekFragment.getInstance(eventsContext, true, 7);
         }
 
         @Override
