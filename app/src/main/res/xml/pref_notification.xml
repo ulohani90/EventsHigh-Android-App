@@ -9,7 +9,7 @@
     <CheckBoxPreference
         android:key="notifications_weekly"
         android:title="@string/pref_title_weekly_notifications"
-        android:summary="Shown twice per week, once for weekend and once for followed interests."
+        android:summary="Shown once per week for followed interests."
         android:defaultValue="true"
     />
     <CheckBoxPreference

@@ -55,7 +55,8 @@ public abstract class BaseEventsFragment extends Fragment {
     }
 
     public void showSearchView(String query) {
-        activity.reportActionToAnalytics("showSearchView", query);
+        activity.reportActionToAnalytics("header:" + query,
+                eventsContext.query + eventsContext.dateFilter);
         EventsContext param = new EventsContext(eventsContext.location, query);
         param.dateFilter = eventsContext.dateFilter;
         Intent intent = new Intent(activity, activity.getClass())
@@ -64,7 +65,7 @@ public abstract class BaseEventsFragment extends Fragment {
     }
 
     public void seeAll() {
-        activity.reportActionToAnalytics("seeAll", eventsContext.query);
+        activity.reportActionToAnalytics("seeAll", eventsContext.query + eventsContext.dateFilter);
         EventsContext param = new EventsContext(eventsContext.location, eventsContext.query);
         Intent intent = new Intent(activity, activity.getClass())
                 .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);

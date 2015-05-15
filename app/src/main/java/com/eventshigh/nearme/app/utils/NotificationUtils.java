@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.text.format.DateUtils;
@@ -31,7 +32,6 @@ import java.util.List;
 public class NotificationUtils {
     public static final int GCM_NOTIFICATION_ID = 1;
     public static final int MY_EVENTS_NOTIFICATION_ID = 2;
-    public static final int WEEKEND_EVENTS_NOTIFICATION_ID = 3;
     private static final int MAX_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
 
     // See https://code.google.com/p/android/issues/detail?id=36744.
@@ -51,8 +51,8 @@ public class NotificationUtils {
     }
 
     private static Notification createNotification(Context context, String title,
-            CharSequence message, PendingIntent contentIntent) {
-        return createNotificationBuilder(context, title, message, contentIntent)
+            CharSequence message, PendingIntent contentIntent, int priority) {
+        return createNotificationBuilder(context, title, message, contentIntent, priority)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .build();
     }
@@ -93,12 +93,12 @@ public class NotificationUtils {
         VolleyHelper.addToRequestQueue(context, request);
     }
 
-    private static void showNotificationAndReleaseWakeLock(
-            NotificationData notificationData) {
+    private static void showNotificationAndReleaseWakeLock(NotificationData notificationData) {
         Notification notification = createNotificationBuilder(notificationData.context,
-                notificationData.title, notificationData.message, notificationData.pendingIntent)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationData.message))
-                .build();
+                notificationData.title, notificationData.message, notificationData.pendingIntent,
+                notificationData.priority)
+            .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationData.message))
+            .build();
 
         showNotification(notificationData.context, notification, notificationData.notificationId);
 
@@ -110,12 +110,12 @@ public class NotificationUtils {
                                                            Bitmap bitmap) {
         NotificationCompat.Builder notificationBuilder = createNotificationBuilder(
                 notificationData.context, notificationData.title, notificationData.message,
-                notificationData.pendingIntent)
-                .setStyle(new NotificationCompat.BigPictureStyle()
-                                .setSummaryText(notificationData.message)
-                                .bigPicture(bitmap)
-                                .setBigContentTitle(notificationData.title)
-                );
+                notificationData.pendingIntent, notificationData.priority)
+            .setStyle(new NotificationCompat.BigPictureStyle()
+                            .setSummaryText(notificationData.message)
+                            .bigPicture(bitmap)
+                            .setBigContentTitle(notificationData.title)
+            );
 
         if (notificationData.showOnMapIntent != null) {
             PendingIntent showOnMapPendingIntent = PendingIntent.getActivity(
@@ -136,19 +136,25 @@ public class NotificationUtils {
 
     @SuppressLint("InlinedApi")
     private static NotificationCompat.Builder createNotificationBuilder(Context context,
-            String title, CharSequence message, PendingIntent contentIntent) {
+            String title, CharSequence message, PendingIntent contentIntent, int priority) {
         Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
-        return new NotificationCompat.Builder(context)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.notification)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)
                 .setShowWhen(false)
-                .setCategory(Notification.CATEGORY_RECOMMENDATION)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setCategory(Notification.CATEGORY_EVENT)
+                .setPriority(priority)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setLargeIcon(largeIcon)
                 .setContentIntent(contentIntent);
+
+        if (priority >= Notification.PRIORITY_DEFAULT) {
+            builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+        }
+
+        return builder;
     }
 
     public static void showNotification(Context context, Notification notification, int notificationId) {
@@ -181,7 +187,8 @@ public class NotificationUtils {
         }
 
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, 0);
-        Notification notification = createNotification(context, title, message, pendingIntent);
+        Notification notification = createNotification(context, title, message, pendingIntent,
+                Notification.PRIORITY_DEFAULT);
         showNotification(context, notification, notificationId);
     }
 
@@ -196,6 +203,7 @@ public class NotificationUtils {
         public final PendingIntent pendingIntent;
         public final Intent showOnMapIntent;
         public final int notificationId;
+        public final int priority;
 
         public NotificationData(Context context, Intent alarmIntent, Event event,
                                 int notificationId) {
@@ -214,10 +222,11 @@ public class NotificationUtils {
             pendingIntent = createPendingIntent(context, event.id, event.city);
             showOnMapIntent = event.getShowOnMapIntent();
             this.notificationId = notificationId;
+            this.priority = Notification.PRIORITY_DEFAULT;
         }
 
         public NotificationData(Context context, Intent alarmIntent, String title, String message,
-                                String imageUrl, PendingIntent pendingIntent) {
+                                String imageUrl, PendingIntent pendingIntent, int priority) {
             this.context = context;
             this.alarmIntent = alarmIntent;
 
@@ -226,6 +235,8 @@ public class NotificationUtils {
             this.imageUrl = imageUrl;
 
             this.pendingIntent = pendingIntent;
+            this.priority = priority;
+
             showOnMapIntent = null;
             notificationId = NotificationUtils.GCM_NOTIFICATION_ID;
         }

@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.broadcast;
 
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.location.Location;
@@ -101,6 +102,7 @@ public class GcmIntentService extends IntentService {
         String imageUrl = Utils.checkIfUnknown(msg.getString("img"));
         String ticket = Utils.checkIfUnknown(msg.getString("ticket"));
         String target = Utils.checkIfUnknown(msg.getString("target"));
+        String priority = Utils.checkIfUnknown(msg.getString("priority"));
 
         if (eventId == null && query == null && contestUrl == null && ticket == null && target == null) {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
@@ -149,7 +151,8 @@ public class GcmIntentService extends IntentService {
 
         NotificationUtils.NotificationData notificationData =
                 new NotificationUtils.NotificationData(this, alarmIntent, title, message,
-                        imageUrl, contentIntent);
+                        imageUrl, contentIntent,
+                        priority == null ? Notification.PRIORITY_LOW : Notification.PRIORITY_HIGH);
         return new ParsedBundle(notificationData, bounded ? new LatLng(lat, lon) : null, distance);
     }
 
