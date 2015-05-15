@@ -75,6 +75,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.model.LatLng;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -591,8 +592,12 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 new JsonObjectRequest(Request.Method.GET, Signer.sign(requestUrl).toString(), null,
                     new Listener<JSONObject>() {
                         @Override
-                        public void onResponse(JSONObject s, boolean isIntermediate) {
-                            checkInSuccess();
+                        public void onResponse(JSONObject response, boolean isIntermediate) {
+                            try {
+                                checkInSuccess(response.getString("total_points"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     },
                     new ErrorListener() {
@@ -615,11 +620,11 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             Toast.LENGTH_SHORT).show();
     }
 
-    private void checkInSuccess() {
+    private void checkInSuccess(String points) {
         checkInAlertDialog.dismiss();
         reportActionToAnalytics("checkInSuccess");
-        Toast.makeText(EventDetailActivity.this, R.string.check_in_success,
-            Toast.LENGTH_SHORT).show();
+        String message = String.format(getResources().getString(R.string.check_in_success), points);
+        Toast.makeText(EventDetailActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
     private class EventCard {
