@@ -68,9 +68,7 @@ public class ExploreFragment extends BaseEventsFragment {
         @Override
         public void onResponse(EventCollection eventCollection, boolean isIntermediate) {
             topProgressBar.setVisibility(isIntermediate ? View.VISIBLE : View.GONE);
-            if (!eventCollection.trendingTopics.isEmpty()) {
-                eventsAdapter.setExploreCategories(eventCollection, EXPLORE_TAGS);
-            }
+            eventsAdapter.setExploreCategories(eventCollection, EXPLORE_TAGS);
         }
     };
 

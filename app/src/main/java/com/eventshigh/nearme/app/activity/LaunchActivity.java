@@ -241,6 +241,7 @@ public class LaunchActivity extends BaseContextActivity {
             reportActionToAnalytics("locationFailed");
             tabsView.setVisibility(View.GONE);
             viewPager.setVisibility(View.GONE);
+            citySelector.setVisibility(View.VISIBLE);
             citySelector.setAdapter(new CityListAdapter(LaunchActivity.this, mCitySelectionListener));
             if (connectionResult != null) {
                 Toast.makeText(LaunchActivity.this, R.string.failed_location, Toast.LENGTH_SHORT).show();
