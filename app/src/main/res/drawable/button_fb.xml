@@ -2,9 +2,9 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- pressed -->
-    <item android:state_pressed="true" android:drawable="@color/blue_dark" />
+    <item android:state_pressed="true" android:drawable="@color/fb_blue_dark" />
 
     <!-- default -->
-    <item  android:drawable="@color/blue" />
+    <item  android:drawable="@color/fb_blue" />
 
 </selector>

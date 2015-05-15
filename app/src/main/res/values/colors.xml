@@ -23,10 +23,10 @@
 
     <color name="red">#D9604F</color>
     <color name="red_dark">#D96000</color>
-    <color name="green">#69BE5A</color>
-    <color name="green_dark">#0B9F4E</color>
-    <color name="blue">#526DBF</color>
-    <color name="blue_dark">#496AAB</color>
+    <color name="whatsapp_green">#69BE5A</color>
+    <color name="whatsapp_green_dark">#0B9F4E</color>
+    <color name="fb_blue">#526DBF</color>
+    <color name="fb_blue_dark">#395185</color>
     <color name="twitter">#55ACEE</color>
     <color name="twitter_dark">#5590D0</color>
 </resources>
