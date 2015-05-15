@@ -23,7 +23,7 @@
         android:verticalSpacing="2dp"
         android:paddingLeft="2dp"
         android:paddingTop="2dp"
-        android:paddingBottom="100dp"
+        android:paddingBottom="20dp"
         android:clipToPadding="false"
         android:elevation="0dp"
         tools:listitem="@layout/card_explore"

@@ -457,7 +457,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             dotsView.removeAllViews();
             for (int i = 0; i < eventPagerData.events.size(); i++) {
-                View view = activity.getLayoutInflater().inflate(R.layout.viewpager_dot, dotsView, false);
+                View view = activity.getLayoutInflater().inflate(R.layout.view_dot_featured, dotsView, false);
                 view.setSelected(i == 0);
                 dotsView.addView(view);
             }

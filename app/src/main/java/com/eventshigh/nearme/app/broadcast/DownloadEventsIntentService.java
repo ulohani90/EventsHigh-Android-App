@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
 import com.android.volley.Request;
-import com.android.volley.Request.Priority;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
@@ -16,7 +15,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.user.Account;
@@ -37,10 +35,7 @@ public class DownloadEventsIntentService extends IntentService {
     public enum IntentType {
         MY_EVENTS("eh_my_events", EventsHighEndpoints.QUERY_MY_EVENT,
                 R.string.ui_upcoming_events, R.string.ui_upcoming_events_msg,
-                NotificationUtils.MY_EVENTS_NOTIFICATION_ID),
-        WEEKEND_EVENTS("eh_weekend_events", EventsHighEndpoints.QUERY_WEEKEND,
-                R.string.ui_weekend_events, R.string.ui_weekend_events_msg,
-                NotificationUtils.WEEKEND_EVENTS_NOTIFICATION_ID);
+                NotificationUtils.MY_EVENTS_NOTIFICATION_ID);
 
         public final String intentAction;
         public final String query;
@@ -58,10 +53,6 @@ public class DownloadEventsIntentService extends IntentService {
         }
 
         public static IntentType getType(Intent intent) {
-            if (intent.getAction().equals(WEEKEND_EVENTS.intentAction)) {
-                return WEEKEND_EVENTS;
-            }
-
             return MY_EVENTS;
         }
     }
@@ -85,15 +76,9 @@ public class DownloadEventsIntentService extends IntentService {
             eventsContext.changeLocation(lastCity.cityBounds.getCenter());
         }
 
-        if (type == IntentType.WEEKEND_EVENTS) {
-            EventCollectionRequest.submit(this, eventsContext, Priority.NORMAL, this,
-                    false /* shouldBypassCache */, true /* includeWithoutLocation */,
-                    new WeekendEventsListener(intent), new WeekendEventsErrorListener(intent));
-        } else {
-            new MyEventsRequest(this, eventsContext, Request.Priority.NORMAL, this,
-                    false /* shouldBypassCache */, true /* includeWithoutLocation */,
-                    new MyEventsListener(intent), new MyEventsErrorListener(intent)).execute();
-        }
+        new MyEventsRequest(this, eventsContext, Request.Priority.NORMAL, this,
+                false /* shouldBypassCache */, true /* includeWithoutLocation */,
+                new MyEventsListener(intent), new MyEventsErrorListener(intent)).execute();
     }
 
     private class MyEventsErrorListener implements Response.ErrorListener {
@@ -129,36 +114,6 @@ public class DownloadEventsIntentService extends IntentService {
             for (TopicEvents topicEvents : myEvents) {
                 eventSet.addAll(topicEvents.events);
             }
-            showNotification(eventSet, intent);
-        }
-    }
-
-    private class WeekendEventsErrorListener implements Response.ErrorListener {
-        private final Intent intent;
-
-        private WeekendEventsErrorListener(Intent intent) {
-            this.intent = intent;
-        }
-
-        @Override
-        public void onErrorResponse(VolleyError volleyError) {
-            // TODO: This could happen when user is not connected. should we retry at some other point?
-            // Should we switch to SyncAdapters ?
-            showNotification(new HashSet<Event>(), intent);
-        }
-    }
-
-    private class WeekendEventsListener implements Response.Listener<List<Event>> {
-        private final Intent intent;
-
-        private WeekendEventsListener(Intent intent) {
-            this.intent = intent;
-        }
-
-        @Override
-        public void onResponse(final List<Event> featuredEvents, boolean isIntermediate) {
-            // Merge all events into one List and remove duplicates.
-            Set<Event> eventSet = new HashSet<>(featuredEvents);
             showNotification(eventSet, intent);
         }
     }

@@ -51,7 +51,7 @@
             android:paddingTop="4dp"
 			android:paddingLeft="4dp"
 			android:paddingRight="4dp"
-            android:paddingBottom="50dp"
+            android:paddingBottom="20dp"
             android:clipToPadding="false"
             tools:listitem="@layout/event_card"
         />

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Title -->
     <string name="app_name">EventsHigh</string>
@@ -20,7 +20,7 @@
     <string name="action_new_feedback">Send New Feedback</string>
     <string name="action_direction">Directions</string>
     <string name="action_calendar">Calendar</string>
-    <string name="action_ama">Help</string>
+    <string name="action_ama">Ask Anything</string>
     <string name="action_show_map">Show on map</string>
     <string name="action_show_list">Show as list</string>
     <string name="action_check_out">Check out</string>
@@ -54,17 +54,10 @@
     <string name="ui_code">We have sent a code to %s. Please enter it below</string>
     <string name="ui_code_verified">Your phone number %s has been verified</string>
     <string name="ui_verify_phone">Verify your phone number</string>
-    <string name="ui_no_my_event">This looks so empty!\n\nShow your love by clicking on heart icon and those events will appear here.\n\n Also when you follow a category or performer, it will appear here.</string>
+    <string name="ui_no_my_event">This looks so empty!\n\nShow your love by clicking on ♥ and those events will appear here.\n\n Also when you follow a category or performer, it will appear here.</string>
     <string name="ui_view_location_on_map">View location on map</string>
     <string name="ui_upcoming_events">Upcoming events</string>
     <string name="ui_upcoming_events_msg">See events for your interests!</string>
-    <string name="ui_weekend_events">Explore amazing weekend</string>
-    <string name="ui_weekend_events_msg">See events happening on this weekend!</string>
-    <string name="ui_my_events_clue">Added to \'My Events\'.\nTap to go to \'My Events\' now.</string>
-    <string name="ui_share_event_clue">Like the event? Share it!</string>
-    <string name="ui_more">More</string>
-    <string name="ui_my_events">My Events</string>
-    <string name="ui_my_events_help">Events marked as favourite (♥) &amp;\nevents for interests and performers you follow!</string>
     <string name="ui_price">Price</string>
     <string name="ui_browse_featured">What\'s Trending</string>
     <string name="ui_browse_cat">Browse By Category</string>
@@ -143,5 +136,9 @@
     <string name="rate_app_no">No, Thanks</string>
     <string name="rate_app_now">Now</string>
     <string name="rate_app_later">Later</string>
+
+    <!-- Zendesk -->
+    <string name="contact_fragment_description_hint">Enter your query</string>
+    <string tools:ignore="UnusedResources" name="contact_fragment_title">Contact EventsHigh</string>
 
 </resources>

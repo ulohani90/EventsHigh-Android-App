@@ -94,7 +94,7 @@ public class AlarmUtils {
 
     private static void cancelWeekendEventsAlarm(Context context) {
         Intent intent = new Intent(context, DownloadEventsBroadcastReceiver.class);
-        intent.setAction(IntentType.WEEKEND_EVENTS.intentAction);
+        intent.setAction("eh_weekend_events");
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context,
                 0, intent, PendingIntent.FLAG_NO_CREATE);
         if (alarmIntent != null) {
