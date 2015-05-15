@@ -116,8 +116,8 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     private GoogleApiClient client;
     private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
 
-    private LocationRequest locationRequest;
-    private AlertDialog alertDialog;
+    private LocationRequest checkInLocationRequest;
+    private AlertDialog checkInAlertDialog;
     private long locationRequestStartTime;
 
 
@@ -137,10 +137,11 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
         onNewIntent(getIntent());
 
-        locationRequest = new LocationRequest();
-        locationRequest.setInterval(3000);
-        locationRequest.setFastestInterval(1000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        // Initialize location request used for check in.
+        checkInLocationRequest = new LocationRequest();
+        checkInLocationRequest.setInterval(3000);
+        checkInLocationRequest.setFastestInterval(1000);
+        checkInLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     protected void onStart() {
@@ -152,7 +153,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         }
 
         findViewById(R.id.event_container).setMinimumHeight(
-            (int) (1.33 * getResources().getDisplayMetrics().heightPixels));
+                (int) (1.33 * getResources().getDisplayMetrics().heightPixels));
 
         // Get the event from Intent.
         if (getIntent().hasExtra(EXTRA_EVENT_PARAM)) {
@@ -192,6 +193,26 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         if (showRateAppDialog) {
             RateAppDialog.show(this);
             showRateAppDialog = false;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        // All required changes were successfully made
+                        startLocationDetection();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        // The user was asked to change settings, but chose not to
+                        locationDetectionFailed();
+                        break;
+                    default:
+                        break;
+                }
+                break;
         }
     }
 
@@ -252,14 +273,14 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         }
 
         CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
-            getString(R.string.title_book));
+                getString(R.string.title_book));
     }
 
     public void openOfferSite(View view) {
         reportEventAction(event, "openOffer");
         CustomUrlActivity.launchCustomUrl(this,
-            Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
-            event.offerTitle);
+                Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
+                event.offerTitle);
     }
 
     public void onCheckIn(View view) {
@@ -281,9 +302,9 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             return;
         }
 
-        // Check if we have GPS location
+        // Check if we have high accuracy location.
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-            .addLocationRequest(locationRequest);
+            .addLocationRequest(checkInLocationRequest);
         PendingResult<LocationSettingsResult> result =
             LocationServices.SettingsApi.checkLocationSettings(client, builder.build());
         result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
@@ -318,63 +339,16 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         });
 
         createAlertDialog(R.string.ui_detecting_location);
-        alertDialog.setOnDismissListener(
-            new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    stopLocationDetection();
-                    dialog.dismiss();
+        checkInAlertDialog.setOnDismissListener(
+                new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        stopLocationDetection();
+                        dialog.dismiss();
+                    }
                 }
-            }
         );
-        alertDialog.show();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CHECK_SETTINGS:
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        // All required changes were successfully made
-                        startLocationDetection();
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        // The user was asked to change settings, but chose not to
-                        locationDetectionFailed();
-                        break;
-                    default:
-                        break;
-                }
-                break;
-        }
-    }
-
-    private void locationDetectionFailed() {
-        reportEventAction(event, "checkInFailedLocation");
-        stopLocationDetection();
-        Toast.makeText(this, R.string.failed_location, Toast.LENGTH_LONG).show();
-        alertDialog.dismiss();
-    }
-
-    private void createAlertDialog(int messageResourceId) {
-        alertDialog = new AlertDialog.Builder(this).create();
-        @SuppressLint("InflateParams")
-        View dialogView = alertDialog.getLayoutInflater().inflate(R.layout.dialog_busy, null);
-        ((TextView) dialogView.findViewById(R.id.message)).setText(messageResourceId);
-        alertDialog.setView(dialogView);
-    }
-
-    private void startLocationDetection() {
-        locationRequestStartTime = System.currentTimeMillis();
-        LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
-    }
-
-    private void stopLocationDetection() {
-        if (client.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(client,
-                EventDetailActivity.this);
-        }
+        checkInAlertDialog.show();
     }
 
     public void imagePreview(View view) {
@@ -549,7 +523,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         if (location.hasAccuracy() && location.getAccuracy() < LOCATION_ACCURACY_REQUIRED_METERS) {
             // We have enough location accuracy. Stop detecting location, and close dialog
             stopLocationDetection();
-            alertDialog.dismiss();
+            checkInAlertDialog.dismiss();
 
             // Lets check if the user is near the event
             userLocation = new LatLng(location.getLatitude(), location.getLongitude());
@@ -573,6 +547,33 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         }
     }
 
+    private void locationDetectionFailed() {
+        reportEventAction(event, "checkInFailedLocation");
+        stopLocationDetection();
+        Toast.makeText(this, R.string.failed_location, Toast.LENGTH_LONG).show();
+        checkInAlertDialog.dismiss();
+    }
+
+    private void createAlertDialog(int messageResourceId) {
+        checkInAlertDialog = new AlertDialog.Builder(this).create();
+        @SuppressLint("InflateParams")
+        View dialogView = checkInAlertDialog.getLayoutInflater().inflate(R.layout.dialog_busy, null);
+        ((TextView) dialogView.findViewById(R.id.message)).setText(messageResourceId);
+        checkInAlertDialog.setView(dialogView);
+    }
+
+    private void startLocationDetection() {
+        locationRequestStartTime = System.currentTimeMillis();
+        LocationServices.FusedLocationApi.requestLocationUpdates(client, checkInLocationRequest, this);
+    }
+
+    private void stopLocationDetection() {
+        if (client.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(client,
+                    EventDetailActivity.this);
+        }
+    }
+
     private void checkIn() {
         reportEventAction(event, "checkInSubmit");
         try {
@@ -584,7 +585,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 .build();
 
             createAlertDialog(R.string.ui_checking_in);
-            alertDialog.show();
+            checkInAlertDialog.show();
 
             VolleyHelper.addToRequestQueue(this,
                 new JsonObjectRequest(Request.Method.GET, Signer.sign(requestUrl).toString(), null,
@@ -608,14 +609,14 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     private void checkInFailed() {
-        alertDialog.dismiss();
+        checkInAlertDialog.dismiss();
         reportActionToAnalytics("checkInFailed");
         Toast.makeText(EventDetailActivity.this, R.string.check_in_failed,
             Toast.LENGTH_SHORT).show();
     }
 
     private void checkInSuccess() {
-        alertDialog.dismiss();
+        checkInAlertDialog.dismiss();
         reportActionToAnalytics("checkInSuccess");
         Toast.makeText(EventDetailActivity.this, R.string.check_in_success,
             Toast.LENGTH_SHORT).show();
