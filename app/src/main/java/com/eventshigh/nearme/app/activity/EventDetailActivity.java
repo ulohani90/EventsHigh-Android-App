@@ -442,7 +442,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     public void facebook(View view) {
-        shareEvent(event, PACKAGE_NAME_FACEBOOK);
         if (ShareDialog.canShow(ShareLinkContent.class)) {
             ShareLinkContent content = new ShareLinkContent.Builder()
                     .setContentUrl(event.getEventShareURI(this, "fb"))
