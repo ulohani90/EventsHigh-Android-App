@@ -71,7 +71,7 @@ public abstract class BaseEventListRequest extends JsonRequest<List<Event>>  {
     public static List<Event> parseEventsFromNetworkResponse(NetworkResponse response,
             Context context, EventsContext eventsContext, EventsMarkerManager eventsMarkerManager,
             boolean includeWithoutLocation) throws UnsupportedEncodingException, JSONException {
-        new ReportTimingTask(context, "events").execute(response.networkTimeMs);
+        ReportTimingTask.report(context, "events", response.networkTimeMs);
 
         String jsonString = new String(response.data, "UTF-8");
         JSONObject eventsJson = new JSONObject(jsonString);

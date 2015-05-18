@@ -16,6 +16,7 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
+import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONArray;
@@ -90,6 +91,8 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
 
     @Override
     protected Response<EventCollection> parseNetworkResponse(NetworkResponse response) {
+        ReportTimingTask.report(context, "featured-events", response.networkTimeMs);
+
         try {
             // Parse the response.
             List<Event> events = BaseEventListRequest.parseEventsFromNetworkResponse(response,

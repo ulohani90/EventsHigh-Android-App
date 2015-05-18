@@ -86,7 +86,7 @@ public class EventRequest extends JsonRequest<Event> {
 
     @Override
     protected Response<Event> parseNetworkResponse(NetworkResponse response) {
-        new ReportTimingTask(context, "event").execute(response.networkTimeMs);
+        ReportTimingTask.report(context, "event", response.networkTimeMs);
 
         try {
             String jsonString = new String(response.data,

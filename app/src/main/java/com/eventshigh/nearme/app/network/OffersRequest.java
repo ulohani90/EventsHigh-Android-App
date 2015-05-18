@@ -109,7 +109,7 @@ public class OffersRequest extends JsonRequest<List<Offer>> {
 
     @Override
     protected Response<List<Offer>> parseNetworkResponse(NetworkResponse response) {
-        new ReportTimingTask(context, "offers").execute(response.networkTimeMs);
+        ReportTimingTask.report(context, "offers", response.networkTimeMs);
 
         try {
             String jsonString = new String(response.data, "UTF-8");

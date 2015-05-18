@@ -78,7 +78,7 @@ public class DateCategoryRequest extends JsonRequest<List<TopicEvents>>  {
     protected Response<List<TopicEvents>> parseNetworkResponse(NetworkResponse response) {
         try {
             // Parse the response.
-            new ReportTimingTask(context, "date-category-events").execute(response.networkTimeMs);
+            ReportTimingTask.report(context, "date-category-events", response.networkTimeMs);
             String jsonString = new String(response.data, "UTF-8");
             JSONObject eventsJson = new JSONObject(jsonString);
             JSONObject dateEventsJson = eventsJson.getJSONObject(eventsJson.keys().next());
