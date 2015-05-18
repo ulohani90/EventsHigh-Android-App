@@ -227,7 +227,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
     public void save(View view) {
         showRateAppDialog = true;
-        reportEventAction(event, "addToCalendar" + (view instanceof TextView ? "" : "2"));
+        reportEventAction(event, "addToCalendar");
 
         addToCalendar(event, null);
     }
@@ -245,7 +245,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         }
 
         showRateAppDialog = true;
-        reportEventAction(event, "callOrganizer" + (view instanceof TextView ? "2" : ""));
+        reportEventAction(event, "callOrganizer");
 
         Intent intent = new Intent(Intent.ACTION_DIAL)
                 .setData(Uri.parse("tel:" + (event.organizerPhone.split(",")[0])));
@@ -904,7 +904,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 organizerEmailView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        reportEventAction(event, "emailOrganizer2");
+                        reportEventAction(event, "emailOrganizer");
                         askOverEmail();
                     }
                 });

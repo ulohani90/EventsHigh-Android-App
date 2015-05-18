@@ -218,8 +218,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .setData(Events.CONTENT_URI)
                 .putExtra(Events.TITLE, event.title)
                 .putExtra(Events.EVENT_LOCATION, event.getFullAddress())
-                .putExtra(Events.DESCRIPTION,
-                        event.getEventShareURI(this) + "\n\n" + event.description);
+                .putExtra(Events.DESCRIPTION, event.getEventShareURI(this))
+                .putExtra(Events.EVENT_LOCATION, event.getShortAddress());
 
         if (date == null && event.eventTimings.length > 0) {
             date = new Date(event.eventTimings[0]);
