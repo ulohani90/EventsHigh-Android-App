@@ -13,7 +13,6 @@ import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
@@ -69,7 +68,6 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
     private final Context context;
     private final EventsContext eventsContext;
     private final Priority priority;
-    private final EventsMarkerManager eventsMarkerManager;
 
     public FeaturedEventsRequest(Context context, String url, EventsContext eventsContext,
                                  boolean shouldBypassCache, Priority priority,
@@ -81,7 +79,6 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
         this.context = context;
         this.eventsContext = eventsContext;
         this.priority = priority;
-        this.eventsMarkerManager = EventsMarkerManager.getInstance(context);
     }
 
     @Override
@@ -96,7 +93,7 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
         try {
             // Parse the response.
             List<Event> events = BaseEventListRequest.parseEventsFromNetworkResponse(response,
-                    context, eventsContext, eventsMarkerManager, true);
+                    context, eventsContext, true);
             List<Event> filteredEvents = new ArrayList<>(MAX_FEATURED_EVENTS);
             for (Event event : events) {
                 if (event.imgUrl != null) {

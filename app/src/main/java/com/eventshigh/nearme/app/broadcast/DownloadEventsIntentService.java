@@ -14,7 +14,6 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.user.Account;
@@ -121,8 +120,7 @@ public class DownloadEventsIntentService extends IntentService {
     private void showNotification(Set<Event> eventSet, Intent intent) {
         // Sort the events for user.
         List<Event> events = new ArrayList<>(eventSet);
-        Collections.sort(events, new EventComparator(null,
-                EventsMarkerManager.getInstance(DownloadEventsIntentService.this)));
+        Collections.sort(events, new EventComparator(null));
 
         // In case of single event, use Single Event Notification stack.
         IntentType type = IntentType.getType(intent);

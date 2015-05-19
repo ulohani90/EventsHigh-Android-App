@@ -14,7 +14,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.data.EventsMarkerManager.Editor;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.UserActionDbHelper;
 import com.eventshigh.nearme.app.user.Account;
@@ -31,7 +30,7 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public abstract class BaseContextActivity extends BaseActivity {
     protected EventsContext eventsContext;
-    protected Editor eventsMarkerEditor;
+    protected EventsMarkerManager eventsMarkerManager;
 
     protected Toolbar toolbar;
 
@@ -43,7 +42,7 @@ public abstract class BaseContextActivity extends BaseActivity {
         super.onStart();
 
         // Initialize the EventsMarkerManager.Editor.
-        eventsMarkerEditor = EventsMarkerManager.getInstance(this).getEditor();
+        eventsMarkerManager = EventsMarkerManager.getInstance(this);
 
         // Setup GoogleApiClient
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.APP_INDEX_API).build();
@@ -70,8 +69,6 @@ public abstract class BaseContextActivity extends BaseActivity {
 
     @Override
     protected void onStop() {
-        eventsMarkerEditor.close();
-
         if (client != null && client.isConnected()) {
             if (eventsContext != null) {
                 Uri webUri = EventsHighEndpoints.getWebUri(eventsContext);
@@ -172,13 +169,17 @@ public abstract class BaseContextActivity extends BaseActivity {
         });
     }
 
+    public boolean isFavourite(Event event) {
+        return eventsMarkerManager.isFavourite(event.id);
+    }
+
     public @Nullable
     EventMark getEventMark(Event event) {
-        return eventsMarkerEditor.getEventsMarkerManager().getEventMark(event.id);
+        return eventsMarkerManager.getEventMark(event.id);
     }
 
     public void recordEventMark(Event event, @Nullable EventMark mark) {
-        eventsMarkerEditor.recordEventMark(event, mark);
+        eventsMarkerManager.getEditor().recordEventMark(event, mark).close();
     }
 
     public void reportEventAction(Event event, String actionName, int position) {

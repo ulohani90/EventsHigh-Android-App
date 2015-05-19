@@ -9,7 +9,6 @@ import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
@@ -30,7 +29,6 @@ public abstract class BaseEventListRequest extends JsonRequest<List<Event>>  {
     protected final Context context;
     protected final EventsContext eventsContext;
     private final Priority priority;
-    protected final EventsMarkerManager eventsMarkerManager;
     private final boolean includeWithoutLocation;
 
     /**
@@ -53,7 +51,6 @@ public abstract class BaseEventListRequest extends JsonRequest<List<Event>>  {
         this.context = context;
         this.eventsContext = eventsContext;
         this.priority = priority;
-        this.eventsMarkerManager = EventsMarkerManager.getInstance(context);
         this.includeWithoutLocation = includeWithoutLocation;
     }
 
@@ -64,13 +61,13 @@ public abstract class BaseEventListRequest extends JsonRequest<List<Event>>  {
 
     protected List<Event> parseEventsFromNetworkResponse(NetworkResponse response)
             throws UnsupportedEncodingException, JSONException {
-        return parseEventsFromNetworkResponse(response, context, eventsContext, eventsMarkerManager,
+        return parseEventsFromNetworkResponse(response, context, eventsContext,
                 includeWithoutLocation);
     }
 
     public static List<Event> parseEventsFromNetworkResponse(NetworkResponse response,
-            Context context, EventsContext eventsContext, EventsMarkerManager eventsMarkerManager,
-            boolean includeWithoutLocation) throws UnsupportedEncodingException, JSONException {
+            Context context, EventsContext eventsContext, boolean includeWithoutLocation)
+            throws UnsupportedEncodingException, JSONException {
         ReportTimingTask.report(context, "events", response.networkTimeMs);
 
         String jsonString = new String(response.data, "UTF-8");
@@ -80,8 +77,7 @@ public abstract class BaseEventListRequest extends JsonRequest<List<Event>>  {
         filterOldEvents(events, !eventsContext.dateFilter.isEmpty());
 
         // Sort the event list to user.
-        eventsMarkerManager.waitForLoading();
-        Collections.sort(events, new EventComparator(eventsContext.location, eventsMarkerManager));
+        Collections.sort(events, new EventComparator(eventsContext.location));
 
         return events;
     }

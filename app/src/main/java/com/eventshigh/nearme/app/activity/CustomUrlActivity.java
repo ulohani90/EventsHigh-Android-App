@@ -19,6 +19,7 @@ import android.webkit.WebViewClient;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.utils.Utils;
 
 public class CustomUrlActivity extends BaseActivity {
     public static final String OFFER_URL_PREFIX = "http://www.eventshigh.com/get_event_contest/";
@@ -70,6 +71,12 @@ public class CustomUrlActivity extends BaseActivity {
         String title = getIntent().getStringExtra(EXTRA_TITLE_KEY);
 
         // Process the Offer request.
+        if (Utils.checkIfUnknown(getIntent().getDataString()) == null) {
+            // nothing to do
+            finish();
+            return;
+        }
+
         if (getIntent().getDataString().startsWith(OFFER_URL_PREFIX)) {
             getIntent().setData(getIntent().getData().buildUpon()
                 .appendQueryParameter("reflink", new Account(this).getAppDownloadLink()).build());

@@ -9,6 +9,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -16,6 +17,7 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import org.json.JSONException;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,6 +38,12 @@ public class EventCollectionRequest extends BaseEventListRequest {
                               Listener<List<Event>> listener, ErrorListener errorListener) {
         if (eventsContext.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
+            return;
+        }
+
+        if (EventsHighEndpoints.isMyEventQuery(eventsContext.query) &&
+            !(context instanceof BaseContextActivity)) {
+            listener.onResponse(new ArrayList<Event>(), false);
             return;
         }
 
@@ -69,11 +77,16 @@ public class EventCollectionRequest extends BaseEventListRequest {
 
             // In case of MyEvents request, filter out the events which user has favourited.
             if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-                for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
-                    Event event = it.next();
-                    if (! eventsMarkerManager.isFavourite(event.id)) {
-                        it.remove();
+                if (context instanceof BaseContextActivity) {
+                    BaseContextActivity activity = (BaseContextActivity) context;
+                    for (Iterator<Event> it = events.iterator(); it.hasNext(); ) {
+                        Event event = it.next();
+                        if (!activity.isFavourite(event)) {
+                            it.remove();
+                        }
                     }
+                } else {
+                    events = new ArrayList<>();
                 }
             }
 

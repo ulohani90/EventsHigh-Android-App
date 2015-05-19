@@ -22,6 +22,7 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
@@ -66,6 +67,9 @@ public abstract class BaseActivity extends AppCompatActivity {
             Fabric.with(this, new Crashlytics());
         }
 
+        // Report app to Facebook
+        FacebookSdk.sdkInitialize(getApplicationContext());
+
         // Setup Google Analytics.
         isPlayServicesPresent = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS;
         if (isPlayServicesPresent) {
@@ -104,8 +108,8 @@ public abstract class BaseActivity extends AppCompatActivity {
             actionBar.collapseActionView();
         }
 
-        // Report app to Facebook
-        FacebookSdk.sdkInitialize(getApplicationContext());
+        // FB.
+        AppEventsLogger.activateApp(this);
 
         // Find out share action result.
         if (shareAppInitiatedTimestamp > 0) {
@@ -117,6 +121,14 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
         shareAppInitiatedTimestamp = 0;
         shareEventInitiatedTimestamp = 0;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // FB.
+        AppEventsLogger.deactivateApp(this);
     }
 
     @Override

@@ -17,13 +17,11 @@ import java.util.Map;
  * we reduce 500*N meters from its distance.
  */
 public class EventComparator implements Comparator<Event> {
-    private final EventsMarkerManager eventsMarkerManager;
     @Nullable  private final LatLng userLocation;
     private final Map<String, Double> eventScoreMap = new HashMap<>();
 
-    public EventComparator(@Nullable LatLng userLocation, EventsMarkerManager eventsMarkerManager) {
+    public EventComparator(@Nullable LatLng userLocation) {
         this.userLocation = userLocation;
-        this.eventsMarkerManager = eventsMarkerManager;
     }
 
     @Override
@@ -45,8 +43,7 @@ public class EventComparator implements Comparator<Event> {
             double timePenalty = eventTime == null || eventTime.time == null ? 30 :
                     Math.min(30, 1e-7 * Math.abs(System.currentTimeMillis() - event.eventTimings[0]));
 
-            result = event.uberScore + (eventsMarkerManager.isFavourite(event.id) ? 20 : 0)
-                    - timePenalty - distancePenalty;
+            result = event.uberScore - timePenalty - distancePenalty;
             eventScoreMap.put(event.id, result);
         }
         return result;
