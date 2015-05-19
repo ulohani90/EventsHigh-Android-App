@@ -38,7 +38,7 @@
         android:layout_toLeftOf="@+id/share_app"
         android:layout_toStartOf="@+id/share_app"
         android:layout_margin="16dp"
-        android:text="Get 10 points for every friend who installs the app through you!"
+        android:text="Share this app &amp; get 10 points for every friend who installs the app!"
     />
 
     <TextView
