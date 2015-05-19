@@ -61,6 +61,10 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.share.Sharer.Result;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.appindexing.AppIndex;
@@ -443,10 +447,30 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
     public void facebook(View view) {
         if (ShareDialog.canShow(ShareLinkContent.class)) {
+            reportEventAction(event, "eventShareInitiated", "fb");
+
+            ShareDialog shareDialog = new ShareDialog(this);
+            shareDialog.registerCallback(CallbackManager.Factory.create(), new FacebookCallback<Result>() {
+                @Override
+                public void onSuccess(Result result) {
+                    reportEventAction(event, "shareEvent", "fb");
+                }
+
+                @Override
+                public void onCancel() {
+                    reportEventAction(event, "eventShareDismissed", "fb");
+                }
+
+                @Override
+                public void onError(FacebookException e) {
+                    reportEventAction(event, "eventShareError", "fb");
+                }
+            });
+
             ShareLinkContent content = new ShareLinkContent.Builder()
                     .setContentUrl(event.getEventShareURI(this, "fb"))
                     .build();
-            ShareDialog.show(this, content);
+            shareDialog.show(content);
         } else {
             shareEvent(event, PACKAGE_NAME_FACEBOOK);
         }
