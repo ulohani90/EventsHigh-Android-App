@@ -7,13 +7,16 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 
 public class EHPreferenceFragment extends PreferenceFragment
     implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private Preference pointsView;
+    private Preference lastCityView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,11 @@ public class EHPreferenceFragment extends PreferenceFragment
         pointsView = getPreferenceScreen().findPreference("points_key");
         pointsView.setSummary(Preferences.getInstance(getActivity()).getPoints());
         Account.getNumPoints(getActivity(), null);
+
+        // Last city preference.
+        lastCityView = getPreferenceScreen().findPreference("last_city_key");
+        City city = GcmRegistration.getInstance(getActivity()).getLastCity();
+        lastCityView.setSummary(city == null ? "" : city.name());
 
         Preferences.getInstance(getActivity()).registerOnSharedPreferenceChangeListener(this);
     }
