@@ -286,6 +286,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private void bindHeaderView(final BaseEventsFragment eventsFragment, final HeaderData header) {
             titleView.setText(header.header);
+            titleView.setTypeface(BaseActivity.fontQuestrial);
             if (header.numEvents <= 0) {
                 numEventsView.setVisibility(View.GONE);
             } else {
@@ -349,6 +350,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private void bindHeaderView(final SmallHeaderData header) {
             titleView.setText(header.header);
+            titleView.setTypeface(BaseActivity.fontQuestrial);
         }
     }
 

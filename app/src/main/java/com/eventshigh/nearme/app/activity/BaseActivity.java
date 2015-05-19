@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.activity;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
@@ -50,6 +51,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected long shareEventInitiatedTimestamp = 0;
     protected long shareAppInitiatedTimestamp = 0;
 
+    public static Typeface fontQuestrial;
+    public static Object lock = new Object();
+    public static boolean loadedFonts = false;
 
     // **********************************************
     // Activity lifecycle  Methods
@@ -75,6 +79,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         isPlayServicesPresent = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS;
         if (isPlayServicesPresent) {
             gaHelper = GAHelper.getInstance(this);
+        }
+
+        synchronized (lock) {
+            if (!loadedFonts) {
+                fontQuestrial = Typeface.createFromAsset(getAssets(), "Questrial-Regular.ttf");
+                loadedFonts = true;
+            }
         }
     }
 
