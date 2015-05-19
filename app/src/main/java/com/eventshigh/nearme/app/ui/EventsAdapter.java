@@ -23,7 +23,6 @@ import com.eventshigh.nearme.app.activity.BaseEventsFragment;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
-import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
@@ -67,13 +66,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             dataToShow.add(new SeeAllData(categoryForSeeAll));
         }
         notifyDataSetChanged();
-    }
-
-    public void addOffer(Offer offer) {
-        if (dataToShow.size() > 10 && dataToShow.get(10) instanceof EventData) {
-            dataToShow.add(10, new OfferData(offer));
-            notifyDataSetChanged();
-        }
     }
 
     public void setTopicEvents(List<TopicEvents> topicEvents, int maxPerCategory) {
@@ -185,7 +177,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private enum DataType {
         HEADER(0),
         EVENT(1),
-        OFFER(2),
         FOLLOW(3),
         TRENDING_CATEGORY(4),
         EXPLORE_CATEGORY(5),
@@ -210,10 +201,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             if (typeId == EVENT.typeId) {
                 return EventCard.newInstance(activity, parent);
-            }
-
-            if (typeId == OFFER.typeId) {
-                return OfferCard.newInstance(activity, parent);
             }
 
             if (typeId == FOLLOW.typeId) {
@@ -674,44 +661,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         }
     }
-
-    // Offer Data.
-    private class OfferData implements Data {
-        private final Offer offer;
-
-        private OfferData(com.eventshigh.nearme.app.data.Offer offer) {
-            this.offer = offer;
-        }
-
-        @Override
-        public DataType getType() {
-            return DataType.OFFER;
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder card, int position) {
-            offer.populateOfferCard(card.itemView, eventsFragment.getContextActivity());
-        }
-
-        @Override
-        public String getId() {
-            return offer.id;
-        }
-    }
-
-    static class OfferCard extends ViewHolder {
-
-        static OfferCard newInstance(final BaseActivity activity, ViewGroup parent) {
-            View view = activity.getLayoutInflater().inflate(
-                    R.layout.card_offer, parent, false);
-            return new OfferCard(view);
-        }
-
-        public OfferCard(View itemView) {
-            super(itemView);
-        }
-    }
-
 
     // Follow Data.
     private class FollowData implements Data {

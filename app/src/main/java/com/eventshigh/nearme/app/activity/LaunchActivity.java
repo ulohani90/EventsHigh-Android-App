@@ -267,7 +267,7 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.setViewPager(viewPager);
         tabsView.setOnPageChangeListener(adapter);
         tabsView.setCustomTabColorizer(adapter);
-        viewPager.setCurrentItem(1, false);
+        viewPager.setCurrentItem(2, false);
         lastFetchTimestamp = System.currentTimeMillis();
     }
 
@@ -326,22 +326,14 @@ public class LaunchActivity extends BaseContextActivity {
     /**
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
-    enum ExploreScreenTab {
-        WEEK("this week"),
-        EXPLORE("explore"),
-        My_EVENTS(EventsHighEndpoints.QUERY_MY_EVENT);
-
-        private final String title;
-
-        ExploreScreenTab(String title) {
-            this.title = title;
-        }
-    }
-
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
             implements TabViewAdapter, OnPageChangeListener, TabColorizer {
-        private final ExploreScreenTab[] tabs = {ExploreScreenTab.My_EVENTS, ExploreScreenTab.EXPLORE,
-                ExploreScreenTab.WEEK};
+        private final String[] tabs = {
+                "offers",
+                EventsHighEndpoints.QUERY_MY_EVENT,
+                "explore",
+                "this week"
+            };
         private final TextView[] tabViews = new TextView[tabs.length];
 
         public ExploreScreenPagerAdapter() {
@@ -351,11 +343,15 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public Fragment getItem(int position) {
             if (position == 0) {
+                return new OffersFragment();
+            }
+
+            if (position == 1) {
                 return EventsFragment.getInstance(new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_EVENT), false, true);
             }
 
-            if (position == 1) {
+            if (position == 2) {
                 return ExploreFragment.getInstance(eventsContext);
             }
 
@@ -386,7 +382,7 @@ public class LaunchActivity extends BaseContextActivity {
             TextView textView = (TextView) getLayoutInflater().inflate(
                     R.layout.view_explore_tab, parent, false);
             tabViews[position] = textView;
-            textView.setText(Utils.capitalize(tabs[position].title));
+            textView.setText(Utils.capitalize(tabs[position]));
             return textView;
         }
 

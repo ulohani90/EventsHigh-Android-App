@@ -17,12 +17,10 @@ import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.DateCategoryRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
-import com.eventshigh.nearme.app.network.OffersRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -179,19 +177,6 @@ public class EventsFragment extends BaseEventsFragment {
                     (eventsContext.query.isEmpty() || eventsContext.dateFilter.isEmpty() ? null : eventsContext.query));
                 if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, events.size());
-                }
-
-                if (!isIntermediate && events.size() > 10) {
-                    OffersRequest.submit(activity, Priority.NORMAL, EventsFragment.this,
-                        new Listener<Offer>() {
-                            @Override
-                            public void onResponse(Offer offer, boolean isIntermediate) {
-                                if (isDetached()) {
-                                    return;
-                                }
-                                eventsAdapter.addOffer(offer);
-                            }
-                        });
                 }
             }
         }

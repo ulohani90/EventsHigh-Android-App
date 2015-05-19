@@ -10,7 +10,6 @@
     <screenName name="com.eventshigh.nearme.app.activity.EventDetailActivity">Details</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.CustomUrlActivity">CustomUrlActivity</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.OnBoardingActivity">OnBoarding</screenName>
-    <screenName name="com.eventshigh.nearme.app.activity.OffersActivity">Offers</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.PhoneLoginActivity">PhoneLogin</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.SettingsActivity">Settings</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.AboutUsActivity">AboutUs</screenName>

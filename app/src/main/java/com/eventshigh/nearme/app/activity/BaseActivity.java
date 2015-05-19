@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -176,18 +177,14 @@ public abstract class BaseActivity extends AppCompatActivity {
     /**
      * Helper method to start activity which lets user share the app.
      */
-    public void shareApp(@Nullable String message) {
+    public void shareApp(View view) {
         reportActionToAnalytics("appShareInitiated");
         shareAppInitiatedTimestamp = System.currentTimeMillis();
-
-        if (message == null) {
-            message = getString(R.string.share_app_text);
-        }
 
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT,
-                String.format(message, new Account(this).getAppDownloadLink()));
+                String.format(getString(R.string.share_app_text), new Account(this).getAppDownloadLink()));
         intent.setType("text/plain");
         startActivity(intent);
     }

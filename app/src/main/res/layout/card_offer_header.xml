@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+>
+    <TextView
+        style="?android:attr/textAppearanceLarge"
+        android:id="@+id/num_points"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="32dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/offer"
+        android:gravity="center"
+        tools:text="300"
+    />
+
+    <TextView
+        style="?android:attr/textAppearanceMedium"
+        android:id="@+id/claim_count_tip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/num_points"
+        android:gravity="center"
+        android:text="@string/pref_title_points"
+    />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/claim_count_tip"
+        android:layout_toLeftOf="@+id/share_app"
+        android:layout_toStartOf="@+id/share_app"
+        android:layout_margin="16dp"
+        android:text="Get 10 points for every friend who installs the app through you!"
+    />
+
+    <TextView
+        android:id="@+id/share_app"
+        style="@style/EHButtonCTA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/claim_count_tip"
+        android:textAllCaps="true"
+        android:text="@string/action_share_app"
+        android:onClick="shareApp"
+    />
+</RelativeLayout>

@@ -228,19 +228,6 @@
             />
         </activity>
         <activity
-            android:name=".activity.OffersActivity"
-            android:label="@string/pref_title_offers"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:parentActivityName=".activity.LaunchActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="UnusedAttribute"
-        >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.LaunchActivity"
-            />
-        </activity>
-        <activity
             android:name=".activity.PhoneLoginActivity"
             android:label="@string/pref_title_phone_no"
             android:screenOrientation="portrait"

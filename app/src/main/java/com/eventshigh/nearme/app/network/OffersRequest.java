@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -32,33 +31,6 @@ public class OffersRequest extends JsonRequest<List<Offer>> {
     private final Priority priority;
 
     /**
-     * Helper method to submit a volley request to fetch a single offer.
-     *
-     * @param context an application eventsContext to initiate the volley.
-     * @param listener callback on success.
-     */
-    public static void submit(Context context, Priority priority, Object tag,
-                              final Listener<Offer> listener) {
-        submit(context, priority, tag, false, new Listener<List<Offer>>() {
-            @Override
-            public void onResponse(List<Offer> offers, boolean isIntermediate) {
-                for (final Offer offer : offers) {
-                    if (offer.isGoodToShow()) {
-                        listener.onResponse(offer, isIntermediate);
-                        break;
-                    }
-                }
-            }
-        }, new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                Log.e(OffersRequest.class.getSimpleName(),
-                        "failed to fetch offers: " + volleyError.getMessage(), volleyError.getCause());
-            }
-        });
-    }
-
-    /**
      * Helper method to submit a volley request to fetch all offers information.
      *
      * @param context an application eventsContext to initiate the volley.
@@ -69,7 +41,7 @@ public class OffersRequest extends JsonRequest<List<Offer>> {
                               Listener<List<Offer>> listener, ErrorListener errorListener) {
         try {
             OffersRequest request = new OffersRequest(context,
-                    AccountStateReporter.getBaseUri(context, "getOffers").build(),
+                    AccountStateReporter.getBaseUri(context, "getOffersTab").build(),
                     priority, shouldBypassCache, listener, errorListener);
             request.setTag(tag);
             VolleyHelper.addToRequestQueue(context, request);

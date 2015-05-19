@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context=".activity.OffersActivity"
 >
     <ProgressBar
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:id="@+id/top_progress_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="top"
         android:layout_marginTop="-4dp"
         android:layout_marginBottom="-4dp"
         android:indeterminate="true"
-        android:visibility="gone"
     />
 
     <com.eventshigh.nearme.app.view.AutofitRecyclerView
@@ -29,15 +27,5 @@
         android:paddingRight="4dp"
         android:paddingBottom="20dp"
         android:clipToPadding="false"
-        android:layout_alignParentBottom="true"
     />
-
-    <include
-        android:id="@+id/retry"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:visibility="gone"
-        layout="@layout/view_retry"
-    />
-</RelativeLayout>
+</FrameLayout>
