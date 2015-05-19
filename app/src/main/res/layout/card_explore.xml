@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
 >
-    <com.android.volley.toolbox.NetworkImageView
+    <com.eventshigh.nearme.app.view.FadeInNetworkImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="@dimen/explore_card_width"
