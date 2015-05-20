@@ -187,6 +187,14 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
+    public void cityChanged(City city) {
+        drawer.closeDrawer(Gravity.START);
+        eventsContext.changeLocation(city.cityBounds.getCenter());
+        LatLng newLocation = city.cityBounds.getCenter();
+        new FetchLocalityTask(this).execute(newLocation);
+        showExploreScreen();
+    }
+
     // ***********************
     // Callbacks
     // ***********************

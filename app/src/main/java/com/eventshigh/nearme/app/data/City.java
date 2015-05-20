@@ -47,4 +47,14 @@ public enum City {
 
         return null;
     }
+
+    public static String[] getValuesAsString() {
+        City[] cities = values();
+        String[] cityNames = new String[cities.length];
+        for (int i = 0; i < cities.length; i++) {
+            cityNames[i] = cities[i].name();
+        }
+
+        return cityNames;
+    }
 }
