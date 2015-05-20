@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.app.Activity;
-import android.graphics.Typeface;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -287,7 +286,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private void bindHeaderView(final BaseEventsFragment eventsFragment, final HeaderData header) {
             titleView.setText(header.header);
-            titleView.setTypeface(BaseActivity.fontQuestrial, Typeface.BOLD);
+            titleView.setTypeface(BaseActivity.fontQuicksandBold);
             if (header.numEvents <= 0) {
                 numEventsView.setVisibility(View.GONE);
             } else {
@@ -351,7 +350,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private void bindHeaderView(final SmallHeaderData header) {
             titleView.setText(header.header);
-            titleView.setTypeface(BaseActivity.fontQuestrial);
+            titleView.setTypeface(BaseActivity.fontQuicksand);
         }
     }
 

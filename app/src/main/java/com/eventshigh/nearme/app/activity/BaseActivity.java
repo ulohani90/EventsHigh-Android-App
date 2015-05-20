@@ -51,7 +51,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected long shareEventInitiatedTimestamp = 0;
     protected long shareAppInitiatedTimestamp = 0;
 
-    public static Typeface fontQuestrial;
+    public static Typeface fontQuicksand;
+    public static Typeface fontQuicksandBold;
     public static Object lock = new Object();
     public static boolean loadedFonts = false;
 
@@ -83,7 +84,8 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         synchronized (lock) {
             if (!loadedFonts) {
-                fontQuestrial = Typeface.createFromAsset(getAssets(), "Questrial-Regular.ttf");
+                fontQuicksand = Typeface.createFromAsset(getAssets(), "Quicksand-Regular.ttf");
+                fontQuicksandBold = Typeface.createFromAsset(getAssets(), "Quicksand-Bold.ttf");
                 loadedFonts = true;
             }
         }
