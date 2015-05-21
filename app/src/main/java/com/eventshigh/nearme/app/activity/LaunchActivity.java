@@ -17,7 +17,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -349,7 +348,6 @@ public class LaunchActivity extends BaseContextActivity {
             if (position == 1) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_EVENT);
-                Log.w("launchactivity city", myEventsContext.toString());
                 return EventsFragment.getInstance(myEventsContext, false, true);
             }
 
