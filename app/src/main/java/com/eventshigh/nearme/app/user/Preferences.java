@@ -67,8 +67,11 @@ public class Preferences implements OnSharedPreferenceChangeListener {
         new BackupManager(context).dataChanged();
     }
 
-    public void registerOnSharedPreferenceChangeListener(
-        OnSharedPreferenceChangeListener listener) {
+    public void registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
         sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener);
     }
 }

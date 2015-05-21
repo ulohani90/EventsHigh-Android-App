@@ -103,10 +103,6 @@ public class EventsMarkerManager {
             threads.add(EventMarkDbHelper.removeEntry(database, event.id));
             return this;
         }
-
-        public EventsMarkerManager getEventsMarkerManager() {
-            return EventsMarkerManager.this;
-        }
     }
 
     /**
@@ -122,7 +118,6 @@ public class EventsMarkerManager {
     }
 
     private final Context context;
-    private boolean loaded = false;
     private final Map<String, EventMark> eventMarkMap = new ConcurrentHashMap<>();
 
     private EventsMarkerManager(Context context) {
@@ -134,24 +129,10 @@ public class EventsMarkerManager {
             public void run() {
                 synchronized (this) {
                     refreshListingFromDb();
-                    loaded = true;
                     this.notifyAll();
                 }
             }
         }).start();
-    }
-
-    /**
-     * Waits for data to be loaded from DB.
-     */
-    public synchronized void waitForLoading() {
-        while (!loaded) {
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-                // ignore.
-            }
-        }
     }
 
     public @Nullable EventMark getEventMark(String eventId) {

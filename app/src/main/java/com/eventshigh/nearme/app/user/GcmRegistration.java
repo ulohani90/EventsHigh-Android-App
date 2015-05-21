@@ -23,6 +23,10 @@ import java.io.IOException;
  * This class stores the GCM registration data locally within app.
  */
 public class GcmRegistration {
+    public interface UserCityListener {
+        void onUserCityChanged(City newUserCity);
+    }
+
     // Constants used for SharedPreferences.
     private static final String PREFS_FILE_NAME = "eh_gcm_credentials";
 
@@ -39,6 +43,9 @@ public class GcmRegistration {
     // Member variables used to store the user account details in preferences.
     private final Context context;
     private final SharedPreferences gcmRegistrationInfo;
+
+    // City listener.
+    UserCityListener userCityListener = null;
 
     private GcmRegistration(Context context) {
         this.context = context.getApplicationContext();
@@ -60,6 +67,9 @@ public class GcmRegistration {
     public void setLastCity(@Nullable City city, @Nullable LatLng location) {
         if (city != null) {
             new CityRegistar(city, location).execute();
+            if (userCityListener != null) {
+                userCityListener.onUserCityChanged(city);
+            }
         }
     }
 
@@ -74,6 +84,10 @@ public class GcmRegistration {
             }
         }
         return city;
+    }
+
+    public void setUserCityListener (@Nullable UserCityListener userCityListener) {
+        this.userCityListener = userCityListener;
     }
 
     private class CityRegistar extends AsyncTask<Void, Void, Void> {

@@ -15,7 +15,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
-import com.eventshigh.nearme.app.data.UserActionDbHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -201,8 +200,6 @@ public abstract class BaseContextActivity extends BaseActivity {
 
     public void showEventDetails(Event event, @Nullable Bundle bundle) {
         reportEventAction(event, "showEventDetails", event.id);
-        UserActionDbHelper.getInstance(this).recordAction(
-            UserActionDbHelper.EventAction.OPEN_EVENT_DETAIL, event.id);
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.putExtra(EventDetailActivity.EXTRA_EVENT_PARAM, event);
         startActivity(detailIntent, bundle);

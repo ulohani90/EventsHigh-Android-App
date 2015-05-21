@@ -48,6 +48,8 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.data.UserActionDbHelper;
+import com.eventshigh.nearme.app.data.UserActionDbHelper.EventAction;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
@@ -232,6 +234,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     public void save(View view) {
         showRateAppDialog = true;
         reportEventAction(event, "addToCalendar");
+        UserActionDbHelper.getInstance(this).recordAction(EventAction.SAVE, event.id);
 
         addToCalendar(event, null);
     }
@@ -249,7 +252,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         }
 
         showRateAppDialog = true;
-        reportEventAction(event, "callOrganizer");
+        reportEventAction(event, "organizer", "call");
 
         Intent intent = new Intent(Intent.ACTION_DIAL)
                 .setData(Uri.parse("tel:" + (event.organizerPhone.split(",")[0])));
@@ -258,14 +261,14 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     public void openOrganizerLink(View view) {
-        reportEventAction(event, "openOrganizerLink");
+        reportEventAction(event, "organizer", "openLink");
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerLink));
         startActivitySafe(intent);
     }
 
     public void openOrganizerWebsite(View view) {
-        reportEventAction(event, "openOrganizerWebsite");
+        reportEventAction(event, "organizer", "openWebsite");
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerWebsite));
         startActivitySafe(intent);
@@ -274,6 +277,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     public void openBookingSite(View view) {
         showRateAppDialog = true;
         reportEventAction(event, "bookTicket");
+        UserActionDbHelper.getInstance(this).recordAction(EventAction.BOOK, event.id);
 
         final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
         if (event.bookingUrl != null && event.bookingUrl.contains("ticketing.eventshigh.com")) {
@@ -446,6 +450,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     public void facebook(View view) {
+        showRateAppDialog = true;
         if (ShareDialog.canShow(ShareLinkContent.class)) {
             reportEventAction(event, "eventShareInitiated", "fb");
 
@@ -477,14 +482,17 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     public void twitter(View view) {
+        showRateAppDialog = true;
         shareEvent(event, PACKAGE_NAME_TWITTER);
     }
 
     public void email(View view) {
+        showRateAppDialog = true;
         shareEvent(event, PACKAGE_NAME_EMAIL);
     }
 
     public void whatsapp(View view) {
+        showRateAppDialog = true;
         shareEvent(event, PACKAGE_NAME_WHATSAPP);
     }
 
@@ -503,6 +511,9 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
     private void populateView(Event event) {
         this.event = event;
+
+        // Report the Event View.
+        UserActionDbHelper.getInstance(this).recordAction(EventAction.VIEW_EVENT, event.id);
 
         // Set Title.
         ActionBar actionBar = getSupportActionBar();
@@ -889,13 +900,18 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
             // Show tags.
             tagsView.removeAllViews();
-            tagsHeaderView.setVisibility(event.tags.length == 0 ? View.GONE : View.VISIBLE);
+            if (event.isCleanVenue) {
+                addTagView(tagsView, event.venue, "venueAsTag");
+            }
+            if (event.locality != null) {
+                addTagView(tagsView, event.locality, "localityAsTag");
+            }
             if (event.tags.length > 0) {
-                tagsHeaderView.setVisibility(View.VISIBLE);
                 for (final String tag : event.tags) {
                     addTagView(tagsView, tag, "tagClick");
                 }
             }
+            tagsHeaderView.setVisibility(tagsView.getChildCount() > 0 ? View.GONE : View.VISIBLE);
 
             // Set description.
             descriptionHeaderView.setVisibility(event.description.isEmpty() ? View.GONE : View.VISIBLE);
@@ -927,7 +943,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 organizerEmailView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        reportEventAction(event, "emailOrganizer");
+                        reportEventAction(event, "organizer", "email");
                         askOverEmail();
                     }
                 });

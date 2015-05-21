@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.task.FetchLocalityTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
@@ -100,8 +99,6 @@ public class EventsGridActivity extends BaseEventsActivity {
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
         tr.replace(R.id.event_container, eventFragment);
         tr.commit();
-
-        new FetchLocalityTask(this).execute(eventsContext.location);
     }
 
     private OnScrollListener doNothingScrollListener = new OnScrollListener() {

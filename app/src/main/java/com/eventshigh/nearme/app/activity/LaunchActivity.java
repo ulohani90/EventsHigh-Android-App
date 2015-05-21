@@ -29,7 +29,6 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.task.FetchLocalityTask;
 import com.eventshigh.nearme.app.ui.CityListAdapter;
 import com.eventshigh.nearme.app.ui.CityListAdapter.OnCitySelectionListener;
 import com.eventshigh.nearme.app.user.GcmRegistration;
@@ -190,8 +189,6 @@ public class LaunchActivity extends BaseContextActivity {
     public void cityChanged(City city) {
         drawer.closeDrawer(Gravity.START);
         eventsContext.changeLocation(city.cityBounds.getCenter());
-        LatLng newLocation = city.cityBounds.getCenter();
-        new FetchLocalityTask(this).execute(newLocation);
         showExploreScreen();
     }
 
@@ -291,12 +288,6 @@ public class LaunchActivity extends BaseContextActivity {
             return;
         }
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null &&
-            (actionBar.getSubtitle() == null || actionBar.getSubtitle().length() == 0)) {
-            new FetchLocalityTask(this).execute(eventsContext.location);
-        }
-
         // If we do not have query, show explore screen.
         if (eventsContext.query.isEmpty() && eventsContext.dateFilter.isEmpty()) {
             refreshIfOldData();
@@ -359,8 +350,9 @@ public class LaunchActivity extends BaseContextActivity {
             }
 
             if (tabs[position].equals(MY_EVENTS_TAB)) {
-                return EventsFragment.getInstance(new EventsContext(eventsContext.location,
-                        EventsHighEndpoints.QUERY_MY_EVENT), false, true);
+                EventsContext myEventsContext = new EventsContext(eventsContext.location,
+                    EventsHighEndpoints.QUERY_MY_EVENT);
+                return EventsFragment.getInstance(myEventsContext, false, true);
             }
 
             if (tabs[position].equals(EXPLORE_TAB)) {
