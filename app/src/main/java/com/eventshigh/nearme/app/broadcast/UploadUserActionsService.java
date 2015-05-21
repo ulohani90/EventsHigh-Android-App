@@ -71,6 +71,7 @@ public class UploadUserActionsService extends IntentService {
 
             final String postBody = UserActionDbHelper.getInstance(this).getActionsSince(
                     lastUploadTimestamp);
+            Log.w(LOG_TAG, "posting: " + postBody);
             VolleyHelper.addToRequestQueue(context, new JsonObjectRequest(Request.Method.POST,
                             Signer.sign(uri).toString(), null, onSuccess, onFailed) {
                         @Override
@@ -86,9 +87,7 @@ public class UploadUserActionsService extends IntentService {
     }
 
     private void cleanUp() {
-        // Remove the mark that says upload is in progress
-        preferences.edit().putBoolean(NetworkChangeBroadcastReceiver.PREF_IS_UPLOADING, false)
-                .apply();
+        NetworkChangeBroadcastReceiver.setUploadFinished();
         NetworkChangeBroadcastReceiver.completeWakefulIntent(intent);
     }
 }

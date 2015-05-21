@@ -18,6 +18,8 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.data.UserActionDbHelper;
+import com.eventshigh.nearme.app.data.UserActionDbHelper.EventAction;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -53,7 +55,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public static Typeface fontQuicksand;
     public static Typeface fontQuicksandBold;
-    public static Object lock = new Object();
+    public static final Object lock = new Object();
     public static boolean loadedFonts = false;
 
     // **********************************************
@@ -208,6 +210,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void shareEvent(Event event, @Nullable String packageName) {
         reportEventAction(event, "eventShareInitiated", packageName);
         shareEventInitiatedTimestamp = System.currentTimeMillis();
+        UserActionDbHelper.getInstance(this).recordAction(EventAction.SHARE, event.id);
 
         try {
             Intent sendIntent = new Intent();

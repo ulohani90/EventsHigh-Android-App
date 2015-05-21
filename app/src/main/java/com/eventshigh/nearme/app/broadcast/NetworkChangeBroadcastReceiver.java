@@ -12,7 +12,6 @@ import android.text.format.DateUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
 public class NetworkChangeBroadcastReceiver extends BaseWakefulBroadcastReceiver {
-    public static final String PREF_IS_UPLOADING = "isUploading";
     public static final String PREF_LAST_UPLOAD_TIMESTAMP = "lastUploadTimestamp";
 
     @Override
@@ -27,26 +26,20 @@ public class NetworkChangeBroadcastReceiver extends BaseWakefulBroadcastReceiver
             return;
         }
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
         // Do not upload if an upload was successful in the last 24 hrs.
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         if (!Utils.isDebug(context)) {
             long timeSinceLastUpload = System.currentTimeMillis()
                     - preferences.getLong(PREF_LAST_UPLOAD_TIMESTAMP, 0);
-            if (timeSinceLastUpload < DateUtils.DAY_IN_MILLIS) {
+            if (!Utils.isDebug(context) && timeSinceLastUpload < DateUtils.DAY_IN_MILLIS) {
                 return;
             }
         }
 
         // Return if another upload is already in progress (see below)
-        if (preferences.getBoolean(PREF_IS_UPLOADING, false)) {
-            return;
+        if (setUploading()) {
+            super.onReceive(context, intent);
         }
-
-        // Mark that upload has started, because we can receive multiple intents while we are
-        // processing one upload
-        preferences.edit().putBoolean(PREF_IS_UPLOADING, true).apply();
-        super.onReceive(context, intent);
     }
 
     public boolean shouldSetResultCode() {
@@ -56,5 +49,25 @@ public class NetworkChangeBroadcastReceiver extends BaseWakefulBroadcastReceiver
     @Override
     public Class<? extends IntentService> getIntentServiceClass() {
         return UploadUserActionsService.class;
+    }
+
+    private static final Object lock = new Object();
+    private static boolean isUploading = false;
+
+    private static boolean setUploading() {
+        synchronized (lock) {
+            if (isUploading) {
+                return false;
+            }
+
+            isUploading = true;
+            return true;
+        }
+    }
+
+    public static void setUploadFinished() {
+        synchronized (lock) {
+            isUploading = false;
+        }
     }
 }
