@@ -27,4 +27,11 @@
         android:textColor="@android:color/white"
         tools:text="Hip Hop Music"
     />
+    <ImageView
+        android:id="@+id/follow"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="8dp"
+        android:src="@drawable/ic_favorite_white_18dp"/>
 </FrameLayout>
