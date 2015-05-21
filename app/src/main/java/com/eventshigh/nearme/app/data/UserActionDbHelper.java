@@ -138,7 +138,7 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
     }
 
     public JSONObject getActionsSince(long timestamp) throws JSONException {
-        openDatabase();
+        SQLiteDatabase database = getReadableDatabase();
         Cursor cursor =  database.query(USER_ACTIONS_TABLE_NAME, ALL_COLUMNS,
                 COLUMN_TIMESTAMP + " > " + timestamp, null, null, null, COLUMN_TIMESTAMP);
 
@@ -151,7 +151,7 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
         while (!cursor.isAfterLast()) {
             JSONObject action = new JSONObject();
             action.put(JSON_KEY_ACTION, cursor.getString(cursor.getColumnIndex(COLUMN_ACTION)));
-            action.put(JSON_KEY_TIMESTAMP, cursor.getString(cursor.getColumnIndex(COLUMN_TIMESTAMP)));
+            action.put(JSON_KEY_TIMESTAMP, cursor.getLong(cursor.getColumnIndex(COLUMN_TIMESTAMP)));
             JSONObject data = new JSONObject(cursor.getString(cursor.getColumnIndex(COLUMN_DATA)));
             action.put(JSON_KEY_DATA, data);
             actions.put(action);
@@ -159,7 +159,7 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
         }
         // make sure to close the cursor
         cursor.close();
-        closeDatabase();
+        database.close();
         return jsonObject;
     }
 }
