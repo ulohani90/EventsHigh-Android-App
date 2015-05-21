@@ -56,7 +56,6 @@ public class UploadUserActionsService extends IntentService {
 
             final JSONObject postBody = UserActionDbHelper.getInstance(this).getActionsSince(
                     lastUploadTimestamp);
-            Log.w(LOG_TAG, "posting: " + postBody);
             VolleyHelper.addToRequestQueue(this,
                 new JsonObjectRequest(Request.Method.POST, Signer.sign(uri).toString(), postBody,
                         onSuccess, onError));
