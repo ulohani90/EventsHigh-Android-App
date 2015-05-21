@@ -350,7 +350,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private void bindHeaderView(final SmallHeaderData header) {
             titleView.setText(header.header);
-            titleView.setTypeface(BaseActivity.fontQuicksand);
         }
     }
 
