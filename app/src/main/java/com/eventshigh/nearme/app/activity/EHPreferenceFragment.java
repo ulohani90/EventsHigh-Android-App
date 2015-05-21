@@ -9,11 +9,9 @@ import android.preference.PreferenceFragment;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.task.FetchLocalityTask;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
-import com.google.android.gms.maps.model.LatLng;
 
 public class EHPreferenceFragment extends PreferenceFragment
     implements SharedPreferences.OnSharedPreferenceChangeListener,

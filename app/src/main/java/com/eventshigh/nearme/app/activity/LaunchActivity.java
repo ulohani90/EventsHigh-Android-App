@@ -336,12 +336,16 @@ public class LaunchActivity extends BaseContextActivity {
      */
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
             implements TabViewAdapter, OnPageChangeListener, TabColorizer {
+        private static final String OFFERS_TAB = "offers";
+        private static final String MY_EVENTS_TAB = EventsHighEndpoints.QUERY_MY_EVENT;
+        private static final String EXPLORE_TAB = "explore";
+        private static final String THIS_WEEK_TAB = "this week";
         private final String[] tabs = {
-                "offers",
-                EventsHighEndpoints.QUERY_MY_EVENT,
-                "explore",
-                "this week"
-            };
+            OFFERS_TAB,
+            MY_EVENTS_TAB,
+            EXPLORE_TAB,
+            THIS_WEEK_TAB
+        };
         private final TextView[] tabViews = new TextView[tabs.length];
 
         public ExploreScreenPagerAdapter() {
@@ -350,16 +354,16 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public Fragment getItem(int position) {
-            if (position == 0) {
+            if (tabs[position].equals(OFFERS_TAB)) {
                 return new OffersFragment();
             }
 
-            if (position == 1) {
+            if (tabs[position].equals(MY_EVENTS_TAB)) {
                 return EventsFragment.getInstance(new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_EVENT), false, true);
             }
 
-            if (position == 2) {
+            if (tabs[position].equals(EXPLORE_TAB)) {
                 return ExploreFragment.getInstance(eventsContext);
             }
 
