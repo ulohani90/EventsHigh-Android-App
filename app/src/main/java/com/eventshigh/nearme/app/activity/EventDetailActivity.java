@@ -446,6 +446,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     public void facebook(View view) {
+        showRateAppDialog = true;
         if (ShareDialog.canShow(ShareLinkContent.class)) {
             reportEventAction(event, "eventShareInitiated", "fb");
 
@@ -477,14 +478,17 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     public void twitter(View view) {
+        showRateAppDialog = true;
         shareEvent(event, PACKAGE_NAME_TWITTER);
     }
 
     public void email(View view) {
+        showRateAppDialog = true;
         shareEvent(event, PACKAGE_NAME_EMAIL);
     }
 
     public void whatsapp(View view) {
+        showRateAppDialog = true;
         shareEvent(event, PACKAGE_NAME_WHATSAPP);
     }
 
@@ -889,13 +893,18 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
             // Show tags.
             tagsView.removeAllViews();
-            tagsHeaderView.setVisibility(event.tags.length == 0 ? View.GONE : View.VISIBLE);
+            if (event.isCleanVenue) {
+                addTagView(tagsView, event.venue, "venueAsTag");
+            }
+            if (event.locality != null) {
+                addTagView(tagsView, event.locality, "localityAsTag");
+            }
             if (event.tags.length > 0) {
-                tagsHeaderView.setVisibility(View.VISIBLE);
                 for (final String tag : event.tags) {
                     addTagView(tagsView, tag, "tagClick");
                 }
             }
+            tagsHeaderView.setVisibility(tagsView.getChildCount() > 0 ? View.GONE : View.VISIBLE);
 
             // Set description.
             descriptionHeaderView.setVisibility(event.description.isEmpty() ? View.GONE : View.VISIBLE);

@@ -46,6 +46,7 @@
                     android:src="@drawable/eh_recommend"
                     android:adjustViewBounds="true"
                     android:transitionName="eh_recommends"
+                    android:visibility="gone"
                     tools:ignore="UnusedAttribute, ContentDescription"
                 />
             </FrameLayout>
@@ -711,7 +712,7 @@
             android:background="@drawable/button_fb"
             android:onClick="facebook"
             android:visibility="gone"
-            tools:ignore="UnusedAttribute"
+            tools:ignore="ContentDescription"
             tools:visibility="visible"
         />
         <ImageView
@@ -725,6 +726,7 @@
             android:background="@drawable/button_twitter"
             android:onClick="twitter"
             android:visibility="gone"
+            tools:ignore="ContentDescription"
             tools:visibility="visible"
         />
         <ImageView
@@ -738,6 +740,7 @@
             android:background="@drawable/button_email"
             android:onClick="email"
             android:visibility="gone"
+            tools:ignore="ContentDescription"
             tools:visibility="visible"
         />
         <ImageView
@@ -751,7 +754,7 @@
             android:background="@drawable/button_whatsapp"
             android:onClick="whatsapp"
             android:visibility="gone"
-            tools:ignore="UnusedAttribute"
+            tools:ignore="ContentDescription"
             tools:visibility="visible"
         />
     </LinearLayout>
