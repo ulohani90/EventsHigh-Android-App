@@ -18,6 +18,12 @@
             android:targetClass="com.eventshigh.nearme.app.activity.FeedbackActivity"
         />
     </Preference>
+    <Preference android:title="@string/pref_title_rate_us">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="market://details?id=com.eventshigh.nearme.app"
+        />
+    </Preference>
     <Preference android:title="@string/pref_title_about_us">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
