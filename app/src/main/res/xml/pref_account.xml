@@ -11,10 +11,6 @@
         android:title="@string/pref_title_points"
         android:summary="0"
     />
-    <ListPreference
-        android:key="last_city_key"
-        android:title="@string/pref_title_change_location"
-        />
     <Preference android:title="@string/pref_title_delete_query_history">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"

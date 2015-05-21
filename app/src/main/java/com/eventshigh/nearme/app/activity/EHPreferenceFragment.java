@@ -6,21 +6,24 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
+import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.task.FetchLocalityTask;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.user.GcmRegistration.UserCityListener;
 import com.eventshigh.nearme.app.user.Preferences;
-import com.google.android.gms.maps.model.LatLng;
 
 public class EHPreferenceFragment extends PreferenceFragment
-    implements SharedPreferences.OnSharedPreferenceChangeListener,
+    implements UserCityListener, SharedPreferences.OnSharedPreferenceChangeListener,
     Preference.OnPreferenceChangeListener {
 
     private Preference pointsView;
     private ListPreference lastCityView;
+
+    private GcmRegistration gcmRegistration;
+    private Preferences preferences;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,7 +46,6 @@ public class EHPreferenceFragment extends PreferenceFragment
 
         // Num Points preference.
         pointsView = getPreferenceScreen().findPreference("points_key");
-        pointsView.setSummary(Preferences.getInstance(getActivity()).getPoints());
         Account.getNumPoints(getActivity(), null);
 
         // Last city preference.
@@ -51,14 +53,30 @@ public class EHPreferenceFragment extends PreferenceFragment
         String[] cityNames = City.getValuesAsString();
         lastCityView.setEntries(cityNames);
         lastCityView.setEntryValues(cityNames);
-        City city = GcmRegistration.getInstance(getActivity()).getLastCity();
-        if (city != null) {
-            lastCityView.setValue(city.name());
-            lastCityView.setSummary(city == null ? "" : city.name());
-        }
         lastCityView.setOnPreferenceChangeListener(this);
 
-        Preferences.getInstance(getActivity()).registerOnSharedPreferenceChangeListener(this);
+        // shared preferences instance.
+        preferences = Preferences.getInstance(getActivity());
+        gcmRegistration = GcmRegistration.getInstance(getActivity());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        pointsView.setSummary(preferences.getPoints());
+        preferences.registerOnSharedPreferenceChangeListener(this);
+
+        onUserCityChanged(gcmRegistration.getLastCity());
+        gcmRegistration.setUserCityListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
+        gcmRegistration.setUserCityListener(null);
     }
 
     @Override
@@ -73,11 +91,21 @@ public class EHPreferenceFragment extends PreferenceFragment
         if (preference == lastCityView) {
             if (!newValue.equals(lastCityView.getValue())) {
                 City newCity = City.getCity((String) newValue);
-                lastCityView.setSummary(newCity.name());
-                LaunchActivity activity = (LaunchActivity) getActivity();
-                activity.cityChanged(newCity);
+                 if (newCity != null) {
+                    gcmRegistration.setLastCity(newCity, null);
+                    LaunchActivity activity = (LaunchActivity) getActivity();
+                    activity.cityChanged(newCity);
+                }
             }
         }
         return true;
+    }
+
+    @Override
+    public void onUserCityChanged(@Nullable City newUserCity) {
+        if (newUserCity != null) {
+            lastCityView.setValue(newUserCity.name());
+            lastCityView.setSummary(newUserCity.name());
+        }
     }
 }
