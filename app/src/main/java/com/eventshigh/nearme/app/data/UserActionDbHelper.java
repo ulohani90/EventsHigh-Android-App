@@ -137,7 +137,7 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
         thread.start();
     }
 
-    public String getActionsSince(long timestamp) throws JSONException {
+    public JSONObject getActionsSince(long timestamp) throws JSONException {
         openDatabase();
         Cursor cursor =  database.query(USER_ACTIONS_TABLE_NAME, ALL_COLUMNS,
                 COLUMN_TIMESTAMP + " > " + timestamp, null, null, null, COLUMN_TIMESTAMP);
@@ -160,6 +160,6 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
         // make sure to close the cursor
         cursor.close();
         closeDatabase();
-        return jsonObject.toString(4);
+        return jsonObject;
     }
 }
