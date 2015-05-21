@@ -252,7 +252,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         }
 
         showRateAppDialog = true;
-        reportEventAction(event, "callOrganizer");
+        reportEventAction(event, "organizer", "call");
 
         Intent intent = new Intent(Intent.ACTION_DIAL)
                 .setData(Uri.parse("tel:" + (event.organizerPhone.split(",")[0])));
@@ -261,14 +261,14 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     public void openOrganizerLink(View view) {
-        reportEventAction(event, "openOrganizerLink");
+        reportEventAction(event, "organizer", "openLink");
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerLink));
         startActivitySafe(intent);
     }
 
     public void openOrganizerWebsite(View view) {
-        reportEventAction(event, "openOrganizerWebsite");
+        reportEventAction(event, "organizer", "openWebsite");
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerWebsite));
         startActivitySafe(intent);
@@ -943,7 +943,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 organizerEmailView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        reportEventAction(event, "emailOrganizer");
+                        reportEventAction(event, "organizer", "email");
                         askOverEmail();
                     }
                 });
