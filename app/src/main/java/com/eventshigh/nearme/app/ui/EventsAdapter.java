@@ -861,15 +861,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 }
             });
 
+            setFollowView(data.tag);
             if (followView != null) {
-                setFollowView(data.tag);
                 followView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final Account account = new Account(imageView.getContext());
-                        boolean isFollowing = account.isFollowing(data.tag);
-                        account.setIsFollowing(data.tag, !isFollowing);
-                        setFollowView(data.tag);
                     }
                 });
             }
