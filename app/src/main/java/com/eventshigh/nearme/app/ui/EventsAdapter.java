@@ -31,7 +31,6 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
@@ -805,7 +804,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static class TrendingCategoryCard extends ViewHolder {
         private NetworkImageView imageView;
         private TextView titleView;
-        private ImageView followView;
 
         static TrendingCategoryCard newInstance(final BaseActivity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(R.layout.card_explore, parent, false);
@@ -817,7 +815,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             imageView = (NetworkImageView) itemView.findViewById(R.id.image);
             titleView = (TextView) itemView.findViewById(R.id.title);
-            followView = (ImageView) itemView.findViewById(R.id.follow);
         }
 
         public void populateTrendingCategoryData(final TrendingCategoryData data,
@@ -861,33 +858,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     imageView.setLayoutParams(lp);
                 }
             });
-
-            if (followView != null) {
-                if (data.tag.equals(EventsHighEndpoints.QUERY_FEATURED)) {
-                    followView.setVisibility(View.GONE);
-                } else {
-                    setFollowView(data.tag);
-                    followView.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            final Account account = new Account(imageView.getContext());
-                            boolean isFollowing = account.isFollowing(data.tag);
-                            isFollowing = !isFollowing;
-                            account.setIsFollowing(data.tag, isFollowing);
-                            eventsFragment.getContextActivity().reportActionToAnalytics(
-                                isFollowing ? "addFollowing" : "removeFollowing", data.tag);
-                            setFollowView(data.tag);
-                        }
-                    });
-                }
-            }
-        }
-
-        private void setFollowView(String tagName) {
-            final Account account = new Account(imageView.getContext());
-            boolean isFollowing = account.isFollowing(tagName);
-            followView.setImageResource(isFollowing ?
-                R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
         }
     }
 }
