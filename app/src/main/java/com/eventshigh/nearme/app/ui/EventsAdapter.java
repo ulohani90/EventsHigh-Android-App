@@ -868,7 +868,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     public void onClick(View v) {
                         final Account account = new Account(imageView.getContext());
                         boolean isFollowing = account.isFollowing(data.tag);
-                        account.setIsFollowing(data.tag, !isFollowing);
+                        isFollowing = !isFollowing;
+                        account.setIsFollowing(data.tag, isFollowing);
+                        eventsFragment.getContextActivity().reportActionToAnalytics(
+                            isFollowing ? "addFollowing" : "removeFollowing", data.tag);
                         setFollowView(data.tag);
                     }
                 });
