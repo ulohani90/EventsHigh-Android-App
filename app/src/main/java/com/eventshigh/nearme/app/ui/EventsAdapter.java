@@ -31,7 +31,6 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
@@ -863,23 +862,19 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             });
 
             if (followView != null) {
-                if (data.tag.equals(EventsHighEndpoints.QUERY_FEATURED)) {
-                    followView.setVisibility(View.GONE);
-                } else {
-                    setFollowView(data.tag);
-                    followView.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            final Account account = new Account(imageView.getContext());
-                            boolean isFollowing = account.isFollowing(data.tag);
-                            isFollowing = !isFollowing;
-                            account.setIsFollowing(data.tag, isFollowing);
-                            eventsFragment.getContextActivity().reportActionToAnalytics(
-                                isFollowing ? "addFollowing" : "removeFollowing", data.tag);
-                            setFollowView(data.tag);
-                        }
-                    });
-                }
+                setFollowView(data.tag);
+                followView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final Account account = new Account(imageView.getContext());
+                        boolean isFollowing = account.isFollowing(data.tag);
+                        isFollowing = !isFollowing;
+                        account.setIsFollowing(data.tag, isFollowing);
+                        eventsFragment.getContextActivity().reportActionToAnalytics(
+                            isFollowing ? "addFollowing" : "removeFollowing", data.tag);
+                        setFollowView(data.tag);
+                    }
+                });
             }
         }
 
