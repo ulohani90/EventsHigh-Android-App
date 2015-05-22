@@ -804,7 +804,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static class TrendingCategoryCard extends ViewHolder {
         private NetworkImageView imageView;
         private TextView titleView;
-        private ImageView followView;
 
         static TrendingCategoryCard newInstance(final BaseActivity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(R.layout.card_explore, parent, false);
@@ -816,13 +815,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             imageView = (NetworkImageView) itemView.findViewById(R.id.image);
             titleView = (TextView) itemView.findViewById(R.id.title);
-            followView = (ImageView) itemView.findViewById(R.id.follow);
         }
 
         public void populateTrendingCategoryData(final TrendingCategoryData data,
                                                  final BaseEventsFragment eventsFragment) {
             imageView.setImageUrl(data.trendingTopic.imgUrl,
-                VolleyHelper.getImageLoader(eventsFragment.getContextActivity()));
+                    VolleyHelper.getImageLoader(eventsFragment.getContextActivity()));
             titleView.setText(data.trendingTopic.tagName);
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
@@ -860,22 +858,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     imageView.setLayoutParams(lp);
                 }
             });
-
-            setFollowView(data.tag);
-            if (followView != null) {
-                followView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                    }
-                });
-            }
-        }
-
-        private void setFollowView(String tagName) {
-            final Account account = new Account(imageView.getContext());
-            boolean isFollowing = account.isFollowing(tagName);
-            followView.setImageResource(isFollowing ?
-                R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
         }
     }
 }
