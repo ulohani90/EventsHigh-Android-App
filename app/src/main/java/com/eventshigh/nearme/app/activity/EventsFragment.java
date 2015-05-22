@@ -23,6 +23,7 @@ import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
+import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
@@ -41,7 +42,7 @@ public class EventsFragment extends BaseEventsFragment {
     private View noMyEventsView;
     private View retryView;
 
-    private OnScrollListener onScrollListener = new HideActionBarOnScroll();
+    private OnScrollListener onScrollListener = new HideActionBarOnScroll(activity);
 
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
                                              boolean showCategories) {

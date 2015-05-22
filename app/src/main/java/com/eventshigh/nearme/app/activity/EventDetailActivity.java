@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -1051,17 +1052,21 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
     private static final Set<String> INSTALLED_PACKAGES = new HashSet<>();
     private boolean isInstalled(String packageName) {
+        return isInstalled(this, packageName);
+    }
+
+    public static boolean isInstalled(Context context, String packageName) {
         synchronized (INSTALLED_PACKAGES) {
             if (INSTALLED_PACKAGES.isEmpty()) {
-                getInstalledApps();
+                getInstalledApps(context);
             }
         }
 
         return INSTALLED_PACKAGES.contains(packageName);
     }
 
-    private void getInstalledApps() {
-        for(PackageInfo packageInfo : getPackageManager().getInstalledPackages(0)) {
+    private static void getInstalledApps(Context context) {
+        for(PackageInfo packageInfo : context.getPackageManager().getInstalledPackages(0)) {
             if (packageInfo.versionName != null && packageInfo.applicationInfo.enabled) {
                 INSTALLED_PACKAGES.add(packageInfo.packageName);
             }

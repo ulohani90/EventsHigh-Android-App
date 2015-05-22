@@ -15,6 +15,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.OffersRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.OffersAdapter;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
@@ -25,15 +26,16 @@ import java.util.List;
  * Fragment which is used to show the offers tab.
  */
 public class OffersFragment extends Fragment {
-    private BaseActivity activity;
+    private BaseContextActivity activity;
 
     private AutofitRecyclerView offersGridView;
     private View topProgressBar;
+    private OffersAdapter offersAdapter;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.activity = (BaseActivity) activity;
+        this.activity = (BaseContextActivity) activity;
     }
 
     @Override
@@ -51,16 +53,27 @@ public class OffersFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         offersGridView = (AutofitRecyclerView) view.findViewById(R.id.offers);
+        offersGridView.setOnScrollListener(new HideActionBarOnScroll(activity));
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         OffersRequest.submit(activity, Priority.IMMEDIATE, this, false, mOffersCallback,
                 mErrorListener);
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        if (offersAdapter != null) {
+            offersAdapter.notifyDataSetChanged();
+        }
     }
 
     private Listener<List<Offer>> mOffersCallback = new Listener<List<Offer>>() {
         @Override
         public void onResponse(List<Offer> offers, boolean isIntermediate) {
             topProgressBar.setVisibility(View.GONE);
-            offersGridView.setAdapter(new OffersAdapter(activity, offers));
+            offersAdapter = new OffersAdapter(activity, offers);
+            offersGridView.setAdapter(offersAdapter);
         }
     };
 

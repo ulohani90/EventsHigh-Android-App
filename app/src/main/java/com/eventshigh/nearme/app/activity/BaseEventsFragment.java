@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.OnScrollListener;
 
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -70,39 +68,5 @@ public abstract class BaseEventsFragment extends Fragment {
         Intent intent = new Intent(activity, activity.getClass())
                 .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
         startActivity(intent);
-    }
-
-    protected class HideActionBarOnScroll extends OnScrollListener {
-        private int currentY;
-        private boolean actionBarShown = true;
-
-        @Override
-        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-            super.onScrollStateChanged(recyclerView, newState);
-        }
-
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
-
-            if (currentY * dy > 0) {
-                currentY += dy;
-            } else {
-                currentY = dy;
-            }
-
-            if (currentY > 250 || currentY < -250) {
-                boolean isDown = dy > 0;
-                if (isDown && actionBarShown) {
-                    activity.hideActionBar();
-                    actionBarShown = false;
-                }
-
-                if (!isDown && !actionBarShown) {
-                    activity.showActionBar();
-                    actionBarShown = true;
-                }
-            }
-        }
     }
 }

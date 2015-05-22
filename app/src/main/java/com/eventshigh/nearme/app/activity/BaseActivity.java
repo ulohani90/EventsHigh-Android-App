@@ -11,7 +11,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -21,7 +20,6 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.UserActionDbHelper;
 import com.eventshigh.nearme.app.data.UserActionDbHelper.EventAction;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -51,7 +49,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     // Check out the share event timings.
     protected long shareEventInitiatedTimestamp = 0;
-    protected long shareAppInitiatedTimestamp = 0;
 
     public static Typeface fontQuicksand;
     public static Typeface fontQuicksandBold;
@@ -128,14 +125,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         AppEventsLogger.activateApp(this);
 
         // Find out share action result.
-        if (shareAppInitiatedTimestamp > 0) {
-            long secForShare = (System.currentTimeMillis() - shareAppInitiatedTimestamp) / 1000;
-            reportActionToAnalytics(secForShare > 5 ? "shareApp" : "appShareDismissed", Long.toString(secForShare));
-        } else if (shareEventInitiatedTimestamp > 0) {
+        if (shareEventInitiatedTimestamp > 0) {
             long secForShare = (System.currentTimeMillis() - shareEventInitiatedTimestamp) / 1000;
             reportActionToAnalytics(secForShare > 5 ? "shareEvent" : "eventShareDismissed", Long.toString(secForShare));
         }
-        shareAppInitiatedTimestamp = 0;
         shareEventInitiatedTimestamp = 0;
     }
 
@@ -187,21 +180,6 @@ public abstract class BaseActivity extends AppCompatActivity {
             gaHelper.reportActionToAnalytics(getClass().getSimpleName(),
                     actionName, label, value, customValues);
         }
-    }
-
-    /**
-     * Helper method to start activity which lets user share the app.
-     */
-    public void shareApp(View view) {
-        reportActionToAnalytics("appShareInitiated");
-        shareAppInitiatedTimestamp = System.currentTimeMillis();
-
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_TEXT,
-                String.format(getString(R.string.share_app_text), new Account(this).getAppDownloadLink()));
-        intent.setType("text/plain");
-        startActivity(intent);
     }
 
     /**
