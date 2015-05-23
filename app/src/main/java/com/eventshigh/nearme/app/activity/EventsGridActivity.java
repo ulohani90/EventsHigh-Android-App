@@ -26,6 +26,7 @@ public class EventsGridActivity extends BaseEventsActivity {
 
     private boolean showFollowCard;
     private boolean searchViewExpanded;
+    private View followFab;
 
 
     // ***********************
@@ -35,6 +36,8 @@ public class EventsGridActivity extends BaseEventsActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        followFab = findViewById(R.id.fab_follow);
 
         // Should we show follow widget?
         showFollowCard = !eventsContext.query.isEmpty() &&
@@ -133,9 +136,11 @@ public class EventsGridActivity extends BaseEventsActivity {
     private int currentToolBarAlpha = 255;
     private void updateToolbar(int toolbarAlpha) {
         if (toolbarAlpha == currentToolBarAlpha) {
+            followFab.setVisibility(View.VISIBLE);
             // do nothing
             return;
         }
+        followFab.setVisibility(View.GONE);
 
         // Change the color of toolbar icons and text if needed.
         if (toolbarAlpha < 100) {
