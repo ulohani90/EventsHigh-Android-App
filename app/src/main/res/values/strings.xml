@@ -82,7 +82,7 @@
 
     <string name="share_app_message">Share this app &amp; earn 10 points for every friend who installs the app through your invite link!</string>
     <string name="ui_invite_link_title">Your Invite Link…… (touch to copy)</string>
-    <string name="ui_invite_link_copy">Your Invite Link is copied to Clipboard!</string>
+    <string name="ui_invite_link_copy">Your invite link is copied to clipboard!</string>
     <string name="action_invite_fb">Invite Via\nFacebook</string>
     <string name="action_invite_twitter">Invite Via\nTwitter</string>
     <string name="action_invite_email">Invite Via\nEmail</string>
