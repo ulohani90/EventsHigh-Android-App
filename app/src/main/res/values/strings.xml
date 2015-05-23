@@ -81,14 +81,14 @@
     <string name="ui_invite_link_copy">Your invite link is copied to clipboard!</string>
     <string name="ui_for_claim">Available</string>
     <string name="ui_claimed">Claimed</string>
-    <string name="ui_total_referrer">Total Installs</string>
+    <string name="ui_total_referrer">Total Installed</string>
 
     <string name="action_invite_fb">Invite Via\nFacebook</string>
     <string name="action_invite_twitter">Invite Via\nTwitter</string>
     <string name="action_invite_email">Invite Via\nEmail</string>
     <string name="action_invite_whatsapp">Invite Via\nWhatsApp</string>
 
-    <string name="share_app_message">Invite your friends to join EventsHigh by sharing your invite link. Get exciting offers mentioned below!</string>
+    <string name="share_app_message">Invite your friends to join EventsHigh by sharing your invite link &amp; get exciting offers mentioned below!</string>
     <string name="offer_email">[Please send this email to redeem the offer.]\n\nOffer: %1$s\nRegistered Phone Number: %2$s\nOffer Code:%3$s\n\n</string>
     <string name="share_app_text">Hey! I liked this EventsHigh app and I think you will too. It has a lot of weekend activities to choose from. Check it out. %s</string>
     <string name="offer_threshold_message">There should be %d installs and then you can claim this offer. If you have already shared the app with your friends then they need to install the app using the link you shared.</string>
