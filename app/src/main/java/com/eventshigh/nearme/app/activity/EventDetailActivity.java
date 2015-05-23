@@ -57,7 +57,6 @@ import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
-import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -640,7 +639,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                         @Override
                         public void onResponse(JSONObject response, boolean isIntermediate) {
                             try {
-                                checkInSuccess(response.getString("total_points"));
+                                checkInSuccess(response.getString("message"));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -666,12 +665,10 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             Toast.LENGTH_SHORT).show();
     }
 
-    private void checkInSuccess(String points) {
+    private void checkInSuccess(String message) {
         checkInAlertDialog.dismiss();
         reportActionToAnalytics("checkInSuccess");
-        String message = String.format(getResources().getString(R.string.check_in_success), points);
         Toast.makeText(EventDetailActivity.this, message, Toast.LENGTH_SHORT).show();
-        Preferences.getInstance(this).setPoints(points);
     }
 
     private class EventCard {

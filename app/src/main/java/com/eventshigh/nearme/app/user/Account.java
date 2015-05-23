@@ -4,12 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Pair;
 
 import com.android.volley.Request;
-import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
@@ -21,11 +19,9 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
@@ -146,37 +142,6 @@ public class Account {
             }
         }
         return interests;
-    }
-
-    public static void getNumPoints(final Context context, @Nullable final Listener<String> listener) {
-        Uri requestUrl = AccountStateReporter.getBaseUri(context, "get_user_points").build();
-        try {
-            VolleyHelper.addToRequestQueue(context,
-                new JsonObjectRequest(Request.Method.GET, Signer.sign(requestUrl).toString(), null,
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response, boolean isIntermediate) {
-                                try {
-                                    String totalPoints = response.getString("total_points");
-                                    Preferences.getInstance(context).setPoints(totalPoints);
-                                    if (listener != null) {
-                                        listener.onResponse(totalPoints, isIntermediate);
-                                    }
-                                } catch (JSONException e) {
-                                    // Ignore.
-                                }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError volleyError) {
-                            }
-                        }
-                )
-            );
-        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
     }
 
     private static String getKeyForTag(String tag) {

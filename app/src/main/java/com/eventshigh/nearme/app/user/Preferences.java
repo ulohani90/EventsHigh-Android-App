@@ -15,7 +15,6 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_NOTIFY_WEEKLY = "notifications_weekly";
     public static final String PREF_NOTIFY_EH = "notifications_eh";
     public static final String PREF_SHOW_ONBOARDING = "show_onboarding";
-    public static final String PREF_POINTS = "points";
 
     private final Context context;
     private final SharedPreferences sharedPreferences;
@@ -54,24 +53,8 @@ public class Preferences implements OnSharedPreferenceChangeListener {
         return sharedPreferences.getBoolean(PREF_SHOW_ONBOARDING, true);
     }
 
-    public void setPoints(String points) {
-        sharedPreferences.edit().putString(PREF_POINTS, points).apply();
-    }
-
-    public String getPoints() {
-        return sharedPreferences.getString(PREF_POINTS, "0");
-    }
-
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         new BackupManager(context).dataChanged();
-    }
-
-    public void registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
-        sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
-    }
-
-    public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener);
     }
 }
