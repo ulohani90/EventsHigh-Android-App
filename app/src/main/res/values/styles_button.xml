@@ -14,7 +14,7 @@
     </style>
     <style name="EHButtonCTATransparent" parent="EHButton">
         <item name="android:textColor">@color/primary_dark</item>
-        <item name="android:background">@drawable/button_transparent_dark</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
     </style>
     <style name="EHDetailActionButton" parent="android:style/TextAppearance.Small">
         <item name="android:background">@drawable/eh_button</item>

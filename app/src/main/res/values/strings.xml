@@ -72,14 +72,26 @@
     <string name="ui_not_at_event">We could not detect that you are at the event</string>
     <string name="ui_checking_in">Checking in</string>
     <string name="check_in_failed">Unable to check in. Please try again.</string>
-    <string name="check_in_success">Successfully checked in. You have %1$s points!</string>
 
     <!-- Offer -->
     <string name="ui_offer_expire">Oh no! Offer is expired already. Better luck next time!</string>
     <string name="ui_offer_expired">Ended</string>
-    <string name="ui_offer_tip">Invitations Accepted</string>
     <string name="ui_offer_redeem_phone">Please register your phone number to redeem the offer!</string>
+    <string name="ui_invite_link_title">Your Invite Link…… (touch to copy)</string>
+    <string name="ui_invite_link_copy">Your invite link is copied to clipboard!</string>
+    <string name="ui_for_claim">Available</string>
+    <string name="ui_claimed">Claimed</string>
+    <string name="ui_total_referrer">Total Installed</string>
+
+    <string name="action_invite_fb">Invite Via\nFacebook</string>
+    <string name="action_invite_twitter">Invite Via\nTwitter</string>
+    <string name="action_invite_email">Invite Via\nEmail</string>
+    <string name="action_invite_whatsapp">Invite Via\nWhatsApp</string>
+
+    <string name="share_app_message">Invite your friends to join EventsHigh by sharing your invite link &amp; get exciting offers mentioned below!</string>
     <string name="offer_email">[Please send this email to redeem the offer.]\n\nOffer: %1$s\nRegistered Phone Number: %2$s\nOffer Code:%3$s\n\n</string>
+    <string name="share_app_text">Hey! I liked this EventsHigh app and I think you will too. It has a lot of weekend activities to choose from. Check it out. %s</string>
+    <string name="offer_threshold_message">There should be %d installs and then you can claim this offer. If you have already shared the app with your friends then they need to install the app using the link you shared.</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title_details">One Stop Shop</string>
@@ -97,10 +109,7 @@
     <string name="ask_locality">Enter an area or city</string>
 
     <!-- Sharing -->
-    <string name="action_share">Invite Friends</string>
-    <string name="action_share_app">Share This App</string>
-    <string name="action_claim">Redeem Offer</string>
-    <string name="share_app_text">Hey! I liked this EventsHigh app and I think you will too. It has a lot of weekend activities to choose from. Check it out. %s</string>
+    <string name="action_share_event">Invite Friends</string>
     <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Sounds fun!\n\n%1$s\n\n%2$s</string>
 
     <!-- Failed messages -->

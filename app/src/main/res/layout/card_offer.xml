@@ -7,7 +7,7 @@
     android:foreground="?android:attr/selectableItemBackground"
     android:descendantFocusability="blocksDescendants"
     card_view:cardCornerRadius="2dp"
-    tools:layout_width="280dp"
+    tools:layout_width="320dp"
 >
     <RelativeLayout
         android:layout_width="match_parent"
@@ -15,30 +15,30 @@
     >
         <com.eventshigh.nearme.app.view.FadeInNetworkImageView
             android:id="@+id/offer_image"
-            android:layout_width="96dp"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
             android:scaleType="centerCrop"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_alignBottom="@+id/offer_action"
-            android:layout_centerVertical="true"
             android:adjustViewBounds="false"
+        />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray600"
+            android:layout_below="@+id/offer_image"
         />
 
         <TextView
             android:id="@+id/offer_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_toRightOf="@+id/offer_image"
-            android:layout_toEndOf="@+id/offer_image"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="16dp"
+            android:layout_below="@+id/offer_image"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_toLeftOf="@+id/offer_action"
+            android:layout_toStartOf="@+id/offer_action"
+            android:layout_margin="12dp"
             android:textSize="14sp"
             android:textColor="#CC000000"
             android:fontFamily="sans-serif-medium"
@@ -47,12 +47,17 @@
 
         <TextView
             android:id="@+id/offer_action"
-            style="@style/EHButtonCTATransparent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/offer_message"
+            android:layout_alignTop="@+id/offer_message"
+            android:layout_alignBottom="@+id/offer_message"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:gravity="center"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/primary"
             tools:text="Claim"
         />
     </RelativeLayout>

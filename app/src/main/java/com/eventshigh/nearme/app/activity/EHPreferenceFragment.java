@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -10,20 +9,15 @@ import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.GcmRegistration.UserCityListener;
-import com.eventshigh.nearme.app.user.Preferences;
 
 public class EHPreferenceFragment extends PreferenceFragment
-    implements UserCityListener, SharedPreferences.OnSharedPreferenceChangeListener,
-    Preference.OnPreferenceChangeListener {
+    implements UserCityListener, Preference.OnPreferenceChangeListener {
 
-    private Preference pointsView;
     private ListPreference lastCityView;
 
     private GcmRegistration gcmRegistration;
-    private Preferences preferences;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,10 +38,6 @@ public class EHPreferenceFragment extends PreferenceFragment
         getPreferenceScreen().addPreference(notificationHeader);
         addPreferencesFromResource(R.xml.pref_notification);
 
-        // Num Points preference.
-        pointsView = getPreferenceScreen().findPreference("points_key");
-        Account.getNumPoints(getActivity(), null);
-
         // Last city preference.
         lastCityView = (ListPreference) getPreferenceScreen().findPreference("last_city_key");
         String[] cityNames = City.getValuesAsString();
@@ -56,16 +46,12 @@ public class EHPreferenceFragment extends PreferenceFragment
         lastCityView.setOnPreferenceChangeListener(this);
 
         // shared preferences instance.
-        preferences = Preferences.getInstance(getActivity());
         gcmRegistration = GcmRegistration.getInstance(getActivity());
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-        pointsView.setSummary(preferences.getPoints());
-        preferences.registerOnSharedPreferenceChangeListener(this);
 
         onUserCityChanged(gcmRegistration.getLastCity());
         gcmRegistration.setUserCityListener(this);
@@ -75,15 +61,7 @@ public class EHPreferenceFragment extends PreferenceFragment
     public void onPause() {
         super.onPause();
 
-        preferences.unregisterOnSharedPreferenceChangeListener(this);
         gcmRegistration.setUserCityListener(null);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (Preferences.PREF_POINTS.equals(key) && isAdded()) {
-            pointsView.setSummary(Preferences.getInstance(getActivity()).getPoints());
-        }
     }
 
     @Override
