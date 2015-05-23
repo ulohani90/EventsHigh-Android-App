@@ -11,8 +11,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
@@ -26,7 +28,7 @@ public class EventsGridActivity extends BaseEventsActivity {
 
     private boolean showFollowCard;
     private boolean searchViewExpanded;
-    private View followFab;
+    private ImageButton followFab;
 
 
     // ***********************
@@ -37,7 +39,23 @@ public class EventsGridActivity extends BaseEventsActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        followFab = findViewById(R.id.fab_follow);
+        followFab = (ImageButton) findViewById(R.id.fab_follow);
+        final Account account = new Account(this);
+        followFab.setImageResource(account.isFollowing(eventsContext.query)
+            ? R.drawable.ic_favorite_red_18dp
+            : R.drawable.ic_favorite_white_18dp);
+        followFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isFollowing = account.isFollowing(eventsContext.query);
+                isFollowing = !isFollowing;
+                reportActionToAnalytics(isFollowing ? "addFollowing" : "removeFollowing",
+                    eventsContext.query);
+                followFab.setImageResource(isFollowing ? R.drawable.ic_favorite_red_18dp
+                    : R.drawable.ic_favorite_white_18dp);
+                account.setIsFollowing(eventsContext.query, isFollowing);
+            }
+        });
 
         // Should we show follow widget?
         showFollowCard = !eventsContext.query.isEmpty() &&
@@ -135,6 +153,10 @@ public class EventsGridActivity extends BaseEventsActivity {
 
     private int currentToolBarAlpha = 255;
     private void updateToolbar(int toolbarAlpha) {
+        final Account account = new Account(this);
+        followFab.setImageResource(account.isFollowing(eventsContext.query)
+            ? R.drawable.ic_favorite_red_18dp
+            : R.drawable.ic_favorite_white_18dp);
         if (toolbarAlpha == currentToolBarAlpha) {
             followFab.setVisibility(View.VISIBLE);
             // do nothing
