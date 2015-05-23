@@ -162,6 +162,11 @@ public abstract class BaseActivity extends AppCompatActivity {
             return true;
         }
 
+        if (id == R.id.action_share) {
+            shareApp(item.getActionView());
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

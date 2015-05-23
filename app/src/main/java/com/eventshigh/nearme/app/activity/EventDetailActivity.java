@@ -18,6 +18,7 @@ import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Pair;
+import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -152,6 +153,13 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         checkInLocationRequest.setInterval(3000);
         checkInLocationRequest.setFastestInterval(1000);
         checkInLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.activity_event_detail, menu);
+        return true;
     }
 
     protected void onStart() {
