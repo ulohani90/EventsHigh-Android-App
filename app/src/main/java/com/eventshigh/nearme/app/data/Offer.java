@@ -1,12 +1,7 @@
 package com.eventshigh.nearme.app.data;
 
 import android.net.Uri;
-import android.view.View;
 
-import com.android.volley.toolbox.NetworkImageView;
-import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 
 import org.json.JSONArray;
@@ -56,7 +51,7 @@ public class Offer {
             throws JSONException, IllegalArgumentException, ParseException {
         return new Offer(
                 offerJSON.getString("offer_id"),
-                offerJSON.getString("offer_detail_message"),
+                offerJSON.getString("offer_message"),
                 offerJSON.getString("img_url"),
                 DateTimeUtils.parseOfferDate(offerJSON.getString("offer_end_date")),
                 offerJSON.getString("offer_action_type"),
