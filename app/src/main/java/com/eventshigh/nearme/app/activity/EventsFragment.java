@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
@@ -35,20 +36,27 @@ import java.util.List;
 public class EventsFragment extends BaseEventsFragment {
     private static final String LOG_TAG = EventsFragment.class.getSimpleName();
 
-    private EventsAdapter eventsAdapter;
-
     private AutofitRecyclerView eventGridView;
     private View topProgressBar;
     private View noMyEventsView;
     private View retryView;
 
-    private OnScrollListener onScrollListener = new HideActionBarOnScroll(activity);
+    private EventsAdapter eventsAdapter;
+    private OnScrollListener onScrollListener;
 
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
                                              boolean showCategories) {
         EventsFragment fragment = new EventsFragment();
         fragment.setArguments(getArgs(eventsContext, showFollowCard, showCategories));
         return fragment;
+    }
+
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        if (onScrollListener == null) {
+            onScrollListener = new HideActionBarOnScroll(this.activity);
+        }
     }
 
     @Override
