@@ -103,8 +103,8 @@ public class OffersRequest extends JsonRequest<OffersResponse> {
             String jsonString = new String(response.data, "UTF-8");
             JSONObject offersJSON = new JSONObject(jsonString);
             List<Offer> offers = Offer.parse(offersJSON.getJSONArray("offers"));
-            OffersResponse res = new OffersResponse(offers, 32 /*offersJSON.getInt("to_claim")*/,
-                    18 /*offersJSON.getInt("claimed")*/, 50 /*offersJSON.getInt("total")*/);
+            OffersResponse res = new OffersResponse(offers, offersJSON.getInt("for_claim"),
+                    offersJSON.getInt("claimed"), offersJSON.getInt("total"));
             return Response.success(res, HttpHeaderParser.parseCacheHeaders(response));
         } catch (Exception e) {
             return Response.error(new ParseError(e));

@@ -25,10 +25,10 @@ public class Offer {
     public final String actionType;
     public final String actionName;
     public final String actionLink;
-    public final int offerThreshold;
+    public final int threshold;
 
     public Offer(String id, String message, String imgUrl, Date offerEndDate,
-                 String actionType, String actionName, String actionLink, int offerThreshold)
+                 String actionType, String actionName, String actionLink, int threshold)
             throws IllegalArgumentException {
         this.id = id;
         this.message = message;
@@ -37,7 +37,7 @@ public class Offer {
         this.actionType = actionType;
         this.actionName = actionName;
         this.actionLink = actionLink;
-        this.offerThreshold = offerThreshold;
+        this.threshold = threshold;
     }
 
     public boolean isExpired() {

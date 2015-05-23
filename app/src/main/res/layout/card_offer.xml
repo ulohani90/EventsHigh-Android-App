@@ -47,14 +47,17 @@
 
         <TextView
             android:id="@+id/offer_action"
-            style="@style/EHButtonCTATransparent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/offer_image"
-            android:layout_margin="12dp"
-            android:padding="9dp"
+            android:layout_alignTop="@+id/offer_message"
+            android:layout_alignBottom="@+id/offer_message"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:gravity="center"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/primary"
             tools:text="Claim"
         />
     </RelativeLayout>

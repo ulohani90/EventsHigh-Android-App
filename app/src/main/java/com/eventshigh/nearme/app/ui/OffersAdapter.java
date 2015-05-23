@@ -211,22 +211,22 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             messageView.setText(offer.message);
             actionView.setText(offer.actionName);
-            actionView.setOnClickListener(new OnClickListener() {
+            expiredView.setVisibility(offer.isExpired() ? View.VISIBLE : View.GONE);
+
+            itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     claimOffer(offer);
                 }
             });
-
-            expiredView.setVisibility(offer.isExpired() ? View.VISIBLE : View.GONE);
         }
 
     }
 
     private void claimOffer(final Offer offer) {
-        if (offer.offerThreshold > offersResponse.forClaim) {
+        if (offer.threshold > offersResponse.forClaim) {
             String message = String.format(
-                    activity.getString(R.string.offer_threshold_message), offer.offerThreshold);
+                    activity.getString(R.string.offer_threshold_message), offer.threshold);
             Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
             return;
         }
