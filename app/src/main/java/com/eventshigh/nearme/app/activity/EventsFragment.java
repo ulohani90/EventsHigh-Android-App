@@ -90,7 +90,7 @@ public class EventsFragment extends BaseEventsFragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                activity.reportActionToAnalytics("swipeRefresh");
+                activity.reportActionToAnalytics("swipeRefresh", eventsContext.toString());
                 swipeRefreshLayout.setRefreshing(false);
                 fetchNewListing(true /* bypass cache*/);
             }

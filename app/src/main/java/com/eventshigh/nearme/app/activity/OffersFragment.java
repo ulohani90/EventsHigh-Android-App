@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +13,12 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.OffersRequest;
+import com.eventshigh.nearme.app.network.OffersRequest.OffersResponse;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.OffersAdapter;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
-
-import java.util.List;
 
 
 /**
@@ -30,7 +29,6 @@ public class OffersFragment extends Fragment {
 
     private AutofitRecyclerView offersGridView;
     private View topProgressBar;
-    private OffersAdapter offersAdapter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -55,25 +53,39 @@ public class OffersFragment extends Fragment {
         offersGridView = (AutofitRecyclerView) view.findViewById(R.id.offers);
         offersGridView.setOnScrollListener(new HideActionBarOnScroll(activity));
         topProgressBar = view.findViewById(R.id.top_progress_bar);
-        OffersRequest.submit(activity, Priority.IMMEDIATE, this, false, mOffersCallback,
-                mErrorListener);
+
+        // Setup the refresh on swipe down.
+        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                activity.reportActionToAnalytics("swipeRefresh", "offers");
+                swipeRefreshLayout.setRefreshing(false);
+                refresh(true);
+            }
+        });
+        swipeRefreshLayout.setColorSchemeResources(R.color.primary);
+
+        refresh(false);
     }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-
-        if (offersAdapter != null) {
-            offersAdapter.notifyDataSetChanged();
-        }
+        refresh(true);
     }
 
-    private Listener<List<Offer>> mOffersCallback = new Listener<List<Offer>>() {
+    private void refresh(boolean shouldBypassCache) {
+        topProgressBar.setVisibility(View.VISIBLE);
+        OffersRequest.submit(activity, Priority.IMMEDIATE, this, shouldBypassCache, mOffersCallback,
+                mErrorListener);
+    }
+
+    private Listener<OffersResponse> mOffersCallback = new Listener<OffersResponse>() {
         @Override
-        public void onResponse(List<Offer> offers, boolean isIntermediate) {
-            topProgressBar.setVisibility(View.GONE);
-            offersAdapter = new OffersAdapter(activity, offers);
-            offersGridView.setAdapter(offersAdapter);
+        public void onResponse(OffersResponse offers, boolean isIntermediate) {
+            topProgressBar.setVisibility(isIntermediate ? View.VISIBLE: View.GONE);
+            offersGridView.setAdapter(new OffersAdapter(activity, offers));
         }
     };
 

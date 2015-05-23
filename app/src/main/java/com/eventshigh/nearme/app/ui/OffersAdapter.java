@@ -17,22 +17,20 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.data.Offer;
+import com.eventshigh.nearme.app.network.OffersRequest.OffersResponse;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.Preferences;
-
-import java.util.List;
 
 /**
  * Adapter used to show offers information in RecyclerView.
  */
 public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
     private final BaseActivity activity;
-    private final List<Offer> offers;
+    private final OffersResponse offersResponse;
 
-    public OffersAdapter(BaseActivity activity, List<Offer> offers) {
+    public OffersAdapter(BaseActivity activity, OffersResponse offersResponse) {
         this.activity = activity;
-        this.offers = offers;
+        this.offersResponse = offersResponse;
     }
 
     @Override
@@ -54,21 +52,24 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder card, int position) {
         if (position == 0) {
-            ((OffersHeaderCard) card).populate(activity);
+            ((OffersHeaderCard) card).populate(activity, offersResponse);
         }
         if (position > 0) {
-            ((OfferCard) card).populate(offers.get(position - 1), activity);
+            ((OfferCard) card).populate(offersResponse.offers.get(position - 1), activity);
         }
     }
 
     @Override
     public int getItemCount() {
-        return offers.size() + 1;
+        return offersResponse.offers.size() + 1;
     }
 
 
     public static class OffersHeaderCard extends ViewHolder {
-        private final TextView numPointsView;
+        private final TextView forClaimView;
+        private final TextView claimedView;
+        private final TextView totalInstallsView;
+
         private final TextView inviteLinkView;
 
         private final View inviteViaFB;
@@ -79,7 +80,10 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
         public OffersHeaderCard(View itemView) {
             super(itemView);
 
-            numPointsView = (TextView) itemView.findViewById(R.id.num_points);
+            forClaimView = (TextView) itemView.findViewById(R.id.for_claim);
+            claimedView = (TextView) itemView.findViewById(R.id.claimed);
+            totalInstallsView = (TextView) itemView.findViewById(R.id.total_installs);
+
             inviteLinkView = (TextView) itemView.findViewById(R.id.invite_link);
 
             inviteViaFB = itemView.findViewById(R.id.share_fb);
@@ -88,8 +92,11 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
             inviteViaWhatsapp = itemView.findViewById(R.id.share_whatsapp);
         }
 
-        public void populate(final BaseActivity activity) {
-            numPointsView.setText(Preferences.getInstance(activity).getPoints());
+        public void populate(final BaseActivity activity, OffersResponse offersResponse) {
+
+            forClaimView.setText(Integer.toString(offersResponse.forClaim));
+            claimedView.setText(Integer.toString(offersResponse.claimed));
+            totalInstallsView.setText(Integer.toString(offersResponse.totalInstalls));
 
             final String inviteLink = new Account(activity).getAppDownloadLink();
             inviteLinkView.setText(inviteLink);
