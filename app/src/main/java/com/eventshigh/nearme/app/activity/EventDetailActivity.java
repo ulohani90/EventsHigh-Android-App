@@ -20,6 +20,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -160,6 +161,18 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.activity_event_detail, menu);
         return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_share) {
+            if (event != null) {
+                shareEvent(event, null);
+            }
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     protected void onStart() {

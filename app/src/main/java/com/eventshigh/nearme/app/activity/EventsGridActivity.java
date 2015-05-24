@@ -50,9 +50,9 @@ public class EventsGridActivity extends BaseEventsActivity {
                 boolean isFollowing = account.isFollowing(eventsContext.query);
                 isFollowing = !isFollowing;
                 reportActionToAnalytics(isFollowing ? "addFollowing" : "removeFollowing",
-                    eventsContext.query);
+                        eventsContext.query);
                 followFab.setImageResource(isFollowing ? R.drawable.ic_favorite_red_18dp
-                    : R.drawable.ic_favorite_white_18dp);
+                        : R.drawable.ic_favorite_white_18dp);
                 account.setIsFollowing(eventsContext.query, isFollowing);
             }
         });
@@ -77,26 +77,31 @@ public class EventsGridActivity extends BaseEventsActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         boolean returnValue = super.onCreateOptionsMenu(menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        MenuItemCompat.setOnActionExpandListener(item,
-                new MenuItemCompat.OnActionExpandListener() {
-                    int oldToolbarAlpha;
 
-                    @Override
-                    public boolean onMenuItemActionExpand(MenuItem item) {
-                        searchViewExpanded = true;
-                        oldToolbarAlpha = currentToolBarAlpha;
-                        updateToolbar(255);
-                        return true;
-                    }
+        if (showFollowCard) {
+            MenuItem item = menu.findItem(R.id.action_search);
+            MenuItemCompat.setOnActionExpandListener(item,
+                    new MenuItemCompat.OnActionExpandListener() {
+                        int oldToolbarAlpha;
 
-                    @Override
-                    public boolean onMenuItemActionCollapse(MenuItem item) {
-                        searchViewExpanded = false;
-                        updateToolbar(oldToolbarAlpha);
-                        return true;
-                    }
-                });
+                        @Override
+                        public boolean onMenuItemActionExpand(MenuItem item) {
+                            searchViewExpanded = true;
+                            oldToolbarAlpha = currentToolBarAlpha;
+                            updateToolbar(255);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onMenuItemActionCollapse(MenuItem item) {
+                            searchViewExpanded = false;
+                            updateToolbar(oldToolbarAlpha);
+                            return true;
+                        }
+                    });
+
+            shareMenu.setVisible(true);
+        }
 
         return returnValue;
     }

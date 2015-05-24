@@ -37,7 +37,6 @@ public class EventsHighEndpoints {
 
     public static final String QUERY_MY_EVENT = "my events";
     public static final String QUERY_FEATURED = "editor's picks";
-    public static final String QUERY_WEEKEND = "this weekend";
 
     public static Uri getEventDetailsURI(Event event) {
         StringBuilder sb = new StringBuilder(event.id);
@@ -75,18 +74,25 @@ public class EventsHighEndpoints {
 
     public static Uri getWebUri(EventsContext param) {
         Uri.Builder builder = Uri.parse(WEB_URI_BASE).buildUpon();
+        String city = param.city == null ? null : param.city.toString().toLowerCase();
+
         if (param.query.isEmpty()) {
-            if (param.city != null) {
-                builder.appendPath("city").appendPath(param.city.toString().toLowerCase());
+            if (city != null) {
+                builder.appendPath("city").appendPath(city);
             }
             return builder.build();
         }
 
-        builder.appendPath("search");
-        if (param.city != null) {
-            builder.appendQueryParameter("city", param.city.toString().toLowerCase());
+        if (city != null) {
+            builder.appendPath("browse");
+            builder.appendPath(city);
+            builder.appendEncodedPath(URLEncoder.encode(param.query.toLowerCase()) + "-in-" + city);
+            return builder.build();
+        } else {
+            builder.appendPath("search");
+            builder.appendQueryParameter("interest", param.query);
+            return builder.build();
         }
-        return builder.appendQueryParameter("interest", param.query).build();
     }
 
     public static String getFeaturedEventsEndpoint(City city) {

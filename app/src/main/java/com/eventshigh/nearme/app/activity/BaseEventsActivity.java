@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.SearchManager;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,11 +11,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 
 /**
@@ -37,6 +40,7 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
     // UI elements.
     protected FrameLayout eventContainer;
     protected SearchView searchView;
+    protected MenuItem shareMenu;
 
     // when was this activity last started on.
     private long lastStartedAt;
@@ -106,6 +110,8 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
         // Set visibility.
         menu.findItem(R.id.action_show_map).setVisible(isPlayServicesPresent);
         menu.findItem(getDisabledMenuItem()).setVisible(false);
+        shareMenu = menu.findItem(R.id.action_share);
+        shareMenu.setVisible(false);
 
         return true;
     }
@@ -123,6 +129,23 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
         if (id == R.id.action_show_list) {
             reportActionToAnalytics("switchToList");
             switchTo(EventsGridActivity.class);
+            return true;
+        }
+
+        if (id == R.id.action_share) {
+            reportActionToAnalytics("share");
+
+            String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
+                    .appendQueryParameter("src", "ehm").toString();
+            try {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + uri);
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
+            }
             return true;
         }
 

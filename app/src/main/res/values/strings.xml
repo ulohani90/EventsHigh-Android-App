@@ -109,7 +109,7 @@
     <string name="ask_locality">Enter an area or city</string>
 
     <!-- Sharing -->
-    <string name="action_share_event">Invite Friends</string>
+    <string name="action_share">Share</string>
     <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Sounds fun!\n\n%1$s\n\n%2$s</string>
 
     <!-- Failed messages -->
