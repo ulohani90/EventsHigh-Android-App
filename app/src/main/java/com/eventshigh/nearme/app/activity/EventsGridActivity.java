@@ -11,6 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.ImageButton;
 
 import com.eventshigh.nearme.app.R;
@@ -182,17 +184,25 @@ public class EventsGridActivity extends BaseEventsActivity
     };
 
     private int currentToolBarAlpha = 255;
+    private boolean fabHidden = true;
     private void updateToolbar(int toolbarAlpha) {
         final Account account = new Account(this);
         followFab.setImageResource(account.isFollowing(eventsContext.query)
             ? R.drawable.ic_favorite_red_18dp
             : R.drawable.ic_favorite_white_18dp);
         if (toolbarAlpha == currentToolBarAlpha) {
-            followFab.setVisibility(View.VISIBLE);
+            if (fabHidden) {
+                fabHidden = false;
+                animateFab(0, 1);
+                followFab.setVisibility(View.VISIBLE);
+            }
             // do nothing
             return;
         }
-        followFab.setVisibility(View.GONE);
+        if (!fabHidden) {
+            fabHidden = true;
+            animateFab(1, 0);
+        }
 
         // Change the color of toolbar icons and text if needed.
         if (toolbarAlpha < 100) {
@@ -209,6 +219,31 @@ public class EventsGridActivity extends BaseEventsActivity
         toolbar.setBackgroundColor(Color.argb(toolbarAlpha, 0xEA, 0x5D, 0x4B));
         toolbar.setTitleTextColor(Color.argb(toolbarAlpha, 255, 255, 255));
         toolbar.setSubtitleTextColor(Color.argb(toolbarAlpha, 255, 255, 255));
+    }
+
+    private void animateFab(int start, int end) {
+        float pivot = getResources().getDimension(R.dimen.fab_size) / 2;
+        Animation animation = new ScaleAnimation(start, end, start, end, pivot, pivot);
+        if (end == 0) {
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    followFab.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+        }
+        animation.setDuration(200);
+        followFab.startAnimation(animation);
     }
 
     private void setDarkToolbarIcons() {
