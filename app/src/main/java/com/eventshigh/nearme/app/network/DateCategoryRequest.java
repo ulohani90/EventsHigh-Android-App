@@ -10,6 +10,7 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
@@ -99,9 +100,8 @@ public class DateCategoryRequest extends JsonRequest<List<TopicEvents>>  {
             }
 
             return Response.success(topicEvents, HttpHeaderParser.parseCacheHeaders(response));
-        } catch (UnsupportedEncodingException e) {
-            return Response.error(new ParseError(e));
-        } catch (JSONException e) {
+        } catch (UnsupportedEncodingException | JSONException e) {
+            Crashlytics.logException(e);
             return Response.error(new ParseError(e));
         }
     }

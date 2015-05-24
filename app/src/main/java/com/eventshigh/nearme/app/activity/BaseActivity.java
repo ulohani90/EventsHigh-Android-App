@@ -209,6 +209,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
             startActivity(sendIntent);
         } catch (ActivityNotFoundException e) {
+		    Crashlytics.logException(e);
             Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
             Log.w(LOG_TAG, "failed sharing", e);
         }
@@ -239,6 +240,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
             // No activity to open cal.
+            Crashlytics.logException(e);
             Toast.makeText(this, R.string.no_cal_app, Toast.LENGTH_SHORT).show();
         }
     }

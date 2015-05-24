@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.toolbox.NetworkImageView;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
@@ -271,6 +272,7 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
                 );
                 activity.reportActionToAnalytics("claimOffer", offer.id);
             } catch (Exception e) {
+                Crashlytics.logException(e);
                 activity.reportActionToAnalytics("claimOfferNoEmail", offer.id);
                 Toast.makeText(activity, "Send us email at contact@eventshigh.com to redeem the offer",
                         Toast.LENGTH_LONG).show();

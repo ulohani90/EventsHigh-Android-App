@@ -7,6 +7,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONArray;
@@ -32,12 +33,12 @@ public class TagsSuggestRequest extends JsonRequest<List<String>> {
                     suggestTags.add(tagsJSONArray.getJSONObject(i).getString("tag"));
                 } catch (JSONException e) {
                   // Ignore.
+                    Crashlytics.logException(e);
                 }
             }
             return Response.success(suggestTags, HttpHeaderParser.parseCacheHeaders(response));
-        } catch (UnsupportedEncodingException e) {
-            return Response.error(new ParseError(e));
-        } catch (JSONException e) {
+        } catch (UnsupportedEncodingException | JSONException e) {
+            Crashlytics.logException(e);
             return Response.error(new ParseError(e));
         }
     }

@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
@@ -792,8 +793,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                         EventCategory.toCategoryParsableString(tag).toLowerCase()).getInt(null);
             } catch (IllegalAccessException e) {
                 // Ignore
+                Crashlytics.logException(e);
             } catch (NoSuchFieldException e) {
                 // Ignore
+                Crashlytics.logException(e);
                 Log.d("", "No image for: " + tag, e);
             }
 

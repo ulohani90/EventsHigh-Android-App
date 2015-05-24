@@ -17,7 +17,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,6 +45,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -197,8 +197,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                         public void onErrorResponse(VolleyError volleyError) {
                             Toast.makeText(EventDetailActivity.this, R.string.failed_load,
                                     Toast.LENGTH_SHORT).show();
-                            Log.e(EventDetailActivity.class.getSimpleName(), volleyError.toString(),
-                                    volleyError.getCause());
+                            VolleyHelper.log(EventDetailActivity.this, volleyError);
                             finish();
                         }
                     });
@@ -359,6 +358,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                             status.startResolutionForResult(EventDetailActivity.this,
                                 REQUEST_CHECK_SETTINGS);
                         } catch (IntentSender.SendIntentException e) {
+                            Crashlytics.logException(e);
                             locationDetectionFailed();
                         }
                         break;
@@ -446,6 +446,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
             // No activity to open maps.
+            Crashlytics.logException(e);
             Toast.makeText(this, R.string.no_map_app, Toast.LENGTH_SHORT).show();
         }
     }
@@ -527,6 +528,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
             // No activity to open url. ignore.
+            Crashlytics.logException(e);
         }
     }
 
@@ -581,7 +583,8 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                     "\n\nQuery:\n<please type in your question here>");
             startActivitySafe(sendIntent);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            // do nothing.
+            Crashlytics.logException(e);
         }
     }
 
@@ -662,7 +665,9 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                             try {
                                 checkInSuccess(response.getString("message"));
                             } catch (JSONException e) {
-                                e.printStackTrace();
+                                // do nothing.
+                                Crashlytics.logException(e);
+                                checkInFailed();
                             }
                         }
                     },
@@ -675,6 +680,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 )
             );
         } catch (IOException | GeneralSecurityException e) {
+            Crashlytics.logException(e);
             checkInFailed();
         }
     }

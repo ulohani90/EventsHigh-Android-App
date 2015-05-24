@@ -12,6 +12,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.UserActionDbHelper;
 import com.eventshigh.nearme.app.data.UserActionDbHelper.FollowingAction;
@@ -191,6 +192,7 @@ public class Account {
                         );
                         VolleyHelper.addToRequestQueue(context, request);
                     } catch (IOException | GeneralSecurityException e) {
+                        Crashlytics.logException(e);
                         Log.w(Account.class.getSimpleName(), "failed to get shortlink", e);
                     }
                 }

@@ -9,6 +9,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -91,10 +92,8 @@ public class EventCollectionRequest extends BaseEventListRequest {
             }
 
             return Response.success(events, HttpHeaderParser.parseCacheHeaders(response));
-        } catch (UnsupportedEncodingException e) {
-            return Response.error(new ParseError(e));
-        } catch (JSONException e) {
-            VolleyHelper.getInstance(context).invalidateCache(this);
+        } catch (UnsupportedEncodingException | JSONException e) {
+            Crashlytics.logException(e);
             return Response.error(new ParseError(e));
         }
     }

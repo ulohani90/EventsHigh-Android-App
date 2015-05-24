@@ -8,6 +8,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -157,6 +158,7 @@ public class GcmRegistration {
                     editor.apply();
                 } catch (IOException e) {
                     // Ignore. try it next time.
+                    Crashlytics.logException(e);
                     Editor editor = gcmRegistrationInfo.edit();
                     editor.remove(PREF_REGISTRATION_ID);
                     editor.remove(PREF_APP_VERSION);
@@ -207,6 +209,7 @@ public class GcmRegistration {
                             });
                 } catch (Exception e) {
                     // Wait for initialization to finish and retry later.
+                    Crashlytics.logException(e);
                 }
             }
 
@@ -221,6 +224,7 @@ public class GcmRegistration {
             return packageInfo.versionCode;
         } catch (NameNotFoundException e) {
             // should never happen
+            Crashlytics.logException(e);
             throw new RuntimeException("Could not get package name: " + e);
         }
     }

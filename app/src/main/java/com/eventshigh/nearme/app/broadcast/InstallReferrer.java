@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.user.Account;
 import com.google.android.gms.analytics.CampaignTrackingReceiver;
 
@@ -30,6 +31,7 @@ public class InstallReferrer extends BroadcastReceiver {
                 new Account(context).recordReferrer(referrer);
             } catch (UnsupportedEncodingException e) {
                 // Ignore.
+                Crashlytics.logException(e);
             }
         }
 

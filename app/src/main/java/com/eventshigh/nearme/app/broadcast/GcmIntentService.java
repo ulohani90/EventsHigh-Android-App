@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
@@ -61,6 +62,7 @@ public class GcmIntentService extends IntentService {
                 sendNotification(parsedBundle, intent);
             } catch (ClassNotFoundException e) {
                 // Ignore.
+                Crashlytics.logException(e);
             }
         }
     }

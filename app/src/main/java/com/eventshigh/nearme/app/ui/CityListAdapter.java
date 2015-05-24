@@ -12,8 +12,8 @@ import com.eventshigh.nearme.app.data.City;
 * An @{link ArrayAdapter} which can be used to show City selection list.
 */
 public class CityListAdapter extends ArrayAdapter<City> {
-    public static interface OnCitySelectionListener {
-        public void onCitySelection(City city);
+    public interface OnCitySelectionListener {
+        void onCitySelection(City city);
     }
 
     private final OnCitySelectionListener citySelectionListener;

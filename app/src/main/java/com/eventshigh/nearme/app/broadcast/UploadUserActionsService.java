@@ -12,6 +12,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.UserActionDbHelper;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
@@ -59,9 +60,9 @@ public class UploadUserActionsService extends IntentService {
             VolleyHelper.addToRequestQueue(this,
                 new JsonObjectRequest(Request.Method.POST, Signer.sign(uri).toString(), postBody,
                         onSuccess, onError));
-
         } catch (IOException | GeneralSecurityException | JSONException e) {
             Log.w(LOG_TAG, "Failed to upload user actions: " + uri, e);
+            Crashlytics.logException(e);
             cleanUp();
         }
     }
@@ -87,6 +88,10 @@ public class UploadUserActionsService extends IntentService {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
             Log.w(LOG_TAG, "Failed to uploaded user actions", volleyError.getCause());
+            if (volleyError.getCause() != null) {
+                Crashlytics.logException(volleyError.getCause());
+            }
+
             cleanUp();
         }
     };

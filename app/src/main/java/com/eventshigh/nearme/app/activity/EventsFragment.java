@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -205,14 +204,7 @@ public class EventsFragment extends BaseEventsFragment {
                 retryView.setVisibility(View.VISIBLE);
             }
 
-            Throwable cause = volleyError.getCause();
-            if (cause != null) {
-                Log.w(LOG_TAG, "Volley Error: " + volleyError.getMessage(), cause);
-                activity.reportActionToAnalytics("failedRequest", cause.getClass().getSimpleName());
-            } else {
-                Log.w(LOG_TAG, "Volley Error: " + volleyError.getMessage());
-                activity.reportActionToAnalytics("failedRequest");
-            }
+            VolleyHelper.log(activity, volleyError);
         }
     };
 }

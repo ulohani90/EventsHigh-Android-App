@@ -11,6 +11,7 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.Offer;
 import com.eventshigh.nearme.app.network.OffersRequest.OffersResponse;
 import com.eventshigh.nearme.app.security.Signer;
@@ -107,6 +108,7 @@ public class OffersRequest extends JsonRequest<OffersResponse> {
                     offersJSON.getInt("claimed"), offersJSON.getInt("total"));
             return Response.success(res, HttpHeaderParser.parseCacheHeaders(response));
         } catch (Exception e) {
+            Crashlytics.logException(e);
             return Response.error(new ParseError(e));
         }
     }

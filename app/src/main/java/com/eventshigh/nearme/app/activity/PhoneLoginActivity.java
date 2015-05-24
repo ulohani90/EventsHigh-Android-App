@@ -15,6 +15,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
@@ -103,6 +104,7 @@ public class PhoneLoginActivity extends BaseActivity {
                                 public void onErrorResponse(VolleyError volleyError) {
                                     progressBar.setVisibility(View.GONE);
                                     reportActionToAnalytics("sendCodeRetry");
+                                    VolleyHelper.log(PhoneLoginActivity.this, volleyError);
                                     showRetryMessage();
                                 }
                             }
@@ -111,6 +113,7 @@ public class PhoneLoginActivity extends BaseActivity {
         } catch (IOException | GeneralSecurityException e) {
             progressBar.setVisibility(View.GONE);
             reportActionToAnalytics("sendCodeRetry");
+            Crashlytics.logException(e);
             showRetryMessage();
         }
     }
@@ -145,6 +148,7 @@ public class PhoneLoginActivity extends BaseActivity {
                                 public void onErrorResponse(VolleyError volleyError) {
                                     progressBar.setVisibility(View.GONE);
                                     reportActionToAnalytics("verifyCodeRetry");
+                                    VolleyHelper.log(PhoneLoginActivity.this, volleyError);
                                     showRetryMessage();
                                 }
                             }
@@ -153,6 +157,7 @@ public class PhoneLoginActivity extends BaseActivity {
         } catch (IOException | GeneralSecurityException e) {
             progressBar.setVisibility(View.GONE);
             reportActionToAnalytics("verifyCodeRetry");
+            Crashlytics.logException(e);
             showRetryMessage();
         }
     }

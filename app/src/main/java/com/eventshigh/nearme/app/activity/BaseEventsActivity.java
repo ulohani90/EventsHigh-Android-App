@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.user.GcmRegistration;
@@ -144,6 +145,7 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
                 sendIntent.setType("text/plain");
                 startActivity(sendIntent);
             } catch (ActivityNotFoundException e) {
+                Crashlytics.logException(e);
                 Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
             }
             return true;

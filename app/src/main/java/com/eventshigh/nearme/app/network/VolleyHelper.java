@@ -2,12 +2,16 @@ package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.util.LruCache;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.activity.BaseActivity;
 
 /**
  * Volley Helper which provide the simple methods to manage VolleyRequestQueue
@@ -69,5 +73,18 @@ public class VolleyHelper {
 
     public void invalidateCache(Request request) {
         requestQueue.getCache().remove(request.getCacheKey());
+    }
+
+    public static void log(BaseActivity activity, VolleyError volleyError) {
+        String logTag = activity.getClass().getSimpleName();
+        Throwable cause = volleyError.getCause();
+        if (cause != null) {
+            Crashlytics.logException(cause);
+            Log.w(logTag, "Volley Error: " + volleyError.getMessage(), cause);
+            activity.reportActionToAnalytics("failedRequest", cause.getClass().getSimpleName());
+        } else {
+            Log.w(logTag, "Volley Error: " + volleyError.getMessage());
+            activity.reportActionToAnalytics("failedRequest");
+        }
     }
 }

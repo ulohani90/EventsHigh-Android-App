@@ -11,6 +11,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
@@ -63,11 +64,13 @@ public class AccountStateReporter {
                                 @Override
                                 public void onErrorResponse(VolleyError volleyError) {
                                     // do nothing.
+                                    Crashlytics.logException(volleyError.getCause());
                                 }
                             }
                     )
             );
         } catch (IOException | GeneralSecurityException e) {
+            Crashlytics.logException(e);
             Log.w(AccountStateReporter.class.getSimpleName(), "Failed to sendSignedRequest: " + uri, e);
         }
     }

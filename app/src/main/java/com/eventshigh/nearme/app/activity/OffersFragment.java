@@ -65,8 +65,6 @@ public class OffersFragment extends Fragment {
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
-
-        refresh(false);
     }
 
     @Override
@@ -94,6 +92,7 @@ public class OffersFragment extends Fragment {
         public void onErrorResponse(VolleyError volleyError) {
             // do nothing.
             topProgressBar.setVisibility(View.GONE);
+            VolleyHelper.log(activity, volleyError);
         }
     };
 }
