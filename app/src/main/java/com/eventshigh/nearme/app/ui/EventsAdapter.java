@@ -722,7 +722,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 public void onClick(View v) {
                     activity.reportActionToAnalytics("addFollowing", data.title);
                     account.setIsFollowing(data.title, true);
-                    setFollowButtons(true);
                 }
             });
             followingButton.setOnClickListener(new OnClickListener() {
@@ -730,7 +729,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 public void onClick(View v) {
                     activity.reportActionToAnalytics("removeFollowing", data.title);
                     account.setIsFollowing(data.title, false);
-                    setFollowButtons(false);
+                }
+            });
+            account.addOnChangeListener(new Account.OnAccountChangeListener() {
+                @Override
+                public void followStateChanged() {
+                    setFollowButtons(account.isFollowing(data.title));
                 }
             });
         }

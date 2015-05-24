@@ -24,7 +24,8 @@ import pl.snowdog.material.ui.ToolbarColorizeHelper;
  * On Phone, we have one column in portrait mode and two columns in landscape mode. On Tablet,
  * we try to put more columns as per the width offered.
  */
-public class EventsGridActivity extends BaseEventsActivity {
+public class EventsGridActivity extends BaseEventsActivity
+    implements Account.OnAccountChangeListener {
 
     private boolean showFollowCard;
     private boolean searchViewExpanded;
@@ -41,9 +42,8 @@ public class EventsGridActivity extends BaseEventsActivity {
 
         followFab = (ImageButton) findViewById(R.id.fab_follow);
         final Account account = new Account(this);
-        followFab.setImageResource(account.isFollowing(eventsContext.query)
-            ? R.drawable.ic_favorite_red_18dp
-            : R.drawable.ic_favorite_white_18dp);
+        updateFabIcon();
+
         followFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,11 +51,10 @@ public class EventsGridActivity extends BaseEventsActivity {
                 isFollowing = !isFollowing;
                 reportActionToAnalytics(isFollowing ? "addFollowing" : "removeFollowing",
                         eventsContext.query);
-                followFab.setImageResource(isFollowing ? R.drawable.ic_favorite_red_18dp
-                        : R.drawable.ic_favorite_white_18dp);
                 account.setIsFollowing(eventsContext.query, isFollowing);
             }
         });
+
 
         // Should we show follow widget?
         showFollowCard = !eventsContext.query.isEmpty() &&
@@ -72,6 +71,32 @@ public class EventsGridActivity extends BaseEventsActivity {
             updateToolbar(0);
             setTitle();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        final Account account = new Account(this);
+        account.addOnChangeListener(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        final Account account = new Account(this);
+        account.removeOnChangeListener(this);
+    }
+
+    @Override
+    public void followStateChanged() {
+        updateFabIcon();
+    }
+
+    private void updateFabIcon() {
+        final Account account = new Account(this);
+        followFab.setImageResource(account.isFollowing(eventsContext.query)
+            ? R.drawable.ic_favorite_red_18dp
+            : R.drawable.ic_favorite_white_18dp);
     }
 
     @Override
@@ -201,7 +226,7 @@ public class EventsGridActivity extends BaseEventsActivity {
             @Override
             public void run() {
                 ToolbarColorizeHelper.colorizeToolbar(toolbar,
-                        getResources().getColor(android.R.color.white), EventsGridActivity.this);
+                    getResources().getColor(android.R.color.white), EventsGridActivity.this);
             }
         });
     }
