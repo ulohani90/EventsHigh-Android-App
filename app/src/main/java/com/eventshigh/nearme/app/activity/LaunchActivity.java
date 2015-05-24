@@ -254,6 +254,7 @@ public class LaunchActivity extends BaseContextActivity {
         }
     };
 
+
     // ***********************
     // Helper methods
     // ***********************
@@ -272,7 +273,7 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.setViewPager(viewPager);
         tabsView.setOnPageChangeListener(adapter);
         tabsView.setCustomTabColorizer(adapter);
-        viewPager.setCurrentItem(2, false);
+        viewPager.setCurrentItem(1, false);
         lastFetchTimestamp = System.currentTimeMillis();
     }
 
@@ -332,9 +333,9 @@ public class LaunchActivity extends BaseContextActivity {
         private static final String EXPLORE_TAB = "explore";
         private static final String THIS_WEEK_TAB = "this week";
         private final String[] tabs = {
-            OFFERS_TAB,
             MY_EVENTS_TAB,
             EXPLORE_TAB,
+            OFFERS_TAB,
             THIS_WEEK_TAB
         };
         private final TextView[] tabViews = new TextView[tabs.length];
