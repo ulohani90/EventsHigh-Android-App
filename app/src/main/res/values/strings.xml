@@ -147,7 +147,7 @@
     <string name="rate_app_no">No, Thanks</string>
     <string name="rate_app_later">Later</string>
     <string name="rate_now">Rate Now</string>
-    <string name="feedback">Feedback</string>
+    <string name="feedback">Give Feedback</string>
 
     <!-- Zendesk -->
     <string name="contact_fragment_description_hint">Enter your query</string>
