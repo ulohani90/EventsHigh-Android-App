@@ -11,6 +11,7 @@ import android.view.View;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.FeedbackActivity;
 
 public class RateAppDialog {
     private static final String PREF_SHOW_RATE_APP_DIALOG = "showRateAppDialog";
@@ -49,6 +50,13 @@ public class RateAppDialog {
                 activity.reportActionToAnalytics("rateAppAccepted");
                 Uri uri = Uri.parse("market://details?id=" + activity.getPackageName());
                 activity.startActivity(new Intent(Intent.ACTION_VIEW, uri));
+            }
+        });
+        alertDialog.findViewById(R.id.feedback).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.reportActionToAnalytics("sendFeedback");
+                activity.startActivity(new Intent(activity, FeedbackActivity.class));
             };
         });
     }
