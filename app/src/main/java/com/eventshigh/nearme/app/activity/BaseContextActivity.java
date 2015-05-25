@@ -1,15 +1,19 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
+import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -86,6 +90,51 @@ public abstract class BaseContextActivity extends BaseActivity {
         appData.putParcelable(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
         startSearch(null, false, appData, false);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_show_map) {
+            reportActionToAnalytics("switchToMaps");
+            switchTo(EventsMapsActivity.class);
+            return true;
+        }
+
+        if (id == R.id.action_show_list) {
+            reportActionToAnalytics("switchToList");
+            switchTo(EventsGridActivity.class);
+            return true;
+        }
+
+        if (id == R.id.action_share) {
+            reportActionToAnalytics("share");
+
+            String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
+                    .appendQueryParameter("src", "ehm").toString();
+            try {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + uri);
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+            } catch (ActivityNotFoundException e) {
+                Crashlytics.logException(e);
+                Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    protected void switchTo(Class<?> cls) {
+        reportActionToAnalytics("switchView");
+        Intent intent = new Intent(this, cls)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
+        startActivity(intent);
     }
 
     public LatLng getUserLocation() {

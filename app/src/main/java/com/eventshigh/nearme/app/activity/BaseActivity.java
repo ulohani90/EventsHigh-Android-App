@@ -198,11 +198,17 @@ public abstract class BaseActivity extends AppCompatActivity {
                 src = packageName.split("\\.")[1];
             }
 
-            sendIntent.putExtra(Intent.EXTRA_TEXT,
+            if (packageName != null && packageName.equals(EventDetailActivity.PACKAGE_NAME_TWITTER)) {
+                sendIntent.putExtra(Intent.EXTRA_TEXT,
+                    event.title + (event.isCleanVenue ? " @ " + event.venue : "") +
+                    "\n@eventshighapp\n" + event.getEventShareURI(this, src));
+            } else {
+                sendIntent.putExtra(Intent.EXTRA_TEXT,
                     String.format(getResources().getString(R.string.share_event_text),
                             event.title + (event.isCleanVenue ? " @ " + event.venue : ""),
                             event.getEventShareURI(this, src))
-            );
+                );
+            }
             sendIntent.setType("text/plain");
             if (packageName != null) {
                 sendIntent.setPackage(packageName);

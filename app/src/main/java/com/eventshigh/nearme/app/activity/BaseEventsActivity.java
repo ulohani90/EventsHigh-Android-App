@@ -1,9 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.SearchManager;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
@@ -11,14 +9,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 
 /**
@@ -117,43 +112,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_show_map) {
-            reportActionToAnalytics("switchToMaps");
-            switchTo(EventsMapsActivity.class);
-            return true;
-        }
-
-        if (id == R.id.action_show_list) {
-            reportActionToAnalytics("switchToList");
-            switchTo(EventsGridActivity.class);
-            return true;
-        }
-
-        if (id == R.id.action_share) {
-            reportActionToAnalytics("share");
-
-            String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
-                    .appendQueryParameter("src", "ehm").toString();
-            try {
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + uri);
-                sendIntent.setType("text/plain");
-                startActivity(sendIntent);
-            } catch (ActivityNotFoundException e) {
-                Crashlytics.logException(e);
-                Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
-            }
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
 
     // ***********************
     // Delegated methods
@@ -173,14 +131,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
     // ***********************
     // Helper methods
     // ***********************
-
-    protected void switchTo(Class<?> cls) {
-        reportActionToAnalytics("switchView");
-        Intent intent = new Intent(this, cls)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
-        startActivity(intent);
-    }
 
     protected void setTitle() {
         ActionBar actionBar = getSupportActionBar();
