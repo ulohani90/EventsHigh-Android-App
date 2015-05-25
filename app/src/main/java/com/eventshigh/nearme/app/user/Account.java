@@ -48,15 +48,39 @@ public class Account {
     // track the number of installs.
     private static final String PREF_SHARE_APP_LINK = "app_download_link";
 
+    // The prefix to the shared prefs key used to save follow tags for this user
+    private static final String PREF_FOLLOW_KEY_PREFIX = "follow_";
+
     private static boolean disableSnackBar = false;
+
+    private static final Object lock = new Object();
+    private static final List<OnAccountChangeListener> listeners = new ArrayList<>();
+    private static SharedPreferences accountInfo;
 
     // Member variables used to store the user account details in preferences.
     private final Context context;
-    private final SharedPreferences accountInfo;
 
     public Account(Context context) {
         this.context = context.getApplicationContext();
-        accountInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
+
+        synchronized (lock) {
+            if (accountInfo == null) {
+                accountInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
+                accountInfo.registerOnSharedPreferenceChangeListener(
+                    new SharedPreferences.OnSharedPreferenceChangeListener() {
+                        @Override
+                        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                            if (key.startsWith(PREF_FOLLOW_KEY_PREFIX)) {
+                                synchronized (listeners) {
+                                    for (OnAccountChangeListener listener : listeners) {
+                                        listener.followStateChanged();
+                                    }
+                                }
+                            }
+                        }
+                    });
+            }
+        }
 
         // Check if we need to upload the data.
         new AccountStateRegistar().execute();
@@ -146,7 +170,23 @@ public class Account {
     }
 
     private static String getKeyForTag(String tag) {
-        return "follow_" + EventCategory.toCategoryParsableString(tag);
+        return PREF_FOLLOW_KEY_PREFIX + EventCategory.toCategoryParsableString(tag);
+    }
+
+    public void addOnChangeListener(OnAccountChangeListener listener) {
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
+    }
+
+    public void removeOnChangeListener(OnAccountChangeListener listener) {
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
+    }
+
+    public interface OnAccountChangeListener {
+        void followStateChanged();
     }
 
     private static final Object AccountStateRegistarLock = new Object();

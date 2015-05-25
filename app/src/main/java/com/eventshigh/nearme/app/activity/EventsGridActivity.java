@@ -11,6 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.ImageButton;
 
 import com.eventshigh.nearme.app.R;
@@ -19,12 +21,14 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
 
+
 /**
  * An {@link com.eventshigh.nearme.app.activity.BaseEventsActivity} which shows the events in Grid.
  * On Phone, we have one column in portrait mode and two columns in landscape mode. On Tablet,
  * we try to put more columns as per the width offered.
  */
-public class EventsGridActivity extends BaseEventsActivity {
+public class EventsGridActivity extends BaseEventsActivity
+    implements Account.OnAccountChangeListener {
 
     private boolean showFollowCard;
     private boolean searchViewExpanded;
@@ -59,7 +63,7 @@ public class EventsGridActivity extends BaseEventsActivity {
 
             // Follow Fab.
             account = new Account(this);
-            setFollowFab();
+            updateFabIcon();
             followFab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -68,10 +72,32 @@ public class EventsGridActivity extends BaseEventsActivity {
                     reportActionToAnalytics(isFollowing ? "addFollowing" : "removeFollowing",
                             eventsContext.query);
                     account.setIsFollowing(eventsContext.query, isFollowing);
-                    setFollowFab();
                 }
             });
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (showFollowCard) {
+            account.addOnChangeListener(this);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (showFollowCard) {
+            account.removeOnChangeListener(this);
+        }
+    }
+
+    @Override
+    public void followStateChanged() {
+        updateFabIcon();
     }
 
     @Override
@@ -181,7 +207,8 @@ public class EventsGridActivity extends BaseEventsActivity {
     }
 
     private void setDarkToolbarIcons() {
-        followFab.setVisibility(View.GONE);
+        animateFab(1, 0);
+
         toolbar.post(new Runnable() {
             @Override
             public void run() {
@@ -193,18 +220,45 @@ public class EventsGridActivity extends BaseEventsActivity {
 
     private void setLightToolbarIcons() {
         // TOOD: uncomment this once we fix the sync issue and icon.
-        // followFab.setVisibility(View.VISIBLE);
+        animateFab(0, 1);
+        followFab.setVisibility(View.VISIBLE);
+
         toolbar.post(new Runnable() {
             @Override
             public void run() {
                 ToolbarColorizeHelper.colorizeToolbar(toolbar,
-                        getResources().getColor(android.R.color.white), EventsGridActivity.this);
+                    getResources().getColor(android.R.color.white), EventsGridActivity.this);
             }
         });
     }
 
-    private void setFollowFab() {
+    private void updateFabIcon() {
         followFab.setImageResource(account.isFollowing(eventsContext.query)
                 ? R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
+    }
+
+    private void animateFab(int start, int end) {
+        float pivot = getResources().getDimension(R.dimen.fab_size) / 2;
+        Animation animation = new ScaleAnimation(start, end, start, end, pivot, pivot);
+        if (end == 0) {
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    followFab.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+        }
+        animation.setDuration(200);
+        followFab.startAnimation(animation);
     }
 }

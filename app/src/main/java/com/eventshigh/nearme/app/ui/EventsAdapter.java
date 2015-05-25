@@ -733,6 +733,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     setFollowButtons(false);
                 }
             });
+            account.addOnChangeListener(new Account.OnAccountChangeListener() {
+                @Override
+                public void followStateChanged() {
+                    setFollowButtons(account.isFollowing(data.title));
+                }
+            });
         }
 
         public void setFollowButtons(boolean isFollowing) {
