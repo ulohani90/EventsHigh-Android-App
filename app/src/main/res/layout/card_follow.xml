@@ -33,45 +33,62 @@
         tools:text="39 Events"
     />
 
-    <TextView
-        android:id="@+id/following_button"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_margin="14sp"
-        android:background="@drawable/eh_oval"
-        android:drawableLeft="@drawable/ic_done_white_12dp"
-        android:drawableStart="@drawable/ic_done_white_12dp"
-        android:drawablePadding="4dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:text="@string/ui_following"
-        android:textColor="@android:color/white"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:gravity="center"
-    />
+        android:layout_margin="14dp"
+    >
+        <TextView
+            android:id="@+id/following_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:background="@drawable/eh_oval"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:drawableLeft="@drawable/ic_done_white_12dp"
+            android:drawableStart="@drawable/ic_done_white_12dp"
+            android:drawablePadding="4dp"
+            android:text="@string/ui_following"
+        />
 
-    <TextView
-        android:id="@+id/follow_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="14sp"
-        android:background="@drawable/eh_oval"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:text="@string/ui_follow"
-        android:textColor="@android:color/white"
-        android:textSize="12sp"
-        android:textStyle="bold"
-    />
+        <TextView
+            android:id="@+id/follow_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:background="@drawable/eh_oval"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:text="@string/ui_follow"
+        />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="35 followers"
+        />
+    </LinearLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
