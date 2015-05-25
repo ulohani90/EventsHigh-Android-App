@@ -29,6 +29,7 @@ public class EventsGridActivity extends BaseEventsActivity {
     private boolean showFollowCard;
     private boolean searchViewExpanded;
     private ImageButton followFab;
+    private Account account;
 
 
     // ***********************
@@ -38,24 +39,7 @@ public class EventsGridActivity extends BaseEventsActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         followFab = (ImageButton) findViewById(R.id.fab_follow);
-        final Account account = new Account(this);
-        followFab.setImageResource(account.isFollowing(eventsContext.query)
-            ? R.drawable.ic_favorite_red_18dp
-            : R.drawable.ic_favorite_white_18dp);
-        followFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean isFollowing = account.isFollowing(eventsContext.query);
-                isFollowing = !isFollowing;
-                reportActionToAnalytics(isFollowing ? "addFollowing" : "removeFollowing",
-                        eventsContext.query);
-                followFab.setImageResource(isFollowing ? R.drawable.ic_favorite_red_18dp
-                        : R.drawable.ic_favorite_white_18dp);
-                account.setIsFollowing(eventsContext.query, isFollowing);
-            }
-        });
 
         // Should we show follow widget?
         showFollowCard = !eventsContext.query.isEmpty() &&
@@ -71,6 +55,22 @@ public class EventsGridActivity extends BaseEventsActivity {
             setSupportActionBar(toolbar);
             updateToolbar(0);
             setTitle();
+
+
+            // Follow Fab.
+            account = new Account(this);
+            setFollowFab();
+            followFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    boolean isFollowing = account.isFollowing(eventsContext.query);
+                    isFollowing = !isFollowing;
+                    reportActionToAnalytics(isFollowing ? "addFollowing" : "removeFollowing",
+                            eventsContext.query);
+                    account.setIsFollowing(eventsContext.query, isFollowing);
+                    setFollowFab();
+                }
+            });
         }
     }
 
@@ -158,16 +158,10 @@ public class EventsGridActivity extends BaseEventsActivity {
 
     private int currentToolBarAlpha = 255;
     private void updateToolbar(int toolbarAlpha) {
-        final Account account = new Account(this);
-        followFab.setImageResource(account.isFollowing(eventsContext.query)
-            ? R.drawable.ic_favorite_red_18dp
-            : R.drawable.ic_favorite_white_18dp);
         if (toolbarAlpha == currentToolBarAlpha) {
-            followFab.setVisibility(View.VISIBLE);
             // do nothing
             return;
         }
-        followFab.setVisibility(View.GONE);
 
         // Change the color of toolbar icons and text if needed.
         if (toolbarAlpha < 100) {
@@ -187,6 +181,7 @@ public class EventsGridActivity extends BaseEventsActivity {
     }
 
     private void setDarkToolbarIcons() {
+        followFab.setVisibility(View.GONE);
         toolbar.post(new Runnable() {
             @Override
             public void run() {
@@ -197,6 +192,8 @@ public class EventsGridActivity extends BaseEventsActivity {
     }
 
     private void setLightToolbarIcons() {
+        // TOOD: uncomment this once we fix the sync issue and icon.
+        // followFab.setVisibility(View.VISIBLE);
         toolbar.post(new Runnable() {
             @Override
             public void run() {
@@ -204,5 +201,10 @@ public class EventsGridActivity extends BaseEventsActivity {
                         getResources().getColor(android.R.color.white), EventsGridActivity.this);
             }
         });
+    }
+
+    private void setFollowFab() {
+        followFab.setImageResource(account.isFollowing(eventsContext.query)
+                ? R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
     }
 }

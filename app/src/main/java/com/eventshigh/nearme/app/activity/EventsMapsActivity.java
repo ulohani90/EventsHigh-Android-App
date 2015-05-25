@@ -16,6 +16,7 @@ import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
+import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
@@ -265,12 +266,12 @@ public class EventsMapsActivity extends BaseEventsActivity {
         }
     };
 
-    private Listener<List<Event>> mEventsFetcherCallBack = new Listener<List<Event>>() {
+    private Listener<EventsCollection> mEventsFetcherCallBack = new Listener<EventsCollection>() {
         @Override
-        public void onResponse(List<Event> events, boolean isIntermediate) {
+        public void onResponse(EventsCollection eventsCollection, boolean isIntermediate) {
             topProgressBar.setVisibility(isIntermediate ? View.VISIBLE : View.GONE);
             mOnMapClickListener.onMapClick(null);
-            mapMarkerManager.setEvents(map, events);
+            mapMarkerManager.setEvents(map, eventsCollection.events);
         }
     };
 
@@ -282,7 +283,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
                 events.addAll(topicEvents.events);
             }
 
-            mEventsFetcherCallBack.onResponse(new ArrayList<>(events), isIntermediate);
+            mEventsFetcherCallBack.onResponse(new EventsCollection(new ArrayList<>(events), 0),
+                    isIntermediate);
         }
     };
 }

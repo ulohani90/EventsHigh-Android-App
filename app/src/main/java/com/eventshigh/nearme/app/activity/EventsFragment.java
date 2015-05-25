@@ -15,10 +15,10 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.DateCategoryRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
+import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -33,8 +33,6 @@ import java.util.List;
  * Fragment to show events.
  */
 public class EventsFragment extends BaseEventsFragment {
-    private static final String LOG_TAG = EventsFragment.class.getSimpleName();
-
     private AutofitRecyclerView eventGridView;
     private View topProgressBar;
     private View noMyEventsView;
@@ -164,9 +162,9 @@ public class EventsFragment extends BaseEventsFragment {
 
     // This callback is called by EventsFetcher when new set of events are available. We build the
     // markers for all events and then call method to show selected markers.
-    private Listener<List<Event>> mEventsFetcherCallBack = new Listener<List<Event>>() {
+    private Listener<EventsCollection> mEventsFetcherCallBack = new Listener<EventsCollection>() {
         @Override
-        public void onResponse(List<Event> events, boolean isIntermediate) {
+        public void onResponse(EventsCollection eventsCollection, boolean isIntermediate) {
             if (isDetached()) {
                 return;
             }
@@ -174,17 +172,17 @@ public class EventsFragment extends BaseEventsFragment {
             if (!isIntermediate) {
                 topProgressBar.setVisibility(View.GONE);
 
-                if (events.isEmpty()) {
+                if (eventsCollection.events.isEmpty()) {
                     // Failed. Show toast and return empty list.
                     Toast.makeText(activity, R.string.no_events, Toast.LENGTH_SHORT).show();
                 }
             }
 
-            if (!isIntermediate || !events.isEmpty()) {
-                eventsAdapter.setEvents(events,
+            if (!isIntermediate || !eventsCollection.events.isEmpty()) {
+                eventsAdapter.setEvents(eventsCollection.events,
                     (eventsContext.query.isEmpty() || eventsContext.dateFilter.isEmpty() ? null : eventsContext.query));
                 if (showFollowCard) {
-                    eventsAdapter.addFollowCard(eventsContext.query, events.size());
+                    eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size());
                 }
             }
         }
