@@ -42,23 +42,21 @@
             android:textSize="14sp"
             android:textColor="#CC000000"
             android:fontFamily="sans-serif-medium"
-            tools:text="Win Booksmyshow Pass worth Rs. 100/-"
+            tools:text="Win Booksmyshow pass worth Rs. 200/- for first 5 Installs!"
         />
 
         <TextView
+            style="@style/EHButtonCTA"
             android:id="@+id/offer_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/offer_image"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_alignTop="@+id/offer_message"
-            android:layout_alignBottom="@+id/offer_message"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
+            android:layout_margin="12dp"
+            android:padding="8dp"
             android:gravity="center"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/primary"
+            android:clickable="false"
             tools:text="Claim"
         />
     </RelativeLayout>

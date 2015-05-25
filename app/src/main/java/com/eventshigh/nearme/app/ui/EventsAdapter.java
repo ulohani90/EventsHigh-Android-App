@@ -35,6 +35,7 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -119,8 +120,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void addFollowCard(String title, int numEvents) {
-        dataToShow.add(0, new FollowData(title, numEvents));
+    public void addFollowCard(String title, int numEvents, int numFollowers) {
+        dataToShow.add(0, new FollowData(title, numEvents, numFollowers));
     }
 
     public boolean spanAllColumns(int position) {
@@ -292,9 +293,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 numEventsView.setVisibility(View.GONE);
             } else {
                 numEventsView.setVisibility(View.VISIBLE);
-                numEventsView.setText(String.format(
+                numEventsView.setText(MessageFormat.format(
                     eventsFragment.getContextActivity().getString(R.string.num_events),
-                    header.numEvents));
+                    0, header.numEvents));
             }
 
             if (header.showMore()) {
@@ -668,10 +669,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private class FollowData implements Data {
         private final String title;
         private final int numEvents;
+        private final int numFollowers;
 
-        private FollowData(String title, int numEvents) {
+        private FollowData(String title, int numEvents, int numFollowers) {
             this.title = title;
             this.numEvents = numEvents;
+            this.numFollowers = numFollowers;
         }
 
         @Override
@@ -712,8 +715,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         public void populate(final FollowData data, final BaseContextActivity activity) {
             titleView.setText(data.title);
-            subtitleView.setText(
-                String.format(activity.getString(R.string.num_events), data.numEvents));
+            subtitleView.setText(MessageFormat.format(
+                activity.getString(R.string.num_events), data.numFollowers, data.numEvents));
 
             final Account account = new Account(activity);
             setFollowButtons(account.isFollowing(data.title));

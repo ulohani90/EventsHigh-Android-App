@@ -82,6 +82,7 @@
     <string name="ui_for_claim">Available</string>
     <string name="ui_claimed">Claimed</string>
     <string name="ui_total_referrer">Total Installed</string>
+    <string name="ui_invite_via">Invite Via</string>
 
     <string name="action_invite_fb">Facebook</string>
     <string name="action_invite_twitter">Twitter</string>
@@ -136,7 +137,7 @@
     <string name="event_detail_from">Event details from: %s</string>
     <string name="event_time_venue">%1$s, %2$s</string>
     <string name="event_distance_and_time">%d mins</string>
-    <string name="num_events">%d Events</string>
+    <string name="num_events">{0,choice,10&lt;{1} Events|11&lt;{0} Followers \'|\' {1} Events}</string>
 
     <!-- FB -->
     <string name="facebook_app_id">196111897251952</string>

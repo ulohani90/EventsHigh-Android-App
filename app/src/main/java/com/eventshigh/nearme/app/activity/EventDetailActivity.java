@@ -856,8 +856,8 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 timeView.setText(eventTime.toString());
                 int numDays = DateTimeUtils.getDaysLater(event);
                 if (numDays >= 0) {
-                    timeDetailView.setText(
-                        MessageFormat.format(getResources().getString(R.string.event_time_details), numDays));
+                    timeDetailView.setText(MessageFormat.format(
+                            getString(R.string.event_time_details), numDays));
                 }
 
                 futureTimesView.removeAllViews();
