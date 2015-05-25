@@ -48,7 +48,7 @@ public class MapMarkerManager {
     private static final int MIN_MARKER_DISTANCE_SQ = 6000;
 
     // When events are loaded, we zoom out if there are not enough events shown on map.
-    private static final int MIN_EVENTS_TO_SHOW = 3;
+    private static final int MIN_EVENTS_TO_SHOW = 10;
     // Because screens are not perfect circle, we do approximation here to diagonal distance
     // needed is 2.79f times the event distance. Note: 2.79 ~= 1.5 * (sq root of 5), where
     // (sq root of 5) is diagonal distance for 9:16 wide screens.
