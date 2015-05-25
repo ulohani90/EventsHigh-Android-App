@@ -36,6 +36,8 @@
                     android:onClick="imagePreview"
                     android:transitionName="event_bg"
                     tools:ignore="UnusedAttribute"
+                    tools:layout_height="150dp"
+                    tools:background="@drawable/eh_default_event"
                 />
                 <ImageView
                     android:id="@+id/eh_recommends"
@@ -47,7 +49,35 @@
                     android:adjustViewBounds="true"
                     android:transitionName="eh_recommends"
                     android:visibility="gone"
+                    tools:visibility="visible"
                     tools:ignore="UnusedAttribute, ContentDescription"
+                />
+                <ImageView
+                    android:id="@+id/action_favourite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="16dp"
+                    android:padding="12dp"
+                    android:background="@drawable/shape_circle_white"
+                    android:clickable="true"
+                    android:onClick="addFavourite"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_favorite_grey600_36dp"
+                    tools:visibility="visible"
+                />
+                <ImageView
+                    android:id="@+id/action_favourited"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="16dp"
+                    android:padding="12dp"
+                    android:background="@drawable/shape_circle_white"
+                    android:clickable="true"
+                    android:onClick="removeFavourite"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_favorite_red_36dp"
                 />
             </FrameLayout>
 
@@ -101,31 +131,6 @@
                 android:visibility="gone"
                 tools:visibility="visible"
             >
-                <TextView
-                    android:id="@+id/action_favourite"
-                    style="@style/EHDetailActionButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableTop="@drawable/ic_favorite_grey600_24dp"
-                    android:clickable="true"
-                    android:onClick="addFavourite"
-                    android:text="@string/ui_favourite"
-                    android:transitionName="action_favourite"
-                    tools:ignore="UnusedAttribute"
-                />
-                <TextView
-                    android:id="@+id/action_favourited"
-                    style="@style/EHDetailActionButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableTop="@drawable/ic_favorite_red_24dp"
-                    android:clickable="true"
-                    android:onClick="removeFavourite"
-                    android:text="@string/ui_favourite"
-                    android:visibility="gone"
-                />
                 <TextView
                     style="@style/EHDetailActionButton"
                     android:layout_width="0dp"
@@ -459,7 +464,6 @@
                     android:layout_marginTop="18dp"
                     android:gravity="start"
                     android:textColor="#CC383F3F"
-                    android:transitionName="event_price"
                     tools:ignore="UnusedAttribute"
                     tools:text="₹ 200 - 500"
                 />
