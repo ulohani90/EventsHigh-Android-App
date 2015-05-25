@@ -11,6 +11,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.GcmRegistration.UserCityListener;
+import com.eventshigh.nearme.app.utils.Utils;
 
 public class EHPreferenceFragment extends PreferenceFragment
     implements UserCityListener, Preference.OnPreferenceChangeListener {
@@ -82,8 +83,8 @@ public class EHPreferenceFragment extends PreferenceFragment
     @Override
     public void onUserCityChanged(@Nullable City newUserCity) {
         if (newUserCity != null) {
-            lastCityView.setValue(newUserCity.name());
-            lastCityView.setSummary(newUserCity.name());
+            lastCityView.setValue(Utils.capitalize(newUserCity.name()));
+            lastCityView.setSummary(Utils.capitalize(newUserCity.name()));
         }
     }
 }

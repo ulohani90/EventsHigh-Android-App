@@ -53,9 +53,9 @@ public class Account {
 
     private static boolean disableSnackBar = false;
 
-    private static List<OnAccountChangeListener> listeners;
+    private static final Object lock = new Object();
+    private static final List<OnAccountChangeListener> listeners = new ArrayList<>();
     private static SharedPreferences accountInfo;
-    private static SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener;
 
     // Member variables used to store the user account details in preferences.
     private final Context context;
@@ -63,21 +63,23 @@ public class Account {
     public Account(Context context) {
         this.context = context.getApplicationContext();
 
-        if (listeners == null) {
-            accountInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
-            listeners = new ArrayList<>();
-            sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-                @Override
-                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-                    String key) {
-                    for (OnAccountChangeListener listener : listeners) {
-                        if (key.startsWith(PREF_FOLLOW_KEY_PREFIX)) {
-                            listener.followStateChanged();
+        synchronized (lock) {
+            if (accountInfo == null) {
+                accountInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
+                accountInfo.registerOnSharedPreferenceChangeListener(
+                    new SharedPreferences.OnSharedPreferenceChangeListener() {
+                        @Override
+                        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                            if (key.startsWith(PREF_FOLLOW_KEY_PREFIX)) {
+                                synchronized (listeners) {
+                                    for (OnAccountChangeListener listener : listeners) {
+                                        listener.followStateChanged();
+                                    }
+                                }
+                            }
                         }
-                    }
-                }
-            };
-            accountInfo.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
+                    });
+            }
         }
 
         // Check if we need to upload the data.
@@ -172,13 +174,13 @@ public class Account {
     }
 
     public void addOnChangeListener(OnAccountChangeListener listener) {
-        if (!listeners.contains(listener)) {
+        synchronized (listeners) {
             listeners.add(listener);
         }
     }
 
     public void removeOnChangeListener(OnAccountChangeListener listener) {
-        if (listeners.contains(listener)) {
+        synchronized (listeners) {
             listeners.remove(listener);
         }
     }

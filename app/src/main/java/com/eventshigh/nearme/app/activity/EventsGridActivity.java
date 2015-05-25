@@ -21,6 +21,7 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
 
+
 /**
  * An {@link com.eventshigh.nearme.app.activity.BaseEventsActivity} which shows the events in Grid.
  * On Phone, we have one column in portrait mode and two columns in landscape mode. On Tablet,
@@ -32,6 +33,7 @@ public class EventsGridActivity extends BaseEventsActivity
     private boolean showFollowCard;
     private boolean searchViewExpanded;
     private ImageButton followFab;
+    private Account account;
 
 
     // ***********************
@@ -41,22 +43,7 @@ public class EventsGridActivity extends BaseEventsActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         followFab = (ImageButton) findViewById(R.id.fab_follow);
-        final Account account = new Account(this);
-        updateFabIcon();
-
-        followFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean isFollowing = account.isFollowing(eventsContext.query);
-                isFollowing = !isFollowing;
-                reportActionToAnalytics(isFollowing ? "addFollowing" : "removeFollowing",
-                        eventsContext.query);
-                account.setIsFollowing(eventsContext.query, isFollowing);
-            }
-        });
-
 
         // Should we show follow widget?
         showFollowCard = !eventsContext.query.isEmpty() &&
@@ -72,33 +59,45 @@ public class EventsGridActivity extends BaseEventsActivity
             setSupportActionBar(toolbar);
             updateToolbar(0);
             setTitle();
+
+
+            // Follow Fab.
+            account = new Account(this);
+            updateFabIcon();
+            followFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    boolean isFollowing = account.isFollowing(eventsContext.query);
+                    isFollowing = !isFollowing;
+                    reportActionToAnalytics(isFollowing ? "addFollowing" : "removeFollowing",
+                            eventsContext.query);
+                    account.setIsFollowing(eventsContext.query, isFollowing);
+                }
+            });
         }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        final Account account = new Account(this);
-        account.addOnChangeListener(this);
+
+        if (showFollowCard) {
+            account.addOnChangeListener(this);
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        final Account account = new Account(this);
-        account.removeOnChangeListener(this);
+
+        if (showFollowCard) {
+            account.removeOnChangeListener(this);
+        }
     }
 
     @Override
     public void followStateChanged() {
         updateFabIcon();
-    }
-
-    private void updateFabIcon() {
-        final Account account = new Account(this);
-        followFab.setImageResource(account.isFollowing(eventsContext.query)
-            ? R.drawable.ic_favorite_red_18dp
-            : R.drawable.ic_favorite_white_18dp);
     }
 
     @Override
@@ -184,24 +183,10 @@ public class EventsGridActivity extends BaseEventsActivity
     };
 
     private int currentToolBarAlpha = 255;
-    private boolean fabHidden = true;
     private void updateToolbar(int toolbarAlpha) {
-        final Account account = new Account(this);
-        followFab.setImageResource(account.isFollowing(eventsContext.query)
-            ? R.drawable.ic_favorite_red_18dp
-            : R.drawable.ic_favorite_white_18dp);
         if (toolbarAlpha == currentToolBarAlpha) {
-            if (fabHidden) {
-                fabHidden = false;
-                animateFab(0, 1);
-                followFab.setVisibility(View.VISIBLE);
-            }
             // do nothing
             return;
-        }
-        if (!fabHidden) {
-            fabHidden = true;
-            animateFab(1, 0);
         }
 
         // Change the color of toolbar icons and text if needed.
@@ -219,6 +204,37 @@ public class EventsGridActivity extends BaseEventsActivity
         toolbar.setBackgroundColor(Color.argb(toolbarAlpha, 0xEA, 0x5D, 0x4B));
         toolbar.setTitleTextColor(Color.argb(toolbarAlpha, 255, 255, 255));
         toolbar.setSubtitleTextColor(Color.argb(toolbarAlpha, 255, 255, 255));
+    }
+
+    private void setDarkToolbarIcons() {
+        animateFab(1, 0);
+
+        toolbar.post(new Runnable() {
+            @Override
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                        getResources().getColor(android.R.color.black), EventsGridActivity.this);
+            }
+        });
+    }
+
+    private void setLightToolbarIcons() {
+        // TOOD: uncomment this once we fix the sync issue and icon.
+        animateFab(0, 1);
+        followFab.setVisibility(View.VISIBLE);
+
+        toolbar.post(new Runnable() {
+            @Override
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                    getResources().getColor(android.R.color.white), EventsGridActivity.this);
+            }
+        });
+    }
+
+    private void updateFabIcon() {
+        followFab.setImageResource(account.isFollowing(eventsContext.query)
+                ? R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
     }
 
     private void animateFab(int start, int end) {
@@ -244,25 +260,5 @@ public class EventsGridActivity extends BaseEventsActivity
         }
         animation.setDuration(200);
         followFab.startAnimation(animation);
-    }
-
-    private void setDarkToolbarIcons() {
-        toolbar.post(new Runnable() {
-            @Override
-            public void run() {
-                ToolbarColorizeHelper.colorizeToolbar(toolbar,
-                        getResources().getColor(android.R.color.black), EventsGridActivity.this);
-            }
-        });
-    }
-
-    private void setLightToolbarIcons() {
-        toolbar.post(new Runnable() {
-            @Override
-            public void run() {
-                ToolbarColorizeHelper.colorizeToolbar(toolbar,
-                    getResources().getColor(android.R.color.white), EventsGridActivity.this);
-            }
-        });
     }
 }

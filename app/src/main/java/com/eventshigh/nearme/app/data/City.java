@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.data;
 
 import android.support.annotation.Nullable;
 
+import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
@@ -52,7 +53,7 @@ public enum City {
         City[] cities = values();
         String[] cityNames = new String[cities.length];
         for (int i = 0; i < cities.length; i++) {
-            cityNames[i] = cities[i].name();
+            cityNames[i] = Utils.capitalize(cities[i].name());
         }
 
         return cityNames;

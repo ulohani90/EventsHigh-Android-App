@@ -101,12 +101,13 @@
         </FrameLayout>
     </LinearLayout>
     <TextView
-        style="?android:attr/textAppearanceLarge"
+        style="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:gravity="center"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/share_app_message"
     />
 
@@ -144,19 +145,31 @@
     </FrameLayout>
 
     <!-- Share -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray200"
+        android:text="Invite Via"
+        android:paddingTop="24dp"
+        android:paddingBottom="4dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+    />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/gray200"
         android:orientation="horizontal"
-        android:paddingTop="24dp"
         android:paddingBottom="24dp"
+        android:paddingLeft="8dp"
     >
         <TextView
             android:id="@+id/share_fb"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"
             android:padding="4dp"
             android:drawablePadding="7dp"
             android:textColor="#CCFFFFFF"
@@ -165,15 +178,13 @@
             android:background="@drawable/button_fb"
             android:text="@string/action_invite_fb"
         />
-        <Space
-            android:layout_width="4dp"
-            android:layout_height="match_parent"
-        />
         <TextView
             android:id="@+id/share_twitter"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"
             android:padding="4dp"
             android:drawablePadding="4dp"
             android:textColor="#CCFFFFFF"
@@ -182,15 +193,13 @@
             android:background="@drawable/button_twitter"
             android:text="@string/action_invite_twitter"
         />
-        <Space
-            android:layout_width="4dp"
-            android:layout_height="match_parent"
-        />
         <TextView
             android:id="@+id/share_email"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"
             android:padding="4dp"
             android:drawablePadding="4dp"
             android:textColor="#CCFFFFFF"
@@ -199,15 +208,13 @@
             android:background="@drawable/button_email"
             android:text="@string/action_invite_email"
         />
-        <Space
-            android:layout_width="4dp"
-            android:layout_height="match_parent"
-        />
         <TextView
             android:id="@+id/share_whatsapp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"
             android:padding="4dp"
             android:drawablePadding="4dp"
             android:textColor="#CCFFFFFF"

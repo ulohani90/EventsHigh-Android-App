@@ -123,8 +123,10 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     private Toolbar toolbar;
     private View topProgressBar;
     private EventCard eventCard;
+
     private LatLng userLocation = null;
     private Event event = null;
+    private Account account;
     private GoogleApiClient client;
     private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
 
@@ -147,13 +149,14 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        onNewIntent(getIntent());
-
         // Initialize location request used for check in.
         checkInLocationRequest = new LocationRequest();
         checkInLocationRequest.setInterval(3000);
         checkInLocationRequest.setFastestInterval(1000);
         checkInLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        // Account.
+        account = new Account(this);
     }
 
     @Override
@@ -162,6 +165,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         getMenuInflater().inflate(R.menu.activity_event_detail, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -319,7 +323,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         reportEventAction(event, "onCheckIn");
 
         // Check if the user is logged in
-        Pair<String, Boolean> phoneNumberStatus = new Account(this).getPhoneNumber();
+        Pair<String, Boolean> phoneNumberStatus = account.getPhoneNumber();
         if (!phoneNumberStatus.second) {
             reportEventAction(event, "checkInPhoneNoRequired");
             new AlertDialog.Builder(this)
@@ -1037,7 +1041,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 }
             });
 
-            final Account account = new Account(EventDetailActivity.this);
             boolean isFollowing = account.isFollowing(tagName);
             final View followView = tagView.findViewById(R.id.follow_button);
             final View followingView = tagView.findViewById(R.id.following_button);
