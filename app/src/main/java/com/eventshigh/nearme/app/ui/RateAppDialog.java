@@ -26,21 +26,21 @@ public class RateAppDialog {
         View view = activity.getLayoutInflater().inflate(R.layout.dialog_rate_app, null);
         new AlertDialog.Builder(activity)
                 .setView(view)
-                .setPositiveButton(R.string.rate_app_now, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        disableRateDialog(sharedPreferences);
-                        activity.reportActionToAnalytics("rateAppAccepted");
-                        Uri uri = Uri.parse("market://details?id=" + activity.getPackageName());
-                        activity.startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                    }
-                })
+//                .setPositiveButton(R.string.rate_app_now, new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        disableRateDialog(sharedPreferences);
+//                        activity.reportActionToAnalytics("rateAppAccepted");
+//                        Uri uri = Uri.parse("market://details?id=" + activity.getPackageName());
+//                        activity.startActivity(new Intent(Intent.ACTION_VIEW, uri));
+//                    }
+//                })
                 .setNegativeButton(R.string.rate_app_no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         activity.reportActionToAnalytics("rateAppRejected");
                         disableRateDialog(sharedPreferences);
                     }
                 })
-                .setNeutralButton(R.string.rate_app_later, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.rate_app_later, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         activity.reportActionToAnalytics("rateAppLater");
                         // do nothing

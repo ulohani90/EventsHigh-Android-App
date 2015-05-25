@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/RateText"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="12dp"
-    android:drawableTop="@drawable/ic_launcher"
-    android:drawablePadding="24dp"
-    android:gravity="center"
-    android:lineSpacingExtra="2dp"
-    android:text="@string/rate_app_text"
-/>
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:layout_height="wrap_content">
+
+    <TextView style="@style/RateText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="24dp"
+        android:drawableTop="@drawable/ic_launcher"
+        android:lineSpacingExtra="2dp"
+        android:padding="12dp"
+        android:text="@string/rate_app_text" />
+
+    <Button
+        android:id="@+id/rate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        style="@style/EHButtonCTA"
+        android:text="@string/rate_now"/>
+
+    <TextView style="@style/RateText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="2dp"
+        android:padding="12dp"
+        android:text="@string/feedback_text" />
+
+    <Button
+        android:id="@+id/feedback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/EHButtonCTA"
+        android:text="@string/feedback"/>
+
+</LinearLayout>
