@@ -92,7 +92,7 @@
     <string name="share_app_message">Invite your friends to join EventsHigh by sharing your invite link &amp; get exciting offers mentioned below!</string>
     <string name="offer_email">[Please send this email to redeem the offer.]\n\nOffer: %1$s\nRegistered Phone Number: %2$s\nOffer Code:%3$s\n\n</string>
     <string name="share_app_text">Hey! I liked this EventsHigh app and I think you will too. It has a lot of weekend activities to choose from. Check it out. %s</string>
-    <string name="offer_threshold_message">There should be %d installs and then you can claim this offer. If you have already shared the app with your friends then they need to install the app using the link you shared.</string>
+    <string name="offer_threshold_message">There should be %d installs and then you can claim this offer. For any queries, contact us at support@eventshigh.com.</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title_details">One Stop Shop</string>

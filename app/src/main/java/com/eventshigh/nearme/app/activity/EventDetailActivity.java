@@ -711,8 +711,8 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         private final TextView titleView;
         private final TextView fromView;
 
-        private final TextView favouriteView;
-        private final TextView favouritedView;
+        private final View favouriteView;
+        private final View favouritedView;
 
         private final TextView venueView;
         private final TextView addressView;
@@ -758,8 +758,8 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             recommendedImageView = (ImageView) findViewById(R.id.eh_recommends);
             bgView = (NetworkImageView) findViewById(R.id.event_bg);
 
-            favouriteView = (TextView) findViewById(R.id.action_favourite);
-            favouritedView = (TextView) findViewById(R.id.action_favourited);
+            favouriteView = findViewById(R.id.action_favourite);
+            favouritedView = findViewById(R.id.action_favourited);
 
             titleView = (TextView) findViewById(R.id.event_title);
             fromView = (TextView) findViewById(R.id.event_from);

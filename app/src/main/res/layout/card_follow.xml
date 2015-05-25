@@ -28,7 +28,7 @@
         android:layout_margin="8dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="#99212121"
+        android:textColor="#CC000000"
         android:textSize="14sp"
         tools:text="35 Followers | 39 Events"
     />
