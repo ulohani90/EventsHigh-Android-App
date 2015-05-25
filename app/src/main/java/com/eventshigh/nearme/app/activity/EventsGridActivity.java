@@ -207,7 +207,7 @@ public class EventsGridActivity extends BaseEventsActivity
     }
 
     private void setDarkToolbarIcons() {
-        animateFab(1, 0);
+        // animateFab(1, 0);
 
         toolbar.post(new Runnable() {
             @Override
@@ -220,8 +220,8 @@ public class EventsGridActivity extends BaseEventsActivity
 
     private void setLightToolbarIcons() {
         // TOOD: uncomment this once we fix the sync issue and icon.
-        animateFab(0, 1);
-        followFab.setVisibility(View.VISIBLE);
+        // animateFab(0, 1);
+        // followFab.setVisibility(View.VISIBLE);
 
         toolbar.post(new Runnable() {
             @Override
