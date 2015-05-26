@@ -1011,7 +1011,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
             long currentTimeMillis = System.currentTimeMillis();
             if (isPlayServicesPresent && checkInStartTimeMillis < currentTimeMillis &&
-                    currentTimeMillis < checkInEndTimeMillis) {
+                event.location != null && currentTimeMillis < checkInEndTimeMillis) {
                 // We have established that the time is right
                 checkInView.setVisibility(View.VISIBLE);
             } else {
