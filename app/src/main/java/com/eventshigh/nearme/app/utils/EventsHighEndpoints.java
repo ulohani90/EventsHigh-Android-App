@@ -19,18 +19,20 @@ import java.util.regex.Pattern;
  */
 public class EventsHighEndpoints {
     private static final String WEB_URI_BASE = "http://www.eventshigh.com/";
+    public static final String API_URI_BASE = "http://api.eventshigh.com/";
+
     private static final String API_ENDPOINT_DATE_FORMAT =
-            "http://apiserver.eventshigh.com:8888/api/date/%s/%s?limit=100&mobile=1";
+            API_URI_BASE + "api/date/%s/%s?limit=100&mobile=1";
     private static final String API_ENDPOINT_DATE_CATEGORY_FORMAT =
-            "http://apiserver.eventshigh.com:8888/api/get_mobile_date_explore_screen/%s/%s?mobile=1";
+            API_URI_BASE + "api/get_mobile_date_explore_screen/%s/%s?mobile=1";
     private static final String API_ENDPOINT_QUERY_FORMAT =
-            "http://apiserver.eventshigh.com:8888/api/events/%s/%s?limit=100&mobile=1";
+            API_URI_BASE + "api/events/%s/%s?limit=100&mobile=1";
     private static final String API_ENDPOINT_QUERY_DATE_FORMAT =
-            "http://apiserver.eventshigh.com:8888/api/events_for_interest_by_date/%s/%s/%s?limit=100&mobile=1";
+            API_URI_BASE + "api/events_for_interest_by_date/%s/%s/%s?limit=100&mobile=1";
     private static final String API_ENDPOINT_FEATURED_FORMAT =
-            "http://apiserver.eventshigh.com:8888/api/get_featured_events/%s?mobile=1";
+            API_URI_BASE + "api/get_featured_events/%s?mobile=1";
     private static final String API_ENDPOINT_EVENT_UBER_FORMAT =
-            "http://apiserver.eventshigh.com:8888/api/get_event_uber_info/%s?mobile=1";
+            API_URI_BASE + "api/get_event_uber_info/%s?mobile=1";
     private static final String API_EVENTS_SUGGEST_FORMAT =
             "https://s3-ap-southeast-1.amazonaws.com/ehautocomplete/autocomplete_events_%s.json";
     private static final String API_TAGS_SUGGEST_URL =

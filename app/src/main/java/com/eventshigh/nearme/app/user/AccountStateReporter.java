@@ -15,6 +15,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -76,8 +77,9 @@ public class AccountStateReporter {
     }
 
     public static Builder getBaseUri(Context context, String path) {
-        return Uri.parse("http://apiserver.eventshigh.com:8888/mobileapp")
+        return Uri.parse(EventsHighEndpoints.API_URI_BASE)
             .buildUpon()
+            .appendPath("mobileapp")
             .appendPath(path)
             .appendQueryParameter("android_id", Utils.getAndroidId(context));
     }
