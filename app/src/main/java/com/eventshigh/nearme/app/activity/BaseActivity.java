@@ -22,7 +22,6 @@ import com.eventshigh.nearme.app.data.UserActionDbHelper.EventAction;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
-import com.eventshigh.nearme.app.utils.Utils;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
@@ -68,9 +67,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_translate);
 
         // Twitter CrashAnalytics
-        if (!Utils.isDebug(this)) {
-            Fabric.with(this, new Crashlytics());
-        }
+        Fabric.with(this, new Crashlytics());
 
         // Report app to Facebook
         FacebookSdk.sdkInitialize(getApplicationContext());
