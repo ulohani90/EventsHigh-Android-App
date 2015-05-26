@@ -11,6 +11,7 @@ import android.view.View;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.FeedbackActivity;
 
 public class RateAppDialog {
     private static final String PREF_SHOW_RATE_APP_DIALOG = "showRateAppDialog";
@@ -24,23 +25,15 @@ public class RateAppDialog {
 
         @SuppressLint("InflateParams")
         View view = activity.getLayoutInflater().inflate(R.layout.dialog_rate_app, null);
-        new AlertDialog.Builder(activity)
+        AlertDialog alertDialog = new AlertDialog.Builder(activity)
                 .setView(view)
-                .setPositiveButton(R.string.rate_app_now, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        disableRateDialog(sharedPreferences);
-                        activity.reportActionToAnalytics("rateAppAccepted");
-                        Uri uri = Uri.parse("market://details?id=" + activity.getPackageName());
-                        activity.startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                    }
-                })
                 .setNegativeButton(R.string.rate_app_no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         activity.reportActionToAnalytics("rateAppRejected");
                         disableRateDialog(sharedPreferences);
                     }
                 })
-                .setNeutralButton(R.string.rate_app_later, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.rate_app_later, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         activity.reportActionToAnalytics("rateAppLater");
                         // do nothing
@@ -48,7 +41,24 @@ public class RateAppDialog {
                     }
                 })
                 .setCancelable(false)
-                .show();
+                .create();
+        alertDialog.show();
+        alertDialog.findViewById(R.id.rate).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                disableRateDialog(sharedPreferences);
+                activity.reportActionToAnalytics("rateAppAccepted");
+                Uri uri = Uri.parse("market://details?id=" + activity.getPackageName());
+                activity.startActivity(new Intent(Intent.ACTION_VIEW, uri));
+            }
+        });
+        alertDialog.findViewById(R.id.feedback).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.reportActionToAnalytics("sendFeedback");
+                activity.startActivity(new Intent(activity, FeedbackActivity.class));
+            };
+        });
     }
 
     private static void disableRateDialog(SharedPreferences sharedPreferences) {
