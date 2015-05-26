@@ -13,7 +13,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
 
-public class RateAppDialog {
+public class RateAppDialogV2 {
     private static final String PREF_SHOW_RATE_APP_DIALOG = "showRateAppDialog";
 
     public static void show(final BaseActivity activity) {
@@ -24,7 +24,7 @@ public class RateAppDialog {
         }
 
         @SuppressLint("InflateParams")
-        View view = activity.getLayoutInflater().inflate(R.layout.dialog_rate_app, null);
+        View view = activity.getLayoutInflater().inflate(R.layout.dialog_rate_app_v2, null);
         AlertDialog alertDialog = new AlertDialog.Builder(activity)
                 .setView(view)
                 .setNegativeButton(R.string.rate_app_no, new DialogInterface.OnClickListener() {

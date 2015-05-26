@@ -56,7 +56,7 @@ import com.eventshigh.nearme.app.data.UserActionDbHelper.EventAction;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
-import com.eventshigh.nearme.app.ui.RateAppDialog;
+import com.eventshigh.nearme.app.ui.RateAppDialogV2;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -225,7 +225,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     public void onResume() {
         super.onResume();
         if (showRateAppDialog) {
-            RateAppDialog.show(this);
+            RateAppDialogV2.show(this);
             showRateAppDialog = false;
         }
     }
