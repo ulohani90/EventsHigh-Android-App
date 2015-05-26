@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="wrap_content"
+              android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:padding="12dp"
     android:gravity="center_horizontal"
+    android:background="@android:color/white"
 >
-    <TextView style="@style/RateText"
+    <TextView
+        style="@style/RateText"
+        android:id="@+id/rate_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical|start"
+        android:padding="8dp"
+        android:text="@string/pref_title_rate_us"
+        android:drawableRight="@drawable/com_facebook_close"
+        android:drawableEnd="@drawable/com_facebook_close"
+        android:clickable="true"
+    />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/gray600"
+    />
+
+    <TextView
+        style="@style/RateText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:lineSpacingExtra="2dp"
-        android:paddingTop="12dp"
+        android:paddingTop="24dp"
         android:paddingBottom="8dp"
         android:text="@string/rate_app_text_v2"
     />
@@ -23,36 +44,36 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_favorite_red_18dp"
+            android:src="@drawable/ic_star_rate_24dp"
         />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_favorite_red_18dp"
+            android:src="@drawable/ic_star_rate_24dp"
         />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_favorite_red_18dp"
+            android:src="@drawable/ic_star_rate_24dp"
         />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_favorite_red_18dp"
+            android:src="@drawable/ic_star_rate_24dp"
         />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_favorite_red_18dp"
+            android:src="@drawable/ic_star_rate_24dp"
         />
     </LinearLayout>
 
-    <Button
+    <TextView
+        style="@style/EHButtonCTA"
         android:id="@+id/rate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        style="@style/EHButtonCTA"
         android:text="@string/rate_now"
     />
 
@@ -64,11 +85,12 @@
         android:text="@string/feedback_text"
     />
 
-    <Button
+    <TextView
+        style="@style/EHButton"
         android:id="@+id/feedback"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/EHButtonCTA"
+        android:padding="9dp"
         android:text="@string/feedback"
     />
 
