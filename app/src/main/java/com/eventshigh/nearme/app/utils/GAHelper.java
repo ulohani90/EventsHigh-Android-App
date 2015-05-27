@@ -51,10 +51,6 @@ public class GAHelper {
         googleAnalytics.reportActivityStop(activity);
     }
 
-    public void setAppOptOut(boolean optOut) {
-        googleAnalytics.setAppOptOut(optOut);
-    }
-
     public void reportActionToAnalytics(String category, String actionName) {
         reportActionToAnalytics(category, actionName, "");
     }
