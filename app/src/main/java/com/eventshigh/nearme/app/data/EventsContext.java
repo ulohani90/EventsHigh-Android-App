@@ -48,6 +48,10 @@ public class EventsContext implements Parcelable {
                 calendar.get(Calendar.DAY_OF_MONTH));
     }
 
+    public String getLabel() {
+        return query + dateFilter;
+    }
+
     @Override
     public String toString() {
         return (query + " events" +

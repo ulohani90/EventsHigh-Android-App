@@ -240,15 +240,15 @@ public abstract class BaseContextActivity extends BaseActivity {
                 Integer.toString(position));
     }
 
-    public void showEventDetails(Uri eventDetailsURI) {
-        reportActionToAnalytics("showEventDetails", eventDetailsURI.getLastPathSegment());
+    public void showEventDetails(Uri eventDetailsURI, @Nullable String label) {
+        reportActionToAnalytics("showEventDetails", label);
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.setData(eventDetailsURI);
         startActivity(detailIntent);
     }
 
-    public void showEventDetails(Event event, @Nullable Bundle bundle) {
-        reportEventAction(event, "showEventDetails", event.id);
+    public void showEventDetails(Event event, @Nullable String label, @Nullable Bundle bundle) {
+        reportEventAction(event, "showEventDetails", label);
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.putExtra(EventDetailActivity.EXTRA_EVENT_PARAM, event);
         startActivity(detailIntent, bundle);

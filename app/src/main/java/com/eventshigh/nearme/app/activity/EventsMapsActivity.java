@@ -157,7 +157,8 @@ public class EventsMapsActivity extends BaseEventsActivity {
 
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
-                    showEventDetails(mapMarkerManager.getEvent(lastSelectedMarker), null);
+                    showEventDetails(mapMarkerManager.getEvent(lastSelectedMarker),
+                            eventsContext.getLabel(), null);
                     return true;
                 }
 
@@ -254,7 +255,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private OnInfoWindowClickListener mOnInfoWindowClickListener = new OnInfoWindowClickListener() {
         @Override
         public void onInfoWindowClick(Marker marker) {
-            showEventDetails(mapMarkerManager.getEvent(marker), null);
+            showEventDetails(mapMarkerManager.getEvent(marker), eventsContext.getLabel(), null);
         }
     };
 

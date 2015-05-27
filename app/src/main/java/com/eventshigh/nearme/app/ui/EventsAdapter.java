@@ -172,7 +172,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                                     @Nullable View reuseView, ViewGroup parent) {
         View view = reuseView != null ? reuseView :
                 activity.getLayoutInflater().inflate(R.layout.card_event_big, parent, false);
-        new EventCard(view, true).bindEventView(event, false, activity, -1);
+        new EventCard(view, true).bindEventView(event, false, -1, null, activity);
         return view;
     }
 
@@ -503,8 +503,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            ((EventCard) card).bindEventView(event, isFirstEvent,
-                    eventsFragment.getContextActivity(), position);
+            ((EventCard) card).bindEventView(event, isFirstEvent, position, eventsFragment,
+                    eventsFragment.getContextActivity());
         }
 
         public String getId() {
@@ -554,14 +554,18 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
         }
 
-        private void bindEventView(final Event event, boolean isFirstEvent,
-                                   final BaseContextActivity activity, final int position) {
+        private void bindEventView(final Event event, boolean isFirstEvent, final int position,
+                @Nullable final BaseEventsFragment eventsFragment, final BaseContextActivity activity) {
             itemView.setTag(position);
             itemView.setVisibility(View.VISIBLE);
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.showEventDetails(event, null);
+                    if (eventsFragment != null) {
+                        eventsFragment.showEventDetails(event, null);
+                    } else {
+                        activity.showEventDetails(event, "", null);
+                    }
                 }
             });
 
