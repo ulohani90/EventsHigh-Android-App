@@ -34,9 +34,9 @@ public class EventsHighEndpoints {
     private static final String API_ENDPOINT_EVENT_UBER_FORMAT =
             API_URI_BASE + "api/get_event_uber_info/%s?mobile=1";
     private static final String API_EVENTS_SUGGEST_FORMAT =
-            "https://s3-ap-southeast-1.amazonaws.com/ehautocomplete/autocomplete_events_%s.json";
+            "http://assets.eventshigh.com/autocomplete/autocomplete_events_%s.json";
     private static final String API_TAGS_SUGGEST_URL =
-          "https://s3-ap-southeast-1.amazonaws.com/ehautocomplete/autocomplete_tags.json";
+            "http://assets.eventshigh.com/autocomplete/autocomplete_tags.json";
 
     public static final String QUERY_MY_EVENT = "my events";
     public static final String QUERY_FEATURED = "editor's picks";
