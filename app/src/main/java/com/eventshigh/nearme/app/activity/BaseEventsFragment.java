@@ -2,9 +2,12 @@ package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -53,13 +56,20 @@ public abstract class BaseEventsFragment extends Fragment {
     }
 
     public void showSearchView(String query) {
-        activity.reportActionToAnalytics("header:" + query,
-                eventsContext.query + eventsContext.dateFilter);
+        activity.reportActionToAnalytics("header:" + query, eventsContext.getLabel());
         EventsContext param = new EventsContext(eventsContext.location, query);
         param.dateFilter = eventsContext.dateFilter;
         Intent intent = new Intent(activity, activity.getClass())
                 .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
         startActivity(intent);
+    }
+
+    public void showEventDetails(Uri eventDetailsURI) {
+        activity.showEventDetails(eventDetailsURI, eventsContext.getLabel());
+    }
+
+    public void showEventDetails(Event event, @Nullable Bundle bundle) {
+        activity.showEventDetails(event, eventsContext.getLabel(), bundle);
     }
 
     public void seeAll() {

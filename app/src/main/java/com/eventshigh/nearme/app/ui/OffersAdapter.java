@@ -234,7 +234,7 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         if (offer.actionType.equals("event")) {
             activity.showEventDetails(
-                    EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, offer.actionLink));
+                EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, offer.actionLink), "offer");
             return;
         }
 

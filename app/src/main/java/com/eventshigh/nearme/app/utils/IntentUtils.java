@@ -178,7 +178,7 @@ public class IntentUtils {
     }
 
     private void processDetailViewIntent(Uri webUri) {
-        activity.showEventDetails(webUri);
+        activity.showEventDetails(webUri, "deeplink");
         activity.finish();
     }
 }

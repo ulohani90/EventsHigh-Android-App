@@ -114,19 +114,12 @@ public class GcmRegistration {
 
             if (currentLastCity == null || !city.equals(currentLastCity)) {
                 gcmRegistrationInfo.edit()
-                    .putString(PREF_LAST_CITY, city.toString())
-                    .remove(PREF_LAST_CITY_UPLOADED)
-                    .apply();
+                        .putString(PREF_LAST_CITY, city.toString())
+                        .remove(PREF_LAST_CITY_UPLOADED)
+                        .apply();
             }
 
-            if (!gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
-                AccountStateReporter.reportLastCity(context, city, location, new Runnable() {
-                    @Override
-                    public void run() {
-                        gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();
-                    }
-                });
-            }
+            uploadLastCity(location);
             return null;
         }
     }
@@ -169,7 +162,7 @@ public class GcmRegistration {
             }
 
             if (registrationId != null &&
-                !gcmRegistrationInfo.getBoolean(PREF_REGISTRATION_ID_UPLOADED, false)) {
+                    !gcmRegistrationInfo.getBoolean(PREF_REGISTRATION_ID_UPLOADED, false)) {
                 AccountStateReporter.reportGcmRegistrationId(context, registrationId, new Runnable() {
                     @Override
                     public void run() {
@@ -179,41 +172,46 @@ public class GcmRegistration {
             }
 
             // Upload last city.
-            City city = getLastCity();
-            if (city != null &&
-                    !gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
-                AccountStateReporter.reportLastCity(context, city, null, new Runnable() {
-                    @Override
-                    public void run() {
-                        gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();
-                    }
-                });
-            }
+            uploadLastCity(null);
 
             // Report the GCM registration id with zendesk.
             if (registrationId != null &&
-                !gcmRegistrationInfo.getBoolean(PREF_ZENDESK_UPDATED, false)) {
+                    !gcmRegistrationInfo.getBoolean(PREF_ZENDESK_UPDATED, false)) {
                 ZendeskUtils.initZendesk(context);
                 try {
-                    ZendeskConfig.INSTANCE.enablePush(registrationId,
-                            new ZendeskCallback<PushRegistrationResponse>() {
-                                @Override
-                                public void onSuccess(PushRegistrationResponse pushRegistrationResponse) {
-                                    gcmRegistrationInfo.edit().putBoolean(PREF_ZENDESK_UPDATED, true).apply();
-                                }
-
-                                @Override
-                                public void onError(ErrorResponse errorResponse) {
-                                    // do nothing. upload will be retried.
-                                }
-                            });
+                    ZendeskConfig.INSTANCE.enablePush(registrationId, zendeskCallback);
                 } catch (Exception e) {
                     // Wait for initialization to finish and retry later.
-                    Crashlytics.logException(e);
                 }
             }
 
             return null;
+        }
+    }
+
+    private ZendeskCallback<PushRegistrationResponse> zendeskCallback =
+            new ZendeskCallback<PushRegistrationResponse>() {
+                @Override
+                public void onSuccess(PushRegistrationResponse pushRegistrationResponse) {
+                    gcmRegistrationInfo.edit().putBoolean(PREF_ZENDESK_UPDATED, true).apply();
+                }
+
+                @Override
+                public void onError(ErrorResponse errorResponse) {
+                    // do nothing. upload will be retried.
+                }
+            };
+
+    private void uploadLastCity(LatLng location) {
+        City city = getLastCity();
+        if (city != null &&
+                !gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
+            AccountStateReporter.reportLastCity(context, city, location, new Runnable() {
+                @Override
+                public void run() {
+                    gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();
+                }
+            });
         }
     }
 
