@@ -224,6 +224,7 @@ public class Account {
                                 new ErrorListener() {
                                     @Override
                                     public void onErrorResponse(VolleyError volleyError) {
+                                        Crashlytics.logException(volleyError.getCause());
                                         synchronized (AccountStateRegistarLock) {
                                             inProgress = false;
                                         }
