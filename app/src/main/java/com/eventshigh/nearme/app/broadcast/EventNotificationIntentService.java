@@ -6,6 +6,7 @@ import android.content.Intent;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
+import com.eventshigh.nearme.app.utils.StreamDb;
 
 public class EventNotificationIntentService extends IntentService {
     public static final String BUNDLE_EVENT_KEY = "event";
@@ -25,6 +26,8 @@ public class EventNotificationIntentService extends IntentService {
             return;
         }
 
+        // Record notification in stream
+        StreamDb.addNotificationStreamItem(this, event);
         // Notify user about the Event.
         NotificationUtils.showNotificationAndReleaseWakeLock(this, intent, event, event.hashCode());
     }

@@ -331,11 +331,13 @@ public class LaunchActivity extends BaseContextActivity {
         private static final String OFFERS_TAB = "offers";
         private static final String MY_EVENTS_TAB = EventsHighEndpoints.QUERY_MY_EVENT;
         private static final String EXPLORE_TAB = "explore";
+        private static final String NOTIFICATIONS_TAB = "notifications";
         private static final String THIS_WEEK_TAB = "this week";
         private final String[] tabs = {
             MY_EVENTS_TAB,
             EXPLORE_TAB,
             OFFERS_TAB,
+            NOTIFICATIONS_TAB,
             THIS_WEEK_TAB
         };
         private final TextView[] tabViews = new TextView[tabs.length];
@@ -358,6 +360,10 @@ public class LaunchActivity extends BaseContextActivity {
 
             if (tabs[position].equals(EXPLORE_TAB)) {
                 return ExploreFragment.getInstance(eventsContext);
+            }
+
+            if (tabs[position].equals(NOTIFICATIONS_TAB)) {
+                return new StreamFragment();
             }
 
             return ThisWeekFragment.getInstance(eventsContext, true, 7);
