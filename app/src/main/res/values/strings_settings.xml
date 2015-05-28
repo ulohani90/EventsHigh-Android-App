@@ -5,19 +5,10 @@
     <string name="pref_header_general">General</string>
     <string name="pref_title_offers">Offers</string>
     <string name="pref_title_add_event">Create Event</string>
-    <string name="pref_title_send_feedback">Send Feedback</string>
+    <string name="pref_title_send_feedback">Message EventsHigh</string>
     <string name="pref_title_about_us">About EventsHigh</string>
     <string name="pref_title_change_location">Change City</string>
     <string name="pref_title_rate_us">Rate EventsHigh App</string>
-
-    <string-array name="pref_default_activity_titles">
-        <item>List</item>
-        <item>Maps</item>
-    </string-array>
-    <string-array name="pref_default_activity_values">
-        <item>list</item>
-        <item>maps</item>
-    </string-array>
 
     <!-- Account Settings -->
     <string name="pref_header_account">Account</string>

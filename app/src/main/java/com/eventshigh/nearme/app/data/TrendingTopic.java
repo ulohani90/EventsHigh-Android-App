@@ -44,6 +44,7 @@ public final class TrendingTopic {
             if (action.startsWith("view:")) {
                 String[] actionParts = action.split(":", 3);
                 if (actionParts.length == 3) {
+                    eventsFragment.getContextActivity().reportActionToAnalytics("trending_view", action);
                     CustomUrlActivity.launchCustomUrl(eventsFragment.getContextActivity(),
                             Uri.parse(actionParts[2]), actionParts[1]);
                     return;
@@ -66,6 +67,7 @@ public final class TrendingTopic {
             }
             if (action.startsWith("target:")) {
                 String[] actionParts = action.split(":", 2);
+                eventsFragment.getContextActivity().reportActionToAnalytics("trending_view", action);
                 try {
                     Activity activity = eventsFragment.getContextActivity();
                     Class<?> cls = activity.getClassLoader().loadClass(actionParts[1]);
