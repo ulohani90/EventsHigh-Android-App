@@ -125,7 +125,9 @@ public class EventsGridActivity extends BaseEventsActivity
                             return true;
                         }
                     });
+        }
 
+        if (showFollowCard || EventsHighEndpoints.isDateQuery(eventsContext.query)) {
             shareMenu.setVisible(true);
         }
 

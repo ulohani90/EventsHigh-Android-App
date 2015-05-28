@@ -109,7 +109,7 @@ public abstract class BaseContextActivity extends BaseActivity {
         }
 
         if (id == R.id.action_share) {
-            reportActionToAnalytics("share");
+            reportActionToAnalytics("shareEvents", eventsContext.getLabel());
 
             String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
                     .appendQueryParameter("src", "ehm").toString();

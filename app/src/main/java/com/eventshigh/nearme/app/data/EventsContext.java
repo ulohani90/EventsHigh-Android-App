@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Calendar;
@@ -54,7 +55,7 @@ public class EventsContext implements Parcelable {
 
     @Override
     public String toString() {
-        return (query + " events" +
+        return (DateTimeUtils.queryToTitle(query) + " events" +
                 (city == null ? " near you" : " in " + city.toString().toLowerCase()) +
                 (dateFilter.isEmpty() ? "" : " on " + dateFilter)).trim();
     }
