@@ -6,6 +6,7 @@
             <solid android:color="@color/primary_dark"/>
         </shape>
     </item>
+
     <!-- default -->
     <item>
         <shape android:shape="oval">
