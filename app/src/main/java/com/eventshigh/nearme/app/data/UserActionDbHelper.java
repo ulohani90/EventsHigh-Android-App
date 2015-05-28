@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.utils.Utils;
 
@@ -137,29 +138,36 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
         thread.start();
     }
 
-    public JSONObject getActionsSince(long timestamp) throws JSONException {
+    public @Nullable JSONObject getActionsSince(long timestamp) throws JSONException {
         SQLiteDatabase database = getReadableDatabase();
         Cursor cursor =  database.query(USER_ACTIONS_TABLE_NAME, ALL_COLUMNS,
                 COLUMN_TIMESTAMP + " > " + timestamp, null, null, null, COLUMN_TIMESTAMP);
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(JSON_KEY_ANDROID_ID, Utils.getAndroidId(context));
-        jsonObject.put(JSON_KEY_TIMESTAMP, timestamp);
-        JSONArray actions = new JSONArray();
-        jsonObject.put(JSON_KEY_ACTIONS, actions);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            JSONObject action = new JSONObject();
-            action.put(JSON_KEY_ACTION, cursor.getString(cursor.getColumnIndex(COLUMN_ACTION)));
-            action.put(JSON_KEY_TIMESTAMP, cursor.getLong(cursor.getColumnIndex(COLUMN_TIMESTAMP)));
-            JSONObject data = new JSONObject(cursor.getString(cursor.getColumnIndex(COLUMN_DATA)));
-            action.put(JSON_KEY_DATA, data);
-            actions.put(action);
-            cursor.moveToNext();
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(JSON_KEY_ANDROID_ID, Utils.getAndroidId(context));
+            jsonObject.put(JSON_KEY_TIMESTAMP, timestamp);
+            JSONArray actions = new JSONArray();
+            jsonObject.put(JSON_KEY_ACTIONS, actions);
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                JSONObject action = new JSONObject();
+                action.put(JSON_KEY_ACTION, cursor.getString(cursor.getColumnIndex(COLUMN_ACTION)));
+                action.put(JSON_KEY_TIMESTAMP, cursor.getLong(cursor.getColumnIndex(COLUMN_TIMESTAMP)));
+                JSONObject data = new JSONObject(cursor.getString(cursor.getColumnIndex(COLUMN_DATA)));
+                action.put(JSON_KEY_DATA, data);
+                actions.put(action);
+                cursor.moveToNext();
+            }
+
+            if (actions.length() == 0) {
+                // no actions to upload.
+                return null;
+            }
+            return jsonObject;
+        } finally {
+            cursor.close();
+            database.close();
         }
-        // make sure to close the cursor
-        cursor.close();
-        database.close();
-        return jsonObject;
     }
 }
