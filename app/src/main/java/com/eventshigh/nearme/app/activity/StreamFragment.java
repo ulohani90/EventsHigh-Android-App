@@ -7,10 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.ui.NotificationStreamAdapter;
+import com.eventshigh.nearme.app.ui.StreamAdapter;
 
-public class NotificationStreamFragment extends Fragment {
-  private NotificationStreamAdapter notificationAdapter;
+public class StreamFragment extends Fragment {
+  private StreamAdapter notificationAdapter;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

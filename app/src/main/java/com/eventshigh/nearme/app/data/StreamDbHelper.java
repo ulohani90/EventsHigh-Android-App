@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class NotificationStreamDbHelper extends SQLiteOpenHelper {
+public class StreamDbHelper extends SQLiteOpenHelper {
   public static final String TABLE_NAME = "stream";
   public static final String COLUMN_ID = "_id";
   public static final String COLUMN_TIMESTAMP = "timestamp";
@@ -21,7 +21,16 @@ public class NotificationStreamDbHelper extends SQLiteOpenHelper {
       + COLUMN_TYPE + " integer not null, "
       + COLUMN_BLOB + " blob);";
 
-  public NotificationStreamDbHelper(Context context) {
+  public enum StreamType {
+    NOTIFICATION(1);
+
+    public final int id;
+    private StreamType(int id) {
+      this.id = id;
+    }
+  }
+
+  public StreamDbHelper(Context context) {
     super(context, DATABASE_NAME, null, DATABASE_VERSION);
   }
 
