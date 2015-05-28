@@ -54,9 +54,9 @@ public class Offer {
                 offerJSON.getString("offer_message"),
                 offerJSON.getString("img_url"),
                 DateTimeUtils.parseOfferDate(offerJSON.getString("offer_end_date")),
-                offerJSON.getString("offer_action_type"),
-                offerJSON.getString("offer_action_name"),
-                offerJSON.getString("offer_action_link"),
+                offerJSON.optString("offer_action_type"),
+                offerJSON.optString("offer_action_name"),
+                offerJSON.optString("offer_action_link"),
                 offerJSON.optInt("offer_threshold", 0)
         );
     }
