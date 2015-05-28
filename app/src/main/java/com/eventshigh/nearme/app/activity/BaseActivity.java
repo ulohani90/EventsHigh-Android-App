@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -13,12 +14,16 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.UserActionDbHelper;
 import com.eventshigh.nearme.app.data.UserActionDbHelper.EventAction;
+import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
@@ -182,7 +187,39 @@ public abstract class BaseActivity extends AppCompatActivity {
     /**
      * Helper method to share an Event.
      */
-    public void shareEvent(Event event, @Nullable String packageName) {
+    public void shareEvent(final Event event, @Nullable final String packageName) {
+        String src = null;
+        if (packageName != null) {
+            src = packageName.split("\\.")[1];
+        }
+        final String eventShareUri = event.getEventShareURI(this, src).toString();
+
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setMessage("One sec ...");
+        dialog.setIndeterminate(true);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
+        URLShortenerRequest.submit(this, eventShareUri,
+            new Listener<String>() {
+                @Override
+                public void onResponse(String shortenUri, boolean isIntermediate) {
+                    dialog.dismiss();
+                    shareEvent(event, shortenUri, packageName);
+                }
+            },
+            new ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    dialog.dismiss();
+                    shareEvent(event, eventShareUri, packageName);
+                }
+            }
+        );
+    }
+
+    public void shareEvent(Event event, String eventUri, @Nullable String packageName) {
         reportEventAction(event, "eventShareInitiated", packageName);
         shareEventInitiatedTimestamp = System.currentTimeMillis();
         UserActionDbHelper.getInstance(this).recordAction(EventAction.SHARE, event.id);
@@ -190,20 +227,16 @@ public abstract class BaseActivity extends AppCompatActivity {
         try {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            String src = null;
-            if (packageName != null) {
-                src = packageName.split("\\.")[1];
-            }
 
             if (packageName != null && packageName.equals(EventDetailActivity.PACKAGE_NAME_TWITTER)) {
                 sendIntent.putExtra(Intent.EXTRA_TEXT,
-                    event.title + (event.isCleanVenue ? " @ " + event.venue : "") +
-                    "\n@eventshighapp\n" + event.getEventShareURI(this, src));
+                        event.title + (event.isCleanVenue ? " @ " + event.venue : "") +
+                                "\n@eventshighapp\n" + eventUri);
             } else {
                 sendIntent.putExtra(Intent.EXTRA_TEXT,
                     String.format(getResources().getString(R.string.share_event_text),
-                            event.title + (event.isCleanVenue ? " @ " + event.venue : ""),
-                            event.getEventShareURI(this, src))
+                        event.title + (event.isCleanVenue ? " @ " + event.venue : ""), eventUri)
+
                 );
             }
             sendIntent.setType("text/plain");
@@ -212,7 +245,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
             startActivity(sendIntent);
         } catch (ActivityNotFoundException e) {
-		    Crashlytics.logException(e);
+            Crashlytics.logException(e);
             Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
             Log.w(LOG_TAG, "failed sharing", e);
         }
