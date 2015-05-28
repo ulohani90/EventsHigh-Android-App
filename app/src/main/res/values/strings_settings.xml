@@ -10,15 +10,6 @@
     <string name="pref_title_change_location">Change City</string>
     <string name="pref_title_rate_us">Rate EventsHigh App</string>
 
-    <string-array name="pref_default_activity_titles">
-        <item>List</item>
-        <item>Maps</item>
-    </string-array>
-    <string-array name="pref_default_activity_values">
-        <item>list</item>
-        <item>maps</item>
-    </string-array>
-
     <!-- Account Settings -->
     <string name="pref_header_account">Account</string>
     <string name="pref_title_phone_no">Register Phone Number</string>
