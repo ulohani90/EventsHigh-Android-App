@@ -7,11 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.ui.NotificationStreamAdapter;
 
-public class NotificationFragment extends Fragment {
+public class NotificationStreamFragment extends Fragment {
+  private NotificationStreamAdapter notificationAdapter;
+
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     return inflater.inflate(R.layout.fragment_notifications, container, false);
   }
-
 }

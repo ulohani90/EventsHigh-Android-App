@@ -363,7 +363,7 @@ public class LaunchActivity extends BaseContextActivity {
             }
 
             if (tabs[position].equals(NOTIFICATIONS_TAB)) {
-                return new NotificationFragment();
+                return new NotificationStreamFragment();
             }
 
             return ThisWeekFragment.getInstance(eventsContext, true, 7);
