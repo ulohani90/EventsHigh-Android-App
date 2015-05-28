@@ -16,6 +16,8 @@ import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
+import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -129,11 +131,13 @@ public class GcmIntentService extends IntentService {
             GcmRegistration gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
             contentIntent = NotificationUtils.createPendingIntent(this, eventId,
                     gcmRegistration.getLastCity());
+            EventNotificationStreamItem.record(this, title, message, imageUrl, eventId);
         } else if (query != null) {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + query);
             intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, query));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+            QueryNotificationStreamItem.record(this, title, message, imageUrl, query);
         } else if (ticket != null) {
             ZendeskUtils.initZendesk(this);
             Intent intent = new Intent(this, FeedbackActivity.class);
