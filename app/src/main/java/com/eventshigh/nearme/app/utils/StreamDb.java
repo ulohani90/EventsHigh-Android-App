@@ -1,15 +1,11 @@
 package com.eventshigh.nearme.app.utils;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.StreamDbHelper;
 import com.eventshigh.nearme.app.data.stream.NotificationStreamItem;
-import com.eventshigh.nearme.app.data.stream.StreamItem;
 
 import org.json.JSONException;
 
