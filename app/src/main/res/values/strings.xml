@@ -10,6 +10,7 @@
     <string name="action_skip">Skip</string>
     <string name="action_book">Book</string>
     <string name="action_call">Call Organizer</string>
+    <string name="action_join">Join</string>
     <string name="action_retry">Retry</string>
     <string name="action_verify_code">Verify Code</string>
     <string name="action_change_no">Change Number</string>

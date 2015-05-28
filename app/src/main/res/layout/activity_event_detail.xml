@@ -379,6 +379,28 @@
                 </FrameLayout>
 
                 <FrameLayout
+                    android:id="@+id/join_event"
+                    style="@style/EHButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="openSourceSite"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:drawableLeft="@drawable/ic_event_available_32dp"
+                        android:drawableStart="@drawable/ic_event_available_32dp"
+                        android:textColor="#CC000000"
+                        android:text="@string/action_join"
+                    />
+                </FrameLayout>
+
+                <FrameLayout
                     android:id="@+id/check_in"
                     style="@style/EHButton"
                     android:layout_width="0dp"

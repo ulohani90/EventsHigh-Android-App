@@ -28,11 +28,9 @@ import android.view.Window;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -718,17 +716,18 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         private final TextView addressView;
         private final TextView travelTimeView;
 
-        private final LinearLayout timeGroupView;
-        private final RelativeLayout eventTimeFirstView;
+        private final View timeGroupView;
+        private final View eventTimeFirstView;
         private final TextView timeView;
         private final TextView timeDetailView;
         private final TextView alsoOnView;
         private final HorizontalScrollView futureTimesViewGroup;
         private final LinearLayout futureTimesView;
 
-        private final FrameLayout bookView;
-        private final FrameLayout checkInView;
-        private final FrameLayout callView;
+        private final View bookView;
+        private final View checkInView;
+        private final View callView;
+        private final View joinView;
         private final TextView priceView;
         private final TextView offerView;
 
@@ -740,15 +739,15 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         private final View performerHeaderView;
         private final LinearLayout performersView;
 
-        private final TextView organizerHeader;
-        private final LinearLayout organizerNameRow;
+        private final View organizerHeader;
+        private final View organizerNameRow;
         private final TextView organizerNameView;
         private final TextView organizerLinkView;
-        private final LinearLayout organizerEmailRow;
+        private final View organizerEmailRow;
         private final TextView organizerEmailView;
-        private final LinearLayout organizerPhoneRow;
+        private final View organizerPhoneRow;
         private final TextView organizerPhoneView;
-        private final LinearLayout organizerWebsiteRow;
+        private final View organizerWebsiteRow;
         private final TextView organizerWebsiteView;
 
 
@@ -768,17 +767,18 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             addressView = (TextView) findViewById(R.id.event_address);
             travelTimeView = (TextView) findViewById(R.id.event_travel_time);
 
-            timeGroupView = (LinearLayout) findViewById(R.id.event_time_group);
-            eventTimeFirstView = (RelativeLayout) findViewById(R.id.event_time_first);
+            timeGroupView = findViewById(R.id.event_time_group);
+            eventTimeFirstView = findViewById(R.id.event_time_first);
             timeView = (TextView) findViewById(R.id.event_time);
             timeDetailView = (TextView) findViewById(R.id.event_time_details);
             alsoOnView = (TextView) findViewById(R.id.also_on);
             futureTimesViewGroup = (HorizontalScrollView) findViewById(R.id.event_future_times_hs);
             futureTimesView = (LinearLayout) findViewById(R.id.event_future_times);
 
-            bookView = (FrameLayout) findViewById(R.id.book_ticket);
-            checkInView = (FrameLayout) findViewById(R.id.check_in);
-            callView = (FrameLayout) findViewById(R.id.call);
+            bookView = findViewById(R.id.book_ticket);
+            checkInView = findViewById(R.id.check_in);
+            callView = findViewById(R.id.call);
+            joinView = findViewById(R.id.join_event);
             priceView = (TextView) findViewById(R.id.event_price);
             offerView = (TextView) findViewById(R.id.offer_text);
 
@@ -790,15 +790,15 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             performerHeaderView = findViewById(R.id.performer_header);
             performersView = (LinearLayout) findViewById(R.id.performers);
 
-            organizerHeader = (TextView) findViewById(R.id.organizer_header);
-            organizerNameRow = (LinearLayout) findViewById(R.id.organizer_name_row);
+            organizerHeader = findViewById(R.id.organizer_header);
+            organizerNameRow = findViewById(R.id.organizer_name_row);
             organizerNameView = (TextView) findViewById(R.id.organizer_name);
             organizerLinkView = (TextView) findViewById(R.id.organizer_link);
-            organizerEmailRow = (LinearLayout) findViewById(R.id.organizer_email_row);
+            organizerEmailRow = findViewById(R.id.organizer_email_row);
             organizerEmailView = (TextView) findViewById(R.id.organizer_email);
-            organizerPhoneRow = (LinearLayout) findViewById(R.id.organizer_phone_row);
+            organizerPhoneRow = findViewById(R.id.organizer_phone_row);
             organizerPhoneView = (TextView) findViewById(R.id.organizer_phone);
-            organizerWebsiteRow = (LinearLayout) findViewById(R.id.organizer_website_row);
+            organizerWebsiteRow = findViewById(R.id.organizer_website_row);
             organizerWebsiteView = (TextView) findViewById(R.id.organizer_website);
 
             // Set Image view dimensions.
@@ -912,6 +912,11 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
             callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
             mayBeShowCheckInButton(event);
+            joinView.setVisibility(
+                (bookView.getVisibility() != View.VISIBLE &&
+                    event.sourceUrl != null && event.sourceUrl.contains("facebook.com/") &&
+                    (checkInView.getVisibility() != View.VISIBLE || callView.getVisibility() != View.VISIBLE))
+                ? View.VISIBLE : View.GONE);
 
             // Show price.
             findViewById(R.id.price_row).setVisibility(View.VISIBLE);
