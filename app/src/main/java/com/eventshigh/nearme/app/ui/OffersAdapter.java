@@ -211,15 +211,20 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
             imageView.setImageUrl(offer.imgUrl.toString(), VolleyHelper.getImageLoader(activity));
 
             messageView.setText(offer.message);
-            actionView.setText(offer.actionName);
-            expiredView.setVisibility(offer.isExpired() ? View.VISIBLE : View.GONE);
 
-            itemView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    claimOffer(offer);
-                }
-            });
+            if (offer.actionName.isEmpty()) {
+                actionView.setVisibility(View.GONE);
+            } else {
+                actionView.setText(offer.actionName);
+                itemView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        claimOffer(offer);
+                    }
+                });
+            }
+
+            expiredView.setVisibility(offer.isExpired() ? View.VISIBLE : View.GONE);
         }
 
     }

@@ -26,6 +26,7 @@ import java.security.GeneralSecurityException;
 
 public class UploadUserActionsService extends IntentService {
     private static final String LOG_TAG = UploadUserActionsService.class.getSimpleName();
+    private static final String PREF_LAST_UPLOAD_TIMESTAMP = "lastUploadTimestamp";
 
     private Intent intent;
     private SharedPreferences preferences;
@@ -45,30 +46,29 @@ public class UploadUserActionsService extends IntentService {
     }
 
     private void recordUserActions() {
-        Uri uri = AccountStateReporter.getBaseUri(this, "record_user_action").build();
-
         try {
-            long lastUploadTimestamp = preferences.getLong(
-                    NetworkChangeBroadcastReceiver.PREF_LAST_UPLOAD_TIMESTAMP, 0);
+            long lastUploadTimestamp = preferences.getLong(PREF_LAST_UPLOAD_TIMESTAMP, 0);
             long aWeekBack = System.currentTimeMillis() - DateUtils.DAY_IN_MILLIS * 7;
             if (lastUploadTimestamp < aWeekBack) {
                 lastUploadTimestamp = aWeekBack;
             }
 
-            final JSONObject postBody = UserActionDbHelper.getInstance(this).getActionsSince(
-                    lastUploadTimestamp);
-            VolleyHelper.addToRequestQueue(this,
-                new JsonObjectRequest(Request.Method.POST, Signer.sign(uri).toString(), postBody,
-                        onSuccess, onError));
+            final JSONObject postBody = UserActionDbHelper.getInstance(this)
+                    .getActionsSince(lastUploadTimestamp);
+            if (postBody != null) {
+                Uri uri = AccountStateReporter.getBaseUri(this, "record_user_action").build();
+                String signedUri = Signer.sign(uri).toString();
+                VolleyHelper.addToRequestQueue(this,
+                    new JsonObjectRequest(Request.Method.POST, signedUri, postBody, onSuccess, onError));
+            }
         } catch (IOException | GeneralSecurityException | JSONException e) {
-            Log.w(LOG_TAG, "Failed to upload user actions: " + uri, e);
+            Log.w(LOG_TAG, "Failed to upload user actions", e);
             Crashlytics.logException(e);
             cleanUp();
         }
     }
 
     private void cleanUp() {
-        NetworkChangeBroadcastReceiver.setUploadFinished();
         NetworkChangeBroadcastReceiver.completeWakefulIntent(intent);
     }
 
@@ -76,9 +76,7 @@ public class UploadUserActionsService extends IntentService {
         @Override
         public void onResponse(JSONObject jsonObject, boolean isIntermediate) {
             // Mark the location up to which the data has been uploaded
-            preferences.edit().putLong(
-                    NetworkChangeBroadcastReceiver.PREF_LAST_UPLOAD_TIMESTAMP, uploadTimestamp)
-                    .apply();
+            preferences.edit().putLong(PREF_LAST_UPLOAD_TIMESTAMP, uploadTimestamp).apply();
             Log.i(LOG_TAG, "Successfully uploaded user actions");
             cleanUp();
         }
@@ -88,10 +86,7 @@ public class UploadUserActionsService extends IntentService {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
             Log.w(LOG_TAG, "Failed to uploaded user actions", volleyError.getCause());
-            if (volleyError.getCause() != null) {
-                Crashlytics.logException(volleyError.getCause());
-            }
-
+            Crashlytics.logException(volleyError.getCause());
             cleanUp();
         }
     };

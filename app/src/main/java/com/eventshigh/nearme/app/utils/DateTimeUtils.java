@@ -146,6 +146,15 @@ public class DateTimeUtils {
         return  null;
     }
 
+    public static @Nullable String toBrowseDate(String dateStr) {
+        try {
+            return BROWSE_DATE_FORMAT.format(QUERY_DATE_FORMAT.parse(dateStr));
+        } catch (ParseException e) {
+            // do nothing
+        }
+        return  null;
+    }
+
     public static String timeToFullFormat(long timeMillis) {
         return FULL_DATE_TIME_FORMAT.format(new Date(timeMillis));
     }

@@ -13,10 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
-import android.widget.ImageButton;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
@@ -27,13 +25,11 @@ import pl.snowdog.material.ui.ToolbarColorizeHelper;
  * On Phone, we have one column in portrait mode and two columns in landscape mode. On Tablet,
  * we try to put more columns as per the width offered.
  */
-public class EventsGridActivity extends BaseEventsActivity
-    implements Account.OnAccountChangeListener {
+public class EventsGridActivity extends BaseEventsActivity {
 
     private boolean showFollowCard;
     private boolean searchViewExpanded;
-    private ImageButton followFab;
-    private Account account;
+    private View fabShare;
 
 
     // ***********************
@@ -43,7 +39,15 @@ public class EventsGridActivity extends BaseEventsActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        followFab = (ImageButton) findViewById(R.id.fab_follow);
+
+        // Fab Share.
+        fabShare = findViewById(R.id.fab_share);
+        fabShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(shareMenu);
+            }
+        });
 
         // Should we show follow widget?
         showFollowCard = !eventsContext.query.isEmpty() &&
@@ -59,45 +63,7 @@ public class EventsGridActivity extends BaseEventsActivity
             setSupportActionBar(toolbar);
             updateToolbar(0);
             setTitle();
-
-
-            // Follow Fab.
-            account = new Account(this);
-            updateFabIcon();
-            followFab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    boolean isFollowing = account.isFollowing(eventsContext.query);
-                    isFollowing = !isFollowing;
-                    reportActionToAnalytics(isFollowing ? "addFollowing" : "removeFollowing",
-                            eventsContext.query);
-                    account.setIsFollowing(eventsContext.query, isFollowing);
-                }
-            });
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        if (showFollowCard) {
-            account.addOnChangeListener(this);
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        if (showFollowCard) {
-            account.removeOnChangeListener(this);
-        }
-    }
-
-    @Override
-    public void followStateChanged() {
-        updateFabIcon();
     }
 
     @Override
@@ -125,7 +91,9 @@ public class EventsGridActivity extends BaseEventsActivity
                             return true;
                         }
                     });
+        }
 
+        if (EventsHighEndpoints.isDateQuery(eventsContext.query)) {
             shareMenu.setVisible(true);
         }
 
@@ -207,7 +175,7 @@ public class EventsGridActivity extends BaseEventsActivity
     }
 
     private void setDarkToolbarIcons() {
-        // animateFab(1, 0);
+        animateFab(1, 0);
 
         toolbar.post(new Runnable() {
             @Override
@@ -219,9 +187,8 @@ public class EventsGridActivity extends BaseEventsActivity
     }
 
     private void setLightToolbarIcons() {
-        // TOOD: uncomment this once we fix the sync issue and icon.
-        // animateFab(0, 1);
-        // followFab.setVisibility(View.VISIBLE);
+        animateFab(0, 1);
+        fabShare.setVisibility(View.VISIBLE);
 
         toolbar.post(new Runnable() {
             @Override
@@ -232,11 +199,6 @@ public class EventsGridActivity extends BaseEventsActivity
         });
     }
 
-    private void updateFabIcon() {
-        followFab.setImageResource(account.isFollowing(eventsContext.query)
-                ? R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
-    }
-
     private void animateFab(int start, int end) {
         float pivot = getResources().getDimension(R.dimen.fab_size) / 2;
         Animation animation = new ScaleAnimation(start, end, start, end, pivot, pivot);
@@ -244,12 +206,11 @@ public class EventsGridActivity extends BaseEventsActivity
             animation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
-
                 }
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    followFab.setVisibility(View.GONE);
+                    fabShare.setVisibility(View.GONE);
                 }
 
                 @Override
@@ -258,7 +219,8 @@ public class EventsGridActivity extends BaseEventsActivity
                 }
             });
         }
+
         animation.setDuration(200);
-        followFab.startAnimation(animation);
+        fabShare.startAnimation(animation);
     }
 }

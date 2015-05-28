@@ -65,14 +65,12 @@ public class EventsFragment extends BaseEventsFragment {
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-            eventGridView.post(new Runnable() {
-                @Override
-                public void run() {
-                    fetchNewListing(false);
-                }
-            });
-        }
+        eventGridView.post(new Runnable() {
+            @Override
+            public void run() {
+                fetchNewListing(false);
+            }
+        });
     }
 
     @Override
@@ -81,6 +79,9 @@ public class EventsFragment extends BaseEventsFragment {
         eventsAdapter = new EventsAdapter(this);
         eventGridView = (AutofitRecyclerView) view.findViewById(R.id.event_grid);
         eventGridView.setEventsAdapter(eventsAdapter);
+
+        // Setup the actionbar hide/show on scroll.
+        eventGridView.setOnScrollListener(onScrollListener);
 
         // Setup the refresh on swipe down.
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
@@ -110,14 +111,10 @@ public class EventsFragment extends BaseEventsFragment {
             }
         });
 
-        // Setup the actionbar hide/show on scroll.
-        eventGridView.setOnScrollListener(onScrollListener);
-
+        // More views.
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         noMyEventsView = view.findViewById(R.id.view_no_my_event);
         retryView = view.findViewById(R.id.view_retry);
-
-        fetchNewListing(false);
     }
 
     public void setOnScrollListener (OnScrollListener onScrollListener) {

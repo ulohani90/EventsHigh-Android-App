@@ -167,7 +167,7 @@ public class IntentUtils {
             String query = pathSegments.get(pathSegments.size() - 1).split("-in-")[0];
             String dateQuery = DateTimeUtils.parseBrowseDate(query);
             if (dateQuery != null) {
-                param.dateFilter = dateQuery;
+                param.query = dateQuery;
             } else {
                 param.query = URLDecoder.decode(query.toLowerCase(), "UTF-8").replace('+', ' ');
             }

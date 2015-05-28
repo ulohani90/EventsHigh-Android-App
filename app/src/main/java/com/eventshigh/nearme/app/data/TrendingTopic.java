@@ -17,9 +17,9 @@ import org.json.JSONObject;
 public final class TrendingTopic {
     public final String tagName;
     public final String imgUrl;
-    public final String action;
+    @Nullable public final String action;
 
-    public TrendingTopic(String tagName, String imgUrl, String action) {
+    public TrendingTopic(String tagName, String imgUrl, @Nullable String action) {
         this.tagName = tagName;
         this.imgUrl = imgUrl;
         this.action = action;
