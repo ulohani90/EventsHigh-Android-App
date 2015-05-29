@@ -45,24 +45,24 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.google.android.gms:play-services-base:7.3.0'
-    compile 'com.google.android.gms:play-services-appindexing:7.3.0'
-    compile 'com.google.android.gms:play-services-location:7.3.0'
-    compile 'com.google.android.gms:play-services-maps:7.3.0'
-    compile 'com.google.android.gms:play-services-analytics:7.3.0'
-    compile 'com.google.android.gms:play-services-gcm:7.3.0'
+    compile 'com.google.android.gms:play-services-base:7.5.0'
+    compile 'com.google.android.gms:play-services-appindexing:7.5.0'
+    compile 'com.google.android.gms:play-services-location:7.5.0'
+    compile 'com.google.android.gms:play-services-maps:7.5.0'
+    compile 'com.google.android.gms:play-services-analytics:7.5.0'
+    compile 'com.google.android.gms:play-services-gcm:7.5.0'
 
-    compile 'com.android.support:appcompat-v7:22.1.1'
-    compile 'com.android.support:support-v4:22.1.1'
+    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:support-v4:22.2.0'
     compile 'com.android.support:cardview-v7:21.0.3'
     compile 'com.android.support:recyclerview-v7:21.0.3'
 
-    compile 'com.facebook.android:facebook-android-sdk:4.1.1'
+    compile 'com.facebook.android:facebook-android-sdk:4.2.0'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
     compile 'org.apmem.tools:layouts:1.8@aar'
     compile 'com.zendesk:sdk:1.2.0.1'
 
-    compile('com.crashlytics.sdk.android:crashlytics:2.2.4@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.3.1@aar') {
         transitive = true;
     }
 }
