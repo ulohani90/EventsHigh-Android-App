@@ -166,15 +166,13 @@ public class GcmIntentService extends IntentService {
         if (parsedBundle != null) {
             if (parsedBundle.boundCenter != null) {
                 new BoundsVerifier(parsedBundle, intent).checkAndNotify();
-                return;
             } else {
-                NotificationUtils.showNotificationAndReleaseWakeLock(this,
-                        parsedBundle.notificationData);
+                NotificationUtils.showNotificationAndReleaseWakeLock(this, parsedBundle.notificationData);
             }
+        } else {
+            // Release the wake lock provided by the WakefulBroadcastReceiver.
+            GcmBroadcastReceiver.completeWakefulIntent(intent);
         }
-
-        // Release the wake lock provided by the WakefulBroadcastReceiver.
-        GcmBroadcastReceiver.completeWakefulIntent(intent);
     }
 
     private  class BoundsVerifier {
