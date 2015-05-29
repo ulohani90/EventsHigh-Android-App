@@ -12,6 +12,10 @@ import org.json.JSONObject;
  * timestamp, title, message.
  */
 public abstract class StreamItem {
+    private static final String TITLE_KEY = "title";
+    private static final String MESSAGE_KEY = "message";
+    private static final String IMG_URL_KEY = "img_url";
+
     public final long timestamp;
     public final String title;
     public final String message;
@@ -25,18 +29,18 @@ public abstract class StreamItem {
     }
 
     protected StreamItem(long timestamp, JSONObject json) throws JSONException {
-        this(timestamp, json.getString("title"), json.getString("message"),
-                json.optString("img_url", null));
+        this(timestamp, json.getString(TITLE_KEY), json.getString(MESSAGE_KEY),
+                json.optString(IMG_URL_KEY, null));
     }
 
     public abstract StreamType getStreamType();
 
     public JSONObject toJSON() throws JSONException {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("title", title);
-        jsonObject.put("message", message);
+        jsonObject.put(TITLE_KEY, title);
+        jsonObject.put(MESSAGE_KEY, message);
         if (imgUrl != null) {
-            jsonObject.put("img__url", imgUrl);
+            jsonObject.put(IMG_URL_KEY, imgUrl);
         }
 
         return jsonObject;
