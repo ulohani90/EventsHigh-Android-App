@@ -452,7 +452,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 dotsView.addView(view);
             }
 
-            viewPager.setOnPageChangeListener(new DotsSelector(activity));
+            viewPager.clearOnPageChangeListeners();
+            viewPager.addOnPageChangeListener(new DotsSelector(activity));
         }
 
         private class DotsSelector implements OnPageChangeListener {
@@ -720,7 +721,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         public void populate(final FollowData data, final BaseContextActivity activity) {
             titleView.setText(data.title);
             subtitleView.setText(MessageFormat.format(
-                activity.getString(R.string.num_events), data.numFollowers, data.numEvents));
+                    activity.getString(R.string.num_events), data.numFollowers, data.numEvents));
 
             final Account account = new Account(activity);
             setFollowButtons(account.isFollowing(data.title));
@@ -738,12 +739,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     activity.reportActionToAnalytics("removeFollowing", data.title);
                     account.setIsFollowing(data.title, false);
                     setFollowButtons(false);
-                }
-            });
-            account.addOnChangeListener(new Account.OnAccountChangeListener() {
-                @Override
-                public void followStateChanged() {
-                    setFollowButtons(account.isFollowing(data.title));
                 }
             });
         }
