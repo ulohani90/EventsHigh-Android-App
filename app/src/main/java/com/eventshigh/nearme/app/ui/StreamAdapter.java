@@ -35,8 +35,7 @@ public class StreamAdapter extends CursorAdapter {
         try {
             StreamItem streamItem = StreamDbHelper.parseFromCursor(cursor);
 
-            timeView.setText(DateUtils.formatElapsedTime(
-                    (System.currentTimeMillis() - streamItem.timestamp) / 1000));
+            timeView.setText(DateUtils.getRelativeTimeSpanString(context, streamItem.timestamp, true));
             titleView.setText(streamItem.title);
             messageView.setText(streamItem.message);
         } catch (JSONException e) {

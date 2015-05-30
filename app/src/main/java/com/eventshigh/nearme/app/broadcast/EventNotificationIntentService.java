@@ -26,9 +26,6 @@ public class EventNotificationIntentService extends IntentService {
             return;
         }
 
-        // Record notification in stream.
-        EventNotificationStreamItem.record(this, event.title, event.description, event.imgUrl, event.id);
-
         // Notify user about the Event.
         NotificationUtils.showNotificationAndReleaseWakeLock(this, intent, event, event.hashCode());
     }

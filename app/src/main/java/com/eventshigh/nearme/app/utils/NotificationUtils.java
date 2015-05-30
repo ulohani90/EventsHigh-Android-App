@@ -22,6 +22,7 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 
 import java.util.List;
@@ -218,6 +219,9 @@ public class NotificationUtils {
                     context.getResources().getString(R.string.event_time_venue),
                     relativeTime, event.getShortAddress());
             imageUrl = event.imgUrl;
+
+            // Record notification in stream.
+            EventNotificationStreamItem.record(context, title, message, imageUrl, event.id);
 
             pendingIntent = createPendingIntent(context, event.id, event.city);
             showOnMapIntent = event.getShowOnMapIntent();
