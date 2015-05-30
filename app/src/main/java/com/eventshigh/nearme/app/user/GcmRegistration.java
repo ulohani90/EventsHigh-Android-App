@@ -6,6 +6,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.crashlytics.android.Crashlytics;
@@ -89,6 +90,15 @@ public class GcmRegistration {
 
     public void setUserCityListener (@Nullable UserCityListener userCityListener) {
         this.userCityListener = userCityListener;
+    }
+
+    public static void sendUpstream(Context context, String messageId, Bundle data) {
+        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
+        try {
+            gcm.send(SENDER_ID + "@gcm.googleapis.com", messageId, data);
+        } catch (IOException e) {
+            Crashlytics.logException(e);
+        }
     }
 
     private class CityRegistar extends AsyncTask<Void, Void, Void> {

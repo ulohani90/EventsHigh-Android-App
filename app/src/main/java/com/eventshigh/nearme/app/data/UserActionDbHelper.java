@@ -5,8 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;
@@ -128,11 +130,19 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
             public void run() {
                 openDatabase();
                 ContentValues values = new ContentValues();
-                values.put(COLUMN_TIMESTAMP, System.currentTimeMillis());
+                long now = System.currentTimeMillis();
+                values.put(COLUMN_TIMESTAMP, now);
                 values.put(COLUMN_ACTION, action);
                 values.put(COLUMN_DATA, data);
-                database.insert(USER_ACTIONS_TABLE_NAME, null, values);
+                long rowId = database.insert(USER_ACTIONS_TABLE_NAME, null, values);
                 closeDatabase();
+
+                Bundle bundle = new Bundle();
+                bundle.putString(JSON_KEY_ANDROID_ID, Utils.getAndroidId(context));
+                bundle.putString(JSON_KEY_TIMESTAMP, Long.toString(now));
+                bundle.putString(JSON_KEY_ACTION, action);
+                bundle.putString(JSON_KEY_DATA, data);
+                GcmRegistration.sendUpstream(context, Long.toString(rowId), bundle);
             }
         });
         thread.start();
