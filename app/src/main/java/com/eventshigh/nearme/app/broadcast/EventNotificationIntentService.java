@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.content.Intent;
 
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
 
@@ -25,9 +24,6 @@ public class EventNotificationIntentService extends IntentService {
             EventAlarmBroadcastReceiver.completeWakefulIntent(intent);
             return;
         }
-
-        // Record notification in stream.
-        EventNotificationStreamItem.record(this, event.title, event.description, event.imgUrl, event.id);
 
         // Notify user about the Event.
         NotificationUtils.showNotificationAndReleaseWakeLock(this, intent, event, event.hashCode());
