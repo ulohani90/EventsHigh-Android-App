@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,795 +7,772 @@
     android:background="@android:color/white"
     tools:context=".activity.EventDetailActivity"
 >
-    <ScrollView
-        android:id="@+id/event_scroll_view"
+
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/share_row"
-        android:paddingBottom="16dp"
-        android:clipToPadding="false"
-    >
-        <LinearLayout
-            android:id="@+id/event_container"
+        android:layout_height="match_parent">
+
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/event_scroll_view"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            tools:ignore="WebViewLayout"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
         >
-            <!-- Event Image -->
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-            >
-                <com.eventshigh.nearme.app.view.FadeInNetworkImageView
-                    android:id="@+id/event_bg"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
-                    android:onClick="imagePreview"
-                    android:transitionName="event_bg"
-                    tools:ignore="UnusedAttribute"
-                />
-                <ImageView
-                    android:id="@+id/eh_recommends"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:layout_margin="16dp"
-                    android:src="@drawable/eh_recommend"
-                    android:adjustViewBounds="true"
-                    android:transitionName="eh_recommends"
-                    android:visibility="gone"
-                    tools:ignore="UnusedAttribute, ContentDescription"
-                />
-            </FrameLayout>
-
-            <!-- Event Title -->
-            <TextView
-                android:id="@+id/event_title"
-                style="?android:attr/textAppearanceMedium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="4dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginEnd="16dp"
-                android:textIsSelectable="true"
-                android:textColor="#CC000000"
-                android:transitionName="event_title"
-                tools:ignore="UnusedAttribute"
-                tools:text="The Awesome Event"
-            />
-            <TextView
-                android:id="@+id/event_from"
-                style="@style/EHText"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginEnd="16dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:layout_gravity="end"
-                android:textColor="#99A7A9AC"
-                android:onClick="openSourceSite"
-                tools:text="Event details from: www.eventshigh.com"
-            />
-
-            <!-- EH Actions -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#1a4d4d4d"
-            />
             <LinearLayout
-                android:id="@+id/action_button_group"
+                android:id="@+id/event_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@color/button_gray"
-                android:visibility="gone"
-                tools:visibility="visible"
+                android:orientation="vertical"
+                tools:ignore="WebViewLayout"
             >
+                <!-- Event Title -->
                 <TextView
-                    android:id="@+id/action_favourite"
-                    style="@style/EHDetailActionButton"
-                    android:layout_width="0dp"
+                    android:id="@+id/event_title"
+                    style="?android:attr/textAppearanceMedium"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableTop="@drawable/ic_favorite_grey600_24dp"
-                    android:clickable="true"
-                    android:onClick="addFavourite"
-                    android:text="@string/ui_favourite"
-                    android:transitionName="action_favourite"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:textIsSelectable="true"
+                    android:textColor="#CC000000"
+                    android:transitionName="event_title"
                     tools:ignore="UnusedAttribute"
+                    tools:text="The Awesome Event"
                 />
                 <TextView
-                    android:id="@+id/action_favourited"
-                    style="@style/EHDetailActionButton"
-                    android:layout_width="0dp"
+                    android:id="@+id/event_from"
+                    style="@style/EHText"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableTop="@drawable/ic_favorite_red_24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="?android:attr/selectableItemBackground"
                     android:clickable="true"
-                    android:onClick="removeFavourite"
-                    android:text="@string/ui_favourite"
+                    android:layout_gravity="end"
+                    android:textColor="#99A7A9AC"
+                    android:onClick="openSourceSite"
+                    tools:text="Event details from: www.eventshigh.com"
+                />
+
+                <!-- EH Actions -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#1a4d4d4d"
+                />
+                <LinearLayout
+                    android:id="@+id/action_button_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@color/button_gray"
                     android:visibility="gone"
-                />
-                <TextView
-                    style="@style/EHDetailActionButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableTop="@drawable/ic_event_grey600_24dp"
-                    android:clickable="true"
-                    android:onClick="save"
-                    android:text="@string/action_calendar"
-                />
-                <TextView
-                    style="@style/EHDetailActionButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableTop="@drawable/ic_directions_grey600_24dp"
-                    android:clickable="true"
-                    android:onClick="showDirections"
-                    android:text="@string/action_direction"
-                />
-                <TextView
-                    style="@style/EHDetailActionButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableTop="@drawable/ic_help_grey600_24dp"
-                    android:clickable="true"
-                    android:onClick="ama"
-                    android:text="@string/action_ama"
-                />
-            </LinearLayout>
+                    tools:visibility="visible"
+                >
+                    <TextView
+                        android:id="@+id/action_favourite"
+                        style="@style/EHDetailActionButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawableTop="@drawable/ic_favorite_grey600_24dp"
+                        android:clickable="true"
+                        android:onClick="addFavourite"
+                        android:text="@string/ui_favourite"
+                        android:transitionName="action_favourite"
+                        tools:ignore="UnusedAttribute"
+                    />
+                    <TextView
+                        android:id="@+id/action_favourited"
+                        style="@style/EHDetailActionButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawableTop="@drawable/ic_favorite_red_24dp"
+                        android:clickable="true"
+                        android:onClick="removeFavourite"
+                        android:text="@string/ui_favourite"
+                        android:visibility="gone"
+                    />
+                    <TextView
+                        style="@style/EHDetailActionButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawableTop="@drawable/ic_event_grey600_24dp"
+                        android:clickable="true"
+                        android:onClick="save"
+                        android:text="@string/action_calendar"
+                    />
+                    <TextView
+                        style="@style/EHDetailActionButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawableTop="@drawable/ic_directions_grey600_24dp"
+                        android:clickable="true"
+                        android:onClick="showDirections"
+                        android:text="@string/action_direction"
+                    />
+                    <TextView
+                        style="@style/EHDetailActionButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawableTop="@drawable/ic_help_grey600_24dp"
+                        android:clickable="true"
+                        android:onClick="ama"
+                        android:text="@string/action_ama"
+                    />
+                </LinearLayout>
 
-            <!-- Event Venue -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#1a4d4d4d"
-            />
-            <RelativeLayout
-                android:id="@+id/venue_group"
-                style="@style/EHButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="showVenue"
-                android:visibility="gone"
-                tools:visibility="visible"
-            >
-                <ImageView
-                    android:id="@+id/event_venue_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:src="@drawable/ic_location_on_grey600_24dp"
-                    tools:ignore="ContentDescription"
-                />
-                <TextView
-                    android:id="@+id/event_venue"
-                    style="@style/EHText"
+                <!-- Event Venue -->
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_toRightOf="@+id/event_venue_icon"
-                    android:layout_toEndOf="@+id/event_venue_icon"
-                    android:layout_toLeftOf="@+id/event_travel_time"
-                    android:layout_toStartOf="@+id/event_travel_time"
-                    android:textColor="#A3000000"
-                    android:transitionName="event_venue"
-                    tools:ignore="UnusedAttribute"
-                    tools:text="Counter Culture"
+                    android:layout_height="1dp"
+                    android:background="#1a4d4d4d"
                 />
-                <TextView
-                    android:id="@+id/event_address"
-                    style="@style/EHText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/event_venue"
-                    android:layout_toRightOf="@+id/event_venue_icon"
-                    android:layout_toEndOf="@+id/event_venue_icon"
-                    android:layout_toLeftOf="@+id/event_travel_time"
-                    android:layout_toStartOf="@+id/event_travel_time"
-                    android:textColor="#999197A3"
-                    tools:text="Near Hoodi circle, Whitefield, Bangalore, 560037."
-                />
-                <TextView
-                    android:id="@+id/event_travel_time"
-                    style="@style/EHText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:textColor="#999197A3"
-                    android:drawableTop="@drawable/ic_local_taxi_grey600_12dp"
-                    android:drawablePadding="4dp"
-                    android:transitionName="event_travel_time"
-                    tools:ignore="UnusedAttribute"
-                    tools:text="30 min"
-                />
-            </RelativeLayout>
-
-            <!-- Event Time -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#1a4d4d4d"
-            />
-            <LinearLayout
-                android:id="@+id/event_time_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:animateLayoutChanges="true"
-                android:background="@color/button_gray"
-                android:visibility="gone"
-                tools:visibility="visible"
-            >
                 <RelativeLayout
-                    android:id="@+id/event_time_first"
+                    android:id="@+id/venue_group"
                     style="@style/EHButton"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_weight="1"
-                    android:onClick="save"
+                    android:onClick="showVenue"
+                    android:visibility="gone"
+                    tools:visibility="visible"
                 >
                     <ImageView
-                        android:id="@+id/event_time_icon"
+                        android:id="@+id/event_venue_icon"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentBottom="true"
-                        android:src="@drawable/ic_access_time_grey600_24dp"
+                        android:src="@drawable/ic_location_on_grey600_24dp"
                         tools:ignore="ContentDescription"
                     />
                     <TextView
-                        android:id="@+id/event_time"
+                        android:id="@+id/event_venue"
                         style="@style/EHText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
-                        android:layout_toRightOf="@+id/event_time_icon"
-                        android:layout_toEndOf="@+id/event_time_icon"
+                        android:layout_toRightOf="@+id/event_venue_icon"
+                        android:layout_toEndOf="@+id/event_venue_icon"
+                        android:layout_toLeftOf="@+id/event_travel_time"
+                        android:layout_toStartOf="@+id/event_travel_time"
                         android:textColor="#A3000000"
-                        android:transitionName="event_time"
+                        android:transitionName="event_venue"
                         tools:ignore="UnusedAttribute"
-                        tools:text="Wed, 14 Jan at 9:30 AM"
+                        tools:text="Counter Culture"
                     />
                     <TextView
-                        android:id="@+id/event_time_details"
+                        android:id="@+id/event_address"
                         style="@style/EHText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/event_time_icon"
-                        android:layout_toEndOf="@+id/event_time_icon"
-                        android:layout_below="@+id/event_time"
+                        android:layout_below="@+id/event_venue"
+                        android:layout_toRightOf="@+id/event_venue_icon"
+                        android:layout_toEndOf="@+id/event_venue_icon"
+                        android:layout_toLeftOf="@+id/event_travel_time"
+                        android:layout_toStartOf="@+id/event_travel_time"
                         android:textColor="#999197A3"
-                        tools:text="2 days from now"
+                        tools:text="Near Hoodi circle, Whitefield, Bangalore, 560037."
+                    />
+                    <TextView
+                        android:id="@+id/event_travel_time"
+                        style="@style/EHText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:textColor="#999197A3"
+                        android:drawableTop="@drawable/ic_local_taxi_grey600_12dp"
+                        android:drawablePadding="4dp"
+                        android:transitionName="event_travel_time"
+                        tools:ignore="UnusedAttribute"
+                        tools:text="30 min"
                     />
                 </RelativeLayout>
-                <TextView
-                    android:id="@+id/also_on"
-                    style="@style/EHButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:textColor="#80000000"
-                    android:text="@string/ui_also_on"
-                    android:textAllCaps="false"
+
+                <!-- Event Time -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#1a4d4d4d"
                 />
-                <HorizontalScrollView
-                    android:id="@+id/event_future_times_hs"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:scrollbars="none"
+                <LinearLayout
+                    android:id="@+id/event_time_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:animateLayoutChanges="true"
+                    android:background="@color/button_gray"
                     android:visibility="gone"
+                    tools:visibility="visible"
                 >
-                    <LinearLayout
-                        android:id="@+id/event_future_times"
+                    <RelativeLayout
+                        android:id="@+id/event_time_first"
+                        style="@style/EHButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1"
+                        android:onClick="save"
+                    >
+                        <ImageView
+                            android:id="@+id/event_time_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentBottom="true"
+                            android:src="@drawable/ic_access_time_grey600_24dp"
+                            tools:ignore="ContentDescription"
+                        />
+                        <TextView
+                            android:id="@+id/event_time"
+                            style="@style/EHText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentTop="true"
+                            android:layout_toRightOf="@+id/event_time_icon"
+                            android:layout_toEndOf="@+id/event_time_icon"
+                            android:textColor="#A3000000"
+                            android:transitionName="event_time"
+                            tools:ignore="UnusedAttribute"
+                            tools:text="Wed, 14 Jan at 9:30 AM"
+                        />
+                        <TextView
+                            android:id="@+id/event_time_details"
+                            style="@style/EHText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/event_time_icon"
+                            android:layout_toEndOf="@+id/event_time_icon"
+                            android:layout_below="@+id/event_time"
+                            android:textColor="#999197A3"
+                            tools:text="2 days from now"
+                        />
+                    </RelativeLayout>
+                    <TextView
+                        android:id="@+id/also_on"
+                        style="@style/EHButton"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:showDividers="middle"
-                        android:divider="@drawable/shape_vertical_divider"
-                        android:orientation="horizontal"
-                    />
-                </HorizontalScrollView>
-            </LinearLayout>
-
-            <!-- Contest -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#1a4d4d4d"
-            />
-            <TextView
-                android:id="@+id/offer_text"
-                style="@style/EHButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="12sp"
-                android:textColor="#A3000000"
-                android:textAllCaps="false"
-                android:drawableLeft="@drawable/ic_local_offer_grey600_24dp"
-                android:drawableStart="@drawable/ic_local_offer_grey600_24dp"
-                android:onClick="openOfferSite"
-                android:visibility="gone"
-                tools:visibility="visible"
-                tools:text="Win Free Pass to Arijit Singh Live Concert on 5th April"
-            />
-
-            <!-- Action Items -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#1a4d4d4d"
-            />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:showDividers="middle"
-                android:divider="@drawable/shape_vertical_divider"
-                android:baselineAligned="false"
-            >
-                <FrameLayout
-                    android:id="@+id/book_ticket"
-                    style="@style/EHButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="openBookingSite"
-                    android:visibility="gone"
-                    tools:visibility="visible"
-                >
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:gravity="center"
-                        android:drawableLeft="@drawable/action_book"
-                        android:drawableStart="@drawable/action_book"
-                        android:textColor="#CC000000"
-                        android:text="@string/action_book"
+                        android:textColor="#80000000"
+                        android:text="@string/ui_also_on"
+                        android:textAllCaps="false"
                     />
-                </FrameLayout>
+                    <HorizontalScrollView
+                        android:id="@+id/event_future_times_hs"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:scrollbars="none"
+                        android:visibility="gone"
+                    >
+                        <LinearLayout
+                            android:id="@+id/event_future_times"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:showDividers="middle"
+                            android:divider="@drawable/shape_vertical_divider"
+                            android:orientation="horizontal"
+                        />
+                    </HorizontalScrollView>
+                </LinearLayout>
 
-                <FrameLayout
-                    android:id="@+id/join_event"
-                    style="@style/EHButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="openSourceSite"
-                    android:visibility="gone"
-                    tools:visibility="visible"
-                >
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:drawableLeft="@drawable/ic_event_available_32dp"
-                        android:drawableStart="@drawable/ic_event_available_32dp"
-                        android:textColor="#CC000000"
-                        android:text="@string/action_join"
-                    />
-                </FrameLayout>
-
-                <FrameLayout
-                    android:id="@+id/check_in"
-                    style="@style/EHButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="onCheckIn"
-                    android:visibility="gone"
-                    tools:visibility="visible"
-                >
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:drawableLeft="@drawable/action_check_in"
-                        android:drawableStart="@drawable/action_check_in"
-                        android:textColor="#CC000000"
-                        android:text="@string/action_check_in"
-                    />
-                </FrameLayout>
-
-                <FrameLayout
-                    android:id="@+id/call"
-                    style="@style/EHButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="call"
-                    android:visibility="gone"
-                    tools:visibility="visible"
-                >
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:drawableLeft="@drawable/action_call"
-                        android:drawableStart="@drawable/action_call"
-                        android:textColor="#CC000000"
-                        android:text="@string/action_call"
-                    />
-                </FrameLayout>
-            </LinearLayout>
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#1a4d4d4d"
-            />
-
-            <!-- Price -->
-            <LinearLayout
-                android:id="@+id/price_row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                tools:visibility="visible"
-            >
+                <!-- Contest -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#1a4d4d4d"
+                />
                 <TextView
+                    android:id="@+id/offer_text"
+                    style="@style/EHButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="12sp"
+                    android:textColor="#A3000000"
+                    android:textAllCaps="false"
+                    android:drawableLeft="@drawable/ic_local_offer_grey600_24dp"
+                    android:drawableStart="@drawable/ic_local_offer_grey600_24dp"
+                    android:onClick="openOfferSite"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    tools:text="Win Free Pass to Arijit Singh Live Concert on 5th April"
+                />
+
+                <!-- Action Items -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#1a4d4d4d"
+                />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:showDividers="middle"
+                    android:divider="@drawable/shape_vertical_divider"
+                    android:baselineAligned="false"
+                >
+                    <FrameLayout
+                        android:id="@+id/book_ticket"
+                        style="@style/EHButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:onClick="openBookingSite"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                    >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:drawableLeft="@drawable/action_book"
+                            android:drawableStart="@drawable/action_book"
+                            android:textColor="#CC000000"
+                            android:text="@string/action_book"
+                        />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/join_event"
+                        style="@style/EHButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:onClick="openSourceSite"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                    >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:drawableLeft="@drawable/ic_event_available_32dp"
+                            android:drawableStart="@drawable/ic_event_available_32dp"
+                            android:textColor="#CC000000"
+                            android:text="@string/action_join"
+                        />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/check_in"
+                        style="@style/EHButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:onClick="onCheckIn"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                    >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:drawableLeft="@drawable/action_check_in"
+                            android:drawableStart="@drawable/action_check_in"
+                            android:textColor="#CC000000"
+                            android:text="@string/action_check_in"
+                        />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/call"
+                        style="@style/EHButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:onClick="call"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                    >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:drawableLeft="@drawable/action_call"
+                            android:drawableStart="@drawable/action_call"
+                            android:textColor="#CC000000"
+                            android:text="@string/action_call"
+                        />
+                    </FrameLayout>
+                </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#1a4d4d4d"
+                />
+
+                <!-- Price -->
+                <LinearLayout
+                    android:id="@+id/price_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                >
+                    <TextView
+                        style="@style/EHHeader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="18dp"
+                        android:textAllCaps="true"
+                        android:textColor="#CC383F3F"
+                        android:text="@string/ui_price"
+                    />
+                    <TextView
+                        style="@style/EHText"
+                        android:id="@+id/event_price"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="18dp"
+                        android:gravity="start"
+                        android:textColor="#CC383F3F"
+                        android:transitionName="event_price"
+                        tools:ignore="UnusedAttribute"
+                        tools:text="₹ 200 - 500"
+                    />
+                </LinearLayout>
+
+                <!-- Performers Info -->
+                <TextView
+                    android:id="@+id/performer_header"
                     style="@style/EHHeader"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="18dp"
+                    android:layout_marginBottom="8dp"
                     android:textAllCaps="true"
                     android:textColor="#CC383F3F"
-                    android:text="@string/ui_price"
+                    android:text="@string/ui_performer"
+                    android:visibility="gone"
+                    tools:visibility="visible"
                 />
+                <LinearLayout
+                    android:id="@+id/performers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="vertical"
+                />
+
+                <!-- Event tags -->
                 <TextView
-                    style="@style/EHText"
-                    android:id="@+id/event_price"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:id="@+id/tags_header"
+                    style="@style/EHHeader"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="18dp"
-                    android:gravity="start"
+                    android:layout_marginBottom="8dp"
+                    android:textAllCaps="true"
                     android:textColor="#CC383F3F"
-                    android:transitionName="event_price"
-                    tools:ignore="UnusedAttribute"
-                    tools:text="₹ 200 - 500"
+                    android:text="@string/ui_categories"
+                    android:visibility="gone"
+                    tools:visibility="visible"
                 />
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/event_tags"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="vertical"
+                />
 
-            <!-- Performers Info -->
-            <TextView
-                android:id="@+id/performer_header"
-                style="@style/EHHeader"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="18dp"
-                android:layout_marginBottom="8dp"
-                android:textAllCaps="true"
-                android:textColor="#CC383F3F"
-                android:text="@string/ui_performer"
-                android:visibility="gone"
-                tools:visibility="visible"
-            />
-            <LinearLayout
-                android:id="@+id/performers"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="10dp"
-                android:orientation="vertical"
-            />
-
-            <!-- Event tags -->
-            <TextView
-                android:id="@+id/tags_header"
-                style="@style/EHHeader"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="18dp"
-                android:layout_marginBottom="8dp"
-                android:textAllCaps="true"
-                android:textColor="#CC383F3F"
-                android:text="@string/ui_categories"
-                android:visibility="gone"
-                tools:visibility="visible"
-            />
-            <LinearLayout
-                android:id="@+id/event_tags"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="10dp"
-                android:orientation="vertical"
-            />
-
-            <!-- Event Description -->
-            <TextView
-                android:id="@+id/description_header"
-                style="@style/EHHeader"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="18dp"
-                android:layout_marginBottom="8dp"
-                android:textAllCaps="true"
-                android:textColor="#CC383F3F"
-                android:text="@string/ui_description"
-                android:visibility="gone"
-                tools:visibility="visible"
-            />
-            <WebView
-                android:id="@+id/event_description"
-                style="@style/EHText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textIsSelectable="true"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"
-                android:ellipsize="end"
-                android:textColor="#CC383F3F"
-                tools:text="...\n,,,\n---"
-            />
-
-            <!-- Organizer Info -->
-            <TextView
-                android:id="@+id/organizer_header"
-                style="@style/EHHeader"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:textAllCaps="true"
-                android:textColor="#CC383F3F"
-                android:text="@string/ui_organizer"
-                android:visibility="gone"
-                tools:visibility="visible"
-            />
-            <LinearLayout
-                android:id="@+id/organizer_name_row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:visibility="gone"
-                tools:visibility="visible"
-            >
+                <!-- Event Description -->
                 <TextView
+                    android:id="@+id/description_header"
+                    style="@style/EHHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginBottom="8dp"
+                    android:textAllCaps="true"
+                    android:textColor="#CC383F3F"
+                    android:text="@string/ui_description"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                />
+                <WebView
+                    android:id="@+id/event_description"
+                    style="@style/EHText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textIsSelectable="true"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:ellipsize="end"
+                    android:textColor="#CC383F3F"
+                    tools:text="...\n,,,\n---"
+                />
+
+                <!-- Organizer Info -->
+                <TextView
+                    android:id="@+id/organizer_header"
+                    style="@style/EHHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:textAllCaps="true"
+                    android:textColor="#CC383F3F"
+                    android:text="@string/ui_organizer"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                />
+                <LinearLayout
+                    android:id="@+id/organizer_name_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                >
+                    <TextView
+                        style="@style/EHText"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:textColor="#CC222222"
+                        android:text="@string/ui_name"
+                    />
+                    <TextView
+                        android:id="@+id/organizer_name"
+                        style="@style/EHText"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:textColor="#CC222222"
+                        tools:text="Counter Culture"
+                    />
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/organizer_link"
                     style="@style/EHText"
                     android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:textColor="#CC222222"
-                    android:text="@string/ui_name"
-                />
-                <TextView
-                    android:id="@+id/organizer_name"
-                    style="@style/EHText"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:textColor="#CC222222"
-                    tools:text="Counter Culture"
-                />
-            </LinearLayout>
-            <TextView
-                android:id="@+id/organizer_link"
-                style="@style/EHText"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:layout_marginLeft="30dp"
-                android:layout_marginStart="30dp"
-                android:textColor="@color/link_color"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:onClick="openOrganizerLink"
-                tools:text="parag@eventshigh.com"
-            />
-            <LinearLayout
-                android:id="@+id/organizer_email_row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:visibility="gone"
-                tools:visibility="visible"
-            >
-                <TextView
-                    style="@style/EHText"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:textColor="#CC222222"
-                    android:text="@string/ui_email"
-                />
-                <TextView
-                    android:id="@+id/organizer_email"
-                    style="@style/EHText"
-                    android:layout_height="wrap_content"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginStart="30dp"
                     android:textColor="@color/link_color"
                     android:background="?android:attr/selectableItemBackground"
                     android:clickable="true"
+                    android:onClick="openOrganizerLink"
                     tools:text="parag@eventshigh.com"
                 />
+                <LinearLayout
+                    android:id="@+id/organizer_email_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                >
+                    <TextView
+                        style="@style/EHText"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:textColor="#CC222222"
+                        android:text="@string/ui_email"
+                    />
+                    <TextView
+                        android:id="@+id/organizer_email"
+                        style="@style/EHText"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:textColor="@color/link_color"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        tools:text="parag@eventshigh.com"
+                    />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/organizer_phone_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                >
+                    <TextView
+                        style="@style/EHText"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:textColor="#CC222222"
+                        android:text="@string/ui_phone"
+                    />
+                    <TextView
+                        android:id="@+id/organizer_phone"
+                        style="@style/EHText"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:textColor="@color/link_color"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:onClick="call"
+                        tools:text="+91-9900439770"
+                    />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/organizer_website_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                >
+                    <TextView
+                        style="@style/EHText"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:textColor="#CC222222"
+                        android:text="@string/ui_website"
+                    />
+                    <TextView
+                        android:id="@+id/organizer_website"
+                        style="@style/EHText"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:textColor="@color/link_color"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:onClick="openOrganizerWebsite"
+                        tools:text="www.eventshigh.com"
+                    />
+                </LinearLayout>
             </LinearLayout>
-            <LinearLayout
-                android:id="@+id/organizer_phone_row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
+        </android.support.v4.widget.NestedScrollView>
+
+        <include
+            layout="@layout/toolbar_details"
+            tools:visibility="gone"
+            />
+
+        <ProgressBar
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:id="@+id/top_progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="?android:attr/actionBarSize"
+            android:indeterminate="true"
+            tools:visibility="gone"
+            />
+
+        <!-- Share -->
+        <LinearLayout
+            android:id="@+id/share_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+        >
+            <ImageView
+                android:id="@+id/share_fb"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:src="@drawable/fb_24dp"
+                android:scaleType="center"
+                android:background="@drawable/button_fb"
+                android:onClick="facebook"
                 android:visibility="gone"
+                tools:ignore="ContentDescription"
                 tools:visibility="visible"
-            >
-                <TextView
-                    style="@style/EHText"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:textColor="#CC222222"
-                    android:text="@string/ui_phone"
-                />
-                <TextView
-                    android:id="@+id/organizer_phone"
-                    style="@style/EHText"
-                    android:layout_height="wrap_content"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:textColor="@color/link_color"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:onClick="call"
-                    tools:text="+91-9900439770"
-                />
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/organizer_website_row"
-                android:layout_width="match_parent"
+            />
+            <ImageView
+                android:id="@+id/share_twitter"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="8dp"
+                android:src="@drawable/twitter_white"
+                android:background="@drawable/button_twitter"
+                android:onClick="twitter"
                 android:visibility="gone"
+                tools:ignore="ContentDescription"
                 tools:visibility="visible"
-            >
-                <TextView
-                    style="@style/EHText"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:textColor="#CC222222"
-                    android:text="@string/ui_website"
-                />
-                <TextView
-                    android:id="@+id/organizer_website"
-                    style="@style/EHText"
-                    android:layout_height="wrap_content"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:textColor="@color/link_color"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:onClick="openOrganizerWebsite"
-                    tools:text="www.eventshigh.com"
-                />
-            </LinearLayout>
+            />
+            <ImageView
+                android:id="@+id/share_email"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="8dp"
+                android:src="@drawable/ic_email_white_24dp"
+                android:background="@drawable/button_email"
+                android:onClick="email"
+                android:visibility="gone"
+                tools:ignore="ContentDescription"
+                tools:visibility="visible"
+            />
+            <ImageView
+                android:id="@+id/share_whatsapp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="8dp"
+                android:src="@drawable/whatsapp_24dp"
+                android:background="@drawable/button_whatsapp"
+                android:onClick="whatsapp"
+                android:visibility="gone"
+                tools:ignore="ContentDescription"
+                tools:visibility="visible"
+            />
         </LinearLayout>
-    </ScrollView>
 
-    <!-- Share -->
-    <LinearLayout
-        android:id="@+id/share_row"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
-    >
-        <ImageView
-            android:id="@+id/share_fb"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:src="@drawable/fb_24dp"
-            android:scaleType="center"
-            android:background="@drawable/button_fb"
-            android:onClick="facebook"
-            android:visibility="gone"
-            tools:ignore="ContentDescription"
-            tools:visibility="visible"
-        />
-        <ImageView
-            android:id="@+id/share_twitter"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:padding="8dp"
-            android:src="@drawable/twitter_white"
-            android:background="@drawable/button_twitter"
-            android:onClick="twitter"
-            android:visibility="gone"
-            tools:ignore="ContentDescription"
-            tools:visibility="visible"
-        />
-        <ImageView
-            android:id="@+id/share_email"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:padding="8dp"
-            android:src="@drawable/ic_email_white_24dp"
-            android:background="@drawable/button_email"
-            android:onClick="email"
-            android:visibility="gone"
-            tools:ignore="ContentDescription"
-            tools:visibility="visible"
-        />
-        <ImageView
-            android:id="@+id/share_whatsapp"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:padding="8dp"
-            android:src="@drawable/whatsapp_24dp"
-            android:background="@drawable/button_whatsapp"
-            android:onClick="whatsapp"
-            android:visibility="gone"
-            tools:ignore="ContentDescription"
-            tools:visibility="visible"
-        />
-    </LinearLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
-    <include
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        layout="@layout/toolbar"
-        tools:visibility="gone"
-    />
-    <ProgressBar
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:id="@+id/top_progress_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="?android:attr/actionBarSize"
-        android:indeterminate="true"
-        tools:visibility="gone"
-    />
-</RelativeLayout>
+</LinearLayout>
