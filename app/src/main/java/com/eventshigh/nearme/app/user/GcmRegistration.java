@@ -13,6 +13,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
 import com.google.android.gms.maps.model.LatLng;
 import com.zendesk.sdk.model.network.ErrorResponse;
 import com.zendesk.sdk.model.network.PushRegistrationResponse;
@@ -36,6 +37,7 @@ public class GcmRegistration {
     private static final String PREF_APP_VERSION = "app_version";
     private static final String PREF_REGISTRATION_ID_UPLOADED = "registration_id_uploaded";
     private static final String PREF_ZENDESK_UPDATED = "zendesk_updated2";
+    private static final String PREF_IID_UPLOADED = "iid_updated";
 
     private static final String PREF_LAST_CITY = "last_city";
     private static final String PREF_LAST_CITY_UPLOADED = "last_city_uploaded";
@@ -162,6 +164,7 @@ public class GcmRegistration {
                 } catch (IOException e) {
                     // Ignore. try it next time.
                     Crashlytics.logException(e);
+                    registrationId = null;
                     Editor editor = gcmRegistrationInfo.edit();
                     editor.remove(PREF_REGISTRATION_ID);
                     editor.remove(PREF_APP_VERSION);
@@ -193,6 +196,17 @@ public class GcmRegistration {
                 } catch (Exception e) {
                     // Wait for initialization to finish and retry later.
                 }
+            }
+
+            // Upload IID.
+            if (!gcmRegistrationInfo.getBoolean(PREF_IID_UPLOADED, false)) {
+                String iid = InstanceID.getInstance(context).getId();
+                AccountStateReporter.reportInstanceId(context, iid, new Runnable() {
+                    @Override
+                    public void run() {
+                        gcmRegistrationInfo.edit().putBoolean(PREF_IID_UPLOADED, true).apply();
+                    }
+                });
             }
 
             return null;
