@@ -10,6 +10,8 @@ import com.google.android.gms.analytics.CampaignTrackingReceiver;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Received the Broadcast intent after app is installed. The intent contains the
@@ -27,7 +29,7 @@ public class InstallReferrer extends BroadcastReceiver {
                     return;
                 }
 
-                referrer = URLDecoder.decode(referrer, "UTF-8");
+                referrer = URLDecoder.decode(simplifyUtmTerm(referrer), "UTF-8");
                 new Account(context).recordReferrer(referrer);
             } catch (UnsupportedEncodingException e) {
                 // Ignore.
@@ -37,5 +39,15 @@ public class InstallReferrer extends BroadcastReceiver {
 
         // Report the install referrer intent to Google Analytics.
         new CampaignTrackingReceiver().onReceive(context, intent);
+    }
+
+    private static Pattern pattern = Pattern.compile("utm_term=[^&]*");
+    private static String simplifyUtmTerm(String referrer) {
+        Matcher matcher = pattern.matcher(referrer);
+        if (matcher.find()) {
+            return referrer.substring(matcher.start(), matcher.end());
+        }
+
+        return referrer;
     }
 }
