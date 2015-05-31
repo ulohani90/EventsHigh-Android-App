@@ -3,8 +3,6 @@ package com.eventshigh.nearme.app.user;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,6 +11,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
 import com.google.android.gms.maps.model.LatLng;
 import com.zendesk.sdk.model.network.ErrorResponse;
 import com.zendesk.sdk.model.network.PushRegistrationResponse;
@@ -33,9 +32,9 @@ public class GcmRegistration {
     private static final String PREFS_FILE_NAME = "eh_gcm_credentials";
 
     private static final String PREF_REGISTRATION_ID = "registration_id";
-    private static final String PREF_APP_VERSION = "app_version";
     private static final String PREF_REGISTRATION_ID_UPLOADED = "registration_id_uploaded";
     private static final String PREF_ZENDESK_UPDATED = "zendesk_updated2";
+    private static final String PREF_IID_UPLOADED = "iid_updated";
 
     private static final String PREF_LAST_CITY = "last_city";
     private static final String PREF_LAST_CITY_UPLOADED = "last_city_uploaded";
@@ -64,6 +63,15 @@ public class GcmRegistration {
 
     public void updateGcmRegistrationIdIfNeeded() {
         new GcmRegistar().execute();
+    }
+
+    public void resetGcmRegistrationId() {
+        Editor editor = gcmRegistrationInfo.edit();
+        editor.remove(PREF_REGISTRATION_ID);
+        editor.remove(PREF_REGISTRATION_ID_UPLOADED);
+        editor.apply();
+
+        updateGcmRegistrationIdIfNeeded();
     }
 
     public void setLastCity(@Nullable City city, @Nullable LatLng location) {
@@ -137,42 +145,31 @@ public class GcmRegistration {
     private class GcmRegistar extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            String registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
-            if (registrationId != null) {
-                // Check if app was updated; if so, it must clear the registration ID
-                // since the existing regID is not guaranteed to work with the new
-                // app version.
-                int registeredVersion = gcmRegistrationInfo.getInt(PREF_APP_VERSION, Integer.MIN_VALUE);
-                int currentVersion = getAppVersion(context);
-                if (registeredVersion != currentVersion) {
-                    registrationId = null;
-                }
-            }
 
+            String registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
             if (registrationId == null) {
                 try {
-                    GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
-                    registrationId = gcm.register(SENDER_ID);
+                    InstanceID instanceID = InstanceID.getInstance(context);
+                    registrationId = instanceID.getToken(SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
 
                     Editor editor = gcmRegistrationInfo.edit();
                     editor.putString(PREF_REGISTRATION_ID, registrationId);
-                    editor.putInt(PREF_APP_VERSION, getAppVersion(context));
                     editor.remove(PREF_REGISTRATION_ID_UPLOADED);
                     editor.apply();
                 } catch (IOException e) {
                     // Ignore. try it next time.
                     Crashlytics.logException(e);
+                    registrationId = null;
+
                     Editor editor = gcmRegistrationInfo.edit();
                     editor.remove(PREF_REGISTRATION_ID);
-                    editor.remove(PREF_APP_VERSION);
                     editor.remove(PREF_ZENDESK_UPDATED);
                     editor.remove(PREF_REGISTRATION_ID_UPLOADED);
                     editor.apply();
                 }
             }
 
-            if (registrationId != null &&
-                    !gcmRegistrationInfo.getBoolean(PREF_REGISTRATION_ID_UPLOADED, false)) {
+            if (!gcmRegistrationInfo.getBoolean(PREF_REGISTRATION_ID_UPLOADED, false)) {
                 AccountStateReporter.reportGcmRegistrationId(context, registrationId, new Runnable() {
                     @Override
                     public void run() {
@@ -193,6 +190,17 @@ public class GcmRegistration {
                 } catch (Exception e) {
                     // Wait for initialization to finish and retry later.
                 }
+            }
+
+            // Upload IID.
+            if (!gcmRegistrationInfo.getBoolean(PREF_IID_UPLOADED, false)) {
+                String iid = InstanceID.getInstance(context).getId();
+                AccountStateReporter.reportInstanceId(context, iid, new Runnable() {
+                    @Override
+                    public void run() {
+                        gcmRegistrationInfo.edit().putBoolean(PREF_IID_UPLOADED, true).apply();
+                    }
+                });
             }
 
             return null;
@@ -222,18 +230,6 @@ public class GcmRegistration {
                     gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();
                 }
             });
-        }
-    }
-
-    public static int getAppVersion(Context context) {
-        try {
-            PackageInfo packageInfo = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-            return packageInfo.versionCode;
-        } catch (NameNotFoundException e) {
-            // should never happen
-            Crashlytics.logException(e);
-            throw new RuntimeException("Could not get package name: " + e);
         }
     }
 }

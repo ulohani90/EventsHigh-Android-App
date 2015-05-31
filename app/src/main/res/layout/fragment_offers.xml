@@ -34,4 +34,11 @@
             android:clipToPadding="false"
         />
     </android.support.v4.widget.SwipeRefreshLayout>
+    <include
+        android:id="@+id/view_retry"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        layout="@layout/view_retry"
+        android:visibility="gone"
+    />
 </FrameLayout>

@@ -36,11 +36,15 @@ import com.eventshigh.nearme.app.utils.Utils;
  */
 public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
     private final BaseContextActivity activity;
-    private final OffersResponse offersResponse;
+    private OffersResponse offersResponse;
 
-    public OffersAdapter(BaseContextActivity activity, OffersResponse offersResponse) {
+    public OffersAdapter(BaseContextActivity activity) {
         this.activity = activity;
+    }
+
+    public void setOffersResponse(OffersResponse offersResponse) {
         this.offersResponse = offersResponse;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -71,9 +75,8 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return offersResponse.offers.size() + 1;
+        return offersResponse == null ? 0 : offersResponse.offers.size() + 1;
     }
-
 
     private class OffersHeaderCard extends ViewHolder {
         private final TextView forClaimView;

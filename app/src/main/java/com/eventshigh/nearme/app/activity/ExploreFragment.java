@@ -77,7 +77,10 @@ public class ExploreFragment extends BaseEventsFragment {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
             topProgressBar.setVisibility(View.GONE);
-            eventsAdapter.setExploreCategories(null, EXPLORE_TAGS);
+
+            if (eventsAdapter.getItemCount() == 0) {
+                eventsAdapter.setExploreCategories(null, EXPLORE_TAGS);
+            }
         }
     };
 }

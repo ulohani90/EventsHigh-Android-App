@@ -39,6 +39,12 @@ public class AccountStateReporter {
                 .build(), onSuccess);
     }
 
+    public static void reportInstanceId(Context context, String iid, Runnable onSuccess) {
+        sendSignedRequest(context, getBaseUri(context, "reportInstanceId")
+                .appendQueryParameter("instance_id", iid)
+                .build(), onSuccess);
+    }
+
     public static void reportLastCity(Context context, City city, @Nullable LatLng location, Runnable onSuccess) {
         if (location == null) {
             location = new LatLng(0, 0);

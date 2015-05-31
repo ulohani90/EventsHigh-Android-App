@@ -126,7 +126,7 @@ public class EventsFragment extends BaseEventsFragment {
         noMyEventsView.setVisibility(View.GONE);
         retryView.setVisibility(View.GONE);
 
-        // Stop all requests associated with this activity and then submit new request.
+        // Stop all requests associated with this fragment and then submit new request.
         VolleyHelper.getRequestQueue(activity).cancelAll(this);
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
             new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
