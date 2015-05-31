@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import com.android.volley.Request.Priority;
@@ -27,8 +28,9 @@ import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 public class OffersFragment extends Fragment {
     private BaseContextActivity activity;
 
-    private AutofitRecyclerView offersGridView;
+    private OffersAdapter offersAdapter;
     private View topProgressBar;
+    private View retryView;
 
     @Override
     public void onAttach(Activity activity) {
@@ -50,9 +52,14 @@ public class OffersFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        offersGridView = (AutofitRecyclerView) view.findViewById(R.id.offers);
+        AutofitRecyclerView offersGridView = (AutofitRecyclerView) view.findViewById(R.id.offers);
         offersGridView.setOnScrollListener(new HideActionBarOnScroll(activity));
+        offersAdapter = new OffersAdapter(activity);
+        offersGridView.setAdapter(offersAdapter);
+        offersGridView.setOnScrollListener(new HideActionBarOnScroll(activity));
+
         topProgressBar = view.findViewById(R.id.top_progress_bar);
+        retryView = view.findViewById(R.id.view_retry);
 
         // Setup the refresh on swipe down.
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
@@ -65,16 +72,26 @@ public class OffersFragment extends Fragment {
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
+
+        // Setup the retry button.
+        view.findViewById(R.id.retry).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refresh(false);
+            }
+        });
     }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        refresh(true);
+        refresh(false);
     }
 
     private void refresh(boolean shouldBypassCache) {
         topProgressBar.setVisibility(View.VISIBLE);
+        retryView.setVisibility(View.INVISIBLE);
+
         OffersRequest.submit(activity, Priority.IMMEDIATE, this, shouldBypassCache, mOffersCallback,
                 mErrorListener);
     }
@@ -82,17 +99,20 @@ public class OffersFragment extends Fragment {
     private Listener<OffersResponse> mOffersCallback = new Listener<OffersResponse>() {
         @Override
         public void onResponse(OffersResponse offers, boolean isIntermediate) {
-            topProgressBar.setVisibility(isIntermediate ? View.VISIBLE: View.GONE);
-            offersGridView.setAdapter(new OffersAdapter(activity, offers));
+            topProgressBar.setVisibility(isIntermediate ? View.VISIBLE : View.GONE);
+            offersAdapter.setOffersResponse(offers);
         }
     };
 
     private ErrorListener mErrorListener = new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
-            // do nothing.
             topProgressBar.setVisibility(View.GONE);
             VolleyHelper.log(activity, volleyError);
+
+            if (offersAdapter.getItemCount() == 0) {
+                retryView.setVisibility(View.VISIBLE);
+            }
         }
     };
 }
