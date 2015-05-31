@@ -286,15 +286,21 @@
         <receiver android:name=".broadcast.DownloadEventsBroadcastReceiver" />
         <service android:name=".broadcast.DownloadEventsIntentService" />
 
-        <!-- Network change receiver -->
+        <!-- Network change receiver, used for uploading user actions. -->
         <receiver android:name=".broadcast.NetworkChangeBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-
-        <!-- The service that will upload user action data -->
         <service android:name=".broadcast.UploadUserActionsService" />
+
+        <!-- Instance ID service is used to update the tokens -->
+        <service android:name=".broadcast.EHInstanceIdService" android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID"/>
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
