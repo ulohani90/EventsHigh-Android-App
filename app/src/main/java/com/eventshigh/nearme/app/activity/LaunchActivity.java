@@ -355,6 +355,7 @@ public class LaunchActivity extends BaseContextActivity {
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
             implements TabViewAdapter, OnPageChangeListener, TabColorizer {
         private final TextView[] tabViews = new TextView[TABS.length];
+        private EventsFragment myEventsFragment;
 
         public ExploreScreenPagerAdapter() {
             super(getSupportFragmentManager());
@@ -369,7 +370,8 @@ public class LaunchActivity extends BaseContextActivity {
             if (TABS[position].equals(MY_EVENTS_TAB)) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                     EventsHighEndpoints.QUERY_MY_EVENT);
-                return EventsFragment.getInstance(myEventsContext, false, true);
+                myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true);
+                return myEventsFragment;
             }
 
             if (TABS[position].equals(EXPLORE_TAB)) {
@@ -391,6 +393,10 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public void onPageSelected(int position) {
             showActionBar();
+
+            if (TABS[position].equals(MY_EVENTS_TAB)) {
+                myEventsFragment.onResume();
+            }
 
             for (int i = 0; i < tabViews.length; i++) {
                 tabViews[i].setTypeface(null, i == position ? Typeface.BOLD : Typeface.NORMAL);

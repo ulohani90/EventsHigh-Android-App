@@ -11,6 +11,7 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -119,6 +120,7 @@ public class EventsMarkerManager {
 
     private final Context context;
     private final Map<String, EventMark> eventMarkMap = new ConcurrentHashMap<>();
+    private boolean loaded = false;
 
     private EventsMarkerManager(Context context) {
         this.context = context.getApplicationContext();
@@ -129,10 +131,22 @@ public class EventsMarkerManager {
             public void run() {
                 synchronized (this) {
                     refreshListingFromDb();
+                    loaded = true;
                     this.notifyAll();
                 }
             }
         }).start();
+    }
+
+    // Waits for data to be loaded from DB.
+    public synchronized void waitForLoading() {
+        while (!loaded) {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                // ignore.
+            }
+        }
     }
 
     public @Nullable EventMark getEventMark(String eventId) {
@@ -145,6 +159,17 @@ public class EventsMarkerManager {
 
     public boolean isFavourite(String eventId) {
         return EventMark.isFavourite(getEventMark(eventId));
+    }
+
+    public List<String> getFavouritedEvents() {
+        List<String> favouritedEvents = new ArrayList<>();
+        for (Entry<String, EventMark> entry : eventMarkMap.entrySet()) {
+            if (EventMark.isFavourite(entry.getValue())) {
+                favouritedEvents.add(entry.getKey());
+            }
+        }
+
+        return favouritedEvents;
     }
 
     private void refreshListingFromDb() {

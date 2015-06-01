@@ -11,7 +11,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
-import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -25,7 +24,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +43,6 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             this.numFollowers = numFollowers;
         }
     }
-    public static final EventsCollection EMPTY = new EventsCollection(new ArrayList<Event>(), 0);
 
     /**
      * Helper method to submit a volley request to fetch Events information.
@@ -60,12 +57,6 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
                               Listener<EventsCollection> listener, ErrorListener errorListener) {
         if (eventsContext.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
-            return;
-        }
-
-        if (EventsHighEndpoints.isMyEventQuery(eventsContext.query) &&
-            !(context instanceof BaseContextActivity)) {
-            listener.onResponse(EMPTY, false);
             return;
         }
 
@@ -114,21 +105,6 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             EventsCollection eventsCollection = parseEventsFromNetworkResponse(response, context,
                     eventsContext, includeWithoutLocation);
 
-            // In case of MyEvents request, filter out the events which user has favourited.
-            if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-                if (context instanceof BaseContextActivity) {
-                    BaseContextActivity activity = (BaseContextActivity) context;
-                    for (Iterator<Event> it = eventsCollection.events.iterator(); it.hasNext(); ) {
-                        Event event = it.next();
-                        if (!activity.isFavourite(event)) {
-                            it.remove();
-                        }
-                    }
-                } else {
-                    eventsCollection = EMPTY;
-                }
-            }
-
             return Response.success(eventsCollection, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
             Crashlytics.logException(e);
@@ -145,7 +121,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         JSONObject eventsJson = new JSONObject(jsonString);
         List<Event> events = Event.parseUpcomingEvents(eventsContext.city, eventsJson,
                 includeWithoutLocation);
-        filterOldEvents(events, !eventsContext.dateFilter.isEmpty());
+        filterOldEvents(events);
 
         // Sort the event list to user.
         Collections.sort(events, new EventComparator(eventsContext.location));
@@ -154,15 +130,19 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     }
 
     // Filter out the events which has started more than three hours back.
-    public static void filterOldEvents(List<Event> events, boolean isDateQuery) {
+    public static void filterOldEvents(List<Event> events) {
         long threeHoursBack = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(3);
+        long aDayBack = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1);
+
         for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
             Event event = it.next();
-            EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
-            if (eventTime != null && eventTime.time != null && event.eventTimings[0] < threeHoursBack) {
-                // The event has started more than two hours back. We filter it out either if
-                // it has not future occurrences or if its a date query.
-                if (event.eventTimings.length == 1 || isDateQuery) {
+
+            if (event.eventTimings.length == 0 || event.eventTimings[0] < aDayBack) {
+                it.remove();
+            } else {
+                EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
+                if (eventTime != null && eventTime.time != null &&
+                        event.eventTimings[0] < threeHoursBack) {
                     it.remove();
                 }
             }

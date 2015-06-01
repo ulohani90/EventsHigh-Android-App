@@ -6,8 +6,8 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -269,6 +269,11 @@ public class Event implements Parcelable {
      Helper static methods, used for JSON parsing
      *********************************/
     public static Event fromJSON(City city, JSONObject eventJson) throws JSONException, ParseException {
+        if (eventJson.optBoolean("junk")) {
+            // Junk event.
+            throw new ParseException("junk event", 0);
+        }
+
         String id = eventJson.getString("id");
         String title = eventJson.getString("title");
         String description = eventJson.optString("description")
@@ -474,7 +479,7 @@ public class Event implements Parcelable {
                     events.add(event);
                 }
             } catch (JSONException | ParseException e) {
-                Log.w(Event.class.getSimpleName(), "malformed JSON", e);
+                Crashlytics.logException(e);
             }
         }
         return events;

@@ -10,6 +10,7 @@ import android.util.Pair;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Helper class to manage the SQLite db storing the
@@ -75,10 +76,12 @@ public class EventMarkDbHelper extends SQLiteOpenHelper {
     }
 
     static Iterable<Pair<String, EventMark>> fetchAllEntries(final SQLiteDatabase database) {
+        final long aMonthAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30);
         return new Iterable<Pair<String, EventMark>>() {
             @Override
             public Iterator<Pair<String, EventMark>> iterator() {
-                final Cursor cursor = database.query(EVENT_PREFS_TABLE_NAME, null, null, null, null, null, null);
+                final Cursor cursor = database.query(EVENT_PREFS_TABLE_NAME, null,
+                        EVENT_PREFS_COLUMN_UPDATED_AT + " > " + (aMonthAgo / 1000), null, null, null, null);
                 cursor.moveToFirst();
                 return new Iterator<Pair<String, EventMark>>() {
                     @Override

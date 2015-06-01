@@ -62,13 +62,19 @@ public class EventsFragment extends BaseEventsFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        fetchNewListing(false);
+    }
+
+    @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
         eventGridView.post(new Runnable() {
             @Override
             public void run() {
-                fetchNewListing(false);
+                // fetchNewListing(false);
             }
         });
     }
@@ -121,7 +127,14 @@ public class EventsFragment extends BaseEventsFragment {
         this.onScrollListener = onScrollListener;
     }
 
+    private long lastFetchTimestamp = 0;
     private void fetchNewListing(boolean shouldBypassCache) {
+        if (lastFetchTimestamp > System.currentTimeMillis() - 2000) {
+            // recently fetched ... do nothing.
+            return;
+        }
+        lastFetchTimestamp = System.currentTimeMillis();
+
         topProgressBar.setVisibility(View.VISIBLE);
         noMyEventsView.setVisibility(View.GONE);
         retryView.setVisibility(View.GONE);
@@ -147,7 +160,11 @@ public class EventsFragment extends BaseEventsFragment {
                 topProgressBar.setVisibility(View.GONE);
 
                 if (myEvents.isEmpty()) {
-                    noMyEventsView.setVisibility(View.VISIBLE);
+                    if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
+                        noMyEventsView.setVisibility(View.VISIBLE);
+                    } else {
+                        retryView.setVisibility(View.VISIBLE);
+                    }
                 }
             }
 

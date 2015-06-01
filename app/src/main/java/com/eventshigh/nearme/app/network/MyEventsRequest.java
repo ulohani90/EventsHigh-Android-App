@@ -8,9 +8,9 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,11 +74,11 @@ public class MyEventsRequest {
         InternalErrorListener errorListener = new InternalErrorListener();
 
         // Favourites event requests.
-        EventCollectionRequest.submit(context,
-                new EventsContext(eventsContext.location, EventsHighEndpoints.QUERY_MY_EVENT),
+        EventsMarkerManager markerManager = EventsMarkerManager.getInstance(context);
+        markerManager.waitForLoading();
+        MultiEventsRequest.submit(context, eventsContext, markerManager.getFavouritedEvents(),
                 priority, tag, shouldBypassCache, includeWithoutLocation,
                 new FavouritedEventsListener(), errorListener);
-
 
         // Interest based requests.
         for (String interest : interests) {
@@ -96,38 +96,54 @@ public class MyEventsRequest {
         }
     }
 
-    private class FavouritedEventsListener extends EventsListener {
+    private class FavouritedEventsListener extends BaseEventsListener implements Listener<List<Event>> {
         public FavouritedEventsListener() {
             super(FAVOURITES_NAME);
         }
 
-        public void addToResult(List<Event> events) {
-            result.add(0, new TopicEvents(FAVOURITES_NAME, events));
+        @Override
+        public void onResponse(List<Event> events, boolean intermediate) {
+            addToResult(events, 0, intermediate);
         }
     }
 
-    private class EventsListener implements Listener<EventsCollection> {
-        private final String title;
+    private class EventsListener extends BaseEventsListener implements Listener<EventsCollection> {
 
         public EventsListener(String title) {
-            this.title = title;
-        }
-
-        public void addToResult(List<Event> events) {
-            synchronized (result) {
-                result.add(new TopicEvents(title, events));
-            }
+            super(title);
         }
 
         @Override
         public void onResponse(EventsCollection eventsCollection, boolean intermediate) {
+            appendToResult(eventsCollection.events, intermediate);
+        }
+    }
+
+    private class BaseEventsListener {
+        private final String title;
+
+        public BaseEventsListener(String title) {
+            this.title = title;
+        }
+
+        public void appendToResult(List<Event> events, boolean intermediate) {
+            addToResult(events, -1, intermediate);
+        }
+
+        public void addToResult(List<Event> events, int index, boolean intermediate) {
             if (intermediate) {
                 return;
             }
-
-            if (!eventsCollection.events.isEmpty()) {
-                addToResult(eventsCollection.events);
+            if (!events.isEmpty()) {
+                synchronized (result) {
+                    if (index >= 0) {
+                        result.add(index, new TopicEvents(title, events));
+                    } else {
+                        result.add(new TopicEvents(title, events));
+                    }
+                }
             }
+
             reportResult();
         }
     }

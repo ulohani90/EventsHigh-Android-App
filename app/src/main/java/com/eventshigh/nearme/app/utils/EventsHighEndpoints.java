@@ -9,9 +9,12 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.user.Account;
+import com.zendesk.sdk.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -33,6 +36,8 @@ public class EventsHighEndpoints {
             API_URI_BASE + "api/get_featured_events/%s?mobile=1";
     private static final String API_ENDPOINT_EVENT_UBER_FORMAT =
             API_URI_BASE + "api/get_event_uber_info/%s?mobile=1";
+    private static final String API_ENDPOINT_MULTI_EVENT_UBER_FORMAT =
+            API_URI_BASE + "api/get_event_uber_infos/%s?mobile=1";
     private static final String API_EVENTS_SUGGEST_FORMAT =
             "http://assets.eventshigh.com/autocomplete/autocomplete_events_%s.json";
     private static final String API_TAGS_SUGGEST_URL =
@@ -150,6 +155,11 @@ public class EventsHighEndpoints {
 
     public static String getApiEndpointEventUber(String eventId) {
         return String.format(API_ENDPOINT_EVENT_UBER_FORMAT, eventId);
+    }
+
+    public static String getApiEndpointEventsUber(List<String> eventIds) {
+        Collections.sort(eventIds);
+        return String.format(API_ENDPOINT_MULTI_EVENT_UBER_FORMAT, StringUtils.toCsvString(eventIds));
     }
 
     private static final Pattern DATE_PATTERN = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
