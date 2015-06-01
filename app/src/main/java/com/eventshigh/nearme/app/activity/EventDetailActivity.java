@@ -12,9 +12,6 @@ import android.content.pm.PackageInfo;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.view.NestedScrollingChild;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -704,8 +701,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     private class EventCard {
-        private final NestedScrollingChild eventScrollView;
-        private final CollapsingToolbarLayout collapsingToolbarLayout;
+        private final ScrollView eventScrollView;
 
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
@@ -756,8 +752,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
 
         private EventCard() {
-            eventScrollView = (NestedScrollView) findViewById(R.id.event_scroll_view);
-            collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_parent);
+            eventScrollView = (ScrollView) findViewById(R.id.event_scroll_view);
 
             recommendedImageView = (ImageView) findViewById(R.id.eh_recommends);
             bgView = (NetworkImageView) findViewById(R.id.event_bg);
@@ -815,15 +810,14 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         }
 
         private void populateView(final Event event) {
-            collapsingToolbarLayout.setTitle(event.title);
-//            eventScrollView.getViewTreeObserver().addOnScrollChangedListener(
-//                new OnScrollChangedListener() {
-//                    @Override
-//                        public void onScrollChanged() {
-//                            setScroll(eventScrollView.getScrollY());
-//                        }
-//                    });
-//            eventScrollView.setVisibility(View.VISIBLE);
+            eventScrollView.getViewTreeObserver().addOnScrollChangedListener(
+                new OnScrollChangedListener() {
+                    @Override
+                        public void onScrollChanged() {
+                            setScroll(eventScrollView.getScrollY());
+                        }
+                    });
+            eventScrollView.setVisibility(View.VISIBLE);
             topProgressBar.setVisibility(View.GONE);
 
             bgView.setDefaultImageResId(R.drawable.eh_default_event);
