@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.DrawerLayout;
@@ -18,6 +17,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -204,15 +204,15 @@ public class LaunchActivity extends BaseContextActivity {
 
     @Override
     public void onBackPressed() {
-        if(drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        if(drawer.isDrawerOpen(Gravity.START)) {
+            drawer.closeDrawer(Gravity.START);
         } else {
             super.onBackPressed();
         }
     }
 
     public void cityChanged(City city) {
-        drawer.closeDrawer(GravityCompat.START);
+        drawer.closeDrawer(Gravity.START);
         eventsContext.changeLocation(city.cityBounds.getCenter());
         showExploreScreen();
     }
