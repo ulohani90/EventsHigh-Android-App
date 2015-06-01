@@ -217,6 +217,7 @@ public class LaunchActivity extends BaseContextActivity {
         showExploreScreen();
     }
 
+
     // ***********************
     // Callbacks
     // ***********************

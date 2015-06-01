@@ -12,6 +12,9 @@ import android.content.pm.PackageInfo;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.view.NestedScrollingChild;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -149,6 +152,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         topProgressBar = findViewById(R.id.top_progress_bar);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         // Initialize location request used for check in.
         checkInLocationRequest = new LocationRequest();
@@ -577,11 +581,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         getGoogleApiClient();
     }
 
-    private void setScroll(int scrollValue) {
-        float opacity = Math.min(1.0f, scrollValue * 3f / getResources().getDisplayMetrics().heightPixels);
-        toolbar.setAlpha(opacity);
-    }
-
     private Listener<Event> mEventListener = new Listener<Event>() {
         @Override
         public void onResponse(final Event event, boolean isIntermediate) {
@@ -717,12 +716,12 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     }
 
     private class EventCard {
-        private final ScrollView eventScrollView;
+        private final NestedScrollingChild eventScrollView;
+        private final CollapsingToolbarLayout collapsingToolbarLayout;
 
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
 
-        private final TextView titleView;
         private final TextView fromView;
 
         private final View favouriteView;
@@ -768,7 +767,8 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
 
         private EventCard() {
-            eventScrollView = (ScrollView) findViewById(R.id.event_scroll_view);
+            eventScrollView = (NestedScrollView) findViewById(R.id.event_scroll_view);
+            collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_parent);
 
             recommendedImageView = (ImageView) findViewById(R.id.eh_recommends);
             bgView = (NetworkImageView) findViewById(R.id.event_bg);
@@ -776,7 +776,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             favouriteView = findViewById(R.id.action_favourite);
             favouritedView = findViewById(R.id.action_favourited);
 
-            titleView = (TextView) findViewById(R.id.event_title);
             fromView = (TextView) findViewById(R.id.event_from);
 
             venueView = (TextView) findViewById(R.id.event_venue);
@@ -826,22 +825,12 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         }
 
         private void populateView(final Event event) {
-            eventScrollView.getViewTreeObserver().addOnScrollChangedListener(
-                new OnScrollChangedListener() {
-                    @Override
-                        public void onScrollChanged() {
-                            setScroll(eventScrollView.getScrollY());
-                        }
-                    });
-            eventScrollView.setVisibility(View.VISIBLE);
+            collapsingToolbarLayout.setTitle(event.title);
             topProgressBar.setVisibility(View.GONE);
 
             bgView.setDefaultImageResId(R.drawable.eh_default_event);
             bgView.setErrorImageResId(R.drawable.eh_default_event);
             bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(EventDetailActivity.this));
-
-            // Set title
-            titleView.setText(event.title);
 
             // Add attribution.
             if (event.sourceUrl == null) {
