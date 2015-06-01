@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
@@ -59,13 +58,8 @@ public class GcmIntentService extends IntentService {
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
         String messageType = gcm.getMessageType(intent);
         if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-            try {
-                ParsedBundle parsedBundle = parsedBundle(intent.getExtras(), intent);
-                sendNotification(parsedBundle, intent);
-            } catch (ClassNotFoundException e) {
-                // Ignore.
-                Crashlytics.logException(e);
-            }
+            ParsedBundle parsedBundle = parsedBundle(intent.getExtras(), intent);
+            sendNotification(parsedBundle, intent);
         }
     }
 
@@ -92,7 +86,7 @@ public class GcmIntentService extends IntentService {
         }
     }
 
-    private @Nullable ParsedBundle parsedBundle(Bundle msg, Intent alarmIntent) throws ClassNotFoundException {
+    private @Nullable ParsedBundle parsedBundle(Bundle msg, Intent alarmIntent) {
         String title = Utils.checkIfUnknown(msg.getString("t"));
         String message = Utils.checkIfUnknown(msg.getString("m"));
         if (message == null || title == null) {
@@ -144,8 +138,23 @@ public class GcmIntentService extends IntentService {
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else if (target != null) {
-            Intent intent = new Intent(this, getClassLoader().loadClass(target));
-            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+            Intent intent = null;
+            if (target.startsWith("tab:")) {
+                intent = new Intent(this, LaunchActivity.class);
+                intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, target.split(":", 2)[1]);
+            } else {
+                try {
+                    intent = new Intent(this, getClassLoader().loadClass(target));
+                } catch (ClassNotFoundException e) {
+                    if (target.contains("Offers")) {
+                        intent = new Intent(this, LaunchActivity.class);
+                        intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, LaunchActivity.OFFERS_TAB);
+                    }
+                }
+            }
+
+            if (intent == null) { return null; }
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION + target);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else {
             Intent intent = new Intent(this, CustomUrlActivity.class);

@@ -54,6 +54,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class LaunchActivity extends BaseContextActivity {
     // Constants
     private static final long REFRESH_EVENTS_INTERVAL = 3600 * 1000L;
+    public static final String DEFAULT_TAB_PARAM = LaunchActivity.class.getName() + "_default_tab";
 
     // UI Elements for this activity.
     private DrawerLayout drawer;
@@ -68,6 +69,21 @@ public class LaunchActivity extends BaseContextActivity {
 
     // GCM registration helper.
     private GcmRegistration gcmRegistration;
+
+    // Tabs.
+    private int defaultTab = 1;
+    public static final String OFFERS_TAB = "offers";
+    public static final String MY_EVENTS_TAB = EventsHighEndpoints.QUERY_MY_EVENT;
+    public static final String EXPLORE_TAB = "explore";
+    public static final String NOTIFICATIONS_TAB = "notifications";
+    public static final String THIS_WEEK_TAB = "this week";
+    public final String[] TABS = {
+            MY_EVENTS_TAB,
+            EXPLORE_TAB,
+            OFFERS_TAB,
+            NOTIFICATIONS_TAB,
+            THIS_WEEK_TAB
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +118,15 @@ public class LaunchActivity extends BaseContextActivity {
 
         // Process the incoming intent.
         eventsContext = IntentUtils.processIntent(this, getIntent());
+        String tabName= getIntent().getStringExtra(DEFAULT_TAB_PARAM);
+        if (tabName != null) {
+            for (int i = 0 ; i < TABS.length; i++) {
+                if (TABS[i].equalsIgnoreCase(tabName)) {
+                    defaultTab = i;
+                    break;
+                }
+            }
+        }
         if (isFinishing()) {
             return;
         }
@@ -135,7 +160,7 @@ public class LaunchActivity extends BaseContextActivity {
                 return;
             }
 
-            if (!isTaskRoot()) {
+            if (!isTaskRoot() && !getIntent().getAction().startsWith(NOTIFICATION_ACTION)) {
                 finish();
                 return;
             }
@@ -273,7 +298,8 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.setViewPager(viewPager);
         tabsView.setOnPageChangeListener(adapter);
         tabsView.setCustomTabColorizer(adapter);
-        viewPager.setCurrentItem(1, false);
+        tabsView.scrollTo(defaultTab);
+        viewPager.setCurrentItem(defaultTab, false);
         lastFetchTimestamp = System.currentTimeMillis();
     }
 
@@ -328,19 +354,7 @@ public class LaunchActivity extends BaseContextActivity {
      */
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
             implements TabViewAdapter, OnPageChangeListener, TabColorizer {
-        private static final String OFFERS_TAB = "offers";
-        private static final String MY_EVENTS_TAB = EventsHighEndpoints.QUERY_MY_EVENT;
-        private static final String EXPLORE_TAB = "explore";
-        private static final String NOTIFICATIONS_TAB = "notifications";
-        private static final String THIS_WEEK_TAB = "this week";
-        private final String[] tabs = {
-            MY_EVENTS_TAB,
-            EXPLORE_TAB,
-            OFFERS_TAB,
-            NOTIFICATIONS_TAB,
-            THIS_WEEK_TAB
-        };
-        private final TextView[] tabViews = new TextView[tabs.length];
+        private final TextView[] tabViews = new TextView[TABS.length];
 
         public ExploreScreenPagerAdapter() {
             super(getSupportFragmentManager());
@@ -348,21 +362,21 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public Fragment getItem(int position) {
-            if (tabs[position].equals(OFFERS_TAB)) {
+            if (TABS[position].equals(OFFERS_TAB)) {
                 return new OffersFragment();
             }
 
-            if (tabs[position].equals(MY_EVENTS_TAB)) {
+            if (TABS[position].equals(MY_EVENTS_TAB)) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                     EventsHighEndpoints.QUERY_MY_EVENT);
                 return EventsFragment.getInstance(myEventsContext, false, true);
             }
 
-            if (tabs[position].equals(EXPLORE_TAB)) {
+            if (TABS[position].equals(EXPLORE_TAB)) {
                 return ExploreFragment.getInstance(eventsContext);
             }
 
-            if (tabs[position].equals(NOTIFICATIONS_TAB)) {
+            if (TABS[position].equals(NOTIFICATIONS_TAB)) {
                 return new StreamFragment();
             }
 
@@ -393,13 +407,13 @@ public class LaunchActivity extends BaseContextActivity {
             TextView textView = (TextView) getLayoutInflater().inflate(
                     R.layout.view_explore_tab, parent, false);
             tabViews[position] = textView;
-            textView.setText(Utils.capitalize(tabs[position]));
+            textView.setText(Utils.capitalize(TABS[position]));
             return textView;
         }
 
         @Override
         public int getCount() {
-            return tabs.length;
+            return TABS.length;
         }
 
         @Override
