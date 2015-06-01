@@ -62,7 +62,7 @@ dependencies {
     compile 'org.apmem.tools:layouts:1.8@aar'
     compile 'com.zendesk:sdk:1.2.0.1'
 
-    compile('com.crashlytics.sdk.android:crashlytics:2.3.1@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.3.2@aar') {
         transitive = true;
     }
 }
