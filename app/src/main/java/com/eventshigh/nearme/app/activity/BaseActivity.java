@@ -22,7 +22,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.UserActionDbHelper;
-import com.eventshigh.nearme.app.data.UserActionDbHelper.EventAction;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -222,7 +221,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void shareEvent(Event event, String eventUri, @Nullable String packageName) {
         reportEventAction(event, "eventShareInitiated", packageName);
         shareEventInitiatedTimestamp = System.currentTimeMillis();
-        UserActionDbHelper.getInstance(this).recordAction(EventAction.SHARE, event.id);
+        UserActionDbHelper.getInstance(this).recordShareAction(event.id, packageName, null);
 
         try {
             Intent sendIntent = new Intent();
