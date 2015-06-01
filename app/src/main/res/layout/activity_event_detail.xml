@@ -29,24 +29,6 @@
                 android:orientation="vertical"
                 tools:ignore="WebViewLayout"
             >
-                <!-- Event Title -->
-                <TextView
-                    android:id="@+id/event_title"
-                    style="?android:attr/textAppearanceMedium"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:textIsSelectable="true"
-                    android:textColor="#CC000000"
-                    android:transitionName="event_title"
-                    tools:ignore="UnusedAttribute"
-                    tools:text="The Awesome Event"
-                />
                 <TextView
                     android:id="@+id/event_from"
                     style="@style/EHText"

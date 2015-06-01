@@ -47,6 +47,12 @@
 
 
         <android.support.v7.widget.Toolbar
+            app:theme="@style/EHActionBarDark"
+            app:subtitleTextAppearance="@style/EHActionBarSubtitle"
+            app:navigationContentDescription="@string/abc_action_bar_up_description"
+            app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
+            android:elevation="8dp"
+            tools:ignore="UnusedAttribute"
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
