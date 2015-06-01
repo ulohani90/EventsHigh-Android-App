@@ -31,6 +31,15 @@
         <item name="colorAccent">@color/accent</item>
     </style>
 
+    <style name="text_ToolbarCollapsedTitle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="text_ToolbarExpandedTitle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">26sp</item>
+    </style>
+
     <!-- Theme used for Events Details Pane -->
     <style name="EHText" parent="android:style/TextAppearance.Small">
         <item name="android:paddingLeft">8dp</item>

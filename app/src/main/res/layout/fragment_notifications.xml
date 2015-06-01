@@ -1,9 +1,10 @@
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/list"
-    android:divider="@android:color/transparent"
-    android:dividerHeight="8dp"
+<com.eventshigh.nearme.app.view.AutofitRecyclerView
+    android:id="@+id/grid"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:padding="16dp"
-    android:clipToPadding="false"
     android:layout_height="match_parent"
-/>
+    android:clipToPadding="false"
+    android:columnWidth="@dimen/event_card_width"
+    android:horizontalSpacing="10dp"
+    android:padding="16dp"
+    android:verticalSpacing="10dp" />
