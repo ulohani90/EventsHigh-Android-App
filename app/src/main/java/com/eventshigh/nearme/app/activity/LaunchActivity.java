@@ -81,7 +81,7 @@ public class LaunchActivity extends BaseContextActivity {
             MY_EVENTS_TAB,
             EXPLORE_TAB,
             OFFERS_TAB,
-            NOTIFICATIONS_TAB,
+//             NOTIFICATIONS_TAB,
             THIS_WEEK_TAB
     };
 
