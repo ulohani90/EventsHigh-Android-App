@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -80,6 +81,22 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
         // TODO: Implement proper upgrade. Currently this will delete all user data.
         db.execSQL("DROP TABLE IF EXISTS " + USER_ACTIONS_TABLE_NAME);
         onCreate(db);
+    }
+
+    public void recordShareAction(String eventId, @Nullable String appName, @Nullable String postId) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(JSON_KEY_EVENT_ID, eventId);
+            if (appName != null) {
+                jsonObject.put("app_name", appName);
+            }
+            if (postId != null) {
+                jsonObject.put("post_id", postId);
+            }
+            recordAction(EventAction.SHARE.name().toLowerCase(), jsonObject.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void recordAction(EventAction action, String eventId) {

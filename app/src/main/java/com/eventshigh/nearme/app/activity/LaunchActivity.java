@@ -394,7 +394,7 @@ public class LaunchActivity extends BaseContextActivity {
         public void onPageSelected(int position) {
             showActionBar();
 
-            if (TABS[position].equals(MY_EVENTS_TAB)) {
+            if (TABS[position].equals(MY_EVENTS_TAB) && myEventsFragment != null) {
                 myEventsFragment.onResume();
             }
 

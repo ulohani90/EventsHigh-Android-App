@@ -135,6 +135,9 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     private AlertDialog checkInAlertDialog;
     private long locationRequestStartTime;
 
+    // FB
+    private CallbackManager callbackManager;
+
 
     /*****************************************
      Activity lifecycle management utilities
@@ -173,6 +176,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         int id = item.getItemId();
         if (id == R.id.action_share) {
             if (event != null) {
+                showRateAppDialog = true;
                 shareEvent(event, null);
             }
             return true;
@@ -234,6 +238,8 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         switch (requestCode) {
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
@@ -249,6 +255,10 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                         break;
                 }
                 break;
+        }
+
+        if (callbackManager != null) {
+            callbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -483,10 +493,16 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             reportEventAction(event, "eventShareInitiated", "fb");
 
             ShareDialog shareDialog = new ShareDialog(this);
-            shareDialog.registerCallback(CallbackManager.Factory.create(), new FacebookCallback<Result>() {
+            if (callbackManager == null) {
+                callbackManager = CallbackManager.Factory.create();
+            }
+
+            shareDialog.registerCallback(callbackManager, new FacebookCallback<Result>() {
                 @Override
                 public void onSuccess(Result result) {
                     reportEventAction(event, "shareEvent", "fb");
+                    UserActionDbHelper.getInstance(EventDetailActivity.this).recordShareAction(
+                            event.id, "fb", result.getPostId());
                 }
 
                 @Override
