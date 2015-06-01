@@ -28,11 +28,15 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Fragment to show events.
  */
 public class EventsFragment extends BaseEventsFragment {
+    private static final long REFRESH_MY_EVENTS = TimeUnit.SECONDS.toMillis(2);
+    private static final long REFRESH_EVENTS = TimeUnit.HOURS.toMillis(1);
+
     private AutofitRecyclerView eventGridView;
     private View topProgressBar;
     private View noMyEventsView;
@@ -40,6 +44,9 @@ public class EventsFragment extends BaseEventsFragment {
 
     private EventsAdapter eventsAdapter;
     private OnScrollListener onScrollListener;
+
+    private long lastFetchTimestamp = 0;
+    private long refreshInterval = REFRESH_EVENTS;
 
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
                                              boolean showCategories) {
@@ -59,24 +66,6 @@ public class EventsFragment extends BaseEventsFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_events, container, false);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        fetchNewListing(false);
-    }
-
-    @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-
-        eventGridView.post(new Runnable() {
-            @Override
-            public void run() {
-                // fetchNewListing(false);
-            }
-        });
     }
 
     @Override
@@ -121,15 +110,26 @@ public class EventsFragment extends BaseEventsFragment {
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         noMyEventsView = view.findViewById(R.id.view_no_my_event);
         retryView = view.findViewById(R.id.view_retry);
+
+        // Refresh interval.
+        if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
+            refreshInterval = REFRESH_MY_EVENTS;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        fetchNewListing(false);
     }
 
     public void setOnScrollListener (OnScrollListener onScrollListener) {
         this.onScrollListener = onScrollListener;
     }
 
-    private long lastFetchTimestamp = 0;
     private void fetchNewListing(boolean shouldBypassCache) {
-        if (lastFetchTimestamp > System.currentTimeMillis() - 2000) {
+        if (lastFetchTimestamp > System.currentTimeMillis() - refreshInterval) {
             // recently fetched ... do nothing.
             return;
         }

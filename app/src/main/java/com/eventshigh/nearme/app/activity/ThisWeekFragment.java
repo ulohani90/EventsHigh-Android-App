@@ -60,12 +60,6 @@ public class ThisWeekFragment extends BaseEventsFragment {
     }
 
     @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        refresh();
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         adapter = new ThisWeekPagerAdapter();
 
@@ -78,6 +72,13 @@ public class ThisWeekFragment extends BaseEventsFragment {
         tabsView.setOnPageChangeListener(adapter);
         tabsView.setCustomTabColorizer(adapter);
         tabsView.scrollTo(eventsContext.dateFilter);
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        refresh();
     }
 
     private void refresh() {
