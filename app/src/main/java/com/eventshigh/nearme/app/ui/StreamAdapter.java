@@ -18,8 +18,10 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.StreamDbHelper;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
+import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.StreamItem;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
 
 import org.json.JSONException;
@@ -40,8 +42,15 @@ public class StreamAdapter extends RecyclerView.Adapter<StreamAdapter.ViewHolder
             if (streamItem instanceof EventNotificationStreamItem) {
                 EventNotificationStreamItem eventNotificationStreamItem =
                     (EventNotificationStreamItem) streamItem;
-                Intent intent = NotificationUtils.createIntent(activity,
+                Intent intent = IntentUtils.createIntent(activity,
                     eventNotificationStreamItem.eventId, eventNotificationStreamItem.city);
+                activity.startActivity(intent);
+            }
+            if (streamItem instanceof QueryNotificationStreamItem) {
+                QueryNotificationStreamItem queryNotificationStreamItem =
+                    (QueryNotificationStreamItem) streamItem;
+                Intent intent = IntentUtils.createIntent(activity,
+                    queryNotificationStreamItem.query);
                 activity.startActivity(intent);
             }
         }

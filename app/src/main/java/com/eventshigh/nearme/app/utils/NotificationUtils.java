@@ -40,20 +40,9 @@ public class NotificationUtils {
     private static final int NOTIFICATION_IMAGE_HEIGHT_DP = 225;
 
     public static PendingIntent createPendingIntent(Context context, String eventId, City city) {
-        return PendingIntent.getActivity(context, 0, createIntent(context, eventId, city), 0);
+        return PendingIntent.getActivity(context, 0,
+            IntentUtils.createIntent(context, eventId, city), 0);
     }
-
-  public static Intent createIntent(Context context, String eventId, City city) {
-    if (city == null) {
-      // placeholder for city.
-      city = City.BANGALORE;
-    }
-
-    Intent intent = new Intent(context, EventDetailActivity.class);
-    intent.setAction(BaseActivity.NOTIFICATION_ACTION);
-    intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
-    return intent;
-  }
 
     private static Notification createNotification(Context context, String title,
             CharSequence message, PendingIntent contentIntent, int priority) {

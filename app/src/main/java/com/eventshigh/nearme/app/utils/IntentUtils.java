@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.utils;
 
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,6 +10,8 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
+import com.eventshigh.nearme.app.activity.EventDetailActivity;
+import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
@@ -180,5 +183,24 @@ public class IntentUtils {
     private void processDetailViewIntent(Uri webUri) {
         activity.showEventDetails(webUri, "deeplink");
         activity.finish();
+    }
+
+    public static Intent createIntent(Context context, String eventId, City city) {
+        if (city == null) {
+            // placeholder for city.
+            city = City.BANGALORE;
+        }
+
+        Intent intent = new Intent(context, EventDetailActivity.class);
+        intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+        intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
+        return intent;
+    }
+
+    public static Intent createIntent(Context context, String query) {
+        Intent intent = new Intent(context, LaunchActivity.class);
+        intent.setAction(BaseActivity.NOTIFICATION_ACTION + query);
+        intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, query));
+        return intent;
     }
 }
