@@ -1,6 +1,8 @@
 package com.eventshigh.nearme.app.ui;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
@@ -14,8 +16,8 @@ import android.widget.TextView;
 import com.android.volley.toolbox.NetworkImageView;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.StreamDbHelper;
+import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.StreamItem;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
@@ -23,7 +25,7 @@ import com.eventshigh.nearme.app.utils.NotificationUtils;
 import org.json.JSONException;
 
 public class StreamAdapter extends RecyclerView.Adapter<StreamAdapter.ViewHolder> {
-    private final Context context;
+    private final Activity activity;
     private final CursorAdapter cursorAdapter;
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -34,13 +36,21 @@ public class StreamAdapter extends RecyclerView.Adapter<StreamAdapter.ViewHolder
 
         @Override
         public void onClick(View v) {
+            StreamItem streamItem = (StreamItem) itemView.getTag();
+            if (streamItem instanceof EventNotificationStreamItem) {
+                EventNotificationStreamItem eventNotificationStreamItem =
+                    (EventNotificationStreamItem) streamItem;
+                Intent intent = NotificationUtils.createIntent(activity,
+                    eventNotificationStreamItem.eventId, eventNotificationStreamItem.city);
+                activity.startActivity(intent);
+            }
         }
     }
 
-    public StreamAdapter(Context context, Cursor cursor) {
-        this.context = context;
+    public StreamAdapter(Activity activity, Cursor cursor) {
+        this.activity = activity;
 
-        cursorAdapter = new CursorAdapter(context, cursor, 0) {
+        cursorAdapter = new CursorAdapter(StreamAdapter.this.activity, cursor, 0) {
             @Override
             public View newView(Context context, Cursor cursor, ViewGroup parent) {
                 return LayoutInflater.from(context).inflate(R.layout.stream_item_notification,
@@ -83,14 +93,14 @@ public class StreamAdapter extends RecyclerView.Adapter<StreamAdapter.ViewHolder
 
     @Override
     public StreamAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = cursorAdapter.newView(context, cursorAdapter.getCursor(), parent);
+        View view = cursorAdapter.newView(activity, cursorAdapter.getCursor(), parent);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(StreamAdapter.ViewHolder holder, int position) {
         cursorAdapter.getCursor().moveToPosition(position);
-        cursorAdapter.bindView(holder.itemView, context, cursorAdapter.getCursor());
+        cursorAdapter.bindView(holder.itemView, activity, cursorAdapter.getCursor());
     }
 
     @Override
