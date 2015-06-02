@@ -123,7 +123,7 @@
                     android:drawableTop="@drawable/ic_favorite_red_24dp"
                     android:clickable="true"
                     android:onClick="removeFavourite"
-                    android:text="@string/ui_favourite"
+                    android:text="@string/ui_favourited"
                     android:visibility="gone"
                 />
                 <TextView
