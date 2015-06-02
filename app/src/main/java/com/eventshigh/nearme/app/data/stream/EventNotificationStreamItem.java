@@ -4,15 +4,17 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.StreamDbHelper;
 import com.eventshigh.nearme.app.data.StreamDbHelper.StreamType;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class EventNotificationStreamItem extends StreamItem {
-    private static final String EVENT_ID__KEY = "event_id";
+    private static final String EVENT_ID_KEY = "event_id";
     private static final String CITY_KEY = "city";
 
     public final String eventId;
@@ -41,7 +43,7 @@ public class EventNotificationStreamItem extends StreamItem {
     public EventNotificationStreamItem(long timestamp, JSONObject json) throws JSONException {
         super(timestamp, json);
 
-        this.eventId = json.getString(EVENT_ID__KEY);
+        this.eventId = json.getString(EVENT_ID_KEY);
         this.city = City.getCity(json.getString(CITY_KEY));
     }
 
@@ -51,9 +53,14 @@ public class EventNotificationStreamItem extends StreamItem {
 
     public JSONObject toJSON() throws JSONException {
         JSONObject jsonObject = super.toJSON();
-        jsonObject.put(EVENT_ID__KEY, eventId);
+        jsonObject.put(EVENT_ID_KEY, eventId);
         jsonObject.put(CITY_KEY, city.name());
         return jsonObject;
+    }
+
+    public void launch(BaseContextActivity activity) {
+        activity.showEventDetails(EventsHighEndpoints.getEventDetailsURI(city, eventId),
+                EventNotificationStreamItem.class.getSimpleName());
     }
 
 }

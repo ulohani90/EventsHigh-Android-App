@@ -240,6 +240,15 @@ public abstract class BaseContextActivity extends BaseActivity {
                 Integer.toString(position));
     }
 
+    public void showSearchView(String query) {
+        reportActionToAnalytics("showSearchView", query);
+        EventsContext param = new EventsContext(eventsContext.location, query);
+        param.dateFilter = eventsContext.dateFilter;
+        Intent intent = new Intent(this, getClass())
+                .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
+        startActivity(intent);
+    }
+
     public void showEventDetails(Uri eventDetailsURI, @Nullable String label) {
         reportActionToAnalytics("showEventDetails", label);
         Intent detailIntent = new Intent(this, EventDetailActivity.class);

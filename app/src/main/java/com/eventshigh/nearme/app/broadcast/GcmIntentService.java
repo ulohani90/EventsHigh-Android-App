@@ -128,8 +128,10 @@ public class GcmIntentService extends IntentService {
             EventNotificationStreamItem.record(this, title, message, imageUrl, eventId,
                     gcmRegistration.getLastCity());
         } else if (query != null) {
-            contentIntent = PendingIntent.getActivity(this, 0,
-                IntentUtils.createIntent(this, query), 0);
+            Intent intent = new Intent(this, LaunchActivity.class);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION + query);
+            intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, query));
+            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
             QueryNotificationStreamItem.record(this, title, message, imageUrl, query);
         } else if (ticket != null) {
             ZendeskUtils.initZendesk(this);

@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.data.stream;
 
 import android.support.annotation.Nullable;
 
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.StreamDbHelper.StreamType;
 
 import org.json.JSONException;
@@ -34,6 +35,8 @@ public abstract class StreamItem {
     }
 
     public abstract StreamType getStreamType();
+
+    public abstract void launch(BaseContextActivity activity);
 
     public JSONObject toJSON() throws JSONException {
         JSONObject jsonObject = new JSONObject();

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.StreamDbHelper;
 import com.eventshigh.nearme.app.data.StreamDbHelper.StreamType;
 
@@ -46,5 +47,9 @@ public class QueryNotificationStreamItem extends StreamItem {
         JSONObject jsonObject = super.toJSON();
         jsonObject.put("query", query);
         return jsonObject;
+    }
+
+    public void launch(BaseContextActivity activity) {
+        activity.showSearchView(query);
     }
 }
