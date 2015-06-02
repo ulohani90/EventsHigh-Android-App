@@ -152,7 +152,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         topProgressBar = findViewById(R.id.top_progress_bar);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setHomeButtonEnabled(true);
 
         // Initialize location request used for check in.
         checkInLocationRequest = new LocationRequest();
@@ -581,6 +580,11 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         getGoogleApiClient();
     }
 
+    private void setScroll(int scrollValue) {
+        float opacity = Math.min(1.0f, scrollValue * 3f / getResources().getDisplayMetrics().heightPixels);
+        toolbar.setAlpha(opacity);
+    }
+
     private Listener<Event> mEventListener = new Listener<Event>() {
         @Override
         public void onResponse(final Event event, boolean isIntermediate) {
@@ -722,6 +726,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         private final NetworkImageView bgView;
         private final ImageView recommendedImageView;
 
+        private final TextView titleView;
         private final TextView fromView;
 
         private final View favouriteView;
@@ -776,6 +781,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             favouriteView = findViewById(R.id.action_favourite);
             favouritedView = findViewById(R.id.action_favourited);
 
+            titleView = (TextView) findViewById(R.id.event_title);
             fromView = (TextView) findViewById(R.id.event_from);
 
             venueView = (TextView) findViewById(R.id.event_venue);
@@ -826,11 +832,22 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
         private void populateView(final Event event) {
             collapsingToolbarLayout.setTitle(event.title);
+//            eventScrollView.getViewTreeObserver().addOnScrollChangedListener(
+//                new OnScrollChangedListener() {
+//                    @Override
+//                        public void onScrollChanged() {
+//                            setScroll(eventScrollView.getScrollY());
+//                        }
+//                    });
+//            eventScrollView.setVisibility(View.VISIBLE);
             topProgressBar.setVisibility(View.GONE);
 
             bgView.setDefaultImageResId(R.drawable.eh_default_event);
             bgView.setErrorImageResId(R.drawable.eh_default_event);
             bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(EventDetailActivity.this));
+
+            // Set title
+            titleView.setText(event.title);
 
             // Add attribution.
             if (event.sourceUrl == null) {
