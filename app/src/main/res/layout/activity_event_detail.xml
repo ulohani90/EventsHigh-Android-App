@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -10,7 +8,8 @@
     tools:context=".activity.EventDetailActivity"
 >
 
-    <android.support.design.widget.CoordinatorLayout
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -715,7 +714,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="bottom"
+            android:layout_alignParentBottom="true"
         >
             <ImageView
                 android:id="@+id/share_fb"
@@ -776,4 +775,8 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
+<<<<<<< HEAD
 </FrameLayout>
+=======
+</LinearLayout>
+>>>>>>> parent of c93ae6f... show share buttons at the bottom in event details view
