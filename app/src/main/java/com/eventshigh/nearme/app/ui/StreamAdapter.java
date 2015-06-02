@@ -14,19 +14,26 @@ import android.widget.TextView;
 import com.android.volley.toolbox.NetworkImageView;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.StreamDbHelper;
 import com.eventshigh.nearme.app.data.stream.StreamItem;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.utils.NotificationUtils;
 
 import org.json.JSONException;
 
-public class StreamAdapter extends RecyclerView.Adapter {
+public class StreamAdapter extends RecyclerView.Adapter<StreamAdapter.ViewHolder> {
     private final Context context;
     private final CursorAdapter cursorAdapter;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ViewHolder(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
         }
     }
 
@@ -49,6 +56,7 @@ public class StreamAdapter extends RecyclerView.Adapter {
 
                 try {
                     StreamItem streamItem = StreamDbHelper.parseFromCursor(cursor);
+                    view.setTag(streamItem);
 
                     timeView.setText(DateUtils.getRelativeTimeSpanString(streamItem.timestamp));
                     titleView.setText(streamItem.title);
@@ -63,6 +71,7 @@ public class StreamAdapter extends RecyclerView.Adapter {
                     }
                 } catch (JSONException e) {
                     Crashlytics.logException(e);
+                    e.printStackTrace();
 
                     timeView.setText("");
                     timeView.setText("Error");
@@ -73,13 +82,13 @@ public class StreamAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public StreamAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = cursorAdapter.newView(context, cursorAdapter.getCursor(), parent);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(StreamAdapter.ViewHolder holder, int position) {
         cursorAdapter.getCursor().moveToPosition(position);
         cursorAdapter.bindView(holder.itemView, context, cursorAdapter.getCursor());
     }

@@ -125,7 +125,8 @@ public class GcmIntentService extends IntentService {
             GcmRegistration gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
             contentIntent = NotificationUtils.createPendingIntent(this, eventId,
                     gcmRegistration.getLastCity());
-            EventNotificationStreamItem.record(this, title, message, imageUrl, eventId);
+            EventNotificationStreamItem.record(this, title, message, imageUrl, eventId,
+                    gcmRegistration.getLastCity());
         } else if (query != null) {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + query);
