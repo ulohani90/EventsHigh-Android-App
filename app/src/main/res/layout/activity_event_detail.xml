@@ -775,8 +775,4 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
-<<<<<<< HEAD
-</FrameLayout>
-=======
 </LinearLayout>
->>>>>>> parent of c93ae6f... show share buttons at the bottom in event details view
