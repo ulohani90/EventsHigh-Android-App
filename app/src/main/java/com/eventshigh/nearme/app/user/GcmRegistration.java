@@ -9,7 +9,9 @@ import android.support.annotation.Nullable;
 
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
+import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.google.android.gms.maps.model.LatLng;
@@ -35,6 +37,7 @@ public class GcmRegistration {
     private static final String PREF_REGISTRATION_ID_UPLOADED = "registration_id_uploaded";
     private static final String PREF_ZENDESK_UPDATED = "zendesk_updated2";
     private static final String PREF_IID_UPLOADED = "iid_updated";
+    private static final String PREF_FIRST_TOPICS = "first_topics";
 
     private static final String PREF_LAST_CITY = "last_city";
     private static final String PREF_LAST_CITY_UPLOADED = "last_city_uploaded";
@@ -68,7 +71,9 @@ public class GcmRegistration {
     public void resetGcmRegistrationId() {
         Editor editor = gcmRegistrationInfo.edit();
         editor.remove(PREF_REGISTRATION_ID);
+        editor.remove(PREF_ZENDESK_UPDATED);
         editor.remove(PREF_REGISTRATION_ID_UPLOADED);
+        editor.remove(PREF_FIRST_TOPICS);
         editor.apply();
 
         updateGcmRegistrationIdIfNeeded();
@@ -104,7 +109,7 @@ public class GcmRegistration {
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
         try {
             gcm.send(SENDER_ID + "@gcm.googleapis.com", messageId, data);
-        } catch (IOException e) {
+        } catch (Exception e) {
             Crashlytics.logException(e);
         }
     }
@@ -135,6 +140,15 @@ public class GcmRegistration {
                         .putString(PREF_LAST_CITY, city.toString())
                         .remove(PREF_LAST_CITY_UPLOADED)
                         .apply();
+
+                try {
+                    if (currentLastCity != null) {
+                        unsubscribeToTopic(currentLastCity.toString());
+                    }
+                    subscribeToTopic(city.toString());
+                } catch (IOException e) {
+                    Crashlytics.logException(e);
+                }
             }
 
             uploadLastCity(location);
@@ -145,16 +159,33 @@ public class GcmRegistration {
     private class GcmRegistar extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
+            // Upload last city.
+            if (!uploadLastCity(null)) {
+                return null;
+            }
 
+            // Upload IID.
+            InstanceID instanceID = InstanceID.getInstance(context);
+            if (!gcmRegistrationInfo.getBoolean(PREF_IID_UPLOADED, false)) {
+                String iid = instanceID.getId();
+                AccountStateReporter.reportInstanceId(context, iid, new Runnable() {
+                    @Override
+                    public void run() {
+                        gcmRegistrationInfo.edit().putBoolean(PREF_IID_UPLOADED, true).apply();
+                    }
+                });
+            }
+
+            // Fetch the GCM registration id.
             String registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
             if (registrationId == null) {
                 try {
-                    InstanceID instanceID = InstanceID.getInstance(context);
                     registrationId = instanceID.getToken(SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
 
                     Editor editor = gcmRegistrationInfo.edit();
                     editor.putString(PREF_REGISTRATION_ID, registrationId);
                     editor.remove(PREF_REGISTRATION_ID_UPLOADED);
+                    editor.remove(PREF_ZENDESK_UPDATED);
                     editor.apply();
                 } catch (IOException e) {
                     // Ignore. try it next time.
@@ -165,10 +196,16 @@ public class GcmRegistration {
                     editor.remove(PREF_REGISTRATION_ID);
                     editor.remove(PREF_ZENDESK_UPDATED);
                     editor.remove(PREF_REGISTRATION_ID_UPLOADED);
+                    editor.remove(PREF_FIRST_TOPICS);
                     editor.apply();
                 }
             }
 
+            if (registrationId == null) {
+                return null;
+            }
+
+            // Upload GCM registration id.
             if (!gcmRegistrationInfo.getBoolean(PREF_REGISTRATION_ID_UPLOADED, false)) {
                 AccountStateReporter.reportGcmRegistrationId(context, registrationId, new Runnable() {
                     @Override
@@ -178,12 +215,8 @@ public class GcmRegistration {
                 });
             }
 
-            // Upload last city.
-            uploadLastCity(null);
-
             // Report the GCM registration id with zendesk.
-            if (registrationId != null &&
-                    !gcmRegistrationInfo.getBoolean(PREF_ZENDESK_UPDATED, false)) {
+            if (!gcmRegistrationInfo.getBoolean(PREF_ZENDESK_UPDATED, false)) {
                 ZendeskUtils.initZendesk(context);
                 try {
                     ZendeskConfig.INSTANCE.enablePush(registrationId, zendeskCallback);
@@ -192,19 +225,53 @@ public class GcmRegistration {
                 }
             }
 
-            // Upload IID.
-            if (!gcmRegistrationInfo.getBoolean(PREF_IID_UPLOADED, false)) {
-                String iid = InstanceID.getInstance(context).getId();
-                AccountStateReporter.reportInstanceId(context, iid, new Runnable() {
-                    @Override
-                    public void run() {
-                        gcmRegistrationInfo.edit().putBoolean(PREF_IID_UPLOADED, true).apply();
-                    }
-                });
-            }
+            // Subscribe to topics.
+            if (!gcmRegistrationInfo.getBoolean(PREF_FIRST_TOPICS, false)) {
+                try {
+                    GcmPubSub gcmPubSub = GcmPubSub.getInstance(context);
 
+                    // Subscribe to city.
+                    subscribeToTopic(gcmPubSub, registrationId, getLastCity().toString());
+
+                    // Subscribe to interests.
+                    Account account = new Account(context);
+                    for (String interest : account.getFollowingInterests()) {
+                        subscribeToTopic(gcmPubSub, registrationId, interest);
+                    }
+
+                    gcmRegistrationInfo.edit().putBoolean(PREF_FIRST_TOPICS, true).apply();
+                } catch (Exception e) {
+                    Crashlytics.logException(e);
+                }
+            }
             return null;
         }
+    }
+
+    public void subscribeToTopic(String interest) throws IOException {
+        String registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
+        if(registrationId != null) {
+            subscribeToTopic(GcmPubSub.getInstance(context), registrationId, interest);
+        }
+    }
+
+    public void unsubscribeToTopic(String interest) throws IOException {
+        String registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
+        if(registrationId != null) {
+            unsubscribeToTopic(GcmPubSub.getInstance(context), registrationId, interest);
+        }
+    }
+
+    public void subscribeToTopic(GcmPubSub gcmPubSub, String registrationId, String interest)
+            throws IOException {
+        gcmPubSub.subscribe(registrationId,
+                "/topics/" + EventCategory.toCategoryParsableString(interest), null);
+    }
+
+    public void unsubscribeToTopic(GcmPubSub gcmPubSub, String registrationId, String interest)
+            throws IOException {
+        gcmPubSub.unsubscribe(registrationId,
+                "/topics/" + EventCategory.toCategoryParsableString(interest));
     }
 
     private ZendeskCallback<PushRegistrationResponse> zendeskCallback =
@@ -220,10 +287,13 @@ public class GcmRegistration {
                 }
             };
 
-    private void uploadLastCity(LatLng location) {
+    private boolean uploadLastCity(LatLng location) {
         City city = getLastCity();
-        if (city != null &&
-                !gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
+        if (city == null) {
+            return false;
+        }
+
+        if (!gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
             AccountStateReporter.reportLastCity(context, city, location, new Runnable() {
                 @Override
                 public void run() {
@@ -231,5 +301,6 @@ public class GcmRegistration {
                 }
             });
         }
+        return true;
     }
 }
