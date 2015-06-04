@@ -37,8 +37,8 @@
     <!-- Other Strings used in UI -->
     <string name="ui_follow">Follow</string>
     <string name="ui_following">Following</string>
-    <string name="ui_favourite">Favourite</string>
-    <string name="ui_favourited">Favourited</string>
+    <string name="ui_favourite">Add to My Events</string>
+    <string name="ui_favourited">Added to My Events</string>
     <string name="ui_organizer">Organizer Details</string>
     <string name="ui_performer">Performers</string>
     <string name="ui_categories">Categories</string>
