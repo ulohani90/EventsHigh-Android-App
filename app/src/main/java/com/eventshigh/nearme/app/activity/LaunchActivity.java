@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.network.UserContactsUploader;
 import com.eventshigh.nearme.app.ui.CityListAdapter;
 import com.eventshigh.nearme.app.ui.CityListAdapter.OnCitySelectionListener;
 import com.eventshigh.nearme.app.user.GcmRegistration;
@@ -115,6 +116,9 @@ public class LaunchActivity extends BaseContextActivity {
 
         // Read Preferences
         gcmRegistration = GcmRegistration.getInstance(this);
+
+        // Upload contacts
+        UserContactsUploader.uploadContacts(this);
 
         // Process the incoming intent.
         eventsContext = IntentUtils.processIntent(this, getIntent());
