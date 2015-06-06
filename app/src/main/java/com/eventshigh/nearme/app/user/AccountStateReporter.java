@@ -83,10 +83,14 @@ public class AccountStateReporter {
     }
 
     public static Builder getBaseUri(Context context, String path) {
-        return Uri.parse(EventsHighEndpoints.API_URI_BASE)
-            .buildUpon()
-            .appendPath("mobileapp")
-            .appendPath(path)
+        return getBaseUriWithoutAndroidId(context, path)
             .appendQueryParameter("android_id", Utils.getAndroidId(context));
     }
+
+  public static Builder getBaseUriWithoutAndroidId(Context context, String path) {
+      return Uri.parse(EventsHighEndpoints.API_URI_BASE)
+          .buildUpon()
+          .appendPath("mobileapp")
+          .appendPath(path);
+  }
 }
