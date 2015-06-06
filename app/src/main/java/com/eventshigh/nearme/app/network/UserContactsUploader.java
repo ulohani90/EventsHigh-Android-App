@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.network;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.ContactsContract;
 import android.text.format.DateUtils;
 
@@ -109,15 +110,24 @@ public class UserContactsUploader implements Response.Listener<JSONObject>, Resp
 
         new Thread() {
             public void run() {
-                String[] PROJECTION = {
+                String[] projection = {
                         ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                         ContactsContract.CommonDataKinds.Phone.NUMBER,
                 };
-                String SELECTION = ContactsContract.Contacts.HAS_PHONE_NUMBER + " = 1";
+                String selection;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                    // On android versions that have the contact updated timestamp, get only the
+                    // contacts that have changed since the last sync
+                    selection = ContactsContract.Contacts.HAS_PHONE_NUMBER + " = 1 and "
+                            + ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP
+                            + " >= " + preferences.getLastContactsSyncTimestamp();
+                } else {
+                    selection = ContactsContract.Contacts.HAS_PHONE_NUMBER + " = 1";
+                }
                 Context applicationContext = context.getApplicationContext();
                 Cursor cursor = applicationContext.getContentResolver().query(
                         ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                        PROJECTION, SELECTION, null, null);
+                        projection, selection, null, null);
 
                 try {
                     UserContactsUploader uploader = new UserContactsUploader(context);
