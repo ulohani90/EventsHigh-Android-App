@@ -4,31 +4,41 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.text.format.DateUtils;
 
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class UserContactsUploader {
+import java.util.ArrayList;
+import java.util.List;
+
+public class UserContactsUploader implements Response.Listener<JSONObject>, Response.ErrorListener, RequestQueue.RequestFinishedListener<Object> {
     private static final int MAX_CONTACTS_TO_UPLOAD = 200;
 
     private final Context context;
     private final JSONObject objectToUpload;
+    private final List<JsonObjectRequest> pendingRequests;
+
     JSONArray userContactArray = new JSONArray();
+    private boolean syncFailed;
 
     private UserContactsUploader(Context context) throws JSONException {
         this.context = context;
         objectToUpload = new JSONObject();
         objectToUpload.put("android_id", Utils.getAndroidId(context));
         createContactsArray();
+        pendingRequests = new ArrayList<>();
     }
 
     private void createContactsArray() throws JSONException {
@@ -45,30 +55,58 @@ public class UserContactsUploader {
     }
 
     private void upload() {
+        Uri requestUrl = AccountStateReporter.getBaseUriWithoutAndroidId(context,
+                "record_user_contacts").build();
+        System.out.println("--------> sending " + requestUrl.toString());
+        System.out.println("--------> body " + objectToUpload);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+                requestUrl.toString(), objectToUpload, this, this);
+        synchronized (pendingRequests) {
+            pendingRequests.add(request);
+        }
+        VolleyHelper.addToRequestQueue(context, request);
+        VolleyHelper.getRequestQueue(context).addRequestFinishedListener(this);
+    }
+
+    private void flush() throws InterruptedException {
         if (userContactArray.length() > 0) {
-            Uri requestUrl = AccountStateReporter.getBaseUriWithoutAndroidId(context,
-                    "record_user_contacts").build();
-            System.out.println("--------> sending " + requestUrl.toString());
-            System.out.println("--------> body " + objectToUpload);
+            upload();
+        }
 
-            VolleyHelper.addToRequestQueue(context, new JsonObjectRequest(Request.Method.POST,
-                    requestUrl.toString(), objectToUpload, new Response.Listener<JSONObject>() {
+        synchronized (pendingRequests) {
+            while (pendingRequests.size() != 0) {
+                pendingRequests.wait();
+            }
+        }
+    }
 
-                @Override
-                public void onResponse(JSONObject jsonObject, boolean b) {
-                    System.out.println("--------> success " + jsonObject + "  " + b);
-                }
-            }, new Response.ErrorListener() {
+    @Override
+    public void onResponse(JSONObject jsonObject, boolean b) {
+        System.out.println("--------> success " + jsonObject + "  " + b);
+    }
 
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
-                    System.out.println("--------> failure " + volleyError);
-                }
-            }));
+    @Override
+    public void onErrorResponse(VolleyError volleyError) {
+        System.out.println("--------> failure " + volleyError);
+        syncFailed = true;
+    }
+
+    @Override
+    public void onRequestFinished(Request<Object> request) {
+        synchronized (pendingRequests) {
+            pendingRequests.remove(request);
+            pendingRequests.notify();
         }
     }
 
     public static void uploadContacts(final Context context) {
+        // Don't do anything if we have synced in the last 7 days
+        final Preferences preferences = Preferences.getInstance(context);
+        final long currentTimeMillis = System.currentTimeMillis();
+        if (currentTimeMillis - preferences.getLastContactsSyncTimestamp() < DateUtils.WEEK_IN_MILLIS) {
+            return;
+        }
+
         new Thread() {
             public void run() {
                 String[] PROJECTION = {
@@ -80,21 +118,22 @@ public class UserContactsUploader {
                 Cursor cursor = applicationContext.getContentResolver().query(
                         ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                         PROJECTION, SELECTION, null, null);
-                uploadContacts(applicationContext, cursor);
+
+                try {
+                    UserContactsUploader uploader = new UserContactsUploader(context);
+                    while (cursor.moveToNext()) {
+                        uploader.addUserContact(cursor);
+                    }
+                    uploader.flush();
+                    if (!uploader.syncFailed) {
+                        preferences.setLastContactsSyncTimestamp(currentTimeMillis);
+                    }
+                } catch (JSONException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 cursor.close();
             }
         }.start();
-    }
-
-    private static void uploadContacts(Context context, Cursor cursor) {
-        try {
-            UserContactsUploader uploader = new UserContactsUploader(context);
-            while (cursor.moveToNext()) {
-                uploader.addUserContact(cursor);
-            }
-            uploader.upload();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 }

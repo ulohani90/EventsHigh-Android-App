@@ -15,6 +15,7 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_NOTIFY_WEEKLY = "notifications_weekly";
     public static final String PREF_NOTIFY_EH = "notifications_eh";
     public static final String PREF_SHOW_ONBOARDING = "show_onboarding";
+    public static final String PREF_LAST_CONTACTS_SYNC_TIMESTAMP = "last_contacts_sync_timestamp";
 
     private final Context context;
     private final SharedPreferences sharedPreferences;
@@ -51,6 +52,14 @@ public class Preferences implements OnSharedPreferenceChangeListener {
 
     public boolean shouldShowOnBoarding() {
         return sharedPreferences.getBoolean(PREF_SHOW_ONBOARDING, true);
+    }
+
+    public long getLastContactsSyncTimestamp() {
+        return sharedPreferences.getLong(PREF_LAST_CONTACTS_SYNC_TIMESTAMP, 0);
+    }
+
+    public void setLastContactsSyncTimestamp(long timestamp) {
+        sharedPreferences.edit().putLong(PREF_LAST_CONTACTS_SYNC_TIMESTAMP, timestamp).apply();
     }
 
     @Override
