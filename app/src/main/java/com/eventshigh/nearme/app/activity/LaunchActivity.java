@@ -29,7 +29,7 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.network.UserContactsUploader;
+import com.eventshigh.nearme.app.user.UserContactsUploader;
 import com.eventshigh.nearme.app.ui.CityListAdapter;
 import com.eventshigh.nearme.app.ui.CityListAdapter.OnCitySelectionListener;
 import com.eventshigh.nearme.app.user.GcmRegistration;

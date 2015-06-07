@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.network;
+package com.eventshigh.nearme.app.user;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,6 +15,7 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.UserContact;
+import com.eventshigh.nearme.app.network.ContactsUploadRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,8 +26,8 @@ import java.util.List;
 public class UserContactsUploader implements Listener<JSONObject>, ErrorListener, Runnable {
     private static final int MAX_CONTACTS_TO_UPLOAD = 400;
 
-    private static final String PARAM_LAST_CONTACTS_SYNC_TIMESTAMP = "last_contacts_sync_timestamp5";
-    private static final String PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP = "last_contacts_sync_try_timestamp5";
+    private static final String PARAM_LAST_CONTACTS_SYNC_TIMESTAMP = "last_contacts_sync_timestamp";
+    private static final String PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP = "last_contacts_sync_try_timestamp";
 
     private final Context context;
     private final SharedPreferences sharedPreferences;
