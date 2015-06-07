@@ -94,13 +94,9 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
             titleView.setText(streamItem.title);
             messageView.setText(Html.fromHtml(streamItem.message));
 
-            if (streamItem.imgUrl != null) {
-                imageView.setVisibility(View.VISIBLE);
-                imageView.setDefaultImageResId(R.drawable.eh_default_event);
-                imageView.setImageUrl(streamItem.imgUrl, VolleyHelper.getImageLoader(activity));
-            } else {
-                imageView.setVisibility(View.GONE);
-            }
+            imageView.setDefaultImageResId(R.drawable.eh_default_event);
+            imageView.setErrorImageResId(R.drawable.eh_default_event);
+            imageView.setImageUrl(streamItem.imgUrl, VolleyHelper.getImageLoader(activity));
 
             itemView.setOnClickListener(new OnClickListener() {
                 @Override

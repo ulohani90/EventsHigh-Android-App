@@ -1,51 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+                                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                                    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants"
     card_view:cardCornerRadius="2dp"
     card_view:cardBackgroundColor="@android:color/white"
-    card_view:contentPadding="16dp"
-    tools:layout_width="280dp">
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:layout_width="280dp"
+>
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:gravity="end"
-            android:id="@+id/time"
-            style="?android:attr/textAppearanceSmall"
-            android:layout_width="match_parent"
-            android:paddingBottom="16dp"
-            android:layout_height="wrap_content" />
-
+        android:layout_height="wrap_content"
+    >
         <com.eventshigh.nearme.app.view.FadeInNetworkImageView
             android:id="@+id/image"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/event_card_height"
+            android:layout_width="96dp"
+            android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:layout_marginBottom="8dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignBottom="@+id/message"
+            android:layout_centerVertical="true"
             android:adjustViewBounds="false"
-            />
+        />
 
         <TextView
             android:id="@+id/title"
-            style="?android:attr/textAppearanceMedium"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_toRightOf="@+id/image"
+            android:layout_toEndOf="@+id/image"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="2dp"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#CC000000"
+            tools:text="No plans yet for the evening?"
+        />
 
         <TextView
-            android:id="@+id/message"
-            style="?android:attr/textAppearanceSmall"
-            android:paddingTop="8dp"
-            android:maxLines="2"
-            android:ellipsize="end"
+            android:id="@+id/time"
+            style="@style/EventCardText"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/title"
+            android:layout_toRightOf="@+id/image"
+            android:layout_toEndOf="@+id/image"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:paddingBottom="8dp"
+            android:drawableStart="@drawable/ic_access_time_grey600_12dp"
+            android:drawableLeft="@drawable/ic_access_time_grey600_12dp"
+            tools:text="4 hours ago"
+        />
+        <TextView
+            style="@style/EventCardText"
+            android:id="@+id/message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/time"
+            android:layout_toRightOf="@+id/image"
+            android:layout_toEndOf="@+id/image"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:minLines="2"
+            android:maxLines="5"
+            tools:text="Last minute impromptu plans are the best ones!"
+        />
+    </RelativeLayout>
+
+
 </android.support.v7.widget.CardView>
