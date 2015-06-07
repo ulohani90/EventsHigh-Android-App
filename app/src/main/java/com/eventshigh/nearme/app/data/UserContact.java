@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.data;
 
 import android.database.Cursor;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.support.annotation.Nullable;
 
 import org.json.JSONException;
@@ -44,11 +43,10 @@ public class UserContact {
     }
 
     public static UserContact parseFromCursor(Cursor cursor) throws JSONException {
-        String name = cursor.getString(
-                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
         String phoneNumber = cursor.getString(
                 cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-        String emails = cursor.getString(cursor.getColumnIndex(Email.DATA));
-        return new UserContact(name, phoneNumber, emails);
+        String name = cursor.getString(
+                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+        return new UserContact(phoneNumber, name, null);
     }
 }

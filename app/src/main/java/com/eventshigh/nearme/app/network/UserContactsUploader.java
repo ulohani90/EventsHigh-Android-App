@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
@@ -22,15 +22,16 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserContactsUploader implements Listener<JSONObject>, ErrorListener {
-    private static final int MAX_CONTACTS_TO_UPLOAD = 200;
+public class UserContactsUploader implements Listener<JSONObject>, ErrorListener, Runnable {
+    private static final int MAX_CONTACTS_TO_UPLOAD = 400;
 
-    private static final String PARAM_LAST_CONTACTS_SYNC_TIMESTAMP = "last_contacts_sync_timestamp";
-    private static final String PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP = "last_contacts_sync_try_timestamp";
+    private static final String PARAM_LAST_CONTACTS_SYNC_TIMESTAMP = "last_contacts_sync_timestamp5";
+    private static final String PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP = "last_contacts_sync_try_timestamp5";
 
     private final Context context;
     private final SharedPreferences sharedPreferences;
     private long currentTimeMillis;
+    private long lastSync;
 
     public UserContactsUploader(Context context) {
         this.context = context.getApplicationContext();
@@ -46,50 +47,53 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
         }
 
         // Don't do anything if we have uploaded contacts in the last 7 day.
-        final long lastSync = sharedPreferences.getLong(PARAM_LAST_CONTACTS_SYNC_TIMESTAMP, 0);
+        lastSync = sharedPreferences.getLong(PARAM_LAST_CONTACTS_SYNC_TIMESTAMP, 0);
         if (currentTimeMillis - lastSync < DateUtils.WEEK_IN_MILLIS) {
             return;
         }
 
-        new Thread() {
-            public void run() {
-                String[] projection = {
-                        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                        ContactsContract.CommonDataKinds.Phone.NUMBER,
-                        Email.DATA,
-                };
-                String selection;
-                String order = null;
+        new Thread(this).start();
+    }
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                    // On android versions that have the contact updated timestamp, get only the
-                    // contacts that have changed since the last sync
-                    selection = ContactsContract.Contacts.HAS_PHONE_NUMBER + " = 1 and "
-                            + ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP
-                            + " >= " + lastSync;
-                    order = ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP +
-                            " LIMIT " + MAX_CONTACTS_TO_UPLOAD;
-                } else {
-                    selection = ContactsContract.Contacts.HAS_PHONE_NUMBER + " = 1";
-                }
+    @Override
+    public void run() {
+        // Build contact query.
+        String[] projection = {
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                ContactsContract.CommonDataKinds.Phone.NUMBER,
+        };
+        String selection;
+        String order = null;
 
-                Cursor cursor = context.getContentResolver().query(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                        projection, selection, null, order);
-                List<UserContact> contacts = new ArrayList<>();
-                while(cursor.moveToNext()) {
-                    try {
-                        contacts.add(UserContact.parseFromCursor(cursor));
-                    } catch (JSONException e) {
-                        Crashlytics.getInstance().core.logException(e);
-                    }
-                }
-                cursor.close();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            // On android versions that have the contact updated timestamp, get only the
+            // contacts that have changed since the last sync
+            selection = ContactsContract.Contacts.HAS_PHONE_NUMBER + " = 1 and "
+                    + ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP
+                    + " >= " + lastSync;
+            order = ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP +
+                    " LIMIT " + MAX_CONTACTS_TO_UPLOAD;
+        } else {
+            selection = ContactsContract.Contacts.HAS_PHONE_NUMBER + " = 1";
+        }
 
-                ContactsUploadRequest.submit(context, contacts, Priority.LOW,
-                        UserContactsUploader.this, UserContactsUploader.this);
+        // Parse contacts data.
+        Cursor cursor = context.getContentResolver().query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                projection, selection, null, order);
+        List<UserContact> contacts = new ArrayList<>();
+        while(cursor.moveToNext()) {
+            try {
+                contacts.add(UserContact.parseFromCursor(cursor));
+            } catch (JSONException e) {
+                Log.w(UserContactsUploader.class.getSimpleName(), "failed to load contact", e);
+                Crashlytics.getInstance().core.logException(e);
             }
-        }.start();
+        }
+        cursor.close();
+
+        // Upload contacts data.
+        ContactsUploadRequest.submit(context, contacts, Priority.LOW, this, this);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response.ErrorListener;
@@ -38,6 +39,7 @@ public class ContactsUploadRequest extends JsonObjectRequest {
             return;
         }
 
+        Log.d(ContactsUploadRequest.class.getSimpleName(), "request: " + jsonRequest.toString());
         String url = AccountStateReporter.getBaseUriWithoutAndroidId(
                 context, "record_user_contacts").build().toString();
         ContactsUploadRequest request = new ContactsUploadRequest(
