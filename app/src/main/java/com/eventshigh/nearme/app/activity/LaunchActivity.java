@@ -117,9 +117,6 @@ public class LaunchActivity extends BaseContextActivity {
         // Read Preferences
         gcmRegistration = GcmRegistration.getInstance(this);
 
-        // Upload contacts
-        UserContactsUploader.uploadContacts(this);
-
         // Process the incoming intent.
         eventsContext = IntentUtils.processIntent(this, getIntent());
         String tabName= getIntent().getStringExtra(DEFAULT_TAB_PARAM);
@@ -172,6 +169,9 @@ public class LaunchActivity extends BaseContextActivity {
 
         // Show next screen.
         showNextScreen();
+
+        // Upload contacts
+        new UserContactsUploader(this).uploadContacts();
     }
 
     @Override

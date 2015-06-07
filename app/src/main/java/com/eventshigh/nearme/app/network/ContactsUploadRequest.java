@@ -7,7 +7,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.eventshigh.nearme.app.data.Contact;
+import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.Utils;
 
@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class ContactsUploadRequest extends JsonObjectRequest {
 
-    public static void submit(Context context, List<Contact> contacts,
+    public static void submit(Context context, List<UserContact> contacts,
             Priority priority, Listener<JSONObject> listener, ErrorListener errorListener) {
 
         JSONObject jsonRequest = new JSONObject();
@@ -30,7 +30,7 @@ public class ContactsUploadRequest extends JsonObjectRequest {
         try {
             jsonRequest.put("android_id", Utils.getAndroidId(context));
             jsonRequest.put("contacts", userContactArray);
-            for (Contact contact : contacts) {
+            for (UserContact contact : contacts) {
                 userContactArray.put(contact.toJSON());
             }
         } catch (JSONException e) {

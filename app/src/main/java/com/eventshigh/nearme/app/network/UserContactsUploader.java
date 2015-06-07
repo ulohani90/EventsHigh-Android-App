@@ -14,7 +14,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.crashlytics.android.Crashlytics;
-import com.eventshigh.nearme.app.data.Contact;
+import com.eventshigh.nearme.app.data.UserContact;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,12 +32,12 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
     private final SharedPreferences sharedPreferences;
     private long currentTimeMillis;
 
-    private UserContactsUploader(Context context) throws JSONException {
+    public UserContactsUploader(Context context) {
         this.context = context.getApplicationContext();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context);
     }
 
-    public void uploadContacts(final Context context) {
+    public void uploadContacts() {
         // Don't do anything if we have tried in the last 1 day.
         final long lastTry = sharedPreferences.getLong(PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP, 0);
         currentTimeMillis = System.currentTimeMillis();
@@ -76,10 +76,10 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
                 Cursor cursor = context.getContentResolver().query(
                         ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                         projection, selection, null, order);
-                List<Contact> contacts = new ArrayList<>();
+                List<UserContact> contacts = new ArrayList<>();
                 while(cursor.moveToNext()) {
                     try {
-                        contacts.add(Contact.parseFromCursor(cursor));
+                        contacts.add(UserContact.parseFromCursor(cursor));
                     } catch (JSONException e) {
                         Crashlytics.getInstance().core.logException(e);
                     }

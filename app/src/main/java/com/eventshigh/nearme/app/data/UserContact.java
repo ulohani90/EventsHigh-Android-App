@@ -11,12 +11,12 @@ import org.json.JSONObject;
 /**
  * Represents the user contact.
  */
-public class Contact {
+public class UserContact {
     public final String mobileNo;
     @Nullable public final String name;
     @Nullable public final String emails;
 
-    public Contact(String mobileNo, @Nullable String name, @Nullable String emails) {
+    public UserContact(String mobileNo, @Nullable String name, @Nullable String emails) {
         this.mobileNo = mobileNo;
         this.name = name;
         this.emails = emails;
@@ -43,12 +43,12 @@ public class Contact {
         }
     }
 
-    public static Contact parseFromCursor(Cursor cursor) throws JSONException {
+    public static UserContact parseFromCursor(Cursor cursor) throws JSONException {
         String name = cursor.getString(
                 cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
         String phoneNumber = cursor.getString(
                 cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
         String emails = cursor.getString(cursor.getColumnIndex(Email.DATA));
-        return new Contact(name, phoneNumber, emails);
+        return new UserContact(name, phoneNumber, emails);
     }
 }
