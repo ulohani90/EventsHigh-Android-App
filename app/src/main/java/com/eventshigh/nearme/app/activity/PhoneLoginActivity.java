@@ -120,7 +120,7 @@ public class PhoneLoginActivity extends BaseActivity {
         } catch (IOException | GeneralSecurityException e) {
             progressBar.setVisibility(View.GONE);
             reportActionToAnalytics("sendCodeRetry");
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             showRetryMessage();
         }
     }
@@ -164,7 +164,7 @@ public class PhoneLoginActivity extends BaseActivity {
         } catch (IOException | GeneralSecurityException e) {
             progressBar.setVisibility(View.GONE);
             reportActionToAnalytics("verifyCodeRetry");
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             showRetryMessage();
         }
     }
@@ -209,6 +209,7 @@ public class PhoneLoginActivity extends BaseActivity {
             }
         } catch (Exception e) {
             // do nothing.
+            Crashlytics.getInstance().core.logException(e);
         }
         return VerificationStatus.RETRY;
     }

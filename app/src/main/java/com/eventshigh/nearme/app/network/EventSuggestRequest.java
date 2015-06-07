@@ -59,12 +59,12 @@ public class EventSuggestRequest extends JsonRequest<List<SuggestEvent>> {
                     suggestEvents.add(SuggestEvent.parse(suggestJSONArray.getJSONObject(i)));
                 } catch (JSONException e) {
                     // Ignore.
-                    Crashlytics.logException(e);
+                    Crashlytics.getInstance().core.logException(e);
                 }
             }
             return Response.success(suggestEvents, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }

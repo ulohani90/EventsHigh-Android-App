@@ -37,7 +37,7 @@ public class SettingsActivity extends BaseActivity {
                             Uri.parse("mailto:listings@eventshigh.com")));
                 } catch (ActivityNotFoundException e) {
                     // No activity to open url. ignore.
-                    Crashlytics.logException(e);
+                    Crashlytics.getInstance().core.logException(e);
                 }
             }
         }

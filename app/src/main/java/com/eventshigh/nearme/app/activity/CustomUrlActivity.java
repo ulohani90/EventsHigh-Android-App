@@ -104,7 +104,7 @@ public class CustomUrlActivity extends BaseActivity {
                     return;
                 } catch (Exception e) {
                     // do nothing
-                    Crashlytics.logException(e);
+                    Crashlytics.getInstance().core.logException(e);
                 }
             }
         }
@@ -130,7 +130,7 @@ public class CustomUrlActivity extends BaseActivity {
                 startActivity(intent);
             } catch (ActivityNotFoundException e) {
                 // No application to open url. ignore.
-                Crashlytics.logException(e);
+                Crashlytics.getInstance().core.logException(e);
             }
             return  true;
         }

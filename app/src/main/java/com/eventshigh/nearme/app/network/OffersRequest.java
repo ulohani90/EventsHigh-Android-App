@@ -108,7 +108,7 @@ public class OffersRequest extends JsonRequest<OffersResponse> {
                     offersJSON.getInt("claimed"), offersJSON.getInt("total"));
             return Response.success(res, HttpHeaderParser.parseCacheHeaders(response));
         } catch (Exception e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }

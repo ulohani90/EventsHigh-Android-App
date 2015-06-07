@@ -101,7 +101,7 @@ public class DateCategoryRequest extends JsonRequest<List<TopicEvents>>  {
 
             return Response.success(topicEvents, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }

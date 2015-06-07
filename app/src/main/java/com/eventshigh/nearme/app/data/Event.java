@@ -479,7 +479,7 @@ public class Event implements Parcelable {
                     events.add(event);
                 }
             } catch (JSONException | ParseException e) {
-                Crashlytics.logException(e);
+                Crashlytics.getInstance().core.logException(e);
             }
         }
         return events;

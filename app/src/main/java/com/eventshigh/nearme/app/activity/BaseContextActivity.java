@@ -120,7 +120,7 @@ public abstract class BaseContextActivity extends BaseActivity {
                 sendIntent.setType("text/plain");
                 startActivity(sendIntent);
             } catch (ActivityNotFoundException e) {
-                Crashlytics.logException(e);
+                Crashlytics.getInstance().core.logException(e);
                 Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
             }
             return true;

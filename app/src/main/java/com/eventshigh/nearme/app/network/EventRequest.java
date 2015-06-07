@@ -96,7 +96,7 @@ public class EventRequest extends JsonRequest<Event> {
             return Response.success(Event.fromJSON(city, eventJson),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException | ParseException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }

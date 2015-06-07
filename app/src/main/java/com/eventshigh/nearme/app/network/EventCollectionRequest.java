@@ -107,7 +107,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
             return Response.success(eventsCollection, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }

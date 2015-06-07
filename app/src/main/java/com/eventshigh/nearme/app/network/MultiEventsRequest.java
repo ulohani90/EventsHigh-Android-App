@@ -89,7 +89,7 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
                         events.add(event);
                     }
                 } catch (JSONException | ParseException e) {
-                    Crashlytics.logException(e);
+                    Crashlytics.getInstance().core.logException(e);
                 }
             }
             EventCollectionRequest.filterOldEvents(events);
@@ -99,7 +99,7 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
 
             return Response.success(events, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }

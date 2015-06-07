@@ -122,7 +122,7 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
             return Response.success(new EventCollection(filteredEvents, trendingTopics),
                 HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }

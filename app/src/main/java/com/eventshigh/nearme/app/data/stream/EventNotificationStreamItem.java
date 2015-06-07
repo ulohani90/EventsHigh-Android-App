@@ -28,7 +28,7 @@ public class EventNotificationStreamItem extends StreamItem {
         try {
             StreamDbHelper.addStreamToDB(context, streamItem);
         } catch (JSONException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
         }
     }
 

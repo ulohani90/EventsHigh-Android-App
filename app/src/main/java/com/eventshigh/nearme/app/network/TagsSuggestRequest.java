@@ -32,13 +32,13 @@ public class TagsSuggestRequest extends JsonRequest<List<String>> {
                 try {
                     suggestTags.add(tagsJSONArray.getJSONObject(i).getString("tag"));
                 } catch (JSONException e) {
-                  // Ignore.
-                    Crashlytics.logException(e);
+                    // Ignore.
+                    Crashlytics.getInstance().core.logException(e);
                 }
             }
             return Response.success(suggestTags, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }
