@@ -14,8 +14,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.data.UserActionDbHelper;
-import com.eventshigh.nearme.app.data.UserActionDbHelper.FollowingAction;
+import com.eventshigh.nearme.app.user.UserActionHelper.FollowingAction;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -54,7 +53,6 @@ public class Account {
     private static boolean disableSnackBar = false;
 
     private static final Object lock = new Object();
-    private static final List<OnAccountChangeListener> listeners = new ArrayList<>();
     private static SharedPreferences accountInfo;
 
     // Member variables used to store the user account details in preferences.
@@ -66,19 +64,6 @@ public class Account {
         synchronized (lock) {
             if (accountInfo == null) {
                 accountInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
-                accountInfo.registerOnSharedPreferenceChangeListener(
-                    new SharedPreferences.OnSharedPreferenceChangeListener() {
-                        @Override
-                        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                            if (key.startsWith(PREF_FOLLOW_KEY_PREFIX)) {
-                                synchronized (listeners) {
-                                    for (OnAccountChangeListener listener : listeners) {
-                                        listener.followStateChanged();
-                                    }
-                                }
-                            }
-                        }
-                    });
             }
         }
 
@@ -151,19 +136,19 @@ public class Account {
     public void setIsFollowing(String tag, boolean isFollowing) {
         if (isFollowing) {
             accountInfo.edit().putString(getKeyForTag(tag), tag).apply();
-            UserActionDbHelper.getInstance(context).recordAction(FollowingAction.FOLLOW, tag);
+            new UserActionHelper(context).recordAction(FollowingAction.FOLLOW, tag);
             try {
                 GcmRegistration.getInstance(context).subscribeToTopic(tag);
             } catch (IOException e) {
-                Crashlytics.logException(e);
+                Crashlytics.getInstance().core.logException(e);
             }
         } else {
             accountInfo.edit().remove(getKeyForTag(tag)).apply();
-            UserActionDbHelper.getInstance(context).recordAction(FollowingAction.UN_FOLLOW, tag);
+            new UserActionHelper(context).recordAction(FollowingAction.UN_FOLLOW, tag);
             try {
                 GcmRegistration.getInstance(context).unsubscribeToTopic(tag);
             } catch (IOException e) {
-                Crashlytics.logException(e);
+                Crashlytics.getInstance().core.logException(e);
             }
         }
     }
@@ -180,22 +165,6 @@ public class Account {
 
     private static String getKeyForTag(String tag) {
         return PREF_FOLLOW_KEY_PREFIX + EventCategory.toCategoryParsableString(tag);
-    }
-
-    public void addOnChangeListener(OnAccountChangeListener listener) {
-        synchronized (listeners) {
-            listeners.add(listener);
-        }
-    }
-
-    public void removeOnChangeListener(OnAccountChangeListener listener) {
-        synchronized (listeners) {
-            listeners.remove(listener);
-        }
-    }
-
-    public interface OnAccountChangeListener {
-        void followStateChanged();
     }
 
     private static final Object AccountStateRegistarLock = new Object();
@@ -233,7 +202,7 @@ public class Account {
                                 new ErrorListener() {
                                     @Override
                                     public void onErrorResponse(VolleyError volleyError) {
-                                        Crashlytics.logException(volleyError.getCause());
+                                        Crashlytics.getInstance().core.logException(volleyError.getCause());
                                         synchronized (AccountStateRegistarLock) {
                                             inProgress = false;
                                         }
@@ -242,7 +211,7 @@ public class Account {
                         );
                         VolleyHelper.addToRequestQueue(context, request);
                     } catch (IOException | GeneralSecurityException e) {
-                        Crashlytics.logException(e);
+                        Crashlytics.getInstance().core.logException(e);
                         Log.w(Account.class.getSimpleName(), "failed to get shortlink", e);
                     }
                 }

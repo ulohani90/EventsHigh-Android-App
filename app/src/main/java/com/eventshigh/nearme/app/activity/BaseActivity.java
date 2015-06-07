@@ -21,7 +21,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.data.UserActionDbHelper;
+import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -221,7 +221,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void shareEvent(Event event, String eventUri, @Nullable String packageName) {
         reportEventAction(event, "eventShareInitiated", packageName);
         shareEventInitiatedTimestamp = System.currentTimeMillis();
-        UserActionDbHelper.getInstance(this).recordShareAction(event.id, packageName, null);
+        new UserActionHelper(this).recordShareAction(event.id, packageName, null);
 
         try {
             Intent sendIntent = new Intent();
@@ -244,7 +244,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
             startActivity(sendIntent);
         } catch (ActivityNotFoundException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
             Log.w(LOG_TAG, "failed sharing", e);
         }
@@ -275,7 +275,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
             // No activity to open cal.
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             Toast.makeText(this, R.string.no_cal_app, Toast.LENGTH_SHORT).show();
         }
     }

@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.util.Pair;
 
+import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
 
 import java.io.Closeable;
@@ -86,8 +87,8 @@ public class EventsMarkerManager {
                 eventMarkMap.put(event.id, mark);
                 if (EventMark.isFavourite(mark)) {
                     AlarmUtils.setEventAlarm(context, event);
-                    UserActionDbHelper.getInstance(context).recordAction(
-                            UserActionDbHelper.EventAction.ADD_FAVORITE, event.id);
+                    new UserActionHelper(context).recordAction(
+                            UserActionHelper.EventAction.ADD_FAVORITE, event.id);
                 }
                 threads.add(EventMarkDbHelper.addEntry(database, event.id, mark));
             }
@@ -98,8 +99,8 @@ public class EventsMarkerManager {
             EventMark mark = eventMarkMap.remove(event.id);
             if (EventMark.isFavourite(mark)) {
                 AlarmUtils.cancelEventAlarm(context, event);
-                UserActionDbHelper.getInstance(context).recordAction(
-                        UserActionDbHelper.EventAction.REMOVE_FAVORITE, event.id);
+                new UserActionHelper(context).recordAction(
+                        UserActionHelper.EventAction.REMOVE_FAVORITE, event.id);
             }
             threads.add(EventMarkDbHelper.removeEntry(database, event.id));
             return this;
@@ -172,6 +173,7 @@ public class EventsMarkerManager {
         return favouritedEvents;
     }
 
+    @SuppressWarnings("TryFinallyCanBeTryWithResources")
     private void refreshListingFromDb() {
         SQLiteDatabase database = new EventMarkDbHelper(this.context).getReadableDatabase();
         try {

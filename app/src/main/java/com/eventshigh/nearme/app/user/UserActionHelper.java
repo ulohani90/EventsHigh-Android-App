@@ -1,13 +1,9 @@
-package com.eventshigh.nearme.app.data;
+package com.eventshigh.nearme.app.user;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONException;
@@ -15,32 +11,13 @@ import org.json.JSONObject;
 
 import java.util.UUID;
 
-public class UserActionDbHelper extends SQLiteOpenHelper {
-    // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 1;
-
-    private static final String DATABASE_NAME = "user_actions.db";
-    private static final String USER_ACTIONS_TABLE_NAME = "user_actions";
-
-    private static final String COLUMN_TIMESTAMP = "timestamp";
-    private static final String COLUMN_ACTION = "action";
-    private static final String COLUMN_DATA = "data";
-
+public class UserActionHelper {
     private static final String JSON_KEY_ANDROID_ID = "android_id";
     private static final String JSON_KEY_TIMESTAMP = "timestamp";
     private static final String JSON_KEY_ACTION = "action";
     private static final String JSON_KEY_DATA = "data";
     private static final String JSON_KEY_EVENT_ID = "event_id";
     private static final String JSON_KEY_INTEREST = "interest";
-
-    private static final String[] ALL_COLUMNS = { COLUMN_TIMESTAMP, COLUMN_ACTION, COLUMN_DATA };
-
-    private static final String CREATE_TABLE =
-            "CREATE TABLE " + USER_ACTIONS_TABLE_NAME + " ( "
-                    + COLUMN_TIMESTAMP + " INTEGER PRIMARY KEY, "
-                    + COLUMN_ACTION + " TEXT, "
-                    + COLUMN_DATA + " TEXT "
-                    + ");";
 
     public enum EventAction {
         ADD_FAVORITE,
@@ -56,31 +33,10 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
         UN_FOLLOW,
     }
 
-    private static UserActionDbHelper instance;
     private final Context context;
 
-    public static synchronized UserActionDbHelper getInstance(Context context) {
-        if (instance == null) {
-            instance = new UserActionDbHelper(context.getApplicationContext());
-        }
-        return instance;
-    }
-
-    private UserActionDbHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    public UserActionHelper(Context context) {
         this.context = context;
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_TABLE);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // TODO: Implement proper upgrade. Currently this will delete all user data.
-        db.execSQL("DROP TABLE IF EXISTS " + USER_ACTIONS_TABLE_NAME);
-        onCreate(db);
     }
 
     public void recordShareAction(String eventId, @Nullable String appName, @Nullable String postId) {
@@ -136,22 +92,5 @@ public class UserActionDbHelper extends SQLiteOpenHelper {
             }
         });
         thread.start();
-    }
-
-    public void reportActionSince(long timestamp) {
-        SQLiteDatabase database = getReadableDatabase();
-        Cursor cursor =  database.query(USER_ACTIONS_TABLE_NAME, ALL_COLUMNS,
-                COLUMN_TIMESTAMP + " > " + timestamp, null, null, null, COLUMN_TIMESTAMP);
-        try {
-            while (!cursor.isAfterLast()) {
-                recordAction(cursor.getString(cursor.getColumnIndex(COLUMN_ACTION)),
-                        cursor.getString(cursor.getColumnIndex(COLUMN_DATA)),
-                        cursor.getLong(cursor.getColumnIndex(COLUMN_TIMESTAMP)));
-                cursor.moveToNext();
-            }
-        } finally {
-            cursor.close();
-            database.close();
-        }
     }
 }

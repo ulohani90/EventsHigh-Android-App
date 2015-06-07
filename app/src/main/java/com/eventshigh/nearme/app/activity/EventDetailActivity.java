@@ -49,8 +49,8 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
-import com.eventshigh.nearme.app.data.UserActionDbHelper;
-import com.eventshigh.nearme.app.data.UserActionDbHelper.EventAction;
+import com.eventshigh.nearme.app.user.UserActionHelper;
+import com.eventshigh.nearme.app.user.UserActionHelper.EventAction;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
@@ -266,7 +266,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     public void save(View view) {
         showRateAppDialog = true;
         reportEventAction(event, "addToCalendar");
-        UserActionDbHelper.getInstance(this).recordAction(EventAction.SAVE, event.id);
+        new UserActionHelper(this).recordAction(EventAction.SAVE, event.id);
 
         addToCalendar(event, null);
     }
@@ -309,7 +309,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     public void openBookingSite(View view) {
         showRateAppDialog = true;
         reportEventAction(event, "bookTicket");
-        UserActionDbHelper.getInstance(this).recordAction(EventAction.BOOK, event.id);
+        new UserActionHelper(this).recordAction(EventAction.BOOK, event.id);
 
         final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
         if (event.bookingUrl != null && event.bookingUrl.contains("ticketing.eventshigh.com")) {
@@ -370,7 +370,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                             status.startResolutionForResult(EventDetailActivity.this,
                                 REQUEST_CHECK_SETTINGS);
                         } catch (IntentSender.SendIntentException e) {
-                            Crashlytics.logException(e);
+                            Crashlytics.getInstance().core.logException(e);
                             locationDetectionFailed();
                         }
                         break;
@@ -458,7 +458,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
             // No activity to open maps.
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             Toast.makeText(this, R.string.no_map_app, Toast.LENGTH_SHORT).show();
         }
     }
@@ -497,7 +497,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 @Override
                 public void onSuccess(Result result) {
                     reportEventAction(event, "shareEvent", "fb");
-                    UserActionDbHelper.getInstance(EventDetailActivity.this).recordShareAction(
+                    new UserActionHelper(EventDetailActivity.this).recordShareAction(
                             event.id, "fb", result.getPostId());
                 }
 
@@ -546,7 +546,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
             // No activity to open url. ignore.
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
         }
     }
 
@@ -554,7 +554,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         this.event = event;
 
         // Report the Event View.
-        UserActionDbHelper.getInstance(this).recordAction(EventAction.VIEW_EVENT, event.id);
+        new UserActionHelper(this).recordAction(EventAction.VIEW_EVENT, event.id);
 
         // Set Title.
         ActionBar actionBar = getSupportActionBar();
@@ -602,7 +602,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             startActivitySafe(sendIntent);
         } catch (UnsupportedEncodingException e) {
             // do nothing.
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
         }
     }
 
@@ -684,7 +684,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                                 checkInSuccess(response.getString("message"));
                             } catch (JSONException e) {
                                 // do nothing.
-                                Crashlytics.logException(e);
+                                Crashlytics.getInstance().core.logException(e);
                                 checkInFailed();
                             }
                         }
@@ -698,7 +698,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 )
             );
         } catch (IOException | GeneralSecurityException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             checkInFailed();
         }
     }
