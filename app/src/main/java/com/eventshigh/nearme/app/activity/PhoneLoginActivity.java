@@ -21,6 +21,7 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONObject;
 
@@ -69,8 +70,14 @@ public class PhoneLoginActivity extends BaseActivity {
     }
 
     public void sendCode(View view) {
+        final String phoneNo = Utils.simplifyPhoneNo(phoneNoView.getText().toString());
+        if (phoneNo.length() < 10 || phoneNo.length() > 12) {
+            phoneNoView.requestFocus();
+            Toast.makeText(this, "Entered phoneNo is not correct", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         progressBar.setVisibility(View.VISIBLE);
-        final String phoneNo = phoneNoView.getText().toString();
         Uri requestUrl = AccountStateReporter.getBaseUri(this, "registerMobileNo")
                 .appendQueryParameter("mobile_no", phoneNo)
                 .build();

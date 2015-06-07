@@ -16,6 +16,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Helper methods for managing strings and titles.
@@ -128,4 +129,10 @@ public class Utils {
     public static boolean isDebug(Context context) {
         return BuildConfig.DEBUG || DEBUG_ANDROID_ID.contains(getAndroidId(context));
     }
+
+    private static Pattern phoneNoPattern = Pattern.compile("[^\\d\\+]");
+    public static String simplifyPhoneNo(String phoneNo) {
+        return phoneNoPattern.matcher(phoneNo).replaceAll("");
+    }
+
 }
