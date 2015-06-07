@@ -60,6 +60,7 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
     public void run() {
         // Build contact query.
         String[] projection = {
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                 ContactsContract.CommonDataKinds.Phone.NUMBER,
         };
@@ -84,8 +85,11 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
                 projection, selection, null, order);
         List<UserContact> contacts = new ArrayList<>();
         while(cursor.moveToNext()) {
+            String contactId = cursor.getString(
+                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+            Cursor emailCursor = getEmailCursorForContactId(contactId);
             try {
-                contacts.add(UserContact.parseFromCursor(cursor));
+                contacts.add(UserContact.parseFromCursor(cursor, emailCursor));
             } catch (JSONException e) {
                 Log.w(UserContactsUploader.class.getSimpleName(), "failed to load contact", e);
                 Crashlytics.getInstance().core.logException(e);
@@ -95,6 +99,16 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
 
         // Upload contacts data.
         ContactsUploadRequest.submit(context, contacts, Priority.LOW, this, this);
+    }
+
+    private Cursor getEmailCursorForContactId(String contactId) {
+        String[] projection = {
+                ContactsContract.CommonDataKinds.Email.ADDRESS,
+        };
+        String selection = ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId;
+        return context.getContentResolver().query(
+                ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                projection, selection, null, null);
     }
 
     @Override
