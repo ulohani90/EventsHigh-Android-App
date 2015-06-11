@@ -24,10 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserContactsUploader implements Listener<JSONObject>, ErrorListener, Runnable {
+    private static final String LOG_TAG = UserContactsUploader.class.getSimpleName();
     private static final int MAX_CONTACTS_TO_UPLOAD = 400;
 
-    private static final String PARAM_LAST_CONTACTS_SYNC_TIMESTAMP = "last_contacts_sync_timestamp";
-    private static final String PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP = "last_contacts_sync_try_timestamp";
+    private static final String PARAM_LAST_CONTACTS_SYNC_TIMESTAMP = "last_contacts_sync_timestamp10";
+    private static final String PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP = "last_contacts_sync_try_timestamp10";
 
     private final Context context;
     private final SharedPreferences sharedPreferences;
@@ -54,9 +55,11 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
         }
 
         new Thread(this).start();
+        sharedPreferences.edit().putLong(PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP, currentTimeMillis).apply();
     }
 
     @Override
+    @SuppressWarnings("TryFinallyCanBeTryWithResources")
     public void run() {
         // Build contact query.
         String[] projection = {
@@ -91,9 +94,11 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
             try {
                 contacts.add(UserContact.parseFromCursor(cursor, emailCursor));
             } catch (JSONException e) {
-                Log.w(UserContactsUploader.class.getSimpleName(), "failed to load contact", e);
+                Log.w(LOG_TAG, "failed to load contact", e);
                 Crashlytics.getInstance().core.logException(e);
-            }
+            } finally {
+			    emailCursor.close();
+			}
         }
         cursor.close();
 
@@ -114,11 +119,13 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
     @Override
     public void onResponse(JSONObject jsonObject, boolean isIntermediate) {
         // TODO: replace currentTimeMillis with last contact timestamp.
+        Log.i(LOG_TAG, "Successfully uploaded the contacts");
         sharedPreferences.edit().putLong(PARAM_LAST_CONTACTS_SYNC_TIMESTAMP, currentTimeMillis).apply();
     }
 
     @Override
     public void onErrorResponse(VolleyError volleyError) {
+        Log.w(LOG_TAG, volleyError.getMessage(), volleyError.getCause());
         Crashlytics.getInstance().core.logException(volleyError.getCause());
     }
 }

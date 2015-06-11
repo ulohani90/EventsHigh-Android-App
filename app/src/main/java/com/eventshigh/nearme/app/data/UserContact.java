@@ -33,7 +33,7 @@ public class UserContact {
             for (String email : emails) {
                 jsonArray.put(email);
             }
-            jsonObject.put("email", jsonArray);
+            jsonObject.put("emails", jsonArray);
         }
 
         return jsonObject;

@@ -37,7 +37,7 @@ public class LocationUtils {
     }
 
 
-    private static final int RADIAL_DISTANCE_TO_TIME_MULTIPLIER = 4;
+    private static final int RADIAL_DISTANCE_TO_TIME_MULTIPLIER = 5;
     public static @Nullable String getTravelTime(Context context, @Nullable LatLng userLocation,
                                        @Nullable LatLng destination) {
         // If user location is very close to city center, we assume userLocation as null.

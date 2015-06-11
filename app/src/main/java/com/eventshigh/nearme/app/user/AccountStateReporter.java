@@ -71,23 +71,23 @@ public class AccountStateReporter {
                                 @Override
                                 public void onErrorResponse(VolleyError volleyError) {
                                     // do nothing.
-                                    Crashlytics.logException(volleyError.getCause());
+                                    Crashlytics.getInstance().core.logException(volleyError.getCause());
                                 }
                             }
                     )
             );
         } catch (IOException | GeneralSecurityException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             Log.w(AccountStateReporter.class.getSimpleName(), "Failed to sendSignedRequest: " + uri, e);
         }
     }
 
     public static Builder getBaseUri(Context context, String path) {
-        return getBaseUriWithoutAndroidId(context, path)
+        return getBaseUriWithoutAndroidId(path)
             .appendQueryParameter("android_id", Utils.getAndroidId(context));
     }
 
-  public static Builder getBaseUriWithoutAndroidId(Context context, String path) {
+  public static Builder getBaseUriWithoutAndroidId(String path) {
       return Uri.parse(EventsHighEndpoints.API_URI_BASE)
           .buildUpon()
           .appendPath("mobileapp")
