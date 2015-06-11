@@ -40,8 +40,7 @@ public class ContactsUploadRequest extends JsonObjectRequest {
         }
 
         Log.d(ContactsUploadRequest.class.getSimpleName(), "request: " + jsonRequest.toString());
-        String url = AccountStateReporter.getBaseUriWithoutAndroidId(
-                context, "record_user_contacts").build().toString();
+        String url = AccountStateReporter.getBaseUriWithoutAndroidId("record_user_contacts").build().toString();
         ContactsUploadRequest request = new ContactsUploadRequest(
                 url, jsonRequest, priority, listener, errorListener);
         VolleyHelper.addToRequestQueue(context, request);
