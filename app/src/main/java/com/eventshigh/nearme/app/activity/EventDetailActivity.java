@@ -447,7 +447,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     public void showDirections(View view) {
         reportEventAction(event, "showDirections");
 
-        Intent intent = event.getShowOnMapIntent();
+        Intent intent = event.getShowDirectionsOnMapIntent();
         if (intent == null) {
             reportActionToAnalytics("skipDirectionsNoLocation");
             Toast.makeText(this, R.string.failed_event_location, Toast.LENGTH_SHORT).show();

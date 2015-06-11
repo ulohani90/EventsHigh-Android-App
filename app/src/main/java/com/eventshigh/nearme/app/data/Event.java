@@ -511,4 +511,13 @@ public class Event implements Parcelable {
         Uri locationUri = Uri.parse("geo:0,0?q=" + query);
         return new Intent(Intent.ACTION_VIEW, locationUri);
     }
+
+    public Intent getShowDirectionsOnMapIntent() {
+        // From https://developers.google.com/maps/documentation/android/intents
+        String query = location.latitude + "," + location.longitude;
+        Uri locationUri = Uri.parse("google.navigation:q=" + query);
+        Intent mapIntent = new Intent(android.content.Intent.ACTION_VIEW, locationUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        return mapIntent;
+    }
 }
