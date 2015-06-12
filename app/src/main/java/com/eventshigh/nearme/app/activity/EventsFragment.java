@@ -2,13 +2,13 @@ package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
@@ -188,7 +188,7 @@ public class EventsFragment extends BaseEventsFragment {
 
                 if (eventsCollection.events.isEmpty()) {
                     // Failed. Show toast and return empty list.
-                    Toast.makeText(activity, R.string.no_events, Toast.LENGTH_SHORT).show();
+                    Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
                 }
             }
 
@@ -212,7 +212,7 @@ public class EventsFragment extends BaseEventsFragment {
 
             topProgressBar.setVisibility(View.GONE);
             if (eventsAdapter.getItemCount() > 0) {
-                Toast.makeText(activity, R.string.failed_refresh, Toast.LENGTH_SHORT).show();
+                Snackbar.make(topProgressBar, R.string.failed_refresh, Snackbar.LENGTH_SHORT).show();
             } else {
                 retryView.setVisibility(View.VISIBLE);
             }
