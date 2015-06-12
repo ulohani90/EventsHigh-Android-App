@@ -495,7 +495,7 @@ public class Event implements Parcelable {
         return (string == null ? "" : string);
     }
 
-    public Intent getShowOnMapIntent() {
+    public @Nullable String getMapQuery() {
         String query = isCleanVenue && venue != null ?
                 (venue.toLowerCase().contains(city.toString().toLowerCase()) ?
                         venue :
@@ -508,13 +508,25 @@ public class Event implements Parcelable {
             query = location.latitude + "," + location.longitude +  " (" + title + ")";
         }
 
-        Uri locationUri = Uri.parse("geo:0,0?q=" + query);
-        return new Intent(Intent.ACTION_VIEW, locationUri);
+        return query;
+    }
+
+    public @Nullable Intent getShowOnMapIntent() {
+        String query = getMapQuery();
+        if (query == null) {
+            return null;
+        }
+
+        return new Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=" + query));
     }
 
     public Intent getShowDirectionsOnMapIntent() {
+        String query = getMapQuery();
+        if (query == null) {
+            return null;
+        }
+
         // From https://developers.google.com/maps/documentation/android/intents
-        String query = location.latitude + "," + location.longitude;
         Uri locationUri = Uri.parse("google.navigation:q=" + query);
         Intent mapIntent = new Intent(android.content.Intent.ACTION_VIEW, locationUri);
         mapIntent.setPackage("com.google.android.apps.maps");

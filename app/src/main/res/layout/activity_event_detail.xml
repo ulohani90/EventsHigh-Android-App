@@ -452,6 +452,31 @@
                 android:layout_height="1dp"
                 android:background="#1a4d4d4d"
             />
+            <FrameLayout
+                android:id="@+id/check_with_friends"
+                style="@style/EHButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="whatsapp"
+                android:visibility="gone"
+                tools:visibility="visible"
+            >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:drawableLeft="@drawable/whatsapp_gray_32dp"
+                    android:drawableStart="@drawable/whatsapp_gray_32dp"
+                    android:textColor="#CC000000"
+                    android:text="@string/action_check_friends"
+                />
+            </FrameLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#1a4d4d4d"
+            />
 
             <!-- Price -->
             <LinearLayout
@@ -613,35 +638,19 @@
                     tools:text="Counter Culture"
                 />
             </LinearLayout>
-            <LinearLayout
-                android:id="@+id/organizer_link_row"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/organizer_link"
+                style="@style/EHText"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_marginLeft="8dp"
                 android:layout_marginStart="8dp"
-                android:visibility="visible"
-                tools:visibility="visible"
-                >
-                <TextView
-                    style="@style/EHText"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:textColor="#CC222222"
-                    android:text="@string/ui_organizer_facebook"
-                    />
-                <TextView
-                    android:id="@+id/organizer_link"
-                    style="@style/EHText"
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:textColor="@color/link_color"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:onClick="openOrganizerLink"
-                    tools:text="parag@eventshigh.com"
-                    />
-            </LinearLayout>
+                android:textColor="@color/link_color"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:onClick="openOrganizerLink"
+                tools:text="parag@eventshigh.com"
+            />
             <LinearLayout
                 android:id="@+id/organizer_email_row"
                 android:layout_width="match_parent"

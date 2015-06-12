@@ -750,6 +750,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         private final View joinView;
         private final TextView priceView;
         private final TextView offerView;
+        private final View checkWithFriendView;
 
         private final View tagsHeaderView;
         private final LinearLayout tagsView;
@@ -762,7 +763,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         private final View organizerHeader;
         private final View organizerNameRow;
         private final TextView organizerNameView;
-        private final View organizerLinkRow;
         private final TextView organizerLinkView;
         private final View organizerEmailRow;
         private final TextView organizerEmailView;
@@ -802,6 +802,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             joinView = findViewById(R.id.join_event);
             priceView = (TextView) findViewById(R.id.event_price);
             offerView = (TextView) findViewById(R.id.offer_text);
+            checkWithFriendView = findViewById(R.id.check_with_friends);
 
             tagsHeaderView = findViewById(R.id.tags_header);
             tagsView = (LinearLayout) findViewById(R.id.event_tags);
@@ -814,7 +815,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             organizerHeader = findViewById(R.id.organizer_header);
             organizerNameRow = findViewById(R.id.organizer_name_row);
             organizerNameView = (TextView) findViewById(R.id.organizer_name);
-            organizerLinkRow = findViewById(R.id.organizer_link_row);
             organizerLinkView = (TextView) findViewById(R.id.organizer_link);
             organizerEmailRow = findViewById(R.id.organizer_email_row);
             organizerEmailView = (TextView) findViewById(R.id.organizer_email);
@@ -939,6 +939,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                     event.sourceUrl != null && event.sourceUrl.contains("facebook.com/") &&
                     (checkInView.getVisibility() != View.VISIBLE || callView.getVisibility() != View.VISIBLE))
                 ? View.VISIBLE : View.GONE);
+            checkWithFriendView.setVisibility(View.VISIBLE);
 
             // Show price.
             findViewById(R.id.price_row).setVisibility(View.VISIBLE);
@@ -988,7 +989,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 if (event.organizerLink != null) {
                     organizerLinkView.setText(event.organizerLink);
                 } else {
-                    organizerLinkRow.setVisibility(View.GONE);
+                    organizerLinkView.setVisibility(View.GONE);
                 }
             }
 
