@@ -758,7 +758,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         private final View organizerHeader;
         private final View organizerNameRow;
         private final TextView organizerNameView;
-        private final View organizerLinkRow;
         private final TextView organizerLinkView;
         private final View organizerEmailRow;
         private final TextView organizerEmailView;
@@ -810,7 +809,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             organizerHeader = findViewById(R.id.organizer_header);
             organizerNameRow = findViewById(R.id.organizer_name_row);
             organizerNameView = (TextView) findViewById(R.id.organizer_name);
-            organizerLinkRow = findViewById(R.id.organizer_link_row);
             organizerLinkView = (TextView) findViewById(R.id.organizer_link);
             organizerEmailRow = findViewById(R.id.organizer_email_row);
             organizerEmailView = (TextView) findViewById(R.id.organizer_email);
@@ -984,7 +982,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                 if (event.organizerLink != null) {
                     organizerLinkView.setText(event.organizerLink);
                 } else {
-                    organizerLinkRow.setVisibility(View.GONE);
+                    organizerLinkView.setVisibility(View.GONE);
                 }
             }
 
