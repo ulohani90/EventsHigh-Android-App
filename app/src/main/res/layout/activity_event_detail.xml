@@ -452,6 +452,31 @@
                 android:layout_height="1dp"
                 android:background="#1a4d4d4d"
             />
+            <FrameLayout
+                android:id="@+id/check_with_friends"
+                style="@style/EHButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="whatsapp"
+                android:visibility="gone"
+                tools:visibility="visible"
+            >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:drawableLeft="@drawable/whatsapp_gray_32dp"
+                    android:drawableStart="@drawable/whatsapp_gray_32dp"
+                    android:textColor="#CC000000"
+                    android:text="@string/action_check_friends"
+                />
+            </FrameLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#1a4d4d4d"
+            />
 
             <!-- Price -->
             <LinearLayout

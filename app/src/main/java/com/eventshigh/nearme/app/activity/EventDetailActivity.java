@@ -746,6 +746,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         private final View joinView;
         private final TextView priceView;
         private final TextView offerView;
+        private final View checkWithFriendView;
 
         private final View tagsHeaderView;
         private final LinearLayout tagsView;
@@ -797,6 +798,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             joinView = findViewById(R.id.join_event);
             priceView = (TextView) findViewById(R.id.event_price);
             offerView = (TextView) findViewById(R.id.offer_text);
+            checkWithFriendView = findViewById(R.id.check_with_friends);
 
             tagsHeaderView = findViewById(R.id.tags_header);
             tagsView = (LinearLayout) findViewById(R.id.event_tags);
@@ -933,6 +935,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                     event.sourceUrl != null && event.sourceUrl.contains("facebook.com/") &&
                     (checkInView.getVisibility() != View.VISIBLE || callView.getVisibility() != View.VISIBLE))
                 ? View.VISIBLE : View.GONE);
+            checkWithFriendView.setVisibility(View.VISIBLE);
 
             // Show price.
             findViewById(R.id.price_row).setVisibility(View.VISIBLE);
