@@ -5,6 +5,12 @@
         android:key="last_city_key"
         android:title="@string/pref_title_change_location"
     />
+    <Preference android:title="@string/pref_title_rate_us">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="market://details?id=com.eventshigh.nearme.app"
+        />
+    </Preference>
     <Preference android:title="@string/pref_title_add_event" android:summary="listings@eventshigh.com">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
@@ -16,12 +22,6 @@
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.FeedbackActivity"
-        />
-    </Preference>
-    <Preference android:title="@string/pref_title_rate_us">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="market://details?id=com.eventshigh.nearme.app"
         />
     </Preference>
     <Preference android:title="@string/pref_title_about_us">
