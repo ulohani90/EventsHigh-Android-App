@@ -33,12 +33,6 @@ public class EHPreferenceFragment extends PreferenceFragment
         getPreferenceScreen().addPreference(accountHeader);
         addPreferencesFromResource(R.xml.pref_account);
 
-        // Add 'notifications' preferences, and a corresponding header.
-        PreferenceCategory notificationHeader = new PreferenceCategory(getActivity());
-        notificationHeader.setTitle(R.string.pref_header_notifications);
-        getPreferenceScreen().addPreference(notificationHeader);
-        addPreferencesFromResource(R.xml.pref_notification);
-
         // Last city preference.
         lastCityView = (ListPreference) getPreferenceScreen().findPreference("last_city_key");
         String[] cityNames = City.getValuesAsString();

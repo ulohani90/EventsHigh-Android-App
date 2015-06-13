@@ -11,9 +11,6 @@ import android.preference.PreferenceManager;
  * {@link android.preference.PreferenceManager#getDefaultSharedPreferences(android.content.Context)}
  */
 public class Preferences implements OnSharedPreferenceChangeListener {
-    public static final String PREF_NOTIFY_FAVOURITED = "notifications_favourited";
-    public static final String PREF_NOTIFY_WEEKLY = "notifications_weekly";
-    public static final String PREF_NOTIFY_EH = "notifications_eh";
     public static final String PREF_SHOW_ONBOARDING = "show_onboarding";
 
     private final Context context;
@@ -31,18 +28,6 @@ public class Preferences implements OnSharedPreferenceChangeListener {
             instance = new Preferences(context);
         }
         return instance;
-    }
-
-    public boolean shouldNotifyFavourited() {
-        return sharedPreferences.getBoolean(PREF_NOTIFY_FAVOURITED, true);
-    }
-
-    public boolean shouldNotifyWeekly() {
-        return sharedPreferences.getBoolean(PREF_NOTIFY_WEEKLY, true);
-    }
-
-    public boolean shouldNotifyEHRecommendation() {
-        return sharedPreferences.getBoolean(PREF_NOTIFY_EH, true);
     }
 
     public void setShowOnboarding(boolean shouldShowOnboarding) {

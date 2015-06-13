@@ -18,7 +18,6 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.user.GcmRegistration;
-import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
@@ -46,12 +45,6 @@ public class GcmIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(final Intent intent) {
-        Preferences preferences = Preferences.getInstance(getApplicationContext());
-        if (!preferences.shouldNotifyEHRecommendation()) {
-            Log.w(LOG_TAG, "notification skipped as per user preference");
-            return;
-        }
-
         // Filter messages based on message type. Since it is likely that GCM will be extended
         // in the future with new message types, just ignore any message types you're not
         // interested in, or that you don't recognize.

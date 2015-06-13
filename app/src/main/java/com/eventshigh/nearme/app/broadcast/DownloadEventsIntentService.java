@@ -18,7 +18,6 @@ import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
-import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
@@ -62,11 +61,6 @@ public class DownloadEventsIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (!Preferences.getInstance(getApplicationContext()).shouldNotifyWeekly()) {
-            WakefulBroadcastReceiver.completeWakefulIntent(intent);
-            return;
-        }
-
         // TODO: may be get the user location from LocationClient
         IntentType type = IntentType.getType(intent);
         EventsContext eventsContext = new EventsContext(null, type.query);

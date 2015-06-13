@@ -111,7 +111,6 @@ public class LaunchActivity extends BaseContextActivity {
 
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
-        PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
 
         // Read Preferences
         gcmRegistration = GcmRegistration.getInstance(this);
