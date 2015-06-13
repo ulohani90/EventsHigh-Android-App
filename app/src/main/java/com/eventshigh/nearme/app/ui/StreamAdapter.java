@@ -40,7 +40,7 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
 
     @Override
     public NotificationCard onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = activity.getLayoutInflater().inflate(R.layout.stream_item_notification, parent, false);
+        View view = activity.getLayoutInflater().inflate(R.layout.card_stream, parent, false);
         return new NotificationCard(view);
     }
 
@@ -74,14 +74,9 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
             titleView.setText(streamItem.title);
             messageView.setText(Html.fromHtml(streamItem.message));
 
-            imageView.setDefaultImageResId(R.drawable.eh_default_event);
-            imageView.setErrorImageResId(R.drawable.eh_default_event);
-            if (streamItem.imgUrl == null) {
-                imageView.setVisibility(View.GONE);
-            } else {
-                imageView.setVisibility(View.VISIBLE);
-                imageView.setImageUrl(streamItem.imgUrl, VolleyHelper.getImageLoader(activity));
-            }
+            imageView.setDefaultImageResId(R.drawable.eh_logo);
+            imageView.setErrorImageResId(R.drawable.eh_logo);
+            imageView.setImageUrl(streamItem.imgUrl, VolleyHelper.getImageLoader(activity));
 
             itemView.setOnClickListener(new OnClickListener() {
                 @Override

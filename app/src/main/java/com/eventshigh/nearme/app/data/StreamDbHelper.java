@@ -111,7 +111,10 @@ public class StreamDbHelper extends SQLiteOpenHelper {
         try {
             while (cursor.moveToNext()) {
                 try {
-                    streamItems.add(parseFromCursor(cursor));
+                    StreamItem item = parseFromCursor(cursor);
+                    if (streamItems.isEmpty() || !streamItems.get(streamItems.size() - 1).equals(item)) {
+                        streamItems.add(item);
+                    }
                 } catch (JSONException e) {
                     Crashlytics.getInstance().core.logException(e);
                 }

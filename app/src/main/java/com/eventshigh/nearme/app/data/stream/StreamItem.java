@@ -49,11 +49,27 @@ public abstract class StreamItem {
         return jsonObject;
     }
 
+    @Override
     public String toString() {
         try {
             return toJSON().toString();
         } catch (JSONException e) {
             return super.toString();
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof  StreamItem)) {
+            return false;
+        }
+
+        StreamItem other = (StreamItem) o;
+        return other.title.equals(title) && other.message.equals(message);
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
     }
 }

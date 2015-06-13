@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
                                     xmlns:card_view="http://schemas.android.com/apk/res-auto"
                                     xmlns:tools="http://schemas.android.com/tools"
@@ -36,13 +35,14 @@
             android:layout_alignParentEnd="true"
             android:layout_toRightOf="@+id/image"
             android:layout_toEndOf="@+id/image"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="6dp"
-            android:layout_marginBottom="2dp"
             android:textSize="14sp"
             android:fontFamily="sans-serif-medium"
             android:textColor="#CC000000"
+            android:minLines="2"
+            android:maxLines="2"
             tools:text="No plans yet for the evening?"
         />
 
@@ -56,9 +56,9 @@
             android:layout_below="@id/title"
             android:layout_toRightOf="@+id/image"
             android:layout_toEndOf="@+id/image"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:paddingBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="2dp"
             android:drawableStart="@drawable/ic_access_time_grey600_12dp"
             android:drawableLeft="@drawable/ic_access_time_grey600_12dp"
             tools:text="4 hours ago"
@@ -73,13 +73,11 @@
             android:layout_below="@id/time"
             android:layout_toRightOf="@+id/image"
             android:layout_toEndOf="@+id/image"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:minLines="2"
-            android:maxLines="5"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:minLines="4"
+            android:maxLines="4"
             tools:text="Last minute impromptu plans are the best ones!"
         />
     </RelativeLayout>
-
-
 </android.support.v7.widget.CardView>
