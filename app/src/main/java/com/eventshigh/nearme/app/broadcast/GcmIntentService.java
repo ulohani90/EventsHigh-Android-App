@@ -17,6 +17,7 @@ import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
+import com.eventshigh.nearme.app.data.stream.TicketNotificationStreamItem;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
@@ -131,6 +132,7 @@ public class GcmIntentService extends IntentService {
             Intent intent = new Intent(this, FeedbackActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+            TicketNotificationStreamItem.record(this, title, message, imageUrl, ticket);
         } else if (target != null) {
             Intent intent = null;
             if (target.startsWith("tab:")) {
