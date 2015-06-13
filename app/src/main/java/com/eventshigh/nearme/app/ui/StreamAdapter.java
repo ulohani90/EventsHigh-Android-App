@@ -20,6 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
+    private static final int[] DEFAULT_IMAGES = {
+            R.drawable.stream_1,
+            R.drawable.stream_2,
+            R.drawable.stream_3,
+            R.drawable.stream_4,
+            R.drawable.stream_5
+    };
+
     private final BaseContextActivity activity;
     private List<StreamItem> streamItems;
 
@@ -40,13 +48,13 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
 
     @Override
     public NotificationCard onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = activity.getLayoutInflater().inflate(R.layout.stream_item_notification, parent, false);
+        View view = activity.getLayoutInflater().inflate(R.layout.card_stream, parent, false);
         return new NotificationCard(view);
     }
 
     @Override
     public void onBindViewHolder(NotificationCard card, int position) {
-        card.bindView(streamItems.get(position), activity);
+        card.bindView(streamItems.get(position), activity, position);
     }
 
     @Override
@@ -69,19 +77,15 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
             imageView = (NetworkImageView) itemView.findViewById(R.id.image);
         }
 
-        public void bindView(final StreamItem streamItem, final BaseContextActivity activity) {
+        public void bindView(final StreamItem streamItem, final BaseContextActivity activity, int position) {
             timeView.setText(DateUtils.getRelativeTimeSpanString(streamItem.timestamp));
             titleView.setText(streamItem.title);
             messageView.setText(Html.fromHtml(streamItem.message));
 
-            imageView.setDefaultImageResId(R.drawable.eh_default_event);
-            imageView.setErrorImageResId(R.drawable.eh_default_event);
-            if (streamItem.imgUrl == null) {
-                imageView.setVisibility(View.GONE);
-            } else {
-                imageView.setVisibility(View.VISIBLE);
-                imageView.setImageUrl(streamItem.imgUrl, VolleyHelper.getImageLoader(activity));
-            }
+            int defaultImage = getDefaultImage(position);
+            imageView.setDefaultImageResId(defaultImage);
+            imageView.setErrorImageResId(defaultImage);
+            imageView.setImageUrl(streamItem.imgUrl, VolleyHelper.getImageLoader(activity));
 
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
@@ -90,5 +94,9 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
                 }
             });
         }
+    }
+
+    private static int getDefaultImage(int position) {
+        return DEFAULT_IMAGES[position % DEFAULT_IMAGES.length];
     }
 }

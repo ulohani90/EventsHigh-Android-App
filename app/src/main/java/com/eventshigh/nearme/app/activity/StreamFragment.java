@@ -38,7 +38,6 @@ public class StreamFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         gridView.setOnScrollListener(new HideActionBarOnScroll(activity));
-
         streamAdapter.setStreamItems(StreamDbHelper.getStreamItems(activity));
     }
 }
