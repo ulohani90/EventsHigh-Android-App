@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
@@ -24,16 +25,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.user.UserContactsUploader;
 import com.eventshigh.nearme.app.ui.CityListAdapter;
 import com.eventshigh.nearme.app.ui.CityListAdapter.OnCitySelectionListener;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
+import com.eventshigh.nearme.app.user.UserContactsUploader;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -279,7 +279,7 @@ public class LaunchActivity extends BaseContextActivity {
             citySelector.setVisibility(View.VISIBLE);
             citySelector.setAdapter(new CityListAdapter(LaunchActivity.this, mCitySelectionListener));
             if (connectionResult != null) {
-                Toast.makeText(LaunchActivity.this, R.string.failed_location, Toast.LENGTH_SHORT).show();
+                Snackbar.make(tabsView, R.string.failed_location, Snackbar.LENGTH_SHORT).show();
             }
         }
     };

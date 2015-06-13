@@ -3,12 +3,12 @@ package com.eventshigh.nearme.app.activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.text.util.Linkify;
 import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request.Method;
 import com.android.volley.Response.ErrorListener;
@@ -69,11 +69,16 @@ public class PhoneLoginActivity extends BaseActivity {
         updateView();
     }
 
+    @Override
+    public View getViewForSnackbar() {
+        return codeView;
+    }
+
     public void sendCode(View view) {
         final String phoneNo = Utils.simplifyPhoneNo(phoneNoView.getText().toString());
         if (phoneNo.length() < 10 || phoneNo.length() > 12) {
             phoneNoView.requestFocus();
-            Toast.makeText(this, "Entered phoneNo is not correct", Toast.LENGTH_SHORT).show();
+            Snackbar.make(this.getViewForSnackbar(), "Entered phoneNo is not correct", Snackbar.LENGTH_SHORT).show();
             return;
         }
 
@@ -199,7 +204,7 @@ public class PhoneLoginActivity extends BaseActivity {
     }
 
     private void showRetryMessage() {
-        Toast.makeText(this, R.string.retry, Toast.LENGTH_SHORT).show();
+        Snackbar.make(this.getViewForSnackbar(), R.string.retry, Snackbar.LENGTH_SHORT).show();
     }
 
     private VerificationStatus parseStatus(@Nullable String statusString) {

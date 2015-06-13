@@ -1,13 +1,13 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
@@ -263,7 +263,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
             topProgressBar.setVisibility(View.GONE);
-            Toast.makeText(EventsMapsActivity.this, R.string.failed_load, Toast.LENGTH_SHORT).show();
+            Snackbar.make(topProgressBar, R.string.failed_load, Snackbar.LENGTH_SHORT).show();
         }
     };
 

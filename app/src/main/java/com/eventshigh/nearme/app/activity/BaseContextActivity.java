@@ -5,13 +5,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
@@ -121,7 +121,7 @@ public abstract class BaseContextActivity extends BaseActivity {
                 startActivity(sendIntent);
             } catch (ActivityNotFoundException e) {
                 Crashlytics.getInstance().core.logException(e);
-                Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
+                Snackbar.make(this.getViewForSnackbar(), R.string.failed_share, Snackbar.LENGTH_SHORT).show();
             }
             return true;
         }
@@ -261,5 +261,10 @@ public abstract class BaseContextActivity extends BaseActivity {
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.putExtra(EventDetailActivity.EXTRA_EVENT_PARAM, event);
         startActivity(detailIntent, bundle);
+    }
+
+    @Override
+    public View getViewForSnackbar() {
+        return toolbar;
     }
 }

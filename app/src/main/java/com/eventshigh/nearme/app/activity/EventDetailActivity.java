@@ -12,6 +12,7 @@ import android.content.pm.PackageInfo;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -33,7 +34,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Request.Priority;
@@ -49,14 +49,14 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
-import com.eventshigh.nearme.app.user.UserActionHelper;
-import com.eventshigh.nearme.app.user.UserActionHelper.EventAction;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.ui.RateAppDialogV2;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
+import com.eventshigh.nearme.app.user.UserActionHelper;
+import com.eventshigh.nearme.app.user.UserActionHelper.EventAction;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -181,6 +181,11 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public View getViewForSnackbar() {
+        return toolbar;
+    }
+
     protected void onStart() {
         super.onStart();
 
@@ -197,12 +202,12 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             Event event = getIntent().getParcelableExtra(EXTRA_EVENT_PARAM);
             populateView(event);
         } else {
+            final View viewForSnackbar = getViewForSnackbar();
             EventRequest.submit(this, getIntent().getData(), Priority.IMMEDIATE, mEventListener,
                     new ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError volleyError) {
-                            Toast.makeText(EventDetailActivity.this, R.string.failed_load,
-                                    Toast.LENGTH_SHORT).show();
+                            Snackbar.make(viewForSnackbar, R.string.failed_load, Snackbar.LENGTH_SHORT).show();
                             VolleyHelper.log(EventDetailActivity.this, volleyError);
                             finish();
                         }
@@ -450,7 +455,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         Intent intent = event.getShowDirectionsOnMapIntent();
         if (intent == null) {
             reportActionToAnalytics("skipDirectionsNoLocation");
-            Toast.makeText(this, R.string.failed_event_location, Toast.LENGTH_SHORT).show();
+            Snackbar.make(this.getViewForSnackbar(), R.string.failed_event_location, Snackbar.LENGTH_SHORT).show();
             return;
         }
 
@@ -459,7 +464,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         } catch (ActivityNotFoundException e) {
             // No activity to open maps.
             Crashlytics.getInstance().core.logException(e);
-            Toast.makeText(this, R.string.no_map_app, Toast.LENGTH_SHORT).show();
+            Snackbar.make(this.getViewForSnackbar(), R.string.no_map_app, Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -623,7 +628,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             } else {
                 // The user is not near the location, let the user know
                 reportEventAction(event, "checkInFailedNotAtLocation");
-                Toast.makeText(this, R.string.ui_not_at_event, Toast.LENGTH_LONG).show();
+                Snackbar.make(this.getViewForSnackbar(), R.string.ui_not_at_event, Snackbar.LENGTH_LONG).show();
             }
         } else {
             // Location is not accurate enough. Wait for some more time until the timeout has
@@ -638,7 +643,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     private void locationDetectionFailed() {
         reportEventAction(event, "checkInFailedLocation");
         stopLocationDetection();
-        Toast.makeText(this, R.string.failed_location, Toast.LENGTH_LONG).show();
+        Snackbar.make(this.getViewForSnackbar(), R.string.failed_location, Snackbar.LENGTH_LONG).show();
         checkInAlertDialog.dismiss();
     }
 
@@ -706,14 +711,13 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     private void checkInFailed() {
         checkInAlertDialog.dismiss();
         reportActionToAnalytics("checkInFailed");
-        Toast.makeText(EventDetailActivity.this, R.string.check_in_failed,
-            Toast.LENGTH_SHORT).show();
+        Snackbar.make(this.getViewForSnackbar(), R.string.check_in_failed, Snackbar.LENGTH_SHORT).show();
     }
 
     private void checkInSuccess(String message) {
         checkInAlertDialog.dismiss();
         reportActionToAnalytics("checkInSuccess");
-        Toast.makeText(EventDetailActivity.this, message, Toast.LENGTH_SHORT).show();
+        Snackbar.make(this.getViewForSnackbar(), message, Snackbar.LENGTH_SHORT).show();
     }
 
     private class EventCard {

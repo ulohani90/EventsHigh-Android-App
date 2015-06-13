@@ -8,11 +8,12 @@ import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
 
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
@@ -21,9 +22,9 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.facebook.FacebookSdk;
@@ -245,7 +246,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             startActivity(sendIntent);
         } catch (ActivityNotFoundException e) {
             Crashlytics.getInstance().core.logException(e);
-            Toast.makeText(this, R.string.failed_share, Toast.LENGTH_SHORT).show();
+            Snackbar.make(this.getViewForSnackbar(), R.string.failed_share, Snackbar.LENGTH_SHORT).show();
             Log.w(LOG_TAG, "failed sharing", e);
         }
     }
@@ -276,7 +277,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         } catch (ActivityNotFoundException e) {
             // No activity to open cal.
             Crashlytics.getInstance().core.logException(e);
-            Toast.makeText(this, R.string.no_cal_app, Toast.LENGTH_SHORT).show();
+            Snackbar.make(this.getViewForSnackbar(), R.string.no_cal_app, Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -304,4 +305,5 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    public abstract View getViewForSnackbar();
 }

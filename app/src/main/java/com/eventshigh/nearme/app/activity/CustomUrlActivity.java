@@ -139,6 +139,11 @@ public class CustomUrlActivity extends BaseActivity {
     }
 
     @Override
+    public View getViewForSnackbar() {
+        return webView;
+    }
+
+    @Override
     public void onBackPressed() {
         // Handle web view back button before exiting the activity
         if(webView.canGoBack()) {

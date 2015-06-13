@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.util.Pair;
@@ -14,7 +15,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.crashlytics.android.Crashlytics;
@@ -121,7 +121,8 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
                             (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
                     ClipData clip = ClipData.newPlainText("invite link", inviteLink);
                     clipboard.setPrimaryClip(clip);
-                    Toast.makeText(activity, R.string.ui_invite_link_copy, Toast.LENGTH_SHORT).show();
+                    Snackbar.make(activity.getViewForSnackbar(), R.string.ui_invite_link_copy,
+                            Snackbar.LENGTH_SHORT).show();
                 }
             });
 
@@ -236,7 +237,7 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
         if (offer.threshold > offersResponse.forClaim) {
             String message = String.format(
                     activity.getString(R.string.offer_threshold_message), offer.threshold);
-            Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+            Snackbar.make(activity.getViewForSnackbar(), message, Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -282,8 +283,9 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
             } catch (Exception e) {
                 Crashlytics.logException(e);
                 activity.reportActionToAnalytics("claimOfferNoEmail", offer.id);
-                Toast.makeText(activity, "Send us email at contact@eventshigh.com to redeem the offer",
-                        Toast.LENGTH_LONG).show();
+                Snackbar.make(activity.getViewForSnackbar(),
+                        "Send us email at contact@eventshigh.com to redeem the offer",
+                        Snackbar.LENGTH_LONG).show();
             }
         }
     }
