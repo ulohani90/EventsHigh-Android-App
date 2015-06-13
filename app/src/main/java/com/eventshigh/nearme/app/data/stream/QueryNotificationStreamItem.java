@@ -50,6 +50,7 @@ public class QueryNotificationStreamItem extends StreamItem {
     }
 
     public void launch(BaseContextActivity activity) {
+        activity.reportActionToAnalytics("streamItemClick", query);
         activity.showSearchView(query);
     }
 }

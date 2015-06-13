@@ -1,70 +1,57 @@
 package com.eventshigh.nearme.app.ui;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.format.DateUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
-import com.eventshigh.nearme.app.data.StreamDbHelper;
+import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.StreamItem;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.StreamAdapter.NotificationCard;
 
-import org.json.JSONException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
     private final BaseContextActivity activity;
-    private final CursorAdapter cursorAdapter;
+    private List<StreamItem> streamItems;
 
-    public StreamAdapter(BaseContextActivity activity, Cursor cursor) {
+    public StreamAdapter(BaseContextActivity activity) {
         this.activity = activity;
 
-        cursorAdapter = new CursorAdapter(StreamAdapter.this.activity, cursor, 0) {
-            @Override
-            public View newView(Context context, Cursor cursor, ViewGroup parent) {
-                return LayoutInflater.from(context).inflate(R.layout.stream_item_notification,
-                    parent, false);
-            }
+        streamItems = new ArrayList<>();
+        streamItems.add(new QueryNotificationStreamItem(System.currentTimeMillis(),
+            "What's Happening Today", "Check out whats happending in city today", null, "today"));
+    }
 
-            @Override
-            public void bindView(View view, Context context, Cursor cursor) {
-                // not used.
-            }
-        };
+    public void setStreamItems(List<StreamItem> streamItems) {
+        if (! streamItems.isEmpty()) {
+            this.streamItems = streamItems;
+            notifyDataSetChanged();
+        }
     }
 
     @Override
     public NotificationCard onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = cursorAdapter.newView(activity, cursorAdapter.getCursor(), parent);
+        View view = activity.getLayoutInflater().inflate(R.layout.stream_item_notification, parent, false);
         return new NotificationCard(view);
     }
 
     @Override
     public void onBindViewHolder(NotificationCard card, int position) {
-        try {
-            cursorAdapter.getCursor().moveToPosition(position);
-            StreamItem streamItem = StreamDbHelper.parseFromCursor(cursorAdapter.getCursor());
-            card.bindView(streamItem, activity);
-        } catch (JSONException e) {
-            Crashlytics.logException(e);
-            card.showErrorView();
-        }
+        card.bindView(streamItems.get(position), activity);
     }
 
     @Override
     public int getItemCount() {
-        return cursorAdapter.getCount();
+        return streamItems.size();
     }
 
     public class NotificationCard extends RecyclerView.ViewHolder {
@@ -82,13 +69,6 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
             imageView = (NetworkImageView) itemView.findViewById(R.id.image);
         }
 
-        public void showErrorView() {
-            timeView.setText("");
-            timeView.setText("Error");
-            messageView.setText("Error in loading data. sorry!");
-            itemView.setClickable(false);
-        }
-
         public void bindView(final StreamItem streamItem, final BaseContextActivity activity) {
             timeView.setText(DateUtils.getRelativeTimeSpanString(streamItem.timestamp));
             titleView.setText(streamItem.title);
@@ -96,7 +76,12 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
 
             imageView.setDefaultImageResId(R.drawable.eh_default_event);
             imageView.setErrorImageResId(R.drawable.eh_default_event);
-            imageView.setImageUrl(streamItem.imgUrl, VolleyHelper.getImageLoader(activity));
+            if (streamItem.imgUrl == null) {
+                imageView.setVisibility(View.GONE);
+            } else {
+                imageView.setVisibility(View.VISIBLE);
+                imageView.setImageUrl(streamItem.imgUrl, VolleyHelper.getImageLoader(activity));
+            }
 
             itemView.setOnClickListener(new OnClickListener() {
                 @Override

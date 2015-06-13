@@ -16,6 +16,7 @@ import com.eventshigh.nearme.app.ui.StreamAdapter;
 public class StreamFragment extends Fragment {
     private BaseContextActivity activity;
     private RecyclerView gridView;
+    private StreamAdapter streamAdapter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -26,15 +27,18 @@ public class StreamFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_notifications, container, false);
-        StreamAdapter streamAdapter = new StreamAdapter(activity,
-                StreamDbHelper.getCursorToStreamItems(activity));
         gridView = (RecyclerView) view.findViewById(R.id.grid);
+
+        streamAdapter = new StreamAdapter(activity);
         gridView.setAdapter(streamAdapter);
+
         return view;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         gridView.setOnScrollListener(new HideActionBarOnScroll(activity));
+
+        streamAdapter.setStreamItems(StreamDbHelper.getStreamItems(activity));
     }
 }

@@ -59,8 +59,8 @@ public class EventNotificationStreamItem extends StreamItem {
     }
 
     public void launch(BaseContextActivity activity) {
+        activity.reportActionToAnalytics("streamItemClick", eventId);
         activity.showEventDetails(EventsHighEndpoints.getEventDetailsURI(city, eventId),
                 EventNotificationStreamItem.class.getSimpleName());
     }
-
 }

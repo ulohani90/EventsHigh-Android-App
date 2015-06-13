@@ -6,12 +6,16 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.StreamItem;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StreamDbHelper extends SQLiteOpenHelper {
     private static final String TABLE_NAME = "stream";
@@ -58,6 +62,7 @@ public class StreamDbHelper extends SQLiteOpenHelper {
     /**
      * @return the row ID of the newly inserted row.
      */
+    @SuppressWarnings("TryFinallyCanBeTryWithResources")
     public static long addStreamToDB(Context context, StreamItem streamItem) throws JSONException {
         ContentValues values = new ContentValues();
         values.put(COLUMN_TIMESTAMP, streamItem.timestamp);
@@ -93,8 +98,28 @@ public class StreamDbHelper extends SQLiteOpenHelper {
 
     public static Cursor getCursorToStreamItems(Context context) {
         StreamDbHelper dbHelper = new StreamDbHelper(context);
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        SQLiteDatabase database = dbHelper.getReadableDatabase();
         return database.rawQuery("select * from " + StreamDbHelper.TABLE_NAME + " order by "
-                + StreamDbHelper.COLUMN_TIMESTAMP + " desc;", null);
+                + StreamDbHelper.COLUMN_TIMESTAMP + " desc limit 20;", null);
+    }
+
+    @SuppressWarnings("TryFinallyCanBeTryWithResources")
+    public static List<StreamItem> getStreamItems(Context context) {
+        List<StreamItem> streamItems = new ArrayList<>();
+        Cursor cursor = getCursorToStreamItems(context);
+
+        try {
+            while (cursor.moveToNext()) {
+                try {
+                    streamItems.add(parseFromCursor(cursor));
+                } catch (JSONException e) {
+                    Crashlytics.getInstance().core.logException(e);
+                }
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return streamItems;
     }
 }
