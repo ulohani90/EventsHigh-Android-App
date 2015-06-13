@@ -20,6 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
+    private static final int[] DEFAULT_IMAGES = {
+            R.drawable.stream_1,
+            R.drawable.stream_2,
+            R.drawable.stream_3,
+            R.drawable.stream_4,
+            R.drawable.stream_5
+    };
+
     private final BaseContextActivity activity;
     private List<StreamItem> streamItems;
 
@@ -46,7 +54,7 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
 
     @Override
     public void onBindViewHolder(NotificationCard card, int position) {
-        card.bindView(streamItems.get(position), activity);
+        card.bindView(streamItems.get(position), activity, position);
     }
 
     @Override
@@ -69,13 +77,14 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
             imageView = (NetworkImageView) itemView.findViewById(R.id.image);
         }
 
-        public void bindView(final StreamItem streamItem, final BaseContextActivity activity) {
+        public void bindView(final StreamItem streamItem, final BaseContextActivity activity, int position) {
             timeView.setText(DateUtils.getRelativeTimeSpanString(streamItem.timestamp));
             titleView.setText(streamItem.title);
             messageView.setText(Html.fromHtml(streamItem.message));
 
-            imageView.setDefaultImageResId(R.drawable.eh_logo);
-            imageView.setErrorImageResId(R.drawable.eh_logo);
+            int defaultImage = getDefaultImage(position);
+            imageView.setDefaultImageResId(defaultImage);
+            imageView.setErrorImageResId(defaultImage);
             imageView.setImageUrl(streamItem.imgUrl, VolleyHelper.getImageLoader(activity));
 
             itemView.setOnClickListener(new OnClickListener() {
@@ -85,5 +94,9 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
                 }
             });
         }
+    }
+
+    private static int getDefaultImage(int position) {
+        return DEFAULT_IMAGES[position % DEFAULT_IMAGES.length];
     }
 }

@@ -75,6 +75,7 @@
             android:layout_toEndOf="@+id/image"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginBottom="6dp"
             android:minLines="4"
             android:maxLines="4"
             tools:text="Last minute impromptu plans are the best ones!"
