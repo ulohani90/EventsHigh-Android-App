@@ -48,8 +48,6 @@ public class EventsFragment extends BaseEventsFragment {
     private long lastFetchTimestamp = 0;
     private long refreshInterval = REFRESH_EVENTS;
 
-    private boolean isActiveFragment = true;
-
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
                                              boolean showCategories) {
         EventsFragment fragment = new EventsFragment();
@@ -126,10 +124,6 @@ public class EventsFragment extends BaseEventsFragment {
         fetchNewListing(false);
     }
 
-    public void setActive(boolean isActiveFragment) {
-        this.isActiveFragment = isActiveFragment;
-    }
-
     public void setOnScrollListener (OnScrollListener onScrollListener) {
         this.onScrollListener = onScrollListener;
     }
@@ -194,9 +188,7 @@ public class EventsFragment extends BaseEventsFragment {
 
                 if (eventsCollection.events.isEmpty()) {
                     // Failed. Show toast and return empty list.
-                    if (isActiveFragment) {
-                        Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
-                    }
+                    Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
                 }
             }
 
@@ -219,7 +211,7 @@ public class EventsFragment extends BaseEventsFragment {
             }
 
             topProgressBar.setVisibility(View.GONE);
-            if (eventsAdapter.getItemCount() > 0 && isActiveFragment) {
+            if (eventsAdapter.getItemCount() > 0) {
                 Snackbar.make(topProgressBar, R.string.failed_refresh, Snackbar.LENGTH_SHORT).show();
             } else {
                 retryView.setVisibility(View.VISIBLE);

@@ -52,12 +52,12 @@
         android:id="@+id/fab_share"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/abc_ic_menu_share_mtrl_alpha"
-        android:visibility="gone"
-        tools:visibility="visible"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
+        android:src="@drawable/abc_ic_menu_share_mtrl_alpha"
         app:elevation="8dp"
         app:borderWidth="0dp"
-        />
+        android:visibility="gone"
+        tools:visibility="visible"
+    />
 </FrameLayout>

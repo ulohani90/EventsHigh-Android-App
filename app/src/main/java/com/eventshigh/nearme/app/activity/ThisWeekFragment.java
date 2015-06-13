@@ -21,10 +21,8 @@ import com.example.android.common.view.TabViewAdapter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Fragment to show this weeks events by date.
@@ -108,7 +106,6 @@ public class ThisWeekFragment extends BaseEventsFragment {
     private class ThisWeekPagerAdapter extends FragmentStatePagerAdapter
             implements TabViewAdapter, OnPageChangeListener, TabColorizer {
         private final List<DateTabView> dateTabViews = new ArrayList<>(numDays);
-        private final Map<Integer, EventsFragment> fragmentMap = new HashMap<>();
 
         private int lastPosition = -1;
 
@@ -120,10 +117,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
         public Fragment getItem(int position) {
             EventsContext dateContext = new EventsContext(eventsContext.location, "");
             dateContext.setDateFilter(getDate(position));
-            EventsFragment fragment = EventsFragment.getInstance(dateContext, false, showCategories);
-            fragmentMap.put(position, fragment);
-            fragment.setActive(false);
-            return fragment;
+            return EventsFragment.getInstance(dateContext, false, showCategories);
         }
 
         @Override
@@ -138,15 +132,11 @@ public class ThisWeekFragment extends BaseEventsFragment {
 
         @Override
         public void onPageSelected(int position) {
-            if (fragmentMap.get(position) != null) {
-                fragmentMap.get(position).setActive(true);
-            }
             activity.showActionBar();
 
             if (lastPosition >= 0) {
                 TextView last = dateTabViews.get(lastPosition).dayOfMonthView;
                 last.setTypeface(null, Typeface.NORMAL);
-                fragmentMap.get(lastPosition).setActive(false);
             }
 
             TextView selected = dateTabViews.get(position).dayOfMonthView;
@@ -171,12 +161,6 @@ public class ThisWeekFragment extends BaseEventsFragment {
 
             dateTabViews.add(position, dateTabView);
             return dateTabView.root;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            super.destroyItem(container, position, object);
-            fragmentMap.remove(position);
         }
 
         @Override
