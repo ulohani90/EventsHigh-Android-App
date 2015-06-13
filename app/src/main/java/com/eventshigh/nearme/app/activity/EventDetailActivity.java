@@ -12,7 +12,6 @@ import android.content.pm.PackageInfo;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -940,7 +939,7 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
                     event.sourceUrl != null && event.sourceUrl.contains("facebook.com/") &&
                     (checkInView.getVisibility() != View.VISIBLE || callView.getVisibility() != View.VISIBLE))
                 ? View.VISIBLE : View.GONE);
-            checkWithFriendView.setVisibility(View.VISIBLE);
+            checkWithFriendView.setVisibility(isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
 
             // Show price.
             findViewById(R.id.price_row).setVisibility(View.VISIBLE);
