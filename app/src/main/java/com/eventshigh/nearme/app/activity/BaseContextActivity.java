@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,7 +11,6 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -104,24 +102,6 @@ public abstract class BaseContextActivity extends BaseActivity {
         if (id == R.id.action_show_list) {
             reportActionToAnalytics("switchToList");
             switchTo(EventsGridActivity.class);
-            return true;
-        }
-
-        if (id == R.id.action_share) {
-            reportActionToAnalytics("shareEvents", eventsContext.getLabel());
-
-            String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
-                    .appendQueryParameter("src", "ehm").toString();
-            try {
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + uri);
-                sendIntent.setType("text/plain");
-                startActivity(sendIntent);
-            } catch (ActivityNotFoundException e) {
-                Crashlytics.getInstance().core.logException(e);
-                showMessage(R.string.failed_share);
-            }
             return true;
         }
 

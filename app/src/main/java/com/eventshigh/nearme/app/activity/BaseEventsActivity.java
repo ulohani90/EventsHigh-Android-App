@@ -7,7 +7,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.eventshigh.nearme.app.R;
@@ -36,7 +35,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
     // UI elements.
     protected FrameLayout eventContainer;
     protected SearchView searchView;
-    protected MenuItem shareMenu;
 
     // when was this activity last started on.
     private long lastStartedAt;
@@ -106,8 +104,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
         // Set visibility.
         menu.findItem(R.id.action_show_map).setVisible(isPlayServicesPresent);
         menu.findItem(getDisabledMenuItem()).setVisible(false);
-        shareMenu = menu.findItem(R.id.action_share);
-        shareMenu.setVisible(false);
 
         return true;
     }

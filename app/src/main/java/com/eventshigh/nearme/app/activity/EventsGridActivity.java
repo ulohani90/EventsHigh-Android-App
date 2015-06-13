@@ -1,5 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,9 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.ScaleAnimation;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
@@ -45,7 +46,20 @@ public class EventsGridActivity extends BaseEventsActivity {
         fabShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onOptionsItemSelected(shareMenu);
+                reportActionToAnalytics("shareEvents", eventsContext.getLabel());
+
+                String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
+                        .appendQueryParameter("src", "ehm").toString();
+                try {
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + uri);
+                    sendIntent.setType("text/plain");
+                    startActivity(sendIntent);
+                } catch (ActivityNotFoundException e) {
+                    Crashlytics.getInstance().core.logException(e);
+                    showMessage(R.string.failed_share);
+                }
             }
         });
 
@@ -93,8 +107,8 @@ public class EventsGridActivity extends BaseEventsActivity {
                     });
         }
 
-        if (EventsHighEndpoints.isDateQuery(eventsContext.query)) {
-            shareMenu.setVisible(true);
+        if (showFollowCard || EventsHighEndpoints.isDateQuery(eventsContext.query)) {
+            fabShare.setVisibility(View.VISIBLE);
         }
 
         return returnValue;
@@ -175,8 +189,6 @@ public class EventsGridActivity extends BaseEventsActivity {
     }
 
     private void setDarkToolbarIcons() {
-        animateFab(1, 0);
-
         toolbar.post(new Runnable() {
             @Override
             public void run() {
@@ -187,40 +199,12 @@ public class EventsGridActivity extends BaseEventsActivity {
     }
 
     private void setLightToolbarIcons() {
-        animateFab(0, 1);
-        fabShare.setVisibility(View.VISIBLE);
-
         toolbar.post(new Runnable() {
             @Override
             public void run() {
                 ToolbarColorizeHelper.colorizeToolbar(toolbar,
-                    getResources().getColor(android.R.color.white), EventsGridActivity.this);
+                        getResources().getColor(android.R.color.white), EventsGridActivity.this);
             }
         });
-    }
-
-    private void animateFab(int start, int end) {
-        float pivot = getResources().getDimension(R.dimen.fab_size) / 2;
-        Animation animation = new ScaleAnimation(start, end, start, end, pivot, pivot);
-        if (end == 0) {
-            animation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    fabShare.setVisibility(View.GONE);
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-        }
-
-        animation.setDuration(200);
-        fabShare.startAnimation(animation);
     }
 }
