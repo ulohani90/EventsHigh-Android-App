@@ -263,7 +263,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
             topProgressBar.setVisibility(View.GONE);
-            Snackbar.make(topProgressBar, R.string.failed_load, Snackbar.LENGTH_SHORT).show();
+            showMessage(R.string.failed_load);
         }
     };
 

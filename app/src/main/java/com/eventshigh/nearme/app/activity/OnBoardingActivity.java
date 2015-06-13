@@ -146,11 +146,6 @@ public class OnBoardingActivity extends BaseActivity {
         pref.setShowOnboarding(false);
     }
 
-    @Override
-    public View getViewForSnackbar() {
-        return imageView;
-    }
-
 
     // ***********************
     // Callbacks

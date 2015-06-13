@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.util.Pair;
@@ -121,8 +120,7 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
                             (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
                     ClipData clip = ClipData.newPlainText("invite link", inviteLink);
                     clipboard.setPrimaryClip(clip);
-                    Snackbar.make(activity.getViewForSnackbar(), R.string.ui_invite_link_copy,
-                            Snackbar.LENGTH_SHORT).show();
+                    activity.showMessage(R.string.ui_invite_link_copy);
                 }
             });
 
@@ -237,7 +235,7 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
         if (offer.threshold > offersResponse.forClaim) {
             String message = String.format(
                     activity.getString(R.string.offer_threshold_message), offer.threshold);
-            Snackbar.make(activity.getViewForSnackbar(), message, Snackbar.LENGTH_LONG).show();
+            activity.showMessage(message);
             return;
         }
 
@@ -281,11 +279,10 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
                 );
                 activity.reportActionToAnalytics("claimOffer", offer.id);
             } catch (Exception e) {
-                Crashlytics.logException(e);
+                Crashlytics.getInstance().core.logException(e);
                 activity.reportActionToAnalytics("claimOfferNoEmail", offer.id);
-                Snackbar.make(activity.getViewForSnackbar(),
-                        "Send us email at contact@eventshigh.com to redeem the offer",
-                        Snackbar.LENGTH_LONG).show();
+                activity.showMessage(
+                        "Send us email at contact@eventshigh.com to redeem the offer");
             }
         }
     }

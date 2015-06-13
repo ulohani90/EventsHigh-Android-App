@@ -86,6 +86,10 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
         Cursor cursor = context.getContentResolver().query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 projection, selection, null, order);
+        if (cursor == null) {
+            return;
+        }
+
         List<UserContact> contacts = new ArrayList<>();
         while(cursor.moveToNext()) {
             String contactId = cursor.getString(

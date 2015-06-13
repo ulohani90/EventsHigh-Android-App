@@ -26,11 +26,6 @@ public class FeedbackActivity extends BaseActivity {
         onRetry(null);
     }
 
-    @Override
-    public View getViewForSnackbar() {
-        return null;
-    }
-
     public void newFeedback(View view) {
         if (view != null) {
             reportActionToAnalytics("newFeedback");

@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
-import android.view.View;
 
 import com.eventshigh.nearme.app.R;
 
@@ -13,10 +12,5 @@ public class AboutUsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about_us);
-    }
-
-    @Override
-    public View getViewForSnackbar() {
-        return null;
     }
 }

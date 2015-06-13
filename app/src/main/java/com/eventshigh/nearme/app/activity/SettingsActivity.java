@@ -4,8 +4,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
@@ -25,8 +23,7 @@ public class SettingsActivity extends BaseActivity {
                 reportActionToAnalytics("deleteQueryHistory");
 
                 EventSearchSuggestionsProvider.clearHistory(this);
-                Snackbar.make(this.getViewForSnackbar(), R.string.message_delete_query_history,
-                        Snackbar.LENGTH_SHORT).show();
+                showMessage(R.string.message_delete_query_history);
             }
         }
 
@@ -45,10 +42,5 @@ public class SettingsActivity extends BaseActivity {
         }
 
         finish();
-    }
-
-    @Override
-    public View getViewForSnackbar() {
-        return null;
     }
 }

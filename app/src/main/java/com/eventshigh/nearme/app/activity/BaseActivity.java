@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
@@ -164,6 +165,23 @@ public abstract class BaseActivity extends AppCompatActivity {
         finish();
     }
 
+    public View getViewForSnackbar() {
+        return null;
+    }
+
+    public void showMessage(int messageId) {
+        showMessage(getString(messageId));
+    }
+
+    public void showMessage(String message) {
+        View snackBarView = getViewForSnackbar();
+        if (snackBarView != null) {
+            Snackbar.make(snackBarView, message, Snackbar.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     /**
      * Helper method which can be used to report any action in analytics.
      * @param actionName name of action to be reported.
@@ -246,7 +264,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             startActivity(sendIntent);
         } catch (ActivityNotFoundException e) {
             Crashlytics.getInstance().core.logException(e);
-            Snackbar.make(this.getViewForSnackbar(), R.string.failed_share, Snackbar.LENGTH_SHORT).show();
+            showMessage(R.string.failed_share);
             Log.w(LOG_TAG, "failed sharing", e);
         }
     }
@@ -277,7 +295,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         } catch (ActivityNotFoundException e) {
             // No activity to open cal.
             Crashlytics.getInstance().core.logException(e);
-            Snackbar.make(this.getViewForSnackbar(), R.string.no_cal_app, Snackbar.LENGTH_SHORT).show();
+            showMessage(R.string.no_cal_app);
         }
     }
 
@@ -304,6 +322,4 @@ public abstract class BaseActivity extends AppCompatActivity {
             gaHelper.reportCampaignParams(campaignData);
         }
     }
-
-    public abstract View getViewForSnackbar();
 }

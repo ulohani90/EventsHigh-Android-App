@@ -8,7 +8,6 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
@@ -279,7 +278,7 @@ public class LaunchActivity extends BaseContextActivity {
             citySelector.setVisibility(View.VISIBLE);
             citySelector.setAdapter(new CityListAdapter(LaunchActivity.this, mCitySelectionListener));
             if (connectionResult != null) {
-                Snackbar.make(tabsView, R.string.failed_location, Snackbar.LENGTH_SHORT).show();
+                showMessage(R.string.failed_location);
             }
         }
     };

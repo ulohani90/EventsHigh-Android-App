@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -121,12 +120,17 @@ public abstract class BaseContextActivity extends BaseActivity {
                 startActivity(sendIntent);
             } catch (ActivityNotFoundException e) {
                 Crashlytics.getInstance().core.logException(e);
-                Snackbar.make(this.getViewForSnackbar(), R.string.failed_share, Snackbar.LENGTH_SHORT).show();
+                showMessage(R.string.failed_share);
             }
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public View getViewForSnackbar() {
+        return toolbar;
     }
 
     protected void switchTo(Class<?> cls) {
@@ -261,10 +265,5 @@ public abstract class BaseContextActivity extends BaseActivity {
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.putExtra(EventDetailActivity.EXTRA_EVENT_PARAM, event);
         startActivity(detailIntent, bundle);
-    }
-
-    @Override
-    public View getViewForSnackbar() {
-        return toolbar;
     }
 }

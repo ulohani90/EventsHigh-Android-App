@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.text.util.Linkify;
 import android.util.Pair;
 import android.view.View;
@@ -78,7 +77,7 @@ public class PhoneLoginActivity extends BaseActivity {
         final String phoneNo = Utils.simplifyPhoneNo(phoneNoView.getText().toString());
         if (phoneNo.length() < 10 || phoneNo.length() > 12) {
             phoneNoView.requestFocus();
-            Snackbar.make(this.getViewForSnackbar(), "Entered phoneNo is not correct", Snackbar.LENGTH_SHORT).show();
+            showMessage("Entered phone number is not correct");
             return;
         }
 
@@ -204,7 +203,7 @@ public class PhoneLoginActivity extends BaseActivity {
     }
 
     private void showRetryMessage() {
-        Snackbar.make(this.getViewForSnackbar(), R.string.retry, Snackbar.LENGTH_SHORT).show();
+        showMessage(R.string.retry);
     }
 
     private VerificationStatus parseStatus(@Nullable String statusString) {
