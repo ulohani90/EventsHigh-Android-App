@@ -48,6 +48,8 @@ public class EventsFragment extends BaseEventsFragment {
     private long lastFetchTimestamp = 0;
     private long refreshInterval = REFRESH_EVENTS;
 
+    private boolean isActiveFragment = true;
+
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
                                              boolean showCategories) {
         EventsFragment fragment = new EventsFragment();
@@ -124,6 +126,10 @@ public class EventsFragment extends BaseEventsFragment {
         fetchNewListing(false);
     }
 
+    public void setActive(boolean isActiveFragment) {
+        this.isActiveFragment = isActiveFragment;
+    }
+
     public void setOnScrollListener (OnScrollListener onScrollListener) {
         this.onScrollListener = onScrollListener;
     }
@@ -188,13 +194,15 @@ public class EventsFragment extends BaseEventsFragment {
 
                 if (eventsCollection.events.isEmpty()) {
                     // Failed. Show toast and return empty list.
-                    Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+                    if (isActiveFragment) {
+                        Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+                    }
                 }
             }
 
             if (!isIntermediate || !eventsCollection.events.isEmpty()) {
                 eventsAdapter.setEvents(eventsCollection.events,
-                    (eventsContext.query.isEmpty() || eventsContext.dateFilter.isEmpty() ? null : eventsContext.query));
+                        (eventsContext.query.isEmpty() || eventsContext.dateFilter.isEmpty() ? null : eventsContext.query));
                 if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                             eventsCollection.numFollowers);
@@ -211,7 +219,7 @@ public class EventsFragment extends BaseEventsFragment {
             }
 
             topProgressBar.setVisibility(View.GONE);
-            if (eventsAdapter.getItemCount() > 0) {
+            if (eventsAdapter.getItemCount() > 0 && isActiveFragment) {
                 Snackbar.make(topProgressBar, R.string.failed_refresh, Snackbar.LENGTH_SHORT).show();
             } else {
                 retryView.setVisibility(View.VISIBLE);
