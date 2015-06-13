@@ -75,7 +75,7 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String OFFERS_TAB = "offers";
     public static final String MY_EVENTS_TAB = EventsHighEndpoints.QUERY_MY_EVENT;
     public static final String EXPLORE_TAB = "explore";
-    public static final String NOTIFICATIONS_TAB = "stream";
+    public static final String NOTIFICATIONS_TAB = "Notifications";
     public static final String THIS_WEEK_TAB = "this week";
     public final String[] TABS = {
             OFFERS_TAB,

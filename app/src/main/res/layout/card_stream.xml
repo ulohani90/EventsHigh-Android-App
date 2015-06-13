@@ -15,7 +15,7 @@
     >
         <com.eventshigh.nearme.app.view.FadeInNetworkImageView
             android:id="@+id/image"
-            android:layout_width="96dp"
+            android:layout_width="120dp"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:layout_alignParentLeft="true"
@@ -75,9 +75,9 @@
             android:layout_toEndOf="@+id/image"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginBottom="6dp"
-            android:minLines="4"
-            android:maxLines="4"
+            android:paddingBottom="6dp"
+            android:minLines="3"
+            android:maxLines="3"
             tools:text="Last minute impromptu plans are the best ones!"
         />
     </RelativeLayout>
