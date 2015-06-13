@@ -44,7 +44,7 @@ public class TicketNotificationStreamItem extends StreamItem {
     }
 
     public StreamType getStreamType() {
-        return StreamType.QUERY_NOTIFICATION;
+        return StreamType.TICKET_NOTIFICATION;
     }
 
     public JSONObject toJSON() throws JSONException {

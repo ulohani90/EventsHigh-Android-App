@@ -10,6 +10,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.StreamItem;
+import com.eventshigh.nearme.app.data.stream.TicketNotificationStreamItem;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,7 +37,8 @@ public class StreamDbHelper extends SQLiteOpenHelper {
 
     public enum StreamType {
         EVENT_NOTIFICATION(1),
-        QUERY_NOTIFICATION(2);
+        QUERY_NOTIFICATION(2),
+        TICKET_NOTIFICATION(3);
 
         public final int id;
 
@@ -91,6 +93,10 @@ public class StreamDbHelper extends SQLiteOpenHelper {
 
         if (type == StreamType.QUERY_NOTIFICATION.id) {
             return new QueryNotificationStreamItem(time, jsonObject);
+        }
+
+        if (type == StreamType.TICKET_NOTIFICATION.id) {
+            return new TicketNotificationStreamItem(time, jsonObject);
         }
 
         throw new IllegalArgumentException("invalid type: " + type);
