@@ -18,11 +18,10 @@
             android:layout_height="wrap_content"
             layout="@layout/toolbar"
         />
-        <com.example.android.common.view.SlidingTabLayout
+        <android.support.design.widget.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/primary"
             android:elevation="8dp"
             tools:ignore="UnusedAttribute"
         />
