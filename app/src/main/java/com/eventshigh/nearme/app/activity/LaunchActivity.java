@@ -30,7 +30,6 @@ import com.eventshigh.nearme.app.ui.CityListAdapter;
 import com.eventshigh.nearme.app.ui.CityListAdapter.OnCitySelectionListener;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
-import com.eventshigh.nearme.app.user.UserContactsUploader;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -162,9 +161,6 @@ public class LaunchActivity extends BaseContextActivity {
 
         // Show next screen.
         showNextScreen();
-
-        // Upload contacts
-        new UserContactsUploader(this).uploadContacts();
     }
 
     @Override

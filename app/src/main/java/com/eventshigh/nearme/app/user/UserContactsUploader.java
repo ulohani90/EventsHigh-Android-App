@@ -25,7 +25,7 @@ import java.util.List;
 
 public class UserContactsUploader implements Listener<JSONObject>, ErrorListener, Runnable {
     private static final String LOG_TAG = UserContactsUploader.class.getSimpleName();
-    private static final int MAX_CONTACTS_TO_UPLOAD = 400;
+    private static final int MAX_CONTACTS_TO_UPLOAD = 1000;
 
     private static final String PARAM_LAST_CONTACTS_SYNC_TIMESTAMP = "last_contacts_sync_timestamp10";
     private static final String PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP = "last_contacts_sync_try_timestamp10";
@@ -45,12 +45,6 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
         final long lastTry = sharedPreferences.getLong(PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP, 0);
         currentTimeMillis = System.currentTimeMillis();
         if (currentTimeMillis - lastTry < DateUtils.DAY_IN_MILLIS) {
-            return;
-        }
-
-        // Don't do anything if we have uploaded contacts in the last 7 day.
-        lastSync = sharedPreferences.getLong(PARAM_LAST_CONTACTS_SYNC_TIMESTAMP, 0);
-        if (currentTimeMillis - lastSync < DateUtils.WEEK_IN_MILLIS) {
             return;
         }
 
