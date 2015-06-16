@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:gravity="center_horizontal"
+    android:background="@android:color/white"
+>
+    <TextView
+        style="@style/RateText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableTop="@drawable/ic_launcher"
+        android:drawablePadding="24dp"
+        android:gravity="center"
+        android:lineSpacingExtra="2dp"
+        android:text="@string/perm_upload_contacts"
+    />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:drawableLeft="@drawable/ic_info_black_24dp"
+        android:drawableStart="@drawable/ic_info_black_24dp"
+        android:text="@string/contacts_upload_promise"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textSize="12sp"
+    />
+</LinearLayout>

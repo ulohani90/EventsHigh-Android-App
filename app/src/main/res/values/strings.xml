@@ -141,11 +141,14 @@
     <string name="event_distance_and_time">%d mins</string>
     <string name="num_events">{0,choice,10&lt;{1} Events|11&lt;{0} Followers \'|\' {1} Events}</string>
 
+    <!-- Contacts Upload -->
+    <string name="perm_upload_contacts">Events are best with Friends. We would like to upload your contacts to our servers so that we can show events that matter to you most.</string>
+    <string name="contacts_upload_promise">We will not sell your contacts to any third party, that\'s a promise!</string>
+
     <!-- FB -->
     <string name="facebook_app_id">196111897251952</string>
 
     <!-- Rating -->
-    <string name="rate_app_text_v1">Loving EventsHigh? Help us spread the word by rating us in the playstore</string>
     <string name="rate_app_text_v2">Loving EventsHigh? Give us 5 stars!</string>
     <string name="feedback_text">How can we improve?</string>
     <string name="rate_app_no">No, Thanks</string>

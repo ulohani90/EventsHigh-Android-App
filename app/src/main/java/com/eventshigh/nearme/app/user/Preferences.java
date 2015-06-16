@@ -12,6 +12,8 @@ import android.preference.PreferenceManager;
  */
 public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_SHOW_ONBOARDING = "show_onboarding";
+    public static final String PREF_UPLOAD_CONTACTS = "upload_contacts";
+    public static final String PREF_LAST_TIME_ASKED_CONTACTS = "last_time_asked_contacts";
 
     private final Context context;
     private final SharedPreferences sharedPreferences;
@@ -36,6 +38,22 @@ public class Preferences implements OnSharedPreferenceChangeListener {
 
     public boolean shouldShowOnBoarding() {
         return sharedPreferences.getBoolean(PREF_SHOW_ONBOARDING, true);
+    }
+
+    public void setShouldUploadContacts(boolean shouldUploadContacts) {
+        sharedPreferences.edit().putBoolean(PREF_UPLOAD_CONTACTS, shouldUploadContacts).apply();
+    }
+
+    public boolean shouldUploadContacts() {
+        return sharedPreferences.getBoolean(PREF_UPLOAD_CONTACTS, false);
+    }
+
+    public void setUploadContactsAsked() {
+        sharedPreferences.edit().putLong(PREF_LAST_TIME_ASKED_CONTACTS, System.currentTimeMillis()).apply();
+    }
+
+    public long getLastUploadContactsAsked () {
+        return sharedPreferences.getLong(PREF_LAST_TIME_ASKED_CONTACTS, 0);
     }
 
     @Override
