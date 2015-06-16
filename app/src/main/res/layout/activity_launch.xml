@@ -26,6 +26,7 @@
             android:background="@color/primary"
             app:tabIndicatorColor="@android:color/white"
             android:elevation="8dp"
+            app:tabIndicatorHeight="3dp"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             tools:ignore="UnusedAttribute"
         />
