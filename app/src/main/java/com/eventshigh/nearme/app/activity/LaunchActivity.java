@@ -4,15 +4,14 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,7 +20,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -37,9 +35,6 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.example.android.common.view.SlidingTabLayout;
-import com.example.android.common.view.SlidingTabLayout.TabColorizer;
-import com.example.android.common.view.TabViewAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -57,7 +52,7 @@ public class LaunchActivity extends BaseContextActivity {
 
     // UI Elements for this activity.
     private DrawerLayout drawer;
-    private SlidingTabLayout tabsView;
+    private TabLayout tabsView;
     private ViewPager viewPager;
     private ListView citySelector;
     private ActionBarDrawerToggle drawerToggle;
@@ -91,7 +86,7 @@ public class LaunchActivity extends BaseContextActivity {
         // Set View.
         setContentView(R.layout.activity_launch);
         drawer = (DrawerLayout) findViewById(R.id.nav_drawer);
-        tabsView = (SlidingTabLayout) findViewById(R.id.tabs);
+        tabsView = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         citySelector = (ListView) findViewById(R.id.city_selector);
 
@@ -278,13 +273,16 @@ public class LaunchActivity extends BaseContextActivity {
     }
 
     private void showExploreScreen() {
+        tabsView.setTabMode(TabLayout.MODE_SCROLLABLE);
         ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
         viewPager.setAdapter(adapter);
-        tabsView.setTabViewAdapter(adapter);
-        tabsView.setViewPager(viewPager);
-        tabsView.setOnPageChangeListener(adapter);
-        tabsView.setCustomTabColorizer(adapter);
-        tabsView.scrollTo(defaultTab);
+        tabsView.setupWithViewPager(viewPager);
+        // TODO: text colors is not yet working
+        tabsView.setTabTextColors(getResources().getColor(android.R.color.white),
+                getResources().getColor(android.R.color.white));
+        tabsView.setScrollPosition(defaultTab, 0, true);
+        tabsView.setOnTabSelectedListener(adapter);
+
         viewPager.setCurrentItem(defaultTab, false);
         lastFetchTimestamp = System.currentTimeMillis();
     }
@@ -334,7 +332,7 @@ public class LaunchActivity extends BaseContextActivity {
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
-            implements TabViewAdapter, OnPageChangeListener, TabColorizer {
+            implements TabLayout.OnTabSelectedListener {
         private final TextView[] tabViews = new TextView[TABS.length];
         private EventsFragment myEventsFragment;
 
@@ -367,50 +365,35 @@ public class LaunchActivity extends BaseContextActivity {
         }
 
         @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            // do nothing.
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            showActionBar();
-
-            if (TABS[position].equals(MY_EVENTS_TAB) && myEventsFragment != null) {
-                myEventsFragment.onResume();
-            }
-
-            for (int i = 0; i < tabViews.length; i++) {
-                tabViews[i].setTypeface(null, i == position ? Typeface.BOLD : Typeface.NORMAL);
-            }
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-            // do nothing.
-        }
-
-        @Override
-        public View getView(int position, ViewGroup parent) {
-            TextView textView = (TextView) getLayoutInflater().inflate(
-                    R.layout.view_explore_tab, parent, false);
-            tabViews[position] = textView;
-            textView.setText(Utils.capitalize(TABS[position]));
-            return textView;
-        }
-
-        @Override
         public int getCount() {
             return TABS.length;
         }
 
         @Override
-        public int getIndicatorColor(int position) {
-            return getResources().getColor(android.R.color.white);
+        public CharSequence getPageTitle(int position) {
+            return TABS[position];
         }
 
         @Override
-        public int getDividerColor(int position) {
-            return getResources().getColor(android.R.color.transparent);
+        public void onTabSelected(TabLayout.Tab tab) {
+            showActionBar();
+
+            int position = tab.getPosition();
+            if (TABS[position].equals(MY_EVENTS_TAB) && myEventsFragment != null) {
+                myEventsFragment.onResume();
+            }
+
+            viewPager.setCurrentItem(position);
+        }
+
+        @Override
+        public void onTabUnselected(TabLayout.Tab tab) {
+
+        }
+
+        @Override
+        public void onTabReselected(TabLayout.Tab tab) {
+
         }
     }
 }
