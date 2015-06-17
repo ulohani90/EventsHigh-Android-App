@@ -171,6 +171,9 @@ public class LaunchActivity extends BaseContextActivity {
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
+        // Set visibility.
+        menu.findItem(R.id.action_show_map).setVisible(isPlayServicesPresent);
+
         return true;
     }
 
