@@ -1,12 +1,11 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
-import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +14,8 @@ import android.widget.TextView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
-import com.example.android.common.view.SlidingTabLayout;
-import com.example.android.common.view.SlidingTabLayout.TabColorizer;
-import com.example.android.common.view.TabViewAdapter;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -29,6 +23,8 @@ import java.util.Locale;
  */
 public class ThisWeekFragment extends BaseEventsFragment {
     public static final String NUM_DAYS_PARAM = ThisWeekFragment.class.getName() + "_num_days";
+
+    private final Calendar today = DateTimeUtils.toMidnight(Calendar.getInstance(), null);
 
     public static ThisWeekFragment getInstance(EventsContext eventsContext,  boolean showCategories,
             int numDays) {
@@ -42,7 +38,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
 
     private ViewPager viewPager;
     private ThisWeekPagerAdapter adapter;
-    private SlidingTabLayout tabsView;
+    private TabLayout tabsView;
 
     private  int numDays;
 
@@ -66,12 +62,26 @@ public class ThisWeekFragment extends BaseEventsFragment {
         viewPager = (ViewPager) view.findViewById(R.id.view_pager_date);
         viewPager.setAdapter(adapter);
 
-        tabsView = (SlidingTabLayout) view.findViewById(R.id.date_filter);
-        tabsView.setTabViewAdapter(adapter);
-        tabsView.setViewPager(viewPager);
-        tabsView.setOnPageChangeListener(adapter);
-        tabsView.setCustomTabColorizer(adapter);
-        tabsView.scrollTo(eventsContext.dateFilter);
+        tabsView = (TabLayout) view.findViewById(R.id.date_filter);
+        int selectedPosition = 0;
+        for (int i = 0; i < adapter.getCount(); i++) {
+            if (adapter.getPageTitle(i).equals(eventsContext.dateFilter)) {
+                selectedPosition = i;
+            }
+
+            Calendar calendar = getDate(i);
+            DateTabView dateTabView = new DateTabView(
+                    activity.getLayoutInflater().inflate(R.layout.view_tab_date, null));
+            dateTabView.weekDayView.setText(
+                    calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US));
+            dateTabView.dayOfMonthView.setText(
+                    Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));
+            tabsView.addTab(tabsView.newTab().setCustomView(dateTabView.root));
+        }
+        tabsView.setTabMode(TabLayout.MODE_SCROLLABLE);
+        tabsView.setOnTabSelectedListener(adapter);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabsView));
+        tabsView.setScrollPosition(selectedPosition, 0, true);
     }
 
     @Override
@@ -86,9 +96,16 @@ public class ThisWeekFragment extends BaseEventsFragment {
             @Override
             public void run() {
                 viewPager.setAdapter(adapter);
-                tabsView.scrollTo(0);
+                tabsView.setScrollPosition(0, 0, true);
             }
         });
+    }
+
+    private Calendar getDate(int position) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(today.getTime());
+        calendar.add(Calendar.DAY_OF_MONTH, position);
+        return calendar;
     }
 
     private static class DateTabView {
@@ -104,11 +121,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
     }
 
     private class ThisWeekPagerAdapter extends FragmentStatePagerAdapter
-            implements TabViewAdapter, OnPageChangeListener, TabColorizer {
-        private final List<DateTabView> dateTabViews = new ArrayList<>(numDays);
-
-        private int lastPosition = -1;
-
+            implements TabLayout.OnTabSelectedListener {
         public ThisWeekPagerAdapter() {
             super(activity.getSupportFragmentManager());
         }
@@ -126,64 +139,24 @@ public class ThisWeekFragment extends BaseEventsFragment {
         }
 
         @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            // do nothing.
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            activity.showActionBar();
-
-            if (lastPosition >= 0) {
-                TextView last = dateTabViews.get(lastPosition).dayOfMonthView;
-                last.setTypeface(null, Typeface.NORMAL);
-            }
-
-            TextView selected = dateTabViews.get(position).dayOfMonthView;
-            selected.setTypeface(null, Typeface.BOLD);
-            lastPosition = position;
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-            // do nothing.
-        }
-
-        @Override
-        public View getView(int position, ViewGroup parent) {
-            Calendar calendar = getDate(position);
-            DateTabView dateTabView = new DateTabView(
-                    activity.getLayoutInflater().inflate(R.layout.view_tab_date, parent, false));
-            dateTabView.weekDayView.setText(
-                    calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US));
-            dateTabView.dayOfMonthView.setText(
-                    Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));
-
-            dateTabViews.add(position, dateTabView);
-            return dateTabView.root;
-        }
-
-        @Override
         public int getCount() {
             return numDays;
         }
 
         @Override
-        public int getIndicatorColor(int position) {
-            return getResources().getColor(android.R.color.white);
+        public void onTabSelected(TabLayout.Tab tab) {
+            activity.showActionBar();
+            viewPager.setCurrentItem(tab.getPosition());
         }
 
         @Override
-        public int getDividerColor(int position) {
-            return 0x26000000;
+        public void onTabUnselected(TabLayout.Tab tab) {
+            // do nothing.
         }
 
-        private final Calendar today = DateTimeUtils.toMidnight(Calendar.getInstance(), null);
-        private Calendar getDate(int position) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(today.getTime());
-            calendar.add(Calendar.DAY_OF_MONTH, position);
-            return calendar;
+        @Override
+        public void onTabReselected(TabLayout.Tab tab) {
+            // do nothing.
         }
     }
 }
