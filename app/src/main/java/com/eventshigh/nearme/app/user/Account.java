@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.user;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.util.Pair;
 
@@ -14,9 +13,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.user.UserActionHelper.FollowingAction;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
+import com.eventshigh.nearme.app.user.UserActionHelper.FollowingAction;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONObject;
@@ -51,9 +50,15 @@ public class Account {
     private static final String PREF_FOLLOW_KEY_PREFIX = "follow_";
 
     private static boolean disableSnackBar = false;
+    private boolean syncCompleted = false;
 
-    private static final Object lock = new Object();
+    // shared and static accountInfo which usages shared preference to store records.
     private static SharedPreferences accountInfo;
+    private static synchronized void setAccountInfo(Context context) {
+        if (accountInfo == null) {
+            accountInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
+        }
+    }
 
     // Member variables used to store the user account details in preferences.
     private final Context context;
@@ -61,14 +66,12 @@ public class Account {
     public Account(Context context) {
         this.context = context.getApplicationContext();
 
-        synchronized (lock) {
-            if (accountInfo == null) {
-                accountInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
-            }
-        }
+        setAccountInfo(this.context);
 
         // Check if we need to upload the data.
-        new AccountStateRegistar().execute();
+        if (!syncCompleted) {
+            new Thread(new AccountStateRegistar()).start();
+        }
     }
 
     public Pair<String, Boolean> getPhoneNumber() {
@@ -97,25 +100,30 @@ public class Account {
     }
 
     public static void disablePhoneVerifySnackbar() {
-        Account.disableSnackBar = true;
+        disableSnackBar = true;
     }
 
     public static boolean isPhoneVerifyPending(Context context) {
         if (disableSnackBar) {
             return false;
         }
+
         Account account = new Account(context);
         Pair<String, Boolean> accountPhoneStatus = account.getPhoneNumber();
-        return accountPhoneStatus.first != null && !accountPhoneStatus.second;
+        disableSnackBar = (accountPhoneStatus.first == null || accountPhoneStatus.second);
+        return !disableSnackBar;
     }
 
     public boolean recordReferrer(String referrer) {
-        if (!accountInfo.contains(PREF_REFERRER)) {
-            accountInfo.edit().putString(PREF_REFERRER, referrer).apply();
-            return true;
-        }
+        synchronized (AccountStateRegistarLock) {
+            if (!accountInfo.contains(PREF_REFERRER)) {
+                accountInfo.edit().putString(PREF_REFERRER, referrer).apply();
+                syncCompleted = false;
+                return true;
+            }
 
-        return false;
+            return false;
+        }
     }
 
     public String getAppDownloadLink() {
@@ -162,45 +170,32 @@ public class Account {
     private static final Object AccountStateRegistarLock = new Object();
     private static boolean inProgress = false;
 
-    private class AccountStateRegistar extends AsyncTask<Void, Void, Void> {
+    private class AccountStateRegistar implements Runnable {
         @Override
-        protected Void doInBackground(Void... params) {
-            String referrer = accountInfo.getString(PREF_REFERRER, null);
-            if (referrer != null && !accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false)) {
-                uploadReferrer(referrer);
-            }
-
+        public void run() {
             synchronized (AccountStateRegistarLock) {
-                if (!inProgress &&
-                    accountInfo.getString(PREF_SHARE_APP_LINK, null) == null &&
-                    GcmRegistration.getInstance(context).getLastCity() != null) {
+                String referrer = accountInfo.getString(PREF_REFERRER, null);
+                String appLink = accountInfo.getString(PREF_SHARE_APP_LINK, null);
+                if (appLink != null && (referrer == null || accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false))) {
+                    syncCompleted = true;
+                    return;
+                }
+
+                if (referrer != null) {
+                    uploadReferrer(referrer);
+                }
+
+                if (inProgress) {
+                    return;
+                }
+
+                if (referrer != null || GcmRegistration.getInstance(context).getLastCity() != null) {
                     try {
                         Uri uri = AccountStateReporter.getBaseUri(context, "getReferrerLink").build();
                         String url = Signer.sign(uri).toString();
                         inProgress = true;
                         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
-                                new Listener<JSONObject>() {
-                                    @Override
-                                    public void onResponse(JSONObject jsonObject, boolean isIntermediate) {
-                                        String link = jsonObject.optString("link");
-                                        if (link != null && !link.isEmpty()) {
-                                            accountInfo.edit().putString(PREF_SHARE_APP_LINK, link).apply();
-                                        }
-                                        synchronized (AccountStateRegistarLock) {
-                                            inProgress = false;
-                                        }
-                                    }
-                                },
-                                new ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError volleyError) {
-                                        Crashlytics.getInstance().core.logException(volleyError.getCause());
-                                        synchronized (AccountStateRegistarLock) {
-                                            inProgress = false;
-                                        }
-                                    }
-                                }
-                        );
+                                appLinkListener, errorListener);
                         VolleyHelper.addToRequestQueue(context, request);
                     } catch (IOException | GeneralSecurityException e) {
                         Crashlytics.getInstance().core.logException(e);
@@ -208,7 +203,6 @@ public class Account {
                     }
                 }
             }
-            return null;
         }
 
         private void uploadReferrer(String referrer) {
@@ -219,5 +213,28 @@ public class Account {
                 }
             });
         }
+
+        private Listener<JSONObject> appLinkListener = new Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject jsonObject, boolean isIntermediate) {
+                String link = jsonObject.optString("link");
+                if (link != null && !link.isEmpty()) {
+                    accountInfo.edit().putString(PREF_SHARE_APP_LINK, link).apply();
+                }
+                synchronized (AccountStateRegistarLock) {
+                    inProgress = false;
+                }
+            }
+        };
+
+        private ErrorListener errorListener = new ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Crashlytics.getInstance().core.logException(volleyError.getCause());
+                synchronized (AccountStateRegistarLock) {
+                    inProgress = false;
+                }
+            }
+        };
     }
 }

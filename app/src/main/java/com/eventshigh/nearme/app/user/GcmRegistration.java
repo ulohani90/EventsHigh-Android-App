@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.utils.DeviceUtils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -50,6 +49,7 @@ public class GcmRegistration {
     // Member variables used to store the user account details in preferences.
     private final Context context;
     private final SharedPreferences gcmRegistrationInfo;
+    private boolean syncCompleted = false;
 
     // City listener.
     private UserCityListener userCityListener = null;
@@ -68,11 +68,13 @@ public class GcmRegistration {
         return  instance;
     }
 
-    public void updateGcmRegistrationIdIfNeeded() {
-        new Thread(new GcmRegistar()).start();
+    public synchronized void updateGcmRegistrationIdIfNeeded() {
+        if (! syncCompleted) {
+            new Thread(new GcmRegistar()).start();
+        }
     }
 
-    public void resetGcmRegistrationId() {
+    public synchronized void resetGcmRegistrationId() {
         Editor editor = gcmRegistrationInfo.edit();
         editor.remove(PREF_REGISTRATION_ID);
         editor.remove(PREF_ZENDESK_UPDATED);
@@ -80,10 +82,11 @@ public class GcmRegistration {
         editor.remove(PREF_FIRST_TOPICS);
         editor.apply();
 
+        syncCompleted = false;
         updateGcmRegistrationIdIfNeeded();
     }
 
-    public void setLastCity(@Nullable City city, @Nullable LatLng location) {
+    public synchronized void setLastCity(@Nullable City city, @Nullable LatLng location) {
         userLocation = location;
 
         if (city == null) {
@@ -105,6 +108,7 @@ public class GcmRegistration {
                     .putString(PREF_LAST_CITY, city.toString())
                     .remove(PREF_LAST_CITY_UPLOADED)
                     .apply();
+            syncCompleted = false;
 
             if (currentLastCity != null) {
                 subscribeOrUnSubscribe(currentLastCity.toString(), false);
@@ -143,11 +147,10 @@ public class GcmRegistration {
         }
     }
 
-    private static final Object LOCK = new Object();
     private class GcmRegistar implements Runnable {
         @Override
         public void run() {
-            synchronized (LOCK) {
+            synchronized (GcmRegistration.this) {
                 boolean isPlayServicesPresent =
                     GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
 
@@ -163,14 +166,14 @@ public class GcmRegistration {
                             Crashlytics.getInstance().core.logException(e);
                             registrationId = null;
                         }
-                    }
 
-                    if (registrationId != null) {
-                        Editor editor = gcmRegistrationInfo.edit();
-                        editor.putString(PREF_REGISTRATION_ID, registrationId);
-                        editor.remove(PREF_REGISTRATION_ID_UPLOADED);
-                        editor.remove(PREF_ZENDESK_UPDATED);
-                        editor.apply();
+                        if (registrationId != null) {
+                            Editor editor = gcmRegistrationInfo.edit();
+                            editor.putString(PREF_REGISTRATION_ID, registrationId);
+                            editor.remove(PREF_REGISTRATION_ID_UPLOADED);
+                            editor.remove(PREF_ZENDESK_UPDATED);
+                            editor.apply();
+                        }
                     }
                 }
 
@@ -257,6 +260,16 @@ public class GcmRegistration {
                     } catch (Exception e) {
                         Crashlytics.getInstance().core.logException(e);
                     }
+                }
+
+                // Check if everything is done.
+                if (gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false) &&
+                    gcmRegistrationInfo.getBoolean(PREF_DEVICE_INFO_UPLOADED, false)&&
+                    gcmRegistrationInfo.getBoolean(PREF_IID_UPLOADED, false) &&
+                    gcmRegistrationInfo.getBoolean(PREF_REGISTRATION_ID_UPLOADED, false) &&
+                    gcmRegistrationInfo.getBoolean(PREF_ZENDESK_UPDATED, false) &&
+                    gcmRegistrationInfo.getBoolean(PREF_FIRST_TOPICS, false)) {
+                    syncCompleted = true;
                 }
             }
         }
