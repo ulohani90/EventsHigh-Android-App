@@ -26,6 +26,7 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
+import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
@@ -98,9 +99,16 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        // Google Analytics reporting.
+        if (isFinishing()) {
+            return;
+        }
+
         if (isPlayServicesPresent) {
+            // Google Analytics reporting.
             gaHelper.reportActivityStart(this);
+
+            // Register with GCM if needed. GCM is used for notifications messages.
+            GcmRegistration.getInstance(this).updateGcmRegistrationIdIfNeeded();
         }
     }
 
@@ -144,7 +152,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 public void run() {
                     AskForContactsDialog.doNeedful(BaseActivity.this);
                 }
-            }, 1000);
+            }, 3000);
         }
     }
 

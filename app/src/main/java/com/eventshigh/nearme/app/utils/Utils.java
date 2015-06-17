@@ -50,7 +50,7 @@ public class Utils {
     public static Uri getAppUri(Uri webUri) {
         Uri.Builder builder = Uri.parse("android-app://com.eventshigh.nearme.app/").buildUpon();
         builder.appendPath(webUri.getScheme());
-        builder.appendPath(webUri.getHost().replaceAll("www.", ""));
+        builder.appendPath(webUri.getHost());
         for (String pathSegment : webUri.getPathSegments()) {
             builder.appendPath(pathSegment);
         }
@@ -79,7 +79,7 @@ public class Utils {
                         callback.run();
                     } catch (Exception e) {
                         // Ignore.
-                        Crashlytics.logException(e);
+                        Crashlytics.getInstance().core.logException(e);
                     }
                 }
             }

@@ -212,7 +212,7 @@ public class EventsFragment extends BaseEventsFragment {
 
             topProgressBar.setVisibility(View.GONE);
             if (eventsAdapter.getItemCount() > 0) {
-                Snackbar.make(topProgressBar, R.string.failed_refresh, Snackbar.LENGTH_SHORT).show();
+                activity.showMessage(R.string.failed_refresh);
             } else {
                 retryView.setVisibility(View.VISIBLE);
             }

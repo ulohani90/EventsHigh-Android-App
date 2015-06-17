@@ -133,19 +133,6 @@ public class LaunchActivity extends BaseContextActivity {
         AlarmUtils.setWeeklyAlarms(this);
     }
 
-    public void onStart() {
-        super.onStart();
-
-        if (isFinishing()) {
-            return;
-        }
-
-        // Register with GCM if needed. GCM is used for notifications messages.
-        if (isPlayServicesPresent) {
-            gcmRegistration.updateGcmRegistrationIdIfNeeded();
-        }
-    }
-
     protected void onResume() {
         super.onResume();
 
@@ -318,17 +305,12 @@ public class LaunchActivity extends BaseContextActivity {
         if (eventsContext.query.isEmpty() && eventsContext.dateFilter.isEmpty()) {
             refreshIfOldData();
         } else {
-            launch(eventsContext);
+            Intent outIntent = new Intent(this, EventsGridActivity.class);
+            outIntent.setAction(Intent.ACTION_VIEW);
+            outIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
+            startActivity(outIntent);
             finish();
         }
-    }
-
-    // Launch the target activity.
-    private void launch(EventsContext eventsContext) {
-        Intent outIntent = new Intent(this, EventsGridActivity.class);
-        outIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
-
-        startActivity(outIntent);
     }
 
     private final OnCitySelectionListener mCitySelectionListener = new OnCitySelectionListener() {
