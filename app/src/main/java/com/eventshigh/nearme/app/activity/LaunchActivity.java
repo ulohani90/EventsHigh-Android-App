@@ -21,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
@@ -277,9 +276,6 @@ public class LaunchActivity extends BaseContextActivity {
         ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
         viewPager.setAdapter(adapter);
         tabsView.setupWithViewPager(viewPager);
-        // TODO: text colors is not yet working
-        tabsView.setTabTextColors(getResources().getColor(android.R.color.white),
-                getResources().getColor(android.R.color.white));
         tabsView.setScrollPosition(defaultTab, 0, true);
         tabsView.setOnTabSelectedListener(adapter);
 
@@ -333,7 +329,6 @@ public class LaunchActivity extends BaseContextActivity {
      */
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
             implements TabLayout.OnTabSelectedListener {
-        private final TextView[] tabViews = new TextView[TABS.length];
         private EventsFragment myEventsFragment;
 
         public ExploreScreenPagerAdapter() {
