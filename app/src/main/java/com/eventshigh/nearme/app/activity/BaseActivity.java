@@ -25,7 +25,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -53,6 +52,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     // Google Analytics
     protected boolean isPlayServicesPresent;
     private GAHelper gaHelper;
+    private boolean isRunning = false;
 
     // Check out the share event timings.
     protected long shareEventInitiatedTimestamp = 0;
@@ -128,6 +128,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        isRunning = true;
+
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.collapseActionView();
@@ -142,23 +144,12 @@ public abstract class BaseActivity extends AppCompatActivity {
             reportActionToAnalytics(secForShare > 5 ? "shareEvent" : "eventShareDismissed", Long.toString(secForShare));
         }
         shareEventInitiatedTimestamp = 0;
-
-        // Upload contacts
-        View view = getViewForSnackbar();
-        Intent inIntent = getIntent();
-        if (view != null && (inIntent == null || !Intent.ACTION_VIEW.equals(inIntent.getAction()))) {
-            view.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    AskForContactsDialog.doNeedful(BaseActivity.this);
-                }
-            }, 3000);
-        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        isRunning = false;
 
         // FB.
         AppEventsLogger.deactivateApp(this);
@@ -201,6 +192,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public boolean isRunning() {
+        return isRunning;
     }
 
     /**

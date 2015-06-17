@@ -99,14 +99,10 @@ public class GcmRegistration {
                         .remove(PREF_LAST_CITY_UPLOADED)
                         .apply();
 
-                try {
-                    if (currentLastCity != null) {
-                        unsubscribeToTopic(currentLastCity.toString());
-                    }
-                    subscribeToTopic(city.toString());
-                } catch (IOException e) {
-                    Crashlytics.getInstance().core.logException(e);
+                if (currentLastCity != null) {
+                    subscribeOrUnSubscribe(currentLastCity.toString(), false);
                 }
+                subscribeToTopic(city.toString());
 
                 userCityListener.onUserCityChanged(city);
             }
@@ -222,12 +218,12 @@ public class GcmRegistration {
                         GcmPubSub gcmPubSub = GcmPubSub.getInstance(context);
 
                         // Subscribe to city.
-                        subscribeToTopic(gcmPubSub, registrationId, city.toString());
+                        subscribeOrUnSubscribe(gcmPubSub, registrationId, city.toString(), true);
 
                         // Subscribe to interests.
                         Account account = new Account(context);
                         for (String interest : account.getFollowingInterests()) {
-                            subscribeToTopic(gcmPubSub, registrationId, interest);
+                            subscribeOrUnSubscribe(gcmPubSub, registrationId, interest, true);
                         }
 
                         gcmRegistrationInfo.edit().putBoolean(PREF_FIRST_TOPICS, true).apply();
@@ -239,34 +235,44 @@ public class GcmRegistration {
         }
     }
 
-    public void subscribeToTopic(String interest) throws IOException {
-        if (gcmRegistrationInfo.getBoolean(PREF_FIRST_TOPICS, false)) {
-            String registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
-            if (registrationId != null) {
-                subscribeToTopic(GcmPubSub.getInstance(context), registrationId, interest);
-            }
+    public void subscribeToTopic(final String interest) {
+        subscribeOrUnSubscribe(interest, true);
+    }
+
+    public void unSubscribeToTopic(String interest) {
+        subscribeOrUnSubscribe(interest, false);
+    }
+
+    private void subscribeOrUnSubscribe(final String interest, final boolean subscribe) {
+        if (!gcmRegistrationInfo.getBoolean(PREF_FIRST_TOPICS, false)) {
+            return;
         }
-    }
-
-    public void unsubscribeToTopic(String interest) throws IOException {
-        if (gcmRegistrationInfo.getBoolean(PREF_FIRST_TOPICS, false)) {
-            String registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
-            if (registrationId != null) {
-                unsubscribeToTopic(GcmPubSub.getInstance(context), registrationId, interest);
-            }
+        final String registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
+        if (registrationId == null) {
+            return;
         }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    subscribeOrUnSubscribe(GcmPubSub.getInstance(context), registrationId, interest,
+                            subscribe);
+                } catch (IOException e) {
+                    Crashlytics.getInstance().core.logException(e);
+                }
+            }
+        }).start();
     }
 
-    public void subscribeToTopic(GcmPubSub gcmPubSub, String registrationId, String interest)
-            throws IOException {
-        gcmPubSub.subscribe(registrationId,
-                "/topics/" + EventCategory.toCategoryParsableString(interest), null);
-    }
-
-    public void unsubscribeToTopic(GcmPubSub gcmPubSub, String registrationId, String interest)
-            throws IOException {
-        gcmPubSub.unsubscribe(registrationId,
-                "/topics/" + EventCategory.toCategoryParsableString(interest));
+    private void subscribeOrUnSubscribe(GcmPubSub gcmPubSub, String registrationId, String interest,
+            boolean subscribe) throws IOException {
+        String topicName = "/topics/" + EventCategory.toCategoryParsableString(interest);
+        if (subscribe) {
+            gcmPubSub.subscribe(registrationId, topicName, null);
+        } else {
+            gcmPubSub.unsubscribe(registrationId, topicName);
+        }
     }
 
     private ZendeskCallback<PushRegistrationResponse> zendeskCallback =

@@ -137,19 +137,11 @@ public class Account {
         if (isFollowing) {
             accountInfo.edit().putString(getKeyForTag(tag), tag).apply();
             new UserActionHelper(context).recordAction(FollowingAction.FOLLOW, tag);
-            try {
-                GcmRegistration.getInstance(context).subscribeToTopic(tag);
-            } catch (IOException e) {
-                Crashlytics.getInstance().core.logException(e);
-            }
+            GcmRegistration.getInstance(context).subscribeToTopic(tag);
         } else {
             accountInfo.edit().remove(getKeyForTag(tag)).apply();
             new UserActionHelper(context).recordAction(FollowingAction.UN_FOLLOW, tag);
-            try {
-                GcmRegistration.getInstance(context).unsubscribeToTopic(tag);
-            } catch (IOException e) {
-                Crashlytics.getInstance().core.logException(e);
-            }
+            GcmRegistration.getInstance(context).unSubscribeToTopic(tag);
         }
     }
 

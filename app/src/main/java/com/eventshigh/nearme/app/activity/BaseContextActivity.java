@@ -16,6 +16,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -69,6 +70,8 @@ public abstract class BaseContextActivity extends BaseActivity {
 
     @Override
     protected void onStop() {
+        super.onStop();
+
         if (client != null && client.isConnected()) {
             if (eventsContext != null) {
                 Uri webUri = EventsHighEndpoints.getWebUri(eventsContext);
@@ -77,7 +80,24 @@ public abstract class BaseContextActivity extends BaseActivity {
             client.disconnect();
         }
 
-        super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Upload contacts
+        Intent inIntent = getIntent();
+        if (toolbar != null && (inIntent == null || !Intent.ACTION_VIEW.equals(inIntent.getAction()))) {
+            toolbar.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (isRunning()) {
+                        AskForContactsDialog.doNeedful(BaseContextActivity.this);
+                    }
+                }
+            }, 3000);
+        }
     }
 
     @Override
