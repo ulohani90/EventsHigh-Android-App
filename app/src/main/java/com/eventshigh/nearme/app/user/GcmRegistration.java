@@ -16,10 +16,10 @@ import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.google.android.gms.maps.model.LatLng;
-import com.zendesk.sdk.model.network.ErrorResponse;
 import com.zendesk.sdk.model.network.PushRegistrationResponse;
-import com.zendesk.sdk.network.impl.ZendeskCallback;
 import com.zendesk.sdk.network.impl.ZendeskConfig;
+import com.zendesk.service.ErrorResponse;
+import com.zendesk.service.ZendeskCallback;
 
 import java.io.IOException;
 

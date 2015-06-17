@@ -9,7 +9,7 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.user.Account;
-import com.zendesk.sdk.util.StringUtils;
+import com.zendesk.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -148,7 +148,7 @@ public class EventsHighEndpoints {
                 URLEncoder.encode(eventsContext.query, "UTF-8"),
                 eventsContext.dateFilter);
         } catch (UnsupportedEncodingException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             throw new IllegalArgumentException(e);
         }
     }

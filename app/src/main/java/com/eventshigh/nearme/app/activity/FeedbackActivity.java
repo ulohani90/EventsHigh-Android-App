@@ -9,9 +9,9 @@ import android.view.View;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
-import com.zendesk.sdk.model.network.ErrorResponse;
 import com.zendesk.sdk.network.impl.ZendeskRequestService.RequestLoadingListener;
 import com.zendesk.sdk.requests.RequestListFragment;
+import com.zendesk.service.ErrorResponse;
 
 /**
  * An activity which wraps around the ZenDesk SDK to manage user interactions.
