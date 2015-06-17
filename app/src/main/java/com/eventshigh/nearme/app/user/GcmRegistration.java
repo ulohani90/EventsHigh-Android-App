@@ -192,7 +192,7 @@ public class GcmRegistration {
                     });
                 }
 
-                // Upload IID.
+                // Upload device info.
                 if (!gcmRegistrationInfo.getBoolean(PREF_DEVICE_INFO_UPLOADED, false)) {
                     AccountStateReporter.reportDeviceInfo(context, new Runnable() {
                         @Override
