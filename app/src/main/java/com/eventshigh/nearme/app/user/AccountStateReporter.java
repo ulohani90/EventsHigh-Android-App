@@ -15,6 +15,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
+import com.eventshigh.nearme.app.utils.DeviceUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
@@ -54,6 +55,13 @@ public class AccountStateReporter {
                 .appendQueryParameter("last_city", city.toString())
                 .appendQueryParameter("lat", Double.toString(location.latitude))
                 .appendQueryParameter("lon", Double.toString(location.longitude))
+                .build(), onSuccess);
+    }
+
+    public static void reportDeviceInfo(Context context, Runnable onSuccess) {
+        sendSignedRequest(context, getBaseUri(context, "reportDeviceInfo")
+                .appendQueryParameter("device_name", DeviceUtils.getDeviceName())
+                .appendQueryParameter("is_rooted", Boolean.toString(DeviceUtils.isRooted()))
                 .build(), onSuccess);
     }
 

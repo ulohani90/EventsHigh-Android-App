@@ -39,6 +39,11 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
     public static void submit(Context context, EventsContext eventsContext, List<String> eventIds,
             Priority priority, Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
             Listener<List<Event>> listener, ErrorListener errorListener) {
+        if (eventIds.isEmpty()) {
+            listener.onResponse(new ArrayList<Event>(), false);
+            return;
+        }
+
         String url;
         try {
             url = EventsHighEndpoints.getApiEndpointEventsUber(eventIds);

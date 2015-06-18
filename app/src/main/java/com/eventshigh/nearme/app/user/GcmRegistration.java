@@ -10,6 +10,8 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
@@ -36,6 +38,7 @@ public class GcmRegistration {
     private static final String PREF_REGISTRATION_ID_UPLOADED = "registration_id_uploaded";
     private static final String PREF_ZENDESK_UPDATED = "zendesk_updated2";
     private static final String PREF_IID_UPLOADED = "iid_updated";
+    private static final String PREF_DEVICE_INFO_UPLOADED = "device_info";
     private static final String PREF_FIRST_TOPICS = "first_topics";
 
     private static final String PREF_LAST_CITY = "last_city";
@@ -46,6 +49,7 @@ public class GcmRegistration {
     // Member variables used to store the user account details in preferences.
     private final Context context;
     private final SharedPreferences gcmRegistrationInfo;
+    private boolean syncCompleted = false;
 
     // City listener.
     private UserCityListener userCityListener = null;
@@ -64,11 +68,13 @@ public class GcmRegistration {
         return  instance;
     }
 
-    public void updateGcmRegistrationIdIfNeeded() {
-        new Thread(new GcmRegistar()).start();
+    public synchronized void updateGcmRegistrationIdIfNeeded() {
+        if (! syncCompleted) {
+            new Thread(new GcmRegistar()).start();
+        }
     }
 
-    public void resetGcmRegistrationId() {
+    public synchronized void resetGcmRegistrationId() {
         Editor editor = gcmRegistrationInfo.edit();
         editor.remove(PREF_REGISTRATION_ID);
         editor.remove(PREF_ZENDESK_UPDATED);
@@ -76,39 +82,43 @@ public class GcmRegistration {
         editor.remove(PREF_FIRST_TOPICS);
         editor.apply();
 
+        syncCompleted = false;
         updateGcmRegistrationIdIfNeeded();
     }
 
-    public void setLastCity(@Nullable City city, @Nullable LatLng location) {
+    public synchronized void setLastCity(@Nullable City city, @Nullable LatLng location) {
         userLocation = location;
 
-        if (city != null) {
-            City currentLastCity = null;
-            String cityName = gcmRegistrationInfo.getString(PREF_LAST_CITY, null);
-            if (cityName != null) {
-                try {
-                    currentLastCity = City.valueOf(cityName);
-                } catch (IllegalArgumentException e) {
-                    // Ignore.
-                }
-            }
-
-            if (currentLastCity == null || !city.equals(currentLastCity)) {
-                gcmRegistrationInfo.edit()
-                        .putString(PREF_LAST_CITY, city.toString())
-                        .remove(PREF_LAST_CITY_UPLOADED)
-                        .apply();
-
-                if (currentLastCity != null) {
-                    subscribeOrUnSubscribe(currentLastCity.toString(), false);
-                }
-                subscribeToTopic(city.toString());
-
-                userCityListener.onUserCityChanged(city);
-            }
-
-            updateGcmRegistrationIdIfNeeded();
+        if (city == null) {
+            return;
         }
+
+        City currentLastCity = null;
+        String cityName = gcmRegistrationInfo.getString(PREF_LAST_CITY, null);
+        if (cityName != null) {
+            try {
+                currentLastCity = City.valueOf(cityName);
+            } catch (IllegalArgumentException e) {
+                // Ignore.
+            }
+        }
+
+        if (currentLastCity == null || !city.equals(currentLastCity)) {
+            gcmRegistrationInfo.edit()
+                    .putString(PREF_LAST_CITY, city.toString())
+                    .remove(PREF_LAST_CITY_UPLOADED)
+                    .apply();
+            syncCompleted = false;
+
+            if (currentLastCity != null) {
+                subscribeOrUnSubscribe(currentLastCity.toString(), false);
+            }
+            subscribeToTopic(city.toString());
+
+            userCityListener.onUserCityChanged(city);
+        }
+
+        updateGcmRegistrationIdIfNeeded();
     }
 
     public @Nullable City getLastCity() {
@@ -137,28 +147,34 @@ public class GcmRegistration {
         }
     }
 
-    private static final Object LOCK = new Object();
     private class GcmRegistar implements Runnable {
         @Override
         public void run() {
-            synchronized (LOCK) {
-                InstanceID instanceID = InstanceID.getInstance(context);
-                String registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
-                if (registrationId == null) {
-                    try {
-                        registrationId = instanceID.getToken(SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-                    } catch (IOException e) {
-                        Crashlytics.getInstance().core.logException(e);
-                        registrationId = null;
-                    }
-                }
+            synchronized (GcmRegistration.this) {
+                boolean isPlayServicesPresent =
+                    GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
 
-                if (registrationId != null) {
-                    Editor editor = gcmRegistrationInfo.edit();
-                    editor.putString(PREF_REGISTRATION_ID, registrationId);
-                    editor.remove(PREF_REGISTRATION_ID_UPLOADED);
-                    editor.remove(PREF_ZENDESK_UPDATED);
-                    editor.apply();
+                InstanceID instanceID = null;
+                String registrationId = null;
+                if (isPlayServicesPresent) {
+                    instanceID = InstanceID.getInstance(context);
+                    registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
+                    if (registrationId == null) {
+                        try {
+                            registrationId = instanceID.getToken(SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+                        } catch (IOException e) {
+                            Crashlytics.getInstance().core.logException(e);
+                            registrationId = null;
+                        }
+
+                        if (registrationId != null) {
+                            Editor editor = gcmRegistrationInfo.edit();
+                            editor.putString(PREF_REGISTRATION_ID, registrationId);
+                            editor.remove(PREF_REGISTRATION_ID_UPLOADED);
+                            editor.remove(PREF_ZENDESK_UPDATED);
+                            editor.apply();
+                        }
+                    }
                 }
 
                 City city = getLastCity();
@@ -174,6 +190,20 @@ public class GcmRegistration {
                             gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();
                         }
                     });
+                }
+
+                // Upload device info.
+                if (!gcmRegistrationInfo.getBoolean(PREF_DEVICE_INFO_UPLOADED, false)) {
+                    AccountStateReporter.reportDeviceInfo(context, new Runnable() {
+                        @Override
+                        public void run() {
+                            gcmRegistrationInfo.edit().putBoolean(PREF_IID_UPLOADED, true).apply();
+                        }
+                    });
+                }
+
+                if (instanceID == null) {
+                    return;
                 }
 
                 // Upload IID.
@@ -230,6 +260,16 @@ public class GcmRegistration {
                     } catch (Exception e) {
                         Crashlytics.getInstance().core.logException(e);
                     }
+                }
+
+                // Check if everything is done.
+                if (gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false) &&
+                    gcmRegistrationInfo.getBoolean(PREF_DEVICE_INFO_UPLOADED, false)&&
+                    gcmRegistrationInfo.getBoolean(PREF_IID_UPLOADED, false) &&
+                    gcmRegistrationInfo.getBoolean(PREF_REGISTRATION_ID_UPLOADED, false) &&
+                    gcmRegistrationInfo.getBoolean(PREF_ZENDESK_UPDATED, false) &&
+                    gcmRegistrationInfo.getBoolean(PREF_FIRST_TOPICS, false)) {
+                    syncCompleted = true;
                 }
             }
         }
