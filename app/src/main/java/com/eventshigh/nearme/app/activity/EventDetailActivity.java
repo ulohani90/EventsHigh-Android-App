@@ -82,6 +82,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.plus.PlusOneButton;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 
 import org.json.JSONException;
@@ -110,7 +111,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     private static final int REQUEST_CHECK_SETTINGS = 1020;
 
     public static final String PACKAGE_NAME_FACEBOOK = "com.facebook.katana";
-    public static final String PACKAGE_NAME_TWITTER = "com.twitter.android";
     public static final String PACKAGE_NAME_EMAIL = "com.google.android.gm";
     public static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
 
@@ -231,10 +231,18 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     @Override
     public void onResume() {
         super.onResume();
+
         if (showRateAppDialog) {
             RateAppDialogV2.show(this);
             showRateAppDialog = false;
         }
+
+        PlusOneButton plusOneButton = (PlusOneButton) findViewById(R.id.plus_one_button);
+
+        String url = event == null ?
+            getIntent().getData().buildUpon().appendQueryParameter("src", "ehm_gp1").toString() :
+            event.getEventShareURI(this, "gp1").toString();
+        plusOneButton.initialize(url, 111 /*PLUS_ONE_REQUEST_CODE*/);
     }
 
     @Override
@@ -524,11 +532,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         } else {
             shareEvent(event, PACKAGE_NAME_FACEBOOK);
         }
-    }
-
-    public void twitter(View view) {
-        showRateAppDialog = true;
-        shareEvent(event, PACKAGE_NAME_TWITTER);
     }
 
     public void email(View view) {
@@ -1022,7 +1025,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
             // Share Buttons.
             findViewById(R.id.share_fb).setVisibility(isInstalled(PACKAGE_NAME_FACEBOOK) ? View.VISIBLE : View.GONE);
-            findViewById(R.id.share_twitter).setVisibility(isInstalled(PACKAGE_NAME_TWITTER) ? View.VISIBLE : View.GONE);
             findViewById(R.id.share_email).setVisibility(isInstalled(PACKAGE_NAME_EMAIL) ? View.VISIBLE : View.GONE);
             findViewById(R.id.share_whatsapp).setVisibility(isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
         }

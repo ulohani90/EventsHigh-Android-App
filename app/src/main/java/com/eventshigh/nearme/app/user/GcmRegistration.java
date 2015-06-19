@@ -68,7 +68,7 @@ public class GcmRegistration {
         return  instance;
     }
 
-    public synchronized void updateGcmRegistrationIdIfNeeded() {
+    public void updateGcmRegistrationIdIfNeeded() {
         if (! syncCompleted) {
             new Thread(new GcmRegistar()).start();
         }
@@ -86,7 +86,7 @@ public class GcmRegistration {
         updateGcmRegistrationIdIfNeeded();
     }
 
-    public synchronized void setLastCity(@Nullable City city, @Nullable LatLng location) {
+    public void setLastCity(@Nullable City city, @Nullable LatLng location) {
         userLocation = location;
 
         if (city == null) {
@@ -108,7 +108,6 @@ public class GcmRegistration {
                     .putString(PREF_LAST_CITY, city.toString())
                     .remove(PREF_LAST_CITY_UPLOADED)
                     .apply();
-            syncCompleted = false;
 
             if (currentLastCity != null) {
                 subscribeOrUnSubscribe(currentLastCity.toString(), false);
@@ -116,6 +115,10 @@ public class GcmRegistration {
             subscribeToTopic(city.toString());
 
             userCityListener.onUserCityChanged(city);
+
+            synchronized (this) {
+                syncCompleted = false;
+            }
         }
 
         updateGcmRegistrationIdIfNeeded();

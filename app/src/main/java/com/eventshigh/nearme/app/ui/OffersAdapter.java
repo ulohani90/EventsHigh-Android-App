@@ -85,7 +85,6 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView inviteLinkView;
 
         private final View inviteViaFB;
-        private final View inviteViaTwitter;
         private final View inviteViaEmail;
         private final View inviteViaWhatsapp;
 
@@ -99,7 +98,6 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
             inviteLinkView = (TextView) itemView.findViewById(R.id.invite_link);
 
             inviteViaFB = itemView.findViewById(R.id.share_fb);
-            inviteViaTwitter = itemView.findViewById(R.id.share_twitter);
             inviteViaEmail = itemView.findViewById(R.id.share_email);
             inviteViaWhatsapp = itemView.findViewById(R.id.share_whatsapp);
         }
@@ -127,9 +125,6 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
             inviteViaFB.setVisibility(
                     EventDetailActivity.isInstalled(activity, EventDetailActivity.PACKAGE_NAME_FACEBOOK) ?
                             View.VISIBLE : View.GONE);
-            inviteViaTwitter.setVisibility(
-                EventDetailActivity.isInstalled(activity, EventDetailActivity.PACKAGE_NAME_TWITTER) ?
-                    View.VISIBLE : View.GONE);
             inviteViaEmail.setVisibility(
                 EventDetailActivity.isInstalled(activity, EventDetailActivity.PACKAGE_NAME_EMAIL) ?
                     View.VISIBLE : View.GONE);
@@ -141,12 +136,6 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     shareAppFB(activity, inviteLink);
-                }
-            });
-            inviteViaTwitter.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    shareAppTwitter(activity, inviteLink);
                 }
             });
             inviteViaEmail.setOnClickListener(new OnClickListener() {
@@ -165,10 +154,6 @@ public class OffersAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private void shareAppFB(BaseActivity activity, String inviteLink) {
             shareApp(activity, inviteLink, EventDetailActivity.PACKAGE_NAME_FACEBOOK);
-        }
-
-        private void shareAppTwitter(BaseActivity activity, String inviteLink) {
-            shareApp(activity,inviteLink, EventDetailActivity.PACKAGE_NAME_TWITTER);
         }
 
         private void shareAppEmail(BaseActivity activity, String inviteLink) {

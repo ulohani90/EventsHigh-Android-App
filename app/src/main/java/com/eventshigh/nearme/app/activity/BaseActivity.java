@@ -58,7 +58,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     // Check out the share event timings.
     protected long shareEventInitiatedTimestamp = 0;
 
-    public static Typeface fontQuicksand;
+    // public static Typeface fontQuicksand;
     public static Typeface fontQuicksandBold;
     public static final Object lock = new Object();
     public static boolean loadedFonts = false;
@@ -89,7 +89,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         synchronized (lock) {
             if (!loadedFonts) {
-                fontQuicksand = Typeface.createFromAsset(getAssets(), "Quicksand-Regular.ttf");
+                // fontQuicksand = Typeface.createFromAsset(getAssets(), "Quicksand-Regular.ttf");
                 fontQuicksandBold = Typeface.createFromAsset(getAssets(), "Quicksand-Bold.ttf");
                 loadedFonts = true;
             }
@@ -262,18 +262,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         try {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT,
+                String.format(getResources().getString(R.string.share_event_text),
+                    event.title + (event.isCleanVenue ? " @ " + event.venue : ""), eventUri)
 
-            if (packageName != null && packageName.equals(EventDetailActivity.PACKAGE_NAME_TWITTER)) {
-                sendIntent.putExtra(Intent.EXTRA_TEXT,
-                        event.title + (event.isCleanVenue ? " @ " + event.venue : "") +
-                                "\n@eventshighapp\n" + eventUri);
-            } else {
-                sendIntent.putExtra(Intent.EXTRA_TEXT,
-                    String.format(getResources().getString(R.string.share_event_text),
-                        event.title + (event.isCleanVenue ? " @ " + event.venue : ""), eventUri)
+            );
 
-                );
-            }
             sendIntent.setType("text/plain");
             if (packageName != null) {
                 sendIntent.setPackage(packageName);
