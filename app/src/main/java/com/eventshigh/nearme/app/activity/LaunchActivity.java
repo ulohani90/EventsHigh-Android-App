@@ -40,6 +40,7 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.plus.PlusOneButton;
 
 /**
  * Application Main or launch activity.
@@ -147,6 +148,11 @@ public class LaunchActivity extends BaseContextActivity {
 
         // Show next screen.
         showNextScreen();
+
+        // Setup the Google+ Button.
+        PlusOneButton plusOneButton = (PlusOneButton) findViewById(R.id.plus_one_button);
+        plusOneButton.initialize("https://play.google.com/store/apps/details?id=" + getPackageName(),
+                111 /*PLUS_ONE_REQUEST_CODE*/);
     }
 
     @Override
