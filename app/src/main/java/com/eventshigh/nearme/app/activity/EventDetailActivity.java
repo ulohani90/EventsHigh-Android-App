@@ -1,23 +1,16 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageInfo;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,13 +28,11 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
@@ -51,10 +42,8 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.user.UserActionHelper.EventAction;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -72,26 +61,13 @@ import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.PlusOneButton;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -104,19 +80,12 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
  * link or from Events{Grid,Maps}Activity. In both cases, event data is not available so
  * this activity fetches the event data and shows it using the EventDetailFragment.
  */
-public class EventDetailActivity extends BaseActivity implements LocationListener {
+public class EventDetailActivity extends BaseActivity {
     public static final String EXTRA_EVENT_PARAM = EventDetailActivity.class.getSimpleName() + "_event";
-
-    // Request code for location settings check intent
-    private static final int REQUEST_CHECK_SETTINGS = 1020;
 
     public static final String PACKAGE_NAME_FACEBOOK = "com.facebook.katana";
     public static final String PACKAGE_NAME_EMAIL = "com.google.android.gm";
     public static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
-
-    private static final long LOCATION_LOCK_MAX_TIME_MILLIS = 10 * DateUtils.SECOND_IN_MILLIS;
-    private static final float LOCATION_ACCURACY_REQUIRED_METERS = 300;
-    private static final float ALLOWED_USER_DISTANCE_FROM_EVENT_FOR_CHECK_IN_METERS = 300;
 
     private Toolbar toolbar;
     private View topProgressBar;
@@ -127,10 +96,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     private Account account;
     private GoogleApiClient client;
     private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
-
-    private LocationRequest checkInLocationRequest;
-    private AlertDialog checkInAlertDialog;
-    private long locationRequestStartTime;
 
     // FB
     private CallbackManager callbackManager;
@@ -149,12 +114,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         topProgressBar = findViewById(R.id.top_progress_bar);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // Initialize location request used for check in.
-        checkInLocationRequest = new LocationRequest();
-        checkInLocationRequest.setInterval(3000);
-        checkInLocationRequest.setFastestInterval(1000);
-        checkInLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         // Account.
         account = new Account(this);
@@ -249,23 +208,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode) {
-            case REQUEST_CHECK_SETTINGS:
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        // All required changes were successfully made
-                        startLocationDetection();
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        // The user was asked to change settings, but chose not to
-                        locationDetectionFailed();
-                        break;
-                    default:
-                        break;
-                }
-                break;
-        }
-
         if (callbackManager != null) {
             callbackManager.onActivityResult(requestCode, resultCode, data);
         }
@@ -338,75 +280,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         CustomUrlActivity.launchCustomUrl(this,
                 Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
                 event.offerTitle);
-    }
-
-    public void onCheckIn(View view) {
-        reportEventAction(event, "onCheckIn");
-
-        // Check if the user is logged in
-        Pair<String, Boolean> phoneNumberStatus = account.getPhoneNumber();
-        if (!phoneNumberStatus.second) {
-            reportEventAction(event, "checkInPhoneNoRequired");
-            new AlertDialog.Builder(this)
-                .setTitle(R.string.pref_title_phone_no)
-                .setMessage(R.string.ui_register_for_check_in)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        startActivity(new Intent(EventDetailActivity.this, PhoneLoginActivity.class));
-                    }
-                })
-                .show();
-            return;
-        }
-
-        // Check if we have high accuracy location.
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-            .addLocationRequest(checkInLocationRequest);
-        PendingResult<LocationSettingsResult> result =
-            LocationServices.SettingsApi.checkLocationSettings(client, builder.build());
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-            @Override
-            public void onResult(LocationSettingsResult result) {
-                final Status status = result.getStatus();
-                switch (status.getStatusCode()) {
-                    case LocationSettingsStatusCodes.SUCCESS:
-                        // All location settings are satisfied. The client can initialize location
-                        // requests here.
-                        startLocationDetection();
-                        break;
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        // Location settings are not satisfied. But could be fixed by showing the user
-                        // a dialog.
-                        try {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            status.startResolutionForResult(EventDetailActivity.this,
-                                REQUEST_CHECK_SETTINGS);
-                        } catch (IntentSender.SendIntentException e) {
-                            Crashlytics.getInstance().core.logException(e);
-                            locationDetectionFailed();
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // Location settings are not satisfied. However, we have no way to fix the
-                        // settings so we won't show the dialog.
-                        locationDetectionFailed();
-                        break;
-                }
-            }
-        });
-
-        createAlertDialog(R.string.ui_detecting_location);
-        checkInAlertDialog.setOnDismissListener(
-                new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        stopLocationDetection();
-                        dialog.dismiss();
-                    }
-                }
-        );
-        checkInAlertDialog.show();
     }
 
     public void imagePreview(View view) {
@@ -541,6 +414,10 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
 
     public void whatsapp(View view) {
         showRateAppDialog = true;
+
+        if (view.getId() == R.id.check_with_friends) {
+            reportEventAction(event, "check_with_friends");
+        }
         shareEvent(event, PACKAGE_NAME_WHATSAPP);
     }
 
@@ -614,115 +491,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         }
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        if (location.hasAccuracy() && location.getAccuracy() < LOCATION_ACCURACY_REQUIRED_METERS) {
-            // We have enough location accuracy. Stop detecting location, and close dialog
-            stopLocationDetection();
-            checkInAlertDialog.dismiss();
-
-            // Lets check if the user is near the event
-            userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            if (Utils.isDebug(this) ||
-                LocationUtils.distanceInMeters(event.location, userLocation)
-                    < ALLOWED_USER_DISTANCE_FROM_EVENT_FOR_CHECK_IN_METERS) {
-                // Yes, user is near the event, start the check in flow
-                checkIn();
-            } else {
-                // The user is not near the location, let the user know
-                reportEventAction(event, "checkInFailedNotAtLocation");
-                showMessage(R.string.ui_not_at_event);
-            }
-        } else {
-            // Location is not accurate enough. Wait for some more time until the timeout has
-            // reached, and then let the user know that the location could not be detected
-            if (System.currentTimeMillis() - locationRequestStartTime >
-                LOCATION_LOCK_MAX_TIME_MILLIS) {
-                locationDetectionFailed();
-            }
-        }
-    }
-
-    private void locationDetectionFailed() {
-        reportEventAction(event, "checkInFailedLocation");
-        stopLocationDetection();
-        showMessage(R.string.failed_location);
-        checkInAlertDialog.dismiss();
-    }
-
-    private void createAlertDialog(int messageResourceId) {
-        checkInAlertDialog = new AlertDialog.Builder(this).create();
-        @SuppressLint("InflateParams")
-        View dialogView = checkInAlertDialog.getLayoutInflater().inflate(R.layout.dialog_busy, null);
-        ((TextView) dialogView.findViewById(R.id.message)).setText(messageResourceId);
-        checkInAlertDialog.setView(dialogView);
-    }
-
-    private void startLocationDetection() {
-        locationRequestStartTime = System.currentTimeMillis();
-        LocationServices.FusedLocationApi.requestLocationUpdates(client, checkInLocationRequest, this);
-    }
-
-    private void stopLocationDetection() {
-        if (client.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(client,
-                    EventDetailActivity.this);
-        }
-    }
-
-    private void checkIn() {
-        reportEventAction(event, "checkInSubmit");
-        try {
-            Uri requestUrl = AccountStateReporter.getBaseUri(this, "event_checkin")
-                .appendQueryParameter("event_id", event.id)
-                .appendQueryParameter("timestamp", "" + System.currentTimeMillis())
-                .appendQueryParameter("location",
-                    URLEncoder.encode(userLocation.toString(), "UTF-8"))
-                .build();
-
-            createAlertDialog(R.string.ui_checking_in);
-            checkInAlertDialog.show();
-
-            VolleyHelper.addToRequestQueue(this,
-                new JsonObjectRequest(Request.Method.GET, Signer.sign(requestUrl).toString(), null,
-                    new Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response, boolean isIntermediate) {
-                            try {
-                                checkInSuccess(response.getString("message"));
-                            } catch (JSONException e) {
-                                // do nothing.
-                                Crashlytics.getInstance().core.logException(e);
-                                checkInFailed();
-                            }
-                        }
-                    },
-                    new ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            checkInFailed();
-                        }
-                    }
-                )
-            );
-        } catch (IOException | GeneralSecurityException e) {
-            Crashlytics.getInstance().core.logException(e);
-            checkInFailed();
-        }
-    }
-
-    private void checkInFailed() {
-        checkInAlertDialog.dismiss();
-        reportActionToAnalytics("checkInFailed");
-        showMessage(R.string.check_in_failed);
-    }
-
-    private void checkInSuccess(String message) {
-        checkInAlertDialog.dismiss();
-        reportActionToAnalytics("checkInSuccess");
-        showMessage(message);
-    }
-
     private class EventCard {
         private final ScrollView eventScrollView;
 
@@ -748,7 +516,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
         private final LinearLayout futureTimesView;
 
         private final View bookView;
-        private final View checkInView;
         private final View callView;
         private final View joinView;
         private final TextView priceView;
@@ -800,7 +567,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             futureTimesView = (LinearLayout) findViewById(R.id.event_future_times);
 
             bookView = findViewById(R.id.book_ticket);
-            checkInView = findViewById(R.id.check_in);
             callView = findViewById(R.id.call);
             joinView = findViewById(R.id.join_event);
             priceView = (TextView) findViewById(R.id.event_price);
@@ -936,11 +702,9 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             findViewById(R.id.action_button_group).setVisibility(View.VISIBLE);
             bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
             callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
-            mayBeShowCheckInButton(event);
             joinView.setVisibility(
                 (bookView.getVisibility() != View.VISIBLE &&
-                    event.sourceUrl != null && event.sourceUrl.contains("facebook.com/") &&
-                    (checkInView.getVisibility() != View.VISIBLE || callView.getVisibility() != View.VISIBLE))
+                    event.sourceUrl != null && event.sourceUrl.contains("facebook.com/"))
                 ? View.VISIBLE : View.GONE);
             checkWithFriendView.setVisibility(isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
 
@@ -1027,32 +791,6 @@ public class EventDetailActivity extends BaseActivity implements LocationListene
             findViewById(R.id.share_fb).setVisibility(isInstalled(PACKAGE_NAME_FACEBOOK) ? View.VISIBLE : View.GONE);
             findViewById(R.id.share_email).setVisibility(isInstalled(PACKAGE_NAME_EMAIL) ? View.VISIBLE : View.GONE);
             findViewById(R.id.share_whatsapp).setVisibility(isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
-        }
-
-        private void mayBeShowCheckInButton(Event event) {
-            boolean isDebug = Utils.isDebug(EventDetailActivity.this);
-
-            // Check in starts 30 mins before event start time and till 2 hours after event
-            // start time.
-            long checkInStartTimeMillis = event.eventTimings[0] -
-                    (DateUtils.MINUTE_IN_MILLIS * 30 * (isDebug ? 2 : 1));
-            long checkInEndTimeMillis = event.eventTimings[0] +
-                    (DateUtils.MINUTE_IN_MILLIS * 120 * (isDebug ? 2 : 1));
-
-            long currentTimeMillis = System.currentTimeMillis();
-            if (isPlayServicesPresent && checkInStartTimeMillis < currentTimeMillis &&
-                event.location != null && currentTimeMillis < checkInEndTimeMillis) {
-                // We have established that the time is right
-                checkInView.setVisibility(View.VISIBLE);
-            } else {
-                checkInView.setVisibility(View.GONE);
-            }
-
-            // All three action buttons are not good to show. Hide call in such case.
-            if (checkInView.getVisibility() == View.VISIBLE &&
-                bookView.getVisibility() == View.VISIBLE && callView.getVisibility() == View.VISIBLE) {
-                callView.setVisibility(View.GONE);
-            }
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
