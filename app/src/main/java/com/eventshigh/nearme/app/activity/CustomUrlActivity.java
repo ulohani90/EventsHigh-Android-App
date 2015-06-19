@@ -116,7 +116,7 @@ public class CustomUrlActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_book, menu);
+        getMenuInflater().inflate(R.menu.activity_custom_url, menu);
         return true;
     }
 
