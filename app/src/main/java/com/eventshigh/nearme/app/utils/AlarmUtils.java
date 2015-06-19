@@ -4,7 +4,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.eventshigh.nearme.app.broadcast.EventAlarmBroadcastReceiver;
@@ -14,6 +13,7 @@ import com.eventshigh.nearme.app.data.Event;
 
 import java.util.Calendar;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Helper class to set and cancel alarms for an event.
@@ -22,14 +22,26 @@ public class AlarmUtils {
     private static String LOG_TAG = AlarmUtils.class.getName();
 
     public static void setEventAlarm(Context context, Event event) {
-        // Setup an alarm 1 day before the event.
-        long alarmTimeMillis = event.eventTimings[0] - DateUtils.DAY_IN_MILLIS;
+        // find the upcoming event time.
+        long now = System.currentTimeMillis();
+        long upcomingEventTime = 0;
+        for (long eventTime : event.eventTimings) {
+            if (eventTime > now) {
+                upcomingEventTime = eventTime;
+                break;
+            }
+        }
 
-        // Don't set an alarm if the event is going to happen within 1 day
-        if (alarmTimeMillis < System.currentTimeMillis()) {
-            Log.i(LOG_TAG, "Not setting alarm for " + event.title);
+        // No alarm if upcoming time is in next four hours.
+        if (upcomingEventTime < now + TimeUnit.HOURS.toMillis(4)) {
             return;
         }
+
+        // Set the alarm for 2 hours before the event if its happening in next 48 hours. otherwise
+        // we will set the alarm for 1 day before the event.
+        long alarmTimeMillis = (upcomingEventTime < now + TimeUnit.DAYS.toMillis(2)) ?
+                upcomingEventTime - TimeUnit.HOURS.toMillis(2) :
+                upcomingEventTime - TimeUnit.DAYS.toMillis(1);
 
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, EventAlarmBroadcastReceiver.class);
