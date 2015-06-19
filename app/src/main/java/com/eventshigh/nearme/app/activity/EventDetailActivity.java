@@ -224,6 +224,7 @@ public class EventDetailActivity extends BaseActivity {
         new UserActionHelper(this).recordAction(EventAction.SAVE, event.id);
 
         addToCalendar(event, null);
+        addFavourite(null);
     }
 
     public void openSourceSite(View view) {
@@ -244,7 +245,7 @@ public class EventDetailActivity extends BaseActivity {
         Intent intent = new Intent(Intent.ACTION_DIAL)
                 .setData(Uri.parse("tel:" + (event.organizerPhone.split(",")[0])));
         startActivitySafe(intent);
-
+        addFavourite(null);
     }
 
     public void openOrganizerLink(View view) {
@@ -273,6 +274,7 @@ public class EventDetailActivity extends BaseActivity {
 
         CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
                 getString(R.string.title_book));
+        addFavourite(null);
     }
 
     public void openOfferSite(View view) {
@@ -321,7 +323,9 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void addFavourite(View v) {
-        reportEventAction(event, "addFavourite");
+        if (v != null) {
+            reportEventAction(event, "addFavourite");
+        }
 
         EventsMarkerManager.Editor eventsMarkerEditor =
                 EventsMarkerManager.getInstance(this).getEditor();
@@ -347,6 +351,7 @@ public class EventDetailActivity extends BaseActivity {
             Crashlytics.getInstance().core.logException(e);
             showMessage(R.string.no_map_app);
         }
+        addFavourite(null);
     }
 
     public void showVenue(View view) {
@@ -405,11 +410,13 @@ public class EventDetailActivity extends BaseActivity {
         } else {
             shareEvent(event, PACKAGE_NAME_FACEBOOK);
         }
+        addFavourite(null);
     }
 
     public void email(View view) {
         showRateAppDialog = true;
         shareEvent(event, PACKAGE_NAME_EMAIL);
+        addFavourite(null);
     }
 
     public void whatsapp(View view) {
@@ -419,6 +426,7 @@ public class EventDetailActivity extends BaseActivity {
             reportEventAction(event, "check_with_friends");
         }
         shareEvent(event, PACKAGE_NAME_WHATSAPP);
+        addFavourite(null);
     }
 
 
