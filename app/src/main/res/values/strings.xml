@@ -149,7 +149,7 @@
     <string name="facebook_app_id">196111897251952</string>
 
     <!-- Rating -->
-    <string name="rate_app_text_v2">Loving EventsHigh? Give us 5 stars!</string>
+    <string name="rate_app_text">Loving EventsHigh? Give us 5 stars!</string>
     <string name="feedback_text">How can we improve?</string>
     <string name="rate_app_no">No, Thanks</string>
     <string name="rate_app_now">Now</string>

@@ -33,7 +33,7 @@
         android:lineSpacingExtra="2dp"
         android:paddingTop="24dp"
         android:paddingBottom="8dp"
-        android:text="@string/rate_app_text_v2"
+        android:text="@string/rate_app_text"
     />
 
     <LinearLayout
