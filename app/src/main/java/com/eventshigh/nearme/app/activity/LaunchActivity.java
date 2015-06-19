@@ -125,7 +125,7 @@ public class LaunchActivity extends BaseContextActivity {
         }
 
         // Setup the weekly alarms which are used for notification.
-        AlarmUtils.setWeeklyAlarms(this);
+        AlarmUtils.setMyEventsAlarm(this);
     }
 
     protected void onResume() {

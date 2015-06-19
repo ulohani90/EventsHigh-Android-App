@@ -59,8 +59,7 @@
     <string name="ui_verify_phone">Verify your phone number</string>
     <string name="ui_no_my_event">Personalize this section by clicking on ♥ to favourite events or follow categories and performers.\n\nNever miss events for\nyour interests again!</string>
     <string name="ui_view_location_on_map">View location on map</string>
-    <string name="ui_upcoming_events">Upcoming events</string>
-    <string name="ui_upcoming_events_msg">See events for your interests!</string>
+    <string name="ui_my_events_message">Checkout the events for your interests.</string>
     <string name="ui_price">Price</string>
     <string name="ui_browse_featured">What\'s Trending</string>
     <string name="ui_browse_cat">Browse By Category</string>

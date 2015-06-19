@@ -7,10 +7,9 @@ import android.content.Intent;
 import android.text.format.DateUtils;
 import android.util.Log;
 
-import com.eventshigh.nearme.app.broadcast.DownloadEventsBroadcastReceiver;
-import com.eventshigh.nearme.app.broadcast.DownloadEventsIntentService.IntentType;
 import com.eventshigh.nearme.app.broadcast.EventAlarmBroadcastReceiver;
 import com.eventshigh.nearme.app.broadcast.EventNotificationIntentService;
+import com.eventshigh.nearme.app.broadcast.MyEventsAlarmReceiver;
 import com.eventshigh.nearme.app.data.Event;
 
 import java.util.Calendar;
@@ -51,67 +50,32 @@ public class AlarmUtils {
         alarmMgr.cancel(alarmIntent);
     }
 
-
-    public static void setWeeklyAlarms(Context context) {
-        cancelOldMyEventsAlarm(context);
-        cancelWeekendEventsAlarm(context);
-
-        setMyEventsAlarm(context);
-    }
-
-    private static void setMyEventsAlarm(Context context) {
-        // Set the alarm to start at 3pm-4pm on a random day except Friday and Monday.
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis() + DateUtils.DAY_IN_MILLIS * 7);
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        calendar.set(Calendar.HOUR_OF_DAY, 15);
-        calendar.set(Calendar.MINUTE, new Random().nextInt(60));
-        Intent intent = new Intent(context, DownloadEventsBroadcastReceiver.class);
-        setRepeatingAlarm(context, intent, IntentType.MY_EVENTS.intentAction,
-                calendar.getTimeInMillis(), 7);
-    }
-
-    private static void setRepeatingAlarm(Context context, Intent intent, String intentAction,
-                                          long alarmTimeMillis, int daysInterval) {
-        intent.setAction(intentAction);
-        boolean isAlarmAlreadySet = PendingIntent.getBroadcast(context, 0, intent,
-                PendingIntent.FLAG_NO_CREATE) != null;
+    // Set the alarm to start at 3pm-4pm on Sunday.
+    public static void setMyEventsAlarm(Context context) {
+        // Get the Intent for creating alarm.
+        Intent intent = new Intent(context, MyEventsAlarmReceiver.class);
+        intent.setAction("eh_my_events");
 
         // If the alarm is already set, there is nothing to do
+        boolean isAlarmAlreadySet = PendingIntent.getBroadcast(context,
+                NotificationUtils.MY_EVENTS_NOTIFICATION_ID, intent, PendingIntent.FLAG_NO_CREATE) != null;
         if (isAlarmAlreadySet) {
-            Log.i(LOG_TAG, intentAction + " alarm is already set");
+            Log.i(LOG_TAG, intent.getAction() + " alarm is already set");
             return;
         }
 
-        Log.i(LOG_TAG, "Setting alarm at " +
-                DateTimeUtils.timeToFullFormat(alarmTimeMillis) + " for " + intentAction);
+        // Get the instance of calendar for next Sunday.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        calendar.set(Calendar.HOUR_OF_DAY, 15);
+        calendar.set(Calendar.MINUTE, new Random().nextInt(60));
+
+        Log.i(LOG_TAG, "Setting alarm at " + calendar.getTime()  + " for " + intent.getAction());
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, alarmTimeMillis,
-                AlarmManager.INTERVAL_DAY * daysInterval, alarmIntent);
-    }
-
-    private static void cancelWeekendEventsAlarm(Context context) {
-        Intent intent = new Intent(context, DownloadEventsBroadcastReceiver.class);
-        intent.setAction("eh_weekend_events");
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context,
-                0, intent, PendingIntent.FLAG_NO_CREATE);
-        if (alarmIntent != null) {
-            AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            alarmMgr.cancel(alarmIntent);
-            Log.i(LOG_TAG, "Canceled old weekend events alarm");
-        }
-    }
-
-    private static void cancelOldMyEventsAlarm(Context context) {
-        Intent intent = new Intent(context, DownloadEventsBroadcastReceiver.class);
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(context,
-                0, intent, PendingIntent.FLAG_NO_CREATE);
-        if (alarmIntent != null) {
-            AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            alarmMgr.cancel(alarmIntent);
-            Log.i(LOG_TAG, "Canceled old my events alarm");
-        }
+                NotificationUtils.MY_EVENTS_NOTIFICATION_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, alarmIntent);
     }
 }

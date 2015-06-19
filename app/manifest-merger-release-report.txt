@@ -414,11 +414,11 @@ service#com.eventshigh.nearme.app.broadcast.EventNotificationIntentService
 ADDED from AndroidManifest.xml:293:9
 	android:name
 		ADDED from AndroidManifest.xml:293:18
-receiver#com.eventshigh.nearme.app.broadcast.DownloadEventsBroadcastReceiver
+receiver#com.eventshigh.nearme.app.broadcast.MyEventsAlarmReceiver
 ADDED from AndroidManifest.xml:296:9
 	android:name
 		ADDED from AndroidManifest.xml:296:19
-service#com.eventshigh.nearme.app.broadcast.DownloadEventsIntentService
+service#com.eventshigh.nearme.app.broadcast.MyEventsNotificationService
 ADDED from AndroidManifest.xml:297:9
 	android:name
 		ADDED from AndroidManifest.xml:297:18

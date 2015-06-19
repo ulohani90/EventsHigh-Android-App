@@ -96,7 +96,7 @@ public class NotificationUtils {
 
     private static void showNotificationAndReleaseWakeLock(NotificationData notificationData) {
         Notification notification = createNotificationBuilder(notificationData.context,
-                notificationData.title, notificationData.message, notificationData.pendingIntent,
+                notificationData.title, notificationData.message, notificationData.launchIntent,
                 notificationData.priority)
             .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationData.message))
             .build();
@@ -104,14 +104,14 @@ public class NotificationUtils {
         showNotification(notificationData.context, notification, notificationData.notificationId);
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
-        WakefulBroadcastReceiver.completeWakefulIntent(notificationData.alarmIntent);
+        WakefulBroadcastReceiver.completeWakefulIntent(notificationData.wakefulIntent);
     }
 
     private static void showNotificationAndReleaseWakeLock(NotificationData notificationData,
                                                            Bitmap bitmap) {
         NotificationCompat.Builder notificationBuilder = createNotificationBuilder(
                 notificationData.context, notificationData.title, notificationData.message,
-                notificationData.pendingIntent, notificationData.priority)
+                notificationData.launchIntent, notificationData.priority)
             .setStyle(new NotificationCompat.BigPictureStyle()
                             .setSummaryText(notificationData.message)
                             .bigPicture(bitmap)
@@ -132,7 +132,7 @@ public class NotificationUtils {
                 notificationData.notificationId);
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
-        WakefulBroadcastReceiver.completeWakefulIntent(notificationData.alarmIntent);
+        WakefulBroadcastReceiver.completeWakefulIntent(notificationData.wakefulIntent);
     }
 
     @SuppressLint("InlinedApi")
@@ -165,7 +165,7 @@ public class NotificationUtils {
     }
 
     public synchronized static void showEventsNotification(Context context, int notificationId,
-            List<Event> events, Intent launchIntent, int titleResourceId, int messageResourceId) {
+            List<Event> events, Intent launchIntent, int titleResourceId) {
         if (events.isEmpty()) {
             return;
         }
@@ -181,11 +181,6 @@ public class NotificationUtils {
 
         String title = context.getString(titleResourceId);
         String message = messageBuilder.toString();
-        if (message.isEmpty()) {
-            message = context.getString(messageResourceId);
-        } else {
-            title = context.getString(messageResourceId);
-        }
 
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, 0);
         Notification notification = createNotification(context, title, message, pendingIntent,
@@ -195,21 +190,20 @@ public class NotificationUtils {
 
     public static class NotificationData {
         public final Context context;
-        public final Intent alarmIntent;
+        public final Intent wakefulIntent;
 
         public final String title;
         public final String message;
         public final String imageUrl;
 
-        public final PendingIntent pendingIntent;
+        public final PendingIntent launchIntent;
         public final Intent showOnMapIntent;
         public final int notificationId;
         public final int priority;
 
-        public NotificationData(Context context, Intent alarmIntent, Event event,
-                                int notificationId) {
+        public NotificationData(Context context, Intent wakefulIntent, Event event, int notificationId) {
             this.context = context;
-            this.alarmIntent = alarmIntent;
+            this.wakefulIntent = wakefulIntent;
 
             title = event.title;
             CharSequence relativeTime = DateUtils.getRelativeDateTimeString(
@@ -224,22 +218,22 @@ public class NotificationUtils {
             EventNotificationStreamItem.record(context, title, message, imageUrl, event.id,
                 event.city);
 
-            pendingIntent = createPendingIntent(context, event.id, event.city);
+            launchIntent = createPendingIntent(context, event.id, event.city);
             showOnMapIntent = event.getShowOnMapIntent();
             this.notificationId = notificationId;
             this.priority = Notification.PRIORITY_DEFAULT;
         }
 
-        public NotificationData(Context context, Intent alarmIntent, String title, String message,
-                                String imageUrl, PendingIntent pendingIntent, int priority) {
+        public NotificationData(Context context, Intent wakefulIntent, String title, String message,
+                                String imageUrl, PendingIntent launchIntent, int priority) {
             this.context = context;
-            this.alarmIntent = alarmIntent;
+            this.wakefulIntent = wakefulIntent;
 
             this.title = title;
             this.message = message;
             this.imageUrl = imageUrl;
 
-            this.pendingIntent = pendingIntent;
+            this.launchIntent = launchIntent;
             this.priority = priority;
 
             showOnMapIntent = null;
