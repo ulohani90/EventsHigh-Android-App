@@ -549,6 +549,8 @@ public class EventDetailActivity extends BaseActivity {
         private final View organizerWebsiteRow;
         private final TextView organizerWebsiteView;
 
+        private final TextView numViewsView;
+        private final TextView numSavesView;
 
         private EventCard() {
             eventScrollView = (ScrollView) findViewById(R.id.event_scroll_view);
@@ -599,6 +601,9 @@ public class EventDetailActivity extends BaseActivity {
             organizerPhoneView = (TextView) findViewById(R.id.organizer_phone);
             organizerWebsiteRow = findViewById(R.id.organizer_website_row);
             organizerWebsiteView = (TextView) findViewById(R.id.organizer_website);
+
+            numViewsView = (TextView) findViewById(R.id.num_views);
+            numSavesView = (TextView) findViewById(R.id.num_saves);
 
             // Set Image view dimensions.
             final DisplayMetrics metrics = new DisplayMetrics();
@@ -799,6 +804,14 @@ public class EventDetailActivity extends BaseActivity {
             findViewById(R.id.share_fb).setVisibility(isInstalled(PACKAGE_NAME_FACEBOOK) ? View.VISIBLE : View.GONE);
             findViewById(R.id.share_email).setVisibility(isInstalled(PACKAGE_NAME_EMAIL) ? View.VISIBLE : View.GONE);
             findViewById(R.id.share_whatsapp).setVisibility(isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
+
+            // Show stats
+            String numViews = String.format(getResources().getString(R.string.ui_num_views), event.numViews);
+            numViewsView.setText(numViews);
+            numViewsView.setVisibility(event.numViews > 0 ? View.VISIBLE : View.GONE);
+            String numSaves = String.format(getResources().getString(R.string.ui_num_saves), event.numSaves);
+            numSavesView.setText(numSaves);
+            numSavesView.setVisibility(event.numSaves > 0 ? View.VISIBLE : View.GONE);
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
