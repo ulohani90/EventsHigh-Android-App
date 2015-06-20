@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -110,10 +109,10 @@ public class EventsMapsActivity extends BaseEventsActivity {
         topProgressBar.setVisibility(View.VISIBLE);
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
             new MyEventsRequest(this, eventsContext, Priority.IMMEDIATE, this,
-                    false, true, mMyEventsFetcherCallBack, mErrorListener).execute();
+                    false, false, mMyEventsFetcherCallBack, mErrorListener).execute();
         } else {
             EventCollectionRequest.submit(this, eventsContext, Priority.IMMEDIATE, this,
-                    false, true, mEventsFetcherCallBack, mErrorListener);
+                    false, false, mEventsFetcherCallBack, mErrorListener);
         }
     }
 

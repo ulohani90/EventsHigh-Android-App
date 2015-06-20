@@ -123,7 +123,7 @@ public class EventsHighEndpoints {
         if (eventsContext.query.isEmpty() || isMyEventQuery(eventsContext.query)) {
             return String.format(API_ENDPOINT_DATE_FORMAT,
                 eventsContext.city.toString().toLowerCase(),
-                eventsContext.dateFilter.isEmpty() ? "this%20week" : eventsContext.dateFilter);
+                eventsContext.dateFilter.isEmpty() ? "this+week" : eventsContext.dateFilter);
         }
 
         if (isFeaturedEventQuery(eventsContext.query)) {
