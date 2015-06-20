@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
@@ -528,7 +529,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final View arrowView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent) {
-            View view = activity.getLayoutInflater().inflate(R.layout.card_event, parent, false);
+            View view = activity.getLayoutInflater().inflate(
+                    BuildConfig.SHOW_BIG_CARD ? R.layout.card_event_big_alpha : R.layout.card_event,
+                    parent, false);
             return new EventCard(view, false);
         }
 
