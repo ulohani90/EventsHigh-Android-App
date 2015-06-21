@@ -66,7 +66,7 @@ public class MapMarkerManager {
 
         public MarkerInfo(Event event) {
             this.event = event;
-            canShowAsDot = event.getPopularityScore() < MIN_POPULARITY;
+            canShowAsDot = event.uberScore < MIN_POPULARITY;
             shownAsDot = canShowAsDot;
         }
     }
@@ -172,8 +172,8 @@ public class MapMarkerManager {
                     return 1;
                 }
 
-                return Integer.valueOf(markers.get(rhs).event.getPopularityScore()).compareTo(
-                        markers.get(lhs).event.getPopularityScore());
+                return Float.valueOf(markers.get(rhs).event.uberScore).compareTo(
+                        markers.get(lhs).event.uberScore);
             }
         });
 

@@ -524,7 +524,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView priceView;
         private final TextView venueView;
         private final TextView travelTimeView;
-        private final TextView numPeopleInterestedView;
+        private final TextView numEventsViews;
         private final ImageView favouriteView;
         private final View arrowView;
 
@@ -547,7 +547,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             priceView = (TextView) cardView.findViewById(R.id.event_price);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
-            numPeopleInterestedView = (TextView) cardView.findViewById(R.id.num_people_interested);
+            numEventsViews = (TextView) cardView.findViewById(R.id.num_pv);
             favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
             arrowView = cardView.findViewById(R.id.arrow);
         }
@@ -602,12 +602,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             // Num people interested ?
-            if (numPeopleInterestedView != null) {
-                if (event.numPeopleInterested > 1) {
-                    numPeopleInterestedView.setVisibility(View.VISIBLE);
-                    numPeopleInterestedView.setText(Integer.toString(event.numPeopleInterested));
+            if (numEventsViews != null) {
+                if (event.numViews > 1) {
+                    numEventsViews.setVisibility(View.VISIBLE);
+                    numEventsViews.setText(Integer.toString(event.numViews));
                 } else {
-                    numPeopleInterestedView.setVisibility(View.GONE);
+                    numEventsViews.setVisibility(View.GONE);
                 }
             }
 
@@ -804,10 +804,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                         EventCategory.toCategoryParsableString(tag).toLowerCase()).getInt(null);
             } catch (IllegalAccessException e) {
                 // Ignore
-                Crashlytics.logException(e);
+                Crashlytics.getInstance().core.logException(e);
             } catch (NoSuchFieldException e) {
                 // Ignore
-                Crashlytics.logException(e);
+                Crashlytics.getInstance().core.logException(e);
                 Log.d("", "No image for: " + tag, e);
             }
 

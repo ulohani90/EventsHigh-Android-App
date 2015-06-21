@@ -453,13 +453,6 @@ public class EventDetailActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(event.title);
-            if (event.numPeopleInterested <= 0) {
-                actionBar.setSubtitle("");
-            } else {
-                String text = getResources().getQuantityString(R.plurals.people_interested,
-                        event.numPeopleInterested, event.numPeopleInterested);
-                actionBar.setSubtitle(text);
-            }
         }
 
         // Populate event details.
@@ -805,15 +798,16 @@ public class EventDetailActivity extends BaseActivity {
             organizerHeader.setVisibility(organizerInfoShown ? View.VISIBLE : View.GONE);
 
             // Share Buttons.
+            findViewById(R.id.share_row).setVisibility(View.VISIBLE);
             findViewById(R.id.share_fb).setVisibility(isInstalled(PACKAGE_NAME_FACEBOOK) ? View.VISIBLE : View.GONE);
             findViewById(R.id.share_email).setVisibility(isInstalled(PACKAGE_NAME_EMAIL) ? View.VISIBLE : View.GONE);
             findViewById(R.id.share_whatsapp).setVisibility(isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
 
             // Show stats
-            numViewsView.setText("" + event.numViews);
-            numViewsParentView.setVisibility(event.numViews > 0 ? View.VISIBLE : View.GONE);
-            numSavesView.setText("" + event.numSaves);
-            numSavesParentView.setVisibility(event.numSaves > 0 ? View.VISIBLE : View.GONE);
+            numViewsView.setText(Integer.toString(event.numViews));
+            numViewsParentView.setVisibility(event.numViews > 5 ? View.VISIBLE : View.GONE);
+            numSavesView.setText(Integer.toString(event.numSaves));
+            numSavesParentView.setVisibility(event.numSaves > 5 ? View.VISIBLE : View.GONE);
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
