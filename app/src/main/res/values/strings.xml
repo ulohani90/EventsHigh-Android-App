@@ -63,8 +63,8 @@
     <string name="ui_price">Price</string>
     <string name="ui_browse_featured">What\'s Trending</string>
     <string name="ui_browse_cat">Browse By Category</string>
-    <string name="ui_num_views">%1$s viewed this event</string>
-    <string name="ui_num_saves">%1$s saved this event</string>
+    <string name="ui_num_views_text">viewed this event</string>
+    <string name="ui_num_saves_text">saved this event</string>
 
     <!-- Check in -->
     <string name="action_check_in">Check In</string>

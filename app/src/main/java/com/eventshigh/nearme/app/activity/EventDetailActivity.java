@@ -549,7 +549,9 @@ public class EventDetailActivity extends BaseActivity {
         private final View organizerWebsiteRow;
         private final TextView organizerWebsiteView;
 
+        private final View numViewsParentView;
         private final TextView numViewsView;
+        private final View numSavesParentView;
         private final TextView numSavesView;
 
         private EventCard() {
@@ -602,7 +604,9 @@ public class EventDetailActivity extends BaseActivity {
             organizerWebsiteRow = findViewById(R.id.organizer_website_row);
             organizerWebsiteView = (TextView) findViewById(R.id.organizer_website);
 
+            numViewsParentView = findViewById(R.id.num_views_parent);
             numViewsView = (TextView) findViewById(R.id.num_views);
+            numSavesParentView = findViewById(R.id.num_saves_parent);
             numSavesView = (TextView) findViewById(R.id.num_saves);
 
             // Set Image view dimensions.
@@ -806,12 +810,10 @@ public class EventDetailActivity extends BaseActivity {
             findViewById(R.id.share_whatsapp).setVisibility(isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
 
             // Show stats
-            String numViews = String.format(getResources().getString(R.string.ui_num_views), event.numViews);
-            numViewsView.setText(numViews);
-            numViewsView.setVisibility(event.numViews > 0 ? View.VISIBLE : View.GONE);
-            String numSaves = String.format(getResources().getString(R.string.ui_num_saves), event.numSaves);
-            numSavesView.setText(numSaves);
-            numSavesView.setVisibility(event.numSaves > 0 ? View.VISIBLE : View.GONE);
+            numViewsView.setText("" + event.numViews);
+            numViewsParentView.setVisibility(event.numViews > 0 ? View.VISIBLE : View.GONE);
+            numSavesView.setText("" + event.numSaves);
+            numSavesParentView.setVisibility(event.numSaves > 0 ? View.VISIBLE : View.GONE);
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
