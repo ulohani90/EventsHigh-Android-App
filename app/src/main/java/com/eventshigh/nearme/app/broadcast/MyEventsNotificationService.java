@@ -58,6 +58,7 @@ public class MyEventsNotificationService extends IntentService {
             if (lastNotificationTime > System.currentTimeMillis() - DateUtils.DAY_IN_MILLIS * 3 ||
                 now.get(Calendar.WEEK_OF_YEAR) == lastNotificationCal.get(Calendar.WEEK_OF_YEAR)) {
                 WakefulBroadcastReceiver.completeWakefulIntent(wakefulIntent);
+                return;
             }
         }
 
