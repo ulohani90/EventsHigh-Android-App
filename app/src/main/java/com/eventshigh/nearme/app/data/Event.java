@@ -44,6 +44,8 @@ public class Event implements Parcelable {
     @Nullable public final String bookingUrl;
 
     public final int numPeopleInterested;
+    public final int numViews;
+    public final int numSaves;
     public final boolean ehRecommended;
     public final float uberScore;
 
@@ -70,7 +72,8 @@ public class Event implements Parcelable {
     public Event(String id, City city, String title, EventCategory category,
                  @Nullable String offerTitle, String description, String[] tags,
                  @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
-                 int numPeopleInterested, boolean ehRecommended, float uberScore, long[] eventTimings,
+                 int numPeopleInterested, int numViews, int numSaves, boolean ehRecommended,
+                 float uberScore, long[] eventTimings,
                  @Nullable LatLng location, @Nullable String venue, @Nullable String locality,
                  @Nullable String address, boolean isCleanVenue,
                  String[] performers,
@@ -91,6 +94,8 @@ public class Event implements Parcelable {
         this.bookingUrl = Utils.checkIfUnknown(bookingUrl);
 
         this.numPeopleInterested = numPeopleInterested;
+        this.numViews = numViews;
+        this.numSaves = numSaves;
         this.ehRecommended = ehRecommended;
         this.uberScore = uberScore;
 
@@ -191,6 +196,8 @@ public class Event implements Parcelable {
         dest.writeString(emptyIfNull(bookingUrl));
 
         dest.writeInt(numPeopleInterested);
+        dest.writeInt(numViews);
+        dest.writeInt(numSaves);
         dest.writeBooleanArray(new boolean[]{ehRecommended});
         dest.writeFloat(uberScore);
 
@@ -233,6 +240,8 @@ public class Event implements Parcelable {
                             in.readString(),
                             in.readString(),
 
+                            in.readInt(),
+                            in.readInt(),
                             in.readInt(),
                             in.createBooleanArray()[0],
                             in.readFloat(),
@@ -290,6 +299,9 @@ public class Event implements Parcelable {
         }
 
         int num_people_interested = eventJson.optInt("num_people_interested", 0);
+        JSONObject stats = eventJson.optJSONObject("stats");
+        int num_views = stats == null ? 0 : stats.optInt("num_pvs");
+        int num_saves = stats == null ? 0 : stats.optInt("num_saves");
         boolean eh_recommends = eventJson.optBoolean("eh_editor");
         float uberScore = (float) eventJson.optDouble("uber_score", 1);
 
@@ -445,6 +457,8 @@ public class Event implements Parcelable {
                 booking_url,
 
                 num_people_interested,
+                num_views,
+                num_saves,
                 eh_recommends,
                 uberScore,
 
