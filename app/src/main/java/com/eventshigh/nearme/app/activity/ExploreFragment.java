@@ -12,6 +12,7 @@ import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.Locality;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
@@ -57,7 +58,7 @@ public class ExploreFragment extends BaseEventsFragment {
         eventsAdapter = new EventsAdapter(this);
         AutofitRecyclerView exploreGridView = (AutofitRecyclerView) view.findViewById(R.id.explore_grid);
         exploreGridView.setEventsAdapter(eventsAdapter);
-        exploreGridView.setOnScrollListener(new HideActionBarOnScroll(activity));
+        exploreGridView.addOnScrollListener(new HideActionBarOnScroll(activity));
 
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         topProgressBar.setVisibility(View.VISIBLE);
@@ -75,7 +76,8 @@ public class ExploreFragment extends BaseEventsFragment {
         @Override
         public void onResponse(EventCollection eventCollection, boolean isIntermediate) {
             topProgressBar.setVisibility(isIntermediate ? View.VISIBLE : View.GONE);
-            eventsAdapter.setExploreCategories(eventCollection, EXPLORE_TAGS);
+            eventsAdapter.setExploreCategories(eventCollection,
+                    Locality.getLocalities(eventsContext.city), EXPLORE_TAGS);
         }
     };
 
@@ -85,7 +87,8 @@ public class ExploreFragment extends BaseEventsFragment {
             topProgressBar.setVisibility(View.GONE);
 
             if (eventsAdapter.getItemCount() == 0) {
-                eventsAdapter.setExploreCategories(null, EXPLORE_TAGS);
+                eventsAdapter.setExploreCategories(null,
+                        Locality.getLocalities(eventsContext.city), EXPLORE_TAGS);
             }
         }
     };

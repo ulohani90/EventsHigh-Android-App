@@ -25,6 +25,7 @@ import com.eventshigh.nearme.app.activity.BaseEventsFragment;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.data.Locality;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
@@ -97,7 +98,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void setExploreCategories(@Nullable EventCollection eventCollection, String[] tags) {
+    public void setExploreCategories(@Nullable EventCollection eventCollection,
+            List<Locality> localities, String[] tags) {
         dataToShow.clear();
 
         if (eventCollection != null) {
@@ -113,8 +115,16 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
         }
 
+        if (!localities.isEmpty()) {
+            dataToShow.add(new SmallHeaderData(
+                    eventsFragment.getContextActivity().getString(R.string.ui_browse_loc)));
+            for (Locality locality : localities) {
+                dataToShow.add(new TrendingCategoryData(locality.asTrendingTopic()));
+            }
+        }
+
         dataToShow.add(new SmallHeaderData(
-        eventsFragment.getContextActivity().getString(R.string.ui_browse_cat)));
+            eventsFragment.getContextActivity().getString(R.string.ui_browse_cat)));
         for (String tag : tags) {
             dataToShow.add(new ExploreCategoryData(tag));
         }

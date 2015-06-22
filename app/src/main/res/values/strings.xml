@@ -63,6 +63,7 @@
     <string name="ui_price">Price</string>
     <string name="ui_browse_featured">What\'s Trending</string>
     <string name="ui_browse_cat">Browse By Category</string>
+    <string name="ui_browse_loc">Browse By Locality</string>
     <string name="ui_num_views_text">viewed this event</string>
     <string name="ui_num_saves_text">saved this event</string>
 
