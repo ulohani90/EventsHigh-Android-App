@@ -10,6 +10,7 @@ import com.eventshigh.nearme.app.broadcast.EventAlarmBroadcastReceiver;
 import com.eventshigh.nearme.app.broadcast.EventNotificationIntentService;
 import com.eventshigh.nearme.app.broadcast.MyEventsAlarmReceiver;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.notification.NotificationUtils;
 
 import java.util.Calendar;
 import java.util.Random;

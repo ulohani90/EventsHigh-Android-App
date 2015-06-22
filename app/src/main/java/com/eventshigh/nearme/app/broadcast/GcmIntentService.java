@@ -20,10 +20,11 @@ import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.TicketNotificationStreamItem;
 import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
-import com.eventshigh.nearme.app.utils.NotificationUtils;
-import com.eventshigh.nearme.app.utils.NotificationUtils.NotificationData;
+import com.eventshigh.nearme.app.notification.NotificationUtils;
+import com.eventshigh.nearme.app.notification.EHNotification;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.common.ConnectionResult;
@@ -42,32 +43,39 @@ import com.google.android.gms.maps.model.LatLng;
 public class GcmIntentService extends IntentService {
     private static final String LOG_TAG = GcmIntentService.class.getSimpleName();
 
+    private GAHelper gaHelper;
     public GcmIntentService() {
         super("GcmIntentService");
     }
 
     @Override
-    protected void onHandleIntent(final Intent intent) {
+    protected void onHandleIntent(final Intent wakeupIntent) {
         // Filter messages based on message type. Since it is likely that GCM will be extended
         // in the future with new message types, just ignore any message types you're not
         // interested in, or that you don't recognize.
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
-        String messageType = gcm.getMessageType(intent);
+        String messageType = gcm.getMessageType(wakeupIntent);
         if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-            ParsedBundle parsedBundle = parsedBundle(intent.getExtras(), intent);
-            sendNotification(parsedBundle, intent);
+            gaHelper = GAHelper.getInstance(GcmIntentService.this);
+
+            ParsedBundle parsedBundle = parseBundle(wakeupIntent.getExtras(), wakeupIntent);
+            sendNotification(parsedBundle, wakeupIntent);
         }
     }
 
+    private void reportAction(String actionName) {
+        gaHelper.reportActionToAnalytics(LOG_TAG, actionName);
+    }
+
     private static class ParsedBundle {
-        public final NotificationUtils.NotificationData notificationData;
+        public final EHNotification EHNotification;
         @Nullable
         public final LatLng boundCenter;
         public final double radiusInMeter;
 
-        private ParsedBundle (NotificationUtils.NotificationData notificationData,
+        private ParsedBundle (EHNotification EHNotification,
                               @Nullable LatLng boundCenter, double radiusInMeter) {
-            this.notificationData = notificationData;
+            this.EHNotification = EHNotification;
             this.boundCenter = boundCenter;
             this.radiusInMeter = radiusInMeter;
         }
@@ -82,7 +90,7 @@ public class GcmIntentService extends IntentService {
         }
     }
 
-    private @Nullable ParsedBundle parsedBundle(Bundle msg, Intent alarmIntent) {
+    private @Nullable ParsedBundle parseBundle(Bundle msg, Intent alarmIntent) {
         String title = Utils.checkIfUnknown(msg.getString("t"));
         String message = Utils.checkIfUnknown(msg.getString("m"));
         if (message == null || title == null) {
@@ -120,7 +128,7 @@ public class GcmIntentService extends IntentService {
         PendingIntent contentIntent;
         if (eventId != null) {
             GcmRegistration gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
-            contentIntent = NotificationUtils.createPendingIntent(this, eventId,
+            contentIntent = EHNotification.createPendingIntent(this, eventId,
                     gcmRegistration.getLastCity());
             EventNotificationStreamItem.record(this, title, message, imageUrl, eventId,
                     gcmRegistration.getLastCity());
@@ -160,36 +168,37 @@ public class GcmIntentService extends IntentService {
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         }
 
-        NotificationData notificationData =  new NotificationData(this, alarmIntent, title, message,
+        EHNotification EHNotification =  new EHNotification(this, alarmIntent, title, message,
                 imageUrl, contentIntent,
                 priority == null ? Notification.PRIORITY_LOW : Notification.PRIORITY_HIGH,
                 mobileNo == null ? NotificationUtils.GCM_NOTIFICATION_ID : mobileNo.hashCode()
         );
-        return new ParsedBundle(notificationData, bounded ? new LatLng(lat, lon) : null, distance);
+        return new ParsedBundle(EHNotification, bounded ? new LatLng(lat, lon) : null, distance);
     }
 
-    private void sendNotification(@Nullable ParsedBundle parsedBundle, Intent intent) {
+    private void sendNotification(@Nullable ParsedBundle parsedBundle, Intent wakeupIntent) {
         if (parsedBundle != null) {
             if (parsedBundle.boundCenter != null) {
-                new BoundsVerifier(parsedBundle, intent).checkAndNotify();
+                new BoundsVerifier(parsedBundle, wakeupIntent).checkAndNotify();
             } else {
-                NotificationUtils.showNotificationAndReleaseWakeLock(this, parsedBundle.notificationData);
+                parsedBundle.EHNotification.showNotificationAndReleaseWakeLock();
             }
         } else {
             // Release the wake lock provided by the WakefulBroadcastReceiver.
-            GcmBroadcastReceiver.completeWakefulIntent(intent);
+            reportAction("notificationSkipped");
+            GcmBroadcastReceiver.completeWakefulIntent(wakeupIntent);
         }
     }
 
     private  class BoundsVerifier {
         private final ParsedBundle parsedBundle;
-        private final Intent intent;
+        private final Intent wakeupIntent;
         private GoogleApiClient client;
         private boolean completeWakefulIntentCalled = false;
 
-        private BoundsVerifier(ParsedBundle parsedBundle, Intent intent) {
+        private BoundsVerifier(ParsedBundle parsedBundle, Intent wakeupIntent) {
             this.parsedBundle = parsedBundle;
-            this.intent = intent;
+            this.wakeupIntent = wakeupIntent;
         }
 
         private void checkAndNotify() {
@@ -200,8 +209,9 @@ public class GcmIntentService extends IntentService {
                     public void onConnected(Bundle bundle) {
                         Location location = LocationServices.FusedLocationApi.getLastLocation(client);
                         if (parsedBundle.isInRadius(location)) {
-                            NotificationUtils.showNotificationAndReleaseWakeLock(
-                                    GcmIntentService.this, parsedBundle.notificationData);
+                            parsedBundle.EHNotification.showNotificationAndReleaseWakeLock();
+                        } else {
+                            reportAction("notificationSkippedOutOfBounds");
                         }
 
                         client.disconnect();
@@ -213,11 +223,11 @@ public class GcmIntentService extends IntentService {
                         completeWakefulIntent();
                     }
                 })
-                .addOnConnectionFailedListener(new OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(ConnectionResult connectionResult) {
-                        completeWakefulIntent();
-                    }
+                    .addOnConnectionFailedListener(new OnConnectionFailedListener() {
+                        @Override
+                        public void onConnectionFailed(ConnectionResult connectionResult) {
+                            completeWakefulIntent();
+                        }
                 })
                 .build();
 
@@ -226,7 +236,7 @@ public class GcmIntentService extends IntentService {
 
         private synchronized void completeWakefulIntent() {
             if (!completeWakefulIntentCalled) {
-                GcmBroadcastReceiver.completeWakefulIntent(intent);
+                GcmBroadcastReceiver.completeWakefulIntent(wakeupIntent);
                 completeWakefulIntentCalled = true;
             }
         }

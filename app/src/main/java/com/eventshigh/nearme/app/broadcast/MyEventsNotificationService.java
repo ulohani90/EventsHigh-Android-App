@@ -1,8 +1,11 @@
 package com.eventshigh.nearme.app.broadcast;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.text.format.DateUtils;
 
@@ -18,10 +21,11 @@ import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
+import com.eventshigh.nearme.app.notification.EHNotification;
+import com.eventshigh.nearme.app.notification.NotificationUtils;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
-import com.eventshigh.nearme.app.utils.NotificationUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,6 +37,7 @@ import java.util.Set;
 public class MyEventsNotificationService extends IntentService {
     private static final String PREF_FILE_NAME = "my_events_notification_data";
     private static final String PARAM_LAST_NOTIFICATION_TIMESTAMP = "last_notification_timestamp";
+    private static final int MAX_EVENTS_TO_SHOW_IN_NOTIFICATION = 3;
 
     public MyEventsNotificationService() {
         super("MyEventsNotificationService");
@@ -120,8 +125,9 @@ public class MyEventsNotificationService extends IntentService {
 
         // In case of single event, use Single Event Notification stack.
         if (events.size() == 1) {
-            NotificationUtils.showNotificationAndReleaseWakeLock(this, wakefulIntent, events.get(0),
+            EHNotification EHNotification = new EHNotification(this, wakefulIntent, events.get(0),
                     NotificationUtils.MY_EVENTS_NOTIFICATION_ID);
+            EHNotification.showNotificationAndReleaseWakeLock();
             return;
         }
 
@@ -130,10 +136,34 @@ public class MyEventsNotificationService extends IntentService {
         launchIntent.setAction(BaseActivity.NOTIFICATION_ACTION + wakefulIntent.getAction());
         launchIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT,
                 new EventsContext(null, EventsHighEndpoints.QUERY_MY_EVENT));
-        NotificationUtils.showEventsNotification(this, NotificationUtils.MY_EVENTS_NOTIFICATION_ID,
-                events, launchIntent, R.string.ui_my_events_message);
+        showEventsNotification(events, launchIntent);
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         WakefulBroadcastReceiver.completeWakefulIntent(wakefulIntent);
+    }
+
+    private void showEventsNotification(List<Event> events, Intent launchIntent) {
+        if (events.isEmpty()) {
+            return;
+        }
+
+        StringBuilder messageBuilder = new StringBuilder();
+        for (int i = 0; i < events.size() && i < MAX_EVENTS_TO_SHOW_IN_NOTIFICATION; i++) {
+            messageBuilder.append(events.get(i).title);
+            if (events.get(i).venue != null) {
+                messageBuilder.append(" @ ").append(events.get(i).venue);
+            }
+            messageBuilder.append("\n\n");
+        }
+
+        String title = getString(R.string.ui_my_events_message);
+        String message = messageBuilder.toString();
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, launchIntent, 0);
+        Notification notification = NotificationUtils.createNotificationBuilder(this, title, message,
+                pendingIntent, Notification.PRIORITY_DEFAULT)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                .build();
+        NotificationUtils.showNotification(this, notification, NotificationUtils.MY_EVENTS_NOTIFICATION_ID);
     }
 }
