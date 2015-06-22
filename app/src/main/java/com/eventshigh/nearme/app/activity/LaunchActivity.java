@@ -66,7 +66,6 @@ public class LaunchActivity extends BaseContextActivity {
 
     // Tabs.
     private int defaultTab = 1;
-    public static final String OFFERS_TAB = "offers";
     public static final String MY_EVENTS_TAB = EventsHighEndpoints.QUERY_MY_EVENT;
     public static final String EXPLORE_TAB = "explore";
     public static final String NOTIFICATIONS_TAB = "Notifications";
@@ -76,7 +75,6 @@ public class LaunchActivity extends BaseContextActivity {
             EXPLORE_TAB,
             THIS_WEEK_TAB,
             NOTIFICATIONS_TAB,
-            OFFERS_TAB,
     };
 
     @Override
@@ -347,10 +345,6 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public Fragment getItem(int position) {
-            if (TABS[position].equals(OFFERS_TAB)) {
-                return new OffersFragment();
-            }
-
             if (TABS[position].equals(MY_EVENTS_TAB)) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                     EventsHighEndpoints.QUERY_MY_EVENT);
