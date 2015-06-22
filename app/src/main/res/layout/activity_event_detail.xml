@@ -60,8 +60,8 @@
                 style="?android:attr/textAppearanceMedium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="4dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
@@ -72,106 +72,20 @@
                 tools:ignore="UnusedAttribute"
                 tools:text="The Awesome Event"
             />
-            <TextView
-                android:id="@+id/event_from"
-                style="@style/EHText"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginEnd="16dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:layout_gravity="end"
-                android:textColor="#99A7A9AC"
-                android:onClick="openSourceSite"
-                tools:text="Event details from: www.eventshigh.com"
-            />
 
             <!-- Stats -->
-            <LinearLayout
+            <TextView
+                android:id="@+id/event_stats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@android:color/white"
-            >
-                <RelativeLayout
-                    android:layout_weight="1"
-                    android:padding="8dp"
-                    android:id="@+id/num_views_parent"
-                    android:gravity="center"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                >
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/stats_circle"
-                        tools:ignore="ContentDescription"
-                    />
-                    <TextView
-                        android:id="@+id/num_views"
-                        android:textSize="12sp"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:gravity="center"
-                        tools:text="100"
-                    />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/num_views"
-                        android:layout_toEndOf="@+id/num_views"
-                        android:layout_centerInParent="true"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
-                        android:textSize="12sp"
-                        android:text="@string/ui_num_views_text"
-                    />
-                </RelativeLayout>
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="#1a4d4d4d"
-                />
-
-                <RelativeLayout
-                    android:layout_weight="1"
-                    android:padding="8dp"
-                    android:id="@+id/num_saves_parent"
-                    android:gravity="center"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                >
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/stats_circle"
-                        tools:ignore="ContentDescription"
-                    />
-                    <TextView
-                        android:id="@+id/num_saves"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:textSize="12sp"
-                        android:gravity="center"
-                        tools:text="10"
-                    />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/num_saves"
-                        android:layout_toEndOf="@+id/num_saves"
-                        android:layout_centerInParent="true"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
-                        android:textSize="12sp"
-                        android:text="@string/ui_num_saves_text"
-                    />
-                </RelativeLayout>
-            </LinearLayout>
+                android:layout_margin="10dp"
+                android:textStyle="bold"
+                android:gravity="center_vertical"
+                android:drawableLeft="@drawable/ic_person_black_18dp"
+                android:drawableStart="@drawable/ic_person_black_18dp"
+                android:drawablePadding="4dp"
+                tools:text="1049 views, 23 favourited"
+            />
 
             <!-- EH Actions -->
             <LinearLayout
@@ -627,6 +541,22 @@
                 android:ellipsize="end"
                 android:textColor="#CC383F3F"
                 tools:text="...\n,,,\n---"
+            />
+            <TextView
+                android:id="@+id/event_from"
+                style="@style/EHText"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:layout_gravity="end"
+                android:textColor="#99A7A9AC"
+                android:onClick="openSourceSite"
+                tools:text="Event details from: www.eventshigh.com"
             />
 
             <!-- Organizer Info -->

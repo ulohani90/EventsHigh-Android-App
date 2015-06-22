@@ -500,6 +500,7 @@ public class EventDetailActivity extends BaseActivity {
 
         private final TextView titleView;
         private final TextView fromView;
+        private final TextView statsView;
 
         private final View favouriteView;
         private final View favouritedView;
@@ -542,11 +543,6 @@ public class EventDetailActivity extends BaseActivity {
         private final View organizerWebsiteRow;
         private final TextView organizerWebsiteView;
 
-        private final View numViewsParentView;
-        private final TextView numViewsView;
-        private final View numSavesParentView;
-        private final TextView numSavesView;
-
         private EventCard() {
             eventScrollView = (ScrollView) findViewById(R.id.event_scroll_view);
 
@@ -558,6 +554,7 @@ public class EventDetailActivity extends BaseActivity {
 
             titleView = (TextView) findViewById(R.id.event_title);
             fromView = (TextView) findViewById(R.id.event_from);
+            statsView = (TextView) findViewById(R.id.event_stats);
 
             venueView = (TextView) findViewById(R.id.event_venue);
             addressView = (TextView) findViewById(R.id.event_address);
@@ -597,11 +594,6 @@ public class EventDetailActivity extends BaseActivity {
             organizerWebsiteRow = findViewById(R.id.organizer_website_row);
             organizerWebsiteView = (TextView) findViewById(R.id.organizer_website);
 
-            numViewsParentView = findViewById(R.id.num_views_parent);
-            numViewsView = (TextView) findViewById(R.id.num_views);
-            numSavesParentView = findViewById(R.id.num_saves_parent);
-            numSavesView = (TextView) findViewById(R.id.num_saves);
-
             // Set Image view dimensions.
             final DisplayMetrics metrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -627,6 +619,11 @@ public class EventDetailActivity extends BaseActivity {
 
             // Set title
             titleView.setText(event.title);
+
+            // Show stats
+            statsView.setVisibility(event.numViews > 5 ? View.VISIBLE : View.GONE);
+            statsView.setText("" + event.numViews + " views" +
+                    ( event.numSaves > 3 ? ", " + event.numSaves + " favourites" : ""));
 
             // Add attribution.
             if (event.sourceUrl == null) {
@@ -802,12 +799,6 @@ public class EventDetailActivity extends BaseActivity {
             findViewById(R.id.share_fb).setVisibility(isInstalled(PACKAGE_NAME_FACEBOOK) ? View.VISIBLE : View.GONE);
             findViewById(R.id.share_email).setVisibility(isInstalled(PACKAGE_NAME_EMAIL) ? View.VISIBLE : View.GONE);
             findViewById(R.id.share_whatsapp).setVisibility(isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
-
-            // Show stats
-            numViewsView.setText(Integer.toString(event.numViews));
-            numViewsParentView.setVisibility(event.numViews > 5 ? View.VISIBLE : View.GONE);
-            numSavesView.setText(Integer.toString(event.numSaves));
-            numSavesParentView.setVisibility(event.numSaves > 5 ? View.VISIBLE : View.GONE);
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {

@@ -201,6 +201,7 @@ public class LaunchActivity extends BaseContextActivity {
 
     public void cityChanged(City city) {
         drawer.closeDrawer(GravityCompat.START);
+        reportActionToAnalytics("cityChanged");
         eventsContext.changeLocation(city.cityBounds.getCenter());
         showExploreScreen();
     }
