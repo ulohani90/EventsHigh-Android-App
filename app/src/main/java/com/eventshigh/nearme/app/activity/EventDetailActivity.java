@@ -97,6 +97,7 @@ public class EventDetailActivity extends BaseActivity {
     private Account account;
     private GoogleApiClient client;
     private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
+    private boolean addToFavourite = false;
 
     // FB
     private CallbackManager callbackManager;
@@ -197,6 +198,11 @@ public class EventDetailActivity extends BaseActivity {
             showRateAppDialog = false;
         }
 
+        if (addToFavourite && event != null && !isFavourite(event)) {
+            addFavourite(null);
+        }
+        addToFavourite = false;
+
         String url = event == null ?
             getIntent().getData().buildUpon().appendQueryParameter("src", "ehm_gp1").toString() :
             event.getEventShareURI(this, "gp1").toString();
@@ -228,11 +234,11 @@ public class EventDetailActivity extends BaseActivity {
 
     public void save(View view) {
         showRateAppDialog = true;
+        addToFavourite = true;
         reportEventAction(event, "addToCalendar");
-        new UserActionHelper(this).recordAction(EventAction.SAVE, event.id);
 
+        new UserActionHelper(this).recordAction(EventAction.SAVE, event.id);
         addToCalendar(event, null);
-        addFavourite(null);
     }
 
     public void openSourceSite(View view) {
@@ -248,12 +254,12 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         showRateAppDialog = true;
+        addToFavourite = true;
         reportEventAction(event, "organizer", "call");
 
         Intent intent = new Intent(Intent.ACTION_DIAL)
                 .setData(Uri.parse("tel:" + (event.organizerPhone.split(",")[0])));
         startActivitySafe(intent);
-        addFavourite(null);
     }
 
     public void openOrganizerLink(View view) {
@@ -272,6 +278,7 @@ public class EventDetailActivity extends BaseActivity {
 
     public void openBookingSite(View view) {
         showRateAppDialog = true;
+        addToFavourite = true;
         reportEventAction(event, "bookTicket");
         new UserActionHelper(this).recordAction(EventAction.BOOK, event.id);
 
@@ -282,7 +289,6 @@ public class EventDetailActivity extends BaseActivity {
 
         CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
                 getString(R.string.title_book));
-        addFavourite(null);
     }
 
     public void openOfferSite(View view) {
@@ -343,6 +349,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void showDirections(View view) {
+        addToFavourite = true;
         reportEventAction(event, "showDirections");
 
         Intent intent = event.getShowDirectionsOnMapIntent();
@@ -359,7 +366,6 @@ public class EventDetailActivity extends BaseActivity {
             Crashlytics.getInstance().core.logException(e);
             showMessage(R.string.no_map_app);
         }
-        addFavourite(null);
     }
 
     public void showVenue(View view) {
@@ -384,6 +390,8 @@ public class EventDetailActivity extends BaseActivity {
 
     public void facebook(View view) {
         showRateAppDialog = true;
+        addToFavourite = true;
+
         if (ShareDialog.canShow(ShareLinkContent.class)) {
             reportEventAction(event, "eventShareInitiated", "fb");
 
@@ -418,23 +426,23 @@ public class EventDetailActivity extends BaseActivity {
         } else {
             shareEvent(event, PACKAGE_NAME_FACEBOOK);
         }
-        addFavourite(null);
     }
 
     public void email(View view) {
         showRateAppDialog = true;
+        addToFavourite = true;
+
         shareEvent(event, PACKAGE_NAME_EMAIL);
-        addFavourite(null);
     }
 
     public void whatsapp(View view) {
         showRateAppDialog = true;
+        addToFavourite = true;
 
         if (view.getId() == R.id.check_with_friends) {
             reportEventAction(event, "check_with_friends");
         }
         shareEvent(event, PACKAGE_NAME_WHATSAPP);
-        addFavourite(null);
     }
 
 
