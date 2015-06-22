@@ -225,19 +225,19 @@ public class NotificationUtils {
         }
 
         public NotificationData(Context context, Intent wakefulIntent, String title, String message,
-                                String imageUrl, PendingIntent launchIntent, int priority) {
+                                String imageUrl, PendingIntent launchIntent, int priority, int notificationId) {
             this.context = context;
             this.wakefulIntent = wakefulIntent;
 
             this.title = title;
             this.message = message;
             this.imageUrl = imageUrl;
+            this.notificationId = notificationId;
 
             this.launchIntent = launchIntent;
             this.priority = priority;
 
             showOnMapIntent = null;
-            notificationId = NotificationUtils.GCM_NOTIFICATION_ID;
         }
     }
 }

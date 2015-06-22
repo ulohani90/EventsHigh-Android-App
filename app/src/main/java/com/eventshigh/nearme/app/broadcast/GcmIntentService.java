@@ -23,6 +23,7 @@ import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.NotificationUtils;
+import com.eventshigh.nearme.app.utils.NotificationUtils.NotificationData;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.common.ConnectionResult;
@@ -96,6 +97,7 @@ public class GcmIntentService extends IntentService {
         String ticket = Utils.checkIfUnknown(msg.getString("ticket"));
         String target = Utils.checkIfUnknown(msg.getString("target"));
         String priority = Utils.checkIfUnknown(msg.getString("priority"));
+        String mobileNo = Utils.checkIfUnknown(msg.getString("mobile"));
 
         if (eventId == null && query == null && contestUrl == null && ticket == null && target == null) {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
@@ -158,10 +160,11 @@ public class GcmIntentService extends IntentService {
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         }
 
-        NotificationUtils.NotificationData notificationData =
-                new NotificationUtils.NotificationData(this, alarmIntent, title, message,
-                        imageUrl, contentIntent,
-                        priority == null ? Notification.PRIORITY_LOW : Notification.PRIORITY_HIGH);
+        NotificationData notificationData =  new NotificationData(this, alarmIntent, title, message,
+                imageUrl, contentIntent,
+                priority == null ? Notification.PRIORITY_LOW : Notification.PRIORITY_HIGH,
+                mobileNo == null ? NotificationUtils.GCM_NOTIFICATION_ID : mobileNo.hashCode()
+        );
         return new ParsedBundle(notificationData, bounded ? new LatLng(lat, lon) : null, distance);
     }
 
