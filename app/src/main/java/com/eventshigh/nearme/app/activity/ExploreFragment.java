@@ -10,6 +10,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
@@ -37,6 +38,23 @@ public class ExploreFragment extends BaseEventsFragment {
             EventCategory.ART.categoryName,
             EventCategory.FOOD.categoryName,
             EventCategory.LITERATURE.categoryName
+    };
+
+    public static final String[] EXPLORE_TAGS_BANGALORE = {
+            EventsHighEndpoints.QUERY_FEATURED,
+            EventCategory.PARTIES.categoryName,
+            "Free",
+            EventCategory.THEATRE.categoryName,
+            EventCategory.MUSIC.categoryName,
+            EventCategory.KIDS_ENTERTAINMENT.categoryName,
+            EventCategory.TECH.categoryName,
+            EventCategory.SPORTS.categoryName,
+            EventCategory.HEALTH_WELLNESS.categoryName,
+            EventCategory.DANCE.categoryName,
+            EventCategory.ART.categoryName,
+            EventCategory.FOOD.categoryName,
+            EventCategory.LITERATURE.categoryName,
+            "Workshops"
     };
 
     public static ExploreFragment getInstance(EventsContext eventsContext) {
@@ -77,7 +95,8 @@ public class ExploreFragment extends BaseEventsFragment {
         public void onResponse(EventCollection eventCollection, boolean isIntermediate) {
             topProgressBar.setVisibility(isIntermediate ? View.VISIBLE : View.GONE);
             eventsAdapter.setExploreCategories(eventCollection,
-                    Locality.getLocalities(eventsContext.city), EXPLORE_TAGS);
+                Locality.getLocalities(eventsContext.city),
+                eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS);
         }
     };
 
@@ -88,7 +107,8 @@ public class ExploreFragment extends BaseEventsFragment {
 
             if (eventsAdapter.getItemCount() == 0) {
                 eventsAdapter.setExploreCategories(null,
-                        Locality.getLocalities(eventsContext.city), EXPLORE_TAGS);
+                    Locality.getLocalities(eventsContext.city),
+                    eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS);
             }
         }
     };
