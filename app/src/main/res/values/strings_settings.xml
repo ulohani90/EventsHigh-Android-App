@@ -5,6 +5,7 @@
     <string name="pref_header_general">General</string>
     <string name="pref_title_offers">Offers</string>
     <string name="pref_title_add_event">Create Event</string>
+    <string name="pref_title_share_app">Invite Your Friend</string>
     <string name="pref_title_send_feedback">Message EventsHigh</string>
     <string name="pref_title_about_us">About EventsHigh</string>
     <string name="pref_title_change_location">Change City</string>

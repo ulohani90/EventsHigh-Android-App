@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
@@ -142,10 +143,7 @@ public class GcmIntentService extends IntentService {
                 try {
                     intent = new Intent(this, getClassLoader().loadClass(target));
                 } catch (ClassNotFoundException e) {
-                    if (target.contains("Offers")) {
-                        intent = new Intent(this, LaunchActivity.class);
-                        intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, LaunchActivity.OFFERS_TAB);
-                    }
+                    Crashlytics.getInstance().core.logException(e);
                 }
             }
 
