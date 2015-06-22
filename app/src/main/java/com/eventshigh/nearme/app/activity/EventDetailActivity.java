@@ -64,6 +64,7 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.PlusOneButton;
+import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 
 import java.io.UnsupportedEncodingException;
@@ -196,12 +197,19 @@ public class EventDetailActivity extends BaseActivity {
             showRateAppDialog = false;
         }
 
-        PlusOneButton plusOneButton = (PlusOneButton) findViewById(R.id.plus_one_button);
-
         String url = event == null ?
             getIntent().getData().buildUpon().appendQueryParameter("src", "ehm_gp1").toString() :
             event.getEventShareURI(this, "gp1").toString();
+
+        PlusOneButton plusOneButton = (PlusOneButton) findViewById(R.id.plus_one_button);
         plusOneButton.initialize(url, 111 /*PLUS_ONE_REQUEST_CODE*/);
+        plusOneButton.setOnPlusOneClickListener(new OnPlusOneClickListener() {
+            @Override
+            public void onPlusOneClick(Intent intent) {
+                reportActionToAnalytics("plusOne");
+                startActivityForResult(intent, 111);
+            }
+        });
     }
 
     @Override
