@@ -116,14 +116,15 @@ public class Utils {
 
     private static final Set<String> DEBUG_ANDROID_ID = new HashSet<>();
     static {
-        DEBUG_ANDROID_ID.add("75c19f7ac14abdcd");
-        DEBUG_ANDROID_ID.add("5151a4342221f321");
-        DEBUG_ANDROID_ID.add("5f0f51994cb15c85");
-        DEBUG_ANDROID_ID.add("8fb904e56e6b643f");
-        DEBUG_ANDROID_ID.add("a35df83d1a37a83c");
-        DEBUG_ANDROID_ID.add("186a598b82f6fe8");
-        DEBUG_ANDROID_ID.add("56a538060a00eaa6");
-        DEBUG_ANDROID_ID.add("8fa00ccd84f6351b");
+        DEBUG_ANDROID_ID.add("75c19f7ac14abdcd");  // s2-test
+        DEBUG_ANDROID_ID.add("5151a4342221f321");  // Parag
+        DEBUG_ANDROID_ID.add("5f0f51994cb15c85");  // Arvind
+        DEBUG_ANDROID_ID.add("a35df83d1a37a83c");  // Nikesh
+        DEBUG_ANDROID_ID.add("186a598b82f6fe8");   // Chandan
+        DEBUG_ANDROID_ID.add("56a538060a00eaa6");  // Samsung-duos
+        DEBUG_ANDROID_ID.add("8fa00ccd84f6351b");  // eh
+        DEBUG_ANDROID_ID.add("7298df35e75b75ad");  // n4-test
+        DEBUG_ANDROID_ID.add("8157dfd7790502b4");  // n7-test
     }
 
     public static boolean isDebug(Context context) {
