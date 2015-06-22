@@ -49,6 +49,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     // This constant defines the app specific intent action for notification.
     public static final String NOTIFICATION_ACTION = "com.eventshigh.nearme.app.notification";
+    public static final int PLUS_ONE_REQUEST_CODE = 111;
 
     // Google Analytics
     protected boolean isPlayServicesPresent;

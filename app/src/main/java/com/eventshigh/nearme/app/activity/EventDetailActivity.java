@@ -202,12 +202,12 @@ public class EventDetailActivity extends BaseActivity {
             event.getEventShareURI(this, "gp1").toString();
 
         PlusOneButton plusOneButton = (PlusOneButton) findViewById(R.id.plus_one_button);
-        plusOneButton.initialize(url, 111 /*PLUS_ONE_REQUEST_CODE*/);
+        plusOneButton.initialize(url, PLUS_ONE_REQUEST_CODE);
         plusOneButton.setOnPlusOneClickListener(new OnPlusOneClickListener() {
             @Override
             public void onPlusOneClick(Intent intent) {
                 reportActionToAnalytics("plusOne");
-                startActivityForResult(intent, 111);
+                startActivityForResult(intent, PLUS_ONE_REQUEST_CODE);
             }
         });
     }
