@@ -79,6 +79,10 @@ public class IntentUtils {
         if (param.query.equalsIgnoreCase(QUERY_ALL)) {
             param.query = "";
         }
+        if (param.query.equalsIgnoreCase("this week")) {
+            param.query = "";
+            param.setDateFilter(Calendar.getInstance());
+        }
 
         if (inIntent.getDataString() != null) {
             activity.reportCampaignParams(inIntent.getDataString());
