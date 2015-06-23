@@ -76,7 +76,7 @@ public class EventsFragment extends BaseEventsFragment {
         eventGridView.setEventsAdapter(eventsAdapter);
 
         // Setup the actionbar hide/show on scroll.
-        eventGridView.setOnScrollListener(onScrollListener);
+        eventGridView.addOnScrollListener(onScrollListener);
 
         // Setup the refresh on swipe down.
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);

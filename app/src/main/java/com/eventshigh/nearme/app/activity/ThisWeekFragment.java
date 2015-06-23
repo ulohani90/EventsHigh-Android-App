@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -70,6 +71,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
             }
 
             Calendar calendar = getDate(i);
+            @SuppressLint("InflateParams")
             DateTabView dateTabView = new DateTabView(
                     activity.getLayoutInflater().inflate(R.layout.view_tab_date, null));
             dateTabView.weekDayView.setText(

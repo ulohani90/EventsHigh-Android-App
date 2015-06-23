@@ -55,29 +55,29 @@ public class IntentUtils {
             }
         }
 
-        if (param.query.equalsIgnoreCase(QUERY_ALL) && !param.dateFilter.isEmpty()) {
-            param.query = param.dateFilter;
-            param.dateFilter = "";
-        }
-        if (param.query.equalsIgnoreCase(QUERY_ALL)) {
-            param.query = "";
-        }
         if (param.query.endsWith("day")) {
             if (param.query.equalsIgnoreCase("today")) {
-                param.query = "";
+                param.query = QUERY_ALL;
                 param.setDateFilter(Calendar.getInstance());
             } else {
                 try {
                     Integer day = (Integer) Calendar.class.getField(param.query.toUpperCase()).get(null);
                     Calendar calendar = Calendar.getInstance();
                     calendar.add(Calendar.DAY_OF_MONTH, (7 + day - calendar.get(Calendar.DAY_OF_WEEK)) % 7);
-                    param.query = "";
+                    param.query = QUERY_ALL;
                     param.setDateFilter(calendar);
                 } catch (Exception e) {
                     // ignore.
-                    Crashlytics.logException(e);
+                    Crashlytics.getInstance().core.logException(e);
                 }
             }
+        }
+        if (param.query.equalsIgnoreCase(QUERY_ALL) && !param.dateFilter.isEmpty()) {
+            param.query = param.dateFilter;
+            param.dateFilter = "";
+        }
+        if (param.query.equalsIgnoreCase(QUERY_ALL)) {
+            param.query = "";
         }
 
         if (inIntent.getDataString() != null) {
@@ -114,7 +114,7 @@ public class IntentUtils {
                 deepLinkName = inUri.getPathSegments().get(0);
             } catch (IndexOutOfBoundsException e) {
                 // ignore.
-                Crashlytics.logException(e);
+                Crashlytics.getInstance().core.logException(e);
             }
             activity.reportActionToAnalytics("deepLink", deepLinkName);
         }
@@ -139,7 +139,7 @@ public class IntentUtils {
             param.changeLocation(city.cityBounds.getCenter());
         } catch (IllegalArgumentException | NullPointerException e) {
             // Invalid city in URI. Ignore.
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
         }
     }
 
@@ -149,7 +149,7 @@ public class IntentUtils {
             param.changeLocation(city.cityBounds.getCenter());
         } catch (IllegalArgumentException | NullPointerException e) {
             // Invalid city in URI. Ignore.
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
         }
 
         String query = webUri.getQueryParameter("interest");
@@ -173,7 +173,7 @@ public class IntentUtils {
             }
         } catch (IndexOutOfBoundsException| IllegalArgumentException | NullPointerException | UnsupportedEncodingException e) {
             // Invalid city in URI. Ignore.
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
         }
     }
 
