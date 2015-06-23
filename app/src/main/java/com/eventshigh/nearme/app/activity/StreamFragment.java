@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,18 @@ public class StreamFragment extends Fragment {
 
         streamAdapter = new StreamAdapter(activity);
         gridView.setAdapter(streamAdapter);
+
+        // Setup the refresh on swipe down.
+        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                activity.reportActionToAnalytics("swipeRefresh", "stream");
+                swipeRefreshLayout.setRefreshing(false);
+                streamAdapter.setStreamItems(StreamDbHelper.getStreamItems(activity));
+            }
+        });
+        swipeRefreshLayout.setColorSchemeResources(R.color.primary);
 
         return view;
     }
