@@ -69,8 +69,10 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String EXPLORE_TAB = "explore";
     public static final String NOTIFICATIONS_TAB = "Notifications";
     public static final String THIS_WEEK_TAB = "this week";
+    public static final String CONTACTS_TAB = "contacts";
     public final String[] TABS = {
             MY_EVENTS_TAB,
+            CONTACTS_TAB,
             EXPLORE_TAB,
             THIS_WEEK_TAB,
             NOTIFICATIONS_TAB,
@@ -295,13 +297,13 @@ public class LaunchActivity extends BaseContextActivity {
     private void showExploreScreen() {
         ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
         viewPager.setAdapter(adapter);
+        viewPager.setCurrentItem(defaultTab, false);
 
         tabsView.setTabMode(TabLayout.MODE_SCROLLABLE);
         tabsView.setupWithViewPager(viewPager);
         tabsView.setScrollPosition(defaultTab, 0, true);
         tabsView.setOnTabSelectedListener(adapter);
 
-        viewPager.setCurrentItem(defaultTab, false);
     }
 
     private void showNextScreen() {
@@ -367,6 +369,10 @@ public class LaunchActivity extends BaseContextActivity {
 
             if (TABS[position].equals(NOTIFICATIONS_TAB)) {
                 return new StreamFragment();
+            }
+
+            if (TABS[position].equals(CONTACTS_TAB)) {
+                return new ContactsFragment();
             }
 
             return ThisWeekFragment.getInstance(eventsContext, true, 7);
