@@ -34,8 +34,7 @@ import java.util.concurrent.TimeUnit;
  * Fragment to show events.
  */
 public class EventsFragment extends BaseEventsFragment {
-    private static final long REFRESH_MY_EVENTS = TimeUnit.SECONDS.toMillis(2);
-    private static final long REFRESH_EVENTS = TimeUnit.HOURS.toMillis(1);
+    private static final long REFRESH_MY_EVENTS_INTERVAL = TimeUnit.SECONDS.toMillis(2);
 
     private AutofitRecyclerView eventGridView;
     private View topProgressBar;
@@ -44,9 +43,6 @@ public class EventsFragment extends BaseEventsFragment {
 
     private EventsAdapter eventsAdapter;
     private OnScrollListener onScrollListener;
-
-    private long lastFetchTimestamp = 0;
-    private long refreshInterval = REFRESH_EVENTS;
 
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
                                              boolean showCategories) {
@@ -102,7 +98,7 @@ public class EventsFragment extends BaseEventsFragment {
             @Override
             public void onClick(View v) {
                 activity.reportActionToAnalytics("retry");
-                fetchNewListing(false /* bypass cache*/);
+                refresh();
             }
         });
 
@@ -110,18 +106,17 @@ public class EventsFragment extends BaseEventsFragment {
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         noMyEventsView = view.findViewById(R.id.view_no_my_event);
         retryView = view.findViewById(R.id.view_retry);
-
-        // Refresh interval.
-        if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-            refreshInterval = REFRESH_MY_EVENTS;
-        }
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
+    protected void refresh() {
         fetchNewListing(false);
+    }
+
+    @Override
+    protected long refreshInterval() {
+        return EventsHighEndpoints.isMyEventQuery(eventsContext.query) ?
+                REFRESH_MY_EVENTS_INTERVAL : super.refreshInterval();
     }
 
     public void setOnScrollListener (OnScrollListener onScrollListener) {
@@ -129,12 +124,6 @@ public class EventsFragment extends BaseEventsFragment {
     }
 
     private void fetchNewListing(boolean shouldBypassCache) {
-        if (lastFetchTimestamp > System.currentTimeMillis() - refreshInterval) {
-            // recently fetched ... do nothing.
-            return;
-        }
-        lastFetchTimestamp = System.currentTimeMillis();
-
         topProgressBar.setVisibility(View.VISIBLE);
         noMyEventsView.setVisibility(View.GONE);
         retryView.setVisibility(View.GONE);

@@ -83,9 +83,7 @@ public class ExploreFragment extends BaseEventsFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
+    protected void refresh() {
         FeaturedEventsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                 false, mFetcherCallBack, mErrorListener);
     }

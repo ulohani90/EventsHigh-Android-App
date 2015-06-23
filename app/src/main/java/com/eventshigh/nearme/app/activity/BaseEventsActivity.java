@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.widget.FrameLayout;
 
@@ -20,19 +19,8 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
  * This class also implements base user interactions like tabs, filters etc.
  */
 public abstract class BaseEventsActivity extends BaseContextActivity {
-    // ***********************
-    // MEMBERS
-    // ***********************
-
     // UI elements.
     protected FrameLayout eventContainer;
-    protected SearchView searchView;
-
-
-    // ***********************
-    // Activity lifecycle  Methods
-    // See http://developer.android.com/training/basics/activity-lifecycle/starting.html
-    // ***********************
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +49,6 @@ public abstract class BaseEventsActivity extends BaseContextActivity {
             setTitle();
         }
     }
-
-
-    // ***********************
-    // Helper methods
-    // ***********************
 
     protected void setTitle() {
         ActionBar actionBar = getSupportActionBar();
