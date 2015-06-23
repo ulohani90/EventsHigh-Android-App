@@ -119,12 +119,6 @@ public abstract class BaseContextActivity extends BaseActivity {
             return true;
         }
 
-        if (id == R.id.action_show_list) {
-            reportActionToAnalytics("switchToList");
-            switchTo(EventsGridActivity.class);
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 

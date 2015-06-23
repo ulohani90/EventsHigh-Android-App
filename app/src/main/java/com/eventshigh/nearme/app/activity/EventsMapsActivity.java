@@ -90,16 +90,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
     }
 
-    @Override
-    protected  int getDisabledMenuItem() {
-        return R.id.action_show_map;
-    }
-
-    @Override
-    protected void showEvents() {
-        // do nothing.
-    }
-
 
     // ***********************
     // Helper Methods

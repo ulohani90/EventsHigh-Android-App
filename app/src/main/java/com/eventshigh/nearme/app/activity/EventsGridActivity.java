@@ -6,12 +6,10 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
@@ -29,7 +27,6 @@ import pl.snowdog.material.ui.ToolbarColorizeHelper;
 public class EventsGridActivity extends BaseEventsActivity {
 
     private boolean showFollowCard;
-    private boolean searchViewExpanded;
     private View fabShare;
 
 
@@ -81,44 +78,9 @@ public class EventsGridActivity extends BaseEventsActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        boolean returnValue = super.onCreateOptionsMenu(menu);
+    protected void onStart() {
+        super.onStart();
 
-        if (showFollowCard) {
-            MenuItem item = menu.findItem(R.id.action_search);
-            MenuItemCompat.setOnActionExpandListener(item,
-                    new MenuItemCompat.OnActionExpandListener() {
-                        int oldToolbarAlpha;
-
-                        @Override
-                        public boolean onMenuItemActionExpand(MenuItem item) {
-                            searchViewExpanded = true;
-                            oldToolbarAlpha = currentToolBarAlpha;
-                            updateToolbar(255);
-                            return true;
-                        }
-
-                        @Override
-                        public boolean onMenuItemActionCollapse(MenuItem item) {
-                            searchViewExpanded = false;
-                            updateToolbar(oldToolbarAlpha);
-                            return true;
-                        }
-                    });
-        }
-
-        if (showFollowCard || EventsHighEndpoints.isDateQuery(eventsContext.query)) {
-            fabShare.setVisibility(View.VISIBLE);
-        }
-
-        return returnValue;
-    }
-
-    protected  int getDisabledMenuItem() {
-        return R.id.action_show_list;
-    }
-
-    protected void showEvents() {
         Fragment eventFragment;
         if (!eventsContext.query.isEmpty()) {
             EventsFragment eventFragment1 = EventsFragment.getInstance(
@@ -133,6 +95,21 @@ public class EventsGridActivity extends BaseEventsActivity {
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
         tr.replace(R.id.event_container, eventFragment);
         tr.commit();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.activity_event, menu);
+
+        // Set visibility.
+        menu.findItem(R.id.action_show_map).setVisible(isPlayServicesPresent);
+
+        if (showFollowCard || EventsHighEndpoints.isDateQuery(eventsContext.query)) {
+            fabShare.setVisibility(View.VISIBLE);
+        }
+
+        return true;
     }
 
     private OnScrollListener doNothingScrollListener = new OnScrollListener() {
@@ -158,9 +135,7 @@ public class EventsGridActivity extends BaseEventsActivity {
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             y += dy;
-            if (!searchViewExpanded) {
-                updateToolbar(Math.min(y, 255));
-            }
+            updateToolbar(Math.min(y, 255));
         }
     };
 
