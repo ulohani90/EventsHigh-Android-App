@@ -72,7 +72,7 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String CONTACTS_TAB = "contacts";
     public final String[] TABS = {
             MY_EVENTS_TAB,
-            CONTACTS_TAB,
+//            CONTACTS_TAB,
             EXPLORE_TAB,
             THIS_WEEK_TAB,
             NOTIFICATIONS_TAB,
