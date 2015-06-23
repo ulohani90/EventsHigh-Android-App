@@ -88,7 +88,7 @@ public class UserActionHelper {
                 bundle.putString(JSON_KEY_TIMESTAMP, Long.toString(timestamp));
                 bundle.putString(JSON_KEY_ACTION, action);
                 bundle.putString(JSON_KEY_DATA, data);
-                GcmRegistration.sendUpstream(context, UUID.randomUUID().toString(), bundle);
+                GcmRegistration.sendUpstream(context, bundle);
             }
         });
         thread.start();

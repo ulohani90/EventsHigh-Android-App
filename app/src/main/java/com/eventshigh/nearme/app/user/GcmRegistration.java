@@ -22,6 +22,8 @@ import com.zendesk.service.ErrorResponse;
 import com.zendesk.service.ZendeskCallback;
 
 import java.io.IOException;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class stores the GCM registration data locally within app.
@@ -141,10 +143,11 @@ public class GcmRegistration {
         this.userCityListener = userCityListener;
     }
 
-    public static void sendUpstream(Context context, String messageId, Bundle data) {
+    public static void sendUpstream(Context context, Bundle data) {
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
+        data.putLong("time_to_live", TimeUnit.DAYS.toSeconds(1));
         try {
-            gcm.send(SENDER_ID + "@gcm.googleapis.com", messageId, data);
+            gcm.send(SENDER_ID + "@gcm.googleapis.com", UUID.randomUUID().toString(), data);
         } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);
         }
