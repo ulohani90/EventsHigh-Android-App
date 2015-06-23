@@ -33,7 +33,6 @@ import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
-import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -48,7 +47,6 @@ import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
  */
 public class LaunchActivity extends BaseContextActivity {
     // Constants
-    private static final long REFRESH_EVENTS_INTERVAL = 3600 * 1000L;
     public static final String DEFAULT_TAB_PARAM = LaunchActivity.class.getName() + "_default_tab";
 
     // UI Elements for this activity.
@@ -208,6 +206,7 @@ public class LaunchActivity extends BaseContextActivity {
     public void cityChanged(City city) {
         drawer.closeDrawer(GravityCompat.START);
         reportActionToAnalytics("cityChanged");
+
         eventsContext.changeLocation(city.cityBounds.getCenter());
         showExploreScreen();
     }
@@ -280,23 +279,29 @@ public class LaunchActivity extends BaseContextActivity {
     // Helper methods
     // ***********************
 
-    private long lastFetchTimestamp = 0;
     private void refreshIfOldData() {
-        if (lastFetchTimestamp + REFRESH_EVENTS_INTERVAL < System.currentTimeMillis()) {
+        City userCity = gcmRegistration.getLastCity();
+        if (eventsContext.city != null && userCity != null &&
+                eventsContext.city != userCity) {
+            cityChanged(userCity);
+            return;
+        }
+
+        if (viewPager.getAdapter() == null) {
             showExploreScreen();
         }
     }
 
     private void showExploreScreen() {
-        tabsView.setTabMode(TabLayout.MODE_SCROLLABLE);
         ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
         viewPager.setAdapter(adapter);
+
+        tabsView.setTabMode(TabLayout.MODE_SCROLLABLE);
         tabsView.setupWithViewPager(viewPager);
         tabsView.setScrollPosition(defaultTab, 0, true);
         tabsView.setOnTabSelectedListener(adapter);
 
         viewPager.setCurrentItem(defaultTab, false);
-        lastFetchTimestamp = System.currentTimeMillis();
     }
 
     private void showNextScreen() {
@@ -326,10 +331,6 @@ public class LaunchActivity extends BaseContextActivity {
     private final OnCitySelectionListener mCitySelectionListener = new OnCitySelectionListener() {
         @Override
         public void onCitySelection(City city) {
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setSubtitle(Utils.capitalize(city.name()));
-            }
             eventsContext.changeLocation(city.cityBounds.getCenter());
             gcmRegistration.setLastCity(city, null);
 
@@ -395,12 +396,12 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public void onTabUnselected(TabLayout.Tab tab) {
-
+            // do nothing.
         }
 
         @Override
         public void onTabReselected(TabLayout.Tab tab) {
-
+            // do nothing.
         }
     }
 }
