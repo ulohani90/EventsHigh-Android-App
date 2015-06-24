@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,6 +66,7 @@ public class ExploreFragment extends BaseEventsFragment {
 
     private EventsAdapter eventsAdapter;
     private View topProgressBar;
+    private AutofitRecyclerView exploreGridView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -74,12 +76,22 @@ public class ExploreFragment extends BaseEventsFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         eventsAdapter = new EventsAdapter(this);
-        AutofitRecyclerView exploreGridView = (AutofitRecyclerView) view.findViewById(R.id.explore_grid);
+        exploreGridView = (AutofitRecyclerView) view.findViewById(R.id.explore_grid);
         exploreGridView.setEventsAdapter(eventsAdapter);
         exploreGridView.addOnScrollListener(new HideActionBarOnScroll(activity));
 
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         topProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        ViewPager eventsPager = (ViewPager) exploreGridView.findViewById(R.id.events_pager);
+        if (eventsPager != null) {
+            eventsPager.getAdapter().notifyDataSetChanged();
+        }
     }
 
     @Override

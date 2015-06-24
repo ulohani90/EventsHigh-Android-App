@@ -42,4 +42,10 @@ public class FeaturedEventsAdapter extends PagerAdapter {
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((View) object);
     }
+
+    // This method is added so that {@link PagerAdapter#notifyDataSetChanged} to work.
+    // {@See http://stackoverflow.com/a/7287121/4340116} for details.
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
+    }
 }
