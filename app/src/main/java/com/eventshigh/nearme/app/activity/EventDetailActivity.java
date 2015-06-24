@@ -203,7 +203,7 @@ public class EventDetailActivity extends BaseActivity {
         }
         addToFavourite = false;
 
-        String url = event == null ?
+        final String url = event == null ?
             getIntent().getData().buildUpon().appendQueryParameter("src", "ehm_gp1").toString() :
             event.getEventShareURI(this, "gp1").toString();
 
@@ -212,7 +212,7 @@ public class EventDetailActivity extends BaseActivity {
         plusOneButton.setOnPlusOneClickListener(new OnPlusOneClickListener() {
             @Override
             public void onPlusOneClick(Intent intent) {
-                reportActionToAnalytics("plusOne");
+                reportActionToAnalytics("plusOne", url);
                 startActivityForResult(intent, PLUS_ONE_REQUEST_CODE);
             }
         });
@@ -440,7 +440,7 @@ public class EventDetailActivity extends BaseActivity {
         addToFavourite = true;
 
         if (view.getId() == R.id.check_with_friends) {
-            reportEventAction(event, "check_with_friends");
+            reportEventAction(event, "checkWithFriends");
         }
         shareEvent(event, PACKAGE_NAME_WHATSAPP);
     }
