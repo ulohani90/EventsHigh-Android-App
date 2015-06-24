@@ -1,29 +1,20 @@
-<FrameLayout
+<android.support.v4.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipe_refresh"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh"
+    android:layout_height="match_parent"
+>
+    <com.eventshigh.nearme.app.view.AutofitRecyclerView
+        android:id="@+id/grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        >
-
-        <com.eventshigh.nearme.app.view.AutofitRecyclerView
-            android:id="@+id/grid"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:columnWidth="@dimen/event_card_width"
-            android:horizontalSpacing="10dp"
-            android:paddingBottom="20dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="10dp"
-            android:verticalSpacing="10dp"
-            />
-
-    </android.support.v4.widget.SwipeRefreshLayout>
-
-</FrameLayout>
+        android:columnWidth="@dimen/event_card_width"
+        android:horizontalSpacing="10dp"
+        android:verticalSpacing="10dp"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="20dp"
+        android:clipToPadding="false"
+   />
+</android.support.v4.widget.SwipeRefreshLayout>
