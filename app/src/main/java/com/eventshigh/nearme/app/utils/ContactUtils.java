@@ -3,11 +3,10 @@ package com.eventshigh.nearme.app.utils;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 
 public class ContactUtils {
     public static Cursor getContactsCursor(Context context, String selectionExtras, String order) {
@@ -38,7 +37,28 @@ public class ContactUtils {
                 projection, selection, null, null);
     }
 
-    public static byte[] getPhotoForContactId(Context context, String contactId) {
+    public static String getContactIdFromPhone(Context context, String phone) {
+        // Build contact query.
+        String[] projection = {
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+                ContactsContract.CommonDataKinds.Phone.NUMBER,
+        };
+        String selection = ContactsContract.CommonDataKinds.Phone.NUMBER + " = '" + phone +"'";
+
+        // Parse contacts data.
+        Cursor cursor = context.getContentResolver().query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                projection, selection, null, null);
+        if (cursor == null) {
+            return null;
+        }
+        if (!cursor.moveToNext()) {
+            return null;
+        }
+        return cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+    }
+
+    public static Bitmap getPhotoForContactId(Context context, String contactId) {
         long contactIdLong = Long.parseLong(contactId);
         Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactIdLong);
         Uri photoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
@@ -49,7 +69,10 @@ public class ContactUtils {
         }
         try {
             if (cursor.moveToFirst()) {
-                return cursor.getBlob(0);
+                byte[] bitmapData = cursor.getBlob(0);
+                if (bitmapData != null) {
+                    return BitmapFactory.decodeByteArray(bitmapData, 0, bitmapData.length);
+                }
             }
         } finally {
             cursor.close();

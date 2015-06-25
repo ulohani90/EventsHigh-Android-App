@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,9 +32,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
     @Override
     public void onBindViewHolder(ContactView holder, int position) {
         holder.contactName.setText(contacts.get(position).name);
-        byte[] bitmapData = ContactUtils.getPhotoForContactId(activity, contacts.get(position).contactId);
-        if (bitmapData != null) {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapData, 0, bitmapData.length);
+        Bitmap bitmap = ContactUtils.getPhotoForContactId(activity, contacts.get(position).contactId);
+        if (bitmap != null) {
             holder.contactPhoto.setImageBitmap(bitmap);
         }
     }
