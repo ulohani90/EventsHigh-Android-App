@@ -16,6 +16,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.ui.ContactsAdapter;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
+import com.eventshigh.nearme.app.utils.ContactUtils;
 
 import org.json.JSONException;
 
@@ -70,30 +71,14 @@ public class ContactsFragment extends Fragment {
 
     @SuppressWarnings("TryFinallyCanBeTryWithResources")
     public List<UserContact> loadContacts() {
-        // Build contact query.
-        String[] projection = {
-                ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                ContactsContract.CommonDataKinds.Phone.NUMBER,
-        };
-        String selection;
-        String order = null;
-
-        selection = ContactsContract.Contacts.HAS_PHONE_NUMBER + " = 1";
-        order = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME;
-
-        // Parse contacts data.
-        Cursor cursor = activity.getContentResolver().query(
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                projection, selection, null, order);
+        Cursor cursor = ContactUtils.getContactsCursor(activity, null,
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
         if (cursor == null) {
             return null;
         }
 
         List<UserContact> contacts = new ArrayList<>();
         while (cursor.moveToNext()) {
-            String contactId = cursor.getString(
-                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
             try {
                 contacts.add(UserContact.parseFromCursor(cursor));
             } catch (JSONException e) {

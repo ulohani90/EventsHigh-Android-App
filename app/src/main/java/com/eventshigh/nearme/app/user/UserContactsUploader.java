@@ -16,6 +16,7 @@ import com.android.volley.VolleyError;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.ContactsUploadRequest;
+import com.eventshigh.nearme.app.utils.ContactUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,63 +56,45 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
     @Override
     @SuppressWarnings("TryFinallyCanBeTryWithResources")
     public void run() {
-        // Build contact query.
-        String[] projection = {
-                ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                ContactsContract.CommonDataKinds.Phone.NUMBER,
-        };
-        String selection;
-        String order = null;
+        String selectionExtras = "";
+        String order = " LIMIT " + MAX_CONTACTS_TO_UPLOAD;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             // On android versions that have the contact updated timestamp, get only the
             // contacts that have changed since the last sync
-            selection = ContactsContract.Contacts.HAS_PHONE_NUMBER + " = 1 and "
+            selectionExtras += " and "
                     + ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP
                     + " >= " + lastSync;
-            order = ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP +
-                    " LIMIT " + MAX_CONTACTS_TO_UPLOAD;
-        } else {
-            selection = ContactsContract.Contacts.HAS_PHONE_NUMBER + " = 1";
+            order = ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP + order;
         }
 
         // Parse contacts data.
-        Cursor cursor = context.getContentResolver().query(
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                projection, selection, null, order);
+        Cursor cursor = ContactUtils.getContactsCursor(context, selectionExtras, order);
         if (cursor == null) {
             return;
         }
 
         List<UserContact> contacts = new ArrayList<>();
         while(cursor.moveToNext()) {
-            String contactId = cursor.getString(
-                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
-            Cursor emailCursor = getEmailCursorForContactId(contactId);
+            Cursor emailCursor = null;
             try {
-                contacts.add(UserContact.parseFromCursor(cursor, emailCursor));
+                UserContact userContact = UserContact.parseFromCursor(cursor);
+                emailCursor = ContactUtils.getEmailCursorForContactId(context, userContact.contactId);
+                userContact.parseEmailsFromCursor(emailCursor);
+                contacts.add(userContact);
             } catch (JSONException e) {
                 Log.w(LOG_TAG, "failed to load contact", e);
                 Crashlytics.getInstance().core.logException(e);
             } finally {
-			    emailCursor.close();
+                if (emailCursor != null) {
+                    emailCursor.close();
+                }
 			}
         }
         cursor.close();
 
         // Upload contacts data.
         ContactsUploadRequest.submit(context, contacts, Priority.LOW, this, this);
-    }
-
-    private Cursor getEmailCursorForContactId(String contactId) {
-        String[] projection = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-        };
-        String selection = ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId;
-        return context.getContentResolver().query(
-                ContactsContract.CommonDataKinds.Email.CONTENT_URI,
-                projection, selection, null, null);
     }
 
     @Override
