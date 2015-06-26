@@ -31,7 +31,7 @@ public class NotificationUtils {
     public static NotificationCompat.Builder createNotificationBuilder(Context context, String title,
             CharSequence message, Bitmap largeIcon, PendingIntent contentIntent, int priority) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.notification)
+                .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)

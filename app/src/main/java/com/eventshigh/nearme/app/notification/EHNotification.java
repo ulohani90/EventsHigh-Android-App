@@ -120,12 +120,11 @@ public class EHNotification {
     }
 
     private void showNotificationWithImage(Bitmap bitmap) {
-//        String contactId = ContactUtils.getContactIdFromPhone(context, "(987) 986-8976");
-//        Bitmap contactPhoto = ContactUtils.getPhotoForContactId(context, contactId);
-//        Notification notification = NotificationUtils.createNotificationBuilder(
-//                context, title, message, contactPhoto, launchIntent, priority)
+        Bitmap contactPhoto = ContactUtils.getPhotoForPhone(context, "9879868976");
         Notification notification = NotificationUtils.createNotificationBuilder(
-                context, title, message, launchIntent, priority)
+                context, title, message, contactPhoto, launchIntent, priority)
+//        Notification notification = NotificationUtils.createNotificationBuilder(
+//                context, title, message, launchIntent, priority)
                 .setStyle(new NotificationCompat.BigPictureStyle()
                                 .setSummaryText(message)
                                 .bigPicture(bitmap)
