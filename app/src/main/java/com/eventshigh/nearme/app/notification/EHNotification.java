@@ -23,6 +23,7 @@ import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.ImageUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
 /**
@@ -121,6 +122,9 @@ public class EHNotification {
 
     private void showNotificationWithImage(Bitmap bitmap) {
         Bitmap contactPhoto = ContactUtils.getPhotoForPhone(context, "9879868976");
+        if (contactPhoto != null) {
+            contactPhoto = ImageUtils.getCircularBitmapFrom(contactPhoto);
+        }
         Notification notification = NotificationUtils.createNotificationBuilder(
                 context, title, message, contactPhoto, launchIntent, priority)
 //        Notification notification = NotificationUtils.createNotificationBuilder(
