@@ -23,7 +23,7 @@ public class NotificationUtils {
     @SuppressLint("InlinedApi")
     public static NotificationCompat.Builder createNotificationBuilder(Context context,
             String title, CharSequence message, PendingIntent contentIntent, int priority) {
-        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.notification);
+        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.notification_dark);
         return createNotificationBuilder(context, title, message, largeIcon, contentIntent, priority);
     }
 
