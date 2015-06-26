@@ -242,7 +242,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openSourceSite(View view) {
-        reportEventAction(event, "openSource");
+        reportEventAction(event, view.getId() == R.id.join_event ? "joinEvent" : "openSource");
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.sourceUrl));
         startActivitySafe(intent);
