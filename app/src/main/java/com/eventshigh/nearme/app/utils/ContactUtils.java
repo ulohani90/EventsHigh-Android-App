@@ -7,9 +7,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.support.annotation.Nullable;
 
 public class ContactUtils {
-    public static Cursor getContactsCursor(Context context, String selectionExtras, String order) {
+    public static Cursor getContactsCursor(Context context, @Nullable String selectionExtras, String order) {
         // Build contact query.
         String[] projection = {
                 ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
@@ -52,10 +53,15 @@ public class ContactUtils {
         if (cursor == null) {
             return null;
         }
-        if (!cursor.moveToNext()) {
-            return null;
+
+        try {
+            if (!cursor.moveToNext()) {
+                return null;
+            }
+            return cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+        } finally {
+            cursor.close();
         }
-        return cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
     }
 
     public static Bitmap getPhotoForContactId(Context context, String contactId) {

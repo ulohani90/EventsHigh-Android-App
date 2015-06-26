@@ -10,9 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.StreamDbHelper;
+import com.eventshigh.nearme.app.data.stream.StreamItem;
+import com.eventshigh.nearme.app.task.StreamItemLoaderTask;
+import com.eventshigh.nearme.app.task.StreamItemLoaderTask.StreamItemsCallback;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.StreamAdapter;
+
+import java.util.List;
 
 public class StreamFragment extends Fragment {
     private BaseContextActivity activity;
@@ -40,7 +44,7 @@ public class StreamFragment extends Fragment {
             public void onRefresh() {
                 activity.reportActionToAnalytics("swipeRefresh", "stream");
                 swipeRefreshLayout.setRefreshing(false);
-                streamAdapter.setStreamItems(StreamDbHelper.getStreamItems(activity));
+                refresh();
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
@@ -50,7 +54,18 @@ public class StreamFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        gridView.setOnScrollListener(new HideActionBarOnScroll(activity));
-        streamAdapter.setStreamItems(StreamDbHelper.getStreamItems(activity));
+        gridView.addOnScrollListener(new HideActionBarOnScroll(activity));
+        refresh();
+    }
+
+    private void refresh() {
+        new StreamItemLoaderTask(activity, new StreamItemsCallback() {
+            @Override
+            public void onContactLoad(List<StreamItem> streamItems) {
+                if (isAdded()) {
+                    streamAdapter.setStreamItems(streamItems);
+                }
+            }
+        }).execute();
     }
 }

@@ -26,7 +26,9 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
@@ -144,6 +146,11 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (shareEventInitiatedTimestamp > 0) {
             long secForShare = (System.currentTimeMillis() - shareEventInitiatedTimestamp) / 1000;
             reportActionToAnalytics(secForShare > 5 ? "shareEvent" : "eventShareDismissed", Long.toString(secForShare));
+
+            Preferences preferences = Preferences.getInstance(this);
+            if (secForShare > 5 && ! preferences.shouldUploadContacts()) {
+                AskForContactsDialog.show(this, preferences);
+            }
         }
         shareEventInitiatedTimestamp = 0;
     }

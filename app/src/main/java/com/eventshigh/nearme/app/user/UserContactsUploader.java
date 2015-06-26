@@ -32,25 +32,24 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
     private static final String PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP = "last_contacts_sync_try_timestamp10";
 
     private final Context context;
-    private final SharedPreferences sharedPreferences;
+    private final SharedPreferences preferences;
     private long currentTimeMillis;
-    private long lastSync;
 
     public UserContactsUploader(Context context) {
         this.context = context.getApplicationContext();
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this.context);
     }
 
     public void uploadContacts() {
         // Don't do anything if we have tried in the last 1 day.
-        final long lastTry = sharedPreferences.getLong(PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP, 0);
+        final long lastTry = preferences.getLong(PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP, 0);
         currentTimeMillis = System.currentTimeMillis();
         if (currentTimeMillis - lastTry < DateUtils.DAY_IN_MILLIS) {
             return;
         }
 
         new Thread(this).start();
-        sharedPreferences.edit().putLong(PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP, currentTimeMillis).apply();
+        preferences.edit().putLong(PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP, currentTimeMillis).apply();
     }
 
     @Override
@@ -64,7 +63,7 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
             // contacts that have changed since the last sync
             selectionExtras += " and "
                     + ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP
-                    + " >= " + lastSync;
+                    + " >= " + preferences.getLong(PARAM_LAST_CONTACTS_SYNC_TIMESTAMP, 0);
             order = ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP + order;
         }
 
@@ -75,23 +74,26 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
         }
 
         List<UserContact> contacts = new ArrayList<>();
-        while(cursor.moveToNext()) {
-            Cursor emailCursor = null;
-            try {
-                UserContact userContact = UserContact.parseFromCursor(cursor);
-                emailCursor = ContactUtils.getEmailCursorForContactId(context, userContact.contactId);
-                userContact.parseEmailsFromCursor(emailCursor);
-                contacts.add(userContact);
-            } catch (JSONException e) {
-                Log.w(LOG_TAG, "failed to load contact", e);
-                Crashlytics.getInstance().core.logException(e);
-            } finally {
-                if (emailCursor != null) {
-                    emailCursor.close();
+        try {
+            while (cursor.moveToNext()) {
+                Cursor emailCursor = null;
+                try {
+                    UserContact userContact = UserContact.parseFromCursor(cursor);
+                    emailCursor = ContactUtils.getEmailCursorForContactId(context, userContact.contactId);
+                    userContact.parseEmailsFromCursor(emailCursor);
+                    contacts.add(userContact);
+                } catch (JSONException e) {
+                    Log.w(LOG_TAG, "failed to load contact", e);
+                    Crashlytics.getInstance().core.logException(e);
+                } finally {
+                    if (emailCursor != null) {
+                        emailCursor.close();
+                    }
                 }
-			}
+            }
+        } finally {
+            cursor.close();
         }
-        cursor.close();
 
         // Upload contacts data.
         ContactsUploadRequest.submit(context, contacts, Priority.LOW, this, this);
@@ -101,7 +103,7 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
     public void onResponse(JSONObject jsonObject, boolean isIntermediate) {
         // TODO: replace currentTimeMillis with last contact timestamp.
         Log.i(LOG_TAG, "Successfully uploaded the contacts");
-        sharedPreferences.edit().putLong(PARAM_LAST_CONTACTS_SYNC_TIMESTAMP, currentTimeMillis).apply();
+        preferences.edit().putLong(PARAM_LAST_CONTACTS_SYNC_TIMESTAMP, currentTimeMillis).apply();
     }
 
     @Override

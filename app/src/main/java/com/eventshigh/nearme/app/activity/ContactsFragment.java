@@ -1,33 +1,24 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.UserContact;
+import com.eventshigh.nearme.app.task.ContactsLoaderTask;
+import com.eventshigh.nearme.app.task.ContactsLoaderTask.ContactsCallback;
 import com.eventshigh.nearme.app.ui.ContactsAdapter;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
-import com.eventshigh.nearme.app.utils.ContactUtils;
 
-import org.json.JSONException;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import io.fabric.sdk.android.services.concurrency.AsyncTask;
-
 public class ContactsFragment extends Fragment {
-    private static final String LOG_TAG = ContactsFragment.class.getSimpleName();
-
     private BaseContextActivity activity;
     private RecyclerView gridView;
     private ContactsAdapter contactsAdapter;
@@ -46,48 +37,20 @@ public class ContactsFragment extends Fragment {
         contactsAdapter = new ContactsAdapter(activity);
         gridView.setAdapter(contactsAdapter);
 
-        AsyncTask task = new AsyncTask<Void, Void, List<UserContact>>() {
+        new ContactsLoaderTask(activity, new ContactsCallback() {
             @Override
-            protected List<UserContact> doInBackground(Void... voids) {
-                return loadContacts();
-            }
-
-            @Override
-            protected void onPostExecute(List<UserContact> contacts) {
-                if (contacts != null) {
+            public void onContactLoad(@Nullable List<UserContact> contacts) {
+                if (isAdded() && contacts != null) {
                     contactsAdapter.setContacts(contacts);
                 }
             }
-        };
-        task.execute(new Void[]{});
+        }).execute();
 
         return view;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        gridView.setOnScrollListener(new HideActionBarOnScroll(activity));
-    }
-
-    @SuppressWarnings("TryFinallyCanBeTryWithResources")
-    public List<UserContact> loadContacts() {
-        Cursor cursor = ContactUtils.getContactsCursor(activity, null,
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
-        if (cursor == null) {
-            return null;
-        }
-
-        List<UserContact> contacts = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            try {
-                contacts.add(UserContact.parseFromCursor(cursor));
-            } catch (JSONException e) {
-                Log.w(LOG_TAG, "failed to load contact", e);
-                Crashlytics.getInstance().core.logException(e);
-            }
-        }
-        cursor.close();
-
-        return contacts;
+        gridView.addOnScrollListener(new HideActionBarOnScroll(activity));
     }
 }
