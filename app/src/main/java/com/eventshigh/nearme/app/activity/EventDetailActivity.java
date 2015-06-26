@@ -42,6 +42,7 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.UserActionHelper;
@@ -277,6 +278,12 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openBookingSite(View view) {
+        Account account = new Account(this);
+        if (!account.getPhoneNumber().second) {
+            PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
+            return;
+        }
+
         showRateAppDialog = true;
         addToFavourite = true;
         reportEventAction(event, "bookTicket");
@@ -339,6 +346,11 @@ public class EventDetailActivity extends BaseActivity {
     public void addFavourite(View v) {
         if (v != null) {
             reportEventAction(event, "addFavourite");
+
+            Account account = new Account(this);
+            if (!account.getPhoneNumber().second) {
+                PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_pa);
+            }
         }
 
         EventsMarkerManager.Editor eventsMarkerEditor =
@@ -847,6 +859,11 @@ public class EventDetailActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     reportActionToAnalytics("addFollowing", tagName);
+
+                    if (!account.getPhoneNumber().second) {
+                        PhoneVerificationDialog.show(EventDetailActivity.this,
+                                R.string.ui_verify_phone, R.string.ui_phone_verify_pa);
+                    }
                     account.setIsFollowing(tagName, true);
                     followView.setVisibility(View.GONE);
                     followingView.setVisibility(View.VISIBLE);
