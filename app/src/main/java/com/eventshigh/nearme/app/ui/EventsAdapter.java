@@ -540,7 +540,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private static EventCard newInstance(Activity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(
-                    BuildConfig.SHOW_BIG_CARD ? R.layout.card_event_big_alpha : R.layout.card_event,
+                    BuildConfig.SHOW_BIG_CARD ? R.layout.card_event_big : R.layout.card_event,
                     parent, false);
             return new EventCard(view, false);
         }
