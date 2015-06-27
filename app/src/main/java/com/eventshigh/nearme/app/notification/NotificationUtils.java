@@ -24,10 +24,10 @@ public class NotificationUtils {
     public static NotificationCompat.Builder createNotificationBuilder(Context context, String title,
             CharSequence message, Bitmap largeIcon, PendingIntent contentIntent, int priority) {
         if (largeIcon == null) {
-            largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.notification_dark);
+            largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
         }
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_launcher)
+                .setSmallIcon(R.drawable.notification)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)
