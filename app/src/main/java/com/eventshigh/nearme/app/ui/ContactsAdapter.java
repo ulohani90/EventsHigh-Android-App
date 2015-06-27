@@ -11,6 +11,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.utils.ContactUtils;
+import com.eventshigh.nearme.app.utils.ImageUtils;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
         holder.contactName.setText(contacts.get(position).name);
         Bitmap bitmap = ContactUtils.getPhotoForContactId(activity, contacts.get(position).contactId);
         if (bitmap != null) {
-            holder.contactPhoto.setImageBitmap(bitmap);
+            holder.contactPhoto.setImageBitmap(ImageUtils.getCircularBitmapFrom(bitmap));
         }
     }
 
