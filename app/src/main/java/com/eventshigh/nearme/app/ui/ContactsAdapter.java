@@ -33,7 +33,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
     @Override
     public void onBindViewHolder(ContactView holder, int position) {
         holder.contactName.setText(contacts.get(position).name);
-        Bitmap bitmap = ContactUtils.getPhotoForContactId(activity, contacts.get(position).contactId);
+        Bitmap bitmap = ContactUtils.getPhotoForPhone(activity, contacts.get(position).mobileNo);
         if (bitmap != null) {
             holder.contactPhoto.setImageBitmap(ImageUtils.getCircularBitmapFrom(bitmap));
         }

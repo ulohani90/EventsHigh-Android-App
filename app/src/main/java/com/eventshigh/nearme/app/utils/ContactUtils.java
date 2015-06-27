@@ -60,6 +60,9 @@ public class ContactUtils {
             }
             String contactPhotoUri = cursor.getString(cursor.getColumnIndex(
                     ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI));
+            if (contactPhotoUri == null) {
+                return null;
+            }
             return MediaStore.Images.Media.getBitmap(context.getContentResolver(),
                     Uri.parse(contactPhotoUri));
         } catch (IOException e) {
