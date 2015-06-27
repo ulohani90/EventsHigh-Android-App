@@ -127,7 +127,7 @@ public class EHNotification {
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .build();
 
-        NotificationUtils.showNotification(context, notification, notificationId);
+        NotificationUtils.showNotification(context, notification, notificationId, title);
         WakefulBroadcastReceiver.completeWakefulIntent(wakefulIntent);
     }
 
@@ -142,7 +142,7 @@ public class EHNotification {
                 .build();
 
 
-        NotificationUtils.showNotification(context, notification, notificationId);
+        NotificationUtils.showNotification(context, notification, notificationId, title);
         WakefulBroadcastReceiver.completeWakefulIntent(wakefulIntent);
     }
 

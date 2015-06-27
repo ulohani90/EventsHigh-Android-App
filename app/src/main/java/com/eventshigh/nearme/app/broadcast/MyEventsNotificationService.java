@@ -164,6 +164,7 @@ public class MyEventsNotificationService extends IntentService {
                 null, pendingIntent, Notification.PRIORITY_DEFAULT)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .build();
-        NotificationUtils.showNotification(this, notification, NotificationUtils.MY_EVENTS_NOTIFICATION_ID);
+        NotificationUtils.showNotification(this, notification,
+                NotificationUtils.MY_EVENTS_NOTIFICATION_ID, EventsHighEndpoints.QUERY_MY_EVENT);
     }
 }

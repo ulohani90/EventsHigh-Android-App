@@ -8,7 +8,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
-import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.Builder;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.utils.GAHelper;
@@ -21,12 +21,12 @@ public class NotificationUtils {
     public static final int MY_EVENTS_NOTIFICATION_ID = 2;
 
     @SuppressLint("InlinedApi")
-    public static NotificationCompat.Builder createNotificationBuilder(Context context, String title,
+    public static Builder createNotificationBuilder(Context context, String title,
             CharSequence message, Bitmap largeIcon, PendingIntent contentIntent, int priority) {
         if (largeIcon == null) {
             largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
         }
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+        Builder builder = new Builder(context)
                 .setSmallIcon(R.drawable.notification)
                 .setContentTitle(title)
                 .setContentText(message)
@@ -45,11 +45,12 @@ public class NotificationUtils {
         return builder;
     }
 
-    public static void showNotification(Context context, Notification notification, int notificationId) {
+    public static void showNotification(Context context, Notification notification,
+            int notificationId, String notificationLabel) {
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         GAHelper.getInstance(context).reportActionToAnalytics("background", "notificationShown",
-                Integer.toString(notificationId));
+                notificationLabel);
         notificationManager.notify(notificationId, notification);
     }
 }
