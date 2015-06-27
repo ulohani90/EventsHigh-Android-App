@@ -171,7 +171,7 @@ public class GcmIntentService extends IntentService {
         EHNotification EHNotification =  new EHNotification(this, alarmIntent, title, message,
                 imageUrl, contentIntent,
                 priority == null ? Notification.PRIORITY_LOW : Notification.PRIORITY_HIGH,
-                mobileNo == null ? NotificationUtils.GCM_NOTIFICATION_ID : mobileNo.hashCode()
+                mobileNo
         );
         return new ParsedBundle(EHNotification, bounded ? new LatLng(lat, lon) : null, distance);
     }

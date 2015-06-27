@@ -44,6 +44,7 @@ public class EHNotification {
     public final PendingIntent launchIntent;
     public final int notificationId;
     public final int priority;
+    private final Bitmap contactPhoto;
 
     public EHNotification(Context context, Intent wakefulIntent, Event event, int notificationId) {
         this.context = context;
@@ -61,6 +62,7 @@ public class EHNotification {
         imageUrl = event.imgUrl;
 
         launchIntent = createPendingIntent(context, event.id, event.city);
+        contactPhoto = null;
 
         // Record notification in stream.
         EventNotificationStreamItem.record(context, title, message, imageUrl, event.id,
@@ -68,10 +70,10 @@ public class EHNotification {
     }
 
     public EHNotification(Context context, Intent wakefulIntent, String title, String message,
-                          String imageUrl, PendingIntent launchIntent, int priority, int notificationId) {
+                          String imageUrl, PendingIntent launchIntent, int priority, String mobileNo) {
         this.context = context;
         this.wakefulIntent = wakefulIntent;
-        this.notificationId = notificationId;
+        this.notificationId = mobileNo == null ? NotificationUtils.GCM_NOTIFICATION_ID : mobileNo.hashCode();
         this.priority = priority;
 
         this.title = title;
@@ -79,6 +81,15 @@ public class EHNotification {
         this.imageUrl = imageUrl;
 
         this.launchIntent = launchIntent;
+
+        Bitmap contactPhoto = null;
+        if (mobileNo != null) {
+            contactPhoto = ContactUtils.getPhotoForPhone(context, mobileNo);
+            if (contactPhoto != null) {
+                contactPhoto = ImageUtils.getCircularBitmapFrom(contactPhoto);
+            }
+        }
+        this.contactPhoto = contactPhoto;
     }
 
     public void showNotificationAndReleaseWakeLock() {
@@ -112,7 +123,7 @@ public class EHNotification {
 
     private void showNotificationNoImage() {
         Notification notification = NotificationUtils.createNotificationBuilder(context, title,
-                message, launchIntent, priority)
+                message, contactPhoto, launchIntent, priority)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .build();
 
@@ -121,14 +132,8 @@ public class EHNotification {
     }
 
     private void showNotificationWithImage(Bitmap bitmap) {
-        Bitmap contactPhoto = ContactUtils.getPhotoForPhone(context, "9879868976");
-        if (contactPhoto != null) {
-            contactPhoto = ImageUtils.getCircularBitmapFrom(contactPhoto);
-        }
         Notification notification = NotificationUtils.createNotificationBuilder(
                 context, title, message, contactPhoto, launchIntent, priority)
-//        Notification notification = NotificationUtils.createNotificationBuilder(
-//                context, title, message, launchIntent, priority)
                 .setStyle(new NotificationCompat.BigPictureStyle()
                                 .setSummaryText(message)
                                 .bigPicture(bitmap)

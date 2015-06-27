@@ -161,7 +161,7 @@ public class MyEventsNotificationService extends IntentService {
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, launchIntent, 0);
         Notification notification = NotificationUtils.createNotificationBuilder(this, title, message,
-                pendingIntent, Notification.PRIORITY_DEFAULT)
+                null, pendingIntent, Notification.PRIORITY_DEFAULT)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .build();
         NotificationUtils.showNotification(this, notification, NotificationUtils.MY_EVENTS_NOTIFICATION_ID);

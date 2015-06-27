@@ -21,15 +21,11 @@ public class NotificationUtils {
     public static final int MY_EVENTS_NOTIFICATION_ID = 2;
 
     @SuppressLint("InlinedApi")
-    public static NotificationCompat.Builder createNotificationBuilder(Context context,
-            String title, CharSequence message, PendingIntent contentIntent, int priority) {
-        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.notification_dark);
-        return createNotificationBuilder(context, title, message, largeIcon, contentIntent, priority);
-    }
-
-    @SuppressLint("InlinedApi")
     public static NotificationCompat.Builder createNotificationBuilder(Context context, String title,
             CharSequence message, Bitmap largeIcon, PendingIntent contentIntent, int priority) {
+        if (largeIcon == null) {
+            largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.notification_dark);
+        }
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle(title)
