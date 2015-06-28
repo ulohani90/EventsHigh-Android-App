@@ -1,11 +1,8 @@
 package com.eventshigh.nearme.app.data;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
-
-import com.eventshigh.nearme.app.utils.ContactUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;

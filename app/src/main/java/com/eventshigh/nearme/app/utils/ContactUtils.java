@@ -60,6 +60,9 @@ public class ContactUtils {
             }
             String contactPhotoUri = cursor.getString(cursor.getColumnIndex(
                     ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI));
+            if (contactPhotoUri == null) {
+                return null;
+            }
             return MediaStore.Images.Media.getBitmap(context.getContentResolver(),
                     Uri.parse(contactPhotoUri));
         } catch (IOException e) {
@@ -68,6 +71,29 @@ public class ContactUtils {
             cursor.close();
         }
         return null;
+    }
+
+    public static String getLocalPhotoForServerPhone(Context context, String phone) {
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(phone));
+
+        // Build contact query.
+        String[] projection = { ContactsContract.PhoneLookup.NUMBER };
+
+        // Parse contacts data.
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        if (cursor == null) {
+            return null;
+        }
+
+        try {
+            if (!cursor.moveToNext()) {
+                return null;
+            }
+            return cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.NUMBER));
+        } finally {
+            cursor.close();
+        }
     }
 
     public static Bitmap getPhotoForContactId(Context context, String contactId) {
