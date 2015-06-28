@@ -73,6 +73,29 @@ public class ContactUtils {
         return null;
     }
 
+    public static String getLocalPhotoForServerPhone(Context context, String phone) {
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(phone));
+
+        // Build contact query.
+        String[] projection = { ContactsContract.PhoneLookup.NUMBER };
+
+        // Parse contacts data.
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        if (cursor == null) {
+            return null;
+        }
+
+        try {
+            if (!cursor.moveToNext()) {
+                return null;
+            }
+            return cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.NUMBER));
+        } finally {
+            cursor.close();
+        }
+    }
+
     public static Bitmap getPhotoForContactId(Context context, String contactId) {
         long contactIdLong = Long.parseLong(contactId);
         Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactIdLong);

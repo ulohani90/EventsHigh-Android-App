@@ -8,7 +8,6 @@
     android:descendantFocusability="blocksDescendants"
     card_view:cardBackgroundColor="@android:color/white"
     card_view:cardCornerRadius="2dp"
-    tools:layout_width="280dp"
     android:minHeight="48dp"
     >
 
@@ -26,12 +25,34 @@
             android:layout_width="48dp"
             android:layout_marginRight="16dp"
             android:layout_marginEnd="16dp"
-            android:layout_height="48dp"/>
+            android:layout_height="48dp"
+            android:src="@drawable/ic_launcher"
+            />
 
         <TextView
             android:id="@+id/contact_name"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            tools:text="Parag Sarda"
+            />
+
+        <TextView
+            android:id="@+id/action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="14dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:background="@drawable/eh_oval"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:text="@string/ui_follow"
             />
 
     </LinearLayout>

@@ -67,10 +67,4 @@ public class UserContact {
                 cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
         return new UserContact(contactId, phoneNumber, name, null);
     }
-
-    public static UserContact parseFromJson(JSONObject jsonObject) throws JSONException {
-        String name = jsonObject.getString("name");
-        String phoneNumber = jsonObject.getString("mobile_no");
-        return new UserContact(null, phoneNumber, name, null);
-    }
 }

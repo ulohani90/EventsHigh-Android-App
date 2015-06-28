@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.activity;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,18 +18,16 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
+import com.eventshigh.nearme.app.task.ContactPhoneResolverTask;
+import com.eventshigh.nearme.app.task.ContactsLoaderTask;
 import com.eventshigh.nearme.app.ui.ContactsAdapter;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
-import com.eventshigh.nearme.app.utils.Utils;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ContactsFragment extends Fragment implements Response.Listener<JSONObject>, Response.ErrorListener {
@@ -50,9 +49,16 @@ public class ContactsFragment extends Fragment implements Response.Listener<JSON
         contactsAdapter = new ContactsAdapter(activity);
         gridView.setAdapter(contactsAdapter);
 
-        Uri requestUrl = AccountStateReporter.getBaseUri(activity, "get_social_friends")
-                .appendQueryParameter("android_id=", Utils.getAndroidId(activity))
-                .build();
+        new ContactsLoaderTask(activity, new ContactsLoaderTask.ContactsCallback() {
+            @Override
+            public void onContactLoad(@Nullable List<UserContact> contacts) {
+                if (isAdded() && contacts != null) {
+                    contactsAdapter.setContacts(contacts);
+                }
+            }
+        }).execute();
+
+        Uri requestUrl = AccountStateReporter.getBaseUri(activity, "get_social_friends").build();
         try {
             VolleyHelper.addToRequestQueue(activity, new JsonObjectRequest(
                     Request.Method.GET, Signer.sign(requestUrl).toString(), null, this, this)
@@ -71,22 +77,19 @@ public class ContactsFragment extends Fragment implements Response.Listener<JSON
 
     @Override
     public void onResponse(JSONObject jsonObject, boolean b) {
-        if (!isAdded()) {
-            return;
-        }
-        try {
-            JSONArray friends = jsonObject.getJSONArray("friends");
-            List<UserContact> contacts = new ArrayList<>();
-            for (int i = 0; i < friends.length(); i++) {
-                contacts.add(UserContact.parseFromJson(friends.getJSONObject(i)));
+        new ContactPhoneResolverTask(activity, new ContactPhoneResolverTask.Callback() {
+            @Override
+            public void onContacsResolved(@Nullable List<String> contactsOnEh) {
+                if (!isAdded()) {
+                    return;
+                }
+                contactsAdapter.setContactsOnEh(contactsOnEh);
             }
-            contactsAdapter.setContacts(contacts);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        }).execute(jsonObject);
     }
 
     @Override
     public void onErrorResponse(VolleyError volleyError) {
+        volleyError.printStackTrace();
     }
 }

@@ -19,6 +19,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
     private final BaseContextActivity activity;
 
     private List<UserContact> contacts;
+    private List<String> contactPhonesOnEh;
 
     public ContactsAdapter(BaseContextActivity activity) {
         this.activity = activity;
@@ -32,10 +33,24 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
 
     @Override
     public void onBindViewHolder(ContactView holder, int position) {
-        holder.contactName.setText(contacts.get(position).name);
-        Bitmap bitmap = ContactUtils.getPhotoForPhone(activity, contacts.get(position).mobileNo);
+        UserContact contact = contacts.get(position);
+        holder.contactName.setText(contact.name);
+        Bitmap bitmap = ContactUtils.getPhotoForPhone(activity, contact.mobileNo);
         if (bitmap != null) {
             holder.contactPhoto.setImageBitmap(ImageUtils.getCircularBitmapFrom(bitmap));
+        }
+
+        if (contactPhonesOnEh == null) {
+            holder.action.setVisibility(View.GONE);
+        } else {
+            holder.action.setVisibility(View.VISIBLE);
+            if (contactPhonesOnEh.contains(contact.mobileNo)) {
+                holder.action.setText(R.string.ui_follow);
+                holder.action.setSelected(false);
+            } else {
+                holder.action.setText(R.string.social_invite);
+                holder.action.setSelected(true);
+            }
         }
     }
 
@@ -49,15 +64,22 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
         notifyDataSetChanged();
     }
 
+    public void setContactsOnEh(List<String> contactsOnEh) {
+        contactPhonesOnEh = contactsOnEh;
+        notifyDataSetChanged();
+    }
+
     class ContactView extends RecyclerView.ViewHolder {
         private final TextView contactName;
         private final ImageView contactPhoto;
+        private final TextView action;
 
         public ContactView(View itemView) {
             super(itemView);
 
             contactName = (TextView) itemView.findViewById(R.id.contact_name);
             contactPhoto = (ImageView) itemView.findViewById(R.id.contact_photo);
+            action = (TextView) itemView.findViewById(R.id.action);
         }
     }
 }

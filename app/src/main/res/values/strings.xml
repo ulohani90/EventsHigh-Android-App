@@ -156,6 +156,9 @@
     <string name="rate_now">Rate Now</string>
     <string name="feedback">Give Feedback</string>
 
+    <!-- Social -->
+    <string name="social_invite">Invite</string>
+
     <!-- Zendesk -->
     <string name="contact_fragment_description_hint">Enter your query</string>
     <string tools:ignore="UnusedResources" name="contact_fragment_title">Contact EventsHigh</string>

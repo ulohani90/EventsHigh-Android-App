@@ -56,7 +56,7 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
     @SuppressWarnings("TryFinallyCanBeTryWithResources")
     public void run() {
         String selectionExtras = "";
-        String order = " LIMIT " + MAX_CONTACTS_TO_UPLOAD;
+        String order;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             // On android versions that have the contact updated timestamp, get only the
@@ -64,8 +64,11 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
             selectionExtras += " and "
                     + ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP
                     + " >= " + preferences.getLong(PARAM_LAST_CONTACTS_SYNC_TIMESTAMP, 0);
-            order = ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP + order;
+            order = ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP;
+        } else {
+            order = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME;
         }
+        order += " LIMIT " + MAX_CONTACTS_TO_UPLOAD;
 
         // Parse contacts data.
         Cursor cursor = ContactUtils.getContactsCursor(context, selectionExtras, order);
