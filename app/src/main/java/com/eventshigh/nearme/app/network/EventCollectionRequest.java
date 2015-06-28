@@ -25,8 +25,10 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -137,14 +139,24 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
             Event event = it.next();
 
-            if (event.eventTimings.length == 0 || event.eventTimings[0] < aDayBack) {
-                it.remove();
-            } else {
-                EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
-                if (eventTime != null && eventTime.time != null &&
-                        event.eventTimings[0] < threeHoursBack) {
-                    it.remove();
+            boolean isPastEvent = true;
+            for (long eventTiming : event.eventTimings) {
+                if (eventTiming < aDayBack) {
+                    continue;
                 }
+
+                EventTime eventTime = DateTimeUtils.dateToEventTime(new Date(eventTiming),
+                        TimeZone.getTimeZone(event.city.timeZone));
+                if (eventTime.time != null && eventTiming < threeHoursBack) {
+                    continue;
+                }
+
+                isPastEvent = false;
+                break;
+            }
+
+            if (isPastEvent)  {
+                it.remove();
             }
         }
     }
