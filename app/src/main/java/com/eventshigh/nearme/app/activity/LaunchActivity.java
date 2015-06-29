@@ -69,10 +69,8 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String EXPLORE_TAB = "explore";
     public static final String NOTIFICATIONS_TAB = "Notifications";
     public static final String THIS_WEEK_TAB = "this week";
-    public static final String CONTACTS_TAB = "contacts";
     public final String[] TABS = {
             MY_EVENTS_TAB,
-//            CONTACTS_TAB,
             EXPLORE_TAB,
             THIS_WEEK_TAB,
             NOTIFICATIONS_TAB,
@@ -369,10 +367,6 @@ public class LaunchActivity extends BaseContextActivity {
 
             if (TABS[position].equals(NOTIFICATIONS_TAB)) {
                 return new StreamFragment();
-            }
-
-            if (TABS[position].equals(CONTACTS_TAB)) {
-                return new ContactsFragment();
             }
 
             return ThisWeekFragment.getInstance(eventsContext, true, 7);

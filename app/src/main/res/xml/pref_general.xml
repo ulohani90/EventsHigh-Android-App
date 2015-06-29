@@ -5,6 +5,19 @@
         android:key="last_city_key"
         android:title="@string/pref_title_change_location"
     />
+    <Preference android:title="@string/pref_title_phone_no">
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.activity.PhoneLoginActivity"
+        />
+    </Preference>
+    <Preference android:title="@string/title_my_friends">
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.activity.MyFriendsActivity"
+        />
+    </Preference>
+
     <Preference android:title="@string/pref_title_rate_us">
         <intent
             android:action="android.intent.action.VIEW"
@@ -16,6 +29,13 @@
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.SettingsActivity"
             android:action="com.eventshigh.share_app"
+        />
+    </Preference>
+    <Preference android:title="@string/pref_title_delete_query_history">
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.activity.SettingsActivity"
+            android:action="com.eventshigh.delete_query_history"
         />
     </Preference>
     <Preference android:title="@string/pref_title_add_event" android:summary="listings@eventshigh.com">

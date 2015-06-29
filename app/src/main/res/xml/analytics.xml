@@ -8,6 +8,7 @@
     <screenName name="com.eventshigh.nearme.app.activity.EventsMapsActivity">Maps</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.EventsGridActivity">Grid</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.EventDetailActivity">Details</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.MyFriendsActivity">MyFriends</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.CustomUrlActivity">CustomUrlActivity</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.OnBoardingActivity">OnBoarding</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.PhoneLoginActivity">PhoneLogin</screenName>

@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.activity;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
 
@@ -26,12 +25,6 @@ public class EHPreferenceFragment extends PreferenceFragment
 
         // Add 'general' preferences.
         addPreferencesFromResource(R.xml.pref_general);
-
-        // Add 'account' preferences.
-        PreferenceCategory accountHeader = new PreferenceCategory(getActivity());
-        accountHeader.setTitle(R.string.pref_header_account);
-        getPreferenceScreen().addPreference(accountHeader);
-        addPreferencesFromResource(R.xml.pref_account);
 
         // Last city preference.
         lastCityView = (ListPreference) getPreferenceScreen().findPreference("last_city_key");

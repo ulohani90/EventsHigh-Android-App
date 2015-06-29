@@ -71,15 +71,11 @@ public class VolleyHelper {
         return getInstance(context).imageLoader;
     }
 
-    public void invalidateCache(Request request) {
-        requestQueue.getCache().remove(request.getCacheKey());
-    }
-
     public static void log(BaseActivity activity, VolleyError volleyError) {
         String logTag = activity.getClass().getSimpleName();
         Throwable cause = volleyError.getCause();
         if (cause != null) {
-            Crashlytics.logException(cause);
+            Crashlytics.getInstance().core.logException(cause);
             Log.w(logTag, "Volley Error: " + volleyError.getMessage(), cause);
             activity.reportActionToAnalytics("failedRequest", cause.getClass().getSimpleName());
         } else {

@@ -157,6 +157,7 @@
     <string name="feedback">Give Feedback</string>
 
     <!-- Social -->
+    <string name="title_my_friends">My Friends</string>
     <string name="social_invite">Invite</string>
 
     <!-- Zendesk -->
