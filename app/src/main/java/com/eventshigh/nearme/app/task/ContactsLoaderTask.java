@@ -13,18 +13,21 @@ import com.eventshigh.nearme.app.utils.ContactUtils;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import io.fabric.sdk.android.services.concurrency.AsyncTask;
 
 /**
  * AsyncTask which can be used to load the user contacts.
  */
-public class ContactsLoaderTask extends AsyncTask<Void, Void, List<UserContact>> {
+public class ContactsLoaderTask extends AsyncTask<Void, Void, Map<UserContact, List<String>>> {
     private static final String LOG_TAG = ContactsLoaderTask.class.getSimpleName();
 
     public interface ContactsCallback {
-        void onContactLoad(@Nullable List<UserContact> contacts);
+        void onContactLoad(@Nullable Map<UserContact, List<String>> contacts);
     }
 
     private final Context context;
@@ -37,18 +40,27 @@ public class ContactsLoaderTask extends AsyncTask<Void, Void, List<UserContact>>
 
     @Override
     protected @Nullable
-    List<UserContact> doInBackground(Void... params) {
+    Map<UserContact, List<String>> doInBackground(Void... params) {
         Cursor cursor = ContactUtils.getContactsCursor(context, null,
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
         if (cursor == null) {
             return null;
         }
 
-        List<UserContact> contacts = new ArrayList<>();
+        Map<UserContact, List<String>> contactsToMobileNumbers = new TreeMap<>(new Comparator<UserContact>() {
+            @Override
+            public int compare(UserContact lhs, UserContact rhs) {
+                return lhs.name.compareTo(rhs.name);
+            }
+        });
         try {
             while (cursor.moveToNext()) {
                 try {
-                    contacts.add(UserContact.parseFromCursor(cursor));
+                    UserContact contact = UserContact.parseFromCursor(cursor);
+                    if (!contactsToMobileNumbers.containsKey(contact)) {
+                        contactsToMobileNumbers.put(contact, new ArrayList<String>());
+                    }
+                    contactsToMobileNumbers.get(contact).add(contact.mobileNo);
                 } catch (JSONException e) {
                     Log.w(LOG_TAG, "failed to load contact", e);
                     Crashlytics.getInstance().core.logException(e);
@@ -58,11 +70,11 @@ public class ContactsLoaderTask extends AsyncTask<Void, Void, List<UserContact>>
             cursor.close();
         }
 
-        return contacts;
+        return contactsToMobileNumbers;
     }
 
     @Override
-    protected void onPostExecute(@Nullable List<UserContact> contacts) {
-        callback.onContactLoad(contacts);
+    protected void onPostExecute(@Nullable Map<UserContact, List<String>> contactsToMobileNumbers) {
+        callback.onContactLoad(contactsToMobileNumbers);
     }
 }

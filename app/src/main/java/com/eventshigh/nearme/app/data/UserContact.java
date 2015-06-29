@@ -67,4 +67,28 @@ public class UserContact {
                 cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
         return new UserContact(contactId, phoneNumber, name, null);
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (contactId == null) {
+            return super.equals(object);
+        }
+
+        if (object == null || !(object instanceof UserContact)) {
+            return false;
+        }
+        UserContact contact = (UserContact) object;
+        if (contact.contactId == null) {
+            return false;
+        }
+        return contactId.equals(contact.contactId);
+    }
+
+    @Override
+    public int hashCode() {
+        if (contactId == null) {
+            return super.hashCode();
+        }
+        return contactId.hashCode();
+    }
 }

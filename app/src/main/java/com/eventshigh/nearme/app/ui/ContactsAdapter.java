@@ -15,11 +15,14 @@ import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.ImageUtils;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ContactView> {
     private final BaseActivity activity;
 
-    private List<UserContact> contacts;
+    private UserContact[] contacts;
+    private Map<UserContact, List<String>> contactsToMobileNumbers;
     private List<String> contactPhonesOnEh;
 
     public ContactsAdapter(BaseActivity activity) {
@@ -34,17 +37,19 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
 
     @Override
     public void onBindViewHolder(ContactView holder, int position) {
-        UserContact contact = contacts.get(position);
-        holder.populate(contact, activity, contactPhonesOnEh);
+        UserContact contact = contacts[position];
+        holder.populate(contact, contactsToMobileNumbers.get(contact), activity, contactPhonesOnEh);
     }
 
     @Override
     public int getItemCount() {
-        return contacts == null ? 0 : contacts.size();
+        return contacts == null ? 0 : contacts.length;
     }
 
-    public void setContacts(List<UserContact> contacts) {
-        this.contacts = contacts;
+    public void setContacts(Map<UserContact, List<String>> contactsToMobileNumbers) {
+        this.contactsToMobileNumbers = contactsToMobileNumbers;
+        contacts = new UserContact[contactsToMobileNumbers.size()];
+        contactsToMobileNumbers.keySet().toArray(contacts);
         notifyDataSetChanged();
     }
 
@@ -66,7 +71,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
             action = (TextView) itemView.findViewById(R.id.action);
         }
 
-        public void populate(UserContact contact, BaseActivity activity,
+        public void populate(UserContact contact, List<String> mobileNumbers, BaseActivity activity,
                 @Nullable List<String> contactPhonesOnEh) {
             contactName.setText(contact.name);
             Bitmap bitmap = ContactUtils.getPhotoForPhone(activity, contact.mobileNo);
@@ -78,7 +83,14 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
                 action.setVisibility(View.GONE);
             } else {
                 action.setVisibility(View.VISIBLE);
-                if (contactPhonesOnEh.contains(contact.mobileNo)) {
+                boolean userIsOnEh = false;
+                for (String mobileNo : mobileNumbers) {
+                    if (contactPhonesOnEh.contains(mobileNo)) {
+                        userIsOnEh = true;
+                        break;
+                    }
+                }
+                if (userIsOnEh) {
                     action.setText(R.string.ui_follow);
                     action.setSelected(false);
                 } else {

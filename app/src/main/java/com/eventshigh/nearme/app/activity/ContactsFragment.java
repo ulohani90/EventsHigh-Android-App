@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * UI to show the user's friends. We read the user phone contacts and match it
@@ -54,9 +55,9 @@ public class ContactsFragment extends Fragment implements Response.Listener<JSON
 
         new ContactsLoaderTask(activity, new ContactsLoaderTask.ContactsCallback() {
             @Override
-            public void onContactLoad(@Nullable List<UserContact> contacts) {
-                if (isAdded() && contacts != null) {
-                    contactsAdapter.setContacts(contacts);
+            public void onContactLoad(@Nullable Map<UserContact, List<String>> contactsToMobileNumbers) {
+                if (isAdded() && contactsToMobileNumbers != null) {
+                    contactsAdapter.setContacts(contactsToMobileNumbers);
                 }
             }
         }).execute();
