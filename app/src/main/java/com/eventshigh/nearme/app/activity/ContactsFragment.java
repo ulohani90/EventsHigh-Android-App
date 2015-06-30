@@ -127,7 +127,11 @@ public class ContactsFragment extends Fragment {
         @Override
         public void onResponse(MyContacts myContacts, boolean isIntermediate) {
             topProgressBar.setVisibility(isIntermediate ? View.VISIBLE : View.GONE);
-            contactsAdapter.setContacts(myContacts.EHContacts);
+            if (!isIntermediate && myContacts.isEmpty()) {
+                errorListener.onErrorResponse(new VolleyError("failed contacts"));
+            } else {
+                contactsAdapter.setMyContacts(myContacts);
+            }
         }
     };
 

@@ -39,6 +39,10 @@ public class MyContactsRequest extends JsonRequest<MyContacts> {
             this.EHContacts = EHContacts;
             this.otherContacts = otherContacts;
         }
+
+        public boolean isEmpty() {
+            return EHContacts.isEmpty() && otherContacts.isEmpty();
+        }
     }
 
     public static void submit(Context context, Priority priority,

@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.graphics.Bitmap;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,16 +10,14 @@ import android.widget.TextView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.UserContact;
+import com.eventshigh.nearme.app.network.MyContactsRequest.MyContacts;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.ImageUtils;
-
-import java.util.List;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ContactView> {
     private final BaseActivity activity;
 
-    private List<UserContact> contacts;
-    private List<String> contactsOnEh;
+    private MyContacts myContacts;
 
     public ContactsAdapter(BaseActivity activity) {
         this.activity = activity;
@@ -34,21 +31,16 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
 
     @Override
     public void onBindViewHolder(ContactView holder, int position) {
-        holder.populate(contacts.get(position), activity, contactsOnEh);
+        holder.populate(myContacts.EHContacts.get(position), activity);
     }
 
     @Override
     public int getItemCount() {
-        return contacts == null ? 0 : contacts.size();
+        return myContacts == null ? 0 : myContacts.EHContacts.size();
     }
 
-    public void setContacts(List<UserContact> contacts) {
-        this.contacts = contacts;
-        notifyDataSetChanged();
-    }
-
-    public void setContactsOnEh(List<String> contactsOnEh) {
-        this.contactsOnEh = contactsOnEh;
+    public void setMyContacts(MyContacts myContacts) {
+        this.myContacts = myContacts;
         notifyDataSetChanged();
     }
 
@@ -65,26 +57,18 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
             action = (TextView) itemView.findViewById(R.id.action);
         }
 
-        public void populate(UserContact contact, BaseActivity activity,
-                @Nullable List<String> contactsOnEh) {
+        public void populate(UserContact contact, BaseActivity activity) {
             contactName.setText(contact.name);
+
             Bitmap bitmap = ContactUtils.getPhotoForPhone(activity, contact.mobileNo);
             if (bitmap != null) {
                 contactPhoto.setImageBitmap(ImageUtils.getCircularBitmapFrom(bitmap));
+            } else {
+                contactPhoto.setImageResource(R.drawable.ic_person_black_18dp);
             }
 
-            if (contactsOnEh == null) {
-                action.setVisibility(View.GONE);
-            } else {
-                action.setVisibility(View.VISIBLE);
-                if (contactsOnEh.contains(contact.contactId)) {
-                    action.setText(R.string.ui_follow);
-                    action.setSelected(false);
-                } else {
-                    action.setText(R.string.social_invite);
-                    action.setSelected(true);
-                }
-            }
+            action.setText(R.string.ui_follow);
+            action.setSelected(false);
         }
     }
 }
