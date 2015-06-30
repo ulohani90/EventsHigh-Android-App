@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -45,11 +46,12 @@ public class MyContactsRequest extends JsonRequest<MyContacts> {
         }
     }
 
-    public static void submit(Context context, Priority priority,
-                              Object tag, boolean shouldBypassCache,
-                              Listener<MyContacts> listener, ErrorListener errorListener) {
+    public static void submit(Context context, Priority priority, Object tag, boolean shouldBypassCache,
+            Listener<MyContacts> listener, ErrorListener errorListener) {
         try {
-            String url = Signer.sign(AccountStateReporter.getBaseUri(context, "get_social_friends").build()).toString();
+            Uri getSocialFriendsUri =
+                    AccountStateReporter.getBaseUri(context, "get_social_friends").build();
+            String url = Signer.sign(getSocialFriendsUri).toString();
             MyContactsRequest request = new MyContactsRequest(
                     context, url, priority, shouldBypassCache, listener, errorListener);
             request.setTag(tag);
