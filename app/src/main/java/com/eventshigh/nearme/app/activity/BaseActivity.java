@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.activity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
@@ -61,10 +60,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     // Check out the share event timings.
     protected long shareEventInitiatedTimestamp = 0;
 
-    // public static Typeface fontQuicksand;
-    public static Typeface fontQuicksandBold;
-    public static final Object lock = new Object();
-    public static boolean loadedFonts = false;
 
     // **********************************************
     // Activity lifecycle  Methods
@@ -88,14 +83,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         isPlayServicesPresent = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS;
         if (isPlayServicesPresent) {
             gaHelper = GAHelper.getInstance(this);
-        }
-
-        synchronized (lock) {
-            if (!loadedFonts) {
-                // fontQuicksand = Typeface.createFromAsset(getAssets(), "Quicksand-Regular.ttf");
-                fontQuicksandBold = Typeface.createFromAsset(getAssets(), "Quicksand-Bold.ttf");
-                loadedFonts = true;
-            }
         }
     }
 
