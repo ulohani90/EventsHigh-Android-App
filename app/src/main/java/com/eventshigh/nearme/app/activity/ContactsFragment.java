@@ -1,42 +1,37 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
+import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.UserContact;
+import com.eventshigh.nearme.app.network.MyContactsRequest;
+import com.eventshigh.nearme.app.network.MyContactsRequest.MyContacts;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.security.Signer;
-import com.eventshigh.nearme.app.task.ContactPhoneResolverTask;
-import com.eventshigh.nearme.app.task.ContactsLoaderTask;
 import com.eventshigh.nearme.app.ui.ContactsAdapter;
-import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
-
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.List;
 
 /**
  * UI to show the user's friends. We read the user phone contacts and match it
  * against the user on EH to show friends list.
  */
-public class ContactsFragment extends Fragment implements Response.Listener<JSONObject> {
+public class ContactsFragment extends Fragment {
     private BaseActivity activity;
+    private long lastRefreshTimestamp;
+
+    private View topProgressBar;
+    private View noMyEventsView;
+    private View retryView;
+
     private ContactsAdapter contactsAdapter;
 
     @Override
@@ -46,51 +41,90 @@ public class ContactsFragment extends Fragment implements Response.Listener<JSON
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_contacts, container, false);
-        AutofitRecyclerView gridView = (AutofitRecyclerView) view.findViewById(R.id.grid);
+    public void onDetach() {
+        super.onDetach();
 
+        VolleyHelper.getRequestQueue(activity).cancelAll(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (lastRefreshTimestamp < System.currentTimeMillis() - BaseEventsFragment.DEFAULT_REFRESH_INTERVAL) {
+            refresh(false);
+            lastRefreshTimestamp = System.currentTimeMillis();
+        }
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        refresh(false);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_contacts, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        // Setup the events adapter to show data.
+        AutofitRecyclerView gridView = (AutofitRecyclerView) view.findViewById(R.id.grid);
         contactsAdapter = new ContactsAdapter(activity);
         gridView.setAdapter(contactsAdapter);
 
-        new ContactsLoaderTask(activity, new ContactsLoaderTask.ContactsCallback() {
-            @Override
-            public void onContactLoad(List<UserContact> contacts) {
-                if (isAdded()) {
-                    contactsAdapter.setContacts(contacts);
-                }
-            }
-        }).execute();
+        // More views.
+        topProgressBar = view.findViewById(R.id.top_progress_bar);
+        noMyEventsView = view.findViewById(R.id.view_no_my_event);
+        retryView = view.findViewById(R.id.view_retry);
 
-        Uri requestUrl = AccountStateReporter.getBaseUri(activity, "get_social_friends").build();
-        try {
-            VolleyHelper.addToRequestQueue(activity, new JsonObjectRequest(
-                    Request.Method.GET, Signer.sign(requestUrl).toString(), null, this, errorListener)
-            );
-        } catch (IOException | GeneralSecurityException e) {
-            Crashlytics.getInstance().core.logException(e);
+        // Setup the refresh on swipe down.
+        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                activity.reportActionToAnalytics("swipeRefresh");
+                swipeRefreshLayout.setRefreshing(false);
+                refresh(true /* bypass cache*/);
+            }
+        });
+        swipeRefreshLayout.setColorSchemeResources(R.color.primary);
+
+        retryView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.reportActionToAnalytics("retry");
+                refresh(false);
+            }
+        });
+    }
+
+    protected void refresh(boolean shouldBypassCache) {
+        topProgressBar.setVisibility(View.VISIBLE);
+        retryView.setVisibility(View.GONE);
+        noMyEventsView.setVisibility(View.GONE);
+
+        VolleyHelper.getRequestQueue(activity).cancelAll(this);
+        MyContactsRequest.submit(activity, Priority.IMMEDIATE, this, shouldBypassCache,
+                myContactsListener, errorListener);
+    }
+
+    private Listener<MyContacts> myContactsListener = new Listener<MyContacts>() {
+        @Override
+        public void onResponse(MyContacts myContacts, boolean isIntermediate) {
+            topProgressBar.setVisibility(isIntermediate ? View.VISIBLE : View.GONE);
+            contactsAdapter.setContacts(myContacts.EHContacts);
         }
-
-        return view;
-    }
-
-
-    @Override
-    public void onResponse(JSONObject jsonObject, boolean isIntermediate) {
-        new ContactPhoneResolverTask(activity, new ContactPhoneResolverTask.Callback() {
-            @Override
-            public void onContacsResolved(@Nullable List<String> contactsOnEh) {
-                if (!isAdded()) {
-                    return;
-                }
-                contactsAdapter.setContactsOnEh(contactsOnEh);
-            }
-        }).execute(jsonObject);
-    }
+    };
 
     private ErrorListener errorListener = new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
+            topProgressBar.setVisibility(View.GONE);
+            retryView.setVisibility(View.VISIBLE);
             VolleyHelper.log(activity, volleyError);
         }
     };
