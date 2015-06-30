@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.user;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
@@ -18,10 +17,8 @@ import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.ContactsUploadRequest;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class UserContactsUploader implements Listener<JSONObject>, ErrorListener, Runnable {
@@ -70,32 +67,10 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
         }
         order += " LIMIT " + MAX_CONTACTS_TO_UPLOAD;
 
-        // Parse contacts data.
-        Cursor cursor = ContactUtils.getContactsCursor(context, selectionExtras, order);
-        if (cursor == null) {
+        // Load the contacts data.
+        List<UserContact> contacts = ContactUtils.getContacts(context, selectionExtras, order, true);
+        if (contacts.isEmpty()) {
             return;
-        }
-
-        List<UserContact> contacts = new ArrayList<>();
-        try {
-            while (cursor.moveToNext()) {
-                Cursor emailCursor = null;
-                try {
-                    UserContact userContact = UserContact.parseFromCursor(cursor);
-                    emailCursor = ContactUtils.getEmailCursorForContactId(context, userContact.contactId);
-                    userContact.parseEmailsFromCursor(emailCursor);
-                    contacts.add(userContact);
-                } catch (JSONException e) {
-                    Log.w(LOG_TAG, "failed to load contact", e);
-                    Crashlytics.getInstance().core.logException(e);
-                } finally {
-                    if (emailCursor != null) {
-                        emailCursor.close();
-                    }
-                }
-            }
-        } finally {
-            cursor.close();
         }
 
         // Upload contacts data.

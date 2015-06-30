@@ -15,15 +15,12 @@ import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.ImageUtils;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ContactView> {
     private final BaseActivity activity;
 
-    private UserContact[] contacts;
-    private Map<UserContact, List<String>> contactsToMobileNumbers;
-    private List<String> contactPhonesOnEh;
+    private List<UserContact> contacts;
+    private List<String> contactsOnEh;
 
     public ContactsAdapter(BaseActivity activity) {
         this.activity = activity;
@@ -37,24 +34,21 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
 
     @Override
     public void onBindViewHolder(ContactView holder, int position) {
-        UserContact contact = contacts[position];
-        holder.populate(contact, contactsToMobileNumbers.get(contact), activity, contactPhonesOnEh);
+        holder.populate(contacts.get(position), activity, contactsOnEh);
     }
 
     @Override
     public int getItemCount() {
-        return contacts == null ? 0 : contacts.length;
+        return contacts == null ? 0 : contacts.size();
     }
 
-    public void setContacts(Map<UserContact, List<String>> contactsToMobileNumbers) {
-        this.contactsToMobileNumbers = contactsToMobileNumbers;
-        contacts = new UserContact[contactsToMobileNumbers.size()];
-        contactsToMobileNumbers.keySet().toArray(contacts);
+    public void setContacts(List<UserContact> contacts) {
+        this.contacts = contacts;
         notifyDataSetChanged();
     }
 
     public void setContactsOnEh(List<String> contactsOnEh) {
-        contactPhonesOnEh = contactsOnEh;
+        this.contactsOnEh = contactsOnEh;
         notifyDataSetChanged();
     }
 
@@ -71,26 +65,19 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
             action = (TextView) itemView.findViewById(R.id.action);
         }
 
-        public void populate(UserContact contact, List<String> mobileNumbers, BaseActivity activity,
-                @Nullable List<String> contactPhonesOnEh) {
+        public void populate(UserContact contact, BaseActivity activity,
+                @Nullable List<String> contactsOnEh) {
             contactName.setText(contact.name);
             Bitmap bitmap = ContactUtils.getPhotoForPhone(activity, contact.mobileNo);
             if (bitmap != null) {
                 contactPhoto.setImageBitmap(ImageUtils.getCircularBitmapFrom(bitmap));
             }
 
-            if (contactPhonesOnEh == null) {
+            if (contactsOnEh == null) {
                 action.setVisibility(View.GONE);
             } else {
                 action.setVisibility(View.VISIBLE);
-                boolean userIsOnEh = false;
-                for (String mobileNo : mobileNumbers) {
-                    if (contactPhonesOnEh.contains(mobileNo)) {
-                        userIsOnEh = true;
-                        break;
-                    }
-                }
-                if (userIsOnEh) {
+                if (contactsOnEh.contains(contact.contactId)) {
                     action.setText(R.string.ui_follow);
                     action.setSelected(false);
                 } else {

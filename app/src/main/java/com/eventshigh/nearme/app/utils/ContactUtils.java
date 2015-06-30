@@ -1,34 +1,76 @@
 package com.eventshigh.nearme.app.utils;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.PhoneLookup;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.util.Log;
+
+import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.data.UserContact;
+
+import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ContactUtils {
-    public static Cursor getContactsCursor(Context context, @Nullable String selectionExtras, String order) {
+    private static final String LOG_TAG = ContactUtils.class.getSimpleName();
+
+    public static List<UserContact> getContacts(Context context, @Nullable String selectionExtras,
+            String order, boolean addEmail) {
         // Build contact query.
-        String[] projection = {
+        String[] projection = new String[] {
                 ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                 ContactsContract.CommonDataKinds.Phone.NUMBER,
         };
+
         if (selectionExtras == null) {
             selectionExtras = "";
         }
         String selection = ContactsContract.Contacts.HAS_PHONE_NUMBER + " = 1 " + selectionExtras;
 
         // Parse contacts data.
-        return context.getContentResolver().query(
+        Cursor cursor = context.getContentResolver().query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 projection, selection, null, order);
+
+        // Parse the contacts data.
+        List<UserContact> contacts = new ArrayList<>();
+        if (cursor == null) {
+            return contacts;
+        }
+
+        try {
+            while (cursor.moveToNext()) {
+                Cursor emailCursor = null;
+                try {
+                    UserContact userContact = UserContact.parseFromCursor(cursor);
+                    if (addEmail) {
+                        emailCursor = ContactUtils.getEmailCursorForContactId(context, userContact.contactId);
+                        userContact.parseEmailsFromCursor(emailCursor);
+                    }
+                    contacts.add(userContact);
+                } catch (JSONException e) {
+                    Log.w(LOG_TAG, "failed to load contact", e);
+                    Crashlytics.getInstance().core.logException(e);
+                } finally {
+                    if (emailCursor != null) {
+                        emailCursor.close();
+                    }
+                }
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return contacts;
     }
 
     public static Cursor getEmailCursorForContactId(Context context, String contactId) {
@@ -73,12 +115,12 @@ public class ContactUtils {
         return null;
     }
 
-    public static String getLocalPhotoForServerPhone(Context context, String phone) {
+    public static String getContactIdForServerPhone(Context context, String phone) {
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
                 Uri.encode(phone));
 
         // Build contact query.
-        String[] projection = { ContactsContract.PhoneLookup.NUMBER };
+        String[] projection = { PhoneLookup._ID };
 
         // Parse contacts data.
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
@@ -90,31 +132,9 @@ public class ContactUtils {
             if (!cursor.moveToNext()) {
                 return null;
             }
-            return cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.NUMBER));
+            return cursor.getString(cursor.getColumnIndex(PhoneLookup._ID));
         } finally {
             cursor.close();
         }
-    }
-
-    public static Bitmap getPhotoForContactId(Context context, String contactId) {
-        long contactIdLong = Long.parseLong(contactId);
-        Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactIdLong);
-        Uri photoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
-        Cursor cursor = context.getContentResolver().query(photoUri,
-                new String[] {ContactsContract.Contacts.Photo.PHOTO}, null, null, null);
-        if (cursor == null) {
-            return null;
-        }
-        try {
-            if (cursor.moveToFirst()) {
-                byte[] bitmapData = cursor.getBlob(0);
-                if (bitmapData != null) {
-                    return BitmapFactory.decodeByteArray(bitmapData, 0, bitmapData.length);
-                }
-            }
-        } finally {
-            cursor.close();
-        }
-        return null;
     }
 }

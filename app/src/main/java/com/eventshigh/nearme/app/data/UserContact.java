@@ -61,10 +61,10 @@ public class UserContact {
     public static UserContact parseFromCursor(Cursor cursor) throws JSONException {
         String contactId = cursor.getString(
                 cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
-        String phoneNumber = cursor.getString(
-                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
         String name = cursor.getString(
                 cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+        String phoneNumber = cursor.getString(
+                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
         return new UserContact(contactId, phoneNumber, name, null);
     }
 
@@ -78,10 +78,7 @@ public class UserContact {
             return false;
         }
         UserContact contact = (UserContact) object;
-        if (contact.contactId == null) {
-            return false;
-        }
-        return contactId.equals(contact.contactId);
+        return contact.contactId != null && contactId.equals(contact.contactId);
     }
 
     @Override

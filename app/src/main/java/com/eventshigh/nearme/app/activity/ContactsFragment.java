@@ -14,6 +14,7 @@ import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -29,7 +30,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * UI to show the user's friends. We read the user phone contacts and match it
@@ -55,9 +55,9 @@ public class ContactsFragment extends Fragment implements Response.Listener<JSON
 
         new ContactsLoaderTask(activity, new ContactsLoaderTask.ContactsCallback() {
             @Override
-            public void onContactLoad(@Nullable Map<UserContact, List<String>> contactsToMobileNumbers) {
-                if (isAdded() && contactsToMobileNumbers != null) {
-                    contactsAdapter.setContacts(contactsToMobileNumbers);
+            public void onContactLoad(List<UserContact> contacts) {
+                if (isAdded()) {
+                    contactsAdapter.setContacts(contacts);
                 }
             }
         }).execute();
@@ -68,7 +68,7 @@ public class ContactsFragment extends Fragment implements Response.Listener<JSON
                     Request.Method.GET, Signer.sign(requestUrl).toString(), null, this, errorListener)
             );
         } catch (IOException | GeneralSecurityException e) {
-            e.printStackTrace();
+            Crashlytics.getInstance().core.logException(e);
         }
 
         return view;

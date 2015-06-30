@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 
 import org.json.JSONArray;
@@ -38,11 +39,11 @@ public class ContactPhoneResolverTask extends AsyncTask<JSONObject, Void, List<S
             List<String> contactOnEh = new ArrayList<>();
             for (int i = 0; i < friends.length(); i++) {
                 String mobileNo = friends.getJSONObject(i).getString("mobile_no");
-                contactOnEh.add(ContactUtils.getLocalPhotoForServerPhone(context, mobileNo));
+                contactOnEh.add(ContactUtils.getContactIdForServerPhone(context, mobileNo));
             }
             return contactOnEh;
         } catch (JSONException e) {
-            e.printStackTrace();
+            Crashlytics.getInstance().core.logException(e);
         }
         return null;
     }
