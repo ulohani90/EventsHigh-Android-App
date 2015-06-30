@@ -78,27 +78,6 @@
     <string name="ui_checking_in">Checking in</string>
     <string name="check_in_failed">Unable to check in. Please try again.</string>
 
-    <!-- Offer -->
-    <string name="ui_offer_expire">Oh no! Offer is expired already. Better luck next time!</string>
-    <string name="ui_offer_expired">Ended</string>
-    <string name="ui_offer_redeem_phone">Please register your phone number to redeem the offer!</string>
-    <string name="ui_invite_link_title">Your Invite Link (touch to copy)</string>
-    <string name="ui_invite_link_copy">Your invite link is copied to clipboard!</string>
-    <string name="ui_for_claim">Available</string>
-    <string name="ui_claimed">Claimed</string>
-    <string name="ui_total_referrer">Total Installed</string>
-    <string name="ui_invite_via">Invite Via</string>
-
-    <string name="action_invite_fb">Facebook</string>
-    <string name="action_invite_twitter">Twitter</string>
-    <string name="action_invite_email">Email</string>
-    <string name="action_invite_whatsapp">WhatsApp</string>
-
-    <string name="share_app_message">Invite your friends to join EventsHigh by sharing your invite link &amp; get exciting offers mentioned below!</string>
-    <string name="offer_email">[Please send this email to redeem the offer.]\n\nOffer: %1$s\nRegistered Phone Number: %2$s\nOffer Code:%3$s\n\n</string>
-    <string name="share_app_text">Hey! I liked this EventsHigh app and I think you will too. It has a lot of weekend activities to choose from. Check it out. %s</string>
-    <string name="offer_threshold_message">There should be %d installs and then you can claim this offer. For any queries, contact us at support@eventshigh.com.</string>
-
     <!-- Onbaording message -->
     <string name="onboarding_title_details">One Stop Shop</string>
     <string name="onboarding_title_favorites">Personlized Feed</string>
@@ -117,6 +96,7 @@
     <!-- Sharing -->
     <string name="action_share">Share</string>
     <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Sounds fun!\n\n%1$s\n\n%2$s</string>
+    <string name="share_app_text">Hey! I liked this EventsHigh app and I think you will too. It has a lot of weekend activities to choose from. Check it out. %s</string>
 
     <!-- Failed messages -->
     <string name="failed_load">Oops! Something\'s gone wrong. Let\'s try that again.</string>

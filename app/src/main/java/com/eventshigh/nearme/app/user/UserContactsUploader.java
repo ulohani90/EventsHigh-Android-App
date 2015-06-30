@@ -25,8 +25,8 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
     private static final String LOG_TAG = UserContactsUploader.class.getSimpleName();
     private static final int MAX_CONTACTS_TO_UPLOAD = 1000;
 
-    private static final String PARAM_LAST_CONTACTS_SYNC_TIMESTAMP = "last_contacts_sync_timestamp10";
-    private static final String PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP = "last_contacts_sync_try_timestamp10";
+    private static final String PARAM_LAST_CONTACTS_SYNC_TIMESTAMP = "last_contacts_sync_timestamp";
+    private static final String PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP = "last_contacts_sync_try_timestamp";
 
     private final Context context;
     private final SharedPreferences preferences;

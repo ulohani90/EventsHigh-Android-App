@@ -17,7 +17,10 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.network.MyContactsRequest;
 import com.eventshigh.nearme.app.network.MyContactsRequest.MyContacts;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.ui.AskForContactsDialog;
+import com.eventshigh.nearme.app.ui.AskForContactsDialog.ContactsRequestCallback;
 import com.eventshigh.nearme.app.ui.ContactsAdapter;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 /**
@@ -33,6 +36,8 @@ public class ContactsFragment extends Fragment {
     private View retryView;
 
     private ContactsAdapter contactsAdapter;
+
+    private boolean hasAskForContactsDialogShown = false;
 
     @Override
     public void onAttach(Activity activity) {
@@ -106,10 +111,16 @@ public class ContactsFragment extends Fragment {
         topProgressBar.setVisibility(View.VISIBLE);
         retryView.setVisibility(View.GONE);
         noMyEventsView.setVisibility(View.GONE);
-
         VolleyHelper.getRequestQueue(activity).cancelAll(this);
-        MyContactsRequest.submit(activity, Priority.IMMEDIATE, this, shouldBypassCache,
-                myContactsListener, errorListener);
+
+        Preferences preferences = Preferences.getInstance(activity);
+        if (preferences.shouldUploadContacts()) {
+            MyContactsRequest.submit(activity, Priority.IMMEDIATE, this, shouldBypassCache,
+                    myContactsListener, errorListener);
+        } else if (!hasAskForContactsDialogShown) {
+            hasAskForContactsDialogShown = true;
+            AskForContactsDialog.show(activity, preferences, contactsRequestCallback);
+        }
     }
 
     private Listener<MyContacts> myContactsListener = new Listener<MyContacts>() {
@@ -126,6 +137,19 @@ public class ContactsFragment extends Fragment {
             topProgressBar.setVisibility(View.GONE);
             retryView.setVisibility(View.VISIBLE);
             VolleyHelper.log(activity, volleyError);
+        }
+    };
+
+    private ContactsRequestCallback contactsRequestCallback  = new ContactsRequestCallback() {
+        @Override
+        public void onContactsUploadAccepted() {
+            MyContactsRequest.submit(activity, Priority.IMMEDIATE, this, false,
+                    myContactsListener, errorListener);
+        }
+
+        @Override
+        public void onContactsUploadRejected() {
+            activity.finish();
         }
     };
 }
