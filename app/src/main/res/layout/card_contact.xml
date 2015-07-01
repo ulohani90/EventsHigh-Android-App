@@ -1,60 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:descendantFocusability="blocksDescendants"
-    card_view:cardBackgroundColor="@android:color/white"
-    card_view:cardCornerRadius="2dp"
-    android:minHeight="48dp"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_gravity="center_vertical"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
     >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="8dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_gravity="center_vertical"
-        >
+    <ImageView
+        android:id="@+id/contact_photo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:src="@drawable/ic_launcher"
+        />
 
-        <ImageView
-            android:id="@+id/contact_photo"
-            android:layout_width="48dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_launcher"
-            />
+    <TextView
+        android:id="@+id/contact_name"
+        tools:text="Parag Sarda"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_weight="1"
+        />
 
-        <TextView
-            android:id="@+id/contact_name"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            tools:text="Parag Sarda"
-            />
+    <TextView
+        android:id="@+id/action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="14dp"
+        android:background="@drawable/eh_oval"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        android:text="@string/ui_follow"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        />
 
-        <TextView
-            android:id="@+id/action"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="14dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:background="@drawable/eh_oval"
-            android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:text="@string/ui_follow"
-            />
+</LinearLayout>
 
-    </LinearLayout>
-
-</android.support.v7.widget.CardView>

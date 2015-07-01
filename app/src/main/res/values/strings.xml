@@ -139,6 +139,7 @@
     <!-- Social -->
     <string name="title_my_friends">My Friends</string>
     <string name="social_invite">Invite</string>
+    <string name="invite_friends">Invite your friends to EventsHigh</string>
 
     <!-- Zendesk -->
     <string name="contact_fragment_description_hint">Enter your query</string>
