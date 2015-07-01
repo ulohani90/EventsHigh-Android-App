@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -34,6 +35,7 @@ public class ContactsFragment extends Fragment {
     private View topProgressBar;
     private View noMyEventsView;
     private View retryView;
+    private View inviteView;
 
     private ContactsAdapter contactsAdapter;
 
@@ -85,6 +87,7 @@ public class ContactsFragment extends Fragment {
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         noMyEventsView = view.findViewById(R.id.view_no_my_event);
         retryView = view.findViewById(R.id.view_retry);
+        inviteView = view.findViewById(R.id.invite_footer);
 
         // Setup the refresh on swipe down.
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
@@ -103,6 +106,15 @@ public class ContactsFragment extends Fragment {
             public void onClick(View v) {
                 activity.reportActionToAnalytics("retry");
                 refresh(false);
+            }
+        });
+
+        inviteView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                intent.setAction("com.eventshigh.share_app");
+                startActivity(intent);
             }
         });
     }
