@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,6 +42,8 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.EventRequest;
+import com.eventshigh.nearme.app.network.SocialActionsRequest;
+import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.ui.RateAppDialog;
@@ -53,6 +56,7 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
+import com.eventshigh.nearme.app.view.FollowedByView;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -471,7 +475,7 @@ public class EventDetailActivity extends BaseActivity {
         }
     }
 
-    private void populateView(Event event) {
+    private void populateView(final Event event) {
         this.event = event;
 
         // Report the Event View.
@@ -489,6 +493,23 @@ public class EventDetailActivity extends BaseActivity {
 
         // Connect to Google API client to notify the view.
         getGoogleApiClient();
+
+        // Show social data.
+        SocialActionsRequest.submit(this, Priority.LOW, this, false,
+                new Listener<SocialActions>() {
+                    @Override
+                    public void onResponse(SocialActions socialActions, boolean isIntermediate) {
+                        ((FollowedByView) findViewById(R.id.followed_by)).setFollowers(
+                            socialActions.eventFavourites.get(event.id), false, Gravity.START);
+                    }
+                },
+                new ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        VolleyHelper.log(EventDetailActivity.this, volleyError);
+                    }
+                }
+        );
     }
 
     private void setScroll(int scrollValue) {

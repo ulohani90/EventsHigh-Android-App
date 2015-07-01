@@ -144,20 +144,22 @@ public class EventsFragment extends BaseEventsFragment {
         }
 
         // Load social actions.
-        SocialActionsRequest.submit(activity, Priority.LOW, this, shouldBypassCache,
-            new Listener<SocialActions>() {
-                @Override
-                public void onResponse(SocialActions socialActions, boolean isIntermediate) {
-                    eventsAdapter.setSocialActions(socialActions);
-                }
-            },
-            new ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
-                    VolleyHelper.log(activity, volleyError);
-                }
-            }
-        );
+        if (showFollowCard) {
+            SocialActionsRequest.submit(activity, Priority.LOW, this, shouldBypassCache,
+                    new Listener<SocialActions>() {
+                        @Override
+                        public void onResponse(SocialActions socialActions, boolean isIntermediate) {
+                            eventsAdapter.setSocialActions(socialActions);
+                        }
+                    },
+                    new ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            VolleyHelper.log(activity, volleyError);
+                        }
+                    }
+            );
+        }
     }
 
     private Listener<List<TopicEvents>> mMyEventsFetcherCallBack = new Listener<List<TopicEvents>>() {

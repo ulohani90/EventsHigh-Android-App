@@ -7,10 +7,12 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -194,6 +196,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 activity.getLayoutInflater().inflate(R.layout.card_event_big, parent, false);
         new EventCard(view, true).bindEventView(event, false, -1, null, activity);
         return view;
+    }
+
+    public @Nullable Set<String> getFollowers(String tag) {
+        return socialActions == null ? null :
+                socialActions.tagFollowers.get(EventCategory.toCategoryParsableString(tag));
     }
 
     private enum DataType {
@@ -711,10 +718,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            ((FollowCard) card).populate(this, eventsFragment.getContextActivity(),
-                socialActions == null ? null :
-                    socialActions.tagFollowers.get(EventCategory.toCategoryParsableString(title))
-            );
+            ((FollowCard) card).populate(this, eventsFragment.getContextActivity(), getFollowers(title));
         }
 
         @Override
@@ -774,7 +778,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 }
             });
 
-            followedByView.setFollowers(followers);
+            followedByView.setFollowers(followers, true, Gravity.CENTER);
         }
 
         public void setFollowButtons(boolean isFollowing) {
@@ -799,7 +803,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, final int position) {
-            ((TrendingCategoryCard) card).populateTrendingCategoryData(this, eventsFragment);
+            ((TrendingCategoryCard) card).populateTrendingCategoryData(this, eventsFragment,
+                getFollowers(trendingTopic.tagName));
         }
 
         public String getId() {
@@ -821,8 +826,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, final int position) {
-            ((TrendingCategoryCard) card).populateExploreCategoryData(this, eventsFragment);
-
+            ((TrendingCategoryCard) card).populateExploreCategoryData(this, eventsFragment,
+                getFollowers(tag));
         }
 
         public String getId() {
@@ -849,6 +854,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static class TrendingCategoryCard extends ViewHolder {
         private NetworkImageView imageView;
         private TextView titleView;
+        private FollowedByView followedByView;
 
         static TrendingCategoryCard newInstance(final BaseActivity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(R.layout.card_explore, parent, false);
@@ -860,13 +866,20 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             imageView = (NetworkImageView) itemView.findViewById(R.id.image);
             titleView = (TextView) itemView.findViewById(R.id.title);
+            followedByView = (FollowedByView) itemView.findViewById(R.id.followed_by);
         }
 
         public void populateTrendingCategoryData(final TrendingCategoryData data,
-                                                 final BaseEventsFragment eventsFragment) {
+                final BaseEventsFragment eventsFragment, @Nullable Set<String> followers) {
             imageView.setImageUrl(data.trendingTopic.imgUrl,
                     VolleyHelper.getImageLoader(eventsFragment.getContextActivity()));
             titleView.setText(data.trendingTopic.tagName);
+            followedByView.setFollowers(followers, false, Gravity.START);
+
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) followedByView.getLayoutParams();
+            lp.gravity = Gravity.BOTTOM;
+            followedByView.setLayoutParams(lp);
+
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -885,9 +898,15 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public void populateExploreCategoryData(final ExploreCategoryData data,
-                                                final BaseEventsFragment eventsFragment) {
+                final BaseEventsFragment eventsFragment, @Nullable Set<String> followers) {
             imageView.setDefaultImageResId(data.getInfoGraphId());
             titleView.setVisibility(View.GONE);
+            followedByView.setFollowers(followers, false, Gravity.END);
+
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) followedByView.getLayoutParams();
+            lp.gravity = Gravity.TOP;
+            followedByView.setLayoutParams(lp);
+
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {

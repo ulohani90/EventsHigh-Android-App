@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,7 +22,7 @@ public class FollowedByView extends HorizontalScrollView {
         super(context, attrs);
     }
 
-    public void setFollowers(@Nullable Set<String> contactIds) {
+    public void setFollowers(@Nullable Set<String> contactIds, boolean addFollowedBy, int gravity) {
         removeAllViews();
         if (contactIds == null || contactIds.isEmpty()) {
             return;
@@ -31,12 +30,12 @@ public class FollowedByView extends HorizontalScrollView {
 
         LinearLayout container = new LinearLayout(getContext());
         container.setLayoutParams(
-                new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+                new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, gravity));
         addView(container);
 
         int size = Utils.dpToPx(getContext(), 24);
         for (String contactId : contactIds) {
-            new ContactPhotoLoaderTask(container, size).execute(contactId);
+            new ContactPhotoLoaderTask(container, size, addFollowedBy).execute(contactId);
         }
     }
 
@@ -44,12 +43,14 @@ public class FollowedByView extends HorizontalScrollView {
         private final WeakReference<LinearLayout> parentViewReference;
         private final Context context;
         private final int size;
+        private final boolean addFollowedBy;
 
-        public ContactPhotoLoaderTask(LinearLayout parentView, int size) {
+        public ContactPhotoLoaderTask(LinearLayout parentView, int size, boolean addFollowedBy) {
             this.parentViewReference = new WeakReference<>(parentView);
 
             this.context = parentView.getContext();
             this.size = size;
+            this.addFollowedBy = addFollowedBy;
         }
 
         @Override
@@ -61,7 +62,7 @@ public class FollowedByView extends HorizontalScrollView {
         protected void onPostExecute(@Nullable Bitmap bitmap) {
             LinearLayout parentView = parentViewReference.get();
             if (parentView != null && bitmap != null) {
-                if (parentView.getChildCount() == 0) {
+                if (addFollowedBy && parentView.getChildCount() == 0) {
                     TextView tv = new TextView(parentView.getContext());
                     tv.setText("Followed By: ");
                     parentView.addView(tv);
