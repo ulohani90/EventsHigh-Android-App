@@ -21,6 +21,8 @@ import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
+import com.eventshigh.nearme.app.network.SocialActionsRequest;
+import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
@@ -140,6 +142,22 @@ public class EventsFragment extends BaseEventsFragment {
             EventCollectionRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
         }
+
+        // Load social actions.
+        SocialActionsRequest.submit(activity, Priority.LOW, this, shouldBypassCache,
+            new Listener<SocialActions>() {
+                @Override
+                public void onResponse(SocialActions socialActions, boolean isIntermediate) {
+                    eventsAdapter.setSocialActions(socialActions);
+                }
+            },
+            new ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    VolleyHelper.log(activity, volleyError);
+                }
+            }
+        );
     }
 
     private Listener<List<TopicEvents>> mMyEventsFetcherCallBack = new Listener<List<TopicEvents>>() {

@@ -18,24 +18,23 @@ import java.lang.ref.WeakReference;
 import java.util.Set;
 
 public class FollowedByView extends HorizontalScrollView {
-    private LinearLayout container;
 
     public FollowedByView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-        container = new LinearLayout(context);
-        container.setLayoutParams(
-            new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-        addView(container);
     }
 
     public void setFollowers(@Nullable Set<String> contactIds) {
-        container.removeAllViews();
+        removeAllViews();
         if (contactIds == null || contactIds.isEmpty()) {
             return;
         }
 
-        int size = Utils.dpToPx(getContext(), 12);
+        LinearLayout container = new LinearLayout(getContext());
+        container.setLayoutParams(
+                new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        addView(container);
+
+        int size = Utils.dpToPx(getContext(), 24);
         for (String contactId : contactIds) {
             new ContactPhotoLoaderTask(container, size).execute(contactId);
         }
