@@ -23,7 +23,6 @@ import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
-import com.eventshigh.nearme.app.notification.NotificationUtils;
 import com.eventshigh.nearme.app.notification.EHNotification;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;

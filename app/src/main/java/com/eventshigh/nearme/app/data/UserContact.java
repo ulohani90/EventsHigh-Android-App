@@ -49,7 +49,12 @@ public class UserContact {
         }
     }
 
-    public void parseEmailsFromCursor(Cursor emailCursor) throws JSONException {
+    public void parseEmailsFromCursor(@Nullable Cursor emailCursor) throws JSONException {
+        if (emailCursor == null) {
+            emails = null;
+            return;
+        }
+
         emails = new String[emailCursor.getCount()];
         for (int i = 0; i < emails.length; i++) {
             emailCursor.moveToNext();

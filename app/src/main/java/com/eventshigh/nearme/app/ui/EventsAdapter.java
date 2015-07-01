@@ -30,12 +30,15 @@ import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
+import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
+import com.eventshigh.nearme.app.utils.FontUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.view.FollowedByView;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -53,12 +56,18 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
     private final Set<Integer> usedItemIds = new HashSet<>();
     private List<Data> dataToShow;
+    @Nullable private SocialActions socialActions;
 
     public EventsAdapter(BaseEventsFragment eventsFragment) {
         this.eventsFragment = eventsFragment;
 
         dataToShow = new ArrayList<>();
         setHasStableIds(true);
+    }
+
+    public void setSocialActions(@Nullable SocialActions socialActions) {
+        this.socialActions = socialActions;
+        notifyDataSetChanged();
     }
 
     public void setEvents(List<Event> events, @Nullable String categoryForSeeAll) {
@@ -299,7 +308,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private void bindHeaderView(final BaseEventsFragment eventsFragment, final HeaderData header) {
             titleView.setText(header.header);
-            titleView.setTypeface(BaseActivity.fontQuicksandBold);
+            FontUtils.setTypefaceQuicksandBold(titleView);
             if (header.numEvents <= 0) {
                 numEventsView.setVisibility(View.GONE);
             } else {
@@ -702,7 +711,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            ((FollowCard) card).populate(this, eventsFragment.getContextActivity());
+            ((FollowCard) card).populate(this, eventsFragment.getContextActivity(),
+                socialActions == null ? null :
+                    socialActions.tagFollowers.get(EventCategory.toCategoryParsableString(title))
+            );
         }
 
         @Override
@@ -716,6 +728,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private TextView subtitleView;
         private View followButton;
         private View followingButton;
+        private FollowedByView followedByView;
 
         static FollowCard newInstance(final BaseActivity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(R.layout.card_follow, parent, false);
@@ -729,9 +742,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             subtitleView = (TextView) itemView.findViewById(R.id.subtitle);
             followButton = itemView.findViewById(R.id.follow_button);
             followingButton = itemView.findViewById(R.id.following_button);
+            followedByView = (FollowedByView) itemView.findViewById(R.id.followed_by);
         }
 
-        public void populate(final FollowData data, final BaseContextActivity activity) {
+        public void populate(final FollowData data, final BaseContextActivity activity,
+                @Nullable Set<String> followers) {
             titleView.setText(data.title);
             subtitleView.setText(MessageFormat.format(
                     activity.getString(R.string.num_events), data.numFollowers, data.numEvents));
@@ -758,6 +773,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     setFollowButtons(false);
                 }
             });
+
+            followedByView.setFollowers(followers);
         }
 
         public void setFollowButtons(boolean isFollowing) {
