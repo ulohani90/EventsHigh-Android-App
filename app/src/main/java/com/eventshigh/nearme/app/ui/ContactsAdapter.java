@@ -1,12 +1,15 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.UserContact;
@@ -64,7 +67,10 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
             if (bitmap != null) {
                 contactPhoto.setImageBitmap(ImageUtils.getCircularBitmapFrom(bitmap));
             } else {
-                contactPhoto.setImageResource(R.drawable.ic_person_black_18dp);
+                int color = ColorGenerator.MATERIAL.getColor(contact.name);
+                TextDrawable drawable = TextDrawable.builder().buildRoundRect(
+                        "" + contact.name.charAt(0), color, contactPhoto.getLayoutParams().height);
+                contactPhoto.setImageDrawable(drawable);
             }
 
             action.setText(R.string.ui_follow);
