@@ -67,5 +67,5 @@
         android:background="@drawable/eh_button_cta"
         android:textColor="@android:color/white"
         android:text="@string/invite_friends"
-        />
+    />
 </LinearLayout>

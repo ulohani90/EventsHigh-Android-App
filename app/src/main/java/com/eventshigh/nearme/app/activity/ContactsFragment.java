@@ -35,7 +35,6 @@ public class ContactsFragment extends Fragment {
     private View topProgressBar;
     private View noMyEventsView;
     private View retryView;
-    private View inviteView;
 
     private ContactsAdapter contactsAdapter;
 
@@ -87,7 +86,7 @@ public class ContactsFragment extends Fragment {
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         noMyEventsView = view.findViewById(R.id.view_no_my_event);
         retryView = view.findViewById(R.id.view_retry);
-        inviteView = view.findViewById(R.id.invite_footer);
+        View inviteView = view.findViewById(R.id.invite_footer);
 
         // Setup the refresh on swipe down.
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
@@ -119,7 +118,7 @@ public class ContactsFragment extends Fragment {
         });
     }
 
-    protected void refresh(boolean shouldBypassCache) {
+    private void refresh(boolean shouldBypassCache) {
         topProgressBar.setVisibility(View.VISIBLE);
         retryView.setVisibility(View.GONE);
         noMyEventsView.setVisibility(View.GONE);
