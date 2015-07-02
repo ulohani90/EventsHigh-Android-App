@@ -16,10 +16,12 @@ import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.FriendsStore;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.TicketNotificationStreamItem;
 import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
@@ -97,6 +99,15 @@ public class GcmIntentService extends IntentService {
             return null;
         }
 
+        String mobileNo = Utils.checkIfUnknown(msg.getString("mobile"));
+        if (mobileNo != null) {
+            String contactId = ContactUtils.getContactIdForServerPhone(this, mobileNo);
+            if (!(new FriendsStore(this)).isFollowing(contactId)) {
+                // Don't show notification if the user is not following this friend
+                return null;
+            }
+        }
+
         String eventId = Utils.checkIfUnknown(msg.getString("id"));
         String query = Utils.checkIfUnknown(msg.getString("q"));
         String contestUrl = Utils.checkIfUnknown(msg.getString("contest"));
@@ -104,7 +115,7 @@ public class GcmIntentService extends IntentService {
         String ticket = Utils.checkIfUnknown(msg.getString("ticket"));
         String target = Utils.checkIfUnknown(msg.getString("target"));
         String priority = Utils.checkIfUnknown(msg.getString("priority"));
-        String mobileNo = Utils.checkIfUnknown(msg.getString("mobile"));
+
 
         if (eventId == null && query == null && contestUrl == null && ticket == null && target == null) {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");

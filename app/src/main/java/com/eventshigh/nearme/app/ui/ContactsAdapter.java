@@ -11,6 +11,7 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.data.FriendsStore;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.MyContactsRequest.MyContacts;
 import com.eventshigh.nearme.app.utils.ContactUtils;
@@ -18,11 +19,13 @@ import com.eventshigh.nearme.app.utils.ImageUtils;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ContactView> {
     private final BaseActivity activity;
+    private final FriendsStore friendsStore;
 
     private MyContacts myContacts;
 
     public ContactsAdapter(BaseActivity activity) {
         this.activity = activity;
+        this.friendsStore = new FriendsStore(activity);
     }
 
     @Override
@@ -46,7 +49,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
         notifyDataSetChanged();
     }
 
-    public static class ContactView extends RecyclerView.ViewHolder {
+    public class ContactView extends RecyclerView.ViewHolder {
         private final TextView contactName;
         private final ImageView contactPhoto;
         private final TextView action;
@@ -57,6 +60,24 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
             contactName = (TextView) itemView.findViewById(R.id.contact_name);
             contactPhoto = (ImageView) itemView.findViewById(R.id.contact_photo);
             action = (TextView) itemView.findViewById(R.id.action);
+
+            action.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    friendsStore.setFollowing((String) action.getTag(), !action.isSelected());
+                    updateActionButton();
+                }
+            });
+        }
+
+        private void updateActionButton() {
+            if (friendsStore.isFollowing((String) action.getTag())) {
+                action.setText(R.string.ui_following);
+                action.setSelected(true);
+            } else {
+                action.setText(R.string.ui_follow);
+                action.setSelected(false);
+            }
         }
 
         public void populate(UserContact contact, BaseActivity activity) {
@@ -72,8 +93,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
                 contactPhoto.setImageDrawable(drawable);
             }
 
-            action.setText(R.string.ui_follow);
-            action.setSelected(false);
+            action.setTag(contact.contactId);
+            updateActionButton();
         }
     }
 }
