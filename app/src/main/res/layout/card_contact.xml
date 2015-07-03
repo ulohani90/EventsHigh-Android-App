@@ -23,6 +23,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:layout_weight="1"
+        android:textColor="@color/primary_text_default_material_light"
         tools:text="Parag Sarda"
     />
 
@@ -36,7 +37,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="8dp"
-        android:text="@string/ui_follow"
+        android:text="@string/ui_following"
         android:textColor="@android:color/white"
         android:textSize="12sp"
         android:textStyle="bold"
