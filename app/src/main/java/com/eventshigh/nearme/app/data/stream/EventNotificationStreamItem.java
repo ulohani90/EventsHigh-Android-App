@@ -22,9 +22,9 @@ public class EventNotificationStreamItem extends StreamItem {
 
     // Record event notification as stream item.
     public static void record(Context context, String title, String message,
-              @Nullable String imgUrl, String id, City city) {
+              @Nullable String imgUrl, @Nullable String contactId, String id, City city) {
         EventNotificationStreamItem streamItem = new EventNotificationStreamItem(
-                System.currentTimeMillis(), title, message, imgUrl, id, city);
+                System.currentTimeMillis(), title, message, imgUrl, contactId, id, city);
         try {
             StreamDbHelper.addStreamToDB(context, streamItem);
         } catch (JSONException e) {
@@ -33,8 +33,8 @@ public class EventNotificationStreamItem extends StreamItem {
     }
 
     public EventNotificationStreamItem(long timestamp, String title, String message,
-              @Nullable String imgUrl, String eventId, City city) {
-        super(timestamp, title, message, imgUrl);
+              @Nullable String imgUrl, @Nullable String contactId, String eventId, City city) {
+        super(timestamp, title, message, imgUrl, contactId);
 
         this.eventId = eventId;
         this.city = city;

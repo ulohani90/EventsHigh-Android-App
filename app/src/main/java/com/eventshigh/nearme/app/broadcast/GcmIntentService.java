@@ -17,15 +17,16 @@ import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.FriendsStore;
+import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.TicketNotificationStreamItem;
+import com.eventshigh.nearme.app.notification.EHNotification;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
-import com.eventshigh.nearme.app.notification.EHNotification;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.common.ConnectionResult;
@@ -99,15 +100,6 @@ public class GcmIntentService extends IntentService {
             return null;
         }
 
-        String mobileNo = Utils.checkIfUnknown(msg.getString("mobile"));
-        if (mobileNo != null) {
-            String contactId = ContactUtils.getContactIdForServerPhone(this, mobileNo);
-            if (!(new FriendsStore(this)).isFollowing(contactId)) {
-                // Don't show notification if the user is not following this friend
-                return null;
-            }
-        }
-
         String eventId = Utils.checkIfUnknown(msg.getString("id"));
         String query = Utils.checkIfUnknown(msg.getString("q"));
         String contestUrl = Utils.checkIfUnknown(msg.getString("contest"));
@@ -115,7 +107,24 @@ public class GcmIntentService extends IntentService {
         String ticket = Utils.checkIfUnknown(msg.getString("ticket"));
         String target = Utils.checkIfUnknown(msg.getString("target"));
         String priority = Utils.checkIfUnknown(msg.getString("priority"));
+        String mobileNo = Utils.checkIfUnknown(msg.getString("mobile"));
 
+        UserContact contact = null;
+        if (mobileNo != null) {
+            contact = ContactUtils.getContactForServerPhone(this, mobileNo);
+        }
+
+        String contactId = null;
+        if (contact != null) {
+            if (!(new FriendsStore(this)).isFollowing(contact.contactId)) {
+                // Don't show notification if the user is not following this friend
+                return null;
+            }
+
+            title = title.replace("Your friend", contact.name);
+            message = message.replace("Your friend", contact.name);
+            contactId = contact.contactId;
+        }
 
         if (eventId == null && query == null && contestUrl == null && ticket == null && target == null) {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
@@ -140,14 +149,14 @@ public class GcmIntentService extends IntentService {
             GcmRegistration gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
             contentIntent = EHNotification.createPendingIntent(this, eventId,
                     gcmRegistration.getLastCity());
-            EventNotificationStreamItem.record(this, title, message, imageUrl, eventId,
+            EventNotificationStreamItem.record(this, title, message, imageUrl, contactId, eventId,
                     gcmRegistration.getLastCity());
         } else if (query != null) {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + query);
             intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, query));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
-            QueryNotificationStreamItem.record(this, title, message, imageUrl, query);
+            QueryNotificationStreamItem.record(this, title, message, imageUrl, contactId, query);
         } else if (ticket != null) {
             ZendeskUtils.initZendesk(this);
             Intent intent = new Intent(this, FeedbackActivity.class);

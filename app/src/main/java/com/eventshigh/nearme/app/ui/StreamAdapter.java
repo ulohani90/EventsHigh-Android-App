@@ -36,7 +36,7 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
 
         streamItems = new ArrayList<>();
         streamItems.add(new QueryNotificationStreamItem(System.currentTimeMillis(),
-            "What's Happening Today", "Check out whats happending in city today", null, "today"));
+            "What's Happening Today", "Check out whats happending in city today", null, null, "today"));
     }
 
     public void setStreamItems(List<StreamItem> streamItems) {

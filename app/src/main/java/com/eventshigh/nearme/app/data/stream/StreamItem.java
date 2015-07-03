@@ -16,22 +16,26 @@ public abstract class StreamItem {
     private static final String TITLE_KEY = "title";
     private static final String MESSAGE_KEY = "message";
     private static final String IMG_URL_KEY = "img_url";
+    private static final String USER_CONTACT_ID_KEY = "contact_id";
 
     public final long timestamp;
     public final String title;
     public final String message;
     @Nullable public final String imgUrl;
+    @Nullable public final String contactId;
 
-    protected StreamItem(long timestamp, String title, String message, @Nullable String imgUrl) {
+    protected StreamItem(long timestamp, String title, String message, @Nullable String imgUrl,
+            @Nullable String contactId) {
         this.timestamp = timestamp;
         this.title = title;
         this.message = message;
         this.imgUrl = imgUrl;
+        this.contactId = contactId;
     }
 
     protected StreamItem(long timestamp, JSONObject json) throws JSONException {
         this(timestamp, json.getString(TITLE_KEY), json.getString(MESSAGE_KEY),
-                json.optString(IMG_URL_KEY, null));
+                json.optString(IMG_URL_KEY, null), json.optString(USER_CONTACT_ID_KEY, null));
     }
 
     public abstract StreamType getStreamType();
@@ -44,6 +48,9 @@ public abstract class StreamItem {
         jsonObject.put(MESSAGE_KEY, message);
         if (imgUrl != null) {
             jsonObject.put(IMG_URL_KEY, imgUrl);
+        }
+        if (contactId != null) {
+            jsonObject.put(USER_CONTACT_ID_KEY, contactId);
         }
 
         return jsonObject;

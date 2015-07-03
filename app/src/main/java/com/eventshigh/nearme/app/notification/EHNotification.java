@@ -65,7 +65,7 @@ public class EHNotification {
         contactPhoto = null;
 
         // Record notification in stream.
-        EventNotificationStreamItem.record(context, title, message, imageUrl, event.id,
+        EventNotificationStreamItem.record(context, title, message, imageUrl, null, event.id,
                 event.city);
     }
 
