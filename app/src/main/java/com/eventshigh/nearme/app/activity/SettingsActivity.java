@@ -8,7 +8,6 @@ import android.os.Bundle;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
-import com.eventshigh.nearme.app.user.Account;
 
 /**
  * A dummy activity used to handle the settings actions.
@@ -37,18 +36,6 @@ public class SettingsActivity extends BaseActivity {
                     // No activity to open url. ignore.
                     Crashlytics.getInstance().core.logException(e);
                 }
-            }
-
-            if (intent.getAction().equals("com.eventshigh.share_app")) {
-                reportActionToAnalytics("shareApp", EventDetailActivity.PACKAGE_NAME_WHATSAPP);
-
-                Intent shareIntent = new Intent();
-                shareIntent.setAction(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_TEXT,
-                        String.format(getString(R.string.share_app_text), new Account(this).getAppDownloadLink()));
-                shareIntent.setType("text/plain");
-                shareIntent.setPackage(EventDetailActivity.PACKAGE_NAME_WHATSAPP);
-                startActivity(shareIntent);
             }
         }
         finish();

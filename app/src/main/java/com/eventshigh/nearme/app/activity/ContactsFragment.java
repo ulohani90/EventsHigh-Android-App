@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -111,9 +110,7 @@ public class ContactsFragment extends Fragment {
         inviteView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), SettingsActivity.class);
-                intent.setAction("com.eventshigh.share_app");
-                startActivity(intent);
+                activity.shareApp();
             }
         });
     }

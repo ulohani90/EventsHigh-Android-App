@@ -24,13 +24,6 @@
             android:data="market://details?id=com.eventshigh.nearme.app"
         />
     </Preference>
-    <Preference android:title="@string/pref_title_share_app">
-        <intent
-            android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.SettingsActivity"
-            android:action="com.eventshigh.share_app"
-        />
-    </Preference>
     <Preference android:title="@string/pref_title_delete_query_history">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"

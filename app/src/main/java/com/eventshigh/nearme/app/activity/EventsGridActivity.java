@@ -1,7 +1,5 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,7 +10,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.View;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
@@ -43,20 +40,7 @@ public class EventsGridActivity extends BaseEventsActivity {
         fabShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                reportActionToAnalytics("shareEvents", eventsContext.getLabel());
-
-                String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
-                        .appendQueryParameter("src", "ehm").toString();
-                try {
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + uri);
-                    sendIntent.setType("text/plain");
-                    startActivity(sendIntent);
-                } catch (ActivityNotFoundException e) {
-                    Crashlytics.getInstance().core.logException(e);
-                    showMessage(R.string.failed_share);
-                }
+                shareEvents(eventsContext);
             }
         });
 
