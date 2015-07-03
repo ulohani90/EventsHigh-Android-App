@@ -11,7 +11,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.TrendingTopic;
@@ -110,7 +109,7 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
             JSONObject eventsJson = new JSONObject(jsonString);
             List<TrendingTopic> trendingTopics = new ArrayList<>();
             JSONArray trendingTopicsJSON = eventsJson.optJSONArray("trending_topics");
-            if (eventsContext.city == City.BANGALORE && trendingTopicsJSON != null) {
+            if (trendingTopicsJSON != null) {
                 for (int i = 0; i < trendingTopicsJSON.length(); i++) {
                     TrendingTopic trendingTopic = TrendingTopic.parse(trendingTopicsJSON.optJSONObject(i));
                     if (trendingTopic != null) {
