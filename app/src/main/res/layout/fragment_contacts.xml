@@ -19,11 +19,10 @@
     />
 
     <include
-        android:id="@+id/view_no_my_event"
-        layout="@layout/view_no_my_event"
+        android:id="@+id/view_no_friends_on_eh"
+        layout="@layout/view_no_friends_on_eh"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1000"
+        android:layout_height="match_parent"
         android:visibility="gone"
     />
 
@@ -31,8 +30,7 @@
         android:id="@+id/view_retry"
         layout="@layout/view_retry"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1000"
+        android:layout_height="match_parent"
         android:visibility="gone"
     />
 

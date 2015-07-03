@@ -35,6 +35,7 @@ public class ContactsFragment extends Fragment {
     private View topProgressBar;
     private View noMyEventsView;
     private View retryView;
+    private AutofitRecyclerView gridView;
 
     private ContactsAdapter contactsAdapter;
 
@@ -78,15 +79,16 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         // Setup the events adapter to show data.
-        AutofitRecyclerView gridView = (AutofitRecyclerView) view.findViewById(R.id.grid);
+        gridView = (AutofitRecyclerView) view.findViewById(R.id.grid);
         contactsAdapter = new ContactsAdapter(activity);
         gridView.setAdapter(contactsAdapter);
 
         // More views.
         topProgressBar = view.findViewById(R.id.top_progress_bar);
-        noMyEventsView = view.findViewById(R.id.view_no_my_event);
+        noMyEventsView = view.findViewById(R.id.view_no_friends_on_eh);
         retryView = view.findViewById(R.id.view_retry);
-        View inviteView = view.findViewById(R.id.invite_footer);
+        View inviteFooterView = view.findViewById(R.id.invite_footer);
+        View inviteButtonView = view.findViewById(R.id.invite_button);
 
         // Setup the refresh on swipe down.
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
@@ -108,14 +110,16 @@ public class ContactsFragment extends Fragment {
             }
         });
 
-        inviteView.setOnClickListener(new OnClickListener() {
+        OnClickListener inviteClickHandler = new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), SettingsActivity.class);
                 intent.setAction("com.eventshigh.share_app");
                 startActivity(intent);
             }
-        });
+        };
+        inviteFooterView.setOnClickListener(inviteClickHandler);
+        inviteButtonView.setOnClickListener(inviteClickHandler);
     }
 
     private void refresh(boolean shouldBypassCache) {
@@ -141,6 +145,15 @@ public class ContactsFragment extends Fragment {
             if (!isIntermediate && myContacts.isEmpty()) {
                 errorListener.onErrorResponse(new VolleyError("failed contacts"));
             } else {
+                if (myContacts.isFriendsOnEhEmpty()) {
+                    noMyEventsView.setVisibility(View.VISIBLE);
+                    gridView.setVisibility(View.GONE);
+                    retryView.setVisibility(View.GONE);
+                } else {
+                    noMyEventsView.setVisibility(View.GONE);
+                    gridView.setVisibility(View.VISIBLE);
+                    retryView.setVisibility(View.GONE);
+                }
                 contactsAdapter.setMyContacts(myContacts);
             }
         }
@@ -151,6 +164,7 @@ public class ContactsFragment extends Fragment {
         public void onErrorResponse(VolleyError volleyError) {
             topProgressBar.setVisibility(View.GONE);
             retryView.setVisibility(View.VISIBLE);
+            noMyEventsView.setVisibility(View.GONE);
             VolleyHelper.log(activity, volleyError);
         }
     };

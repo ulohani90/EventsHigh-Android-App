@@ -44,6 +44,10 @@ public class MyContactsRequest extends JsonRequest<MyContacts> {
         public boolean isEmpty() {
             return EHContacts.isEmpty() && otherContacts.isEmpty();
         }
+
+        public boolean isFriendsOnEhEmpty() {
+            return EHContacts.isEmpty();
+        }
     }
 
     public static void submit(Context context, Priority priority, Object tag, boolean shouldBypassCache,
