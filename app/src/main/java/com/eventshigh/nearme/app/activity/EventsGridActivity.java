@@ -59,12 +59,8 @@ public class EventsGridActivity extends BaseEventsActivity {
             updateToolbar(0);
             setTitle();
         }
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
+        // Add Events Fragment.
         Fragment eventFragment;
         if (!eventsContext.query.isEmpty()) {
             EventsFragment eventFragment1 = EventsFragment.getInstance(

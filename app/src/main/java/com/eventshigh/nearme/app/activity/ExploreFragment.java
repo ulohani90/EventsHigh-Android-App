@@ -99,6 +99,7 @@ public class ExploreFragment extends BaseEventsFragment {
 
     @Override
     protected void refresh() {
+        VolleyHelper.getRequestQueue(activity).cancelAll(this);
         FeaturedEventsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                 false, mFetcherCallBack, mErrorListener);
 

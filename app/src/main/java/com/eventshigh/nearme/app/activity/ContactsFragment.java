@@ -43,7 +43,9 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
         this.activity = (BaseActivity) activity;
+        lastRefreshTimestamp = 0;
     }
 
     @Override
@@ -57,17 +59,14 @@ public class ContactsFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        if (lastRefreshTimestamp < System.currentTimeMillis() - BaseEventsFragment.DEFAULT_REFRESH_INTERVAL) {
-            refresh(false);
-            lastRefreshTimestamp = System.currentTimeMillis();
-        }
+        refreshIfneeded();
     }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        refresh(false);
+        refreshIfneeded();
     }
 
     @Override
@@ -105,6 +104,14 @@ public class ContactsFragment extends Fragment {
                 refresh(false);
             }
         });
+    }
+
+    private void refreshIfneeded() {
+        if (lastRefreshTimestamp <
+                System.currentTimeMillis() - BaseEventsFragment.DEFAULT_REFRESH_INTERVAL) {
+            refresh(false);
+            lastRefreshTimestamp = System.currentTimeMillis();
+        }
     }
 
     private void refresh(boolean shouldBypassCache) {
