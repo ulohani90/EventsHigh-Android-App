@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -17,7 +16,6 @@ import com.eventshigh.nearme.app.data.UserContact;
 
 import org.json.JSONException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,38 +81,6 @@ public class ContactUtils {
         return context.getContentResolver().query(
                 ContactsContract.CommonDataKinds.Email.CONTENT_URI,
                 projection, selection, null, null);
-    }
-
-    public static @Nullable Bitmap getPhotoForPhone(Context context, String phone) {
-        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
-                Uri.encode(phone));
-
-        // Build contact query.
-        String[] projection = { ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI };
-
-        // Parse contacts data.
-        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
-        if (cursor == null) {
-            return null;
-        }
-
-        try {
-            if (!cursor.moveToNext()) {
-                return null;
-            }
-            String contactPhotoUri = cursor.getString(cursor.getColumnIndex(
-                    ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI));
-            if (contactPhotoUri == null) {
-                return null;
-            }
-            return MediaStore.Images.Media.getBitmap(context.getContentResolver(),
-                    Uri.parse(contactPhotoUri));
-        } catch (IOException e) {
-            Crashlytics.getInstance().core.logException(e);
-        } finally {
-            cursor.close();
-        }
-        return null;
     }
 
     public static @Nullable Bitmap getPhotoForContactId(Context context, String contactId, int size) {

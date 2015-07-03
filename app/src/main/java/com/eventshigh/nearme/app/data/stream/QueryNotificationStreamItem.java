@@ -16,9 +16,9 @@ public class QueryNotificationStreamItem extends StreamItem {
 
     // Record event notification as stream item.
     public static void record(Context context, String title, String message,
-            @Nullable String imgUrl, @Nullable String contactId, String query) {
+            @Nullable String imgUrl, @Nullable String mobileNo, String query) {
         QueryNotificationStreamItem streamItem = new QueryNotificationStreamItem(
-                System.currentTimeMillis(), title, message, imgUrl, contactId, query);
+                System.currentTimeMillis(), title, message, imgUrl, mobileNo, query);
         try {
             StreamDbHelper.addStreamToDB(context, streamItem);
         } catch (JSONException e) {
@@ -27,8 +27,8 @@ public class QueryNotificationStreamItem extends StreamItem {
     }
 
     public QueryNotificationStreamItem(long timestamp, String title, String message,
-            @Nullable String imgUrl, @Nullable String contactId, String query) {
-        super(timestamp, title, message, imgUrl, contactId);
+            @Nullable String imgUrl, @Nullable String mobileNo, String query) {
+        super(timestamp, title, message, imgUrl, mobileNo);
 
         this.query = query;
     }

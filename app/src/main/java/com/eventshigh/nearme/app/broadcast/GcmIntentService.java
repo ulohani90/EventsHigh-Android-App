@@ -114,7 +114,6 @@ public class GcmIntentService extends IntentService {
             contact = ContactUtils.getContactForServerPhone(this, mobileNo);
         }
 
-        String contactId = null;
         if (contact != null) {
             if (!(new FriendsStore(this)).isFollowing(contact.contactId)) {
                 // Don't show notification if the user is not following this friend
@@ -123,7 +122,6 @@ public class GcmIntentService extends IntentService {
 
             title = title.replace("Your friend", contact.name);
             message = message.replace("Your friend", contact.name);
-            contactId = contact.contactId;
         }
 
         if (eventId == null && query == null && contestUrl == null && ticket == null && target == null) {
@@ -149,14 +147,14 @@ public class GcmIntentService extends IntentService {
             GcmRegistration gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
             contentIntent = EHNotification.createPendingIntent(this, eventId,
                     gcmRegistration.getLastCity());
-            EventNotificationStreamItem.record(this, title, message, imageUrl, contactId, eventId,
+            EventNotificationStreamItem.record(this, title, message, imageUrl, mobileNo, eventId,
                     gcmRegistration.getLastCity());
         } else if (query != null) {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + query);
             intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, query));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
-            QueryNotificationStreamItem.record(this, title, message, imageUrl, contactId, query);
+            QueryNotificationStreamItem.record(this, title, message, imageUrl, mobileNo, query);
         } else if (ticket != null) {
             ZendeskUtils.initZendesk(this);
             Intent intent = new Intent(this, FeedbackActivity.class);
@@ -190,7 +188,7 @@ public class GcmIntentService extends IntentService {
         EHNotification EHNotification =  new EHNotification(this, alarmIntent, title, message,
                 imageUrl, contentIntent,
                 priority == null ? Notification.PRIORITY_LOW : Notification.PRIORITY_HIGH,
-                mobileNo
+                contact
         );
         return new ParsedBundle(EHNotification, bounded ? new LatLng(lat, lon) : null, distance);
     }
