@@ -1,8 +1,18 @@
 package com.eventshigh.nearme.app.data;
 
+import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.eventshigh.nearme.app.utils.ContactUtils;
+import com.eventshigh.nearme.app.utils.ImageUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,17 +21,37 @@ import org.json.JSONObject;
 /**
  * Represents the user contact.
  */
-public class UserContact {
+public class UserContact implements Comparable<UserContact> {
     public final String contactId;
     public final String mobileNo;
-    @Nullable public final String name;
+    public final String name;
     @Nullable public String[] emails;
 
-    public UserContact(String contactId, String mobileNo, @Nullable String name, @Nullable String[] emails) {
+    public static UserContact parseFromCursor(Cursor cursor) throws JSONException {
+        String contactId = cursor.getString(
+                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+        String name = cursor.getString(
+                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+        String phoneNumber = cursor.getString(
+                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+        return new UserContact(contactId, phoneNumber, name, null);
+    }
+
+    public UserContact(String contactId, String mobileNo, String name, @Nullable String[] emails) {
         this.contactId = contactId;
         this.mobileNo = mobileNo;
         this.name = name;
         this.emails = emails;
+    }
+
+    public Drawable getDrawable(Context context, int size) {
+        Bitmap bitmap = ContactUtils.getPhotoForContactId(context, contactId, size);
+        if (bitmap != null) {
+            return new BitmapDrawable(context.getResources(), ImageUtils.getCircularBitmapFrom(bitmap));
+        }
+
+        int color = ColorGenerator.MATERIAL.getColor(name);
+        return TextDrawable.builder().buildRoundRect(Character.toString(name.charAt(0)), color, size);
     }
 
     public JSONObject toJSON() throws JSONException {
@@ -63,34 +93,19 @@ public class UserContact {
         }
     }
 
-    public static UserContact parseFromCursor(Cursor cursor) throws JSONException {
-        String contactId = cursor.getString(
-                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
-        String name = cursor.getString(
-                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-        String phoneNumber = cursor.getString(
-                cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-        return new UserContact(contactId, phoneNumber, name, null);
-    }
-
     @Override
     public boolean equals(Object object) {
-        if (contactId == null) {
-            return super.equals(object);
-        }
-
-        if (object == null || !(object instanceof UserContact)) {
-            return false;
-        }
-        UserContact contact = (UserContact) object;
-        return contact.contactId != null && contactId.equals(contact.contactId);
+        return object != null && object instanceof UserContact &&
+                contactId.equals(((UserContact) object).contactId);
     }
 
     @Override
     public int hashCode() {
-        if (contactId == null) {
-            return super.hashCode();
-        }
         return contactId.hashCode();
+    }
+
+    @Override
+    public int compareTo(@NonNull UserContact another) {
+        return contactId.compareTo(another.contactId);
     }
 }

@@ -147,12 +147,12 @@ public class ContactUtils {
         return null;
     }
 
-    public static @Nullable String getContactIdForServerPhone(Context context, String phone) {
+    public static @Nullable UserContact getContactForServerPhone(Context context, String phone) {
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
                 Uri.encode(phone));
 
         // Build contact query.
-        String[] projection = { PhoneLookup._ID };
+        String[] projection = { PhoneLookup._ID, PhoneLookup.DISPLAY_NAME };
 
         // Parse contacts data.
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
@@ -164,7 +164,12 @@ public class ContactUtils {
             if (!cursor.moveToNext()) {
                 return null;
             }
-            return cursor.getString(cursor.getColumnIndex(PhoneLookup._ID));
+            return new UserContact(
+                    cursor.getString(cursor.getColumnIndex(PhoneLookup._ID)),
+                    phone,
+                    cursor.getString(cursor.getColumnIndex(PhoneLookup.DISPLAY_NAME)),
+                    null
+            );
         } finally {
             cursor.close();
         }

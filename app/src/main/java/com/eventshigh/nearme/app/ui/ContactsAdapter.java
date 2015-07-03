@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.ui;
 
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +12,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.MyContactsRequest.MyContacts;
-import com.eventshigh.nearme.app.utils.ContactUtils;
-import com.eventshigh.nearme.app.utils.ImageUtils;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ContactView> {
     private final BaseActivity activity;
@@ -61,17 +58,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
 
         public void populate(UserContact contact, BaseActivity activity) {
             contactName.setText(contact.name);
-
-            Bitmap bitmap = ContactUtils.getPhotoForPhone(activity, contact.mobileNo);
-            if (bitmap != null) {
-                contactPhoto.setImageBitmap(ImageUtils.getCircularBitmapFrom(bitmap));
-            } else {
-                int color = ColorGenerator.MATERIAL.getColor(contact.name);
-                TextDrawable drawable = TextDrawable.builder().buildRoundRect(
-                        "" + contact.name.charAt(0), color, contactPhoto.getLayoutParams().height);
-                contactPhoto.setImageDrawable(drawable);
-            }
-
+            contactPhoto.setImageDrawable(
+                    contact.getDrawable(activity, contactPhoto.getLayoutParams().height));
             action.setText(R.string.ui_follow);
             action.setSelected(false);
         }

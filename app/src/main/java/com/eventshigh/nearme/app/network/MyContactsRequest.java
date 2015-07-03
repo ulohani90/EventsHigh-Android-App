@@ -17,7 +17,6 @@ import com.eventshigh.nearme.app.network.MyContactsRequest.MyContacts;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.ContactUtils;
-import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class MyContactsRequest extends JsonRequest<MyContacts> {
     public static class MyContacts {
@@ -85,10 +84,10 @@ public class MyContactsRequest extends JsonRequest<MyContacts> {
             String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
             JSONObject resp = new JSONObject(jsonString);
             JSONArray friends = resp.getJSONArray("friends");
-            List<String> contactOnEh = new ArrayList<>();
+            Set<UserContact> contactOnEh = new HashSet<>();
             for (int i = 0; i < friends.length(); i++) {
                 String mobileNo = friends.getJSONObject(i).getString("mobile_no");
-                contactOnEh.add(ContactUtils.getContactIdForServerPhone(context, mobileNo));
+                contactOnEh.add(ContactUtils.getContactForServerPhone(context, mobileNo));
             }
 
             // Read the local contacts and remove duplicates.
@@ -96,14 +95,6 @@ public class MyContactsRequest extends JsonRequest<MyContacts> {
             contacts.addAll(ContactUtils.getContacts(context, null, null, false));
             List<UserContact> uniqueContacts = new ArrayList<>(contacts.size());
             uniqueContacts.addAll(contacts);
-
-            // Remove the ones without any name.
-            Iterator<UserContact> contactIterator = uniqueContacts.iterator();
-            while ((contactIterator.hasNext())) {
-                if (Utils.checkIfUnknown(contactIterator.next().name) == null) {
-                    contactIterator.remove();
-                }
-            }
 
             // Sort by Name.
             Collections.sort(uniqueContacts, new Comparator<UserContact>() {
@@ -121,7 +112,7 @@ public class MyContactsRequest extends JsonRequest<MyContacts> {
             List<UserContact> otherContacts = new ArrayList<>(uniqueContacts.size());
 
             for (UserContact contact : uniqueContacts) {
-                if (contactOnEh.contains(contact.contactId)) {
+                if (contactOnEh.contains(contact)) {
                     EHContacts.add(contact);
                 } else {
                     otherContacts.add(contact);
