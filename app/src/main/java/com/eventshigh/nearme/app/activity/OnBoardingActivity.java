@@ -100,7 +100,7 @@ public class OnBoardingActivity extends BaseActivity {
         // Initialize the The view pager which shows the onboarding steps
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(mOnBoardingStepsAdapter);
-        viewPager.setOnPageChangeListener(mOnPageChangeListener);
+        viewPager.addOnPageChangeListener(mOnPageChangeListener);
 
         // Set action handler for skip and getting started button.
         findViewById(R.id.skip).setOnClickListener(new OnClickListener() {

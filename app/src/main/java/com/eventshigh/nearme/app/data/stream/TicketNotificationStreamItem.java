@@ -32,7 +32,7 @@ public class TicketNotificationStreamItem extends StreamItem {
 
     public TicketNotificationStreamItem(long timestamp, String title, String message,
                                        @Nullable String imgUrl, String ticket) {
-        super(timestamp, title, message, imgUrl);
+        super(timestamp, title, message, imgUrl, null);
 
         this.ticket = ticket;
     }

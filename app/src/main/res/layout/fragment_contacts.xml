@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:elevation="0dp"
-    tools:ignore="UnusedAttribute"
-    android:background="@android:color/white"
 >
     <ProgressBar
         android:id="@+id/top_progress_bar"
@@ -19,26 +15,18 @@
     />
 
     <include
-        android:id="@+id/view_no_friends_on_eh"
-        layout="@layout/view_no_friends_on_eh"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-    />
-
-    <include
         android:id="@+id/view_retry"
         layout="@layout/view_retry"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
+        android:layout_gravity="top"
     />
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
     >
         <com.eventshigh.nearme.app.view.AutofitRecyclerView
             android:id="@+id/grid"
@@ -56,14 +44,19 @@
         />
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <TextView
+    <include
+        android:id="@+id/view_no_friends_on_eh"
+        layout="@layout/view_no_friends_on_eh"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="16dp"
-        android:id="@+id/invite_footer"
-        android:background="@drawable/eh_button_cta"
-        android:textColor="@android:color/white"
-        android:text="@string/invite_friends"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        />
+
+    <include
+        android:id="@+id/view_retry"
+        layout="@layout/view_retry"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
     />
-</LinearLayout>
+</FrameLayout>

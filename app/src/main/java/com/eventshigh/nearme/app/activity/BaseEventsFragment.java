@@ -51,19 +51,22 @@ public abstract class BaseEventsFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        if (lastRefreshTimestamp < System.currentTimeMillis() - refreshInterval()) {
-            VolleyHelper.getRequestQueue(activity).cancelAll(this);
-            refresh();
-            lastRefreshTimestamp = System.currentTimeMillis();
-        }
+        refreshIfneeded();
     }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        VolleyHelper.getRequestQueue(activity).cancelAll(this);
         refresh();
+        lastRefreshTimestamp = System.currentTimeMillis();
+    }
+
+    protected void refreshIfneeded() {
+        if (lastRefreshTimestamp < System.currentTimeMillis() - refreshInterval()) {
+            refresh();
+            lastRefreshTimestamp = System.currentTimeMillis();
+        }
     }
 
     protected abstract void refresh();

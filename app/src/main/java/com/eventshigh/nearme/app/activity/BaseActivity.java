@@ -9,7 +9,6 @@ import android.provider.CalendarContract.Events;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -22,14 +21,17 @@ import com.android.volley.VolleyError;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
@@ -59,6 +61,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     // Check out the share event timings.
     protected long shareEventInitiatedTimestamp = 0;
+    protected long shareEventsInitiatedTimestamp = 0;
 
 
     // **********************************************
@@ -121,25 +124,28 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onResume();
         isRunning = true;
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.collapseActionView();
-        }
-
         // FB.
         AppEventsLogger.activateApp(this);
 
         // Find out share action result.
         if (shareEventInitiatedTimestamp > 0) {
             long secForShare = (System.currentTimeMillis() - shareEventInitiatedTimestamp) / 1000;
-            reportActionToAnalytics(secForShare > 5 ? "shareEvent" : "eventShareDismissed", Long.toString(secForShare));
+            reportActionToAnalytics(secForShare > 5 ? "shareEvent" : "eventShareDismissed",
+                    Long.toString(secForShare));
 
             Preferences preferences = Preferences.getInstance(this);
             if (secForShare > 5 && ! preferences.shouldUploadContacts()) {
                 AskForContactsDialog.show(this, preferences);
             }
         }
+        if (shareEventsInitiatedTimestamp > 0) {
+            long secForShare = (System.currentTimeMillis() - shareEventsInitiatedTimestamp) / 1000;
+            reportActionToAnalytics(secForShare > 5 ? "shareEvents" : "eventsShareDismissed",
+                    Long.toString(secForShare));
+        }
+
         shareEventInitiatedTimestamp = 0;
+        shareEventsInitiatedTimestamp = 0;
     }
 
     @Override
@@ -214,6 +220,18 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    public void shareApp() {
+        reportActionToAnalytics("shareApp", EventDetailActivity.PACKAGE_NAME_WHATSAPP);
+
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT,
+                String.format(getString(R.string.share_app_text), new Account(this).getAppDownloadLink()));
+        shareIntent.setType("text/plain");
+        shareIntent.setPackage(EventDetailActivity.PACKAGE_NAME_WHATSAPP);
+        startActivity(shareIntent);
+    }
+
     /**
      * Helper method to share an Event.
      */
@@ -272,6 +290,24 @@ public abstract class BaseActivity extends AppCompatActivity {
             Crashlytics.getInstance().core.logException(e);
             showMessage(R.string.failed_share);
             Log.w(LOG_TAG, "failed sharing", e);
+        }
+    }
+
+    public void shareEvents(EventsContext eventsContext) {
+        reportActionToAnalytics("eventShareInitiated", eventsContext.getLabel());
+        shareEventsInitiatedTimestamp = System.currentTimeMillis();
+
+        String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
+                .appendQueryParameter("src", "ehm").toString();
+        try {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + uri);
+            sendIntent.setType("text/plain");
+            startActivity(sendIntent);
+        } catch (ActivityNotFoundException e) {
+            Crashlytics.getInstance().core.logException(e);
+            showMessage(R.string.failed_share);
         }
     }
 

@@ -301,7 +301,6 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.setupWithViewPager(viewPager);
         tabsView.setScrollPosition(defaultTab, 0, true);
         tabsView.setOnTabSelectedListener(adapter);
-
     }
 
     private void showNextScreen() {

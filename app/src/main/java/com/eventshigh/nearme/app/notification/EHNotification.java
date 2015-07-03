@@ -19,6 +19,7 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.ContactUtils;
@@ -65,31 +66,27 @@ public class EHNotification {
         contactPhoto = null;
 
         // Record notification in stream.
-        EventNotificationStreamItem.record(context, title, message, imageUrl, event.id,
+        EventNotificationStreamItem.record(context, title, message, imageUrl, null, event.id,
                 event.city);
     }
 
     public EHNotification(Context context, Intent wakefulIntent, String title, String message,
-                          String imageUrl, PendingIntent launchIntent, int priority, String mobileNo) {
+            String imageUrl, PendingIntent launchIntent, int priority, @Nullable UserContact contact) {
         this.context = context;
         this.wakefulIntent = wakefulIntent;
-        this.notificationId = mobileNo == null ? NotificationUtils.GCM_NOTIFICATION_ID : mobileNo.hashCode();
+        this.notificationId = contact == null ?
+                NotificationUtils.GCM_NOTIFICATION_ID : contact.mobileNo.hashCode();
         this.priority = priority;
 
         this.title = title;
         this.message = message;
         this.imageUrl = imageUrl;
-
         this.launchIntent = launchIntent;
 
-        Bitmap contactPhoto = null;
-        if (mobileNo != null) {
-            contactPhoto = ContactUtils.getPhotoForPhone(context, mobileNo);
-            if (contactPhoto != null) {
-                contactPhoto = ImageUtils.getCircularBitmapFrom(contactPhoto);
-            }
-        }
-        this.contactPhoto = contactPhoto;
+        int size = Utils.dpToPx(context, 72);
+        this.contactPhoto = contact == null ? null :
+            ImageUtils.getCircularBitmapFrom(
+                    ContactUtils.getPhotoForContactId(context, contact.contactId, size));
     }
 
     public void showNotificationAndReleaseWakeLock() {

@@ -15,14 +15,16 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.MyContactsRequest;
-import com.eventshigh.nearme.app.network.MyContactsRequest.MyContacts;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog.ContactsRequestCallback;
 import com.eventshigh.nearme.app.ui.ContactsAdapter;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
+
+import java.util.List;
 
 /**
  * UI to show the user's friends. We read the user phone contacts and match it
@@ -33,8 +35,8 @@ public class ContactsFragment extends Fragment {
     private long lastRefreshTimestamp;
 
     private View topProgressBar;
-    private View noMyEventsView;
     private View retryView;
+    private View noFriendsOnEhView;
     private AutofitRecyclerView gridView;
 
     private ContactsAdapter contactsAdapter;
@@ -44,7 +46,9 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
         this.activity = (BaseActivity) activity;
+        lastRefreshTimestamp = 0;
     }
 
     @Override
@@ -58,17 +62,14 @@ public class ContactsFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        if (lastRefreshTimestamp < System.currentTimeMillis() - BaseEventsFragment.DEFAULT_REFRESH_INTERVAL) {
-            refresh(false);
-            lastRefreshTimestamp = System.currentTimeMillis();
-        }
+        refreshIfneeded();
     }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        refresh(false);
+        refreshIfneeded();
     }
 
     @Override
@@ -85,9 +86,8 @@ public class ContactsFragment extends Fragment {
 
         // More views.
         topProgressBar = view.findViewById(R.id.top_progress_bar);
-        noMyEventsView = view.findViewById(R.id.view_no_friends_on_eh);
+        noFriendsOnEhView = view.findViewById(R.id.view_no_friends_on_eh);
         retryView = view.findViewById(R.id.view_retry);
-        View inviteFooterView = view.findViewById(R.id.invite_footer);
         View inviteButtonView = view.findViewById(R.id.invite_button);
 
         // Setup the refresh on swipe down.
@@ -110,52 +110,51 @@ public class ContactsFragment extends Fragment {
             }
         });
 
-        OnClickListener inviteClickHandler = new OnClickListener() {
+        inviteButtonView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), SettingsActivity.class);
-                intent.setAction("com.eventshigh.share_app");
-                startActivity(intent);
+                activity.shareApp();
             }
-        };
-        inviteFooterView.setOnClickListener(inviteClickHandler);
-        inviteButtonView.setOnClickListener(inviteClickHandler);
+        });
+    }
+
+    private void refreshIfneeded() {
+        if (lastRefreshTimestamp <
+                System.currentTimeMillis() - BaseEventsFragment.DEFAULT_REFRESH_INTERVAL) {
+            refresh(false);
+            lastRefreshTimestamp = System.currentTimeMillis();
+        }
     }
 
     private void refresh(boolean shouldBypassCache) {
         topProgressBar.setVisibility(View.VISIBLE);
         retryView.setVisibility(View.GONE);
-        noMyEventsView.setVisibility(View.GONE);
         VolleyHelper.getRequestQueue(activity).cancelAll(this);
 
         Preferences preferences = Preferences.getInstance(activity);
         if (preferences.shouldUploadContacts()) {
             MyContactsRequest.submit(activity, Priority.IMMEDIATE, this, shouldBypassCache,
-                    myContactsListener, errorListener);
+                myContactsListener, errorListener);
         } else if (!hasAskForContactsDialogShown) {
             hasAskForContactsDialogShown = true;
             AskForContactsDialog.show(activity, preferences, contactsRequestCallback);
         }
     }
 
-    private Listener<MyContacts> myContactsListener = new Listener<MyContacts>() {
+    private Listener<List<UserContact>> myContactsListener = new Listener<List<UserContact>>() {
         @Override
-        public void onResponse(MyContacts myContacts, boolean isIntermediate) {
+        public void onResponse(List<UserContact> contacts, boolean isIntermediate) {
             topProgressBar.setVisibility(isIntermediate ? View.VISIBLE : View.GONE);
-            if (!isIntermediate && myContacts.isEmpty()) {
-                errorListener.onErrorResponse(new VolleyError("failed contacts"));
+            if (contacts.isEmpty()) {
+                noFriendsOnEhView.setVisibility(View.VISIBLE);
+                gridView.setVisibility(View.GONE);
+                retryView.setVisibility(View.GONE);
             } else {
-                if (myContacts.isFriendsOnEhEmpty()) {
-                    noMyEventsView.setVisibility(View.VISIBLE);
-                    gridView.setVisibility(View.GONE);
-                    retryView.setVisibility(View.GONE);
-                } else {
-                    noMyEventsView.setVisibility(View.GONE);
-                    gridView.setVisibility(View.VISIBLE);
-                    retryView.setVisibility(View.GONE);
-                }
-                contactsAdapter.setMyContacts(myContacts);
+                noFriendsOnEhView.setVisibility(View.GONE);
+                gridView.setVisibility(View.VISIBLE);
+                retryView.setVisibility(View.GONE);
             }
+            contactsAdapter.setMyContacts(contacts);
         }
     };
 
@@ -164,7 +163,7 @@ public class ContactsFragment extends Fragment {
         public void onErrorResponse(VolleyError volleyError) {
             topProgressBar.setVisibility(View.GONE);
             retryView.setVisibility(View.VISIBLE);
-            noMyEventsView.setVisibility(View.GONE);
+            noFriendsOnEhView.setVisibility(View.GONE);
             VolleyHelper.log(activity, volleyError);
         }
     };

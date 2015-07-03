@@ -1,7 +1,7 @@
 package com.eventshigh.nearme.app.view;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.eventshigh.nearme.app.utils.ContactUtils;
+import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import java.lang.ref.WeakReference;
@@ -22,9 +22,9 @@ public class FollowedByView extends HorizontalScrollView {
         super(context, attrs);
     }
 
-    public void setFollowers(@Nullable Set<String> contactIds, boolean addFollowedBy, int gravity) {
+    public void setFollowers(@Nullable Set<UserContact> contacts, boolean addFollowedBy, int gravity) {
         removeAllViews();
-        if (contactIds == null || contactIds.isEmpty()) {
+        if (contacts == null || contacts.isEmpty()) {
             return;
         }
 
@@ -34,12 +34,12 @@ public class FollowedByView extends HorizontalScrollView {
         addView(container);
 
         int size = Utils.dpToPx(getContext(), 24);
-        for (String contactId : contactIds) {
-            new ContactPhotoLoaderTask(container, size, addFollowedBy).execute(contactId);
+        for (UserContact contact : contacts) {
+            new ContactPhotoLoaderTask(container, size, addFollowedBy).execute(contact);
         }
     }
 
-    public static class ContactPhotoLoaderTask extends AsyncTask<String, Void, Bitmap> {
+    public static class ContactPhotoLoaderTask extends AsyncTask<UserContact, Void, Drawable> {
         private final WeakReference<LinearLayout> parentViewReference;
         private final Context context;
         private final int size;
@@ -54,14 +54,14 @@ public class FollowedByView extends HorizontalScrollView {
         }
 
         @Override
-        protected @Nullable Bitmap doInBackground(String... contactIds) {
-            return ContactUtils.getPhotoForContactId(context, contactIds[0], size);
+        protected Drawable doInBackground(UserContact... contacts) {
+            return contacts[0].getDrawable(context, size);
         }
 
         @Override
-        protected void onPostExecute(@Nullable Bitmap bitmap) {
+        protected void onPostExecute(Drawable drawable) {
             LinearLayout parentView = parentViewReference.get();
-            if (parentView != null && bitmap != null) {
+            if (parentView != null) {
                 if (addFollowedBy && parentView.getChildCount() == 0) {
                     TextView tv = new TextView(parentView.getContext());
                     tv.setText("Followed By: ");
@@ -70,7 +70,7 @@ public class FollowedByView extends HorizontalScrollView {
 
                 ImageView imageView = new ImageView(parentView.getContext());
                 imageView.setLayoutParams(new LinearLayout.LayoutParams(size, size));
-                imageView.setImageBitmap(bitmap);
+                imageView.setImageDrawable(drawable);
                 parentView.addView(imageView);
             }
         }

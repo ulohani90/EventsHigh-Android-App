@@ -29,6 +29,7 @@ import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.Locality;
 import com.eventshigh.nearme.app.data.TrendingTopic;
+import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
@@ -198,7 +199,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         return view;
     }
 
-    public @Nullable Set<String> getFollowers(String tag) {
+    public @Nullable Set<UserContact> getFollowers(String tag) {
         return socialActions == null ? null :
                 socialActions.tagFollowers.get(EventCategory.toCategoryParsableString(tag));
     }
@@ -750,7 +751,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public void populate(final FollowData data, final BaseContextActivity activity,
-                @Nullable Set<String> followers) {
+                @Nullable Set<UserContact> followers) {
             titleView.setText(data.title);
             subtitleView.setText(MessageFormat.format(
                     activity.getString(R.string.num_events), data.numFollowers, data.numEvents));
@@ -870,7 +871,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public void populateTrendingCategoryData(final TrendingCategoryData data,
-                final BaseEventsFragment eventsFragment, @Nullable Set<String> followers) {
+                final BaseEventsFragment eventsFragment, @Nullable Set<UserContact> followers) {
             imageView.setImageUrl(data.trendingTopic.imgUrl,
                     VolleyHelper.getImageLoader(eventsFragment.getContextActivity()));
             titleView.setText(data.trendingTopic.tagName);
@@ -898,7 +899,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public void populateExploreCategoryData(final ExploreCategoryData data,
-                final BaseEventsFragment eventsFragment, @Nullable Set<String> followers) {
+                final BaseEventsFragment eventsFragment, @Nullable Set<UserContact> followers) {
             imageView.setDefaultImageResId(data.getInfoGraphId());
             titleView.setVisibility(View.GONE);
             followedByView.setFollowers(followers, false, Gravity.END);
