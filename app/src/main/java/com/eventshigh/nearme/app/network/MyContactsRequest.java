@@ -13,7 +13,6 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.UserContact;
-import com.eventshigh.nearme.app.network.MyContactsRequest.MyContacts;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.ContactUtils;
@@ -30,23 +29,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MyContactsRequest extends JsonRequest<MyContacts> {
-    public static class MyContacts {
-        public final List<UserContact> EHContacts;
-        public final List<UserContact> otherContacts;
-
-        public MyContacts(List<UserContact> EHContacts, List<UserContact> otherContacts) {
-            this.EHContacts = EHContacts;
-            this.otherContacts = otherContacts;
-        }
-
-        public boolean isEmpty() {
-            return EHContacts.isEmpty() && otherContacts.isEmpty();
-        }
-    }
-
+public class MyContactsRequest extends JsonRequest<List<UserContact>> {
     public static void submit(Context context, Priority priority, Object tag, boolean shouldBypassCache,
-            Listener<MyContacts> listener, ErrorListener errorListener) {
+            Listener<List<UserContact>> listener, ErrorListener errorListener) {
         try {
             Uri getSocialFriendsUri =
                     AccountStateReporter.getBaseUri(context, "get_social_friends").build();
@@ -64,7 +49,7 @@ public class MyContactsRequest extends JsonRequest<MyContacts> {
     private final Priority priority;
 
     public MyContactsRequest(Context context, String url, Priority priority, boolean shouldBypassCache,
-            Listener<MyContacts> listener, ErrorListener errorListener) {
+            Listener<List<UserContact>> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
 
@@ -78,7 +63,7 @@ public class MyContactsRequest extends JsonRequest<MyContacts> {
     }
 
     @Override
-    protected Response<MyContacts> parseNetworkResponse(NetworkResponse response) {
+    protected Response<List<UserContact>> parseNetworkResponse(NetworkResponse response) {
         try {
             // See the contacts which are already on EH.
             String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
@@ -91,13 +76,11 @@ public class MyContactsRequest extends JsonRequest<MyContacts> {
             }
 
             // Read the local contacts and remove duplicates.
-            HashSet<UserContact> contacts = new HashSet<>();
-            contacts.addAll(ContactUtils.getContacts(context, null, null, false));
-            List<UserContact> uniqueContacts = new ArrayList<>(contacts.size());
-            uniqueContacts.addAll(contacts);
+            List<UserContact> contacts = new ArrayList<>(contactOnEh.size());
+            contacts.addAll(contactOnEh);
 
             // Sort by Name.
-            Collections.sort(uniqueContacts, new Comparator<UserContact>() {
+            Collections.sort(contacts, new Comparator<UserContact>() {
                 @Override
                 public int compare(UserContact lhs, UserContact rhs) {
                     if (lhs.name == null || rhs.name == null) {
@@ -107,21 +90,7 @@ public class MyContactsRequest extends JsonRequest<MyContacts> {
                 }
             });
 
-            // Split the contacts into two sections, one which are on EH and one which are not on EH.
-            List<UserContact> EHContacts = new ArrayList<>(contactOnEh.size());
-            List<UserContact> otherContacts = new ArrayList<>(uniqueContacts.size());
-
-            for (UserContact contact : uniqueContacts) {
-                if (contactOnEh.contains(contact)) {
-                    EHContacts.add(contact);
-                } else {
-                    otherContacts.add(contact);
-                }
-            }
-
-            return Response.success(new MyContacts(EHContacts, otherContacts),
-                    HttpHeaderParser.parseCacheHeaders(response));
-
+            return Response.success(contacts, HttpHeaderParser.parseCacheHeaders(response));
         } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));

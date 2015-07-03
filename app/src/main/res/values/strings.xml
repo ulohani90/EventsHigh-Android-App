@@ -5,6 +5,7 @@
     <string name="app_name">EventsHigh</string>
     <string name="title_book">Book Ticket</string>
     <string name="title_pick_interest">Pick Your Interests</string>
+    <string name="title_my_friends">My Friends</string>
 
     <!-- Actions -->
     <string name="action_skip">Skip</string>
@@ -95,8 +96,10 @@
 
     <!-- Sharing -->
     <string name="action_share">Share</string>
+    <string name="action_invite">Share App</string>
     <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Sounds fun!\n\n%1$s\n\n%2$s</string>
-    <string name="share_app_text">Hey! I liked this EventsHigh app and I think you will too. It has a lot of weekend activities to choose from. Check it out. %s</string>
+    <string name="share_app_text">Hey! Pull up a chair. Take a taste. Come join EventsHigh. Life is so endlessly delicious.\n\n%s</string>
+    <string name="share_app_message">Love only grows by sharing. You can only have more for yourself by sharing the app with friends. The more you share, the better would be your experience.</string>
 
     <!-- Failed messages -->
     <string name="failed_load">Oops! Something\'s gone wrong. Let\'s try that again.</string>
@@ -135,11 +138,6 @@
     <string name="rate_app_later">Later</string>
     <string name="rate_now">Rate Now</string>
     <string name="feedback">Give Feedback</string>
-
-    <!-- Social -->
-    <string name="title_my_friends">My Friends</string>
-    <string name="social_invite">Invite</string>
-    <string name="invite_friends">Invite your friends to EventsHigh</string>
 
     <!-- Zendesk -->
     <string name="contact_fragment_description_hint">Enter your query</string>
