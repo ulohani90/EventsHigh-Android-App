@@ -9,8 +9,6 @@ import com.eventshigh.nearme.app.utils.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.UUID;
-
 public class UserActionHelper {
     private static final String JSON_KEY_ANDROID_ID = "android_id";
     private static final String JSON_KEY_TIMESTAMP = "timestamp";
