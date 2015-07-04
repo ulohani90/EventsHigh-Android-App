@@ -74,7 +74,8 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
 
             UserContact contact = streamItem.mobileNo == null ? null :
                     ContactUtils.getContactForServerPhone(activity, streamItem.mobileNo);
-            Drawable drawable = contact == null ? null : contact.getDrawable(activity, imageView.getWidth());
+            Drawable drawable = contact == null ? null : contact.getDrawable(activity,
+                    imageView.getLayoutParams().height);
 
             if (drawable == null) {
                 imageView.setImageResource(R.drawable.ic_launcher);

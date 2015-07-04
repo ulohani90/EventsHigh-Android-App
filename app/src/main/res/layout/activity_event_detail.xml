@@ -50,7 +50,7 @@
                     android:src="@drawable/eh_recommend"
                     android:adjustViewBounds="true"
                     android:transitionName="eh_recommends"
-                    tools:ignore="UnusedAttribute, ContentDescription"
+                    tools:ignore="ContentDescription,UnusedAttribute"
                 />
             </FrameLayout>
 
@@ -74,6 +74,11 @@
             />
 
             <!-- Stats -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#1a4d4d4d"
+            />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -83,7 +88,7 @@
                     android:id="@+id/event_stats"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
+                    android:layout_margin="18dp"
                     android:textStyle="bold"
                     android:layout_gravity="center"
                     android:gravity="center"
@@ -98,7 +103,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:padding="10dp"
+                    android:padding="18dp"
                 />
             </LinearLayout>
 

@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
@@ -24,6 +25,12 @@ public class PhoneVerificationDialog {
                     }
                 })
                 .setCancelable(true)
+                .setOnCancelListener(new OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        activity.reportActionToAnalytics("phoneVerificationRejected");
+                    }
+                })
                 .show();
     }
 }

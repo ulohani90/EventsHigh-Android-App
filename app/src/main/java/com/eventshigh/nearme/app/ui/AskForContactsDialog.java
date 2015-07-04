@@ -1,10 +1,8 @@
 package com.eventshigh.nearme.app.ui;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.text.format.DateUtils;
-import android.view.View;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
@@ -31,10 +29,8 @@ public class AskForContactsDialog {
 
     public static void show(final BaseActivity activity, final Preferences preferences,
             final ContactsRequestCallback callback) {
-        @SuppressLint("InflateParams")
-        View view = activity.getLayoutInflater().inflate(R.layout.dialog_ask_for_contacts, null);
         new AlertDialog.Builder(activity)
-                .setView(view)
+                .setView(R.layout.dialog_ask_for_contacts)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         activity.reportActionToAnalytics("uploadContactsAccepted");

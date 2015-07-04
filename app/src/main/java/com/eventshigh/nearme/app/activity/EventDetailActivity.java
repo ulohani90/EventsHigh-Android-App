@@ -500,7 +500,8 @@ public class EventDetailActivity extends BaseActivity {
                     @Override
                     public void onResponse(SocialActions socialActions, boolean isIntermediate) {
                         ((FollowedByView) findViewById(R.id.followed_by)).setFollowers(
-                            socialActions.eventFavourites.get(event.id), false, Gravity.START);
+                            EventDetailActivity.this, socialActions.eventFavourites.get(event.id),
+                            "Favourited By: ", Gravity.START);
                     }
                 },
                 new ErrorListener() {

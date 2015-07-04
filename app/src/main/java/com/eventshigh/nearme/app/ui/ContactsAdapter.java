@@ -18,18 +18,20 @@ import java.util.List;
 public class ContactsAdapter extends RecyclerView.Adapter<ContactView> {
     private final BaseActivity activity;
     private final FriendsStore friendsStore;
+    private final boolean showInviteFriends;
 
     private List<UserContact> contacts;
 
-    public ContactsAdapter(BaseActivity activity) {
+    public ContactsAdapter(BaseActivity activity, boolean showInviteFriends) {
         this.activity = activity;
+        this.showInviteFriends = showInviteFriends;
         this.friendsStore = new FriendsStore(activity);
     }
 
     @Override
     public void onBindViewHolder(ContactView holder, int position) {
         if (position < contacts.size()) {
-            holder.populate(contacts.get(position), activity);
+            holder.populate(contacts.get(position));
         } else {
             holder.itemView.findViewById(R.id.share_app).setOnClickListener(new OnClickListener() {
                 @Override
@@ -42,7 +44,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactView> {
 
     @Override
     public int getItemCount() {
-        return contacts == null || contacts.isEmpty() ? 0 : contacts.size() + 1;
+        return contacts == null || contacts.isEmpty() ? 0 :
+                contacts.size() + (showInviteFriends ? 1 : 0);
     }
 
     @Override
@@ -85,11 +88,12 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactView> {
             }
         }
 
-        public void populate(final UserContact contact, BaseActivity activity) {
+        public void populate(final UserContact contact) {
             contactName.setText(contact.name);
             contactPhoto.setImageDrawable(
                     contact.getDrawable(activity, contactPhoto.getLayoutParams().height));
 
+            action.setVisibility(showInviteFriends ? View.VISIBLE : View.GONE);
             action.setTag(contact.contactId);
             updateActionButton(contact.contactId);
             action.setOnClickListener(new View.OnClickListener() {

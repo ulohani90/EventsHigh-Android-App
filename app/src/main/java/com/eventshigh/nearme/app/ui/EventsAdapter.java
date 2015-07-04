@@ -779,7 +779,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 }
             });
 
-            followedByView.setFollowers(followers, true, Gravity.CENTER);
+            followedByView.setFollowers(activity, followers, "Followed By: ", Gravity.CENTER);
         }
 
         public void setFollowButtons(boolean isFollowing) {
@@ -875,7 +875,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             imageView.setImageUrl(data.trendingTopic.imgUrl,
                     VolleyHelper.getImageLoader(eventsFragment.getContextActivity()));
             titleView.setText(data.trendingTopic.tagName);
-            followedByView.setFollowers(followers, false, Gravity.START);
+            followedByView.setFollowers(eventsFragment.getContextActivity(), followers, null,
+                    Gravity.START);
 
             FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) followedByView.getLayoutParams();
             lp.gravity = Gravity.BOTTOM;
@@ -902,7 +903,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 final BaseEventsFragment eventsFragment, @Nullable Set<UserContact> followers) {
             imageView.setDefaultImageResId(data.getInfoGraphId());
             titleView.setVisibility(View.GONE);
-            followedByView.setFollowers(followers, false, Gravity.END);
+            followedByView.setFollowers(eventsFragment.getContextActivity(), followers, null,
+                    Gravity.END);
 
             FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) followedByView.getLayoutParams();
             lp.gravity = Gravity.TOP;

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.eventshigh.nearme.app.view.AutofitRecyclerView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/grid"
+    android:layout_width="100dp"
+    android:layout_height="100dp"
+    android:columnWidth="@dimen/event_card_width"
+    android:horizontalSpacing="10dp"
+    android:verticalSpacing="10dp"
+    android:paddingTop="10dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingBottom="20dp"
+    android:clipToPadding="false"
+/>

@@ -80,7 +80,7 @@ public class ContactsFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         // Setup the events adapter to show data.
         gridView = (AutofitRecyclerView) view.findViewById(R.id.grid);
-        contactsAdapter = new ContactsAdapter(activity);
+        contactsAdapter = new ContactsAdapter(activity, true);
         gridView.setAdapter(contactsAdapter);
 
         // More views.

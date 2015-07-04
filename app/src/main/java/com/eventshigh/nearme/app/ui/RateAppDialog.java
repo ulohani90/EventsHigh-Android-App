@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.ui;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -23,10 +22,8 @@ public class RateAppDialog {
             return;
         }
 
-        @SuppressLint("InflateParams")
-        View view = activity.getLayoutInflater().inflate(R.layout.dialog_rate_app, null);
         final AlertDialog alertDialog = new AlertDialog.Builder(activity)
-                .setView(view)
+                .setView(R.layout.dialog_rate_app)
                 .setCancelable(true)
                 .create();
         alertDialog.show();
@@ -57,7 +54,7 @@ public class RateAppDialog {
                 alertDialog.dismiss();
 
                 activity.startActivity(new Intent(activity, FeedbackActivity.class));
-        };
+            }
         });
     }
 
