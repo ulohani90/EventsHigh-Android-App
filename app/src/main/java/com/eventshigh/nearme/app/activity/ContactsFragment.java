@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -102,7 +101,7 @@ public class ContactsFragment extends Fragment {
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
 
-        retryView.setOnClickListener(new OnClickListener() {
+        view.findViewById(R.id.retry).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 activity.reportActionToAnalytics("retry");
@@ -129,6 +128,7 @@ public class ContactsFragment extends Fragment {
     private void refresh(boolean shouldBypassCache) {
         topProgressBar.setVisibility(View.VISIBLE);
         retryView.setVisibility(View.GONE);
+        noFriendsOnEhView.setVisibility(View.INVISIBLE);
         VolleyHelper.getRequestQueue(activity).cancelAll(this);
 
         Preferences preferences = Preferences.getInstance(activity);
@@ -147,12 +147,6 @@ public class ContactsFragment extends Fragment {
             topProgressBar.setVisibility(isIntermediate ? View.VISIBLE : View.GONE);
             if (contacts.isEmpty()) {
                 noFriendsOnEhView.setVisibility(View.VISIBLE);
-                gridView.setVisibility(View.GONE);
-                retryView.setVisibility(View.GONE);
-            } else {
-                noFriendsOnEhView.setVisibility(View.GONE);
-                gridView.setVisibility(View.VISIBLE);
-                retryView.setVisibility(View.GONE);
             }
             contactsAdapter.setMyContacts(contacts);
         }
@@ -162,8 +156,11 @@ public class ContactsFragment extends Fragment {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
             topProgressBar.setVisibility(View.GONE);
-            retryView.setVisibility(View.VISIBLE);
-            noFriendsOnEhView.setVisibility(View.GONE);
+            if (gridView.getAdapter().getItemCount() > 0) {
+                activity.showMessage(R.string.failed_refresh);
+            } else {
+                retryView.setVisibility(View.VISIBLE);
+            }
             VolleyHelper.log(activity, volleyError);
         }
     };

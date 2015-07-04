@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
+import android.view.View;
 
 /**
  * Shows the user's friends. See {@link ContactsFragment}.
@@ -16,5 +17,9 @@ public class MyFriendsActivity extends BaseActivity {
             ContactsFragment contactsFragment = new ContactsFragment();
             getSupportFragmentManager().beginTransaction().add(android.R.id.content, contactsFragment).commit();
         }
+    }
+
+    public View getViewForSnackbar() {
+        return findViewById(android.R.id.content);
     }
 }
