@@ -779,7 +779,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 }
             });
 
-            followedByView.setFollowers(activity, followers, "Followed By: ", Gravity.CENTER);
+            followedByView.setFollowers(activity, followers, " follows this.", Gravity.CENTER);
         }
 
         public void setFollowButtons(boolean isFollowing) {

@@ -501,7 +501,7 @@ public class EventDetailActivity extends BaseActivity {
                     public void onResponse(SocialActions socialActions, boolean isIntermediate) {
                         ((FollowedByView) findViewById(R.id.followed_by)).setFollowers(
                             EventDetailActivity.this, socialActions.eventFavourites.get(event.id),
-                            "Favourited By: ", Gravity.START);
+                            " liked this.", Gravity.START);
                     }
                 },
                 new ErrorListener() {
@@ -672,8 +672,7 @@ public class EventDetailActivity extends BaseActivity {
 
             // Show stats
             statsView.setVisibility(event.numViews > 5 ? View.VISIBLE : View.GONE);
-            statsView.setText("" + event.numViews + " views" +
-                    ( event.numSaves > 3 ? ", " + event.numSaves + " favourites" : ""));
+            statsView.setText("" + event.numViews + " views");
 
             // Add attribution.
             if (event.sourceUrl == null) {

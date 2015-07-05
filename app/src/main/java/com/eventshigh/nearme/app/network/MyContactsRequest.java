@@ -33,11 +33,10 @@ public class MyContactsRequest extends JsonRequest<List<UserContact>> {
     public static void submit(Context context, Priority priority, Object tag, boolean shouldBypassCache,
             Listener<List<UserContact>> listener, ErrorListener errorListener) {
         try {
-            Uri getSocialFriendsUri =
+            Uri socialFriendsUri =
                     AccountStateReporter.getBaseUri(context, "get_social_friends").build();
-            String url = Signer.sign(getSocialFriendsUri).toString();
             MyContactsRequest request = new MyContactsRequest(
-                    context, url, priority, shouldBypassCache, listener, errorListener);
+                    context, socialFriendsUri, priority, shouldBypassCache, listener, errorListener);
             request.setTag(tag);
             VolleyHelper.addToRequestQueue(context, request);
         } catch (GeneralSecurityException | UnsupportedEncodingException e) {
@@ -47,19 +46,26 @@ public class MyContactsRequest extends JsonRequest<List<UserContact>> {
 
     private final Context context;
     private final Priority priority;
+    private final Uri socialFriendsUri;
 
-    public MyContactsRequest(Context context, String url, Priority priority, boolean shouldBypassCache,
-            Listener<List<UserContact>> listener, ErrorListener errorListener) {
-        super(Method.GET, url, null, listener, errorListener);
+    public MyContactsRequest(Context context, Uri socialFriendsUri, Priority priority,
+            boolean shouldBypassCache, Listener<List<UserContact>> listener, ErrorListener errorListener)
+            throws GeneralSecurityException, UnsupportedEncodingException {
+        super(Method.GET, Signer.sign(socialFriendsUri).toString(), null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
 
         this.context = context;
         this.priority = priority;
+        this.socialFriendsUri = socialFriendsUri;
     }
 
     @Override
     public Priority getPriority() {
         return priority;
+    }
+
+    public String getCacheKey() {
+        return socialFriendsUri.toString();
     }
 
     @Override

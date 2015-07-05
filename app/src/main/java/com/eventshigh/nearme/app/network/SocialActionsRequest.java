@@ -45,11 +45,10 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
     public static void submit(Context context, Priority priority, Object tag, boolean shouldBypassCache,
             Listener<SocialActions> listener, ErrorListener errorListener) {
         try {
-            Uri getSocialFriendsUri =
+            Uri getSocialActionsUri =
                     AccountStateReporter.getBaseUri(context, "get_social_actions").build();
-            String url = Signer.sign(getSocialFriendsUri).toString();
             SocialActionsRequest request = new SocialActionsRequest(
-                    context, url, priority, shouldBypassCache, listener, errorListener);
+                    context, getSocialActionsUri, priority, shouldBypassCache, listener, errorListener);
             request.setTag(tag);
             VolleyHelper.addToRequestQueue(context, request);
         } catch (GeneralSecurityException | UnsupportedEncodingException e) {
@@ -59,19 +58,26 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
 
     private final Context context;
     private final Priority priority;
+    private final Uri getSocialActionsUri;
 
-    public SocialActionsRequest(Context context, String url, Priority priority, boolean shouldBypassCache,
-                             Listener<SocialActions> listener, ErrorListener errorListener) {
-        super(Method.GET, url, null, listener, errorListener);
+    public SocialActionsRequest(Context context, Uri getSocialActionsUri, Priority priority,
+            boolean shouldBypassCache,  Listener<SocialActions> listener, ErrorListener errorListener)
+            throws GeneralSecurityException, UnsupportedEncodingException {
+        super(Method.GET, Signer.sign(getSocialActionsUri).toString(), null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
 
         this.context = context;
         this.priority = priority;
+        this.getSocialActionsUri = getSocialActionsUri;
     }
 
     @Override
     public Priority getPriority() {
         return priority;
+    }
+
+    public String getCacheKey() {
+        return getSocialActionsUri.toString();
     }
 
     @Override

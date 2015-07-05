@@ -50,7 +50,7 @@ public class FollowedByView extends HorizontalScrollView {
             public void onClick(View v) {
                 ArrayList<UserContact> contactList = new ArrayList<>(contacts.size());
                 contactList.addAll(contacts);
-                FriendsDialog.show(activity, contactList, text);
+                FriendsDialog.show(activity, contactList);
             }
         });
     }
@@ -93,7 +93,7 @@ public class FollowedByView extends HorizontalScrollView {
                 ImageView imageView = new ImageView(parentView.getContext());
                 imageView.setLayoutParams(new LinearLayout.LayoutParams(size, size));
                 imageView.setImageDrawable(drawable);
-                parentView.addView(imageView);
+                parentView.addView(imageView, 0);
             }
         }
     }
