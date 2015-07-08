@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.crashlytics.android.Crashlytics;
-import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
@@ -551,14 +550,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView priceView;
         private final TextView venueView;
         private final TextView travelTimeView;
-        private final TextView numEventsViews;
         private final ImageView favouriteView;
         private final View arrowView;
 
         private static EventCard newInstance(Activity activity, ViewGroup parent) {
-            View view = activity.getLayoutInflater().inflate(
-                    BuildConfig.SHOW_BIG_CARD ? R.layout.card_event_big : R.layout.card_event,
-                    parent, false);
+            View view = activity.getLayoutInflater().inflate(R.layout.card_event_big, parent, false);
             return new EventCard(view, false);
         }
 
@@ -574,7 +570,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             priceView = (TextView) cardView.findViewById(R.id.event_price);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
-            numEventsViews = (TextView) cardView.findViewById(R.id.num_pv);
             favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
             arrowView = cardView.findViewById(R.id.arrow);
         }
@@ -626,16 +621,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
             if (offerView != null) {
                 offerView.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
-            }
-
-            // Num people interested ?
-            if (numEventsViews != null) {
-                if (event.numViews > 1) {
-                    numEventsViews.setVisibility(View.VISIBLE);
-                    numEventsViews.setText(Integer.toString(event.numViews));
-                } else {
-                    numEventsViews.setVisibility(View.GONE);
-                }
             }
 
             // Set the title.

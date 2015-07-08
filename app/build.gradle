@@ -43,15 +43,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    productFlavors {
-        smallCard {
-            buildConfigField "boolean", "SHOW_BIG_CARD", "false"
-        }
-        bigCard {
-            buildConfigField "boolean", "SHOW_BIG_CARD", "true"
-        }
-    }
 }
 
 dependencies {
