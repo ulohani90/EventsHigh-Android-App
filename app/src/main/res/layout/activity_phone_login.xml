@@ -85,17 +85,6 @@
         />
 
         <TextView
-            style="@style/EHButton"
-            android:id="@+id/skip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/phone_no"
-            android:text="@string/action_skip"
-            android:onClick="skip"
-        />
-        <TextView
             android:id="@+id/send_code"
             style="@style/EHButtonCTA"
             android:layout_width="wrap_content"

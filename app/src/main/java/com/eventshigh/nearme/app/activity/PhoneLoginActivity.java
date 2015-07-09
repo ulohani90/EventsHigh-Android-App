@@ -218,13 +218,8 @@ public class PhoneLoginActivity extends BaseActivity {
         return VerificationStatus.RETRY;
     }
 
-
     // Set the UI elements when we need to ask for mobile no.
     private void setRequestMobileNoView() {
-        // In case of OnBoarding, we show skip button. We also change the message for phone
-        // registration based on the referrer used to install the app.
-        findViewById(R.id.skip).setVisibility(inOnboardingFlow ? View.VISIBLE : View.GONE);
-
         phoneNoParent.setVisibility(View.VISIBLE);
         codeParent.setVisibility(View.GONE);
         verifiedParent.setVisibility(View.GONE);
