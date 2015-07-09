@@ -747,7 +747,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     activity.reportActionToAnalytics("addFollowing", data.title);
-                    if (!account.getPhoneNumber().second) {
+                    if (!account.getUserInfo().isVerified) {
                         PhoneVerificationDialog.show(activity,
                                 R.string.ui_verify_phone, R.string.ui_phone_verify_pa);
                     }

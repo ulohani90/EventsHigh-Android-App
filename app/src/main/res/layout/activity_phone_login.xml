@@ -20,9 +20,8 @@
     />
     <ImageView
         android:id="@+id/eh_logo"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
-        android:layout_marginBottom="24dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:layout_marginTop="24dp"
         android:layout_gravity="center"
         android:src="@drawable/ic_launcher"
@@ -33,7 +32,7 @@
         android:id="@+id/phone_no_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="24dp"
+        android:layout_margin="18dp"
         android:orientation="vertical"
         android:gravity="center_horizontal"
     >
@@ -51,10 +50,36 @@
             android:gravity="center"
             android:drawablePadding="8dp"
             android:fontFamily="sans-serif-light"
-            android:text="@string/ui_phone_verify_tip"
+            android:text="@string/ui_phone_verify_pa"
             tools:ignore="UnusedAttribute"
         />
-
+        <EditText
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/phone_no_info_message"
+            android:layout_toRightOf="@+id/plus_91"
+            android:layout_toEndOf="@+id/plus_91"
+            android:hint="@string/ui_enter_name_hint"
+            android:inputType="textPersonName"
+            tools:ignore="TextFields"
+        />
+        <TextView
+            style="?android:attr/textAppearanceSmall"
+            android:id="@+id/name_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:layout_below="@+id/name"
+            android:layout_toRightOf="@+id/plus_91"
+            android:layout_toEndOf="@+id/plus_91"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:text="(Name will be used when you invite friends to any event)"
+            tools:ignore="HardcodedText,SmallSp"
+        />
         <TextView
             style="?android:attr/textAppearanceMedium"
             android:id="@+id/plus_91"
@@ -62,7 +87,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/phone_no_info_message"
+            android:layout_below="@+id/name_hint"
             android:layout_alignBottom="@+id/phone_no"
             android:gravity="center"
             android:text="+91"
@@ -75,7 +100,7 @@
             android:layout_marginBottom="18dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_below="@+id/phone_no_info_message"
+            android:layout_below="@+id/name_hint"
             android:layout_toRightOf="@+id/plus_91"
             android:layout_toEndOf="@+id/plus_91"
             android:hint="@string/ui_enter_phone_number_hint"

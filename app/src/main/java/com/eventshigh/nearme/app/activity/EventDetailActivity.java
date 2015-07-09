@@ -263,7 +263,7 @@ public class EventDetailActivity extends BaseActivity {
 
     public void openBookingSite(View view) {
         Account account = new Account(this);
-        if (!account.getPhoneNumber().second) {
+        if (account.getUserInfo().phoneNo == null || account.getUserInfo().name == null) {
             PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
             return;
         }
@@ -332,7 +332,7 @@ public class EventDetailActivity extends BaseActivity {
             reportEventAction(event, "addFavourite");
 
             Account account = new Account(this);
-            if (!account.getPhoneNumber().second) {
+            if (!account.getUserInfo().isVerified) {
                 PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_pa);
             }
         }
@@ -808,7 +808,7 @@ public class EventDetailActivity extends BaseActivity {
                 public void onClick(View v) {
                     reportActionToAnalytics("addFollowing", tagName);
 
-                    if (!account.getPhoneNumber().second) {
+                    if (!account.getUserInfo().isVerified) {
                         PhoneVerificationDialog.show(EventDetailActivity.this,
                                 R.string.ui_verify_phone, R.string.ui_phone_verify_pa);
                     }

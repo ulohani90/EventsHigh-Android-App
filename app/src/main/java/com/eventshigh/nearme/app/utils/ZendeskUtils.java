@@ -5,6 +5,7 @@ import android.content.Context;
 import com.eventshigh.nearme.app.BuildConfig;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.zendesk.logger.Logger;
 import com.zendesk.sdk.feedback.impl.BaseZendeskFeedbackConfiguration;
 import com.zendesk.sdk.model.network.AnonymousIdentity;
@@ -57,9 +58,12 @@ public class ZendeskUtils {
         public List<String> getTags() {
             List<String> tags = new ArrayList<>();
             tags.add(Utils.getAndroidId(context));
-            String phoneNo = new Account(context).getPhoneNumber().first;
-            if (phoneNo != null) {
-                tags.add(phoneNo);
+            UserInfo userInfo = new Account(context).getUserInfo();
+            if (userInfo.phoneNo != null) {
+                tags.add(userInfo.phoneNo);
+            }
+            if (userInfo.name != null) {
+                tags.add(userInfo.name);
             }
             return tags;
         }
@@ -67,11 +71,13 @@ public class ZendeskUtils {
 
     public static class EventFeedbackConfiguration  extends FeedbackConfiguration {
         private final Event event;
+        private final UserInfo userInfo;
 
         public EventFeedbackConfiguration(Context context, Event event) {
             super(context);
 
             this.event = event;
+            this.userInfo = new Account(context).getUserInfo();
         }
 
         @Override
@@ -81,7 +87,7 @@ public class ZendeskUtils {
 
         @Override
         public String getAdditionalInfo() {
-            return event.getEventDetailsURI().toString();
+            return event.getEventDetailsURI().toString() + "\n\nUser: " + userInfo.name + " (" + userInfo.phoneNo + ")";
         }
     }
 }

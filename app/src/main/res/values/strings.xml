@@ -53,9 +53,9 @@
     <string name="ui_read_more">Read More …</string>
     <string name="ui_referrer_default">Like this app? Tell your friends!</string>
     <string name="ui_enter_phone_number_hint">Your Phone Number</string>
-    <string name="ui_phone_verify_tip">Register with your phone number to get exciting deals for your favourite events!</string>
-    <string name="ui_code">We have sent a code to %s. Please enter it below</string>
-    <string name="ui_code_verified">Your phone number %s has been verified</string>
+    <string name="ui_enter_name_hint">Your Name</string>
+    <string name="ui_code">%1$s, we have sent a code to %2$s. Please enter it below.</string>
+    <string name="ui_code_verified">%1$s, your phone number %2$s has been verified.</string>
     <string name="ui_verify_phone">Verify your phone number</string>
     <string name="ui_no_my_event">Personalize this section by clicking on ♥ to favourite events or follow categories and performers.\n\nNever miss events for\nyour interests again!</string>
     <string name="ui_view_location_on_map">View location on map</string>

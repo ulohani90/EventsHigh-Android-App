@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.util.Linkify;
-import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -19,6 +18,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.Utils;
 
@@ -45,6 +45,7 @@ public class PhoneLoginActivity extends BaseActivity {
     private View progressBar;
 
     private Account account;
+    private EditText nameView;
     private EditText phoneNoView;
     private EditText codeView;
 
@@ -59,6 +60,7 @@ public class PhoneLoginActivity extends BaseActivity {
         codeParent = findViewById(R.id.code_parent);
         verifiedParent = findViewById(R.id.verified_parent);
 
+        nameView = (EditText) findViewById(R.id.name);
         phoneNoView = (EditText) findViewById(R.id.phone_no);
         codeView = (EditText) findViewById(R.id.code);
         progressBar = findViewById(R.id.top_progress_bar);
@@ -75,14 +77,23 @@ public class PhoneLoginActivity extends BaseActivity {
 
     public void sendCode(View view) {
         final String phoneNo = Utils.simplifyPhoneNo(phoneNoView.getText().toString());
+        phoneNoView.setText(phoneNo);
         if (phoneNo.length() < 10 || phoneNo.length() > 12) {
             phoneNoView.requestFocus();
             showMessage("Entered phone number is not correct");
             return;
         }
 
+        final String name = Utils.checkIfUnknown(nameView.getText().toString());
+        if (name == null || name.length() < 3) {
+            nameView.requestFocus();
+            showMessage("Entered name is not correct");
+            return;
+        }
+
         progressBar.setVisibility(View.VISIBLE);
         Uri requestUrl = AccountStateReporter.getBaseUri(this, "registerMobileNo")
+                .appendQueryParameter("name", name)
                 .appendQueryParameter("mobile_no", phoneNo)
                 .build();
         try {
@@ -99,7 +110,7 @@ public class PhoneLoginActivity extends BaseActivity {
                                         return;
                                     }
 
-                                    account.recordPhoneNumber(phoneNo);
+                                    account.recordPhoneNumber(name, phoneNo);
                                     if (status == VerificationStatus.VERIFIED) {
                                         reportActionToAnalytics("sendCodeVerified");
                                         account.recordVerifiedPhoneNumber();
@@ -175,28 +186,26 @@ public class PhoneLoginActivity extends BaseActivity {
 
     public void changeNumber(View view) {
         reportActionToAnalytics("changeNumber");
-        account.removePhoneNumber();
+        account.removeUserInfo();
         setRequestMobileNoView();
     }
 
     private void updateView() {
-        Pair<String, Boolean> accountPhoneStatus = account.getPhoneNumber();
-        if (accountPhoneStatus.first == null) {
+        UserInfo userInfo = account.getUserInfo();
+        nameView.setText(userInfo.name);
+        phoneNoView.setText(userInfo.phoneNo);
+        if (userInfo.phoneNo == null || userInfo.name == null) {
             setRequestMobileNoView();
+        } else if (userInfo.isVerified) {
+            setVerifiedMobileNoView();
         } else {
-            phoneNoView.setText(accountPhoneStatus.first);
-            if (accountPhoneStatus.second) {
-                setVerifiedMobileNoView();
-            } else {
-                setRequestCodeView();
-            }
+            setRequestCodeView();
         }
     }
 
-    private void setPhoneNumberInStringResource(int viewId, int stringResourceId,
-                                                String phoneNumber) {
+    private void setPhoneNumberInStringResource(int viewId, int stringResourceId) {
         String codeLabelString = String.format(
-                getResources().getString(stringResourceId), phoneNumber);
+            getResources().getString(stringResourceId), nameView.getText(), phoneNoView.getText());
         TextView codeLabelView = (TextView) findViewById(viewId);
         codeLabelView.setText(codeLabelString);
         Linkify.addLinks(codeLabelView, Linkify.PHONE_NUMBERS);
@@ -231,8 +240,7 @@ public class PhoneLoginActivity extends BaseActivity {
             skip(null);
             return;
         }
-        setPhoneNumberInStringResource(R.id.code_label, R.string.ui_code,
-                phoneNoView.getText().toString());
+        setPhoneNumberInStringResource(R.id.code_label, R.string.ui_code);
         phoneNoParent.setVisibility(View.GONE);
         codeParent.setVisibility(View.VISIBLE);
         verifiedParent.setVisibility(View.GONE);
@@ -244,8 +252,7 @@ public class PhoneLoginActivity extends BaseActivity {
             skip(null);
             return;
         }
-        setPhoneNumberInStringResource(R.id.verified, R.string.ui_code_verified,
-                phoneNoView.getText().toString());
+        setPhoneNumberInStringResource(R.id.verified, R.string.ui_code_verified);
         phoneNoParent.setVisibility(View.GONE);
         codeParent.setVisibility(View.GONE);
         verifiedParent.setVisibility(View.VISIBLE);

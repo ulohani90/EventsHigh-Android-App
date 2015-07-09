@@ -3,8 +3,8 @@ package com.eventshigh.nearme.app.user;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.util.Log;
-import android.util.Pair;
 
 import com.android.volley.Request;
 import com.android.volley.Response.ErrorListener;
@@ -31,10 +31,23 @@ import java.util.Map.Entry;
  * SharedPreferences in {@code PREFS_FILE_NAME}.
  */
 public class Account {
+    public static class UserInfo {
+        @Nullable public final String name;
+        @Nullable public final String phoneNo;
+        public final Boolean isVerified;
+
+        public UserInfo(@Nullable String name, @Nullable String phoneNo, Boolean isVerified) {
+            this.name = name;
+            this.phoneNo = phoneNo;
+            this.isVerified = isVerified;
+        }
+    }
+
     // Constants used for SharedPreferences.
     private static final String PREFS_FILE_NAME = "eh_user_credentials";
 
     // Mobile no of the user.
+    private static final String PREF_NAME = "name";
     private static final String PREF_MOBILE_NO = "mobile_no";
     private static final String PREF_MOBILE_NO_VERIFIED = "mobile_no_verified";
 
@@ -74,13 +87,16 @@ public class Account {
         }
     }
 
-    public Pair<String, Boolean> getPhoneNumber() {
-        return Pair.create(accountInfo.getString(PREF_MOBILE_NO, null),
+    public UserInfo getUserInfo() {
+        return new UserInfo(
+                accountInfo.getString(PREF_NAME, null),
+                accountInfo.getString(PREF_MOBILE_NO, null),
                 accountInfo.getBoolean(PREF_MOBILE_NO_VERIFIED, false));
     }
 
-    public void recordPhoneNumber(String phoneNumber) {
+    public void recordPhoneNumber(String name, String phoneNumber) {
         SharedPreferences.Editor editor = accountInfo.edit();
+        editor.putString(PREF_NAME, name);
         editor.putString(PREF_MOBILE_NO, phoneNumber);
         editor.remove(PREF_MOBILE_NO_VERIFIED);
         editor.apply();
@@ -92,8 +108,9 @@ public class Account {
         editor.apply();
     }
 
-    public void removePhoneNumber() {
+    public void removeUserInfo() {
         SharedPreferences.Editor editor = accountInfo.edit();
+        editor.remove(PREF_NAME);
         editor.remove(PREF_MOBILE_NO);
         editor.remove(PREF_MOBILE_NO_VERIFIED);
         editor.apply();
@@ -109,8 +126,8 @@ public class Account {
         }
 
         Account account = new Account(context);
-        Pair<String, Boolean> accountPhoneStatus = account.getPhoneNumber();
-        disableSnackBar = (accountPhoneStatus.first == null || accountPhoneStatus.second);
+        UserInfo userInfo = account.getUserInfo();
+        disableSnackBar = (userInfo.phoneNo == null || userInfo.isVerified);
         return !disableSnackBar;
     }
 
