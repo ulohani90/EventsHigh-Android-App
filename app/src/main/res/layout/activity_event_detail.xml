@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -11,8 +11,6 @@
         android:id="@+id/event_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/share_row"
         android:paddingBottom="16dp"
         android:clipToPadding="false"
         android:visibility="gone"
@@ -221,7 +219,7 @@
                     android:layout_toLeftOf="@+id/event_travel_time"
                     android:layout_toStartOf="@+id/event_travel_time"
                     android:textColor="#999197A3"
-                    tools:text="Near Hoodi circle, Whitefield, Bangalore, 560037."
+                    tools:text="Whitefield, Bangalore."
                 />
                 <TextView
                     android:id="@+id/event_travel_time"
@@ -434,6 +432,7 @@
                 style="@style/EHButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/button_whatsapp"
                 android:onClick="whatsapp"
             >
                 <TextView
@@ -441,9 +440,10 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:drawableLeft="@drawable/whatsapp_gray_32dp"
-                    android:drawableStart="@drawable/whatsapp_gray_32dp"
-                    android:textColor="#CC000000"
+                    android:drawableLeft="@drawable/whatsapp_24dp"
+                    android:drawableStart="@drawable/whatsapp_24dp"
+                    android:drawablePadding="8dp"
+                    android:textColor="@android:color/white"
                     android:text="@string/action_check_friends"
                 />
             </FrameLayout>
@@ -729,53 +729,6 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Share -->
-    <LinearLayout
-        android:id="@+id/share_row"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
-        android:visibility="gone"
-        tools:visibility="visible"
-    >
-        <ImageView
-            android:id="@+id/share_fb"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:src="@drawable/fb_24dp"
-            android:scaleType="center"
-            android:background="@drawable/button_fb"
-            android:onClick="facebook"
-            tools:ignore="ContentDescription"
-        />
-        <ImageView
-            android:id="@+id/share_email"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:padding="8dp"
-            android:src="@drawable/ic_email_white_24dp"
-            android:background="@drawable/button_email"
-            android:onClick="email"
-            tools:ignore="ContentDescription"
-        />
-        <ImageView
-            android:id="@+id/share_whatsapp"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:padding="8dp"
-            android:src="@drawable/whatsapp_24dp"
-            android:background="@drawable/button_whatsapp"
-            android:onClick="whatsapp"
-            tools:ignore="ContentDescription"
-        />
-    </LinearLayout>
-
     <include
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -789,8 +742,9 @@
         android:id="@+id/top_progress_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="top"
         android:layout_marginTop="?android:attr/actionBarSize"
         android:indeterminate="true"
         tools:visibility="gone"
     />
-</RelativeLayout>
+</FrameLayout>

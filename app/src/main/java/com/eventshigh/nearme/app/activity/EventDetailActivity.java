@@ -57,12 +57,6 @@ import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.eventshigh.nearme.app.view.FollowedByView;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.share.Sharer.Result;
-import com.facebook.share.model.ShareLinkContent;
-import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -89,8 +83,6 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 public class EventDetailActivity extends BaseActivity {
     public static final String EXTRA_EVENT_PARAM = EventDetailActivity.class.getSimpleName() + "_event";
 
-    public static final String PACKAGE_NAME_FACEBOOK = "com.facebook.katana";
-    public static final String PACKAGE_NAME_EMAIL = "com.google.android.gm";
     public static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
 
     private Toolbar toolbar;
@@ -103,9 +95,6 @@ public class EventDetailActivity extends BaseActivity {
     private GoogleApiClient client;
     private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
     private boolean addToFavourite = false;
-
-    // FB
-    private CallbackManager callbackManager;
 
 
     /*****************************************
@@ -221,15 +210,6 @@ public class EventDetailActivity extends BaseActivity {
                 startActivityForResult(intent, PLUS_ONE_REQUEST_CODE);
             }
         });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (callbackManager != null) {
-            callbackManager.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
 
@@ -402,53 +382,6 @@ public class EventDetailActivity extends BaseActivity {
         ZendeskUtils.setEventFeedbackConfiguration(this, event);
         Intent feedbackIntent = new Intent(this, ContactZendeskActivity.class);
         startActivity(feedbackIntent);
-    }
-
-    public void facebook(View view) {
-        showRateAppDialog = true;
-        addToFavourite = true;
-
-        if (ShareDialog.canShow(ShareLinkContent.class)) {
-            reportEventAction(event, "eventShareInitiated", "fb");
-
-            ShareDialog shareDialog = new ShareDialog(this);
-            if (callbackManager == null) {
-                callbackManager = CallbackManager.Factory.create();
-            }
-
-            shareDialog.registerCallback(callbackManager, new FacebookCallback<Result>() {
-                @Override
-                public void onSuccess(Result result) {
-                    reportEventAction(event, "shareEvent", "fb");
-                    new UserActionHelper(EventDetailActivity.this).recordShareAction(
-                            event.id, "fb", result.getPostId());
-                }
-
-                @Override
-                public void onCancel() {
-                    reportEventAction(event, "eventShareDismissed", "fb");
-                }
-
-                @Override
-                public void onError(FacebookException e) {
-                    reportEventAction(event, "eventShareError", "fb");
-                }
-            });
-
-            ShareLinkContent content = new ShareLinkContent.Builder()
-                    .setContentUrl(event.getEventShareURI(this, "fb"))
-                    .build();
-            shareDialog.show(content);
-        } else {
-            shareEvent(event, PACKAGE_NAME_FACEBOOK);
-        }
-    }
-
-    public void email(View view) {
-        showRateAppDialog = true;
-        addToFavourite = true;
-
-        shareEvent(event, PACKAGE_NAME_EMAIL);
     }
 
     public void whatsapp(View view) {
@@ -842,12 +775,6 @@ public class EventDetailActivity extends BaseActivity {
             }
 
             organizerHeader.setVisibility(organizerInfoShown ? View.VISIBLE : View.GONE);
-
-            // Share Buttons.
-            findViewById(R.id.share_row).setVisibility(View.VISIBLE);
-            findViewById(R.id.share_fb).setVisibility(isInstalled(PACKAGE_NAME_FACEBOOK) ? View.VISIBLE : View.GONE);
-            findViewById(R.id.share_email).setVisibility(isInstalled(PACKAGE_NAME_EMAIL) ? View.VISIBLE : View.GONE);
-            findViewById(R.id.share_whatsapp).setVisibility(isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
