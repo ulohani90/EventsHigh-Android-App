@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -11,6 +11,7 @@
         android:id="@+id/event_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/check_with_friends"
         android:paddingBottom="16dp"
         android:clipToPadding="false"
         android:visibility="gone"
@@ -427,31 +428,6 @@
                 android:layout_height="1dp"
                 android:background="#1a4d4d4d"
             />
-            <FrameLayout
-                android:id="@+id/check_with_friends"
-                style="@style/EHButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/button_whatsapp"
-                android:onClick="whatsapp"
-            >
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:drawableLeft="@drawable/whatsapp_24dp"
-                    android:drawableStart="@drawable/whatsapp_24dp"
-                    android:drawablePadding="8dp"
-                    android:textColor="@android:color/white"
-                    android:text="@string/action_check_friends"
-                />
-            </FrameLayout>
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#1a4d4d4d"
-            />
 
             <!-- Price -->
             <LinearLayout
@@ -729,6 +705,16 @@
         </LinearLayout>
     </ScrollView>
 
+    <TextView
+        android:id="@+id/check_with_friends"
+        style="@style/EHButtonCTA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:text="@string/action_check_friends"
+        android:onClick="whatsapp"
+    />
     <include
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -747,4 +733,4 @@
         android:indeterminate="true"
         tools:visibility="gone"
     />
-</FrameLayout>
+</RelativeLayout>
