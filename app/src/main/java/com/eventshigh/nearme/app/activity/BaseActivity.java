@@ -53,6 +53,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     // This constant defines the app specific intent action for notification.
     public static final String NOTIFICATION_ACTION = "com.eventshigh.nearme.app.notification";
     public static final int PLUS_ONE_REQUEST_CODE = 111;
+    public static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
 
     // Google Analytics
     protected boolean isPlayServicesPresent;
@@ -221,14 +222,14 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void shareApp() {
-        reportActionToAnalytics("shareApp", EventDetailActivity.PACKAGE_NAME_WHATSAPP);
+        reportActionToAnalytics("shareApp", PACKAGE_NAME_WHATSAPP);
 
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT,
                 String.format(getString(R.string.share_app_text), new Account(this).getAppDownloadLink()));
         shareIntent.setType("text/plain");
-        shareIntent.setPackage(EventDetailActivity.PACKAGE_NAME_WHATSAPP);
+        shareIntent.setPackage(PACKAGE_NAME_WHATSAPP);
         startActivity(shareIntent);
     }
 

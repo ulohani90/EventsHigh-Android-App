@@ -65,6 +65,10 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactView> {
         notifyDataSetChanged();
     }
 
+    public List<UserContact> getSelectedContacts() {
+        return contacts;
+    }
+
     public class ContactView extends RecyclerView.ViewHolder {
         private final TextView contactName;
         private final ImageView contactPhoto;

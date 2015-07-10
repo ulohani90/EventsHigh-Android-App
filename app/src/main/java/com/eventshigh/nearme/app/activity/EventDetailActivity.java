@@ -2,9 +2,7 @@ package com.eventshigh.nearme.app.activity;
 
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -70,8 +68,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
@@ -82,8 +78,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
  */
 public class EventDetailActivity extends BaseActivity {
     public static final String EXTRA_EVENT_PARAM = EventDetailActivity.class.getSimpleName() + "_event";
-
-    public static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
+    public static final String EXTRA_PLAN_ID_PARAM = EventDetailActivity.class.getSimpleName() + "_plan_id";
 
     private Toolbar toolbar;
     private View topProgressBar;
@@ -384,14 +379,12 @@ public class EventDetailActivity extends BaseActivity {
         startActivity(feedbackIntent);
     }
 
-    public void whatsapp(View view) {
-        showRateAppDialog = true;
-        addToFavourite = true;
+    public void checkWithFriends(View view) {
+        reportEventAction(event, "checkWithFriends");
 
-        if (view.getId() == R.id.check_with_friends) {
-            reportEventAction(event, "checkWithFriends");
-        }
-        shareEvent(event, PACKAGE_NAME_WHATSAPP);
+        Intent intent = new Intent(this, PlanActivity.class);
+        intent.putExtra(EXTRA_EVENT_PARAM, event);
+        startActivity(intent);
     }
 
 
@@ -505,7 +498,6 @@ public class EventDetailActivity extends BaseActivity {
         private final View joinView;
         private final TextView priceView;
         private final TextView offerView;
-        private final View checkWithFriendView;
 
         private final View tagsHeaderView;
         private final LinearLayout tagsView;
@@ -556,7 +548,6 @@ public class EventDetailActivity extends BaseActivity {
             joinView = findViewById(R.id.join_event);
             priceView = (TextView) findViewById(R.id.event_price);
             offerView = (TextView) findViewById(R.id.offer_text);
-            checkWithFriendView = findViewById(R.id.check_with_friends);
 
             tagsHeaderView = findViewById(R.id.tags_header);
             tagsView = (LinearLayout) findViewById(R.id.event_tags);
@@ -695,7 +686,6 @@ public class EventDetailActivity extends BaseActivity {
                 (bookView.getVisibility() != View.VISIBLE &&
                     event.sourceUrl != null && event.sourceUrl.contains("facebook.com/"))
                 ? View.VISIBLE : View.GONE);
-            checkWithFriendView.setVisibility(isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
 
             // Show price.
             findViewById(R.id.price_row).setVisibility(View.VISIBLE);
@@ -831,29 +821,6 @@ public class EventDetailActivity extends BaseActivity {
         private void setFavouriteView(boolean isFavourite) {
             favouritedView.setVisibility(isFavourite ? View.VISIBLE : View.GONE);
             favouriteView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
-        }
-    }
-
-    private static final Set<String> INSTALLED_PACKAGES = new HashSet<>();
-    private boolean isInstalled(String packageName) {
-        return isInstalled(this, packageName);
-    }
-
-    public static boolean isInstalled(Context context, String packageName) {
-        synchronized (INSTALLED_PACKAGES) {
-            if (INSTALLED_PACKAGES.isEmpty()) {
-                getInstalledApps(context);
-            }
-        }
-
-        return INSTALLED_PACKAGES.contains(packageName);
-    }
-
-    private static void getInstalledApps(Context context) {
-        for(PackageInfo packageInfo : context.getPackageManager().getInstalledPackages(0)) {
-            if (packageInfo.versionName != null && packageInfo.applicationInfo.enabled) {
-                INSTALLED_PACKAGES.add(packageInfo.packageName);
-            }
         }
     }
 

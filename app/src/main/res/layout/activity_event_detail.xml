@@ -713,7 +713,7 @@
         android:layout_alignParentBottom="true"
         android:gravity="center"
         android:text="@string/action_check_friends"
-        android:onClick="whatsapp"
+        android:onClick="checkWithFriends"
     />
     <include
         android:id="@+id/toolbar"
