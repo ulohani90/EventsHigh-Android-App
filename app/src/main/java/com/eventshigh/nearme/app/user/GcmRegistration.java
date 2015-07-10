@@ -51,7 +51,7 @@ public class GcmRegistration {
     // Member variables used to store the user account details in preferences.
     private final Context context;
     private final SharedPreferences gcmRegistrationInfo;
-    private boolean syncCompleted = false;
+    private long lastSyncTimestamp = 0;
 
     // City listener.
     private UserCityListener userCityListener = null;
@@ -71,7 +71,7 @@ public class GcmRegistration {
     }
 
     public void updateGcmRegistrationIdIfNeeded() {
-        if (! syncCompleted) {
+        if (lastSyncTimestamp < System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1)) {
             new Thread(new GcmRegistar()).start();
         }
     }
@@ -84,7 +84,7 @@ public class GcmRegistration {
         editor.remove(PREF_FIRST_TOPICS);
         editor.apply();
 
-        syncCompleted = false;
+        lastSyncTimestamp = 0;
         updateGcmRegistrationIdIfNeeded();
     }
 
@@ -117,10 +117,7 @@ public class GcmRegistration {
             subscribeToTopic(city.toString());
 
             userCityListener.onUserCityChanged(city);
-
-            synchronized (this) {
-                syncCompleted = false;
-            }
+            lastSyncTimestamp = 0;
         }
 
         updateGcmRegistrationIdIfNeeded();
@@ -157,125 +154,121 @@ public class GcmRegistration {
         @Override
         public void run() {
             synchronized (GcmRegistration.this) {
-                boolean isPlayServicesPresent =
-                    GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
-
-                InstanceID instanceID = null;
-                String registrationId = null;
-                if (isPlayServicesPresent) {
-                    instanceID = InstanceID.getInstance(context);
-                    registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
-                    if (registrationId == null) {
-                        try {
-                            registrationId = instanceID.getToken(SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-                        } catch (IOException e) {
-                            Crashlytics.getInstance().core.logException(e);
-                            registrationId = null;
-                        }
-
-                        if (registrationId != null) {
-                            Editor editor = gcmRegistrationInfo.edit();
-                            editor.putString(PREF_REGISTRATION_ID, registrationId);
-                            editor.remove(PREF_REGISTRATION_ID_UPLOADED);
-                            editor.remove(PREF_ZENDESK_UPDATED);
-                            editor.apply();
-                        }
-                    }
-                }
-
-                City city = getLastCity();
-                if (city == null) {
+                if (lastSyncTimestamp > System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1)) {
                     return;
                 }
 
-                // Upload last city.
-                if (!gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
-                    AccountStateReporter.reportLastCity(context, city, userLocation, new Runnable() {
-                        @Override
-                        public void run() {
-                            gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();
-                        }
-                    });
-                }
+                lastSyncTimestamp = System.currentTimeMillis();
+            }
 
-                // Upload device info.
-                if (!gcmRegistrationInfo.getBoolean(PREF_DEVICE_INFO_UPLOADED, false)) {
-                    AccountStateReporter.reportDeviceInfo(context, new Runnable() {
-                        @Override
-                        public void run() {
-                            gcmRegistrationInfo.edit().putBoolean(PREF_IID_UPLOADED, true).apply();
-                        }
-                    });
-                }
+            boolean isPlayServicesPresent =
+                GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
 
-                if (instanceID == null) {
-                    return;
-                }
-
-                // Upload IID.
-                if (!gcmRegistrationInfo.getBoolean(PREF_IID_UPLOADED, false)) {
-                    String iid = instanceID.getId();
-                    AccountStateReporter.reportInstanceId(context, iid, new Runnable() {
-                        @Override
-                        public void run() {
-                            gcmRegistrationInfo.edit().putBoolean(PREF_IID_UPLOADED, true).apply();
-                        }
-                    });
-                }
-
-                // Fetch the GCM registration id.
+            InstanceID instanceID = null;
+            String registrationId = null;
+            if (isPlayServicesPresent) {
+                instanceID = InstanceID.getInstance(context);
+                registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
                 if (registrationId == null) {
-                    return;
-                }
-
-                // Upload GCM registration id.
-                if (!gcmRegistrationInfo.getBoolean(PREF_REGISTRATION_ID_UPLOADED, false)) {
-                    AccountStateReporter.reportGcmRegistrationId(context, registrationId, new Runnable() {
-                        @Override
-                        public void run() {
-                            gcmRegistrationInfo.edit().putBoolean(PREF_REGISTRATION_ID_UPLOADED, true).apply();
-                        }
-                    });
-                }
-
-                // Report the GCM registration id with zendesk.
-                if (!gcmRegistrationInfo.getBoolean(PREF_ZENDESK_UPDATED, false)) {
-                    ZendeskUtils.initZendesk(context);
                     try {
-                        ZendeskConfig.INSTANCE.enablePush(registrationId, zendeskCallback);
-                    } catch (Exception e) {
-                        // Wait for initialization to finish and retry later.
-                    }
-                }
-
-                // Subscribe to topics.
-                if (!gcmRegistrationInfo.getBoolean(PREF_FIRST_TOPICS, false)) {
-                    try {
-                        GcmPubSub gcmPubSub = GcmPubSub.getInstance(context);
-
-                        // Subscribe to city.
-                        subscribeOrUnSubscribe(gcmPubSub, registrationId, city.toString(), true);
-
-                        // Subscribe to interests.
-                        Account account = new Account(context);
-                        for (String interest : account.getFollowingInterests()) {
-                            subscribeOrUnSubscribe(gcmPubSub, registrationId, interest, true);
-                        }
-
-                        gcmRegistrationInfo.edit().putBoolean(PREF_FIRST_TOPICS, true).apply();
-                    } catch (Exception e) {
+                        registrationId = instanceID.getToken(SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+                    } catch (IOException e) {
                         Crashlytics.getInstance().core.logException(e);
+                        registrationId = null;
+                    }
+
+                    if (registrationId != null) {
+                        Editor editor = gcmRegistrationInfo.edit();
+                        editor.putString(PREF_REGISTRATION_ID, registrationId);
+                        editor.remove(PREF_REGISTRATION_ID_UPLOADED);
+                        editor.remove(PREF_ZENDESK_UPDATED);
+                        editor.apply();
                     }
                 }
+            }
 
-                // Check if everything is done.
-                if (gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false) &&
-                    gcmRegistrationInfo.getBoolean(PREF_DEVICE_INFO_UPLOADED, false)&&
-                    gcmRegistrationInfo.getBoolean(PREF_IID_UPLOADED, false) &&
-                    gcmRegistrationInfo.getBoolean(PREF_REGISTRATION_ID_UPLOADED, false) &&
-                    gcmRegistrationInfo.getBoolean(PREF_ZENDESK_UPDATED, false) &&
-                    gcmRegistrationInfo.getBoolean(PREF_FIRST_TOPICS, false)) {
-                    syncCompleted = true;
+            City city = getLastCity();
+            if (city == null) {
+                return;
+            }
+
+            // Upload last city.
+            if (!gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
+                AccountStateReporter.reportLastCity(context, city, userLocation, new Runnable() {
+                    @Override
+                    public void run() {
+                        gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();
+                    }
+                });
+            }
+
+            // Upload device info.
+            if (!gcmRegistrationInfo.getBoolean(PREF_DEVICE_INFO_UPLOADED, false)) {
+                AccountStateReporter.reportDeviceInfo(context, new Runnable() {
+                    @Override
+                    public void run() {
+                        gcmRegistrationInfo.edit().putBoolean(PREF_DEVICE_INFO_UPLOADED, true).apply();
+                    }
+                });
+            }
+
+            if (instanceID == null) {
+                return;
+            }
+
+            // Upload IID.
+            if (!gcmRegistrationInfo.getBoolean(PREF_IID_UPLOADED, false)) {
+                String iid = instanceID.getId();
+                AccountStateReporter.reportInstanceId(context, iid, new Runnable() {
+                    @Override
+                    public void run() {
+                        gcmRegistrationInfo.edit().putBoolean(PREF_IID_UPLOADED, true).apply();
+                    }
+                });
+            }
+
+            // Fetch the GCM registration id.
+            if (registrationId == null) {
+                return;
+            }
+
+            // Upload GCM registration id.
+            if (!gcmRegistrationInfo.getBoolean(PREF_REGISTRATION_ID_UPLOADED, false)) {
+                AccountStateReporter.reportGcmRegistrationId(context, registrationId, new Runnable() {
+                    @Override
+                    public void run() {
+                        gcmRegistrationInfo.edit().putBoolean(PREF_REGISTRATION_ID_UPLOADED, true).apply();
+                    }
+                });
+            }
+
+            // Report the GCM registration id with zendesk.
+            if (!gcmRegistrationInfo.getBoolean(PREF_ZENDESK_UPDATED, false)) {
+                ZendeskUtils.initZendesk(context);
+                try {
+                    ZendeskConfig.INSTANCE.enablePush(registrationId, zendeskCallback);
+                } catch (Exception e) {
+                    // Wait for initialization to finish and retry later.
+                }
+            }
+
+            // Subscribe to topics.
+            if (!gcmRegistrationInfo.getBoolean(PREF_FIRST_TOPICS, false)) {
+                try {
+                    GcmPubSub gcmPubSub = GcmPubSub.getInstance(context);
+
+                    // Subscribe to city.
+                    subscribeOrUnSubscribe(gcmPubSub, registrationId, city.toString(), true);
+
+                    // Subscribe to interests.
+                    Account account = new Account(context);
+                    for (String interest : account.getFollowingInterests()) {
+                        subscribeOrUnSubscribe(gcmPubSub, registrationId, interest, true);
+                    }
+
+                    gcmRegistrationInfo.edit().putBoolean(PREF_FIRST_TOPICS, true).apply();
+                } catch (Exception e) {
+                    Crashlytics.getInstance().core.logException(e);
                 }
             }
         }

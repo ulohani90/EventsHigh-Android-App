@@ -25,6 +25,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Manages the user account on this device. The account information is stored using
@@ -62,8 +63,9 @@ public class Account {
     // The prefix to the shared prefs key used to save follow tags for this user
     private static final String PREF_FOLLOW_KEY_PREFIX = "follow_";
 
+    private static final Object syncLock = false;
+    private static long lastSyncTimestamp = 0;
     private static boolean disableSnackBar = false;
-    private boolean syncCompleted = false;
 
     // shared and static accountInfo which usages shared preference to store records.
     private static SharedPreferences accountInfo;
@@ -82,9 +84,7 @@ public class Account {
         setAccountInfo(this.context);
 
         // Check if we need to upload the data.
-        if (!syncCompleted) {
-            new Thread(new AccountStateRegistar()).start();
-        }
+        syncIfNeeded();
     }
 
     public UserInfo getUserInfo() {
@@ -132,15 +132,17 @@ public class Account {
     }
 
     public boolean recordReferrer(String referrer) {
-        synchronized (AccountStateRegistarLock) {
-            if (!accountInfo.contains(PREF_REFERRER)) {
-                accountInfo.edit().putString(PREF_REFERRER, referrer).apply();
-                syncCompleted = false;
-                return true;
-            }
+        if (!accountInfo.contains(PREF_REFERRER)) {
+            accountInfo.edit().putString(PREF_REFERRER, referrer).apply();
 
-            return false;
+            synchronized (syncLock) {
+                lastSyncTimestamp = 0;
+                syncIfNeeded();
+            }
+            return true;
         }
+
+        return false;
     }
 
     public String getAppDownloadLink() {
@@ -184,51 +186,49 @@ public class Account {
         return PREF_FOLLOW_KEY_PREFIX + EventCategory.toCategoryParsableString(tag);
     }
 
-    private static final Object AccountStateRegistarLock = new Object();
-    private static boolean inProgress = false;
+    private void syncIfNeeded() {
+        if (lastSyncTimestamp < System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1)) {
+            new Thread(new AccountStateRegistar()).start();
+        }
+    }
 
     private class AccountStateRegistar implements Runnable {
         @Override
         public void run() {
-            synchronized (AccountStateRegistarLock) {
-                String referrer = accountInfo.getString(PREF_REFERRER, null);
-                String appLink = accountInfo.getString(PREF_SHARE_APP_LINK, null);
-                if (appLink != null && (referrer == null || accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false))) {
-                    syncCompleted = true;
+            synchronized (syncLock) {
+                if (lastSyncTimestamp > System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1)) {
                     return;
                 }
+                lastSyncTimestamp = System.currentTimeMillis();
+            }
 
-                if (referrer != null) {
-                    uploadReferrer(referrer);
-                }
+            String referrer = accountInfo.getString(PREF_REFERRER, null);
+            String appLink = accountInfo.getString(PREF_SHARE_APP_LINK, null);
+            if (appLink != null && (referrer == null || accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false))) {
+                return;
+            }
 
-                if (inProgress) {
-                    return;
-                }
-
-                if (referrer != null || GcmRegistration.getInstance(context).getLastCity() != null) {
-                    try {
-                        Uri uri = AccountStateReporter.getBaseUri(context, "getReferrerLink").build();
-                        String url = Signer.sign(uri).toString();
-                        inProgress = true;
-                        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
-                                appLinkListener, errorListener);
-                        VolleyHelper.addToRequestQueue(context, request);
-                    } catch (IOException | GeneralSecurityException e) {
-                        Crashlytics.getInstance().core.logException(e);
-                        Log.w(Account.class.getSimpleName(), "failed to get shortlink", e);
+            if (referrer != null && !accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false)) {
+                AccountStateReporter.reportReferrer(context, referrer, new Runnable() {
+                    @Override
+                    public void run() {
+                        accountInfo.edit().putBoolean(PREF_REFERRER_UPLOADED, true).apply();
                     }
+                });
+            }
+
+            if (referrer != null || GcmRegistration.getInstance(context).getLastCity() != null) {
+                try {
+                    Uri uri = AccountStateReporter.getBaseUri(context, "getReferrerLink").build();
+                    String url = Signer.sign(uri).toString();
+                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                            appLinkListener, errorListener);
+                    VolleyHelper.addToRequestQueue(context, request);
+                } catch (IOException | GeneralSecurityException e) {
+                    Crashlytics.getInstance().core.logException(e);
+                    Log.w(Account.class.getSimpleName(), "failed to get shortlink", e);
                 }
             }
-        }
-
-        private void uploadReferrer(String referrer) {
-            AccountStateReporter.reportReferrer(context, referrer, new Runnable() {
-                @Override
-                public void run() {
-                    accountInfo.edit().putBoolean(PREF_REFERRER_UPLOADED, true).apply();
-                }
-            });
         }
 
         private Listener<JSONObject> appLinkListener = new Listener<JSONObject>() {
@@ -238,9 +238,6 @@ public class Account {
                 if (link != null && !link.isEmpty()) {
                     accountInfo.edit().putString(PREF_SHARE_APP_LINK, link).apply();
                 }
-                synchronized (AccountStateRegistarLock) {
-                    inProgress = false;
-                }
             }
         };
 
@@ -248,9 +245,6 @@ public class Account {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 Crashlytics.getInstance().core.logException(volleyError.getCause());
-                synchronized (AccountStateRegistarLock) {
-                    inProgress = false;
-                }
             }
         };
     }
