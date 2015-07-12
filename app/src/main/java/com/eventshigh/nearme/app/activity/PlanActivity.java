@@ -17,6 +17,7 @@ import com.eventshigh.nearme.app.network.MyContactsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.ui.ContactsAdapter;
+import com.eventshigh.nearme.app.ui.ContactsAdapter.ContactCardType;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
@@ -70,7 +71,7 @@ public class PlanActivity extends BaseActivity {
 
         // Setup the events adapter to show data.
         AutofitRecyclerView gridView = (AutofitRecyclerView) findViewById(R.id.grid);
-        contactsAdapter = new ContactsAdapter(this, true);
+        contactsAdapter = new ContactsAdapter(this);
         gridView.setAdapter(contactsAdapter);
 
         // Show Event Card.
@@ -151,7 +152,7 @@ public class PlanActivity extends BaseActivity {
 
             topProgressBar.setVisibility(View.GONE);
             inviteView.setVisibility(View.VISIBLE);
-            contactsAdapter.setMyContacts(contacts);
+            contactsAdapter.setMyContacts(contacts, ContactCardType.SELECT);
         }
     };
 

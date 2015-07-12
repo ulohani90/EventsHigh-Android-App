@@ -20,6 +20,7 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog.ContactsRequestCallback;
 import com.eventshigh.nearme.app.ui.ContactsAdapter;
+import com.eventshigh.nearme.app.ui.ContactsAdapter.ContactCardType;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
@@ -80,7 +81,7 @@ public class ContactsFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         // Setup the events adapter to show data.
         gridView = (AutofitRecyclerView) view.findViewById(R.id.grid);
-        contactsAdapter = new ContactsAdapter(activity, true);
+        contactsAdapter = new ContactsAdapter(activity);
         gridView.setAdapter(contactsAdapter);
 
         // More views.
@@ -148,7 +149,7 @@ public class ContactsFragment extends Fragment {
             if (contacts.isEmpty()) {
                 noFriendsOnEhView.setVisibility(View.VISIBLE);
             }
-            contactsAdapter.setMyContacts(contacts);
+            contactsAdapter.setMyContacts(contacts, ContactCardType.FOLLOW);
         }
     };
 

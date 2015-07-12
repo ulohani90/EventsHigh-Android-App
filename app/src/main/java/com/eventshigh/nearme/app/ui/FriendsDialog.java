@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.UserContact;
+import com.eventshigh.nearme.app.ui.ContactsAdapter.ContactCardType;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 import java.util.List;
@@ -27,8 +28,8 @@ public class FriendsDialog {
         alertDialog.show();
 
         AutofitRecyclerView gridView = (AutofitRecyclerView) alertDialog.findViewById(R.id.grid);
-        ContactsAdapter contactsAdapter = new ContactsAdapter(activity, false);
-        contactsAdapter.setMyContacts(contacts);
+        ContactsAdapter contactsAdapter = new ContactsAdapter(activity);
+        contactsAdapter.setMyContacts(contacts, ContactCardType.PLAIN);
         gridView.setAdapter(contactsAdapter);
     }
 }
