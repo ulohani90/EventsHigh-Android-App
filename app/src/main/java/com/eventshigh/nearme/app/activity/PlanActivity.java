@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.FrameLayout;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
@@ -17,8 +16,6 @@ import com.eventshigh.nearme.app.network.MyContactsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.ui.ContactsAdapter;
-import com.eventshigh.nearme.app.ui.ContactsAdapter.ContactCardType;
-import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
@@ -74,8 +71,6 @@ public class PlanActivity extends BaseActivity {
         contactsAdapter = new ContactsAdapter(this);
         gridView.setAdapter(contactsAdapter);
 
-        // Show Event Card.
-        EventsAdapter.getEventCard(event, this, (FrameLayout) findViewById(R.id.event_container));
         onRetry(null);
     }
 
@@ -152,7 +147,7 @@ public class PlanActivity extends BaseActivity {
 
             topProgressBar.setVisibility(View.GONE);
             inviteView.setVisibility(View.VISIBLE);
-            contactsAdapter.setMyContacts(contacts, ContactCardType.SELECT);
+            contactsAdapter.setEventContacts(event, contacts);
         }
     };
 

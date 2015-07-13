@@ -69,16 +69,6 @@
     <string name="ui_phone_verify_book">Please register with your phone number before continuing with Booking.</string>
     <string name="ui_phone_verify_pa">Events are best with friends. Please register with your phone number for personalized recommendations.</string>
 
-    <!-- Check in -->
-    <string name="action_check_in">Check In</string>
-    <string name="title_enable_gps">Enable GPS</string>
-    <string name="ui_enable_location">Unable to detect your location. Turn on GPS location source in Settings</string>
-    <string name="ui_detecting_location">Detecting your location</string>
-    <string name="ui_register_for_check_in">Please register your phone number to check in!</string>
-    <string name="ui_not_at_event">We could not detect that you are at the event</string>
-    <string name="ui_checking_in">Checking in</string>
-    <string name="check_in_failed">Unable to check in. Please try again.</string>
-
     <!-- Onbaording message -->
     <string name="onboarding_title_details">One Stop Shop</string>
     <string name="onboarding_title_favorites">Personlized Feed</string>
@@ -143,6 +133,8 @@
     <string name="invite_friends">Invite  your  friends</string>
     <string name="no_friends_on_eh">We couldn\'t find any friends for you on EventsHigh. Why not invite them?</string>
     <string name="no_friends_disclaimer">If you have recently given us the permission to your contacts, it might take us up to 30 minutes to find friends.</string>
+    <string name="plan_add_friend">Don\'t find your friends? Invite them to EventsHigh!</string>
+    <string name="select_message">Select the friends you would like to invite for this event</string>
 
     <!-- Zendesk -->
     <string name="contact_fragment_description_hint">Enter your query</string>

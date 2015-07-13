@@ -1,19 +1,20 @@
 package com.eventshigh.nearme.app.ui;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.amulyakhare.textdrawable.TextDrawable;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.FriendsStore;
 import com.eventshigh.nearme.app.data.UserContact;
+import com.eventshigh.nearme.app.ui.EventsAdapter.EventCard;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -76,6 +77,14 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
         notifyDataSetChanged();
     }
 
+    public void setEventContacts(Event event, List<UserContact> contacts) {
+        dataToShow.clear();
+        setMyContacts(contacts, ContactCardType.SELECT);
+        dataToShow.add(0, new EventData(event));
+        dataToShow.add(1, new InviteMessageData());
+        notifyDataSetChanged();
+    }
+
     public Collection<UserContact> getSelectedContacts() {
         return selectedContacts;
     }
@@ -83,7 +92,9 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private enum DataType {
         CONTACT(0),
         EH_INVITE(1),
-        EVENT_INVITE(2);
+        EVENT_INVITE(2),
+        EVENT(3),
+        INVITE_MESSAGE(4);
 
         public final int typeId;
         DataType (int typeId) {
@@ -97,12 +108,22 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             if (typeId == EH_INVITE.typeId) {
                 View view = activity.getLayoutInflater().inflate(R.layout.card_share_app, parent, false);
-                return new InviteCard(view);
+                return new ViewHolder(view) {};
             }
 
             if (typeId == EVENT_INVITE.typeId) {
-                View view = activity.getLayoutInflater().inflate(R.layout.card_share_app, parent, false);
-                return new InviteCard(view);
+                View view = activity.getLayoutInflater().inflate(R.layout.card_invite_friends, parent, false);
+                return new ViewHolder(view) {};
+            }
+
+            if (typeId == EVENT.typeId) {
+                View view = activity.getLayoutInflater().inflate(R.layout.card_event_big, parent, false);
+                return new EventCard(view, false);
+            }
+
+            if (typeId == INVITE_MESSAGE.typeId) {
+                View view = activity.getLayoutInflater().inflate(R.layout.view_select_message, parent, false);
+                return new ViewHolder(view) {};
             }
 
             throw new IllegalArgumentException("invalid typeid");
@@ -137,7 +158,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public static class ContactCard extends ViewHolder {
         private final TextView contactName;
         private final ImageView contactPhoto;
-        private final TextView action;
+        private final TextView followButton;
+        private final CheckBox selectContact;
 
         public static ContactCard newInstance(BaseActivity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(R.layout.card_contact, parent, false);
@@ -149,61 +171,71 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             contactName = (TextView) itemView.findViewById(R.id.contact_name);
             contactPhoto = (ImageView) itemView.findViewById(R.id.contact_photo);
-            action = (TextView) itemView.findViewById(R.id.action);
+            followButton = (TextView) itemView.findViewById(R.id.follow_button);
+            selectContact = (CheckBox) itemView.findViewById(R.id.select_contact);
         }
 
         private void updateActionButton(FriendsStore friendsStore, String contactId) {
             if (friendsStore.isFollowing(contactId)) {
-                action.setText(R.string.ui_following);
-                action.setSelected(true);
+                followButton.setText(R.string.ui_following);
+                followButton.setSelected(true);
             } else {
-                action.setText(R.string.ui_follow);
-                action.setSelected(false);
+                followButton.setText(R.string.ui_follow);
+                followButton.setSelected(false);
             }
         }
 
-        private void setContactImage(UserContact contact, Context context, boolean isSelected) {
-            int size = contactPhoto.getLayoutParams().height;
-            if (isSelected) {
-                contactPhoto.setImageDrawable(
-                        TextDrawable.builder().buildRoundRect("✓", 0xff616161, size));
-            } else {
-                contactPhoto.setImageDrawable(contact.getDrawable(context, size));
-            }
+        private void setSelected(boolean isSelected) {
+            selectContact.setChecked(isSelected);
         }
 
-        public void populate(final BaseActivity activity, final FriendsStore friendsStore,
-                final Set<UserContact> selectedContacts, final ContactData contactData) {
+        public void populate(BaseActivity activity, final FriendsStore friendsStore,
+                Set<UserContact> selectedContacts, final ContactData contactData) {
             contactName.setText(contactData.contact.name);
 
-            setContactImage(contactData.contact, activity,
-                contactData.cardType == ContactCardType.SELECT &&
-                        selectedContacts.contains(contactData.contact));
+            int size = contactPhoto.getLayoutParams().height;
+            contactPhoto.setImageDrawable(contactData.contact.getDrawable(activity, size));
+
+            selectContact.setVisibility(
+                contactData.cardType == ContactCardType.SELECT ? View.VISIBLE : View.GONE);
             if (contactData.cardType == ContactCardType.SELECT) {
-                contactPhoto.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (selectedContacts.contains(contactData.contact)) {
-                            selectedContacts.remove(contactData.contact);
-                            setContactImage(contactData.contact, activity, false);
-                        } else {
-                            selectedContacts.add(contactData.contact);
-                            setContactImage(contactData.contact, activity, true);
-                        }
-                    }
-                });
+                setSelected(selectedContacts.contains(contactData.contact));
+                SelectionListener listener = new SelectionListener(selectedContacts, contactData.contact);
+                itemView.setOnClickListener(listener);
+                selectContact.setOnClickListener(listener);
             }
 
-            action.setVisibility(contactData.cardType == ContactCardType.FOLLOW ? View.VISIBLE : View.GONE);
-            action.setTag(contactData.contact.contactId);
+            followButton.setVisibility(contactData.cardType == ContactCardType.FOLLOW ? View.VISIBLE : View.GONE);
+            followButton.setTag(contactData.contact.contactId);
             updateActionButton(friendsStore, contactData.contact.contactId);
-            action.setOnClickListener(new View.OnClickListener() {
+            followButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    friendsStore.setFollowing(contactData.contact.contactId, !action.isSelected());
+                    friendsStore.setFollowing(contactData.contact.contactId, !followButton.isSelected());
                     updateActionButton(friendsStore, contactData.contact.contactId);
                 }
             });
+        }
+
+        private class SelectionListener implements OnClickListener {
+            private final Set<UserContact> selectedContacts;
+            private final UserContact contact;
+
+            private SelectionListener(Set<UserContact> selectedContacts, UserContact contact) {
+                this.selectedContacts = selectedContacts;
+                this.contact = contact;
+            }
+
+            @Override
+            public void onClick(View v) {
+                if (selectedContacts.contains(contact)) {
+                    selectedContacts.remove(contact);
+                    setSelected(false);
+                } else {
+                    selectedContacts.add(contact);
+                    setSelected(true);
+                }
+            }
         }
     }
 
@@ -233,9 +265,33 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    private static class InviteCard extends ViewHolder {
-        public InviteCard(View itemView) {
-            super(itemView);
+    private class EventData implements Data {
+        private final Event event;
+
+        private EventData(Event event) {
+            this.event = event;
+        }
+
+        @Override
+        public DataType getType() {
+            return DataType.EVENT;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder card, int position) {
+            ((EventCard) card).bindEventView(event, activity);
+        }
+    }
+
+    private static class InviteMessageData implements Data {
+        @Override
+        public DataType getType() {
+            return DataType.INVITE_MESSAGE;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder card, int position) {
+            // do nothing.
         }
     }
 }

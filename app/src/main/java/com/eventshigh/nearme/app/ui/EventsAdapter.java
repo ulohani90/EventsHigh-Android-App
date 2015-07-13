@@ -198,12 +198,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         return view;
     }
 
-    public static View getEventCard(final Event event, final BaseActivity activity, ViewGroup parent) {
-        View view = activity.getLayoutInflater().inflate(R.layout.card_event_big, parent, false);
-        new EventCard(view, true).bindEventView(event, activity);
-        return view;
-    }
-
     public @Nullable Set<UserContact> getFollowers(String tag) {
         return socialActions == null ? null :
                 socialActions.tagFollowers.get(EventCategory.toCategoryParsableString(tag));
@@ -546,7 +540,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    private static class EventCard extends ViewHolder {
+    public static class EventCard extends ViewHolder {
         private final boolean shouldAdjustImageHeight;
         private final NetworkImageView bgView;
         private final ImageView recommendedView;
@@ -636,7 +630,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
         }
 
-        private void bindEventView(final Event event,final BaseActivity activity) {
+        public void bindEventView(final Event event,final BaseActivity activity) {
             itemView.setVisibility(View.VISIBLE);
 
             // Set the background image.
