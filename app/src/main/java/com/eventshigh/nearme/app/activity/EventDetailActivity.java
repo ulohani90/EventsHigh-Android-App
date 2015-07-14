@@ -43,11 +43,15 @@ import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.Account.UserInfo;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.user.UserActionHelper.EventAction;
+import com.eventshigh.nearme.app.user.UserContactsUploader;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -381,6 +385,23 @@ public class EventDetailActivity extends BaseActivity {
 
     public void checkWithFriends(View view) {
         reportEventAction(event, "checkWithFriends");
+
+        UserInfo userInfo = new Account(this).getUserInfo();
+        if (userInfo.name == null || userInfo.phoneNo == null || !userInfo.isVerified) {
+            PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
+            return;
+        }
+
+        Preferences preferences = Preferences.getInstance(this);
+        if (!preferences.shouldUploadContacts()) {
+            AskForContactsDialog.show(this, preferences);
+            return;
+        }
+
+        if (!UserContactsUploader.hasContactsUploaded(this)) {
+            showMessage(R.string.contacts_sync_pending);
+            return;
+        }
 
         Intent intent = new Intent(this, PlanActivity.class);
         intent.putExtra(EXTRA_EVENT_PARAM, event);

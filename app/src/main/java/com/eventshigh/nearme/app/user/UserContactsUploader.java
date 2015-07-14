@@ -32,6 +32,11 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
     private final SharedPreferences preferences;
     private long currentTimeMillis;
 
+    public static boolean hasContactsUploaded(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getLong(
+                PARAM_LAST_CONTACTS_SYNC_TIMESTAMP, 0) > 0;
+    }
+
     public UserContactsUploader(Context context) {
         this.context = context.getApplicationContext();
         preferences = PreferenceManager.getDefaultSharedPreferences(this.context);

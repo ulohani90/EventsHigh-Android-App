@@ -66,6 +66,7 @@
     <string name="ui_browse_loc">Browse By Locality</string>
     <string name="ui_num_views_text">viewed this event</string>
     <string name="ui_num_saves_text">saved this event</string>
+    <string name="ui_phone_verify_plan">Please register with your phone number before.</string>
     <string name="ui_phone_verify_book">Please register with your phone number before continuing with Booking.</string>
     <string name="ui_phone_verify_pa">Events are best with friends. Please register with your phone number for personalized recommendations.</string>
 
@@ -114,8 +115,9 @@
     <string name="num_events">{0,choice,10&lt;{1} Events|11&lt;{0} Followers \'|\' {1} Events}</string>
 
     <!-- Contacts Upload -->
-    <string name="perm_upload_contacts">Events are best with friends. We would like to upload your contacts to our servers so that further personalize your recommendations.</string>
+    <string name="perm_upload_contacts">Events are best with friends. We would like to upload your contacts to our servers so that we can find friends for you.</string>
     <string name="contacts_upload_promise">We will not share your contacts to any third party, that\'s a promise!</string>
+    <string name="contacts_sync_pending">Your contacts have not been synced with us yet. Please try again after some time</string>
 
     <!-- FB -->
     <string name="facebook_app_id">196111897251952</string>
@@ -135,6 +137,7 @@
     <string name="no_friends_disclaimer">If you have recently given us the permission to your contacts, it might take us up to 30 minutes to find friends.</string>
     <string name="plan_add_friend">Don\'t find your friends? Invite them to EventsHigh!</string>
     <string name="select_message">Select the friends you would like to invite for this event</string>
+    <string name="invite_to_plan">Hey! %1$s would like to invite you to %2$s @ %3$s.\n\nTo accept the invitation, please install the EventsHigh app using this link: %4$s.\n\nCome join EventsHigh. Life is so endlessly delicious.</string>
 
     <!-- Zendesk -->
     <string name="contact_fragment_description_hint">Enter your query</string>

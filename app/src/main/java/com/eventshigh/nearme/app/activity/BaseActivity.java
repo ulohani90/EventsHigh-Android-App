@@ -26,6 +26,7 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
+import com.eventshigh.nearme.app.ui.OneSecDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -135,7 +136,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                     Long.toString(secForShare));
 
             Preferences preferences = Preferences.getInstance(this);
-            if (secForShare > 5 && ! preferences.shouldUploadContacts()) {
+            if (secForShare > 5 && !preferences.shouldUploadContacts()) {
                 AskForContactsDialog.show(this, preferences);
             }
         }
@@ -243,13 +244,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
         final String eventShareUri = event.getEventShareURI(this, src).toString();
 
-        final ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setMessage("One sec ...");
-        dialog.setIndeterminate(true);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-
+        final ProgressDialog dialog = OneSecDialog.show(this);
         URLShortenerRequest.submit(this, eventShareUri,
             new Listener<String>() {
                 @Override
