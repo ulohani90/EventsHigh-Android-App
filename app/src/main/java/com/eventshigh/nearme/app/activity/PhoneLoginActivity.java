@@ -3,9 +3,9 @@ package com.eventshigh.nearme.app.activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.text.util.Linkify;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.Request.Method;
@@ -45,9 +45,9 @@ public class PhoneLoginActivity extends BaseActivity {
     private View progressBar;
 
     private Account account;
-    private EditText nameView;
-    private EditText phoneNoView;
-    private EditText codeView;
+    private TextInputLayout nameView;
+    private TextInputLayout phoneNoView;
+    private TextInputLayout codeView;
 
     private boolean inOnboardingFlow;
 
@@ -60,10 +60,14 @@ public class PhoneLoginActivity extends BaseActivity {
         codeParent = findViewById(R.id.code_parent);
         verifiedParent = findViewById(R.id.verified_parent);
 
-        nameView = (EditText) findViewById(R.id.name);
-        phoneNoView = (EditText) findViewById(R.id.phone_no);
-        codeView = (EditText) findViewById(R.id.code);
+        nameView = (TextInputLayout) findViewById(R.id.name);
+        phoneNoView = (TextInputLayout) findViewById(R.id.phone_no);
+        codeView = (TextInputLayout) findViewById(R.id.code);
         progressBar = findViewById(R.id.top_progress_bar);
+
+        nameView.setErrorEnabled(true);
+        phoneNoView.setErrorEnabled(true);
+        codeView.setErrorEnabled(true);
 
         account = new Account(this);
         inOnboardingFlow = getIntent().getBooleanExtra(EXTRA_IN_ONBOARDING_FLOW, false);
@@ -76,18 +80,18 @@ public class PhoneLoginActivity extends BaseActivity {
     }
 
     public void sendCode(View view) {
-        final String phoneNo = Utils.simplifyPhoneNo(phoneNoView.getText().toString());
-        phoneNoView.setText(phoneNo);
-        if (phoneNo.length() < 10 || phoneNo.length() > 12) {
-            phoneNoView.requestFocus();
-            showMessage("Entered phone number is not correct");
+        final String name = Utils.checkIfUnknown(nameView.getEditText().getText().toString());
+        if (name == null || name.length() < 3) {
+            nameView.getEditText().requestFocus();
+            nameView.setError("Entered name is not correct");
             return;
         }
 
-        final String name = Utils.checkIfUnknown(nameView.getText().toString());
-        if (name == null || name.length() < 3) {
-            nameView.requestFocus();
-            showMessage("Entered name is not correct");
+        final String phoneNo = Utils.simplifyPhoneNo(phoneNoView.getEditText().getText().toString());
+        phoneNoView.getEditText().setText(phoneNo);
+        if (phoneNo.length() < 10 || phoneNo.length() > 12) {
+            phoneNoView.getEditText().requestFocus();
+            phoneNoView.setError("Entered phone number is not correct");
             return;
         }
 
@@ -143,8 +147,8 @@ public class PhoneLoginActivity extends BaseActivity {
     public void verifyCode(View view) {
         progressBar.setVisibility(View.VISIBLE);
         Uri requestUrl = AccountStateReporter.getBaseUri(this, "verifyMobileNo")
-                .appendQueryParameter("mobile_no", phoneNoView.getText().toString())
-                .appendQueryParameter("verification_code", codeView.getText().toString())
+                .appendQueryParameter("mobile_no", phoneNoView.getEditText().getText().toString())
+                .appendQueryParameter("verification_code", codeView.getEditText().getText().toString())
                 .build();
         try {
             VolleyHelper.addToRequestQueue(this,
@@ -192,8 +196,8 @@ public class PhoneLoginActivity extends BaseActivity {
 
     private void updateView() {
         UserInfo userInfo = account.getUserInfo();
-        nameView.setText(userInfo.name);
-        phoneNoView.setText(userInfo.phoneNo);
+        nameView.getEditText().setText(userInfo.name);
+        phoneNoView.getEditText().setText(userInfo.phoneNo);
         if (userInfo.phoneNo == null || userInfo.name == null) {
             setRequestMobileNoView();
         } else if (userInfo.isVerified) {
@@ -205,7 +209,7 @@ public class PhoneLoginActivity extends BaseActivity {
 
     private void setPhoneNumberInStringResource(int viewId, int stringResourceId) {
         String codeLabelString = String.format(
-            getResources().getString(stringResourceId), nameView.getText(), phoneNoView.getText());
+            getResources().getString(stringResourceId), nameView.getEditText().getText(), phoneNoView.getEditText().getText());
         TextView codeLabelView = (TextView) findViewById(viewId);
         codeLabelView.setText(codeLabelString);
         Linkify.addLinks(codeLabelView, Linkify.PHONE_NUMBERS);

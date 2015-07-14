@@ -40,7 +40,7 @@
             android:id="@+id/phone_no_info_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="36dp"
+            android:layout_marginBottom="12dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentStart="true"
@@ -53,7 +53,7 @@
             android:text="@string/ui_phone_verify_pa"
             tools:ignore="UnusedAttribute"
         />
-        <EditText
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -62,22 +62,26 @@
             android:layout_below="@+id/phone_no_info_message"
             android:layout_toRightOf="@+id/plus_91"
             android:layout_toEndOf="@+id/plus_91"
-            android:hint="@string/ui_enter_name_hint"
-            android:inputType="textPersonName"
-            tools:ignore="TextFields"
-        />
+		>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/ui_enter_name_hint"
+                android:inputType="textPersonName"
+            />
+        </android.support.design.widget.TextInputLayout>
         <TextView
             style="?android:attr/textAppearanceSmall"
             android:id="@+id/name_hint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="18dp"
+            android:layout_marginTop="-8dp"
+            android:layout_marginBottom="24dp"
             android:layout_below="@+id/name"
-            android:layout_toRightOf="@+id/plus_91"
-            android:layout_toEndOf="@+id/plus_91"
+            android:layout_centerHorizontal="true"
             android:gravity="center"
             android:textSize="10sp"
-            android:text="(Name will be used when you invite friends to any event)"
+            android:text="(Your name is visible to your friends)"
             tools:ignore="HardcodedText,SmallSp"
         />
         <TextView
@@ -93,21 +97,26 @@
             android:text="+91"
             tools:ignore="HardcodedText"
         />
-        <EditText
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/phone_no"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="18dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginBottom="8dp"
             android:layout_below="@+id/name_hint"
             android:layout_toRightOf="@+id/plus_91"
             android:layout_toEndOf="@+id/plus_91"
-            android:hint="@string/ui_enter_phone_number_hint"
-            android:inputType="phone"
-            android:maxLength="11"
-            tools:ignore="TextFields"
-        />
+		>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/ui_enter_phone_number_hint"
+                android:inputType="phone"
+                android:maxLength="11"
+                tools:ignore="TextFields"
+            />
+        </android.support.design.widget.TextInputLayout>
 
         <TextView
             android:id="@+id/send_code"
@@ -138,15 +147,21 @@
             android:textSize="18sp"
             android:text="@string/ui_code"
         />
-
-        <EditText
-            android:layout_marginTop="8dp"
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/code"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:digits="0123456789"
-        />
+            android:layout_marginTop="8dp"
+        >
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:digits="0123456789"
+                android:hint="Your Code"
+                tools:ignore="HardcodedText"
+            />
+        </android.support.design.widget.TextInputLayout>
 
         <LinearLayout
             android:layout_marginTop="24dp"

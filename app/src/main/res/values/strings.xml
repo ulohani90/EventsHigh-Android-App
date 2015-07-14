@@ -14,7 +14,7 @@
     <string name="action_join">Join</string>
     <string name="action_retry">Retry</string>
     <string name="action_verify_code">Verify Code</string>
-    <string name="action_change_no">Change Name/Number</string>
+    <string name="action_change_no">Change</string>
     <string name="action_register">Register</string>
     <string name="action_find_event">Show Events</string>
     <string name="action_reset">Reset</string>
