@@ -22,6 +22,8 @@ import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.TicketNotificationStreamItem;
 import com.eventshigh.nearme.app.notification.EHNotification;
+import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
@@ -111,6 +113,11 @@ public class GcmIntentService extends IntentService {
 
         UserContact contact = null;
         if (mobileNo != null) {
+            UserInfo userInfo = new Account(this).getUserInfo();
+            if (mobileNo.equals(userInfo.phoneNo)) {
+                reportAction("notificationSkipped");
+                return null;
+            }
             contact = ContactUtils.getContactForServerPhone(this, mobileNo);
         }
 
