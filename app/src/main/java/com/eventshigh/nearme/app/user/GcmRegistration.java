@@ -307,10 +307,14 @@ public class GcmRegistration {
     private void subscribeOrUnSubscribe(GcmPubSub gcmPubSub, String registrationId, String interest,
             boolean subscribe) throws IOException {
         String topicName = "/topics/" + EventCategory.toCategoryParsableString(interest);
-        if (subscribe) {
-            gcmPubSub.subscribe(registrationId, topicName, null);
-        } else {
-            gcmPubSub.unsubscribe(registrationId, topicName);
+        try {
+            if (subscribe) {
+                gcmPubSub.subscribe(registrationId, topicName, null);
+            } else {
+                gcmPubSub.unsubscribe(registrationId, topicName);
+            }
+        } catch (IllegalArgumentException e) {
+            Crashlytics.getInstance().core.logException(e);
         }
     }
 
