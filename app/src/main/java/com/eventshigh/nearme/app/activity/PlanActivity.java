@@ -78,6 +78,8 @@ public class PlanActivity extends BaseActivity {
     }
 
     public void onRetry(View view) {
+        reportActionToAnalytics("retry", planId);
+
         topProgressBar.setVisibility(View.VISIBLE);
         retryView.setVisibility(View.GONE);
         inviteView.setVisibility(View.GONE);
@@ -88,7 +90,7 @@ public class PlanActivity extends BaseActivity {
     }
 
     public void invite(View view) {
-        reportActionToAnalytics("invite");
+        reportActionToAnalytics("invite", planId, contactsAdapter.getSelectedContacts().size());
         topProgressBar.setVisibility(View.VISIBLE);
 
         publishPlan(new Runnable() {
@@ -149,10 +151,11 @@ public class PlanActivity extends BaseActivity {
         if (!isPlanPublished) {
             try {
                 String url = Signer.sign(
-                        AccountStateReporter.getBaseUri(this, "register_event_to_plan")
-                                .appendQueryParameter("plan_id", planId)
-                                .appendQueryParameter("event_id", event.id)
-                                .build()
+                    AccountStateReporter.getBaseUri(this, "register_event_to_plan")
+                            .appendQueryParameter("plan_id", planId)
+                            .appendQueryParameter("event_id", event.id)
+                            .appendQueryParameter("expiry_timestamp", Long.toString(max(event.eventTimings)))
+                            .build()
                 ).toString();
                 JsonObjectRequest request = new JsonObjectRequest(url, null,
                         new PublishPlanIdListener(callback), tryAgainErrorListener);
@@ -249,4 +252,13 @@ public class PlanActivity extends BaseActivity {
             showMessage(R.string.failed_load);
         }
     };
+
+    public long max(long[] arr) {
+        return arr.length == 0 ? 0 : max(arr, 0, arr.length);
+    }
+
+    public long max(long[] arr, int start, int end) {
+        return (start >= end - 1) ? arr[start]
+                : Math.max(arr[start], max(arr, start + 1, end));
+    }
 }
