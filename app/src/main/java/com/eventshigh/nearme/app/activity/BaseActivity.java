@@ -290,7 +290,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void shareEvents(EventsContext eventsContext) {
-        reportActionToAnalytics("eventShareInitiated", eventsContext.getLabel());
+        reportActionToAnalytics("eventsShareInitiated", eventsContext.getLabel());
         shareEventsInitiatedTimestamp = System.currentTimeMillis();
 
         String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
