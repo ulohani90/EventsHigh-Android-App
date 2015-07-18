@@ -127,8 +127,7 @@ public class Account {
 
         Account account = new Account(context);
         UserInfo userInfo = account.getUserInfo();
-        disableSnackBar = (userInfo.phoneNo == null || userInfo.isVerified);
-        return !disableSnackBar;
+        return userInfo.phoneNo != null && !userInfo.isVerified;
     }
 
     public boolean recordReferrer(String referrer) {

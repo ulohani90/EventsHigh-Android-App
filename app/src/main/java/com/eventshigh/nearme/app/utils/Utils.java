@@ -131,5 +131,4 @@ public class Utils {
     public static String simplifyPhoneNo(String phoneNo) {
         return phoneNoPattern.matcher(phoneNo).replaceAll("");
     }
-
 }
