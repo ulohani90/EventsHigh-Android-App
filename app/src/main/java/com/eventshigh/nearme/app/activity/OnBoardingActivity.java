@@ -42,8 +42,8 @@ public class OnBoardingActivity extends BaseActivity {
 
         private OnBoardingStepResource(int titleId, int captionResId, int imageResId) {
             DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-            int imageWidth = displayMetrics.widthPixels / 4;
-            int imageHeight = displayMetrics.heightPixels / 4;
+            int imageWidth = displayMetrics.widthPixels;
+            int imageHeight = displayMetrics.heightPixels;
 
             this.titleId = titleId;
             this.captionResId = captionResId;
@@ -51,7 +51,6 @@ public class OnBoardingActivity extends BaseActivity {
                 imageResId, imageWidth, imageHeight);
         }
     }
-
 
     private OnBoardingStepResource[] onBoardingStepResources;
 
