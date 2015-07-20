@@ -260,9 +260,11 @@ public class EventDetailActivity extends BaseActivity {
         startActivitySafe(intent);
     }
 
+    @SuppressWarnings("all")
     public void openBookingSite(View view) {
         Account account = new Account(this);
-        if (account.getUserInfo().phoneNo == null || account.getUserInfo().name == null) {
+        UserInfo userInfo = account.getUserInfo();
+        if (userInfo.phoneNo == null || userInfo.name == null) {
             PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
             return;
         }
@@ -273,8 +275,10 @@ public class EventDetailActivity extends BaseActivity {
         new UserActionHelper(this).recordAction(EventAction.BOOK, event.id);
 
         final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
-        if (event.bookingUrl != null && event.bookingUrl.contains("ticketing.eventshigh.com")) {
+        if (event.bookingUrl.contains("ticketing.eventshigh.com")) {
             bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
+            bookingUriBuilder.appendQueryParameter("name", userInfo.name);
+            bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
         }
 
         CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
