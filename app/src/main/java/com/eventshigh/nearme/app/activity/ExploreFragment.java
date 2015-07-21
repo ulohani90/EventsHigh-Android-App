@@ -15,6 +15,8 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
+import com.eventshigh.nearme.app.network.EventInvitationsRequest;
+import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -22,6 +24,8 @@ import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
+
+import java.util.List;
 
 /**
  * Fragment to show explore by categories.
@@ -105,10 +109,23 @@ public class ExploreFragment extends BaseEventsFragment {
     private Listener<EventCollection> mFetcherCallBack = new Listener<EventCollection>() {
         @Override
         public void onResponse(EventCollection eventCollection, boolean isIntermediate) {
-            topProgressBar.setVisibility(isIntermediate ? View.VISIBLE : View.GONE);
             eventsAdapter.setExploreCategories(eventCollection,
-                Locality.getLocalities(eventsContext.city),
-                eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS);
+                    Locality.getLocalities(eventsContext.city),
+                    eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS);
+
+            if (!isIntermediate) {
+                EventInvitationsRequest.submit(activity, Priority.IMMEDIATE, this,
+                        false, mEventInvitationsCallback, mErrorListener);
+            }
+        }
+    };
+
+    private Listener<List<EventInvitation>> mEventInvitationsCallback = new Listener<List<EventInvitation>>() {
+        @Override
+        public void onResponse(List<EventInvitation> eventInvitations, boolean isIntermediate) {
+            if (isAdded()) {
+                eventsAdapter.setEventInvitations(eventInvitations);
+            }
         }
     };
 

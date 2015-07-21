@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -23,20 +24,24 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.BaseEventsFragment;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.Locality;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.data.UserContact;
+import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.FontUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -142,6 +147,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         notifyDataSetChanged();
     }
 
+    public void setEventInvitations(List<EventInvitation> invites) {
+        for (EventInvitation invite : invites) {
+            dataToShow.add(1, new EventInvitationData(invite));
+        }
+        notifyDataSetChanged();
+    }
+
     public void addFollowCard(String title, int numEvents, int numFollowers) {
         dataToShow.add(0, new FollowData(title, numEvents, numFollowers));
     }
@@ -211,7 +223,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         EXPLORE_CATEGORY(5),
         SMALL_HEADER(6),
         EVENT_PAGER(7),
-        SEE_ALL(8);
+        SEE_ALL(8),
+        EVENT_INVITATION(9);
 
         public final int typeId;
         DataType (int typeId) {
@@ -220,7 +233,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         public static boolean spanAllColumns (int typeId) {
             return  typeId == HEADER.typeId || typeId == SMALL_HEADER.typeId
-                    || typeId == EVENT_PAGER.typeId || typeId == SEE_ALL.typeId;
+                    || typeId == EVENT_PAGER.typeId || typeId == SEE_ALL.typeId
+                    || typeId == EVENT_INVITATION.typeId;
         }
 
         public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
@@ -254,6 +268,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             if (typeId == SEE_ALL.typeId) {
                 return SeeAllCard.newInstance(activity, parent);
+            }
+
+            if (typeId == EVENT_INVITATION.typeId) {
+                return EventInvitationCard.newInstance(activity, parent);
             }
 
             throw new IllegalArgumentException("invalid typeid");
@@ -808,7 +826,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         @Override
         public void onBindViewHolder(ViewHolder card, final int position) {
             ((TrendingCategoryCard) card).populateTrendingCategoryData(this, eventsFragment,
-                getFollowers(trendingTopic.tagName));
+                    getFollowers(trendingTopic.tagName));
         }
 
         public String getId() {
@@ -926,6 +944,74 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     LayoutParams lp = imageView.getLayoutParams();
                     lp.height = imageView.getWidth();
                     imageView.setLayoutParams(lp);
+                }
+            });
+        }
+    }
+
+    private class EventInvitationData implements Data {
+        private final EventInvitation invite;
+
+        private EventInvitationData(EventInvitation invite) {
+            this.invite = invite;
+        }
+
+        @Override
+        public DataType getType() {
+            return DataType.EVENT_INVITATION;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder card, int position) {
+            ((EventInvitationCard) card).bindView(invite, eventsFragment.getContextActivity());
+        }
+
+        @Override
+        public String getId() {
+            return "invite: " + invite.eventId;
+        }
+    }
+
+    private static class EventInvitationCard extends ViewHolder {
+        private final ImageView imageView;
+        private final TextView titleView;
+        private final TextView subtitleView;
+
+        static EventInvitationCard newInstance(BaseActivity activity, ViewGroup parent) {
+            View view = activity.getLayoutInflater().inflate(R.layout.card_stream, parent, false);
+            return new EventInvitationCard(view);
+        }
+
+        public EventInvitationCard(View itemView) {
+            super(itemView);
+
+            imageView = (ImageView) itemView.findViewById(R.id.image);
+            titleView = (TextView) itemView.findViewById(R.id.title);
+            subtitleView = (TextView) itemView.findViewById(R.id.subtitle);
+        }
+
+        public void bindView(final EventInvitation invite, final BaseContextActivity activity) {
+            String invitedByName = invite.invitedBy.contact == null ? invite.invitedBy.name :
+                    invite.invitedBy.contact.name;
+            titleView.setText(invitedByName + " has invited you to an event!");
+            subtitleView.setVisibility(View.GONE);
+
+            int size = imageView.getLayoutParams().height;
+            Drawable drawable = invite.invitedBy.contact == null ?
+                    UserContact.getDrawableForName(invitedByName, size) :
+                    invite.invitedBy.contact.getDrawable(activity, size);
+            imageView.setImageDrawable(drawable);
+
+            itemView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    City city = GcmRegistration.getInstance(activity).getLastCity();
+                    if (city == null) {
+                        city = City.BANGALORE;
+                    }
+
+                    activity.showEventDetails(EventsHighEndpoints.getEventDetailsURI(city, invite.eventId),
+                            "invitation");
                 }
             });
         }

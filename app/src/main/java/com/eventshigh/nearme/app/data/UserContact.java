@@ -50,8 +50,7 @@ public class UserContact implements Comparable<UserContact> {
             return new BitmapDrawable(context.getResources(), ImageUtils.getCircularBitmapFrom(bitmap));
         }
 
-        int color = ColorGenerator.MATERIAL.getColor(name);
-        return TextDrawable.builder().buildRoundRect(Character.toString(name.charAt(0)), color, size);
+        return getDrawableForName(name, size);
     }
 
     public JSONObject toJSON() throws JSONException {
@@ -107,5 +106,10 @@ public class UserContact implements Comparable<UserContact> {
     @Override
     public int compareTo(@NonNull UserContact another) {
         return contactId.compareTo(another.contactId);
+    }
+
+    public static Drawable getDrawableForName(String name, int size) {
+        int color = ColorGenerator.MATERIAL.getColor(name);
+        return TextDrawable.builder().buildRoundRect(Character.toString(name.charAt(0)), color, size);
     }
 }

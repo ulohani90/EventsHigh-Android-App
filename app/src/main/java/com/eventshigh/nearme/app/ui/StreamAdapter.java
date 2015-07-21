@@ -56,21 +56,21 @@ public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
     }
 
     public class NotificationCard extends RecyclerView.ViewHolder {
-        private final TextView timeView;
-        private final TextView titleView;
         private final ImageView imageView;
+        private final TextView titleView;
+        private final TextView subtitleView;
 
         public NotificationCard(View itemView) {
             super(itemView);
 
-            timeView = (TextView) itemView.findViewById(R.id.time);
-            titleView = (TextView) itemView.findViewById(R.id.title);
             imageView = (ImageView) itemView.findViewById(R.id.image);
+            titleView = (TextView) itemView.findViewById(R.id.title);
+            subtitleView = (TextView) itemView.findViewById(R.id.subtitle);
         }
 
         public void bindView(final StreamItem streamItem, final BaseContextActivity activity) {
-            timeView.setText(DateUtils.getRelativeTimeSpanString(streamItem.timestamp));
             titleView.setText(streamItem.title);
+            subtitleView.setText(DateUtils.getRelativeTimeSpanString(streamItem.timestamp));
 
             UserContact contact = streamItem.mobileNo == null ? null :
                     ContactUtils.getContactForServerPhone(activity, streamItem.mobileNo);
