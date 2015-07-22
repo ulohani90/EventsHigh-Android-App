@@ -9,40 +9,49 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
+import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialFriend;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInvitation>> {
     public static class EventInvitation {
-        public final String eventId;
+        public final Event event;
         public final SocialFriend invitedBy;
 
-        public EventInvitation(String eventId, SocialFriend invitedBy) {
-            this.eventId = eventId;
+        public EventInvitation(Event event, SocialFriend invitedBy) {
+            this.event = event;
             this.invitedBy = invitedBy;
         }
     }
 
-    public static void submit(Context context, Priority priority, Object tag, boolean shouldBypassCache,
-            Listener<List<EventInvitation>> listener, ErrorListener errorListener) {
-        new EventInvitationsRequest(context, priority, tag, shouldBypassCache, listener, errorListener).execute();
+    public static void submit(Context context, EventsContext eventsContext, Priority priority,
+            Object tag, boolean shouldBypassCache, Listener<List<EventInvitation>> listener,
+            ErrorListener errorListener) {
+        new EventInvitationsRequest(context, eventsContext, priority, tag, shouldBypassCache,
+                listener, errorListener).execute();
     }
 
     private final Context context;
+    private final EventsContext eventsContext;
     private final Priority priority;
     private final Object tag;
     private final boolean shouldBypassCache;
     private final Listener<List<EventInvitation>> listener;
     private final ErrorListener errorListener;
 
-    public EventInvitationsRequest(Context context, Priority priority, Object tag, boolean shouldBypassCache,
-            Listener<List<EventInvitation>> listener, ErrorListener errorListener) {
+    public EventInvitationsRequest(Context context, EventsContext eventsContext, Priority priority,
+           Object tag, boolean shouldBypassCache, Listener<List<EventInvitation>> listener,
+           ErrorListener errorListener) {
         this.context = context;
+        this.eventsContext = eventsContext;
         this.priority = priority;
         this.tag = tag;
         this.shouldBypassCache = shouldBypassCache;
@@ -57,11 +66,29 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
 
         try {
             List<SocialInvite> invites = future.get();
-            List<EventInvitation> eventInvitations = new ArrayList<>(invites.size());
+
+            List<String> eventIds = new ArrayList<>(invites.size());
             for (SocialInvite invite : invites) {
                 SocialFriend invitedBy = invite.getInvitedBy();
                 if (invitedBy != null) {
-                    eventInvitations.add(new EventInvitation(invite.eventId, invitedBy));
+                    eventIds.add(invite.eventId);
+                }
+            }
+
+            RequestFuture<List<Event>> future2 = RequestFuture.newFuture();
+            MultiEventsRequest.submit(context, eventsContext, eventIds, priority, tag,
+                    shouldBypassCache, true, future2, future2);
+            Map<String, Event> eventsMap = new HashMap<>(invites.size());
+            for (Event event: future2.get()) {
+                eventsMap.put(event.id, event);
+            }
+
+            List<EventInvitation> eventInvitations = new ArrayList<>(invites.size());
+            for (SocialInvite invite : invites) {
+                Event event = eventsMap.get(invite.eventId);
+                SocialFriend invitedBy = invite.getInvitedBy();
+                if (event != null && invitedBy != null) {
+                    eventInvitations.add(new EventInvitation(event, invitedBy));
                 }
             }
             return eventInvitations;

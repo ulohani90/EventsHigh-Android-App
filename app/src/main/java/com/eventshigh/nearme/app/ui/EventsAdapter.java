@@ -24,7 +24,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.BaseEventsFragment;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
@@ -38,10 +37,8 @@ import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.FontUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -968,7 +965,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public String getId() {
-            return "invite: " + invite.eventId;
+            return "invite: " + invite.event.id;
         }
     }
 
@@ -978,7 +975,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView subtitleView;
 
         static EventInvitationCard newInstance(BaseActivity activity, ViewGroup parent) {
-            View view = activity.getLayoutInflater().inflate(R.layout.card_stream, parent, false);
+            View view = activity.getLayoutInflater().inflate(R.layout.card_invitation, parent, false);
             return new EventInvitationCard(view);
         }
 
@@ -994,7 +991,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             String invitedByName = invite.invitedBy.contact == null ? invite.invitedBy.name :
                     invite.invitedBy.contact.name;
             titleView.setText(invitedByName + " has invited you to an event!");
-            subtitleView.setVisibility(View.GONE);
+            subtitleView.setText(invite.event.title + " @ " + invite.event.getShortAddress());
 
             int size = imageView.getLayoutParams().height;
             Drawable drawable = invite.invitedBy.contact == null ?
@@ -1005,13 +1002,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    City city = GcmRegistration.getInstance(activity).getLastCity();
-                    if (city == null) {
-                        city = City.BANGALORE;
-                    }
-
-                    activity.showEventDetails(EventsHighEndpoints.getEventDetailsURI(city, invite.eventId),
-                            "invitation");
+                    activity.showEventDetails(invite.event, "invitation", null);
                 }
             });
         }
