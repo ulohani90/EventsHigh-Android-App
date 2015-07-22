@@ -39,9 +39,12 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
@@ -71,7 +74,9 @@ import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
@@ -462,7 +467,30 @@ public class EventDetailActivity extends BaseActivity {
                     }
                 }
         );
-    }
+        SocialInvitationsRequest.submit(this, Priority.LOW, this, false,
+                new Listener<List<SocialInvite>>() {
+                    @Override
+                    public void onResponse(List<SocialInvite> invites, boolean isIntermediate) {
+                        for (SocialInvite invite : invites) {
+                            if (invite.eventId.equals(event.id)) {
+                                SocialFriend friend = invite.getInvitedBy();
+                                if (friend != null) {
+                                    ((FollowedByView) findViewById(R.id.invited_by)).setFollowers(
+                                        EventDetailActivity.this, Collections.singleton(friend),
+                                         friend.getName() + " has invited you to this event.", Gravity.START);
+                                }
+                                return;
+                            }
+                        }
+                    }
+                },
+                new ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        VolleyHelper.log(EventDetailActivity.this, volleyError);
+                    }
+                }
+        );    }
 
     private void setScroll(int scrollValue) {
         float opacity = Math.min(1.0f, scrollValue * 3f / getResources().getDisplayMetrics().heightPixels);

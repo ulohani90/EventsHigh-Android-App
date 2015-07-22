@@ -14,7 +14,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SocialFriend {
+public class SocialFriend implements Comparable<SocialFriend> {
     private final String name;
     public final String mobileNo;
     @Nullable
@@ -50,6 +50,11 @@ public class SocialFriend {
     public boolean equals(Object other) {
         return other instanceof SocialFriend
                 && ((SocialFriend) other).mobileNo.equals(mobileNo);
+    }
+
+    @Override
+    public int compareTo(@NonNull SocialFriend another) {
+        return mobileNo.compareTo(another.mobileNo);
     }
 
     public static SocialFriend fromJSON(JSONObject data, Context context) throws JSONException {
