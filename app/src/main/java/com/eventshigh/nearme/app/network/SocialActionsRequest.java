@@ -17,6 +17,7 @@ import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.security.Signer;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 
@@ -90,10 +91,14 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
             String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
             JSONObject resp = new JSONObject(jsonString);
             JSONArray friends = resp.getJSONArray("social");
+            String myMobileNo = new Account(context).getUserInfo().phoneNo;
 
             for (int i = 0; i < friends.length(); i++) {
-                UserContact contact = ContactUtils.getContactForServerPhone(context,
-                        friends.getJSONObject(i).getString("mobile_no"));
+                String mobileNo = friends.getJSONObject(i).getString("mobile_no");
+                if (mobileNo.equalsIgnoreCase(myMobileNo)) {
+                    continue;
+                }
+                UserContact contact = ContactUtils.getContactForServerPhone(context, mobileNo);
                 if (contact == null) {
                     continue;
                 }
