@@ -13,12 +13,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
-import com.eventshigh.nearme.app.data.UserContact;
+import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
-import com.eventshigh.nearme.app.utils.ContactUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,44 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SocialInvitationsRequest extends JsonRequest<List<SocialInvite>>  {
-
-    public static class SocialFriend {
-        public final String name;
-        public final String mobileNo;
-        @Nullable
-        public final UserContact contact;
-
-        public SocialFriend(String name, String mobileNo, @Nullable UserContact contact) {
-            this.name = name;
-            this.mobileNo = mobileNo;
-            this.contact = contact;
-        }
-
-        @Override
-        public int hashCode() {
-            return mobileNo.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            return other instanceof SocialFriend
-                    && ((SocialFriend) other).mobileNo.equals(mobileNo);
-        }
-
-        public static SocialFriend fromJSON(JSONObject data, Context context) throws JSONException {
-            String mobileNo = data.getString("mobile_no");
-            return new SocialFriend(data.getString("name"), mobileNo,
-                    ContactUtils.getContactForServerPhone(context, mobileNo));
-        }
-
-        public static List<SocialFriend> fromJSON(JSONArray data, Context context) throws JSONException {
-            List<SocialFriend> friends = new ArrayList<>(data.length());
-            for (int i = 0; i < data.length(); i++) {
-                friends.add(fromJSON(data.getJSONObject(i), context));
-            }
-            return friends;
-        }
-    }
 
     public static class PlanInvite {
         public final String planId;

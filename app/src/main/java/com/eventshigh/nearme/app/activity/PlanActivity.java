@@ -13,6 +13,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.MyContactsRequest;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
@@ -90,7 +91,7 @@ public class PlanActivity extends BaseActivity {
     }
 
     public void invite(View view) {
-        reportActionToAnalytics("invite", planId, contactsAdapter.getSelectedContacts().size());
+        reportActionToAnalytics("invite", planId, contactsAdapter.getSelectedFriends().size());
         topProgressBar.setVisibility(View.VISIBLE);
 
         publishPlan(new Runnable() {
@@ -174,10 +175,10 @@ public class PlanActivity extends BaseActivity {
     private void sendInvitations() {
         try {
             JSONArray invitations = new JSONArray();
-            for (UserContact contact : contactsAdapter.getSelectedContacts()) {
+            for (SocialFriend friend : contactsAdapter.getSelectedFriends()) {
                 JSONObject invitation = new JSONObject();
-                invitation.put("name", contact.name);
-                invitation.put("mobile_no", contact.mobileNo);
+                invitation.put("name", friend.getName());
+                invitation.put("mobile_no", friend.mobileNo);
                 invitations.put(invitation);
             }
 

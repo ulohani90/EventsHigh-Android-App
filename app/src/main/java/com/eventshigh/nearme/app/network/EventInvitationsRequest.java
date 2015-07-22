@@ -12,7 +12,7 @@ import com.android.volley.toolbox.RequestFuture;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
-import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialFriend;
+import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 
 import java.util.ArrayList;

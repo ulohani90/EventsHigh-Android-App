@@ -6,15 +6,14 @@ import android.support.v7.app.AlertDialog;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.data.UserContact;
-import com.eventshigh.nearme.app.ui.ContactsAdapter.ContactCardType;
+import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
-import java.util.List;
+import java.util.Collection;
 
 public class FriendsDialog {
 
-    public static void show(final BaseActivity activity,List<UserContact> contacts) {
+    public static void show(final BaseActivity activity, Collection<SocialFriend> friends) {
         final AlertDialog alertDialog = new AlertDialog.Builder(activity)
                 .setView(R.layout.view_grid)
                 .setPositiveButton(android.R.string.ok, new OnClickListener() {
@@ -29,7 +28,7 @@ public class FriendsDialog {
 
         AutofitRecyclerView gridView = (AutofitRecyclerView) alertDialog.findViewById(R.id.grid);
         ContactsAdapter contactsAdapter = new ContactsAdapter(activity);
-        contactsAdapter.setMyContacts(contacts, ContactCardType.PLAIN);
+        contactsAdapter.setFriends(friends);
         gridView.setAdapter(contactsAdapter);
     }
 }

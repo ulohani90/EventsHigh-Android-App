@@ -13,6 +13,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.EventCategory;
+import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.security.Signer;
@@ -32,11 +33,11 @@ import java.util.Set;
 public class SocialActionsRequest extends JsonRequest<SocialActions> {
 
     public static class SocialActions {
-        public final Map<String, Set<UserContact>> eventFavourites;
-        public final Map<String, Set<UserContact>> tagFollowers;
+        public final Map<String, Set<SocialFriend>> eventFavourites;
+        public final Map<String, Set<SocialFriend>> tagFollowers;
 
-        public SocialActions(Map<String, Set<UserContact>> eventFavourites,
-                             Map<String, Set<UserContact>> tagFollowers) {
+        public SocialActions(Map<String, Set<SocialFriend>> eventFavourites,
+                             Map<String, Set<SocialFriend>> tagFollowers) {
             this.eventFavourites = eventFavourites;
             this.tagFollowers = tagFollowers;
         }
@@ -82,8 +83,8 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
 
     @Override
     protected Response<SocialActions> parseNetworkResponse(NetworkResponse response) {
-        Map<String, Set<UserContact>> eventFavourites  = new HashMap<>();
-        Map<String, Set<UserContact>> tagFollowers = new HashMap<>();
+        Map<String, Set<SocialFriend>> eventFavourites  = new HashMap<>();
+        Map<String, Set<SocialFriend>> tagFollowers = new HashMap<>();
 
         try {
             String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
@@ -91,17 +92,21 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
             JSONArray friends = resp.getJSONArray("social");
 
             for (int i = 0; i < friends.length(); i++) {
-                UserContact contactId = ContactUtils.getContactForServerPhone(context,
+                UserContact contact = ContactUtils.getContactForServerPhone(context,
                         friends.getJSONObject(i).getString("mobile_no"));
+                if (contact == null) {
+                    continue;
+                }
+
                 JSONArray favouritesArray = friends.getJSONObject(i).getJSONArray("favourites");
                 for (int j = 0; j < favouritesArray.length(); j++) {
-                    add(eventFavourites, favouritesArray.getString(j), contactId);
+                    add(eventFavourites, favouritesArray.getString(j), new SocialFriend(contact));
                 }
 
                 JSONArray followingsArray = friends.getJSONObject(i).getJSONArray("followings");
                 for (int j = 0; j < followingsArray.length(); j++) {
                     String key = EventCategory.toCategoryParsableString(followingsArray.getString(j));
-                    add(tagFollowers, key, contactId);
+                    add(tagFollowers, key, new SocialFriend(contact));
                 }
             }
 
@@ -113,13 +118,13 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
         }
     }
 
-    private static boolean add(Map<String, Set<UserContact>> usersMap, String key, UserContact contact) {
-        Set<UserContact> users = usersMap.get(key);
-        if (users == null) {
-            users = new HashSet<>();
-            usersMap.put(key, users);
+    private static boolean add(Map<String, Set<SocialFriend>> usersMap, String key, SocialFriend friend) {
+        Set<SocialFriend> friends = usersMap.get(key);
+        if (friends == null) {
+            friends = new HashSet<>();
+            usersMap.put(key, friends);
         }
 
-        return users.add(contact);
+        return friends.add(friend);
     }
 }

@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.ui;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -28,8 +27,8 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.Locality;
+import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.TrendingTopic;
-import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
@@ -207,7 +206,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         return view;
     }
 
-    public @Nullable Set<UserContact> getFollowers(String tag) {
+    public @Nullable Set<SocialFriend> getFollowers(String tag) {
         return socialActions == null ? null :
                 socialActions.tagFollowers.get(EventCategory.toCategoryParsableString(tag));
     }
@@ -769,7 +768,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public void populate(final FollowData data, final BaseContextActivity activity,
-                @Nullable Set<UserContact> followers) {
+                @Nullable Set<SocialFriend> followers) {
             titleView.setText(data.title);
             subtitleView.setText(MessageFormat.format(
                     activity.getString(R.string.num_events), data.numFollowers, data.numEvents));
@@ -889,7 +888,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public void populateTrendingCategoryData(final TrendingCategoryData data,
-                final BaseEventsFragment eventsFragment, @Nullable Set<UserContact> followers) {
+                final BaseEventsFragment eventsFragment, @Nullable Set<SocialFriend> followers) {
             imageView.setImageUrl(data.trendingTopic.imgUrl,
                     VolleyHelper.getImageLoader(eventsFragment.getContextActivity()));
             titleView.setText(data.trendingTopic.tagName);
@@ -918,7 +917,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public void populateExploreCategoryData(final ExploreCategoryData data,
-                final BaseEventsFragment eventsFragment, @Nullable Set<UserContact> followers) {
+                final BaseEventsFragment eventsFragment, @Nullable Set<SocialFriend> followers) {
             imageView.setDefaultImageResId(data.getInfoGraphId());
             titleView.setVisibility(View.GONE);
             followedByView.setFollowers(eventsFragment.getContextActivity(), followers, null,
@@ -988,16 +987,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public void bindView(final EventInvitation invite, final BaseContextActivity activity) {
-            String invitedByName = invite.invitedBy.contact == null ? invite.invitedBy.name :
-                    invite.invitedBy.contact.name;
+            String invitedByName = invite.invitedBy.getName();
             titleView.setText(invitedByName + " has invited you to an event!");
             subtitleView.setText(invite.event.title + " @ " + invite.event.getShortAddress());
 
             int size = imageView.getLayoutParams().height;
-            Drawable drawable = invite.invitedBy.contact == null ?
-                    UserContact.getDrawableForName(invitedByName, size) :
-                    invite.invitedBy.contact.getDrawable(activity, size);
-            imageView.setImageDrawable(drawable);
+            imageView.setImageDrawable(invite.invitedBy.getDrawable(activity, size));
 
             itemView.setOnClickListener(new OnClickListener() {
                 @Override

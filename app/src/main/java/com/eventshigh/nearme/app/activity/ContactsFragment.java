@@ -20,7 +20,7 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog.ContactsRequestCallback;
 import com.eventshigh.nearme.app.ui.ContactsAdapter;
-import com.eventshigh.nearme.app.ui.ContactsAdapter.ContactCardType;
+import com.eventshigh.nearme.app.ui.ContactsAdapter.FriendCardType;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
@@ -149,7 +149,7 @@ public class ContactsFragment extends Fragment {
             if (contacts.isEmpty()) {
                 noFriendsOnEhView.setVisibility(View.VISIBLE);
             }
-            contactsAdapter.setMyContacts(contacts, ContactCardType.FOLLOW);
+            contactsAdapter.setMyContacts(contacts, FriendCardType.FOLLOW);
         }
     };
 

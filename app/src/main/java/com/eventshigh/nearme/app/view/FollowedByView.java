@@ -13,12 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.data.UserContact;
+import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.ui.FriendsDialog;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Set;
 
 public class FollowedByView extends HorizontalScrollView {
@@ -27,10 +26,10 @@ public class FollowedByView extends HorizontalScrollView {
         super(context, attrs);
     }
 
-    public void setFollowers(final BaseActivity activity, @Nullable final Set<UserContact> contacts,
+    public void setFollowers(final BaseActivity activity, @Nullable final Set<SocialFriend> friends,
             final @Nullable String text, int gravity) {
         removeAllViews();
-        if (contacts == null || contacts.isEmpty()) {
+        if (friends == null || friends.isEmpty()) {
             return;
         }
 
@@ -40,22 +39,20 @@ public class FollowedByView extends HorizontalScrollView {
         addView(container);
 
         int size = Utils.dpToPx(getContext(), 24);
-        for (UserContact contact : contacts) {
-            new ContactPhotoLoaderTask(container, size, text).execute(contact);
+        for (SocialFriend friend : friends) {
+            new ContactPhotoLoaderTask(container, size, text).execute(friend);
         }
 
         container.setClickable(true);
         container.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<UserContact> contactList = new ArrayList<>(contacts.size());
-                contactList.addAll(contacts);
-                FriendsDialog.show(activity, contactList);
+                FriendsDialog.show(activity, friends);
             }
         });
     }
 
-    public static class ContactPhotoLoaderTask extends AsyncTask<UserContact, Void, Drawable> {
+    public static class ContactPhotoLoaderTask extends AsyncTask<SocialFriend, Void, Drawable> {
         private final WeakReference<LinearLayout> parentViewReference;
         private final Context context;
         private final int size;
@@ -70,8 +67,8 @@ public class FollowedByView extends HorizontalScrollView {
         }
 
         @Override
-        protected Drawable doInBackground(UserContact... contacts) {
-            return contacts[0].getDrawable(context, size);
+        protected Drawable doInBackground(SocialFriend... friends) {
+            return friends[0].getDrawable(context, size);
         }
 
         @Override
@@ -91,7 +88,10 @@ public class FollowedByView extends HorizontalScrollView {
                 }
 
                 ImageView imageView = new ImageView(parentView.getContext());
-                imageView.setLayoutParams(new LinearLayout.LayoutParams(size, size));
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(size, size);
+                lp.leftMargin = Utils.dpToPx(parentView.getContext(), 2);
+                lp.rightMargin = Utils.dpToPx(parentView.getContext(), 2);
+                imageView.setLayoutParams(lp);
                 imageView.setImageDrawable(drawable);
                 parentView.addView(imageView, 0);
             }
