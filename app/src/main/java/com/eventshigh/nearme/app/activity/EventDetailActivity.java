@@ -97,6 +97,7 @@ public class EventDetailActivity extends BaseActivity {
     private LatLng userLocation = null;
     private Event event = null;
     private Account account;
+    private String planId = null;
     private GoogleApiClient client;
     private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
     private boolean addToFavourite = false;
@@ -163,15 +164,15 @@ public class EventDetailActivity extends BaseActivity {
             populateView(event);
         } else {
             EventRequest.submit(this, getIntent().getData(), Priority.IMMEDIATE, mEventListener,
-                    new ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            Toast.makeText(EventDetailActivity.this, R.string.failed_load,
-                                    Toast.LENGTH_SHORT).show();
-                            VolleyHelper.log(EventDetailActivity.this, volleyError);
-                            finish();
-                        }
-                    });
+                new ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Toast.makeText(EventDetailActivity.this, R.string.failed_load,
+                                Toast.LENGTH_SHORT).show();
+                        VolleyHelper.log(EventDetailActivity.this, volleyError);
+                        finish();
+                    }
+                });
         }
     }
 
@@ -415,6 +416,9 @@ public class EventDetailActivity extends BaseActivity {
 
         Intent intent = new Intent(this, PlanActivity.class);
         intent.putExtra(EXTRA_EVENT_PARAM, event);
+        if (planId != null) {
+            intent.putExtra(EXTRA_PLAN_ID_PARAM, planId);
+        }
         startActivity(intent);
     }
 
@@ -478,6 +482,7 @@ public class EventDetailActivity extends BaseActivity {
                         for (SocialInvite invite : invites) {
                             if (invite.eventId.equals(event.id)) {
                                 allInvitedBy = invite.getAllInvitedBy();
+                                planId = invite.getPlanId();
                                 break;
                             }
                         }
@@ -497,7 +502,8 @@ public class EventDetailActivity extends BaseActivity {
                         VolleyHelper.log(EventDetailActivity.this, volleyError);
                     }
                 }
-        );    }
+        );
+    }
 
     private void setScroll(int scrollValue) {
         float opacity = Math.min(1.0f, scrollValue * 3f / getResources().getDisplayMetrics().heightPixels);

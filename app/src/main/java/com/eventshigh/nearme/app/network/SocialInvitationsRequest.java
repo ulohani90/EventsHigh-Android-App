@@ -74,6 +74,15 @@ public class SocialInvitationsRequest extends JsonRequest<List<SocialInvite>>  {
             return  null;
         }
 
+        @SuppressWarnings("LoopStatementThatDoesntLoop")
+        public @Nullable String getPlanId() {
+            for (PlanInvite invite : planInvites) {
+                return invite.planId;
+            }
+
+            return  null;
+        }
+
         public Set<SocialFriend> getAllInvitedBy() {
             Set<SocialFriend> allInvitedBy = new HashSet<>();
             for (PlanInvite invite : planInvites) {
