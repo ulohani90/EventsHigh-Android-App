@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -41,6 +42,15 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
                              Map<String, Set<SocialFriend>> tagFollowers) {
             this.eventFavourites = eventFavourites;
             this.tagFollowers = tagFollowers;
+        }
+
+        public @Nullable Set<SocialFriend> getTagFollowers(String tag) {
+            return tagFollowers.get(EventCategory.toCategoryParsableString(tag));
+        }
+
+        public int getNumFollowers(String tag) {
+            Set<SocialFriend> followers = getTagFollowers(tag);
+            return followers == null ? 0 : followers.size();
         }
     }
 

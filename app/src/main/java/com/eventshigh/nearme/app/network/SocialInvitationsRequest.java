@@ -26,7 +26,9 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SocialInvitationsRequest extends JsonRequest<List<SocialInvite>>  {
 
@@ -70,6 +72,15 @@ public class SocialInvitationsRequest extends JsonRequest<List<SocialInvite>>  {
             }
 
             return  null;
+        }
+
+        public Set<SocialFriend> getAllInvitedBy() {
+            Set<SocialFriend> allInvitedBy = new HashSet<>();
+            for (PlanInvite invite : planInvites) {
+                allInvitedBy.addAll(invite.invitedBy);
+            }
+
+            return allInvitedBy;
         }
 
         public static SocialInvite fromJSON(JSONObject data, Context context) throws JSONException {

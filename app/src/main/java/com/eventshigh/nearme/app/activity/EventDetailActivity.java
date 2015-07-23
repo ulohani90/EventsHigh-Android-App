@@ -77,6 +77,7 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
@@ -455,9 +456,11 @@ public class EventDetailActivity extends BaseActivity {
                 new Listener<SocialActions>() {
                     @Override
                     public void onResponse(SocialActions socialActions, boolean isIntermediate) {
+                        Set<SocialFriend> likedBy = socialActions.eventFavourites.get(event.id);
+                        reportActionToAnalytics("showSocialInfo", "likes",
+                                likedBy == null ? 0 : likedBy.size());
                         ((FollowedByView) findViewById(R.id.followed_by)).setFollowers(
-                            EventDetailActivity.this, socialActions.eventFavourites.get(event.id),
-                            " liked this.", Gravity.START);
+                                EventDetailActivity.this, likedBy, " liked this.", Gravity.START);
                     }
                 },
                 new ErrorListener() {
@@ -471,17 +474,21 @@ public class EventDetailActivity extends BaseActivity {
                 new Listener<List<SocialInvite>>() {
                     @Override
                     public void onResponse(List<SocialInvite> invites, boolean isIntermediate) {
+                        Set<SocialFriend>  allInvitedBy = Collections.emptySet();
                         for (SocialInvite invite : invites) {
                             if (invite.eventId.equals(event.id)) {
-                                SocialFriend friend = invite.getInvitedBy();
-                                if (friend != null) {
-                                    ((FollowedByView) findViewById(R.id.invited_by)).setFollowers(
-                                        EventDetailActivity.this, Collections.singleton(friend),
-                                         friend.getName() + " has invited you to this event.", Gravity.START);
-                                }
-                                return;
+                                allInvitedBy = invite.getAllInvitedBy();
+                                break;
                             }
                         }
+
+                        SocialFriend invitedBy = allInvitedBy.size() == 1 ?
+                                allInvitedBy.iterator().next() : null;
+                        reportActionToAnalytics("showSocialInfo", "invitedBy", allInvitedBy.size());
+                        ((FollowedByView) findViewById(R.id.invited_by)).setFollowers(
+                                EventDetailActivity.this, allInvitedBy,
+                                (invitedBy == null ? "" : invitedBy.getName()) +
+                                        " has invited you to this event.", Gravity.START);
                     }
                 },
                 new ErrorListener() {

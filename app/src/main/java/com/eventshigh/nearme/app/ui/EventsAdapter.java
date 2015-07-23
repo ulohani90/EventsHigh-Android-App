@@ -207,8 +207,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     public @Nullable Set<SocialFriend> getFollowers(String tag) {
-        return socialActions == null ? null :
-                socialActions.tagFollowers.get(EventCategory.toCategoryParsableString(tag));
+        return socialActions == null ? null : socialActions.getTagFollowers(tag);
     }
 
     private enum DataType {

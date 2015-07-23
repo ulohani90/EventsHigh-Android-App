@@ -124,6 +124,8 @@ public class ExploreFragment extends BaseEventsFragment {
         @Override
         public void onResponse(List<EventInvitation> eventInvitations, boolean isIntermediate) {
             if (isAdded()) {
+                activity.reportActionToAnalytics("showSocialInfo", "eventInvitations",
+                        eventInvitations.size());
                 eventsAdapter.setEventInvitations(eventInvitations);
             }
         }

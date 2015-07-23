@@ -149,6 +149,8 @@ public class EventsFragment extends BaseEventsFragment {
                     new Listener<SocialActions>() {
                         @Override
                         public void onResponse(SocialActions socialActions, boolean isIntermediate) {
+                            activity.reportActionToAnalytics("showSocialInfo", "followers",
+                                    socialActions.getNumFollowers(eventsContext.query));
                             eventsAdapter.setSocialActions(socialActions);
                         }
                     },
