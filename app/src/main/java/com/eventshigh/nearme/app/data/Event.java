@@ -27,9 +27,6 @@ import java.util.List;
  * This class describes one Event. Event have few attributes like title, category, location etc.
  */
 public class Event implements Parcelable {
-    // EH_RECOMMENDED is same as 100 people going to event.
-    private static final int EH_RECOMMENDATION_BOOST = 100;
-
     public final String id;
     public final City city;
     public final String title;

@@ -631,8 +631,8 @@ public class EventDetailActivity extends BaseActivity {
 
         private void populateView(final Event event) {
             eventScrollView.getViewTreeObserver().addOnScrollChangedListener(
-                new OnScrollChangedListener() {
-                    @Override
+                    new OnScrollChangedListener() {
+                        @Override
                         public void onScrollChanged() {
                             setScroll(eventScrollView.getScrollY());
                         }
@@ -652,13 +652,11 @@ public class EventDetailActivity extends BaseActivity {
             statsView.setText("" + event.numViews + " views");
 
             // Add attribution.
-            if (event.sourceUrl == null) {
-                fromView.setVisibility(View.INVISIBLE);
+            String sourceHost = event.sourceUrl == null ? null : Uri.parse(event.sourceUrl).getHost();
+            if (sourceHost == null) {
+                fromView.setVisibility(View.GONE);
             } else {
-                final Uri fromUri = Uri.parse(event.sourceUrl);
-                String eventFrom = String.format(
-                        getResources().getString(R.string.event_detail_from),
-                        fromUri.getHost());
+                String eventFrom = String.format(getString(R.string.event_detail_from), sourceHost);
                 fromView.setText(eventFrom);
             }
 
