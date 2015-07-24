@@ -487,11 +487,16 @@ public class EventDetailActivity extends BaseActivity {
                             }
                         }
 
+                        if (allInvitedBy.isEmpty()) {
+                            return;
+                        }
+
+                        reportActionToAnalytics("showSocialInfo", "invitedBy", allInvitedBy.size());
                         SocialFriend invitedBy = allInvitedBy.size() == 1 ?
                                 allInvitedBy.iterator().next() : null;
-                        reportActionToAnalytics("showSocialInfo", "invitedBy", allInvitedBy.size());
-                        ((FollowedByView) findViewById(R.id.invited_by)).setFollowers(
-                                EventDetailActivity.this, allInvitedBy,
+                        FollowedByView invitedByView = (FollowedByView) findViewById(R.id.invited_by);
+                        invitedByView.setVisibility(View.VISIBLE);
+                        invitedByView.setFollowers(EventDetailActivity.this, allInvitedBy,
                                 (invitedBy == null ? "" : invitedBy.getName()) +
                                         " has invited you to this event.", Gravity.START);
                     }
@@ -661,7 +666,7 @@ public class EventDetailActivity extends BaseActivity {
             titleView.setText(event.title);
 
             // Show stats
-            statsView.setVisibility(event.numViews > 5 ? View.VISIBLE : View.GONE);
+            ((View) statsView.getParent()).setVisibility(event.numViews > 5 ? View.VISIBLE : View.GONE);
             statsView.setText("" + event.numViews + " views");
 
             // Add attribution.
