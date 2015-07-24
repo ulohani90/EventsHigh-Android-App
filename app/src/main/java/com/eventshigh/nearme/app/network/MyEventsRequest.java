@@ -121,9 +121,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         try {
             List<SocialInvite> invites = socialInvites.get();
             for (SocialInvite invite : invites) {
-                if (invite.getInvitedBy() == null) {
-                    eventIds.add(invite.eventId);
-                }
+                eventIds.add(invite.eventId);
             }
         } catch (InterruptedException | ExecutionException e) {
             Crashlytics.getInstance().core.logException(e);
@@ -134,8 +132,8 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
                 shouldBypassCache, true, invitedEvents, invitedEvents);
 
         // Build Result.
-        addEventsToResults(result, FAVOURITES_NAME, favEvents);
         addEventsToResults(result, INVITATIONS_NAME, invitedEvents);
+        addEventsToResults(result, FAVOURITES_NAME, favEvents);
         for (Entry<String, RequestFuture<EventsCollection>> interestEvents : interestsEvents.entrySet()) {
             addCollectionToResults(result, interestEvents.getKey(), interestEvents.getValue());
         }
