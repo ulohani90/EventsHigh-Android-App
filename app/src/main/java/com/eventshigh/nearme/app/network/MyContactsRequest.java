@@ -16,6 +16,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.MyContactsRequest.MyContact;
 import com.eventshigh.nearme.app.security.Signer;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 
@@ -87,12 +88,16 @@ public class MyContactsRequest extends JsonRequest<List<MyContact>> {
             String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
             JSONObject resp = new JSONObject(jsonString);
             JSONArray friends = resp.getJSONArray("friends");
+
+            String myMobileNo = new Account(context).getUserInfo().phoneNo;
             Set<UserContact> contactOnEh = new HashSet<>();
             for (int i = 0; i < friends.length(); i++) {
                 String mobileNo = friends.getJSONObject(i).getString("mobile_no");
-                UserContact contact = ContactUtils.getContactForServerPhone(context, mobileNo);
-                if (contact != null) {
-                    contactOnEh.add(contact);
+                if (!mobileNo.equals(myMobileNo)) {
+                    UserContact contact = ContactUtils.getContactForServerPhone(context, mobileNo);
+                    if (contact != null) {
+                        contactOnEh.add(contact);
+                    }
                 }
             }
 
