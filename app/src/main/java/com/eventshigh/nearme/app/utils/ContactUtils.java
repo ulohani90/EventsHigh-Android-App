@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.annotation.Nullable;
 
@@ -19,18 +20,13 @@ public class ContactUtils {
     public static List<UserContact> getContacts(Context context, @Nullable String selectionExtras,
             String order, boolean addEmail) {
         // Build contact query.
-        String[] projection = new String[] {
-                ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                ContactsContract.CommonDataKinds.Phone.NUMBER,
-        };
-
         if (selectionExtras == null) {
             selectionExtras = "";
         }
         String selection = ContactsContract.Contacts.HAS_PHONE_NUMBER + " = 1 " + selectionExtras;
 
         // Parse contacts data.
+        String[] projection = new String[] { Phone.CONTACT_ID, Phone.DISPLAY_NAME, Phone.NUMBER };
         Cursor cursor = context.getContentResolver().query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 projection, selection, null, order);
@@ -120,6 +116,30 @@ public class ContactUtils {
             );
         } finally {
             cursor.close();
+        }
+    }
+
+    @SuppressWarnings("TryFinallyCanBeTryWithResources")
+    public static String[] getAllPhoneNo(Context context, String contactId) {
+        // Build contact query.
+        String[] projection = { Phone.NUMBER };
+        Cursor cursor = context.getContentResolver().query(
+                Phone.CONTENT_URI, projection, Phone.CONTACT_ID + " = " + contactId, null, null);
+
+        // Parse contacts data.
+        if (cursor == null) {
+            return new String[0];
+        }
+
+        try {
+            String[] allPhoneNo = new String[cursor.getCount()];
+            for (int i = 0; i < allPhoneNo.length; i++) {
+                cursor.moveToNext();
+                allPhoneNo[i] = cursor.getString(cursor.getColumnIndex(Phone.NUMBER));
+            }
+            return allPhoneNo;
+        } finally {
+             cursor.close();
         }
     }
 

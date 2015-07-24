@@ -15,6 +15,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.FriendsStore;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.SocialFriend;
+import com.eventshigh.nearme.app.network.MyContactsRequest.MyContact;
 import com.eventshigh.nearme.app.ui.EventsAdapter.EventCard;
 
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
         dataToShow.get(position).onBindViewHolder(holder, position);
     }
 
-    public void setMyContacts(Collection<UserContact> contacts, FriendCardType cardType) {
+    public void setMyContacts(Collection<MyContact> contacts, FriendCardType cardType) {
         dataToShow.clear();
         selectedFriends.clear();
 
@@ -80,7 +81,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void setEventContacts(Event event, Collection<UserContact> contacts) {
+    public void setEventContacts(Event event, Collection<MyContact> contacts) {
         setMyContacts(contacts, FriendCardType.SELECT);
         dataToShow.add(0, new EventData(event));
         dataToShow.add(1, new InviteMessageData());
@@ -129,8 +130,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             if (typeId == EVENT.typeId) {
-                View view = activity.getLayoutInflater().inflate(R.layout.card_event_big, parent, false);
-                return new EventCard(view, false);
+                return EventCard.newInstance(activity, parent, false);
             }
 
             if (typeId == INVITE_MESSAGE.typeId) {

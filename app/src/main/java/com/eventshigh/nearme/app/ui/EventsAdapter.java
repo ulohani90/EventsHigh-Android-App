@@ -200,10 +200,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     // Build the view, reuse existing if possible.
     public static View getEventCard(final Event event, final BaseContextActivity activity,
                                     @Nullable View reuseView, ViewGroup parent) {
-        View view = reuseView != null ? reuseView :
-                activity.getLayoutInflater().inflate(R.layout.card_event_big, parent, false);
-        new EventCard(view, true).bindEventView(event, false, -1, null, activity);
-        return view;
+        EventCard card = reuseView != null ? new EventCard(reuseView, true) :
+                EventCard.newInstance(activity, parent, true);
+        card.bindEventView(event, false, -1, null, activity);
+        return card.itemView;
     }
 
     public @Nullable Set<SocialFriend> getFollowers(String tag) {
@@ -238,7 +238,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
 
             if (typeId == EVENT.typeId) {
-                return EventCard.newInstance(activity, parent);
+                return EventCard.newInstance(activity, parent, false);
             }
 
             if (typeId == FOLLOW.typeId) {
@@ -566,9 +566,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final ImageView favouriteView;
         private final View arrowView;
 
-        private static EventCard newInstance(Activity activity, ViewGroup parent) {
+        public static EventCard newInstance(Activity activity, ViewGroup parent,
+                boolean shouldAdjustImageHeight) {
             View view = activity.getLayoutInflater().inflate(R.layout.card_event_big, parent, false);
-            return new EventCard(view, false);
+            return new EventCard(view, shouldAdjustImageHeight);
         }
 
         public EventCard(View cardView, boolean shouldAdjustImageHeight) {
@@ -608,39 +609,33 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 }
             });
 
-            if (arrowView != null) {
-                arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
-            }
+            arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
 
             // Set the travel time.
-            if (travelTimeView != null) {
-                String travelTime = LocationUtils.getTravelTime(activity, activity.getUserLocation(),
-                        event.location);
-                if (travelTime != null) {
-                    travelTimeView.setText(travelTime);
-                    travelTimeView.setVisibility(View.VISIBLE);
-                } else {
-                    travelTimeView.setVisibility(View.GONE);
-                }
+            String travelTime = LocationUtils.getTravelTime(activity, activity.getUserLocation(),
+                    event.location);
+            if (travelTime != null) {
+                travelTimeView.setText(travelTime);
+                travelTimeView.setVisibility(View.VISIBLE);
+            } else {
+                travelTimeView.setVisibility(View.GONE);
             }
 
             // Set actions handlers.
-            if (favouriteView != null) {
-                favouriteView.setVisibility(View.VISIBLE);
-                setFavouriteView(activity.getEventMark(event));
-                favouriteView.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        EventMark oldMark = (EventMark) favouriteView.getTag();
-                        EventMark newMark = EventMark.isFavourite(oldMark) ? null : EventMark.FAVOURITE;
-                        activity.reportEventAction(event,
-                            EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
-                            position);
-                        activity.recordEventMark(event, newMark);
-                        setFavouriteView(newMark);
-                    }
-                });
-            }
+            favouriteView.setVisibility(View.VISIBLE);
+            setFavouriteView(activity.getEventMark(event));
+            favouriteView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventMark oldMark = (EventMark) favouriteView.getTag();
+                    EventMark newMark = EventMark.isFavourite(oldMark) ? null : EventMark.FAVOURITE;
+                    activity.reportEventAction(event,
+                        EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
+                        position);
+                    activity.recordEventMark(event, newMark);
+                    setFavouriteView(newMark);
+                }
+            });
         }
 
         public void bindEventView(final Event event,final BaseActivity activity) {
@@ -662,57 +657,36 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 });
             }
 
-            if (arrowView != null) {
-                arrowView.setVisibility(View.GONE);
-            }
-
-            // recommended ? Offer ?
-            if (recommendedView != null) {
-                recommendedView.setVisibility(event.ehRecommended ? View.VISIBLE : View.INVISIBLE);
-            }
-            if (offerView != null) {
-                offerView.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
-            }
-
             // Set the title.
             titleView.setText(event.title);
 
             // Event Time.
-            if (eventTimeView != null) {
-                EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
-                if (eventTime == null) {
-                    eventTimeView.setVisibility(View.INVISIBLE);
-                } else {
-                    eventTimeView.setVisibility(View.VISIBLE);
-                    eventTimeView.setText(eventTime.toString());
-                }
+            EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
+            if (eventTime == null) {
+                eventTimeView.setVisibility(View.INVISIBLE);
+            } else {
+                eventTimeView.setVisibility(View.VISIBLE);
+                eventTimeView.setText(eventTime.toString());
             }
 
             // Set the price.
-            if (priceView != null) {
-                String priceString = event.getPriceString();
-                if (priceString == null) {
-                    priceView.setVisibility(View.GONE);
-                } else {
-                    priceView.setVisibility(View.VISIBLE);
-                    priceView.setText(priceString);
-                }
+            String priceString = event.getPriceString();
+            if (priceString == null) {
+                priceView.setVisibility(View.GONE);
+            } else {
+                priceView.setVisibility(View.VISIBLE);
+                priceView.setText(priceString);
             }
 
             // Set the venue.
-            if (venueView != null) {
-                venueView.setText(event.getShortAddress());
-            }
+            venueView.setText(event.getShortAddress());
 
-            // Set the travel time.
-            if (travelTimeView != null) {
-                travelTimeView.setVisibility(View.GONE);
-            }
+            recommendedView.setVisibility(event.ehRecommended ? View.VISIBLE : View.INVISIBLE);
+            offerView.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
 
-            // Set actions handlers.
-            if (favouriteView != null) {
-                favouriteView.setVisibility(View.VISIBLE);
-            }
+            arrowView.setVisibility(View.GONE);
+            favouriteView.setVisibility(View.GONE);
+            travelTimeView.setVisibility(View.GONE);
         }
     }
 

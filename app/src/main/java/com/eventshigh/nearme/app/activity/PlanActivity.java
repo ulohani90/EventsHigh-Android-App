@@ -14,8 +14,8 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.SocialFriend;
-import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.MyContactsRequest;
+import com.eventshigh.nearme.app.network.MyContactsRequest.MyContact;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
@@ -181,6 +181,12 @@ public class PlanActivity extends BaseActivity {
                 JSONObject invitation = new JSONObject();
                 invitation.put("name", friend.getName());
                 invitation.put("mobile_no", friend.mobileNo);
+                if (friend.contact != null && friend.contact instanceof MyContact) {
+                    for (String mobileNo : ((MyContact) friend.contact).allMobileNo) {
+                        invitation.put("name", friend.getName());
+                        invitation.put("mobile_no", mobileNo);
+                    }
+                }
                 invitations.put(invitation);
             }
 
@@ -203,9 +209,9 @@ public class PlanActivity extends BaseActivity {
         }
     }
 
-    private Listener<List<UserContact>> myContactsListener = new Listener<List<UserContact>>() {
+    private Listener<List<MyContact>> myContactsListener = new Listener<List<MyContact>>() {
         @Override
-        public void onResponse(List<UserContact> contacts, boolean isIntermediate) {
+        public void onResponse(List<MyContact> contacts, boolean isIntermediate) {
             if (isIntermediate) {
                 return;
             }
