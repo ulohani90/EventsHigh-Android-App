@@ -31,6 +31,7 @@
         android:gravity="center"
         android:layout_margin="10dp"
         android:textColor="@android:color/white"
-        android:text="@string/action_invite"
+        android:textAllCaps="false"
+        android:text="@string/action_invite_friend"
     />
 </LinearLayout>
