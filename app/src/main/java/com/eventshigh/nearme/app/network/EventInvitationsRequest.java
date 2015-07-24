@@ -9,6 +9,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
@@ -93,7 +94,7 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
             }
             return eventInvitations;
         } catch (InterruptedException|ExecutionException e) {
-            errorListener.onErrorResponse(new VolleyError(e));
+            Crashlytics.getInstance().core.logException(e);
         }
 
         return null;
@@ -102,6 +103,8 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
     protected void onPostExecute(@Nullable List<EventInvitation> result) {
         if (result != null) {
             listener.onResponse(result, false);
+        } else {
+            errorListener.onErrorResponse(new VolleyError("no response"));
         }
     }
 }

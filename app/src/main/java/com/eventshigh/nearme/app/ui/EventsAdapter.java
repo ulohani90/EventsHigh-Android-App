@@ -94,7 +94,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 continue;
             }
 
-            boolean isFavourite = topicEvent.topicName.equals(MyEventsRequest.FAVOURITES_NAME);
+            boolean isFavourite = MyEventsRequest.isSpecialTag(topicEvent.topicName);
             if (!isFavourite && events.size() > maxPerCategory) {
                 events = events.subList(0, maxPerCategory);
             }
@@ -293,7 +293,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         public boolean showMore() {
-            return numEvents > 0 && !header.equals(MyEventsRequest.FAVOURITES_NAME);
+            return numEvents > 0 && !MyEventsRequest.isSpecialTag(header);
         }
 
         @Override

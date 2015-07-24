@@ -132,7 +132,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         // Find out share action result.
         if (shareEventInitiatedTimestamp > 0) {
             long secForShare = (System.currentTimeMillis() - shareEventInitiatedTimestamp) / 1000;
-            reportActionToAnalytics(secForShare > 5 ? "shareEvent" : "eventShareDismissed",
+            reportActionToAnalytics(secForShare > 4 ? "shareEvent" : "eventShareDismissed",
                     Long.toString(secForShare));
 
             Preferences preferences = Preferences.getInstance(this);
@@ -142,7 +142,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
         if (shareEventsInitiatedTimestamp > 0) {
             long secForShare = (System.currentTimeMillis() - shareEventsInitiatedTimestamp) / 1000;
-            reportActionToAnalytics(secForShare > 5 ? "shareEvents" : "eventsShareDismissed",
+            reportActionToAnalytics(secForShare > 4 ? "shareEvents" : "eventsShareDismissed",
                     Long.toString(secForShare));
         }
 

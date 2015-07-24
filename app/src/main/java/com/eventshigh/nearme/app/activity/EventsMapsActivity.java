@@ -268,6 +268,10 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private Listener<List<TopicEvents>> mMyEventsFetcherCallBack = new Listener<List<TopicEvents>>() {
         @Override
         public void onResponse(List<TopicEvents> myEvents, boolean isIntermediate) {
+            if (isFinishing()) {
+                return;
+            }
+
             Set<Event> events = new HashSet<>();
             for (TopicEvents topicEvents : myEvents) {
                 events.addAll(topicEvents.events);

@@ -1,26 +1,40 @@
 package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
+import android.os.AsyncTask;
+import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.RequestFuture;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
+import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.user.Account;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Supports fetching of MyEvents for user -- it includes upcoming events which are marked as
  * favourite and few events for all follow.
  */
-public class MyEventsRequest {
-    public static String FAVOURITES_NAME = "favourites";
+public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
+    private static final String LOG_TAG = MyEventsRequest.class.getSimpleName();
+
+    private static String FAVOURITES_NAME = "favourites";
+    private static String INVITATIONS_NAME = "invitations";
 
     public static class TopicEvents {
         public final String topicName;
@@ -38,6 +52,18 @@ public class MyEventsRequest {
         }
     }
 
+    public static boolean isSpecialTag(String name) {
+        name = name.toLowerCase();
+        return name.equals(FAVOURITES_NAME) || name.equals(INVITATIONS_NAME);
+    }
+
+    public static void submit(Context context, EventsContext eventsContext, Priority priority,
+           Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
+           Listener<List<TopicEvents>> listener, ErrorListener errorListener) {
+        new MyEventsRequest(context, eventsContext, priority, tag, shouldBypassCache,
+                includeWithoutLocation, listener, errorListener).execute();
+    }
+
     private final Context context;
     private final EventsContext eventsContext;
     private final Priority priority;
@@ -46,9 +72,6 @@ public class MyEventsRequest {
     private final Listener<List<TopicEvents>> listener;
     private final ErrorListener errorListener;
     private final Object tag;
-
-    private int numPendingRequests;
-    private final List<TopicEvents> result = new ArrayList<>();
 
     public MyEventsRequest(Context context, EventsContext eventsContext, Priority priority,
                            Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
@@ -63,95 +86,92 @@ public class MyEventsRequest {
         this.tag = tag;
     }
 
-    public void execute() {
+    @Override
+    protected List<TopicEvents> doInBackground(Void... params) {
         if (eventsContext.city == null) {
-            errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
-            return;
+            Log.w(LOG_TAG, "No City for: " + eventsContext.toString());
+            return null;
         }
 
+        List<TopicEvents> result = new ArrayList<>();
+        RequestFuture<List<SocialInvite>> socialInvites = RequestFuture.newFuture();
+        SocialInvitationsRequest.submit(context, priority, tag, shouldBypassCache,
+                socialInvites, socialInvites);
+
+        // Interest based requests.
         List<String> interests = new Account(context).getFollowingInterests();
-        numPendingRequests = interests.size() + 1;
-        InternalErrorListener errorListener = new InternalErrorListener();
+        Map<String, RequestFuture<EventsCollection>> interestsEvents = new HashMap<>(
+                interests.size());
+        for (String interest : interests) {
+            RequestFuture<EventsCollection> eventsFuture = RequestFuture.newFuture();
+            EventCollectionRequest.submit(context, new EventsContext(eventsContext.location, interest),
+                priority, tag, shouldBypassCache, includeWithoutLocation, eventsFuture, eventsFuture);
+            interestsEvents.put(interest, eventsFuture);
+        }
 
         // Favourites event requests.
         EventsMarkerManager markerManager = EventsMarkerManager.getInstance(context);
         markerManager.waitForLoading();
+        RequestFuture<List<Event>> favEvents = RequestFuture.newFuture();
         MultiEventsRequest.submit(context, eventsContext, markerManager.getFavouritedEvents(),
-                priority, tag, shouldBypassCache, includeWithoutLocation,
-                new FavouritedEventsListener(), errorListener);
+                priority, tag, shouldBypassCache, includeWithoutLocation, favEvents, favEvents);
 
-        // Interest based requests.
-        for (String interest : interests) {
-            EventCollectionRequest.submit(context, new EventsContext(eventsContext.location, interest),
-                    priority, tag, shouldBypassCache, includeWithoutLocation,
-                    new EventsListener(interest), errorListener);
-        }
-    }
-
-    private synchronized void reportResult() {
-        numPendingRequests --;
-
-        if (numPendingRequests == 0) {
-            listener.onResponse(result, false);
-        }
-    }
-
-    private class FavouritedEventsListener extends BaseEventsListener implements Listener<List<Event>> {
-        public FavouritedEventsListener() {
-            super(FAVOURITES_NAME);
-        }
-
-        @Override
-        public void onResponse(List<Event> events, boolean intermediate) {
-            addToResult(events, 0, intermediate);
-        }
-    }
-
-    private class EventsListener extends BaseEventsListener implements Listener<EventsCollection> {
-
-        public EventsListener(String title) {
-            super(title);
-        }
-
-        @Override
-        public void onResponse(EventsCollection eventsCollection, boolean intermediate) {
-            appendToResult(eventsCollection.events, intermediate);
-        }
-    }
-
-    private class BaseEventsListener {
-        private final String title;
-
-        public BaseEventsListener(String title) {
-            this.title = title;
-        }
-
-        public void appendToResult(List<Event> events, boolean intermediate) {
-            addToResult(events, -1, intermediate);
-        }
-
-        public void addToResult(List<Event> events, int index, boolean intermediate) {
-            if (intermediate) {
-                return;
-            }
-            if (!events.isEmpty()) {
-                synchronized (result) {
-                    if (index >= 0) {
-                        result.add(index, new TopicEvents(title, events));
-                    } else {
-                        result.add(new TopicEvents(title, events));
-                    }
+        // Look at invites and send the request for sent invitations.
+        List<String> eventIds = new ArrayList<>();
+        try {
+            List<SocialInvite> invites = socialInvites.get();
+            for (SocialInvite invite : invites) {
+                if (invite.getInvitedBy() == null) {
+                    eventIds.add(invite.eventId);
                 }
             }
+        } catch (InterruptedException | ExecutionException e) {
+            Crashlytics.getInstance().core.logException(e);
+        }
 
-            reportResult();
+        RequestFuture<List<Event>> invitedEvents = RequestFuture.newFuture();
+        MultiEventsRequest.submit(context, eventsContext, eventIds, priority, tag,
+                shouldBypassCache, true, invitedEvents, invitedEvents);
+
+        // Build Result.
+        addEventsToResults(result, FAVOURITES_NAME, favEvents);
+        addEventsToResults(result, INVITATIONS_NAME, invitedEvents);
+        for (Entry<String, RequestFuture<EventsCollection>> interestEvents : interestsEvents.entrySet()) {
+            addCollectionToResults(result, interestEvents.getKey(), interestEvents.getValue());
+        }
+
+        return result;
+    }
+
+    protected void onPostExecute(@Nullable List<TopicEvents> result) {
+        if (result != null) {
+            listener.onResponse(result, false);
+        } else {
+            errorListener.onErrorResponse(new VolleyError("no response"));
         }
     }
 
-    private class InternalErrorListener implements ErrorListener {
-        @Override
-        public void onErrorResponse(VolleyError volleyError) {
-            reportResult();
+    private static void addToResults(List<TopicEvents> result, String name, List<Event> events) {
+        if (! events.isEmpty()) {
+            result.add(new TopicEvents(name, events));
+        }
+    }
+
+    private static void addEventsToResults(List<TopicEvents> result, String name,
+                                           RequestFuture<List<Event>> eventsFuture) {
+        try {
+            addToResults(result, name, eventsFuture.get());
+        } catch (InterruptedException | ExecutionException e) {
+            Crashlytics.getInstance().core.logException(e);
+        }
+    }
+
+    private static void addCollectionToResults(List<TopicEvents> result, String name,
+                                               RequestFuture<EventsCollection> eventsFuture) {
+        try {
+            addToResults(result, name, eventsFuture.get().events);
+        } catch (InterruptedException | ExecutionException e) {
+            Crashlytics.getInstance().core.logException(e);
         }
     }
 }

@@ -105,7 +105,7 @@ public class MyEventsNotificationService extends IntentService {
             // Merge all events into one List and remove duplicates.
             Set<Event> eventSet = new HashSet<>();
             for (TopicEvents topicEvents : myEvents) {
-                if (!topicEvents.topicName.equalsIgnoreCase(MyEventsRequest.FAVOURITES_NAME)) {
+                if (MyEventsRequest.isSpecialTag(topicEvents.topicName)) {
                     eventSet.addAll(topicEvents.events);
                 }
             }

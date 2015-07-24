@@ -167,6 +167,9 @@ public class EventsFragment extends BaseEventsFragment {
     private Listener<List<TopicEvents>> mMyEventsFetcherCallBack = new Listener<List<TopicEvents>>() {
         @Override
         public void onResponse(List<TopicEvents> myEvents, boolean isIntermediate) {
+            if (! isAdded()) {
+                return;
+            }
             if (!isIntermediate) {
                 topProgressBar.setVisibility(View.GONE);
 
