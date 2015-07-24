@@ -34,6 +34,7 @@ import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -60,6 +61,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private final Set<Integer> usedItemIds = new HashSet<>();
     private List<Data> dataToShow;
     @Nullable private SocialActions socialActions;
+    @Nullable private Map<String, SocialInvite> socialInvites;
 
     public EventsAdapter(BaseEventsFragment eventsFragment) {
         this.eventsFragment = eventsFragment;
@@ -70,6 +72,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     public void setSocialActions(@Nullable SocialActions socialActions) {
         this.socialActions = socialActions;
+        notifyDataSetChanged();
+    }
+
+    public void setSocialInvites(@Nullable Map<String, SocialInvite> socialInvites) {
+        this.socialInvites = socialInvites;
         notifyDataSetChanged();
     }
 
@@ -143,7 +150,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void setEventInvitations(List<EventInvitation> invites) {
+    public void addEventInvitations(List<EventInvitation> invites) {
         for (EventInvitation invite : invites) {
             dataToShow.add(1, new EventInvitationData(invite));
         }

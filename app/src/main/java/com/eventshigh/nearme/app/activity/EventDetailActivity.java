@@ -74,9 +74,8 @@ import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
@@ -475,22 +474,15 @@ public class EventDetailActivity extends BaseActivity {
                 }
         );
         SocialInvitationsRequest.submit(this, Priority.LOW, this, false,
-                new Listener<List<SocialInvite>>() {
+                new Listener<Map<String, SocialInvite>>() {
                     @Override
-                    public void onResponse(List<SocialInvite> invites, boolean isIntermediate) {
-                        Set<SocialFriend>  allInvitedBy = Collections.emptySet();
-                        for (SocialInvite invite : invites) {
-                            if (invite.eventId.equals(event.id)) {
-                                allInvitedBy = invite.getAllInvitedBy();
-                                planId = invite.getPlanId();
-                                break;
-                            }
-                        }
-
-                        if (allInvitedBy.isEmpty()) {
+                    public void onResponse(Map<String, SocialInvite> invites, boolean isIntermediate) {
+                        SocialInvite invite = invites.get(event.id);
+                        if (invite == null || invite.getInvitedBy() == null) {
                             return;
                         }
 
+                        Set<SocialFriend>  allInvitedBy = invite.getAllInvitedBy();
                         reportActionToAnalytics("showSocialInfo", "invitedBy", allInvitedBy.size());
                         SocialFriend invitedBy = allInvitedBy.size() == 1 ?
                                 allInvitedBy.iterator().next() : null;

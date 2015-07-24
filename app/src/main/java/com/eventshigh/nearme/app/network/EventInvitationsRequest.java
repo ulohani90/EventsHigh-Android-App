@@ -12,11 +12,12 @@ import com.android.volley.toolbox.RequestFuture;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.data.SocialFriend;
+import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,11 +63,11 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
 
     @Override
     protected List<EventInvitation> doInBackground(Void... params) {
-        RequestFuture<List<SocialInvite>> future = RequestFuture.newFuture();
+        RequestFuture<Map<String, SocialInvite>> future = RequestFuture.newFuture();
         SocialInvitationsRequest.submit(context, priority, tag, shouldBypassCache, future, future);
 
         try {
-            List<SocialInvite> invites = future.get();
+            Collection<SocialInvite> invites = future.get().values();
 
             List<String> eventIds = new ArrayList<>(invites.size());
             for (SocialInvite invite : invites) {

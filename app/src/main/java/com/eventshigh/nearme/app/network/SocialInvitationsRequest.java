@@ -12,7 +12,6 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.security.Signer;
@@ -26,11 +25,13 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-public class SocialInvitationsRequest extends JsonRequest<List<SocialInvite>>  {
+public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvite>>  {
 
     public static class PlanInvite {
         public final String planId;
@@ -107,7 +108,7 @@ public class SocialInvitationsRequest extends JsonRequest<List<SocialInvite>>  {
     }
 
     public static void submit(Context context, Priority priority, Object tag, boolean shouldBypassCache,
-            Listener<List<SocialInvite>> listener, ErrorListener errorListener) {
+            Listener<Map<String, SocialInvite>> listener, ErrorListener errorListener) {
         try {
             String mobileNo = new Account(context).getUserInfo().phoneNo;
             if (mobileNo == null) {
@@ -131,7 +132,7 @@ public class SocialInvitationsRequest extends JsonRequest<List<SocialInvite>>  {
     private final Uri getSocialInvitesUri;
 
     public SocialInvitationsRequest(Context context, Uri getSocialInvitesUri, Priority priority,
-            boolean shouldBypassCache, Listener<List<SocialInvite>> listener, ErrorListener errorListener)
+            boolean shouldBypassCache, Listener<Map<String, SocialInvite>> listener, ErrorListener errorListener)
             throws GeneralSecurityException, UnsupportedEncodingException {
         super(Method.GET, Signer.sign(getSocialInvitesUri).toString(), null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
@@ -151,14 +152,18 @@ public class SocialInvitationsRequest extends JsonRequest<List<SocialInvite>>  {
     }
 
     @Override
-    protected Response<List<SocialInvite>> parseNetworkResponse(NetworkResponse response) {
+    protected Response<Map<String, SocialInvite>> parseNetworkResponse(NetworkResponse response) {
         try {
             String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
             JSONObject resp = new JSONObject(jsonString);
-            return Response.success(SocialInvite.fromJSON(resp.getJSONArray("invitations"), context),
-                    HttpHeaderParser.parseCacheHeaders(response));
+            Map<String, SocialInvite> invites = new HashMap<>();
+            for (SocialInvite invite :
+                    SocialInvite.fromJSON(resp.getJSONArray("invitations"), context)) {
+                invites.put(invite.eventId, invite);
+            }
+
+            return Response.success(invites, HttpHeaderParser.parseCacheHeaders(response));
         } catch (Exception e) {
-            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }

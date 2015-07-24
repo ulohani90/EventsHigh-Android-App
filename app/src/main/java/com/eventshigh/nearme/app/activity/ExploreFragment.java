@@ -127,7 +127,7 @@ public class ExploreFragment extends BaseEventsFragment {
                 topProgressBar.setVisibility(View.GONE);
                 activity.reportActionToAnalytics("showSocialInfo", "eventInvitations",
                         eventInvitations.size());
-                eventsAdapter.setEventInvitations(eventInvitations);
+                eventsAdapter.addEventInvitations(eventInvitations);
             }
         }
     };

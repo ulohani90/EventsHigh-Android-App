@@ -23,6 +23,8 @@ import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.EventsAdapter;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
@@ -30,6 +32,7 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -142,6 +145,8 @@ public class EventsFragment extends BaseEventsFragment {
             EventCollectionRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
         }
+        SocialInvitationsRequest.submit(activity, Priority.NORMAL, this, false,
+                mSocialInvitesCallback, mErrorListener);
 
         // Load social actions.
         if (showFollowCard) {
@@ -167,9 +172,10 @@ public class EventsFragment extends BaseEventsFragment {
     private Listener<List<TopicEvents>> mMyEventsFetcherCallBack = new Listener<List<TopicEvents>>() {
         @Override
         public void onResponse(List<TopicEvents> myEvents, boolean isIntermediate) {
-            if (! isAdded()) {
+            if (isDetached()) {
                 return;
             }
+
             if (!isIntermediate) {
                 topProgressBar.setVisibility(View.GONE);
 
@@ -216,6 +222,18 @@ public class EventsFragment extends BaseEventsFragment {
             }
         }
     };
+
+    private Listener<Map<String, SocialInvite>> mSocialInvitesCallback =
+        new Listener<Map<String, SocialInvite>>() {
+            @Override
+            public void onResponse(Map<String, SocialInvite> socialInvites, boolean isIntermediate) {
+                if (isDetached()) {
+                    return;
+                }
+
+                eventsAdapter.setSocialInvites(socialInvites);
+            }
+        };
 
     private ErrorListener mErrorListener = new ErrorListener() {
         @Override
