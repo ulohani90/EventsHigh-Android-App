@@ -147,6 +147,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         for (EventInvitation invite : invites) {
             dataToShow.add(1, new EventInvitationData(invite));
         }
+        if (! invites.isEmpty()) {
+            dataToShow.add(1, new SmallHeaderData("Invitations"));
+        }
         notifyDataSetChanged();
     }
 
