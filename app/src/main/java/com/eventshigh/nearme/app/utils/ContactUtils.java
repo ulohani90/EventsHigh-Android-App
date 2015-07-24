@@ -9,19 +9,13 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.UserContact;
-
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ContactUtils {
-    private static final String LOG_TAG = ContactUtils.class.getSimpleName();
-
     public static List<UserContact> getContacts(Context context, @Nullable String selectionExtras,
             String order, boolean addEmail) {
         // Build contact query.
@@ -50,16 +44,14 @@ public class ContactUtils {
         try {
             while (cursor.moveToNext()) {
                 Cursor emailCursor = null;
+                if (addEmail) {
+                    String contactId = cursor.getString(
+                        cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+                    emailCursor = ContactUtils.getEmailCursorForContactId(context, contactId);
+                }
                 try {
-                    UserContact userContact = UserContact.parseFromCursor(cursor);
-                    if (addEmail) {
-                        emailCursor = ContactUtils.getEmailCursorForContactId(context, userContact.contactId);
-                        userContact.parseEmailsFromCursor(emailCursor);
-                    }
+                    UserContact userContact = UserContact.parseFromCursor(cursor, emailCursor);
                     contacts.add(userContact);
-                } catch (JSONException e) {
-                    Log.w(LOG_TAG, "failed to load contact", e);
-                    Crashlytics.getInstance().core.logException(e);
                 } finally {
                     if (emailCursor != null) {
                         emailCursor.close();
@@ -71,16 +63,6 @@ public class ContactUtils {
         }
 
         return contacts;
-    }
-
-    public static Cursor getEmailCursorForContactId(Context context, String contactId) {
-        String[] projection = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-        };
-        String selection = ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId;
-        return context.getContentResolver().query(
-                ContactsContract.CommonDataKinds.Email.CONTENT_URI,
-                projection, selection, null, null);
     }
 
     public static @Nullable Bitmap getPhotoForContactId(Context context, String contactId, int size) {
@@ -139,5 +121,15 @@ public class ContactUtils {
         } finally {
             cursor.close();
         }
+    }
+
+    private static Cursor getEmailCursorForContactId(Context context, String contactId) {
+        String[] projection = {
+                ContactsContract.CommonDataKinds.Email.ADDRESS,
+        };
+        String selection = ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId;
+        return context.getContentResolver().query(
+                ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                projection, selection, null, null);
     }
 }

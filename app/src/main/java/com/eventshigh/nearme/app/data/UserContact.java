@@ -25,16 +25,27 @@ public class UserContact implements Comparable<UserContact> {
     public final String contactId;
     public final String mobileNo;
     public final String name;
-    @Nullable public String[] emails;
+    @Nullable public final String[] emails;
 
-    public static UserContact parseFromCursor(Cursor cursor) throws JSONException {
+    public static UserContact parseFromCursor(Cursor cursor, Cursor emailCursor) {
         String contactId = cursor.getString(
                 cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
         String name = cursor.getString(
                 cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
         String phoneNumber = cursor.getString(
                 cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-        return new UserContact(contactId, phoneNumber, name, null);
+
+        String[] emails = null;
+        if (emailCursor != null && emailCursor.getCount() > 0) {
+            emails = new String[emailCursor.getCount()];
+            for (int i = 0; i < emails.length; i++) {
+                emailCursor.moveToNext();
+                emails[i] = emailCursor.getString(
+                        emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS));
+            }
+        }
+
+        return new UserContact(contactId, phoneNumber, name, emails);
     }
 
     public UserContact(String contactId, String mobileNo, String name, @Nullable String[] emails) {
@@ -75,20 +86,6 @@ public class UserContact implements Comparable<UserContact> {
             return toJSON().toString();
         } catch (JSONException e) {
             return super.toString();
-        }
-    }
-
-    public void parseEmailsFromCursor(@Nullable Cursor emailCursor) throws JSONException {
-        if (emailCursor == null) {
-            emails = null;
-            return;
-        }
-
-        emails = new String[emailCursor.getCount()];
-        for (int i = 0; i < emails.length; i++) {
-            emailCursor.moveToNext();
-            emails[i] = emailCursor.getString(
-                    emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS));
         }
     }
 
