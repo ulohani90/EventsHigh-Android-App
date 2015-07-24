@@ -93,7 +93,7 @@ public class PlanActivity extends BaseActivity {
     }
 
     public void invite(View view) {
-        reportActionToAnalytics("invite", planId, contactsAdapter.getSelectedFriends().size());
+        reportActionToAnalytics("inviteToPlan", planId, contactsAdapter.getSelectedFriends().size());
         topProgressBar.setVisibility(View.VISIBLE);
 
         publishPlan(new Runnable() {
