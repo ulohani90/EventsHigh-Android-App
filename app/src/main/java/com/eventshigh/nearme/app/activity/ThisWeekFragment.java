@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -25,8 +26,6 @@ import java.util.Locale;
 public class ThisWeekFragment extends BaseEventsFragment {
     public static final String NUM_DAYS_PARAM = ThisWeekFragment.class.getName() + "_num_days";
 
-    private final Calendar today = DateTimeUtils.toMidnight(Calendar.getInstance(), null);
-
     public static ThisWeekFragment getInstance(EventsContext eventsContext,  boolean showCategories,
             int numDays) {
         ThisWeekFragment fragment = new ThisWeekFragment();
@@ -41,7 +40,8 @@ public class ThisWeekFragment extends BaseEventsFragment {
     private ThisWeekPagerAdapter adapter;
     private TabLayout tabsView;
 
-    private  int numDays;
+    private final Calendar today = DateTimeUtils.toMidnight(Calendar.getInstance(), null);
+    private int numDays;
 
     @Override
     public void onAttach(Activity activity) {
@@ -64,6 +64,25 @@ public class ThisWeekFragment extends BaseEventsFragment {
         viewPager.setAdapter(adapter);
 
         tabsView = (TabLayout) view.findViewById(R.id.date_filter);
+        int selectedPosition = populateTabs();
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabsView));
+        tabsView.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+        select(selectedPosition);
+    }
+
+    @Override
+    protected void refresh() {
+        viewPager.post(new Runnable() {
+            @Override
+            public void run() {
+                viewPager.setAdapter(adapter);
+                tabsView.removeAllTabs();
+                select(populateTabs());
+            }
+        });
+    }
+
+    private int populateTabs() {
         int selectedPosition = 0;
         for (int i = 0; i < adapter.getCount(); i++) {
             if (adapter.getPageTitle(i).equals(eventsContext.dateFilter)) {
@@ -80,21 +99,14 @@ public class ThisWeekFragment extends BaseEventsFragment {
                     Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));
             tabsView.addTab(tabsView.newTab().setCustomView(dateTabView.root));
         }
-        tabsView.setTabMode(TabLayout.MODE_SCROLLABLE);
-        tabsView.setOnTabSelectedListener(adapter);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabsView));
-        tabsView.setScrollPosition(selectedPosition, 0, true);
+        return selectedPosition;
     }
 
-    @Override
-    protected void refresh() {
-        viewPager.post(new Runnable() {
-            @Override
-            public void run() {
-                viewPager.setAdapter(adapter);
-                tabsView.setScrollPosition(0, 0, true);
-            }
-        });
+    private void select(int position) {
+        Tab tab = tabsView.getTabAt(position);
+        if (tab != null) {
+            tab.select();
+        }
     }
 
     private Calendar getDate(int position) {
@@ -116,8 +128,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
         }
     }
 
-    private class ThisWeekPagerAdapter extends FragmentStatePagerAdapter
-            implements TabLayout.OnTabSelectedListener {
+    private class ThisWeekPagerAdapter extends FragmentStatePagerAdapter {
         public ThisWeekPagerAdapter() {
             super(activity.getSupportFragmentManager());
         }
@@ -137,22 +148,6 @@ public class ThisWeekFragment extends BaseEventsFragment {
         @Override
         public int getCount() {
             return numDays;
-        }
-
-        @Override
-        public void onTabSelected(TabLayout.Tab tab) {
-            activity.showActionBar();
-            viewPager.setCurrentItem(tab.getPosition());
-        }
-
-        @Override
-        public void onTabUnselected(TabLayout.Tab tab) {
-            // do nothing.
-        }
-
-        @Override
-        public void onTabReselected(TabLayout.Tab tab) {
-            // do nothing.
         }
     }
 }
