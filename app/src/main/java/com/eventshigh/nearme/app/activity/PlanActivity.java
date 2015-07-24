@@ -63,6 +63,8 @@ public class PlanActivity extends BaseActivity {
         if (planId == null) {
             planId = Utils.md5(userInfo.phoneNo + event.id);
             isPlanPublished = false;
+        } else {
+            isPlanPublished = true;
         }
 
         setContentView(R.layout.activity_plan);
