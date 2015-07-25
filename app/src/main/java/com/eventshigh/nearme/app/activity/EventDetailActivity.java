@@ -462,7 +462,7 @@ public class EventDetailActivity extends BaseActivity {
                         reportActionToAnalytics("showSocialInfo", "likes",
                                 likedBy == null ? 0 : likedBy.size());
                         ((ContactListView) findViewById(R.id.followed_by)).setFollowers(
-                                EventDetailActivity.this, likedBy, " liked this.");
+                                EventDetailActivity.this, likedBy);
                     }
                 },
                 new ErrorListener() {
@@ -487,9 +487,9 @@ public class EventDetailActivity extends BaseActivity {
                                 allInvitedBy.iterator().next() : null;
                         ContactListView invitedByView = (ContactListView) findViewById(R.id.invited_by);
                         invitedByView.setVisibility(View.VISIBLE);
-                        invitedByView.setFollowers(EventDetailActivity.this, allInvitedBy,
-                                (invitedBy == null ? "" : invitedBy.getName()) +
-                                        " has invited you to this event.");
+                        invitedByView.setText((invitedBy == null ? "" : invitedBy.getName()) +
+                                " has invited you to this event.");
+                        invitedByView.setFollowers(EventDetailActivity.this, allInvitedBy);
                     }
                 },
                 new ErrorListener() {

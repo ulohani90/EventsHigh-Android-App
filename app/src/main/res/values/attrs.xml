@@ -7,5 +7,6 @@
             <enum name="end" value="1" />
             <enum name="center" value="2" />
         </attr>
+        <attr name="text" format="string" />
     </declare-styleable>
 </resources>

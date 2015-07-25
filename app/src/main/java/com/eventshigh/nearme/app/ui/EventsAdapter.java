@@ -656,8 +656,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             // Is user invited to this event ?
             if (invite != null && invite.getInvitedBy() != null) {
                 invitedByView.setVisibility(View.VISIBLE);
-                invitedByView.setFollowers(activity, invite.getAllInvitedBy(),
-                        " has invited you this event!");
+                invitedByView.setFollowers(activity, invite.getAllInvitedBy());
             } else if (event.numViews > 5) {
                 eventStatsView.setVisibility(View.VISIBLE);
                 eventStatsView.setText("" + event.numViews + " views");
@@ -797,7 +796,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 }
             });
 
-            followedByView.setFollowers(activity, followers, " follows this.");
+            followedByView.setFollowers(activity, followers);
         }
 
         public void setFollowButtons(boolean isFollowing) {
@@ -894,7 +893,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     VolleyHelper.getImageLoader(eventsFragment.getContextActivity()));
             titleView.setText(data.trendingTopic.tagName);
             contactListView.setGravity(Gravity.START);
-            contactListView.setFollowers(eventsFragment.getContextActivity(), followers, null);
+            contactListView.setFollowers(eventsFragment.getContextActivity(), followers);
 
             FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) contactListView.getLayoutParams();
             lp.gravity = Gravity.BOTTOM;
@@ -922,7 +921,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             imageView.setDefaultImageResId(data.getInfoGraphId());
             titleView.setVisibility(View.GONE);
             contactListView.setGravity(Gravity.END);
-            contactListView.setFollowers(eventsFragment.getContextActivity(), followers, null);
+            contactListView.setFollowers(eventsFragment.getContextActivity(), followers);
 
             FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) contactListView.getLayoutParams();
             lp.gravity = Gravity.TOP;

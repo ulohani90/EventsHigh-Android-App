@@ -25,6 +25,7 @@ import java.util.Set;
 public class ContactListView extends HorizontalScrollView {
     private int size;
     private int gravity;
+    @Nullable private String text;
 
     public ContactListView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -34,6 +35,7 @@ public class ContactListView extends HorizontalScrollView {
         size = typedArray.getDimensionPixelSize(R.styleable.ContactListView_contactPhotoSize, 12);
         int position = typedArray.getInteger(R.styleable.ContactListView_contactPosition, 0);
         gravity = position == 0 ? Gravity.START : (position == 1) ? Gravity.END : Gravity.CENTER;
+        text = typedArray.getString(R.styleable.ContactListView_text);
     }
 
     public void setSize(int size) {
@@ -44,8 +46,11 @@ public class ContactListView extends HorizontalScrollView {
         this.gravity = gravity;
     }
 
-    public void setFollowers(final BaseActivity activity, @Nullable final Set<SocialFriend> friends,
-            final @Nullable String text) {
+    public void setText(@Nullable String text) {
+        this.text = text;
+    }
+
+    public void setFollowers(final BaseActivity activity, @Nullable final Set<SocialFriend> friends) {
         removeAllViews();
         if (friends == null || friends.isEmpty()) {
             return;
@@ -96,7 +101,6 @@ public class ContactListView extends HorizontalScrollView {
                     TextView tv = new TextView(parentView.getContext());
                     LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                             LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER);
-                    lp.topMargin = Utils.dpToPx(parentView.getContext(), 2);
                     lp.gravity = Gravity.CENTER;
                     tv.setLayoutParams(lp);
                     tv.setGravity(Gravity.CENTER);

@@ -80,6 +80,7 @@
         android:padding="10dp"
         app:contactPhotoSize="24dp"
         app:contactPosition="center"
+        app:text=" follows this."
     />
 
     <View
