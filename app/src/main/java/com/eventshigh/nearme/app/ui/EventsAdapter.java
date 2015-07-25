@@ -212,7 +212,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                                     @Nullable View reuseView, ViewGroup parent) {
         EventCard card = reuseView != null ? new EventCard(reuseView, true) :
                 EventCard.newInstance(activity, parent, true);
-        card.bindEventView(event, false, -1, null, activity, null);
+        card.bindEventView(event, false, -1, null, activity, null, false);
         return card.itemView;
     }
 
@@ -556,7 +556,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         public void onBindViewHolder(ViewHolder card, int position) {
             ((EventCard) card).bindEventView(event, isFirstEvent, position, eventsFragment,
                 eventsFragment.getContextActivity(),
-                socialInvites == null ? null : socialInvites.get(event.id));
+                socialInvites == null ? null : socialInvites.get(event.id), true);
         }
 
         public String getId() {
@@ -611,7 +611,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private void bindEventView(final Event event, boolean isFirstEvent, final int position,
                 @Nullable final BaseEventsFragment eventsFragment, final BaseContextActivity activity,
-                @Nullable SocialInvite invite) {
+                @Nullable SocialInvite invite, boolean showStats) {
             bindEventView(event, activity);
             itemView.setTag(position);
             itemView.setOnClickListener(new OnClickListener() {
@@ -657,7 +657,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             if (invite != null && invite.getInvitedBy() != null) {
                 invitedByView.setVisibility(View.VISIBLE);
                 invitedByView.setFollowers(activity, invite.getAllInvitedBy());
-            } else if (event.numViews > 5) {
+            } else if (showStats && event.numViews > 5) {
                 eventStatsView.setVisibility(View.VISIBLE);
                 eventStatsView.setText("" + event.numViews + " views");
             }

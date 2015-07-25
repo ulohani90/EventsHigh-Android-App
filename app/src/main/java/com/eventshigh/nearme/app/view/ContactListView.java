@@ -103,8 +103,8 @@ public class ContactListView extends HorizontalScrollView {
                             LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER);
                     lp.gravity = Gravity.CENTER;
                     tv.setLayoutParams(lp);
+                    tv.setTextAppearance(context, android.R.style.TextAppearance_Medium);
                     tv.setGravity(Gravity.CENTER);
-                    tv.setTextColor(parentView.getContext().getResources().getColor(android.R.color.black));
                     tv.setText(text);
                     parentView.addView(tv);
                 }
