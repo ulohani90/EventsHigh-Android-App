@@ -42,7 +42,7 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.FontUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.eventshigh.nearme.app.view.FollowedByView;
+import com.eventshigh.nearme.app.view.ContactListView;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -212,7 +212,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                                     @Nullable View reuseView, ViewGroup parent) {
         EventCard card = reuseView != null ? new EventCard(reuseView, true) :
                 EventCard.newInstance(activity, parent, true);
-        card.bindEventView(event, false, -1, null, activity);
+        card.bindEventView(event, false, -1, null, activity, null);
         return card.itemView;
     }
 
@@ -555,7 +555,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
             ((EventCard) card).bindEventView(event, isFirstEvent, position, eventsFragment,
-                    eventsFragment.getContextActivity());
+                eventsFragment.getContextActivity(),
+                socialInvites == null ? null : socialInvites.get(event.id));
         }
 
         public String getId() {
@@ -569,12 +570,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final ImageView recommendedView;
         private final ImageView offerView;
         private final TextView titleView;
+        private final ImageView favouriteView;
         private final TextView eventTimeView;
         private final TextView priceView;
         private final TextView venueView;
         private final TextView travelTimeView;
-        private final ImageView favouriteView;
         private final View arrowView;
+        private final TextView eventStatsView;
+        private final ContactListView invitedByView;
 
         public static EventCard newInstance(Activity activity, ViewGroup parent,
                 boolean shouldAdjustImageHeight) {
@@ -590,12 +593,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             recommendedView = (ImageView) cardView.findViewById(R.id.event_recommended);
             offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
             titleView = (TextView) cardView.findViewById(R.id.event_title);
+            favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
             eventTimeView = (TextView) cardView.findViewById(R.id.event_time);
             priceView = (TextView) cardView.findViewById(R.id.event_price);
             venueView = (TextView) cardView.findViewById(R.id.event_venue);
             travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
-            favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
             arrowView = cardView.findViewById(R.id.arrow);
+            eventStatsView = (TextView) cardView.findViewById(R.id.event_stats);
+            invitedByView = (ContactListView) cardView.findViewById(R.id.invited_by);
         }
 
         public void setFavouriteView(@Nullable EventMark eventMark) {
@@ -605,7 +610,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
 
         private void bindEventView(final Event event, boolean isFirstEvent, final int position,
-                @Nullable final BaseEventsFragment eventsFragment, final BaseContextActivity activity) {
+                @Nullable final BaseEventsFragment eventsFragment, final BaseContextActivity activity,
+                @Nullable SocialInvite invite) {
             bindEventView(event, activity);
             itemView.setTag(position);
             itemView.setOnClickListener(new OnClickListener() {
@@ -646,6 +652,16 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     setFavouriteView(newMark);
                 }
             });
+
+            // Is user invited to this event ?
+            if (invite != null && invite.getInvitedBy() != null) {
+                invitedByView.setVisibility(View.VISIBLE);
+                invitedByView.setFollowers(activity, invite.getAllInvitedBy(),
+                        " has invited you this event!");
+            } else if (event.numViews > 5) {
+                eventStatsView.setVisibility(View.VISIBLE);
+                eventStatsView.setText("" + event.numViews + " views");
+            }
         }
 
         public void bindEventView(final Event event,final BaseActivity activity) {
@@ -697,6 +713,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             arrowView.setVisibility(View.GONE);
             favouriteView.setVisibility(View.GONE);
             travelTimeView.setVisibility(View.GONE);
+            eventStatsView.setVisibility(View.GONE);
+            invitedByView.setVisibility(View.GONE);
         }
     }
 
@@ -733,7 +751,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private TextView subtitleView;
         private View followButton;
         private View followingButton;
-        private FollowedByView followedByView;
+        private ContactListView followedByView;
 
         static FollowCard newInstance(final BaseActivity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(R.layout.card_follow, parent, false);
@@ -747,7 +765,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             subtitleView = (TextView) itemView.findViewById(R.id.subtitle);
             followButton = itemView.findViewById(R.id.follow_button);
             followingButton = itemView.findViewById(R.id.following_button);
-            followedByView = (FollowedByView) itemView.findViewById(R.id.followed_by);
+            followedByView = (ContactListView) itemView.findViewById(R.id.followed_by);
         }
 
         public void populate(final FollowData data, final BaseContextActivity activity,
@@ -779,7 +797,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 }
             });
 
-            followedByView.setFollowers(activity, followers, " follows this.", Gravity.CENTER);
+            followedByView.setFollowers(activity, followers, " follows this.");
         }
 
         public void setFollowButtons(boolean isFollowing) {
@@ -855,7 +873,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static class TrendingCategoryCard extends ViewHolder {
         private NetworkImageView imageView;
         private TextView titleView;
-        private FollowedByView followedByView;
+        private ContactListView contactListView;
 
         static TrendingCategoryCard newInstance(final BaseActivity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(R.layout.card_explore, parent, false);
@@ -867,7 +885,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             imageView = (NetworkImageView) itemView.findViewById(R.id.image);
             titleView = (TextView) itemView.findViewById(R.id.title);
-            followedByView = (FollowedByView) itemView.findViewById(R.id.followed_by);
+            contactListView = (ContactListView) itemView.findViewById(R.id.followed_by);
         }
 
         public void populateTrendingCategoryData(final TrendingCategoryData data,
@@ -875,12 +893,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             imageView.setImageUrl(data.trendingTopic.imgUrl,
                     VolleyHelper.getImageLoader(eventsFragment.getContextActivity()));
             titleView.setText(data.trendingTopic.tagName);
-            followedByView.setFollowers(eventsFragment.getContextActivity(), followers, null,
-                    Gravity.START);
+            contactListView.setGravity(Gravity.START);
+            contactListView.setFollowers(eventsFragment.getContextActivity(), followers, null);
 
-            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) followedByView.getLayoutParams();
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) contactListView.getLayoutParams();
             lp.gravity = Gravity.BOTTOM;
-            followedByView.setLayoutParams(lp);
+            contactListView.setLayoutParams(lp);
 
             itemView.setOnClickListener(new OnClickListener() {
                 @Override
@@ -903,12 +921,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 final BaseEventsFragment eventsFragment, @Nullable Set<SocialFriend> followers) {
             imageView.setDefaultImageResId(data.getInfoGraphId());
             titleView.setVisibility(View.GONE);
-            followedByView.setFollowers(eventsFragment.getContextActivity(), followers, null,
-                    Gravity.END);
+            contactListView.setGravity(Gravity.END);
+            contactListView.setFollowers(eventsFragment.getContextActivity(), followers, null);
 
-            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) followedByView.getLayoutParams();
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) contactListView.getLayoutParams();
             lp.gravity = Gravity.TOP;
-            followedByView.setLayoutParams(lp);
+            contactListView.setLayoutParams(lp);
 
             itemView.setOnClickListener(new OnClickListener() {
                 @Override

@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -61,7 +60,7 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
-import com.eventshigh.nearme.app.view.FollowedByView;
+import com.eventshigh.nearme.app.view.ContactListView;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -462,8 +461,8 @@ public class EventDetailActivity extends BaseActivity {
                         Set<SocialFriend> likedBy = socialActions.eventFavourites.get(event.id);
                         reportActionToAnalytics("showSocialInfo", "likes",
                                 likedBy == null ? 0 : likedBy.size());
-                        ((FollowedByView) findViewById(R.id.followed_by)).setFollowers(
-                                EventDetailActivity.this, likedBy, " liked this.", Gravity.START);
+                        ((ContactListView) findViewById(R.id.followed_by)).setFollowers(
+                                EventDetailActivity.this, likedBy, " liked this.");
                     }
                 },
                 new ErrorListener() {
@@ -486,11 +485,11 @@ public class EventDetailActivity extends BaseActivity {
                         reportActionToAnalytics("showSocialInfo", "invitedBy", allInvitedBy.size());
                         SocialFriend invitedBy = allInvitedBy.size() == 1 ?
                                 allInvitedBy.iterator().next() : null;
-                        FollowedByView invitedByView = (FollowedByView) findViewById(R.id.invited_by);
+                        ContactListView invitedByView = (ContactListView) findViewById(R.id.invited_by);
                         invitedByView.setVisibility(View.VISIBLE);
                         invitedByView.setFollowers(EventDetailActivity.this, allInvitedBy,
                                 (invitedBy == null ? "" : invitedBy.getName()) +
-                                        " has invited you to this event.", Gravity.START);
+                                        " has invited you to this event.");
                     }
                 },
                 new ErrorListener() {

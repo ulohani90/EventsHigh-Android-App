@@ -47,7 +47,7 @@
             android:layout_height="match_parent"
             android:columnWidth="@dimen/event_card_width"
             android:horizontalSpacing="5dp"
-            android:verticalSpacing="5dp"
+            android:verticalSpacing="10dp"
             android:paddingTop="10dp"
             android:paddingBottom="20dp"
             android:clipToPadding="false"

@@ -28,7 +28,7 @@
         android:textColor="@android:color/white"
         tools:text="Hip Hop Music"
     />
-    <com.eventshigh.nearme.app.view.FollowedByView
+    <com.eventshigh.nearme.app.view.ContactListView
         android:id="@+id/followed_by"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
@@ -12,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.ui.FriendsDialog;
@@ -20,14 +22,30 @@ import com.eventshigh.nearme.app.utils.Utils;
 import java.lang.ref.WeakReference;
 import java.util.Set;
 
-public class FollowedByView extends HorizontalScrollView {
+public class ContactListView extends HorizontalScrollView {
+    private int size;
+    private int gravity;
 
-    public FollowedByView(Context context, AttributeSet attrs) {
+    public ContactListView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        TypedArray typedArray = context.getTheme().obtainStyledAttributes(
+                attrs, R.styleable.ContactListView, 0, 0);
+        size = typedArray.getDimensionPixelSize(R.styleable.ContactListView_contactPhotoSize, 12);
+        int position = typedArray.getInteger(R.styleable.ContactListView_contactPosition, 0);
+        gravity = position == 0 ? Gravity.START : (position == 1) ? Gravity.END : Gravity.CENTER;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public void setGravity(int gravity) {
+        this.gravity = gravity;
     }
 
     public void setFollowers(final BaseActivity activity, @Nullable final Set<SocialFriend> friends,
-            final @Nullable String text, int gravity) {
+            final @Nullable String text) {
         removeAllViews();
         if (friends == null || friends.isEmpty()) {
             return;
@@ -38,7 +56,6 @@ public class FollowedByView extends HorizontalScrollView {
                 new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, gravity));
         addView(container);
 
-        int size = Utils.dpToPx(getContext(), 24);
         for (SocialFriend friend : friends) {
             new ContactPhotoLoaderTask(container, size, text).execute(friend);
         }
@@ -80,6 +97,7 @@ public class FollowedByView extends HorizontalScrollView {
                     LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                             LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER);
                     lp.topMargin = Utils.dpToPx(parentView.getContext(), 2);
+                    lp.gravity = Gravity.CENTER;
                     tv.setLayoutParams(lp);
                     tv.setGravity(Gravity.CENTER);
                     tv.setTextColor(parentView.getContext().getResources().getColor(android.R.color.black));
@@ -91,6 +109,7 @@ public class FollowedByView extends HorizontalScrollView {
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(size, size);
                 lp.leftMargin = Utils.dpToPx(parentView.getContext(), 2);
                 lp.rightMargin = Utils.dpToPx(parentView.getContext(), 2);
+                lp.gravity = Gravity.CENTER;
                 imageView.setLayoutParams(lp);
                 imageView.setImageDrawable(drawable);
                 parentView.addView(imageView, 0);
