@@ -12,7 +12,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -44,25 +43,15 @@ public class EventRequest extends JsonRequest<Event> {
             return;
         }
 
-        City city;
-        try {
-            city = City.valueOf(
-                    eventUriPathSegments.get(eventUriPathSegments.size() - 2).toUpperCase());
-        } catch (IllegalArgumentException e) {
-            errorListener.onErrorResponse(new VolleyError("Invalid data, no city: " + eventUri, e));
-            return;
-        }
-
         String eventId = eventUriPathSegments.get(eventUriPathSegments.size() - 1).split("-", 2)[0];
         String url = EventsHighEndpoints.getApiEndpointEventUber(eventId);
 
-        EventRequest request = new EventRequest(context, url, city, priority, listener, errorListener);
+        EventRequest request = new EventRequest(context, url, priority, listener, errorListener);
         request.setTag(context);
         VolleyHelper.addToRequestQueue(context, request);
     }
 
     private final Context context;
-    private final City city;
     private final Priority priority;
 
     /**
@@ -72,11 +61,10 @@ public class EventRequest extends JsonRequest<Event> {
      * @param listener Listener to receive the JSON response
      * @param errorListener Error listener, or null to ignore errors.
      */
-    public EventRequest(Context context, String url, City city, Priority priority,
+    public EventRequest(Context context, String url, Priority priority,
                         Listener<Event> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         this.context = context;
-        this.city = city;
         this.priority = priority;
     }
 
@@ -93,7 +81,7 @@ public class EventRequest extends JsonRequest<Event> {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject eventJson = new JSONObject(jsonString);
-            return Response.success(Event.fromJSON(city, eventJson),
+            return Response.success(Event.fromJSON(eventJson),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException | ParseException e) {
             Crashlytics.getInstance().core.logException(e);

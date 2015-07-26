@@ -49,16 +49,15 @@ public class DateCategoryRequest extends JsonRequest<List<TopicEvents>>  {
 
         String url = EventsHighEndpoints.getDateCategoryEndpoint(eventsContext.city, eventsContext.dateFilter);
         DateCategoryRequest request = new DateCategoryRequest(
-                context, url, eventsContext, shouldBypassCache, priority, listener, errorListener);
+                context, url, shouldBypassCache, priority, listener, errorListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
 
     private final Context context;
     private final Priority priority;
-    private final EventsContext eventsContext;
 
-    public DateCategoryRequest(Context context, String url, EventsContext eventsContext,
+    public DateCategoryRequest(Context context, String url,
                                boolean shouldBypassCache, Priority priority,
                                Listener<List<TopicEvents>> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
@@ -67,7 +66,6 @@ public class DateCategoryRequest extends JsonRequest<List<TopicEvents>>  {
 
         this.context = context;
         this.priority = priority;
-        this.eventsContext = eventsContext;
     }
 
     @Override
@@ -91,7 +89,7 @@ public class DateCategoryRequest extends JsonRequest<List<TopicEvents>>  {
                 JSONObject categoryEvents = dateEventsJson.getJSONObject(category);
                 int numEvents = categoryEvents.getInt("num_events");
                 JSONArray upcomingEvents = categoryEvents.getJSONArray("events");
-                List<Event> events = Event.fromJSON(eventsContext.city, upcomingEvents, true);
+                List<Event> events = Event.fromJSON(upcomingEvents, true);
 
                 category = category.equals("upcoming") ? IntentUtils.QUERY_ALL : category;
                 if (!events.isEmpty()) {

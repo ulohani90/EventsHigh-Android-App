@@ -399,6 +399,26 @@
                 </FrameLayout>
 
                 <FrameLayout
+                    android:id="@+id/book_enquiry"
+                    style="@style/EHButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="openBookingEnquirySite"
+                >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:drawableLeft="@drawable/action_book"
+                        android:drawableStart="@drawable/action_book"
+                        android:textColor="#CC000000"
+                        android:text="@string/action_book_enquiry"
+                    />
+                </FrameLayout>
+
+                <FrameLayout
                     android:id="@+id/join_event"
                     style="@style/EHButton"
                     android:layout_width="0dp"

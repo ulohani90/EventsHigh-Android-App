@@ -10,6 +10,7 @@
     <!-- Actions -->
     <string name="action_skip">Skip</string>
     <string name="action_book">Book</string>
+    <string name="action_book_enquiry">Book Enquiry</string>
     <string name="action_call">Call Organizer</string>
     <string name="action_join">Join</string>
     <string name="action_retry">Retry</string>

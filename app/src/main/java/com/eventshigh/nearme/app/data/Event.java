@@ -39,6 +39,7 @@ public class Event implements Parcelable {
     @Nullable public final String imgUrl;
     @Nullable public final String sourceUrl;
     @Nullable public final String bookingUrl;
+    @Nullable public final String bookingEnquiryUrl;
 
     public final int numViews;
     public final int numSaves;
@@ -68,6 +69,7 @@ public class Event implements Parcelable {
     public Event(String id, City city, String title, EventCategory category,
                  @Nullable String offerTitle, String description, String[] tags,
                  @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
+                 @Nullable String bookingEnquiryUrl,
                  int numViews, int numSaves, boolean ehRecommended,
                  float uberScore, long[] eventTimings,
                  @Nullable LatLng location, @Nullable String venue, @Nullable String locality,
@@ -88,6 +90,7 @@ public class Event implements Parcelable {
         this.imgUrl = Utils.checkIfUnknown(imgUrl);
         this.sourceUrl = Utils.checkIfUnknown(sourceUrl);
         this.bookingUrl = Utils.checkIfUnknown(bookingUrl);
+        this.bookingEnquiryUrl = Utils.checkIfUnknown(bookingEnquiryUrl);
 
         this.numViews = numViews;
         this.numSaves = numSaves;
@@ -185,6 +188,7 @@ public class Event implements Parcelable {
         dest.writeString(emptyIfNull(imgUrl));
         dest.writeString(emptyIfNull(sourceUrl));
         dest.writeString(emptyIfNull(bookingUrl));
+        dest.writeString(emptyIfNull(bookingEnquiryUrl));
 
         dest.writeInt(numViews);
         dest.writeInt(numSaves);
@@ -229,6 +233,7 @@ public class Event implements Parcelable {
                             in.readString(),
                             in.readString(),
                             in.readString(),
+                            in.readString(),
 
                             in.readInt(),
                             in.readInt(),
@@ -266,7 +271,7 @@ public class Event implements Parcelable {
     /**********************************
      Helper static methods, used for JSON parsing
      *********************************/
-    public static Event fromJSON(City city, JSONObject eventJson) throws JSONException, ParseException {
+    public static Event fromJSON(JSONObject eventJson) throws JSONException, ParseException {
         if (eventJson.optBoolean("junk")) {
             // Junk event.
             throw new ParseException("junk event", 0);
@@ -277,10 +282,12 @@ public class Event implements Parcelable {
         String description = eventJson.optString("description")
                 .replaceAll("Â", "")
                 .replaceAll("\\s+\n", "\n\n");
+        City city = City.valueOf(eventJson.getString("city").toUpperCase());
 
         JSONObject mashup = eventJson.optJSONObject("mashup");
         String source_url = eventJson.optString("source_url");
         String booking_url = mashup == null ? null : mashup.optString("booking_url");
+        String booking_enquiry_url = mashup == null ? null : mashup.optString("booking_enquiry_url");
         String img_url = eventJson.optString("img_url");
         if ((source_url != null && source_url.toLowerCase().contains("eventviva")) ||
             (img_url != null && img_url.endsWith("missing.png"))) {
@@ -443,6 +450,7 @@ public class Event implements Parcelable {
                 img_url,
                 source_url,
                 booking_url,
+                booking_enquiry_url,
 
                 num_views,
                 num_saves,
@@ -471,11 +479,11 @@ public class Event implements Parcelable {
         );
     }
 
-    public static List<Event> fromJSON(City city, JSONArray jsonArray, boolean includeWithoutLocation) {
+    public static List<Event> fromJSON(JSONArray jsonArray, boolean includeWithoutLocation) {
         List<Event> events = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
-                Event event = fromJSON(city, jsonArray.getJSONObject(i));
+                Event event = fromJSON(jsonArray.getJSONObject(i));
                 if (includeWithoutLocation || event.location != null) {
                     events.add(event);
                 }
@@ -486,10 +494,10 @@ public class Event implements Parcelable {
         return events;
     }
 
-    public static List<Event> parseUpcomingEvents(City city, JSONObject eventsJSON,
+    public static List<Event> parseUpcomingEvents(JSONObject eventsJSON,
             boolean includeWithoutLocation) throws JSONException {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
-        return fromJSON(city, upcomingEvents, includeWithoutLocation);
+        return fromJSON(upcomingEvents, includeWithoutLocation);
     }
 
     private static String emptyIfNull(@Nullable String string) {
@@ -510,15 +518,6 @@ public class Event implements Parcelable {
         }
 
         return query;
-    }
-
-    public @Nullable Intent getShowOnMapIntent() {
-        String query = getMapQuery();
-        if (query == null) {
-            return null;
-        }
-
-        return new Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=" + query));
     }
 
     public Intent getShowDirectionsOnMapIntent() {

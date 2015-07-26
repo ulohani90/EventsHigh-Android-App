@@ -89,7 +89,7 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
             Iterator<String> keys = eventsJson.keys();
             while (keys.hasNext()) {
                 try {
-                    Event event = Event.fromJSON(eventsContext.city, eventsJson.getJSONObject(keys.next()));
+                    Event event = Event.fromJSON(eventsJson.getJSONObject(keys.next()));
                     if (includeWithoutLocation || event.location != null) {
                         events.add(event);
                     }

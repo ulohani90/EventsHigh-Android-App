@@ -290,6 +290,30 @@ public class EventDetailActivity extends BaseActivity {
                 getString(R.string.title_book));
     }
 
+    @SuppressWarnings("all")
+    public void openBookingEnquirySite(View view) {
+        Account account = new Account(this);
+        UserInfo userInfo = account.getUserInfo();
+        if (userInfo.phoneNo == null || userInfo.name == null) {
+            PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
+            return;
+        }
+
+        showRateAppDialog = true;
+        addToFavourite = true;
+        reportEventAction(event, "bookingEnquiry");
+
+        final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingEnquiryUrl).buildUpon();
+        if (event.bookingEnquiryUrl.contains("eventshigh.com")) {
+            bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
+            bookingUriBuilder.appendQueryParameter("name", userInfo.name);
+            bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
+        }
+
+        CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
+                getString(R.string.title_book));
+    }
+
     public void openOfferSite(View view) {
         reportEventAction(event, "openOffer");
         CustomUrlActivity.launchCustomUrl(this,
@@ -558,6 +582,7 @@ public class EventDetailActivity extends BaseActivity {
         private final View bookView;
         private final View callView;
         private final View joinView;
+        private final View bookEnquiryView;
         private final TextView priceView;
         private final TextView offerView;
 
@@ -608,6 +633,7 @@ public class EventDetailActivity extends BaseActivity {
             bookView = findViewById(R.id.book_ticket);
             callView = findViewById(R.id.call);
             joinView = findViewById(R.id.join_event);
+            bookEnquiryView = findViewById(R.id.book_enquiry);
             priceView = (TextView) findViewById(R.id.event_price);
             offerView = (TextView) findViewById(R.id.offer_text);
 
@@ -740,10 +766,14 @@ public class EventDetailActivity extends BaseActivity {
 
             // Set action buttons.
             findViewById(R.id.action_button_group).setVisibility(View.VISIBLE);
-            bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
             callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
+            bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
+            bookEnquiryView.setVisibility(
+                (bookView.getVisibility() != View.VISIBLE && event.bookingEnquiryUrl != null)
+                    ? View.VISIBLE : View.GONE
+            );
             joinView.setVisibility(
-                (bookView.getVisibility() != View.VISIBLE &&
+                (bookView.getVisibility() != View.VISIBLE && bookEnquiryView.getVisibility() != View.VISIBLE &&
                     event.sourceUrl != null && event.sourceUrl.contains("facebook.com/"))
                 ? View.VISIBLE : View.GONE);
 

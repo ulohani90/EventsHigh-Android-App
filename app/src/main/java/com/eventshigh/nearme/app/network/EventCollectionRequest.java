@@ -121,8 +121,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
         String jsonString = new String(response.data, "UTF-8");
         JSONObject eventsJson = new JSONObject(jsonString);
-        List<Event> events = Event.parseUpcomingEvents(eventsContext.city, eventsJson,
-                includeWithoutLocation);
+        List<Event> events = Event.parseUpcomingEvents(eventsJson, includeWithoutLocation);
         filterOldEvents(events);
 
         // Sort the event list to user.
