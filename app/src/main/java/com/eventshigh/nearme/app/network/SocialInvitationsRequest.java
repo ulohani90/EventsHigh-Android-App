@@ -36,15 +36,20 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
     public static class PlanInvite {
         public final String planId;
         public final List<SocialFriend> invitedBy;
+        public final List<SocialFriend> allParticipants;
 
-        public PlanInvite(String planId, List<SocialFriend> invitedBy) {
+        public PlanInvite(String planId, List<SocialFriend> invitedBy, List<SocialFriend> allParticipants) {
             this.planId = planId;
             this.invitedBy = invitedBy;
+            this.allParticipants = allParticipants;
         }
 
         public static PlanInvite fromJSON(JSONObject data, Context context) throws JSONException {
-            return new PlanInvite(data.getString("plan_id"),
-                    SocialFriend.fromJSON(data.getJSONArray("invited_by"), context));
+            List<SocialFriend> invitedBy =
+                    SocialFriend.fromJSON(data.getJSONArray("invited_by"), context);
+            List<SocialFriend> allParticipants =
+                    SocialFriend.fromJSON(data.getJSONArray("all_participants"), context);
+            return new PlanInvite(data.getString("plan_id"), invitedBy, allParticipants);
         }
 
         public static List<PlanInvite> fromJSON(JSONArray data, Context context) throws JSONException {
@@ -73,6 +78,14 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
             }
 
             return  null;
+        }
+
+        public Set<SocialFriend> getAllParticipants() {
+            Set<SocialFriend> allParticipants = getAllInvitedBy();
+            for (PlanInvite invite : planInvites) {
+                allParticipants.addAll(invite.allParticipants);
+            }
+            return allParticipants;
         }
 
         @SuppressWarnings("LoopStatementThatDoesntLoop")

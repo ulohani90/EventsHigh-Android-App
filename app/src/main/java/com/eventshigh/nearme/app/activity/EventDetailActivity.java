@@ -502,18 +502,23 @@ public class EventDetailActivity extends BaseActivity {
                     public void onResponse(Map<String, SocialInvite> invites, boolean isIntermediate) {
                         SocialInvite invite = invites.get(event.id);
                         if (invite == null || invite.getInvitedBy() == null) {
+                            reportActionToAnalytics("showSocialInfo", "invitedBy", 0);
                             return;
                         }
 
-                        Set<SocialFriend>  allInvitedBy = invite.getAllInvitedBy();
+                        planId = invite.getPlanId();
+                        Set<SocialFriend> allInvitedBy = invite.getAllInvitedBy();
+                        Set<SocialFriend> allParticipants = invite.getAllParticipants();
                         reportActionToAnalytics("showSocialInfo", "invitedBy", allInvitedBy.size());
-                        SocialFriend invitedBy = allInvitedBy.size() == 1 ?
-                                allInvitedBy.iterator().next() : null;
+
+                        String prefix = allInvitedBy.size() == 1 ?
+                                allInvitedBy.iterator().next().getName() : "";
+                        String suffix = allParticipants.size() < 3 ? "" : "\nand " + (allParticipants.size() - 2) + " more friends";
+
                         ContactListView invitedByView = (ContactListView) findViewById(R.id.invited_by);
                         invitedByView.setVisibility(View.VISIBLE);
-                        invitedByView.setText((invitedBy == null ? "" : invitedBy.getName()) +
-                                " has invited you to this event.");
-                        invitedByView.setFollowers(EventDetailActivity.this, allInvitedBy);
+                        invitedByView.setText(prefix + " has invited you " + suffix);
+                        invitedByView.setFollowers(EventDetailActivity.this, allInvitedBy, allParticipants);
                     }
                 },
                 new ErrorListener() {

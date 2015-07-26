@@ -52,6 +52,11 @@ public class ContactListView extends HorizontalScrollView {
     }
 
     public void setFollowers(final BaseActivity activity, @Nullable final Set<SocialFriend> friends) {
+        setFollowers(activity, friends, friends);
+    }
+
+    public void setFollowers(final BaseActivity activity,
+            @Nullable final Set<SocialFriend> friends, @Nullable final Set<SocialFriend> allFriends) {
         removeAllViews();
         if (friends == null || friends.isEmpty()) {
             return;
@@ -70,7 +75,7 @@ public class ContactListView extends HorizontalScrollView {
         container.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                FriendsDialog.show(activity, friends);
+                FriendsDialog.show(activity, allFriends);
             }
         });
     }
@@ -102,10 +107,11 @@ public class ContactListView extends HorizontalScrollView {
                     TextView tv = new TextView(parentView.getContext());
                     LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                             LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+                    lp.leftMargin = Utils.dpToPx(parentView.getContext(), 4);
                     lp.gravity = Gravity.CENTER;
                     tv.setLayoutParams(lp);
                     tv.setTextAppearance(context, android.R.style.TextAppearance_Medium);
-                    tv.setGravity(Gravity.CENTER);
+                    tv.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
                     tv.setText(text);
                     parentView.addView(tv);
                 }
