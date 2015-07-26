@@ -187,7 +187,7 @@
                 android:paddingBottom="6dp"
                 app:contactPhotoSize="24dp"
                 app:contactPosition="start"
-                app:text=" has invited you this event!"
+                app:text=" has invited you to this event!"
             />
         </FrameLayout>
     </RelativeLayout>

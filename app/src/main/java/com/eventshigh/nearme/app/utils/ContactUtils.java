@@ -10,6 +10,7 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.annotation.Nullable;
+import android.util.LruCache;
 
 import com.eventshigh.nearme.app.data.UserContact;
 
@@ -92,6 +93,11 @@ public class ContactUtils {
     }
 
     public static @Nullable UserContact getContactForServerPhone(Context context, String phone) {
+        UserContact contact = PHONE_TO_CONTACT_MAP.get(phone);
+        if (contact != null) {
+            return contact;
+        }
+
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
                 Uri.encode(phone));
 
@@ -108,12 +114,14 @@ public class ContactUtils {
             if (!cursor.moveToNext()) {
                 return null;
             }
-            return new UserContact(
+            contact = new UserContact(
                     cursor.getString(cursor.getColumnIndex(PhoneLookup._ID)),
                     phone,
                     cursor.getString(cursor.getColumnIndex(PhoneLookup.DISPLAY_NAME)),
                     null
             );
+            PHONE_TO_CONTACT_MAP.put(phone, contact);
+            return contact;
         } finally {
             cursor.close();
         }
@@ -152,4 +160,6 @@ public class ContactUtils {
                 ContactsContract.CommonDataKinds.Email.CONTENT_URI,
                 projection, selection, null, null);
     }
+
+    private static final LruCache<String, UserContact> PHONE_TO_CONTACT_MAP = new LruCache<>(200);
 }

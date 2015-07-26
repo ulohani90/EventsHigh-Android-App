@@ -29,6 +29,7 @@ public class ContactListView extends HorizontalScrollView {
 
     public ContactListView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setHorizontalScrollBarEnabled(false);
 
         TypedArray typedArray = context.getTheme().obtainStyledAttributes(
                 attrs, R.styleable.ContactListView, 0, 0);

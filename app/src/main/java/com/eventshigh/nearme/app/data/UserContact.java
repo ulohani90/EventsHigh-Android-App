@@ -8,15 +8,20 @@ import android.graphics.drawable.Drawable;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.LruCache;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.ImageUtils;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents the user contact.
@@ -56,9 +61,20 @@ public class UserContact implements Comparable<UserContact> {
     }
 
     public Drawable getDrawable(Context context, int size) {
-        Bitmap bitmap = ContactUtils.getPhotoForContactId(context, contactId, size);
+        Bitmap bitmap = null;
+        if (! NULL_PHOTO_CONTACT_ID.contains(contactId)) {
+            bitmap = ContactUtils.getPhotoForContactId(context, contactId,
+                    Utils.dpToPx(context, MAX_PHOTO_SIZE_DP));
+            if (bitmap == null) {
+                NULL_PHOTO_CONTACT_ID.add(contactId);
+            } else {
+                bitmap = ImageUtils.getCircularBitmapFrom(bitmap);
+                CONTACT_PHOTO_CACHE.put(contactId, bitmap);
+            }
+        }
+
         if (bitmap != null) {
-            return new BitmapDrawable(context.getResources(), ImageUtils.getCircularBitmapFrom(bitmap));
+            return new BitmapDrawable(context.getResources(), bitmap);
         }
 
         return getDrawableForName(name, size);
@@ -109,4 +125,19 @@ public class UserContact implements Comparable<UserContact> {
         int color = ColorGenerator.MATERIAL.getColor(name);
         return TextDrawable.builder().buildRoundRect(Character.toString(name.charAt(0)), color, size);
     }
+
+
+    // Use 10% memory for bitmap cache.
+    private static final int BITMAP_CACHE_SIZE = (int)(Runtime.getRuntime().maxMemory() / ( 10 * 1024));
+    private static final int MAX_PHOTO_SIZE_DP = 24;
+    private static final Set<String> NULL_PHOTO_CONTACT_ID = new HashSet<>();
+    private static final LruCache<String, Bitmap> CONTACT_PHOTO_CACHE =
+        new LruCache<String, Bitmap>(BITMAP_CACHE_SIZE) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
 }
