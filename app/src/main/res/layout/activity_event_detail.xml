@@ -12,7 +12,7 @@
         android:id="@+id/event_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/check_with_friends"
+        android:layout_above="@+id/action_footer"
         android:paddingBottom="16dp"
         android:clipToPadding="false"
         android:visibility="gone"
@@ -111,6 +111,11 @@
             </LinearLayout>
 
             <!-- Invitations -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#1a4d4d4d"
+            />
             <com.eventshigh.nearme.app.view.ContactListView
                 android:id="@+id/invited_by"
                 android:layout_width="match_parent"
@@ -370,101 +375,31 @@
                 android:layout_height="1dp"
                 android:background="#1a4d4d4d"
             />
-            <LinearLayout
+            <FrameLayout
+                android:id="@+id/call"
+                style="@style/EHButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:showDividers="middle"
-                android:divider="@drawable/shape_vertical_divider"
-                android:baselineAligned="false"
+                android:onClick="call"
             >
-                <FrameLayout
-                    android:id="@+id/book_ticket"
-                    style="@style/EHButton"
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="openBookingSite"
-                >
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:drawableLeft="@drawable/action_book"
-                        android:drawableStart="@drawable/action_book"
-                        android:textColor="#CC000000"
-                        android:text="@string/action_book"
-                    />
-                </FrameLayout>
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:drawableLeft="@drawable/action_call"
+                    android:drawableStart="@drawable/action_call"
+                    android:textColor="#CC000000"
+                    android:text="@string/action_call"
+                />
+            </FrameLayout>
 
-                <FrameLayout
-                    android:id="@+id/book_enquiry"
-                    style="@style/EHButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="openBookingEnquirySite"
-                >
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:drawableLeft="@drawable/action_book"
-                        android:drawableStart="@drawable/action_book"
-                        android:textColor="#CC000000"
-                        android:text="@string/action_book_enquiry"
-                    />
-                </FrameLayout>
-
-                <FrameLayout
-                    android:id="@+id/join_event"
-                    style="@style/EHButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="openSourceSite"
-                >
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:drawableLeft="@drawable/ic_event_available_32dp"
-                        android:drawableStart="@drawable/ic_event_available_32dp"
-                        android:textColor="#CC000000"
-                        android:text="@string/action_join"
-                    />
-                </FrameLayout>
-
-                <FrameLayout
-                    android:id="@+id/call"
-                    style="@style/EHButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="call"
-                >
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:drawableLeft="@drawable/action_call"
-                        android:drawableStart="@drawable/action_call"
-                        android:textColor="#CC000000"
-                        android:text="@string/action_call"
-                    />
-                </FrameLayout>
-            </LinearLayout>
+            <!-- Price -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#1a4d4d4d"
             />
-
-            <!-- Price -->
             <LinearLayout
                 android:id="@+id/price_row"
                 android:layout_width="match_parent"
@@ -740,16 +675,67 @@
         </LinearLayout>
     </ScrollView>
 
-    <TextView
-        android:id="@+id/check_with_friends"
-        style="@style/EHButtonCTA"
+    <LinearLayout
+        android:id="@+id/action_footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/gray300"
         android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:text="@string/action_check_friends"
-        android:onClick="checkWithFriends"
-    />
+        android:padding="6dp"
+        android:showDividers="middle"
+        android:divider="@drawable/shape_vertical_divider"
+    >
+        <TextView
+            android:id="@+id/check_with_friends"
+            style="@style/EHButtonCTA"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="@string/action_check_friends"
+            android:onClick="checkWithFriends"
+        />
+        <TextView
+            android:id="@+id/book_ticket"
+            style="@style/EHButtonCTA"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_gravity="center"
+            android:layout_marginStart="4dp"
+            android:layout_marginLeft="4dp"
+            android:gravity="center"
+            android:text="@string/action_book"
+            android:onClick="openBookingSite"
+        />
+        <TextView
+            android:id="@+id/book_enquiry"
+            style="@style/EHButtonCTA"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_gravity="center"
+            android:layout_marginStart="4dp"
+            android:layout_marginLeft="4dp"
+            android:gravity="center"
+            android:text="@string/action_book_enquiry"
+            android:onClick="openBookingEnquirySite"
+        />
+        <TextView
+            android:id="@+id/join_event"
+            style="@style/EHButtonCTA"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_gravity="center"
+            android:layout_marginStart="4dp"
+            android:layout_marginLeft="4dp"
+            android:gravity="center"
+            android:text="@string/action_join"
+            android:onClick="openSourceSite"
+        />
+    </LinearLayout>
     <include
         android:id="@+id/toolbar"
         android:layout_width="match_parent"

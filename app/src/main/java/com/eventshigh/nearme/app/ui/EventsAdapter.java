@@ -578,6 +578,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final View arrowView;
         private final TextView eventStatsView;
         private final ContactListView invitedByView;
+        private final View infoArrowView;
 
         public static EventCard newInstance(Activity activity, ViewGroup parent,
                 boolean shouldAdjustImageHeight) {
@@ -601,6 +602,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             arrowView = cardView.findViewById(R.id.arrow);
             eventStatsView = (TextView) cardView.findViewById(R.id.event_stats);
             invitedByView = (ContactListView) cardView.findViewById(R.id.invited_by);
+            infoArrowView = cardView.findViewById(R.id.info_arrow);
         }
 
         public void setFavouriteView(@Nullable EventMark eventMark) {
@@ -657,9 +659,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             if (invite != null && invite.getInvitedBy() != null) {
                 invitedByView.setVisibility(View.VISIBLE);
                 invitedByView.setFollowers(activity, invite.getAllInvitedBy());
+                infoArrowView.setVisibility(View.VISIBLE);
             } else if (showStats && event.numViews > 5) {
                 eventStatsView.setVisibility(View.VISIBLE);
                 eventStatsView.setText("" + event.numViews + " views");
+                infoArrowView.setVisibility(View.VISIBLE);
             }
         }
 
@@ -714,6 +718,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
             travelTimeView.setVisibility(View.GONE);
             eventStatsView.setVisibility(View.GONE);
             invitedByView.setVisibility(View.GONE);
+            infoArrowView.setVisibility(View.GONE);
         }
     }
 

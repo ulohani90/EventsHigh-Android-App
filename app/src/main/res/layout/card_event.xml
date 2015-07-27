@@ -157,6 +157,16 @@
             tools:text="30 mins"
         />
 
+        <View
+            android:id="@+id/info_arrow"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_above="@id/event_info"
+            android:background="@drawable/shape_info_triangle"
+        />
+
         <FrameLayout
             android:id="@+id/event_info"
             android:layout_width="match_parent"
