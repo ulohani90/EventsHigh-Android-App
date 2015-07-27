@@ -701,9 +701,11 @@
                 android:layout_weight="2"
                 android:gravity="center"
                 android:elevation="4dp"
-                tools:ignore="UnusedAttribute"
                 android:text="@string/action_check_friends"
                 android:onClick="checkWithFriends"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:ignore="UnusedAttribute"
             />
             <TextView
                 android:id="@+id/book_ticket"
@@ -717,9 +719,11 @@
                 android:layout_marginLeft="4dp"
                 android:gravity="center"
                 android:elevation="4dp"
-                tools:ignore="UnusedAttribute"
                 android:text="@string/action_book"
                 android:onClick="openBookingSite"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:ignore="UnusedAttribute"
             />
             <TextView
                 android:id="@+id/book_enquiry"
@@ -733,9 +737,11 @@
                 android:layout_marginLeft="4dp"
                 android:gravity="center"
                 android:elevation="4dp"
-                tools:ignore="UnusedAttribute"
                 android:text="@string/action_book_enquiry"
                 android:onClick="openBookingEnquirySite"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:ignore="UnusedAttribute"
             />
             <TextView
                 android:id="@+id/join_event"
@@ -749,9 +755,11 @@
                 android:layout_marginLeft="4dp"
                 android:gravity="center"
                 android:elevation="4dp"
-                tools:ignore="UnusedAttribute"
                 android:text="@string/action_join"
                 android:onClick="openSourceSite"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:ignore="UnusedAttribute"
             />
         </LinearLayout>
     </FrameLayout>

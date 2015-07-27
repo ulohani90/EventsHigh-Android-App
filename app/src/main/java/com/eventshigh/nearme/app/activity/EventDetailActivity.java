@@ -473,6 +473,7 @@ public class EventDetailActivity extends BaseActivity {
         // Populate event details.
         toolbar.setAlpha(0f);
         eventCard.populateView(event);
+        findViewById(R.id.check_with_friends).setVisibility(View.VISIBLE);
 
         // Connect to Google API client to notify the view.
         getGoogleApiClient();
