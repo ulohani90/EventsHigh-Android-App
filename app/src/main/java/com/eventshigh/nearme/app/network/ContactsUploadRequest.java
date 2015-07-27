@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.network;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
@@ -43,6 +44,8 @@ public class ContactsUploadRequest extends JsonObjectRequest {
         String url = AccountStateReporter.getBaseUriWithoutAndroidId("record_user_contacts").build().toString();
         ContactsUploadRequest request = new ContactsUploadRequest(
                 url, jsonRequest, priority, listener, errorListener);
+        request.setRetryPolicy(new DefaultRetryPolicy(60_000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleyHelper.addToRequestQueue(context, request);
     }
 
