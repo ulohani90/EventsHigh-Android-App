@@ -513,7 +513,7 @@ public class EventDetailActivity extends BaseActivity {
 
                         String prefix = allInvitedBy.size() == 1 ?
                                 allInvitedBy.iterator().next().getName() : "";
-                        String suffix = allParticipants.size() < 3 ? "" : "\nand " + (allParticipants.size() - 2) + " more friends";
+                        String suffix = allParticipants.size() < 3 ? "" : "and " + (allParticipants.size() - 2) + " more friends";
 
                         ContactListView invitedByView = (ContactListView) findViewById(R.id.invited_by);
                         invitedByView.setVisibility(View.VISIBLE);

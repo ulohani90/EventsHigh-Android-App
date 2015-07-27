@@ -110,7 +110,6 @@ public class ContactListView extends HorizontalScrollView {
                     lp.leftMargin = Utils.dpToPx(parentView.getContext(), 4);
                     lp.gravity = Gravity.CENTER;
                     tv.setLayoutParams(lp);
-                    tv.setTextAppearance(context, android.R.style.TextAppearance_Medium);
                     tv.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
                     tv.setText(text);
                     parentView.addView(tv);

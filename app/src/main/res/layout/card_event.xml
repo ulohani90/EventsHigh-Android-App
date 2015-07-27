@@ -172,8 +172,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/event_bg"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
             android:background="@android:color/white"
         >
             <TextView
@@ -181,8 +179,7 @@
                 android:id="@+id/event_stats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp"
+                android:padding="10dp"
                 android:layout_marginLeft="6dp"
                 android:layout_marginStart="6dp"
                 android:gravity="center_vertical"
@@ -190,16 +187,14 @@
                 android:drawableStart="@drawable/ic_person_black_18dp"
                 android:drawablePadding="16dp"
                 android:fontFamily="sans-serif-medium"
-                android:textSize="16sp"
                 tools:text="1049 views, 23 favourited"
             />
             <com.eventshigh.nearme.app.view.ContactListView
                 android:id="@+id/invited_by"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp"
-                app:contactPhotoSize="24dp"
+                android:padding="10dp"
+                app:contactPhotoSize="18dp"
                 app:contactPosition="start"
                 app:text=" has invited you to this event!"
             />
