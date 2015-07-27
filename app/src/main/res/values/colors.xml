@@ -21,6 +21,11 @@
     <color name="toolbar_big">#7E57C2</color>
     <color name="toolbar_big_status">#5E35B1</color>
 
+    <color name="book_button">#4698B8</color>
+    <color name="book_button_dark">#3688A8</color>
+    <color name="invite_button">#57B39C</color>
+    <color name="invite_button_dark">#47A38C</color>
+
     <color name="red">#D9604F</color>
     <color name="red_dark">#D96000</color>
     <color name="whatsapp_green">#69BE5A</color>
