@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  * Defines various end points for EH api.
  */
 public class EventsHighEndpoints {
-    private static final String WEB_URI_BASE = "http://www.eventshigh.com/";
+    private static final String WEB_URI_BASE = "https://www.eventshigh.com/";
     public static final String API_URI_BASE = "https://api.eventshigh.com/";
 
     private static final String API_ENDPOINT_DATE_FORMAT =
@@ -39,9 +39,9 @@ public class EventsHighEndpoints {
     private static final String API_ENDPOINT_MULTI_EVENT_UBER_FORMAT =
             API_URI_BASE + "api/get_event_uber_infos/%s?mobile=1";
     private static final String API_EVENTS_SUGGEST_FORMAT =
-            "http://assets.eventshigh.com/autocomplete/autocomplete_events_%s.json";
+            "https://assets.eventshigh.com/autocomplete/autocomplete_events_%s.json";
     private static final String API_TAGS_SUGGEST_URL =
-            "http://assets.eventshigh.com/autocomplete/autocomplete_tags.json";
+            "https://assets.eventshigh.com/autocomplete/autocomplete_tags.json";
 
     public static final String QUERY_MY_EVENT = "my events";
     public static final String QUERY_FEATURED = "editor's picks";

@@ -115,7 +115,7 @@
                 <data
                     android:scheme="http"
                     android:host="www.eventshigh.com"
-                    android:pathPrefix="/"
+                    android:pathPrefix="/city"
                 />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -123,9 +123,9 @@
             </intent-filter>
             <intent-filter>
                 <data
-                    android:scheme="http"
-                    android:host="eventshigh.com"
-                    android:pathPrefix="/"
+                    android:scheme="https"
+                    android:host="www.eventshigh.com"
+                    android:pathPrefix="/city"
                 />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -155,7 +155,48 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/NoActionBar"
             android:screenOrientation="portrait"
-        />
+        >
+            <intent-filter>
+                <data
+                    android:scheme="http"
+                    android:host="www.eventshigh.com"
+                    android:pathPrefix="/browse"
+                />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <data
+                    android:scheme="http"
+                    android:host="www.eventshigh.com"
+                    android:pathPrefix="/search"
+                />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <data
+                    android:scheme="https"
+                    android:host="www.eventshigh.com"
+                    android:pathPrefix="/browse"
+                />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <data
+                    android:scheme="https"
+                    android:host="www.eventshigh.com"
+                    android:pathPrefix="/search"
+                />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".activity.EventDetailActivity"
@@ -163,7 +204,28 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar"
-        />
+        >
+            <intent-filter>
+                <data
+                    android:scheme="http"
+                    android:host="www.eventshigh.com"
+                    android:pathPrefix="/detail"
+                />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <data
+                    android:scheme="https"
+                    android:host="www.eventshigh.com"
+                    android:pathPrefix="/detail"
+                />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".activity.MyFriendsActivity"
