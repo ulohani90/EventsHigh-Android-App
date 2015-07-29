@@ -1,10 +1,7 @@
 package com.eventshigh.nearme.app.utils;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -60,36 +57,6 @@ public class ContactUtils {
         }
 
         return contacts;
-    }
-
-    public static @Nullable Bitmap getPhotoForContactId(Context context, String contactId, int size) {
-        long contactIdLong = Long.parseLong(contactId);
-        Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactIdLong);
-        Uri photoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
-
-        Cursor cursor = context.getContentResolver().query(photoUri,
-                new String[] {ContactsContract.Contacts.Photo.PHOTO}, null, null, null);
-        if (cursor == null) {
-            return null;
-        }
-
-        try {
-            if (cursor.moveToFirst()) {
-                byte[] bitmapData = cursor.getBlob(0);
-                if (bitmapData != null) {
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inJustDecodeBounds = true;
-                    BitmapFactory.decodeByteArray(bitmapData, 0, bitmapData.length, options);
-
-                    options.inSampleSize = (options.outHeight * options.outWidth)/(size * size);
-                    options.inJustDecodeBounds = false;
-                    return BitmapFactory.decodeByteArray(bitmapData, 0, bitmapData.length, options);
-                }
-            }
-        } finally {
-            cursor.close();
-        }
-        return null;
     }
 
     public static @Nullable UserContact getContactForServerPhone(Context context, String phone) {

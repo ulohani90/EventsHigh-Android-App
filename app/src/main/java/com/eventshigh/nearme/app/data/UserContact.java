@@ -1,10 +1,13 @@
 package com.eventshigh.nearme.app.data;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,7 +15,6 @@ import android.util.LruCache;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
-import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.ImageUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
@@ -61,18 +63,7 @@ public class UserContact implements Comparable<UserContact> {
     }
 
     public Drawable getDrawable(Context context, int size) {
-        Bitmap bitmap = null;
-        if (! NULL_PHOTO_CONTACT_ID.contains(contactId)) {
-            bitmap = ContactUtils.getPhotoForContactId(context, contactId,
-                    Utils.dpToPx(context, MAX_PHOTO_SIZE_DP));
-            if (bitmap == null) {
-                NULL_PHOTO_CONTACT_ID.add(contactId);
-            } else {
-                bitmap = ImageUtils.getCircularBitmapFrom(bitmap);
-                CONTACT_PHOTO_CACHE.put(contactId, bitmap);
-            }
-        }
-
+        Bitmap bitmap = getPhotoForContactId(context, contactId);
         if (bitmap != null) {
             return new BitmapDrawable(context.getResources(), bitmap);
         }
@@ -126,10 +117,9 @@ public class UserContact implements Comparable<UserContact> {
         return TextDrawable.builder().buildRoundRect(Character.toString(name.charAt(0)), color, size);
     }
 
-
     // Use 10% memory for bitmap cache.
     private static final int BITMAP_CACHE_SIZE = (int)(Runtime.getRuntime().maxMemory() / ( 10 * 1024));
-    private static final int MAX_PHOTO_SIZE_DP = 24;
+    private static final int MAX_PHOTO_SIZE_DP = 72;
     private static final Set<String> NULL_PHOTO_CONTACT_ID = new HashSet<>();
     private static final LruCache<String, Bitmap> CONTACT_PHOTO_CACHE =
         new LruCache<String, Bitmap>(BITMAP_CACHE_SIZE) {
@@ -140,4 +130,49 @@ public class UserContact implements Comparable<UserContact> {
                 return bitmap.getByteCount() / 1024;
             }
         };
+
+    public static @Nullable Bitmap getPhotoForContactId(Context context, String contactId) {
+        if (NULL_PHOTO_CONTACT_ID.contains(contactId)) {
+            return null;
+        }
+
+        Bitmap bitmap = CONTACT_PHOTO_CACHE.get(contactId);
+        if (bitmap != null) {
+            return bitmap;
+        }
+
+        long contactIdLong = Long.parseLong(contactId);
+        Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactIdLong);
+        Uri photoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
+
+        Cursor cursor = context.getContentResolver().query(photoUri,
+                new String[] {ContactsContract.Contacts.Photo.PHOTO}, null, null, null);
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    byte[] bitmapData = cursor.getBlob(0);
+                    if (bitmapData != null) {
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inJustDecodeBounds = true;
+                        BitmapFactory.decodeByteArray(bitmapData, 0, bitmapData.length, options);
+
+                        int size = Utils.dpToPx(context, MAX_PHOTO_SIZE_DP);
+                        options.inSampleSize = (options.outHeight * options.outWidth) / (size * size);
+                        options.inJustDecodeBounds = false;
+                        bitmap = BitmapFactory.decodeByteArray(bitmapData, 0, bitmapData.length, options);
+                        bitmap = ImageUtils.getCircularBitmapFrom(bitmap);
+                    }
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+
+        if (bitmap == null) {
+            NULL_PHOTO_CONTACT_ID.add(contactId);
+        } else {
+            CONTACT_PHOTO_CACHE.put(contactId, bitmap);
+        }
+        return bitmap;
+    }
 }

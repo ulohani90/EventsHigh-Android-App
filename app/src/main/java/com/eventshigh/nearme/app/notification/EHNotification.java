@@ -22,9 +22,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
-import com.eventshigh.nearme.app.utils.ImageUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
 /**
@@ -83,10 +81,8 @@ public class EHNotification {
         this.imageUrl = imageUrl;
         this.launchIntent = launchIntent;
 
-        int size = Utils.dpToPx(context, 72);
         this.contactPhoto = contact == null ? null :
-            ImageUtils.getCircularBitmapFrom(
-                    ContactUtils.getPhotoForContactId(context, contact.contactId, size));
+            UserContact.getPhotoForContactId(context, contact.contactId);
     }
 
     public void showNotificationAndReleaseWakeLock() {
