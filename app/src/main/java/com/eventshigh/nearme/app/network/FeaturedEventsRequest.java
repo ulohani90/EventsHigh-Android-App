@@ -18,9 +18,7 @@ import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -105,18 +103,11 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
             }
 
             // Parse Trending topics.
-            String jsonString = new String(response.data, "UTF-8");
-            JSONObject eventsJson = new JSONObject(jsonString);
             List<TrendingTopic> trendingTopics = new ArrayList<>();
-            JSONArray trendingTopicsJSON = eventsJson.optJSONArray("trending_topics");
-            if (trendingTopicsJSON != null) {
-                for (int i = 0; i < trendingTopicsJSON.length(); i++) {
-                    TrendingTopic trendingTopic = TrendingTopic.parse(trendingTopicsJSON.optJSONObject(i));
-                    if (trendingTopic != null) {
-                        trendingTopics.add(trendingTopic);
-                    }
-                }
-            }
+            trendingTopics.add(new TrendingTopic("Comedy shows", "http://martinmayhew.com/wordpress/wp-content/uploads/2012/06/528279_351279038257615_2065667218_n1.jpg", null));
+            trendingTopics.add(new TrendingTopic("Bengaluru walking tours", "http://cntcdn.cntraveller.in/sites/default/files/Bengaluru.jpg", null));
+            trendingTopics.add(new TrendingTopic("Dance", "https://upload.wikimedia.org/wikipedia/commons/4/4f/Modern_Indian_dance,_India_Habitat_Centre,_New_Delhi.jpg", null));
+            trendingTopics.add(new TrendingTopic("Kids", "http://images.indianexpress.com/2014/05/schools-m.jpg", null));
 
             return Response.success(new EventCollection(filteredEvents, trendingTopics),
                 HttpHeaderParser.parseCacheHeaders(response));
