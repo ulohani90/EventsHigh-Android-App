@@ -21,13 +21,13 @@ import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.ContactUtils;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -94,8 +94,8 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
 
     @Override
     protected Response<SocialActions> parseNetworkResponse(NetworkResponse response) {
-        Map<String, Set<SocialFriend>> eventFavourites  = new HashMap<>();
-        Map<String, Set<SocialFriend>> tagFollowers = new HashMap<>();
+        Map<String, Set<SocialFriend>> eventFavourites  = Utils.getMap();
+        Map<String, Set<SocialFriend>> tagFollowers = Utils.getMap();
 
         try {
             String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));

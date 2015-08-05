@@ -5,10 +5,10 @@ import android.support.annotation.Nullable;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.LocationUtils;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class EventComparator implements Comparator<Event> {
     @Nullable  private final LatLng userLocation;
-    private final Map<String, Double> eventScoreMap = new HashMap<>();
+    private final Map<String, Double> eventScoreMap = Utils.getMap();
 
     public EventComparator(@Nullable LatLng userLocation) {
         this.userLocation = userLocation;

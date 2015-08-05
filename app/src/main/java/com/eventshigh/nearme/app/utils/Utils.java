@@ -2,10 +2,12 @@ package com.eventshigh.nearme.app.utils;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build.VERSION_CODES;
 import android.os.Handler;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.support.annotation.Nullable;
+import android.util.ArrayMap;
 import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
@@ -14,7 +16,9 @@ import com.eventshigh.nearme.app.BuildConfig;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -130,5 +134,13 @@ public class Utils {
     private static Pattern phoneNoPattern = Pattern.compile("[^\\d\\+]");
     public static String simplifyPhoneNo(String phoneNo) {
         return phoneNoPattern.matcher(phoneNo).replaceAll("");
+    }
+
+    public static <K,V> Map<K,V> getMap() {
+        if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
+            return new ArrayMap<>();
+        } else {
+            return new HashMap<>();
+        }
     }
 }

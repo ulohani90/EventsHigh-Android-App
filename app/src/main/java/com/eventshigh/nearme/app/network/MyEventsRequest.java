@@ -18,9 +18,9 @@ import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -100,8 +100,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
 
         // Interest based requests.
         List<String> interests = new Account(context).getFollowingInterests();
-        Map<String, RequestFuture<EventsCollection>> interestsEvents = new HashMap<>(
-                interests.size());
+        Map<String, RequestFuture<EventsCollection>> interestsEvents = Utils.getMap();
         for (String interest : interests) {
             RequestFuture<EventsCollection> eventsFuture = RequestFuture.newFuture();
             EventCollectionRequest.submit(context, new EventsContext(eventsContext.location, interest),

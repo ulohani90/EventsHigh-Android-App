@@ -46,7 +46,6 @@ import com.eventshigh.nearme.app.view.ContactListView;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +56,7 @@ import java.util.Set;
  */
 public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private final BaseEventsFragment eventsFragment;
-    private final Map<String, Integer> eventIdToItemIdMap = new HashMap<>();
+    private final Map<String, Integer> eventIdToItemIdMap = Utils.getMap();
     private final Set<Integer> usedItemIds = new HashSet<>();
     private List<Data> dataToShow;
     @Nullable private SocialActions socialActions;

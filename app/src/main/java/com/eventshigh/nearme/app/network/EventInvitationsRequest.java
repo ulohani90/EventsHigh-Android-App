@@ -15,10 +15,10 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -80,7 +80,7 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
             RequestFuture<List<Event>> future2 = RequestFuture.newFuture();
             MultiEventsRequest.submit(context, eventsContext, eventIds, priority, tag,
                     shouldBypassCache, true, future2, future2);
-            Map<String, Event> eventsMap = new HashMap<>(invites.size());
+            Map<String, Event> eventsMap = Utils.getMap();
             for (Event event: future2.get()) {
                 eventsMap.put(event.id, event);
             }

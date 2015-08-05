@@ -135,7 +135,7 @@ public enum EventCategory {
     }
 
     private static BitmapDescriptor CIRCLE_ICON;
-    private static final Map<EventCategory, BitmapDescriptor> CATEGORY_ICONS = new HashMap<>();
+    private static final Map<EventCategory, BitmapDescriptor> CATEGORY_ICONS = Utils.getMap();
     private static final Map<EventCategory, BitmapDescriptor> CATEGORY_RECOMMENDATION_ICONS =
             new HashMap<>();
 }
