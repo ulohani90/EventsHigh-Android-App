@@ -43,7 +43,8 @@ public class EHNotification {
     public final PendingIntent launchIntent;
     public final int notificationId;
     public final int priority;
-    private final Bitmap contactPhoto;
+
+    @Nullable UserContact contact;
 
     public EHNotification(Context context, Intent wakefulIntent, Event event, int notificationId) {
         this.context = context;
@@ -61,7 +62,7 @@ public class EHNotification {
         imageUrl = event.imgUrl;
 
         launchIntent = createPendingIntent(context, event.id, event.city);
-        contactPhoto = null;
+        contact = null;
 
         // Record notification in stream.
         EventNotificationStreamItem.record(context, title, message, imageUrl, null, event.id,
@@ -80,9 +81,7 @@ public class EHNotification {
         this.message = message;
         this.imageUrl = imageUrl;
         this.launchIntent = launchIntent;
-
-        this.contactPhoto = contact == null ? null :
-            UserContact.getPhotoForContactId(context, contact.contactId);
+        this.contact = contact;
     }
 
     public void showNotificationAndReleaseWakeLock() {
@@ -116,7 +115,7 @@ public class EHNotification {
 
     private void showNotificationNoImage() {
         Notification notification = NotificationUtils.createNotificationBuilder(context, title,
-                message, contactPhoto, launchIntent, priority)
+                message, contact, launchIntent, priority)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .build();
 
@@ -126,7 +125,7 @@ public class EHNotification {
 
     private void showNotificationWithImage(Bitmap bitmap) {
         Notification notification = NotificationUtils.createNotificationBuilder(
-                context, title, message, contactPhoto, launchIntent, priority)
+                context, title, message, contact, launchIntent, priority)
                 .setStyle(new NotificationCompat.BigPictureStyle()
                                 .setSummaryText(message)
                                 .bigPicture(bitmap)

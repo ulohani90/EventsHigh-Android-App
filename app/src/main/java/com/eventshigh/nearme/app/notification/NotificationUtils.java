@@ -8,9 +8,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat.Builder;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.utils.GAHelper;
 
 /**
@@ -22,10 +24,16 @@ public class NotificationUtils {
 
     @SuppressLint("InlinedApi")
     public static Builder createNotificationBuilder(Context context, String title,
-            CharSequence message, Bitmap largeIcon, PendingIntent contentIntent, int priority) {
+            CharSequence message, @Nullable UserContact contact, PendingIntent contentIntent,
+            int priority) {
+        Bitmap largeIcon = null;
+        if (contact != null) {
+            largeIcon = UserContact.getPhotoForContactId(context, contact.contactId);
+        }
         if (largeIcon == null) {
             largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
         }
+
         Builder builder = new Builder(context)
                 .setSmallIcon(R.drawable.notification)
                 .setContentTitle(title)
@@ -40,6 +48,9 @@ public class NotificationUtils {
 
         if (priority >= Notification.PRIORITY_DEFAULT) {
             builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+        }
+        if (contact != null) {
+            builder.addPerson("tel:" + contact.mobileNo);
         }
 
         return builder;
