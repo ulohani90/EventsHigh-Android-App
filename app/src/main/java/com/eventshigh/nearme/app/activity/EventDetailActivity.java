@@ -114,6 +114,7 @@ public class EventDetailActivity extends BaseActivity {
         topProgressBar = findViewById(R.id.top_progress_bar);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitle(R.string.loading);
 
         // Account.
         account = new Account(this);
