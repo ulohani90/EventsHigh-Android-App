@@ -9,7 +9,6 @@ import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.zendesk.logger.Logger;
 import com.zendesk.sdk.feedback.impl.BaseZendeskFeedbackConfiguration;
 import com.zendesk.sdk.model.network.AnonymousIdentity;
-import com.zendesk.sdk.model.network.Identity;
 import com.zendesk.sdk.network.impl.ZendeskConfig;
 
 import java.util.ArrayList;
@@ -28,12 +27,12 @@ public class ZendeskUtils {
                 "e768bcce15686cef22667ce751438e5637c2f22957521a51",
                 "mobile_sdk_client_c134c9f3e705c0b37a78");
 
-        // Anonymous reporting.
-        Identity anonymousIdentity = new AnonymousIdentity.Builder()
+        Account account = new Account(context);
+        String name = account.getUserInfo().name;
+        ZendeskConfig.INSTANCE.setIdentity(new AnonymousIdentity.Builder()
                 .withExternalIdentifier("user:" + Utils.md5(Utils.getAndroidId(context)))
-                .withNameIdentifier("Me")
-                .build();
-        ZendeskConfig.INSTANCE.setIdentity(anonymousIdentity);
+                .withNameIdentifier(name == null ? "Me" : name)
+                .build());
 
         // Set the configuration used by the Contact ZenDesk component.
         ZendeskConfig.INSTANCE.setContactConfiguration(new FeedbackConfiguration(context));
