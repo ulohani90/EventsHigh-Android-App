@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <exclude domain="sharedpref" path="eh_user_credentials"/>
+    <exclude domain="sharedpref" path="eh_gcm_credentials"/>
+    <exclude domain="sharedpref" path="friends"/>
+</full-backup-content>

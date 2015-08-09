@@ -26,13 +26,15 @@
     <uses-permission android:name="com.eventshigh.nearme.app.permission.C2D_MESSAGE" />
 
     <application
-        android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:backupAgent="utils.EhBackupAgent"
+        android:allowBackup="true"
+        tools:ignore="AllowBackup"
     >
-
+        <!--   http://developer.android.com/preview/backup/index.html
+                android:fullBackupContent="@xml/ehbackup"
+        -->
         <!-- Setup the Google Play Services version and Google Maps api key -->
         <meta-data
             android:name="com.google.android.gms.version"
@@ -51,11 +53,6 @@
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="88e38bba3d2788a9338644aa2f1a2b9f0ee92991"
-        />
-        <!-- Setup the backup service -->
-        <meta-data
-            android:name="com.google.android.backup.api_key"
-            android:value="AEdPqrEAAAAIEdZtnBx5rU5FsV-ObsnqwWWHfPLhczoBadGY9g"
         />
         <!-- Setup the search activity -->
         <meta-data

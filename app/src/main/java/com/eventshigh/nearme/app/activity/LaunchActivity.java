@@ -137,7 +137,8 @@ public class LaunchActivity extends BaseContextActivity {
                 return;
             }
 
-            if (!isTaskRoot() && !getIntent().getAction().startsWith(NOTIFICATION_ACTION)) {
+            String action = getIntent().getAction();
+            if (!isTaskRoot() && (action == null || !action.startsWith(NOTIFICATION_ACTION))) {
                 finish();
                 return;
             }
