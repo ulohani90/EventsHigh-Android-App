@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -88,6 +89,9 @@ public class EventsMapsActivity extends BaseEventsActivity {
         setupGestureDetectorIfNeeded();
 
         eventCardContainer = (FrameLayout) findViewById(R.id.event_card_container);
+        if (eventsContext.location == null) {
+            finish();
+        }
     }
 
 
@@ -106,7 +110,12 @@ public class EventsMapsActivity extends BaseEventsActivity {
         }
     }
 
-    private void updateUserLocation(LatLng userLocation) {
+    private void updateUserLocation(@Nullable LatLng userLocation) {
+        if (userLocation == null) {
+            // do nothing.
+            return;
+        }
+
         isAppMovement = true;
         map.animateCamera(
                 CameraUpdateFactory.newCameraPosition(
