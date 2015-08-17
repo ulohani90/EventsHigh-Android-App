@@ -242,6 +242,12 @@ public class EventDetailActivity extends BaseActivity {
         if (event.organizerPhone == null) {
             return;
         }
+        Account account = new Account(this);
+        UserInfo userInfo = account.getUserInfo();
+        if (userInfo.phoneNo == null || userInfo.name == null) {
+            PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
+            return;
+        }
 
         showRateAppDialog = true;
         addToFavourite = true;
@@ -410,7 +416,13 @@ public class EventDetailActivity extends BaseActivity {
 
     public void ama(View view) {
         reportEventAction(event, "ama");
-
+        Account account = new Account(this);
+        UserInfo userInfo = account.getUserInfo();
+        if (userInfo.phoneNo == null || userInfo.name == null) {
+            PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
+            return;
+        }
+        
         ZendeskUtils.initZendesk(this);
         ZendeskUtils.setEventFeedbackConfiguration(this, event);
         Intent feedbackIntent = new Intent(this, ContactZendeskActivity.class);
