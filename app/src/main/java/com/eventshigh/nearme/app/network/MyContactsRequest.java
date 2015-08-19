@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.Nullable;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -14,7 +13,6 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.UserContact;
-import com.eventshigh.nearme.app.network.MyContactsRequest.MyContact;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
@@ -32,19 +30,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MyContactsRequest extends JsonRequest<List<MyContact>> {
-    public static class MyContact extends UserContact {
-        public final String[] allMobileNo;
-
-        public MyContact(String contactId, String mobileNo, String name, @Nullable String[] emails,
-                         String[] allMobileNo) {
-            super(contactId, mobileNo, name, emails);
-            this.allMobileNo = allMobileNo;
-        }
-    }
-
+public class MyContactsRequest extends JsonRequest<List<UserContact>> {
     public static void submit(Context context, Priority priority, Object tag, boolean shouldBypassCache,
-            Listener<List<MyContact>> listener, ErrorListener errorListener) {
+            Listener<List<UserContact>> listener, ErrorListener errorListener) {
         try {
             Uri socialFriendsUri =
                     AccountStateReporter.getBaseUri(context, "get_social_friends").build();
@@ -62,7 +50,7 @@ public class MyContactsRequest extends JsonRequest<List<MyContact>> {
     private final Uri socialFriendsUri;
 
     public MyContactsRequest(Context context, Uri socialFriendsUri, Priority priority,
-            boolean shouldBypassCache, Listener<List<MyContact>> listener, ErrorListener errorListener)
+            boolean shouldBypassCache, Listener<List<UserContact>> listener, ErrorListener errorListener)
             throws GeneralSecurityException, UnsupportedEncodingException {
         super(Method.GET, Signer.sign(socialFriendsUri).toString(), null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
@@ -82,7 +70,7 @@ public class MyContactsRequest extends JsonRequest<List<MyContact>> {
     }
 
     @Override
-    protected Response<List<MyContact>> parseNetworkResponse(NetworkResponse response) {
+    protected Response<List<UserContact>> parseNetworkResponse(NetworkResponse response) {
         try {
             // See the contacts which are already on EH.
             String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
@@ -102,11 +90,8 @@ public class MyContactsRequest extends JsonRequest<List<MyContact>> {
             }
 
             // Read the local contacts and remove duplicates.
-            List<MyContact> contacts = new ArrayList<>(contactOnEh.size());
-            for (UserContact contact : contactOnEh) {
-                contacts.add(new MyContact(contact.contactId, contact.mobileNo, contact.name,
-                    contact.emails, ContactUtils.getAllPhoneNo(context, contact.contactId)));
-            }
+            List<UserContact> contacts = new ArrayList<>(contactOnEh.size());
+            contacts.addAll(contactOnEh);
 
             // Sort by Name.
             Collections.sort(contacts, new Comparator<UserContact>() {

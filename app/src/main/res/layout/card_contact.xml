@@ -43,11 +43,5 @@
         android:textSize="12sp"
         android:textStyle="bold"
     />
-
-    <CheckBox
-        android:id="@+id/select_contact"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-    />
 </LinearLayout>
 

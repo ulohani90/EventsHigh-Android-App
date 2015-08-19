@@ -14,8 +14,8 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.MyContactsRequest;
-import com.eventshigh.nearme.app.network.MyContactsRequest.MyContact;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog.ContactsRequestCallback;
@@ -133,7 +133,7 @@ public class ContactsFragment extends Fragment {
         VolleyHelper.getRequestQueue(activity).cancelAll(this);
 
         Preferences preferences = Preferences.getInstance(activity);
-        if (preferences.shouldUploadContacts()) {
+        if (preferences.canUploadContacts()) {
             MyContactsRequest.submit(activity, Priority.IMMEDIATE, this, shouldBypassCache,
                 myContactsListener, errorListener);
         } else if (!hasAskForContactsDialogShown) {
@@ -142,9 +142,9 @@ public class ContactsFragment extends Fragment {
         }
     }
 
-    private Listener<List<MyContact>> myContactsListener = new Listener<List<MyContact>>() {
+    private Listener<List<UserContact>> myContactsListener = new Listener<List<UserContact>>() {
         @Override
-        public void onResponse(List<MyContact> contacts, boolean isIntermediate) {
+        public void onResponse(List<UserContact> contacts, boolean isIntermediate) {
             topProgressBar.setVisibility(isIntermediate ? View.VISIBLE : View.GONE);
             if (contacts.isEmpty()) {
                 noFriendsOnEhView.setVisibility(View.VISIBLE);

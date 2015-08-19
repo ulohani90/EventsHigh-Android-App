@@ -1,11 +1,11 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.MultiAutoCompleteTextView;
 
-import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
@@ -13,18 +13,14 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.SocialFriend;
-import com.eventshigh.nearme.app.network.MyContactsRequest;
-import com.eventshigh.nearme.app.network.MyContactsRequest.MyContact;
-import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
-import com.eventshigh.nearme.app.ui.ContactsAdapter;
+import com.eventshigh.nearme.app.ui.ContactsAutoFillAdapter;
+import com.eventshigh.nearme.app.ui.EventsAdapter.EventCard;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +28,6 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
-import java.util.List;
 
 public class PlanActivity extends BaseActivity {
 
@@ -42,15 +37,14 @@ public class PlanActivity extends BaseActivity {
     private boolean isPlanPublished = false;
 
     private View topProgressBar;
-    private View retryView;
-    private View inviteView;
-
-    private ContactsAdapter contactsAdapter;
+    private MultiAutoCompleteTextView contactsView;
+    private View inviteButtton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Parse the incoming intent params.
         userInfo = new Account(this).getUserInfo();
 
         event = getIntent().getParcelableExtra(EventDetailActivity.EXTRA_EVENT_PARAM);
@@ -69,31 +63,43 @@ public class PlanActivity extends BaseActivity {
 
         setContentView(R.layout.activity_plan);
         topProgressBar = findViewById(R.id.top_progress_bar);
-        retryView = findViewById(R.id.view_retry);
-        inviteView = findViewById(R.id.invite_screen);
+        contactsView = (MultiAutoCompleteTextView) findViewById(R.id.contacts);
+        inviteButtton = findViewById(R.id.invite_button);
 
-        // Setup the events adapter to show data.
-        AutofitRecyclerView gridView = (AutofitRecyclerView) findViewById(R.id.grid);
-        contactsAdapter = new ContactsAdapter(this);
-        gridView.setAdapter(contactsAdapter);
+        // Show Event Data.
+        new EventCard(findViewById(R.id.event_container), false).bindEventView(event, this);
 
-        onRetry(null);
-    }
+        // Share Buttons.
+        findViewById(R.id.share_fb).setVisibility(
+                Utils.isDebug(this) || isInstalled(PACKAGE_NAME_FACEBOOK) ? View.VISIBLE : View.GONE);
+        findViewById(R.id.share_twitter).setVisibility(
+                Utils.isDebug(this) || isInstalled(PACKAGE_NAME_TWITTER) ? View.VISIBLE : View.GONE);
+        findViewById(R.id.share_whatsapp).setVisibility(
+                Utils.isDebug(this) || isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
 
-    public void onRetry(View view) {
-        reportActionToAnalytics("retry", planId);
+        // Setup contacts selector.
+        contactsView.setAdapter(new ContactsAutoFillAdapter(this));
+        contactsView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+        contactsView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-        topProgressBar.setVisibility(View.VISIBLE);
-        retryView.setVisibility(View.GONE);
-        inviteView.setVisibility(View.GONE);
+            }
 
-        VolleyHelper.getRequestQueue(this).cancelAll(this);
-        MyContactsRequest.submit(this, Priority.IMMEDIATE, this, false,
-                myContactsListener, errorListener);
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                inviteButtton.setEnabled(s.toString().trim().endsWith(","));
+            }
+        });
     }
 
     public void invite(View view) {
-        reportActionToAnalytics("inviteToPlan", planId, contactsAdapter.getSelectedFriends().size());
+        reportActionToAnalytics("inviteToPlan", planId, 0 /*contactsAdapter.getSelectedFriends().size()*/);
         topProgressBar.setVisibility(View.VISIBLE);
 
         publishPlan(new Runnable() {
@@ -104,50 +110,16 @@ public class PlanActivity extends BaseActivity {
         });
     }
 
-    public void shareApp() {
-        reportActionToAnalytics("shareApp", "inviteToPlan");
-        topProgressBar.setVisibility(View.VISIBLE);
-
-        publishPlan(new Runnable() {
-            @Override
-            public void run() {
-                shareAppWithPlan();
-            }
-        });
+    public void whatsapp(View view) {
+        shareEvent(event, PACKAGE_NAME_WHATSAPP);
     }
 
-    private void shareAppWithPlan() {
-        final String appShareUri =  Uri.parse("https://play.google.com/store/apps/details").buildUpon()
-                .appendQueryParameter("id", getPackageName())
-                .appendQueryParameter("referrer", "plan_" + planId)
-                .build().toString();
-        URLShortenerRequest.submit(this, appShareUri,
-                new Listener<String>() {
-                    @Override
-                    public void onResponse(String shortenUri, boolean isIntermediate) {
-                        shareApp(shortenUri);
-                    }
-                },
-                new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        shareApp(appShareUri);
-                    }
-                }
-        );
+    public void facebook(View view) {
+        shareEvent(event, PACKAGE_NAME_FACEBOOK);
     }
 
-    private void shareApp(String appDownloadLink) {
-        Intent shareIntent = new Intent();
-        shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT,
-                String.format(getString(R.string.invite_to_plan), userInfo.name, event.title,
-                        event.getShortAddress(), appDownloadLink));
-
-        shareIntent.setType("text/plain");
-        shareIntent.setPackage(PACKAGE_NAME_WHATSAPP);
-        startActivity(shareIntent);
-        topProgressBar.setVisibility(View.GONE);
+    public void twitter(View view) {
+        shareEvent(event, PACKAGE_NAME_TWITTER);
     }
 
     private void publishPlan(Runnable callback) {
@@ -177,16 +149,11 @@ public class PlanActivity extends BaseActivity {
     private void sendInvitations() {
         try {
             JSONArray invitations = new JSONArray();
-            for (SocialFriend friend : contactsAdapter.getSelectedFriends()) {
+            for (String friendData : contactsView.getText().toString().split(",")) {
                 JSONObject invitation = new JSONObject();
-                invitation.put("name", friend.getName());
-                invitation.put("mobile_no", friend.mobileNo);
-                if (friend.contact != null && friend.contact instanceof MyContact) {
-                    for (String mobileNo : ((MyContact) friend.contact).allMobileNo) {
-                        invitation.put("name", friend.getName());
-                        invitation.put("mobile_no", mobileNo);
-                    }
-                }
+                String[] nameMobile = friendData.split("\\(\\)");
+                invitation.put("name", nameMobile[0].trim());
+                invitation.put("mobile_no", nameMobile[1].trim());
                 invitations.put(invitation);
             }
 
@@ -208,19 +175,6 @@ public class PlanActivity extends BaseActivity {
             showMessage(R.string.failed_load);
         }
     }
-
-    private Listener<List<MyContact>> myContactsListener = new Listener<List<MyContact>>() {
-        @Override
-        public void onResponse(List<MyContact> contacts, boolean isIntermediate) {
-            if (isIntermediate) {
-                return;
-            }
-
-            topProgressBar.setVisibility(View.GONE);
-            inviteView.setVisibility(View.VISIBLE);
-            contactsAdapter.setEventContacts(event, contacts);
-        }
-    };
 
     private class PublishPlanIdListener implements Listener<JSONObject> {
         private final Runnable publishPlanCallback;
@@ -244,15 +198,6 @@ public class PlanActivity extends BaseActivity {
         }
     };
 
-    private ErrorListener errorListener = new ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError volleyError) {
-            VolleyHelper.log(PlanActivity.this, volleyError);
-            topProgressBar.setVisibility(View.GONE);
-            retryView.setVisibility(View.VISIBLE);
-        }
-    };
-
     private ErrorListener tryAgainErrorListener = new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
@@ -262,11 +207,11 @@ public class PlanActivity extends BaseActivity {
         }
     };
 
-    public long max(long[] arr) {
+    private static long max(long[] arr) {
         return arr.length == 0 ? 0 : max(arr, 0, arr.length);
     }
 
-    public long max(long[] arr, int start, int end) {
+    private static long max(long[] arr, int start, int end) {
         return (start >= end - 1) ? arr[start]
                 : Math.max(arr[start], max(arr, start + 1, end));
     }

@@ -2,7 +2,9 @@ package com.eventshigh.nearme.app.activity;
 
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
@@ -40,6 +42,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TimeZone;
 
 import io.fabric.sdk.android.Fabric;
@@ -54,7 +58,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     // This constant defines the app specific intent action for notification.
     public static final String NOTIFICATION_ACTION = "com.eventshigh.nearme.app.notification";
     public static final int PLUS_ONE_REQUEST_CODE = 111;
+
     public static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
+    public static final String PACKAGE_NAME_FACEBOOK = "com.facebook.katana";
+    public static final String PACKAGE_NAME_TWITTER = "com.twitter.android";
 
     // Google Analytics
     protected boolean isPlayServicesPresent;
@@ -136,7 +143,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                     Long.toString(secForShare));
 
             Preferences preferences = Preferences.getInstance(this);
-            if (secForShare > 5 && !preferences.shouldUploadContacts()) {
+            if (secForShare > 5 && !preferences.canUploadContacts()) {
                 AskForContactsDialog.show(this, preferences);
             }
         }
@@ -246,20 +253,20 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         final ProgressDialog dialog = OneSecDialog.show(this);
         URLShortenerRequest.submit(this, eventShareUri,
-            new Listener<String>() {
-                @Override
-                public void onResponse(String shortenUri, boolean isIntermediate) {
-                    dialog.dismiss();
-                    shareEvent(event, shortenUri, packageName);
+                new Listener<String>() {
+                    @Override
+                    public void onResponse(String shortenUri, boolean isIntermediate) {
+                        dialog.dismiss();
+                        shareEvent(event, shortenUri, packageName);
+                    }
+                },
+                new ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        dialog.dismiss();
+                        shareEvent(event, eventShareUri, packageName);
+                    }
                 }
-            },
-            new ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
-                    dialog.dismiss();
-                    shareEvent(event, eventShareUri, packageName);
-                }
-            }
         );
     }
 
@@ -274,7 +281,6 @@ public abstract class BaseActivity extends AppCompatActivity {
             sendIntent.putExtra(Intent.EXTRA_TEXT,
                 String.format(getResources().getString(R.string.share_event_text),
                     event.title + (event.isCleanVenue ? " @ " + event.venue : ""), eventUri)
-
             );
 
             sendIntent.setType("text/plain");
@@ -359,5 +365,24 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (isPlayServicesPresent) {
             gaHelper.reportCampaignParams(campaignData);
         }
+    }
+
+    private static final Set<String> INSTALLED_PACKAGES = new HashSet<>();
+    protected boolean isInstalled(String packageName) {
+        return isInstalled(this, packageName);
+    }
+
+    public static boolean isInstalled(Context context, String packageName) {
+        synchronized (INSTALLED_PACKAGES) {
+            if (INSTALLED_PACKAGES.isEmpty()) {
+                for(PackageInfo packageInfo : context.getPackageManager().getInstalledPackages(0)) {
+                    if (packageInfo.versionName != null && packageInfo.applicationInfo.enabled) {
+                        INSTALLED_PACKAGES.add(packageInfo.packageName);
+                    }
+                }
+            }
+        }
+
+        return INSTALLED_PACKAGES.contains(packageName);
     }
 }

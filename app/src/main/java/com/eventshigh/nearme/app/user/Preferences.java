@@ -40,11 +40,11 @@ public class Preferences implements OnSharedPreferenceChangeListener {
         return sharedPreferences.getBoolean(PREF_SHOW_ONBOARDING, true);
     }
 
-    public void setShouldUploadContacts(boolean shouldUploadContacts) {
+    public void setCanUploadContacts(boolean shouldUploadContacts) {
         sharedPreferences.edit().putBoolean(PREF_UPLOAD_CONTACTS, shouldUploadContacts).apply();
     }
 
-    public boolean shouldUploadContacts() {
+    public boolean canUploadContacts() {
         return sharedPreferences.getBoolean(PREF_UPLOAD_CONTACTS, false);
     }
 

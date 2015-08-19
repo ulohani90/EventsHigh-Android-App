@@ -89,11 +89,7 @@ public class UserContact implements Comparable<UserContact> {
     }
 
     public String toString() {
-        try {
-            return toJSON().toString();
-        } catch (JSONException e) {
-            return super.toString();
-        }
+        return name + " (" + mobileNo + ")";
     }
 
     @Override

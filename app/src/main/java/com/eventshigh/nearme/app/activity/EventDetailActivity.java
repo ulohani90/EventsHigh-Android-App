@@ -53,7 +53,6 @@ import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.user.UserActionHelper.EventAction;
-import com.eventshigh.nearme.app.user.UserContactsUploader;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -422,7 +421,7 @@ public class EventDetailActivity extends BaseActivity {
             PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
             return;
         }
-        
+
         ZendeskUtils.initZendesk(this);
         ZendeskUtils.setEventFeedbackConfiguration(this, event);
         Intent feedbackIntent = new Intent(this, ContactZendeskActivity.class);
@@ -439,13 +438,8 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         Preferences preferences = Preferences.getInstance(this);
-        if (!preferences.shouldUploadContacts()) {
+        if (!preferences.canUploadContacts()) {
             AskForContactsDialog.show(this, preferences);
-            return;
-        }
-
-        if (!UserContactsUploader.hasContactsUploaded(this)) {
-            showMessage(R.string.contacts_sync_pending);
             return;
         }
 

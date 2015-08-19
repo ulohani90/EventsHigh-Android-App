@@ -17,12 +17,13 @@ public class AskForContactsDialog {
 
     public static void doNeedful(BaseActivity activity) {
         Preferences preferences = Preferences.getInstance(activity);
-        if (preferences.shouldUploadContacts()) {
+        if (preferences.canUploadContacts()) {
             new UserContactsUploader(activity).uploadContacts();
         } else if (preferences.getLastUploadContactsAsked() < System.currentTimeMillis() - DateUtils.WEEK_IN_MILLIS) {
             AskForContactsDialog.show(activity, preferences);
         }
     }
+
     public static void show(final BaseActivity activity, final Preferences preferences) {
         show(activity, preferences, new DummyContactsRequestCallback());
     }
@@ -34,7 +35,7 @@ public class AskForContactsDialog {
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         activity.reportActionToAnalytics("uploadContactsAccepted");
-                        preferences.setShouldUploadContacts(true);
+                        preferences.setCanUploadContacts(true);
                         new UserContactsUploader(activity).uploadContacts();
                         callback.onContactsUploadAccepted();
                     }

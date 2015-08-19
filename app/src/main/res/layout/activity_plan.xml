@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical"
     tools:context=".activity.PlanActivity"
 >
     <ProgressBar
@@ -12,42 +14,107 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:indeterminate="true"
+        android:visibility="gone"
     />
+
     <include
-        android:id="@+id/view_retry"
-        layout="@layout/view_retry"
+        android:id="@+id/event_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
+        android:layout_height="wrap_content"
+        layout="@layout/card_event"
     />
-    <LinearLayout
-        android:id="@+id/invite_screen"
+
+    <TextView
+        style="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@color/gray200"
+        android:text="Share this event with your social networks"
+        tools:ignore="HardcodedText"
+    />
+
+    <LinearLayout
+        android:id="@+id/share_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/gray200"
+        android:padding="10dp"
     >
-        <com.eventshigh.nearme.app.view.AutofitRecyclerView
-            android:id="@+id/grid"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:columnWidth="@dimen/event_card_width"
-            android:horizontalSpacing="10dp"
-            android:verticalSpacing="10dp"
-            android:paddingTop="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="20dp"
-            android:clipToPadding="false"
-        />
-        <TextView
-            style="@style/EHButtonCTA"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/share_whatsapp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/invite_friends"
-            android:onClick="invite"
+            android:padding="8dp"
+            android:src="@drawable/whatsapp_24dp"
+            android:background="@drawable/button_whatsapp"
+            android:onClick="whatsapp"
+            tools:ignore="ContentDescription"
+        />
+        <ImageView
+            android:id="@+id/share_fb"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:padding="8dp"
+            android:src="@drawable/fb_24dp"
+            android:background="@drawable/button_fb"
+            android:onClick="facebook"
+            tools:ignore="ContentDescription"
+        />
+        <ImageView
+            android:id="@+id/share_twitter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:src="@drawable/twitter_white"
+            android:background="@drawable/button_twitter"
+            android:onClick="twitter"
+            tools:ignore="ContentDescription"
         />
     </LinearLayout>
-</FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray400"
+    />
+
+    <TextView
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="Invite Friends"
+        tools:ignore="HardcodedText"
+    />
+
+    <MultiAutoCompleteTextView
+        android:id="@+id/contacts"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:textColor="#0000A0"
+        android:hint="Choose your Contacts"
+        tools:ignore="HardcodedText"
+    />
+
+    <Button
+        android:id="@+id/invite_button"
+        style="@style/EHButtonCTA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_margin="10dp"
+        android:text="@string/action_check_friends"
+        android:onClick="invite"
+        android:enabled="false"
+    />
+
+</LinearLayout>

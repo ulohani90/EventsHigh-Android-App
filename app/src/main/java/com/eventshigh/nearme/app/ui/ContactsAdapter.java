@@ -5,36 +5,28 @@ import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.FriendsStore;
-import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.SocialFriend;
-import com.eventshigh.nearme.app.network.MyContactsRequest.MyContact;
-import com.eventshigh.nearme.app.ui.EventsAdapter.EventCard;
+import com.eventshigh.nearme.app.data.UserContact;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public enum FriendCardType {
         PLAIN,
-        FOLLOW,
-        SELECT
+        FOLLOW
     }
 
     private final BaseActivity activity;
     private final FriendsStore friendsStore;
     private List<Data> dataToShow = new ArrayList<>();
-    private Set<SocialFriend> selectedFriends = new HashSet<>();
 
     public ContactsAdapter(BaseActivity activity) {
         this.activity = activity;
@@ -61,36 +53,23 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
         dataToShow.get(position).onBindViewHolder(holder, position);
     }
 
-    public void setMyContacts(Collection<MyContact> contacts, FriendCardType cardType) {
+    public void setMyContacts(Collection<UserContact> contacts, FriendCardType cardType) {
         dataToShow.clear();
-        selectedFriends.clear();
 
         for (UserContact contact : contacts) {
             SocialFriend friend = new SocialFriend(contact);
             dataToShow.add(new SocialFriendData(friend, cardType));
-            selectedFriends.add(friend);
         }
 
         if (cardType == FriendCardType.FOLLOW && !contacts.isEmpty()) {
             dataToShow.add(new EhInviteData());
         }
-        if (cardType == FriendCardType.SELECT) {
-            dataToShow.add(new EventInviteData());
-        }
 
-        notifyDataSetChanged();
-    }
-
-    public void setEventContacts(Event event, Collection<MyContact> contacts) {
-        setMyContacts(contacts, FriendCardType.SELECT);
-        dataToShow.add(0, new EventData(event));
-        dataToShow.add(1, new InviteMessageData());
         notifyDataSetChanged();
     }
 
     public void setFriends(Collection<SocialFriend> friends) {
         dataToShow.clear();
-        selectedFriends.clear();
 
         for (SocialFriend friend : friends) {
             dataToShow.add(new SocialFriendData(friend, FriendCardType.PLAIN));
@@ -98,16 +77,9 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public Collection<SocialFriend> getSelectedFriends() {
-        return selectedFriends;
-    }
-
     private enum DataType {
         SOCIAL_FRIEND(0),
-        EH_INVITE(1),
-        EVENT_INVITE(2),
-        EVENT(3),
-        INVITE_MESSAGE(4);
+        EH_INVITE(1);
 
         public final int typeId;
         DataType (int typeId) {
@@ -121,20 +93,6 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
             if (typeId == EH_INVITE.typeId) {
                 View view = activity.getLayoutInflater().inflate(R.layout.card_share_app, parent, false);
-                return new ViewHolder(view) {};
-            }
-
-            if (typeId == EVENT_INVITE.typeId) {
-                View view = activity.getLayoutInflater().inflate(R.layout.card_invite_friends, parent, false);
-                return new ViewHolder(view) {};
-            }
-
-            if (typeId == EVENT.typeId) {
-                return EventCard.newInstance(activity, parent, false);
-            }
-
-            if (typeId == INVITE_MESSAGE.typeId) {
-                View view = activity.getLayoutInflater().inflate(R.layout.view_select_message, parent, false);
                 return new ViewHolder(view) {};
             }
 
@@ -163,7 +121,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         @Override
         public void onBindViewHolder(ViewHolder card, int position) {
-            ((SocialFriendCard) card).populate(activity, friendsStore, selectedFriends, this);
+            ((SocialFriendCard) card).populate(activity, friendsStore, this);
         }
     }
 
@@ -171,7 +129,6 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final TextView contactName;
         private final ImageView contactPhoto;
         private final TextView followButton;
-        private final CheckBox selectContact;
 
         public static SocialFriendCard newInstance(BaseActivity activity, ViewGroup parent) {
             View view = activity.getLayoutInflater().inflate(R.layout.card_contact, parent, false);
@@ -184,7 +141,6 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
             contactName = (TextView) itemView.findViewById(R.id.contact_name);
             contactPhoto = (ImageView) itemView.findViewById(R.id.contact_photo);
             followButton = (TextView) itemView.findViewById(R.id.follow_button);
-            selectContact = (CheckBox) itemView.findViewById(R.id.select_contact);
         }
 
         private void updateActionButton(FriendsStore friendsStore, SocialFriend friend) {
@@ -197,25 +153,18 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
         }
 
-        private void setSelected(boolean isSelected) {
-            selectContact.setChecked(isSelected);
+        public void populate(BaseActivity activity, final SocialFriend friend) {
+            contactName.setText(friend.getName());
+
+            int size = contactPhoto.getLayoutParams().height;
+            contactPhoto.setImageDrawable(friend.getDrawable(activity, size));
+
+            followButton.setVisibility(View.INVISIBLE);
         }
 
         public void populate(BaseActivity activity, final FriendsStore friendsStore,
-                Set<SocialFriend> selectedFriends, final SocialFriendData friendData) {
-            contactName.setText(friendData.friend.getName());
-
-            int size = contactPhoto.getLayoutParams().height;
-            contactPhoto.setImageDrawable(friendData.friend.getDrawable(activity, size));
-
-            selectContact.setVisibility(
-                    friendData.cardType == FriendCardType.SELECT ? View.VISIBLE : View.GONE);
-            if (friendData.cardType == FriendCardType.SELECT) {
-                setSelected(selectedFriends.contains(friendData.friend));
-                SelectionListener listener = new SelectionListener(selectedFriends, friendData.friend);
-                itemView.setOnClickListener(listener);
-                selectContact.setOnClickListener(listener);
-            }
+                             final SocialFriendData friendData) {
+            populate(activity, friendData.friend);
 
             followButton.setVisibility(friendData.cardType == FriendCardType.FOLLOW ? View.VISIBLE : View.GONE);
             updateActionButton(friendsStore, friendData.friend);
@@ -228,27 +177,6 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
                     }
                 }
             });
-        }
-
-        private class SelectionListener implements OnClickListener {
-            private final Set<SocialFriend> selectedFriends;
-            private final SocialFriend friend;
-
-            private SelectionListener(Set<SocialFriend> selectedFriends, SocialFriend friend) {
-                this.selectedFriends = selectedFriends;
-                this.friend = friend;
-            }
-
-            @Override
-            public void onClick(View v) {
-                if (selectedFriends.contains(friend)) {
-                    selectedFriends.remove(friend);
-                    setSelected(false);
-                } else {
-                    selectedFriends.add(friend);
-                    setSelected(true);
-                }
-            }
         }
     }
 
@@ -268,43 +196,6 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
         @Override
         public DataType getType() {
             return DataType.EH_INVITE;
-        }
-    }
-
-    private class EventInviteData extends InviteData {
-        @Override
-        public DataType getType() {
-            return DataType.EVENT_INVITE;
-        }
-    }
-
-    private class EventData implements Data {
-        private final Event event;
-
-        private EventData(Event event) {
-            this.event = event;
-        }
-
-        @Override
-        public DataType getType() {
-            return DataType.EVENT;
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder card, int position) {
-            ((EventCard) card).bindEventView(event, activity);
-        }
-    }
-
-    private static class InviteMessageData implements Data {
-        @Override
-        public DataType getType() {
-            return DataType.INVITE_MESSAGE;
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder card, int position) {
-            // do nothing.
         }
     }
 }
