@@ -27,6 +27,11 @@
 # v7 support library
 -keep public class android.support.v7.widget.SearchView { *; }
 
+# Fix http lib issues.
+-keep class org.apache.http.** { *; }
+-dontwarn com.android.volley.**
+-dontwarn com.google.android.gms.**
+-dontwarn com.zendesk.sdk.**
 
 # Default
 -keep public class com.google.android.gms.common.internal.safeparcel.SafeParcelable {
