@@ -89,7 +89,7 @@ public class UserContact implements Comparable<UserContact> {
     }
 
     public String toString() {
-        return name + " (" + mobileNo + ")";
+        return (name + " (" + mobileNo + ")").replaceAll(",", "");
     }
 
     @Override

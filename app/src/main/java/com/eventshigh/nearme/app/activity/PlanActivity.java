@@ -7,9 +7,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.MultiAutoCompleteTextView;
+import android.widget.TextView;
 
+import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
@@ -17,6 +21,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.UserContact;
+import com.eventshigh.nearme.app.network.MyContactsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.ui.ContactsAutoFillAdapter;
@@ -33,6 +39,8 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlanActivity extends BaseActivity {
     private Event event;
@@ -44,6 +52,8 @@ public class PlanActivity extends BaseActivity {
     private View inviteButtton;
     private View contactsInviteCard;
     private MultiAutoCompleteTextView contactsView;
+
+    private PlanViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +79,20 @@ public class PlanActivity extends BaseActivity {
         setContentView(R.layout.activity_plan);
         topProgressBar = findViewById(R.id.top_progress_bar);
         inviteButtton = findViewById(R.id.invite_button);
-        ((AutofitRecyclerView) findViewById(R.id.contact_grid)).setAdapter(new PlanViewAdapter());
+
+        adapter = new PlanViewAdapter();
+        ((AutofitRecyclerView) findViewById(R.id.contact_grid)).setAdapter(adapter);
+        MyContactsRequest.submit(this, Priority.HIGH, this, false, new Listener<List<UserContact>>() {
+            @Override
+            public void onResponse(List<UserContact> userContacts, boolean isIntermediate) {
+                adapter.setContacts(userContacts);
+            }
+        }, new ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                VolleyHelper.log(PlanActivity.this, volleyError);
+            }
+        });
     }
 
     public void invite(View view) {
@@ -184,15 +207,22 @@ public class PlanActivity extends BaseActivity {
         }
     };
 
+    private static class PlanViewHolder extends ViewHolder {
+        public PlanViewHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
     private class PlanViewAdapter extends RecyclerView.Adapter<ViewHolder> implements SpanAllColumnLookup {
         private static final int CARD_PLAN_HEADER = 1;
         private static final int CARD_PLAN_CONTACTS = 2;
         private static final int CARD_CONTACT = 3;
 
-        private class PlanViewHolder extends ViewHolder {
-            public PlanViewHolder(View itemView) {
-                super(itemView);
-            }
+        private List<UserContact> contacts = new ArrayList<>(0);
+
+        public void setContacts(List<UserContact> contacts) {
+            this.contacts = contacts;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -237,19 +267,32 @@ public class PlanActivity extends BaseActivity {
                 return new PlanViewHolder(contactsInviteCard);
             }
 
-            return new PlanViewHolder(getLayoutInflater().inflate(R.layout.card_plan_header, parent, false));
+            return new PlanViewHolder(getLayoutInflater().inflate(R.layout.card_contact_select, parent, false));
         }
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             if (position > 1) {
-
+                final UserContact contact = contacts.get(position - 2);
+                ImageView contactImageView = (ImageView) holder.itemView.findViewById(R.id.contact_image);
+                contactImageView.setImageDrawable(contact.getDrawable(PlanActivity.this, contactImageView.getHeight()));
+                ((TextView) holder.itemView.findViewById(R.id.contact_name)).setText(contact.name);
+                holder.itemView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String contactsText = contactsView.getText().toString();
+                        int pos = contactsText.lastIndexOf(',');
+                        contactsText = pos > 0 ? contactsText.substring(0, pos) + ", " : "";
+                        contactsView.setText(contactsText + contact.toString() + ", ");
+                        showMessage(contact.name + " is added to invitation!");
+                    }
+                });
             }
         }
 
         @Override
         public int getItemCount() {
-            return 2;
+            return 2 + contacts.size();
         }
 
         @Override
