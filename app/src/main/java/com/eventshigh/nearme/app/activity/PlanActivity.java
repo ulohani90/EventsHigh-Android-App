@@ -16,7 +16,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.ui.ContactsAutoFillAdapter;
-import com.eventshigh.nearme.app.ui.EventsAdapter.EventCard;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
@@ -30,7 +29,6 @@ import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 
 public class PlanActivity extends BaseActivity {
-
     private Event event;
     private String planId;
     private UserInfo userInfo;
@@ -66,16 +64,12 @@ public class PlanActivity extends BaseActivity {
         contactsView = (MultiAutoCompleteTextView) findViewById(R.id.contacts);
         inviteButtton = findViewById(R.id.invite_button);
 
-        // Show Event Data.
-        new EventCard(findViewById(R.id.event_container), false).bindEventView(event, this);
-
         // Share Buttons.
         findViewById(R.id.share_fb).setVisibility(
                 Utils.isDebug(this) || isInstalled(PACKAGE_NAME_FACEBOOK) ? View.VISIBLE : View.GONE);
         findViewById(R.id.share_twitter).setVisibility(
                 Utils.isDebug(this) || isInstalled(PACKAGE_NAME_TWITTER) ? View.VISIBLE : View.GONE);
-        findViewById(R.id.share_whatsapp).setVisibility(
-                Utils.isDebug(this) || isInstalled(PACKAGE_NAME_WHATSAPP) ? View.VISIBLE : View.GONE);
+        findViewById(R.id.share_whatsapp).setVisibility(View.GONE);
 
         // Setup contacts selector.
         contactsView.setAdapter(new ContactsAutoFillAdapter(this));
