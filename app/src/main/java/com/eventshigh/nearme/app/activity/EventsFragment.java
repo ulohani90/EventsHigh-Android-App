@@ -74,7 +74,7 @@ public class EventsFragment extends BaseEventsFragment {
         // Setup the events adapter to show data.
         eventsAdapter = new EventsAdapter(this);
         eventGridView = (AutofitRecyclerView) view.findViewById(R.id.event_grid);
-        eventGridView.setEventsAdapter(eventsAdapter);
+        eventGridView.setAdapter(eventsAdapter);
 
         // Setup the actionbar hide/show on scroll.
         eventGridView.addOnScrollListener(onScrollListener);

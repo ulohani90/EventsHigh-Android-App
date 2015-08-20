@@ -1,159 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:orientation="vertical"
     tools:context=".activity.PlanActivity"
 >
-    <LinearLayout
+    <ProgressBar
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:id="@+id/top_progress_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_gravity="top"
+        android:indeterminate="true"
+        android:visibility="gone"
+    />
+
+    <com.eventshigh.nearme.app.view.AutofitRecyclerView
+        android:id="@+id/contact_grid"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:columnWidth="92dp"
+        android:horizontalSpacing="0dp"
+        android:verticalSpacing="0dp"
+        android:paddingBottom="20dp"
+        android:clipToPadding="false"
+    />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:padding="6dp"
     >
-        <ProgressBar
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:id="@+id/top_progress_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:indeterminate="true"
-            android:visibility="gone"
-        />
-
         <TextView
-            style="?android:attr/textAppearanceMedium"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:background="#4698B8"
-            android:textColor="@android:color/white"
-            android:fontFamily="sans-serif-medium"
-            android:text="Be A Tastemaker"
-            tools:ignore="HardcodedText"
-        />
-
-        <TextView
-            style="?android:attr/textAppearanceSmall"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:background="#4698B8"
-            android:textColor="#CCFFFFFF"
-            android:text="Gather your tribe. Select friends from below to build up a guest list."
-            tools:ignore="HardcodedText"
-        />
-
-        <TextView
-            style="?android:attr/textAppearanceMedium"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/button_gray"
-            android:paddingTop="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="The More The Merrier"
-            android:textColor="#A3000000"
-            tools:ignore="HardcodedText"
-        />
-
-        <TextView
-            style="?android:attr/textAppearanceSmall"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="10dp"
-            android:background="@color/button_gray"
-            android:text="Share this event with your social networks"
-            android:textColor="#999197A3"
-            tools:ignore="HardcodedText"
-        />
-
-        <LinearLayout
-            android:id="@+id/share_row"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@color/button_gray"
-            android:padding="10dp"
-        >
-            <ImageView
-                android:id="@+id/share_whatsapp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="16dp"
-                android:src="@drawable/whatsapp_24dp"
-                android:background="@drawable/button_whatsapp"
-                android:visibility="gone"
-                android:onClick="whatsapp"
-                tools:ignore="ContentDescription"
-            />
-            <ImageView
-                android:id="@+id/share_fb"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_weight="1"
-                android:scaleType="center"
-                android:padding="16dp"
-                android:src="@drawable/fb_24dp"
-                android:background="@drawable/button_fb"
-                android:onClick="facebook"
-                tools:ignore="ContentDescription"
-            />
-            <Space
-                android:layout_width="10dp"
-                android:layout_height="match_parent"
-            />
-            <ImageView
-                android:id="@+id/share_twitter"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="16dp"
-                android:src="@drawable/twitter_white"
-                android:background="@drawable/button_twitter"
-                android:onClick="twitter"
-                tools:ignore="ContentDescription"
-            />
-        </LinearLayout>
-
-        <TextView
-            style="?android:attr/textAppearanceMedium"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#DFDED5"
-            android:padding="10dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="Invite Your Contacts"
-            tools:ignore="HardcodedText"
-        />
-
-        <MultiAutoCompleteTextView
-            android:id="@+id/contacts"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:textColor="#0000A0"
-            android:hint="Invite people"
-            tools:ignore="HardcodedText"
-        />
-
-        <Button
             android:id="@+id/invite_button"
             style="@style/EHButtonCTA"
-            android:layout_width="wrap_content"
+            android:background="@drawable/eh_button_invite"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_margin="10dp"
+            android:gravity="center"
+            android:elevation="4dp"
             android:text="@string/action_check_friends"
             android:onClick="invite"
             android:enabled="false"
+            tools:ignore="UnusedAttribute"
         />
-    </LinearLayout>
-</ScrollView>
+    </FrameLayout>
+</LinearLayout>

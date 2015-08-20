@@ -9,12 +9,13 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.eventshigh.nearme.app.ui.EventsAdapter;
-
 public class AutofitRecyclerView extends RecyclerView {
+    public interface SpanAllColumnLookup {
+        boolean spanAllColumns(int position);
+    }
+
     private GridLayoutManager gridLayoutManager;
     private int columnWidth;
-    private EventsAdapter eventsAdapter;
     private int horizontalSpacing = 0;
     private int verticalSpacing = 0;
 
@@ -70,17 +71,24 @@ public class AutofitRecyclerView extends RecyclerView {
         return gridLayoutManager.getSpanCount();
     }
 
-    public void setEventsAdapter(EventsAdapter eventsAdapter) {
-        this.eventsAdapter = eventsAdapter;
+    public void setAdapter(Adapter adapter) {
+        super.setAdapter(adapter);
 
-        gridLayoutManager.setSpanSizeLookup(mSpanSizeLookup);
-        setAdapter(eventsAdapter);
+        if (adapter instanceof SpanAllColumnLookup) {
+            gridLayoutManager.setSpanSizeLookup(new AllSpanSizeLookup((SpanAllColumnLookup) adapter));
+        }
     }
 
-    private SpanSizeLookup mSpanSizeLookup = new SpanSizeLookup() {
+    private class AllSpanSizeLookup extends SpanSizeLookup {
+        private final SpanAllColumnLookup spanAllColumnLookup;
+
+        private AllSpanSizeLookup(SpanAllColumnLookup spanAllColumnLookup) {
+            this.spanAllColumnLookup = spanAllColumnLookup;
+        }
+
         @Override
         public int getSpanSize(int position) {
-            return (eventsAdapter != null && eventsAdapter.spanAllColumns(position)) ? getSpanCount() : 1;
+            return spanAllColumnLookup.spanAllColumns(position) ? getSpanCount() : 1;
         }
-    };
+    }
 }

@@ -42,6 +42,7 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.FontUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.view.AutofitRecyclerView.SpanAllColumnLookup;
 import com.eventshigh.nearme.app.view.ContactListView;
 
 import java.text.MessageFormat;
@@ -54,7 +55,7 @@ import java.util.Set;
 /**
  * An adapter which can be used to populate the Event card.
  */
-public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
+public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements SpanAllColumnLookup {
     private final BaseEventsFragment eventsFragment;
     private final Map<String, Integer> eventIdToItemIdMap = Utils.getMap();
     private final Set<Integer> usedItemIds = new HashSet<>();
@@ -764,7 +765,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         public FollowCard(View itemView) {
             super(itemView);
 
-            titleView = (TextView) itemView.findViewById(R.id.title);
+            titleView = (TextView) itemView.findViewById(R.id.cat_title);
             subtitleView = (TextView) itemView.findViewById(R.id.subtitle);
             followButton = itemView.findViewById(R.id.follow_button);
             followingButton = itemView.findViewById(R.id.following_button);
@@ -886,8 +887,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         public TrendingCategoryCard(View itemView) {
             super(itemView);
 
-            imageView = (NetworkImageView) itemView.findViewById(R.id.image);
-            titleView = (TextView) itemView.findViewById(R.id.title);
+            imageView = (NetworkImageView) itemView.findViewById(R.id.cat_image);
+            titleView = (TextView) itemView.findViewById(R.id.cat_title);
             contactListView = (ContactListView) itemView.findViewById(R.id.followed_by);
         }
 
@@ -985,8 +986,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> {
         public EventInvitationCard(View itemView) {
             super(itemView);
 
-            imageView = (ImageView) itemView.findViewById(R.id.image);
-            titleView = (TextView) itemView.findViewById(R.id.title);
+            imageView = (ImageView) itemView.findViewById(R.id.invite_image);
+            titleView = (TextView) itemView.findViewById(R.id.invite_title);
             subtitleView = (TextView) itemView.findViewById(R.id.subtitle);
         }
 

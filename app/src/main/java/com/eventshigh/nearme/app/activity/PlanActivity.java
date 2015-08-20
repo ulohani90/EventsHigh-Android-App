@@ -1,9 +1,13 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.MultiAutoCompleteTextView;
 
 import com.android.volley.Response.ErrorListener;
@@ -20,6 +24,8 @@ import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.view.AutofitRecyclerView;
+import com.eventshigh.nearme.app.view.AutofitRecyclerView.SpanAllColumnLookup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,8 +41,9 @@ public class PlanActivity extends BaseActivity {
     private boolean isPlanPublished = false;
 
     private View topProgressBar;
-    private MultiAutoCompleteTextView contactsView;
     private View inviteButtton;
+    private View contactsInviteCard;
+    private MultiAutoCompleteTextView contactsView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,35 +68,8 @@ public class PlanActivity extends BaseActivity {
 
         setContentView(R.layout.activity_plan);
         topProgressBar = findViewById(R.id.top_progress_bar);
-        contactsView = (MultiAutoCompleteTextView) findViewById(R.id.contacts);
         inviteButtton = findViewById(R.id.invite_button);
-
-        // Share Buttons.
-        findViewById(R.id.share_fb).setVisibility(
-                Utils.isDebug(this) || isInstalled(PACKAGE_NAME_FACEBOOK) ? View.VISIBLE : View.GONE);
-        findViewById(R.id.share_twitter).setVisibility(
-                Utils.isDebug(this) || isInstalled(PACKAGE_NAME_TWITTER) ? View.VISIBLE : View.GONE);
-        findViewById(R.id.share_whatsapp).setVisibility(View.GONE);
-
-        // Setup contacts selector.
-        contactsView.setAdapter(new ContactsAutoFillAdapter(this));
-        contactsView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
-        contactsView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                inviteButtton.setEnabled(s.toString().trim().endsWith(","));
-            }
-        });
+        ((AutofitRecyclerView) findViewById(R.id.contact_grid)).setAdapter(new PlanViewAdapter());
     }
 
     public void invite(View view) {
@@ -146,9 +126,11 @@ public class PlanActivity extends BaseActivity {
             for (String friendData : contactsView.getText().toString().split(",")) {
                 JSONObject invitation = new JSONObject();
                 String[] nameMobile = friendData.split("\\(\\)");
-                invitation.put("name", nameMobile[0].trim());
-                invitation.put("mobile_no", nameMobile[1].trim());
-                invitations.put(invitation);
+                if (nameMobile.length == 3) {
+                    invitation.put("name", nameMobile[0].trim());
+                    invitation.put("mobile_no", nameMobile[1].trim());
+                    invitations.put(invitation);
+                }
             }
 
             JSONObject req = new JSONObject();
@@ -156,6 +138,7 @@ public class PlanActivity extends BaseActivity {
             req.put("mobile_no", userInfo.phoneNo);
             req.put("name", userInfo.name);
             req.put("invitations", invitations);
+            Log.w("debug", req.toString(2));
 
             String url = Signer.sign(
                     AccountStateReporter.getBaseUri(this, "invite_to_plan").build()).toString();
@@ -200,6 +183,80 @@ public class PlanActivity extends BaseActivity {
             showMessage(R.string.failed_load);
         }
     };
+
+    private class PlanViewAdapter extends RecyclerView.Adapter<ViewHolder> implements SpanAllColumnLookup {
+        private static final int CARD_PLAN_HEADER = 1;
+        private static final int CARD_PLAN_CONTACTS = 2;
+        private static final int CARD_CONTACT = 3;
+
+        private class PlanViewHolder extends ViewHolder {
+            public PlanViewHolder(View itemView) {
+                super(itemView);
+            }
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (position == 0) {
+                return CARD_PLAN_HEADER;
+            }
+            if (position == 1) {
+                return CARD_PLAN_CONTACTS;
+            }
+            return CARD_CONTACT;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            if (viewType == CARD_PLAN_HEADER) {
+                return new PlanViewHolder(getLayoutInflater().inflate(R.layout.card_plan_header, parent, false));
+            }
+            if (viewType == CARD_PLAN_CONTACTS) {
+                if (contactsInviteCard == null) {
+                    contactsInviteCard = getLayoutInflater().inflate(R.layout.card_plan_contacts, parent, false);
+                    contactsView = (MultiAutoCompleteTextView) contactsInviteCard.findViewById(R.id.contacts);
+                    // Setup contacts selector.
+                    contactsView.setAdapter(new ContactsAutoFillAdapter(PlanActivity.this));
+                    contactsView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+                    contactsView.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            inviteButtton.setEnabled(s.toString().trim().endsWith(","));
+                        }
+                    });
+                }
+
+                return new PlanViewHolder(contactsInviteCard);
+            }
+
+            return new PlanViewHolder(getLayoutInflater().inflate(R.layout.card_plan_header, parent, false));
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            if (position > 1) {
+
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return 2;
+        }
+
+        @Override
+        public boolean spanAllColumns(int position) {
+            return (position < 2);
+        }
+    }
 
     private static long max(long[] arr) {
         return arr.length == 0 ? 0 : max(arr, 0, arr.length);

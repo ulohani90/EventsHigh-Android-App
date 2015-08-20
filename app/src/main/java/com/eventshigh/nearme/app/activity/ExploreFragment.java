@@ -82,7 +82,7 @@ public class ExploreFragment extends BaseEventsFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         eventsAdapter = new EventsAdapter(this);
         exploreGridView = (AutofitRecyclerView) view.findViewById(R.id.explore_grid);
-        exploreGridView.setEventsAdapter(eventsAdapter);
+        exploreGridView.setAdapter(eventsAdapter);
         exploreGridView.addOnScrollListener(new HideActionBarOnScroll(activity));
 
         topProgressBar = view.findViewById(R.id.top_progress_bar);
