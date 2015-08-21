@@ -14,6 +14,8 @@ import com.eventshigh.nearme.app.ui.ContactsAdapter.SocialFriendCard;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ContactsAutoFillAdapter extends BaseAdapter implements Filterable {
@@ -64,7 +66,18 @@ public class ContactsAutoFillAdapter extends BaseAdapter implements Filterable {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             if (allContacts == null) {
-                allContacts = ContactUtils.getContacts(activity, null, Phone.DISPLAY_NAME, false);
+                allContacts = new LinkedList<>(ContactUtils.getContacts(activity, null, Phone.DISPLAY_NAME, false));
+
+                String lastContactName = null;
+                Iterator<UserContact> contactIterator = allContacts.iterator();
+                while (contactIterator.hasNext()) {
+                    UserContact contact = contactIterator.next();
+                    if (contact.name.equalsIgnoreCase(lastContactName)) {
+                        contactIterator.remove();
+                    } else {
+                        lastContactName = contact.name;
+                    }
+                }
             }
 
             String c = constraint == null ? "" : constraint.toString().toLowerCase();
