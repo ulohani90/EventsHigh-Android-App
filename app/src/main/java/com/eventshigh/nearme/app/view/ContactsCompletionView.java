@@ -17,6 +17,7 @@ public class ContactsCompletionView extends TokenCompleteTextView<UserContact> {
     public ContactsCompletionView(Context context, AttributeSet attrs) {
         super(context, attrs);
         allowDuplicates(false);
+        setTokenClickStyle(TokenClickStyle.Delete);
     }
 
     @Override
