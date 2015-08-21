@@ -26,6 +26,7 @@ import com.eventshigh.nearme.app.ui.ContactsAutoFillAdapter;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
+import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView.SpanAllColumnLookup;
@@ -38,7 +39,9 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class PlanActivity extends BaseActivity {
     private Event event;
@@ -140,14 +143,15 @@ public class PlanActivity extends BaseActivity {
 
     private void sendInvitations() {
         try {
-            JSONArray invitations = new JSONArray();
+            Set<String> contactNames = new HashSet<>();
             for (String friendData : contactsView.getText().toString().split(",")) {
-                JSONObject invitation = new JSONObject();
-                String[] nameMobile = friendData.split("\\(\\)");
-                if (nameMobile.length == 3) {
-                    invitation.put("name", nameMobile[0].trim());
-                    invitation.put("mobile_no", nameMobile[1].trim());
-                    invitations.put(invitation);
+                contactNames.add(friendData.trim().toLowerCase());
+            }
+
+            JSONArray invitations = new JSONArray();
+            for (UserContact contact : ContactUtils.getContacts(this, null, null, true)) {
+                if (contactNames.contains(contact.name.toLowerCase())) {
+                    invitations.put(contact.toJSON());
                 }
             }
             reportActionToAnalytics("inviteToPlan", planId, invitations.length());

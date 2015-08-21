@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ContactUtils {
     public static List<UserContact> getContacts(Context context, @Nullable String selectionExtras,
-            String order, boolean addEmail) {
+            @Nullable String order, boolean addEmail) {
         // Build contact query.
         if (selectionExtras == null) {
             selectionExtras = "";
