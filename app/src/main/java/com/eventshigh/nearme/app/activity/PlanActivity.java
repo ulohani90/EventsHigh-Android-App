@@ -7,9 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.MultiAutoCompleteTextView;
-import android.widget.TextView;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
@@ -19,10 +16,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.MyContactsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.security.Signer;
+import com.eventshigh.nearme.app.ui.ContactsAdapter.SocialFriendCard;
 import com.eventshigh.nearme.app.ui.ContactsAutoFillAdapter;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
@@ -30,6 +29,7 @@ import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView.SpanAllColumnLookup;
+import com.eventshigh.nearme.app.view.ContactsCompletionView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,7 +48,7 @@ public class PlanActivity extends BaseActivity {
 
     private View topProgressBar;
     private View contactsInviteCard;
-    private MultiAutoCompleteTextView contactsView;
+    private ContactsCompletionView contactsView;
 
     private PlanViewAdapter adapter;
 
@@ -240,32 +240,27 @@ public class PlanActivity extends BaseActivity {
             if (viewType == CARD_PLAN_CONTACTS) {
                 if (contactsInviteCard == null) {
                     contactsInviteCard = getLayoutInflater().inflate(R.layout.card_plan_contacts, parent, false);
-                    contactsView = (MultiAutoCompleteTextView) contactsInviteCard.findViewById(R.id.contacts);
-                    // Setup contacts selector.
+                    contactsView = (ContactsCompletionView) contactsInviteCard.findViewById(R.id.contacts);
                     contactsView.setAdapter(new ContactsAutoFillAdapter(PlanActivity.this));
-                    contactsView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
                 }
 
                 return new PlanViewHolder(contactsInviteCard);
             }
 
-            return new PlanViewHolder(getLayoutInflater().inflate(R.layout.card_contact_select, parent, false));
+            View view = getLayoutInflater().inflate(R.layout.card_contact_select, parent, false);
+            return new SocialFriendCard(view);
         }
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             if (position > 1) {
                 final UserContact contact = contacts.get(position - 2);
-                ImageView contactImageView = (ImageView) holder.itemView.findViewById(R.id.contact_image);
-                contactImageView.setImageDrawable(contact.getDrawable(PlanActivity.this, contactImageView.getHeight()));
-                ((TextView) holder.itemView.findViewById(R.id.contact_name)).setText(contact.name);
+                SocialFriendCard card = (SocialFriendCard) holder;
+                card.populate(PlanActivity.this, new SocialFriend(contact));
                 holder.itemView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String contactsText = contactsView.getText().toString();
-                        int pos = contactsText.lastIndexOf(',');
-                        contactsText = pos > 0 ? contactsText.substring(0, pos) + ", " : "";
-                        contactsView.setText(contactsText + contact.toString() + ", ");
+                        contactsView.addObject(contact, contact.name);
                         showMessage(contact.name + " is added to invitation!");
                     }
                 });

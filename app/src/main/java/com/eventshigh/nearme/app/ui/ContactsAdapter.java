@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.ui;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
@@ -153,13 +154,15 @@ public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
             }
         }
 
-        public void populate(BaseActivity activity, final SocialFriend friend) {
+        public void populate(Context context, final SocialFriend friend) {
             contactName.setText(friend.getName());
 
             int size = contactPhoto.getLayoutParams().height;
-            contactPhoto.setImageDrawable(friend.getDrawable(activity, size));
+            contactPhoto.setImageDrawable(friend.getDrawable(context, size));
 
-            followButton.setVisibility(View.INVISIBLE);
+            if (followButton != null) {
+                followButton.setVisibility(View.INVISIBLE);
+            }
         }
 
         public void populate(BaseActivity activity, final FriendsStore friendsStore,

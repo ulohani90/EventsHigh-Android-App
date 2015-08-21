@@ -16,7 +16,7 @@
         tools:ignore="HardcodedText"
     />
 
-    <MultiAutoCompleteTextView
+    <com.eventshigh.nearme.app.view.ContactsCompletionView
         android:id="@+id/contacts"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

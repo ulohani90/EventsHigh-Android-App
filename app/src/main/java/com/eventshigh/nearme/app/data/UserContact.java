@@ -22,13 +22,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Represents the user contact.
  */
-public class UserContact implements Comparable<UserContact> {
+public class UserContact implements Comparable<UserContact>, Serializable {
     public final String contactId;
     public final String mobileNo;
     public final String name;
@@ -89,7 +90,11 @@ public class UserContact implements Comparable<UserContact> {
     }
 
     public String toString() {
-        return (name + " (" + mobileNo + ")").replaceAll(",", "");
+        try {
+            return toJSON().toString();
+        } catch (JSONException e) {
+            return super.toString();
+        }
     }
 
     @Override
