@@ -32,11 +32,10 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:background="@color/gray200"
         android:padding="6dp"
     >
         <TextView
-            android:id="@+id/invite_button"
             style="@style/EHButtonCTA"
             android:background="@drawable/eh_button_invite"
             android:layout_width="match_parent"
@@ -45,7 +44,6 @@
             android:elevation="4dp"
             android:text="@string/action_check_friends"
             android:onClick="invite"
-            android:enabled="false"
             tools:ignore="UnusedAttribute"
         />
     </FrameLayout>

@@ -3,8 +3,6 @@ package com.eventshigh.nearme.app.activity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -49,7 +47,6 @@ public class PlanActivity extends BaseActivity {
     private boolean isPlanPublished = false;
 
     private View topProgressBar;
-    private View inviteButtton;
     private View contactsInviteCard;
     private MultiAutoCompleteTextView contactsView;
 
@@ -78,7 +75,6 @@ public class PlanActivity extends BaseActivity {
 
         setContentView(R.layout.activity_plan);
         topProgressBar = findViewById(R.id.top_progress_bar);
-        inviteButtton = findViewById(R.id.invite_button);
 
         adapter = new PlanViewAdapter();
         ((AutofitRecyclerView) findViewById(R.id.contact_grid)).setAdapter(adapter);
@@ -96,7 +92,6 @@ public class PlanActivity extends BaseActivity {
     }
 
     public void invite(View view) {
-        reportActionToAnalytics("inviteToPlan", planId, 0 /*contactsAdapter.getSelectedFriends().size()*/);
         topProgressBar.setVisibility(View.VISIBLE);
 
         publishPlan(new Runnable() {
@@ -155,6 +150,7 @@ public class PlanActivity extends BaseActivity {
                     invitations.put(invitation);
                 }
             }
+            reportActionToAnalytics("inviteToPlan", planId, invitations.length());
 
             JSONObject req = new JSONObject();
             req.put("plan_id", planId);
@@ -248,20 +244,6 @@ public class PlanActivity extends BaseActivity {
                     // Setup contacts selector.
                     contactsView.setAdapter(new ContactsAutoFillAdapter(PlanActivity.this));
                     contactsView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
-                    contactsView.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable s) {
-                            inviteButtton.setEnabled(s.toString().trim().endsWith(","));
-                        }
-                    });
                 }
 
                 return new PlanViewHolder(contactsInviteCard);
