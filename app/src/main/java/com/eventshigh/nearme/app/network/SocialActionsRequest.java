@@ -17,10 +17,10 @@ import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
-import com.eventshigh.nearme.app.security.Signer;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.ContactUtils;
+import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;

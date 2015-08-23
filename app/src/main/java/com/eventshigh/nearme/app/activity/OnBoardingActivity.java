@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.animation.FakeDragAnimation;
+import com.eventshigh.nearme.app.ui.animation.FakeDragAnimation;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.ImageUtils;
 import com.eventshigh.nearme.app.utils.Utils;

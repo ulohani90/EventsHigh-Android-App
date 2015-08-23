@@ -14,7 +14,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.security.Signer;
+import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.utils.DeviceUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;

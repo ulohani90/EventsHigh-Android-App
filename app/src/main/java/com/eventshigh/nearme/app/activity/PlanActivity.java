@@ -20,7 +20,7 @@ import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.MyContactsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.security.Signer;
+import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.ui.ContactsAdapter.SocialFriendCard;
 import com.eventshigh.nearme.app.ui.ContactsAutoFillAdapter;
 import com.eventshigh.nearme.app.user.Account;

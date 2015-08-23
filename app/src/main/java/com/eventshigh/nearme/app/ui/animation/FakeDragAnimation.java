@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.animation;
+package com.eventshigh.nearme.app.ui.animation;
 
 import android.support.v4.view.ViewPager;
 import android.view.animation.Animation;

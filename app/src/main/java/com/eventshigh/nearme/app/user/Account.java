@@ -14,7 +14,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.security.Signer;
+import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.user.UserActionHelper.FollowingAction;
 import com.eventshigh.nearme.app.utils.Utils;
 

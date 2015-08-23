@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.security;
+package com.eventshigh.nearme.app.utils;
 
 import android.net.Uri;
 import android.util.Base64;
