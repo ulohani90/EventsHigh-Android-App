@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Toast;
 
 import com.android.volley.Request.Priority;
@@ -96,6 +97,9 @@ public class BlogEntryActivity extends BaseActivity {
         this.blogEntry = blogEntry;
         topProgressBar.setVisibility(View.GONE);
         setTitle(blogEntry.title);
+
+        WebView webview = (WebView) findViewById(R.id.web_view);
+        webview.loadDataWithBaseURL(blogEntry.url, blogEntry.contents, "text/html", "UTF-8", "");
     }
 
     private void shareBlog(BlogEntry blogEntry, @Nullable String packageName) {
