@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:descendantFocusability="blocksDescendants"
+>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        tools:ignore="UselessParent"
+    >
+        <com.eventshigh.nearme.app.view.FadeInNetworkImageView
+            android:id="@+id/blog_image"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/event_card_height"
+            android:scaleType="centerCrop"
+        />
+        <TextView
+            style="?android:attr/textAppearanceMedium"
+            android:id="@+id/blog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#CC000000"
+            tools:text="No plans yet for the evening?"
+        />
+        <WebView
+            android:id="@+id/blog_snippet"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            tools:ignore="WebViewLayout"
+        />
+    </LinearLayout>
+</FrameLayout>

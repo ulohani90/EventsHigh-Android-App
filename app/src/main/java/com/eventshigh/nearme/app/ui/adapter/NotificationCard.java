@@ -5,10 +5,12 @@ import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.stream.StreamItem;
@@ -18,6 +20,11 @@ public class NotificationCard extends RecyclerView.ViewHolder {
     private final ImageView imageView;
     private final TextView titleView;
     private final TextView subtitleView;
+
+    public static NotificationCard newInstance(BaseActivity activity, ViewGroup parent) {
+        View view = activity.getLayoutInflater().inflate(R.layout.card_stream, parent, false);
+        return new NotificationCard(view);
+    }
 
     public NotificationCard(View itemView) {
         super(itemView);
