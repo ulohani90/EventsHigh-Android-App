@@ -36,6 +36,9 @@
     <string name="menu_shortcut">Add to homescreen</string>
     <string name="menu_refresh">Refresh</string>
 
+    <!-- Blog -->
+    <string name="title_blog">EventsHigh Blog</string>
+
     <!-- Other Strings used in UI -->
     <string name="ui_follow">Follow</string>
     <string name="ui_following">Following</string>

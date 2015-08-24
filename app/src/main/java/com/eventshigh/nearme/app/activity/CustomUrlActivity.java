@@ -71,13 +71,13 @@ public class CustomUrlActivity extends BaseActivity {
         // Set title.
         String title = getIntent().getStringExtra(EXTRA_TITLE_KEY);
 
-        // Process the Offer request.
         if (Utils.checkIfUnknown(getIntent().getDataString()) == null) {
             // nothing to do
             finish();
             return;
         }
 
+        // Process the Offer request.
         if (getIntent().getDataString().startsWith(OFFER_URL_PREFIX)) {
             getIntent().setData(getIntent().getData().buildUpon()
                 .appendQueryParameter("reflink", new Account(this).getAppDownloadLink()).build());

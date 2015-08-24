@@ -115,25 +115,15 @@ public class DateTimeUtils {
 
     private static final SimpleDateFormat QUERY_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     public static String queryToTitle(String query) {
-        Date date = parseDateSafe(query);
-        if (date != null) {
+        try {
+            Date date =  QUERY_DATE_FORMAT.parse(query);
             synchronized (SIMPLE_DATE_FORMAT) {
                 return SIMPLE_DAY_FORMAT.format(date) + " " + SIMPLE_DATE_FORMAT.format(date);
             }
-        }
-
-        return Utils.capitalize(query);
-    }
-
-    public static @Nullable Date parseDateSafe(String dateStr) {
-        try {
-            return QUERY_DATE_FORMAT.parse(dateStr);
         } catch (ParseException e) {
-            // do nothing
+            return Utils.capitalize(query);
         }
-        return  null;
     }
-
 
     private static final SimpleDateFormat BROWSE_DATE_FORMAT = new SimpleDateFormat("EEE-dd-MMM-yyyy", Locale.US);
     public static @Nullable String parseBrowseDate(String browseQuery) {
@@ -155,14 +145,8 @@ public class DateTimeUtils {
         return  null;
     }
 
-    public static String timeToFullFormat(long timeMillis) {
-        return FULL_DATE_TIME_FORMAT.format(new Date(timeMillis));
+    private static final SimpleDateFormat BLOG_DATE_FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
+    public static Date parseBlogDate(String blogDateStr) throws ParseException {
+        return BLOG_DATE_FORMAT.parse(blogDateStr);
     }
-
-    private static final SimpleDateFormat OFFER_DATE_TIME_FORMAT =
-            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-    public static Date parseOfferDate(String offerDate) throws ParseException {
-        return OFFER_DATE_TIME_FORMAT.parse(offerDate);
-    }
-
 }

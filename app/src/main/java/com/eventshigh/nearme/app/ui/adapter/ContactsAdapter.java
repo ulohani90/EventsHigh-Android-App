@@ -1,6 +1,6 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.Adapter;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.ViewGroup;
 
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class ContactsAdapter extends RecyclerView.Adapter<ViewHolder> {
+public class ContactsAdapter extends Adapter<ViewHolder> {
     public enum FriendCardType {
         PLAIN,
         FOLLOW

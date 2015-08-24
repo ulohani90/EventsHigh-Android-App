@@ -1,6 +1,6 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.Adapter;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -12,7 +12,7 @@ import com.eventshigh.nearme.app.data.stream.StreamItem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StreamAdapter extends RecyclerView.Adapter<NotificationCard> {
+public class StreamAdapter extends Adapter<NotificationCard> {
     private final BaseContextActivity activity;
     private List<StreamItem> streamItems;
 

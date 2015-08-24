@@ -80,6 +80,7 @@ public class EventsHighEndpoints {
                 .build();
     }
 
+    @SuppressWarnings("deprecation")
     public static Uri getWebUri(EventsContext param) {
         Uri.Builder builder = Uri.parse(WEB_URI_BASE).buildUpon();
         String city = param.city == null ? null : param.city.toString().toLowerCase();
@@ -160,6 +161,15 @@ public class EventsHighEndpoints {
     public static String getApiEndpointEventsUber(List<String> eventIds) {
         Collections.sort(eventIds);
         return String.format(API_ENDPOINT_MULTI_EVENT_UBER_FORMAT, StringUtils.toCsvString(eventIds));
+    }
+
+    public static String getApiEndpointBlogEntry(String blogUrl) {
+        return Uri.parse(API_URI_BASE + "api/get_blog_post").buildUpon()
+                .appendQueryParameter("url", blogUrl).build().toString();
+    }
+
+    public static String getApiEndpointBlogFeed(City city) {
+        return API_URI_BASE + "api/get_blog_feed/" + city.toString().toLowerCase();
     }
 
     private static final Pattern DATE_PATTERN = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");

@@ -13,6 +13,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.notification.NotificationUtils;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -50,8 +51,7 @@ public class AlarmUtils {
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context, event.hashCode(), intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
-        Log.i(LOG_TAG, "Setting alarm at " +
-                DateTimeUtils.timeToFullFormat(alarmTimeMillis)  + " for " + event.title);
+        Log.i(LOG_TAG, "Setting alarm at " + new Date(alarmTimeMillis)  + " for " + event.title);
         alarmMgr.set(AlarmManager.RTC_WAKEUP, alarmTimeMillis, alarmIntent);
     }
 
