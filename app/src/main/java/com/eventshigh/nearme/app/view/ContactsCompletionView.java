@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.UserContact;
-import com.eventshigh.nearme.app.ui.ContactsAdapter.SocialFriendCard;
+import com.eventshigh.nearme.app.ui.adapter.SocialFriendCard;
 import com.tokenautocomplete.TokenCompleteTextView;
 
 public class ContactsCompletionView extends TokenCompleteTextView<UserContact> {

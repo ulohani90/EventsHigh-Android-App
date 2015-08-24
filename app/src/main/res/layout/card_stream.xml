@@ -16,7 +16,7 @@
         tools:ignore="UselessParent"
     >
         <ImageView
-            android:id="@+id/image"
+            android:id="@+id/stream_image"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:scaleType="centerCrop"
@@ -29,14 +29,14 @@
         />
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/stream_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_toRightOf="@+id/image"
-            android:layout_toEndOf="@+id/image"
+            android:layout_toRightOf="@+id/stream_image"
+            android:layout_toEndOf="@+id/stream_image"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="6dp"
@@ -49,15 +49,15 @@
         />
 
         <TextView
-            android:id="@+id/subtitle"
+            android:id="@+id/stream_subtitle"
             style="@style/EventCardText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/title"
-            android:layout_toRightOf="@+id/image"
-            android:layout_toEndOf="@+id/image"
+            android:layout_below="@id/stream_title"
+            android:layout_toRightOf="@+id/stream_image"
+            android:layout_toEndOf="@+id/stream_image"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:drawableStart="@drawable/ic_access_time_grey600_12dp"

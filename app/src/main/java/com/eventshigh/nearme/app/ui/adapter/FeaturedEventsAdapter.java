@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.ui;
+package com.eventshigh.nearme.app.ui.adapter;
 
 import android.support.v4.view.PagerAdapter;
 import android.view.View;
@@ -33,7 +33,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        View view = EventsAdapter.getEventCard(events.get(position), activity, null, container);
+        View view = EventCard.getEventCard(events.get(position), activity, null, container);
         container.addView(view);
         return view;
     }

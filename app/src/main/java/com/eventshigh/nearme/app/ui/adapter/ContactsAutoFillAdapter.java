@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.ui;
+package com.eventshigh.nearme.app.ui.adapter;
 
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.view.View;
@@ -10,7 +10,6 @@ import android.widget.Filterable;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.UserContact;
-import com.eventshigh.nearme.app.ui.ContactsAdapter.SocialFriendCard;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 
 import java.util.ArrayList;

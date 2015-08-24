@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.SocialFriend;
+import com.eventshigh.nearme.app.ui.adapter.ContactsAdapter;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 import java.util.Collection;

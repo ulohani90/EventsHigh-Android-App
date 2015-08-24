@@ -19,7 +19,7 @@ import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
-import com.eventshigh.nearme.app.ui.EventsAdapter;
+import com.eventshigh.nearme.app.ui.adapter.EventCard;
 import com.eventshigh.nearme.app.ui.MapMarkerManager;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -189,7 +189,7 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private void showEventCard() {
         View eventView = eventCardContainer.getChildAt(0);
         Event event = mapMarkerManager.getEvent(lastSelectedMarker);
-        eventView = EventsAdapter.getEventCard(
+        eventView = EventCard.getEventCard(
                 event, EventsMapsActivity.this, eventView, eventCardContainer);
         eventView.setOnTouchListener(
                 new OnTouchListener() {

@@ -9,7 +9,14 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 
+/**
+ * An extension to {@link RecyclerView} which has fixed column width and variable
+ * number of columns based on screen size.
+ */
 public class AutofitRecyclerView extends RecyclerView {
+    /**
+     * Provider which can set a card to span all columns.
+     */
     public interface SpanAllColumnLookup {
         boolean spanAllColumns(int position);
     }

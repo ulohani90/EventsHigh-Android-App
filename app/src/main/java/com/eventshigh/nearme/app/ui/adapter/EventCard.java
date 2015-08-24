@@ -1,0 +1,194 @@
+package com.eventshigh.nearme.app.ui.adapter;
+
+import android.app.Activity;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.android.volley.toolbox.NetworkImageView;
+import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
+import com.eventshigh.nearme.app.activity.BaseEventsFragment;
+import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
+import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
+import com.eventshigh.nearme.app.utils.LocationUtils;
+import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.view.ContactListView;
+
+public class EventCard extends ViewHolder {
+    private final boolean shouldAdjustImageHeight;
+    private final NetworkImageView bgView;
+    private final ImageView recommendedView;
+    private final ImageView offerView;
+    private final TextView titleView;
+    private final ImageView favouriteView;
+    private final TextView eventTimeView;
+    private final TextView priceView;
+    private final TextView venueView;
+    private final TextView travelTimeView;
+    private final View arrowView;
+    private final TextView eventStatsView;
+    private final ContactListView invitedByView;
+    private final View infoArrowView;
+
+    public static EventCard newInstance(Activity activity, ViewGroup parent,
+                                        boolean shouldAdjustImageHeight) {
+        View view = activity.getLayoutInflater().inflate(R.layout.card_event, parent, false);
+        return new EventCard(view, shouldAdjustImageHeight);
+    }
+
+    // Build the view, reuse existing if possible.
+    public static View getEventCard(final Event event, final BaseContextActivity activity,
+                                    @Nullable View reuseView, ViewGroup parent) {
+        EventCard card = reuseView != null ? new EventCard(reuseView, true) :
+                newInstance(activity, parent, true);
+        card.bindEventView(event, activity);
+        return card.itemView;
+    }
+
+    public EventCard(View cardView, boolean shouldAdjustImageHeight) {
+        super(cardView);
+
+        this.shouldAdjustImageHeight = shouldAdjustImageHeight;
+        bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
+        recommendedView = (ImageView) cardView.findViewById(R.id.event_recommended);
+        offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
+        titleView = (TextView) cardView.findViewById(R.id.event_title);
+        favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
+        eventTimeView = (TextView) cardView.findViewById(R.id.event_time);
+        priceView = (TextView) cardView.findViewById(R.id.event_price);
+        venueView = (TextView) cardView.findViewById(R.id.event_venue);
+        travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
+        arrowView = cardView.findViewById(R.id.arrow);
+        eventStatsView = (TextView) cardView.findViewById(R.id.event_stats);
+        invitedByView = (ContactListView) cardView.findViewById(R.id.invited_by);
+        infoArrowView = cardView.findViewById(R.id.info_arrow);
+    }
+
+
+    public void setFavouriteView(@Nullable EventMark eventMark) {
+        favouriteView.setTag(eventMark);
+        favouriteView.setImageResource(EventMark.isFavourite(eventMark) ?
+                R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
+    }
+
+    public void bindEventView(final Event event, boolean isFirstEvent, final int position,
+                              final BaseEventsFragment eventsFragment,
+                              @Nullable SocialInvite invite) {
+        bindEventView(event, eventsFragment.getContextActivity());
+        itemView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                eventsFragment.showEventDetails(event, null);
+            }
+        });
+
+        arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
+
+        // Set the travel time.
+        String travelTime = LocationUtils.getTravelTime(eventsFragment.getContextActivity(),
+                eventsFragment.getContextActivity().getUserLocation(), event.location);
+        if (travelTime != null) {
+            travelTimeView.setText(travelTime);
+            travelTimeView.setVisibility(View.VISIBLE);
+        } else {
+            travelTimeView.setVisibility(View.GONE);
+        }
+
+        // Set actions handlers.
+        favouriteView.setVisibility(View.VISIBLE);
+        setFavouriteView(eventsFragment.getContextActivity().getEventMark(event));
+        favouriteView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventMark oldMark = (EventMark) favouriteView.getTag();
+                EventMark newMark = EventMark.isFavourite(oldMark) ? null : EventMark.FAVOURITE;
+                eventsFragment.getContextActivity().reportEventAction(event,
+                        EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
+                        position);
+                eventsFragment.getContextActivity().recordEventMark(event, newMark);
+                setFavouriteView(newMark);
+            }
+        });
+
+        // Is user invited to this event ?
+        if (invite != null && invite.getInvitedBy() != null) {
+            invitedByView.setVisibility(View.VISIBLE);
+            invitedByView.setFollowers(eventsFragment.getContextActivity(), invite.getAllInvitedBy());
+            infoArrowView.setVisibility(View.VISIBLE);
+        } else if (event.numViews > 5) {
+            eventStatsView.setVisibility(View.VISIBLE);
+            eventStatsView.setText("" + event.numViews + " views");
+            infoArrowView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void bindEventView(final Event event, final BaseContextActivity activity) {
+        itemView.setVisibility(View.VISIBLE);
+        itemView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.showEventDetails(event, "", null);
+            }
+        });
+
+        // Set the background image.
+        bgView.setDefaultImageResId(R.drawable.eh_default_event);
+        bgView.setErrorImageResId(R.drawable.eh_default_event);
+        bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(activity));
+
+        if (shouldAdjustImageHeight) {
+            Utils.waitForViewVisible(bgView, new Runnable() {
+                @Override
+                public void run() {
+                    LayoutParams lp = bgView.getLayoutParams();
+                    lp.height = 9 * bgView.getWidth() / 16;
+                    bgView.setLayoutParams(lp);
+                }
+            });
+        }
+
+        // Set the title.
+        titleView.setText(event.title);
+
+        // Event Time.
+        EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
+        if (eventTime == null) {
+            eventTimeView.setVisibility(View.INVISIBLE);
+        } else {
+            eventTimeView.setVisibility(View.VISIBLE);
+            eventTimeView.setText(eventTime.toString());
+        }
+
+        // Set the price.
+        String priceString = event.getPriceString();
+        if (priceString == null) {
+            priceView.setVisibility(View.GONE);
+        } else {
+            priceView.setVisibility(View.VISIBLE);
+            priceView.setText(priceString);
+        }
+
+        // Set the venue.
+        venueView.setText(event.getShortAddress());
+
+        recommendedView.setVisibility(event.ehRecommended ? View.VISIBLE : View.INVISIBLE);
+        offerView.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
+
+        arrowView.setVisibility(View.GONE);
+        favouriteView.setVisibility(View.GONE);
+        travelTimeView.setVisibility(View.GONE);
+        eventStatsView.setVisibility(View.GONE);
+        invitedByView.setVisibility(View.GONE);
+        infoArrowView.setVisibility(View.GONE);
+    }
+}

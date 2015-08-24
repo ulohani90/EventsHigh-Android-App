@@ -19,8 +19,8 @@ import com.eventshigh.nearme.app.network.MyContactsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog.ContactsRequestCallback;
-import com.eventshigh.nearme.app.ui.ContactsAdapter;
-import com.eventshigh.nearme.app.ui.ContactsAdapter.FriendCardType;
+import com.eventshigh.nearme.app.ui.adapter.ContactsAdapter;
+import com.eventshigh.nearme.app.ui.adapter.ContactsAdapter.FriendCardType;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 

@@ -1,4 +1,4 @@
-package com.eventshigh.nearme.app.ui;
+package com.eventshigh.nearme.app.ui.adapter;
 
 import android.content.Context;
 import android.view.View;

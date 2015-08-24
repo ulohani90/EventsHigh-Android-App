@@ -14,7 +14,7 @@ import com.eventshigh.nearme.app.data.stream.StreamItem;
 import com.eventshigh.nearme.app.task.StreamItemLoaderTask;
 import com.eventshigh.nearme.app.task.StreamItemLoaderTask.StreamItemsCallback;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
-import com.eventshigh.nearme.app.ui.StreamAdapter;
+import com.eventshigh.nearme.app.ui.adapter.StreamAdapter;
 
 import java.util.List;
 
