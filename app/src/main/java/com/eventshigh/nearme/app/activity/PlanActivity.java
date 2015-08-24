@@ -94,6 +94,11 @@ public class PlanActivity extends BaseActivity {
         });
     }
 
+    @Override
+    public View getViewForSnackbar() {
+        return topProgressBar;
+    }
+
     public void invite(View view) {
         topProgressBar.setVisibility(View.VISIBLE);
 

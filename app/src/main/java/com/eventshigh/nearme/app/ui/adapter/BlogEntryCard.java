@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.format.DateUtils;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.BlogEntryActivity;
 import com.eventshigh.nearme.app.data.BlogEntry;
 
 public class BlogEntryCard extends ViewHolder {
@@ -33,7 +35,9 @@ public class BlogEntryCard extends ViewHolder {
         itemView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                // blogEntry.launch(activity);
+                Intent intent = new Intent(activity, BlogEntryActivity.class);
+                intent.putExtra(BlogEntryActivity.EXTRA_BLOG_ENTRY_PARAM, blogEntry);
+                activity.startActivity(intent);
             }
         });
     }

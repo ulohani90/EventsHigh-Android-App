@@ -226,6 +226,38 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activity.BlogEntryActivity"
+            android:label="@string/title_blog"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:parentActivityName=".activity.BlogFeedActivity"
+        >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.BlogFeedActivity"
+            />
+            <intent-filter>
+                <data
+                    android:scheme="http"
+                    android:host="blog.eventshigh.com"
+                    android:pathPrefix="/2"
+                />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <data
+                    android:scheme="https"
+                    android:host="blog.eventshigh.com"
+                    android:pathPrefix="/2"
+                />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".activity.EventDetailActivity"

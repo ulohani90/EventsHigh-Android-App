@@ -1,5 +1,8 @@
 package com.eventshigh.nearme.app.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 
@@ -12,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class BlogEntry {
+public class BlogEntry implements Parcelable {
     public final String title;
     public final String snippet;
     public final String contents;
@@ -32,6 +35,48 @@ public class BlogEntry {
         this.pubDate = pubDate;
     }
 
+    /**********************************
+     Parcel management methods.
+     *********************************/
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(snippet);
+        dest.writeString(contents);
+        dest.writeString(imgUrl);
+        dest.writeStringArray(tags);
+        dest.writeString(url);
+        dest.writeLong(pubDate.getTime());
+    }
+
+    // This is used to regenerate your object. All Parcelables must have
+    // a CREATOR that implements these two methods
+    public static final Parcelable.Creator<BlogEntry> CREATOR =
+            new Parcelable.Creator<BlogEntry>() {
+                public BlogEntry createFromParcel(Parcel in) {
+                    return new BlogEntry(in.readString(),
+                            in.readString(),
+                            in.readString(),
+                            in.readString(),
+                            in.createStringArray(),
+                            in.readString(),
+                            new Date(in.readLong())
+                    );
+                }
+
+                public BlogEntry[] newArray(int size) {
+                    return new BlogEntry[size];
+                }
+            };
+
+    /**********************************
+     Helper static methods, used for JSON parsing
+     *********************************/
     public static BlogEntry parse(JSONObject blogEntryJson) throws JSONException, ParseException {
         return new BlogEntry(blogEntryJson.getString("title"),
                 blogEntryJson.getString("description"),

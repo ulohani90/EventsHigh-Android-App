@@ -11,6 +11,7 @@
     <screenName name="com.eventshigh.nearme.app.activity.PlanActivity">Plan</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.MyFriendsActivity">MyFriends</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.BlogFeedActivity">BlogFeed</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.BlogEntryActivity">BlogEntry</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.CustomUrlActivity">CustomUrl</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.OnBoardingActivity">OnBoarding</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.PhoneLoginActivity">PhoneLogin</screenName>

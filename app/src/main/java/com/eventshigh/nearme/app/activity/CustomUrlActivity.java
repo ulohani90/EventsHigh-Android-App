@@ -23,6 +23,7 @@ import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.Utils;
 
 public class CustomUrlActivity extends BaseActivity {
+    public static final String BLOG_HOST = "blog.eventshigh.com";
     public static final String OFFER_URL_PREFIX = "http://www.eventshigh.com/get_event_contest/";
     public static final String EXTRA_TITLE_KEY =  CustomUrlActivity.class.getName() + ".title";
 
@@ -30,7 +31,8 @@ public class CustomUrlActivity extends BaseActivity {
     private View progressBar;
 
     public static void launchCustomUrl(Context context, Uri webUri, @Nullable String title) {
-        Intent intent = new Intent(context, CustomUrlActivity.class);
+        Intent intent = new Intent(context,
+            webUri.getHost().equalsIgnoreCase(BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
         intent.setData(webUri);
         if (title != null) {
             intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);
@@ -42,7 +44,7 @@ public class CustomUrlActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book_ticket);
+        setContentView(R.layout.activity_custom_url);
         webView = (WebView) findViewById(R.id.web_view);
         progressBar = findViewById(R.id.top_progress_bar);
 

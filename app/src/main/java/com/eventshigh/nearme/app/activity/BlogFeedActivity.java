@@ -53,6 +53,11 @@ public class BlogFeedActivity extends BaseActivity {
         fetchNewListing(false);
     }
 
+    @Override
+    public View getViewForSnackbar() {
+        return topProgressBar;
+    }
+
     private void fetchNewListing(boolean shouldBypassCache) {
         topProgressBar.setVisibility(View.VISIBLE);
         retryView.setVisibility(View.GONE);

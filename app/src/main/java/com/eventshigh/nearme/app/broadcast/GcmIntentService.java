@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.BlogEntryActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
@@ -185,7 +186,8 @@ public class GcmIntentService extends IntentService {
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + target);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else {
-            Intent intent = new Intent(this, CustomUrlActivity.class);
+            Intent intent = new Intent(this,
+                contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + title);
             intent.setData(Uri.parse(contestUrl));
             intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);

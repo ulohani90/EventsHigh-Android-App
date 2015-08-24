@@ -38,6 +38,7 @@
 
     <!-- Blog -->
     <string name="title_blog">EventsHigh Blog</string>
+    <string name="share_blog_text">Hey! Found a nice article by EventsHigh, check it out. \n\n%1$s\n\n%2$s</string>
 
     <!-- Other Strings used in UI -->
     <string name="ui_follow">Follow</string>
