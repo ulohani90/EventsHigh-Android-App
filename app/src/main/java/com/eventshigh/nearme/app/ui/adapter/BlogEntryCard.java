@@ -14,6 +14,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BlogEntryActivity;
 import com.eventshigh.nearme.app.data.BlogEntry;
+import com.eventshigh.nearme.app.ui.CircleTransform;
 
 public class BlogEntryCard extends ViewHolder {
     private final ImageView imageView;
@@ -34,8 +35,8 @@ public class BlogEntryCard extends ViewHolder {
     }
 
     public void bindView(final BlogEntry blogEntry, final BaseActivity activity) {
-        Glide.with(activity).load(blogEntry.thumbnail)
-                .placeholder(R.drawable.ic_launcher).crossFade().centerCrop()
+        Glide.with(activity).load(blogEntry.thumbnailSmall)
+                .placeholder(R.drawable.ic_launcher).crossFade().centerCrop().transform(new CircleTransform(activity))
                 .into(imageView);
         titleView.setText(blogEntry.title);
         dateView.setText(DateUtils.getRelativeTimeSpanString(blogEntry.pubDate.getTime()));

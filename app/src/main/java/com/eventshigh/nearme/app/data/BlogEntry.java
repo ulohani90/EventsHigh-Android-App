@@ -20,14 +20,17 @@ public class BlogEntry implements Parcelable {
     public final String snippet;
     public final String contents;
     public final String thumbnail;
+    public final String thumbnailSmall;
     public final String url;
     public final Date pubDate;
 
-    public BlogEntry(String title, String snippet, String contents, String thumbnail, String url, Date pubDate) {
+    public BlogEntry(String title, String snippet, String contents, String thumbnail,
+                     String thumbnailSmall, String url, Date pubDate) {
         this.title = title;
         this.snippet = snippet;
         this.contents = contents;
         this.thumbnail = thumbnail;
+        this.thumbnailSmall = thumbnailSmall;
         this.url = url;
         this.pubDate = pubDate;
     }
@@ -46,6 +49,7 @@ public class BlogEntry implements Parcelable {
         dest.writeString(snippet);
         dest.writeString(contents);
         dest.writeString(thumbnail);
+        dest.writeString(thumbnailSmall);
         dest.writeString(url);
         dest.writeLong(pubDate.getTime());
     }
@@ -56,6 +60,7 @@ public class BlogEntry implements Parcelable {
             new Parcelable.Creator<BlogEntry>() {
                 public BlogEntry createFromParcel(Parcel in) {
                     return new BlogEntry(in.readString(),
+                            in.readString(),
                             in.readString(),
                             in.readString(),
                             in.readString(),
@@ -77,6 +82,7 @@ public class BlogEntry implements Parcelable {
                 blogEntryJson.getString("excerpt"),
                 blogEntryJson.getString("content"),
                 blogEntryJson.getJSONObject("thumbnail_images").getJSONObject("full").getString("url"),
+                blogEntryJson.getJSONObject("thumbnail_images").getJSONObject("thumbnail").getString("url"),
                 blogEntryJson.getString("url"),
                 DateTimeUtils.parseBlogDate(blogEntryJson.getString("date"))
             );

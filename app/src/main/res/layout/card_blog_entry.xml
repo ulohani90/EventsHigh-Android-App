@@ -12,7 +12,7 @@
         android:orientation="vertical"
         tools:ignore="UselessParent"
     >
-        <com.eventshigh.nearme.app.view.CircularImageView
+        <ImageView
             android:id="@+id/blog_image"
             android:layout_width="80dp"
             android:layout_height="80dp"
