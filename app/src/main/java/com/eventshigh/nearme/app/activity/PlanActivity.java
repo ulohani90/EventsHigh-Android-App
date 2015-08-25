@@ -147,38 +147,43 @@ public class PlanActivity extends BaseActivity {
     }
 
     private void sendInvitations() {
-        try {
-            Set<String> contactNames = new HashSet<>();
-            for (String friendData : contactsView.getText().toString().split(",")) {
-                contactNames.add(friendData.trim().toLowerCase());
-            }
+        final Set<String> contactNames = new HashSet<>();
+        for (String friendData : contactsView.getText().toString().split(",")) {
+            contactNames.add(friendData.trim().toLowerCase());
+        }
 
-            JSONArray invitations = new JSONArray();
-            for (UserContact contact : ContactUtils.getContacts(this, null, null, true)) {
-                if (contactNames.contains(contact.name.toLowerCase())) {
-                    invitations.put(contact.toJSON());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONArray invitations = new JSONArray();
+                    for (UserContact contact : ContactUtils.getContacts(PlanActivity.this, null, null, false)) {
+                        if (contactNames.contains(contact.name.toLowerCase())) {
+                            invitations.put(contact.withEmails(PlanActivity.this).toJSON());
+                        }
+                    }
+                    reportActionToAnalytics("inviteToPlan", planId, invitations.length());
+
+                    JSONObject req = new JSONObject();
+                    req.put("plan_id", planId);
+                    req.put("mobile_no", userInfo.phoneNo);
+                    req.put("name", userInfo.name);
+                    req.put("invitations", invitations);
+                    Log.w("debug", req.toString(2));
+
+                    String url = Signer.sign(AccountStateReporter.getBaseUri(
+                            PlanActivity.this, "invite_to_plan").build()).toString();
+                    JsonObjectRequest request = new JsonObjectRequest(url, req,
+                            invitationResponseListener, tryAgainErrorListener);
+                    request.setTag(PlanActivity.this);
+                    VolleyHelper.addToRequestQueue(PlanActivity.this, request);
+                } catch (JSONException | GeneralSecurityException | UnsupportedEncodingException e) {
+                    Crashlytics.getInstance().core.logException(e);
+                    topProgressBar.setVisibility(View.GONE);
+                    showMessage(R.string.failed_load);
                 }
             }
-            reportActionToAnalytics("inviteToPlan", planId, invitations.length());
-
-            JSONObject req = new JSONObject();
-            req.put("plan_id", planId);
-            req.put("mobile_no", userInfo.phoneNo);
-            req.put("name", userInfo.name);
-            req.put("invitations", invitations);
-            Log.w("debug", req.toString(2));
-
-            String url = Signer.sign(
-                    AccountStateReporter.getBaseUri(this, "invite_to_plan").build()).toString();
-            JsonObjectRequest request = new JsonObjectRequest(url, req, invitationResponseListener,
-                    tryAgainErrorListener);
-            request.setTag(this);
-            VolleyHelper.addToRequestQueue(this, request);
-        } catch (JSONException | GeneralSecurityException | UnsupportedEncodingException e) {
-            Crashlytics.getInstance().core.logException(e);
-            topProgressBar.setVisibility(View.GONE);
-            showMessage(R.string.failed_load);
-        }
+        }).start();
     }
 
     private class PublishPlanIdListener implements Listener<JSONObject> {

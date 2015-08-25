@@ -118,7 +118,7 @@ public class ContactUtils {
         }
     }
 
-    private static Cursor getEmailCursorForContactId(Context context, String contactId) {
+    public static Cursor getEmailCursorForContactId(Context context, String contactId) {
         String[] projection = {
                 ContactsContract.CommonDataKinds.Email.ADDRESS,
         };

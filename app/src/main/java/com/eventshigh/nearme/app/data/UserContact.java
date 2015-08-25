@@ -15,6 +15,7 @@ import android.util.LruCache;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.ImageUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
@@ -61,6 +62,11 @@ public class UserContact implements Comparable<UserContact>, Serializable {
         this.mobileNo = mobileNo;
         this.name = name;
         this.emails = emails;
+    }
+
+    public UserContact withEmails(Context context) {
+        return new UserContact(contactId, mobileNo, name,
+                parseEmails(ContactUtils.getEmailCursorForContactId(context, contactId)));
     }
 
     public Drawable getDrawable(Context context, int size) {
@@ -175,5 +181,18 @@ public class UserContact implements Comparable<UserContact>, Serializable {
             CONTACT_PHOTO_CACHE.put(contactId, bitmap);
         }
         return bitmap;
+    }
+
+    private @Nullable String[] parseEmails(@Nullable Cursor emailCursor) {
+        String[] emails = null;
+        if (emailCursor != null && emailCursor.getCount() > 0) {
+            emails = new String[emailCursor.getCount()];
+            for (int i = 0; i < emails.length; i++) {
+                emailCursor.moveToNext();
+                emails[i] = emailCursor.getString(
+                        emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS));
+            }
+        }
+        return emails;
     }
 }
