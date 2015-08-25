@@ -106,7 +106,7 @@
                     android:padding="18dp"
                     app:contactPhotoSize="24dp"
                     app:contactPosition="start"
-                    app:text=" liked this."
+                    app:text=" ♥ (like) this."
                 />
             </LinearLayout>
 
