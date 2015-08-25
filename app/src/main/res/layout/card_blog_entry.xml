@@ -69,7 +69,7 @@
             android:background="@color/gray400"
         />
 
-        <ImageView
+        <TextView
             android:id="@+id/arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -77,8 +77,10 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_margin="6dp"
-            android:src="@drawable/ic_chevron_right_black_36dp"
-            tools:ignore="ContentDescription"
+            android:textSize="32sp"
+            android:textColor="#35C4FF"
+            android:text="❯"
+            tools:ignore="ContentDescription,HardcodedText"
         />
     </RelativeLayout>
 </FrameLayout>
