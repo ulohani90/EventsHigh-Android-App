@@ -12,7 +12,6 @@ import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -28,7 +27,6 @@ public class CustomUrlActivity extends BaseActivity {
     public static final String EXTRA_TITLE_KEY =  CustomUrlActivity.class.getName() + ".title";
 
     private WebView webView;
-    private View progressBar;
 
     public static void launchCustomUrl(Context context, Uri webUri, @Nullable String title) {
         Intent intent = new Intent(context,
@@ -46,7 +44,6 @@ public class CustomUrlActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_url);
         webView = (WebView) findViewById(R.id.web_view);
-        progressBar = findViewById(R.id.top_progress_bar);
 
         // Enable Javascript
         WebSettings webSettings = webView.getSettings();
@@ -67,8 +64,7 @@ public class CustomUrlActivity extends BaseActivity {
 
         // Setup a new web view client so we can listen in on events and also customize
         // web view behavior.
-        webView.setWebViewClient(new EHWebViewClient());
-        webView.setWebChromeClient(new EHWebChromeClient());
+        webView.setWebViewClient(new EHWebViewClient(this, findViewById(R.id.top_progress_bar)));
 
         // Set title.
         String title = getIntent().getStringExtra(EXTRA_TITLE_KEY);
@@ -155,16 +151,24 @@ public class CustomUrlActivity extends BaseActivity {
         }
     }
 
-    private class EHWebViewClient extends WebViewClient {
+    public static class EHWebViewClient extends WebViewClient {
+        private BaseActivity activity;
+        private View progressBar;
+
+        public EHWebViewClient(BaseActivity activity, View progressBar) {
+            this.activity = activity;
+            this.progressBar = progressBar;
+        }
+
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            reportActionToAnalytics("startLoading");
+            activity.reportActionToAnalytics("startLoading");
             progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            reportActionToAnalytics("finishLoading");
+            activity.reportActionToAnalytics("finishLoading");
             progressBar.setVisibility(View.GONE);
         }
 
@@ -173,23 +177,19 @@ public class CustomUrlActivity extends BaseActivity {
             // Returning true here means that when opening new links from this page will open
             // the default app that can handle the link.
             if (url.contains("www.eventshigh.com")) {
-                reportActionToAnalytics("openEhLink", url);
-                Intent intent = new Intent(view.getContext(), LaunchActivity.class);
+                activity.reportActionToAnalytics("openEhLink", url);
+                Intent intent = new Intent(activity, LaunchActivity.class);
+                intent.setAction(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse(url));
-                view.getContext().startActivity(intent);
-                CustomUrlActivity.this.finish();
+                activity.startActivity(intent);
                 return true;
             } else if (url.contains("twitter.com") || url.contains("facebook.com")) {
-                reportActionToAnalytics("openLink", url);
+                activity.reportActionToAnalytics("openLink", url);
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                view.getContext().startActivity(intent);
+                activity.startActivity(intent);
                 return true;
             }
             return false;
         }
-    }
-
-    private class EHWebChromeClient extends WebChromeClient {
-
     }
 }

@@ -17,6 +17,7 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.CustomUrlActivity.EHWebViewClient;
 import com.eventshigh.nearme.app.data.BlogEntry;
 import com.eventshigh.nearme.app.network.BlogEntryRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -28,6 +29,8 @@ public class BlogEntryActivity extends BaseActivity {
 
     private Toolbar toolbar;
     private View topProgressBar;
+    private ObservableWebView webView;
+
     private BlogEntry blogEntry = null;
 
     @Override
@@ -40,6 +43,9 @@ public class BlogEntryActivity extends BaseActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.loading);
         setSupportActionBar(toolbar);
+
+        webView = (ObservableWebView) findViewById(R.id.web_view);
+        webView.setWebViewClient(new EHWebViewClient(this, topProgressBar));
 
         setShareVisibility(R.id.share_whatsapp, PACKAGE_NAME_WHATSAPP);
         setShareVisibility(R.id.share_fb, PACKAGE_NAME_FACEBOOK);
@@ -130,7 +136,6 @@ public class BlogEntryActivity extends BaseActivity {
         topProgressBar.setVisibility(View.GONE);
         toolbar.setTitle(blogEntry.title);
 
-        final ObservableWebView webView = (ObservableWebView) findViewById(R.id.web_view);
         String html = String.format(BLOG_HTML_FORMAT, blogEntry.title, blogEntry.thumbnail, blogEntry.contents);
         webView.loadDataWithBaseURL(blogEntry.url, html, "text/html", "UTF-8", "");
 
