@@ -10,14 +10,14 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.NetworkImageView;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.BaseEventsFragment;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
-import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.LocationUtils;
@@ -26,7 +26,7 @@ import com.eventshigh.nearme.app.view.ContactListView;
 
 public class EventCard extends ViewHolder {
     private final boolean shouldAdjustImageHeight;
-    private final NetworkImageView bgView;
+    private final ImageView bgView;
     private final ImageView recommendedView;
     private final ImageView offerView;
     private final TextView titleView;
@@ -59,7 +59,7 @@ public class EventCard extends ViewHolder {
         super(cardView);
 
         this.shouldAdjustImageHeight = shouldAdjustImageHeight;
-        bgView = (NetworkImageView) cardView.findViewById(R.id.event_bg);
+        bgView = (ImageView) cardView.findViewById(R.id.event_bg);
         recommendedView = (ImageView) cardView.findViewById(R.id.event_recommended);
         offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
         titleView = (TextView) cardView.findViewById(R.id.event_title);
@@ -142,9 +142,10 @@ public class EventCard extends ViewHolder {
         });
 
         // Set the background image.
-        bgView.setDefaultImageResId(R.drawable.eh_default_event);
-        bgView.setErrorImageResId(R.drawable.eh_default_event);
-        bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(activity));
+        Glide.with(activity).load(event.imgUrl)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                .into(bgView);
 
         if (shouldAdjustImageHeight) {
             Utils.waitForViewVisible(bgView, new Runnable() {

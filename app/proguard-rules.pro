@@ -33,6 +33,14 @@
 -dontwarn com.google.android.gms.**
 -dontwarn com.zendesk.sdk.**
 
+# Glide
+-keep class com.bumptech.glide.integration.volley.VolleyGlideModule
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
+    **[] $VALUES;
+    public *;
+}
+
 # Default
 -keep public class com.google.android.gms.common.internal.safeparcel.SafeParcelable {
     public static final *** NULL;

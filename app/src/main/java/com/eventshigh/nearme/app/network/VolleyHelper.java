@@ -1,14 +1,11 @@
 package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.Log;
-import android.util.LruCache;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
@@ -28,35 +25,9 @@ public class VolleyHelper {
     }
 
     private final RequestQueue requestQueue;
-    private final ImageLoader imageLoader;
 
     private VolleyHelper(Context context) {
         requestQueue = Volley.newRequestQueue(context.getApplicationContext());
-
-        // In memory cache for recent bitmap. This cache can use upto 16% of available
-        // memory. This cache is used to store bitmap for images fetched from internet as
-        // we as for images fetched from resources.
-        imageLoader = new ImageLoader(requestQueue, new ImageLoader.ImageCache() {
-            private final LruCache<String, Bitmap> cache =
-                    new LruCache<String, Bitmap>((int) (Runtime.getRuntime().maxMemory() / (6 * 1024))) {
-                @Override
-                protected int sizeOf(String key, Bitmap bitmap) {
-                    // The cache size will be measured in kilobytes rather than
-                    // number of items.
-                    return bitmap.getByteCount() / 1024;
-                }
-            };
-
-            @Override
-            public Bitmap getBitmap(String url) {
-                return cache.get(url);
-            }
-
-            @Override
-            public void putBitmap(String url, Bitmap bitmap) {
-                cache.put(url, bitmap);
-            }
-        });
     }
 
     public static RequestQueue getRequestQueue(Context context) {
@@ -65,10 +36,6 @@ public class VolleyHelper {
 
     public static <T> void addToRequestQueue(Context context, Request<T> req) {
         getRequestQueue(context).add(req);
-    }
-
-    public static ImageLoader getImageLoader(Context context) {
-        return getInstance(context).imageLoader;
     }
 
     public static void log(BaseActivity activity, VolleyError volleyError) {

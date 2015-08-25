@@ -30,14 +30,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
             >
-                <com.eventshigh.nearme.app.view.FadeInNetworkImageView
+                <ImageView
                     android:id="@+id/event_bg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:scaleType="centerCrop"
                     android:onClick="imagePreview"
                     android:transitionName="event_bg"
-                    tools:ignore="UnusedAttribute"
+                    tools:ignore="ContentDescription,UnusedAttribute"
                     tools:layout_height="150dp"
                     tools:background="@drawable/eh_default_event"
                 />

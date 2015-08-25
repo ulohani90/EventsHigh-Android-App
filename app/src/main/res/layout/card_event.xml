@@ -12,13 +12,14 @@
         android:layout_height="wrap_content"
         tools:ignore="UselessParent"
     >
-        <com.eventshigh.nearme.app.view.FadeInNetworkImageView
+        <ImageView
             android:id="@+id/event_bg"
             android:layout_width="match_parent"
             android:layout_height="@dimen/event_card_height"
             android:scaleType="centerCrop"
             android:layout_alignParentTop="true"
             android:adjustViewBounds="false"
+            tools:ignore="ContentDescription"
         />
         <View
             android:layout_width="match_parent"

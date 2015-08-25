@@ -7,17 +7,17 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.NetworkImageView;
+import com.bumptech.glide.Glide;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.ContactListView;
 
 public class TrendingCategoryCard extends ViewHolder {
-    private NetworkImageView imageView;
+    private ImageView imageView;
     private TextView titleView;
     private ContactListView contactListView;
 
@@ -29,14 +29,15 @@ public class TrendingCategoryCard extends ViewHolder {
     public TrendingCategoryCard(View itemView) {
         super(itemView);
 
-        imageView = (NetworkImageView) itemView.findViewById(R.id.cat_image);
+        imageView = (ImageView) itemView.findViewById(R.id.cat_image);
         titleView = (TextView) itemView.findViewById(R.id.cat_title);
         contactListView = (ContactListView) itemView.findViewById(R.id.followed_by);
     }
 
     public void populateTrendingCategoryData(final TrendingCategoryData data) {
-        imageView.setImageUrl(data.trendingTopic.imgUrl,
-                VolleyHelper.getImageLoader(data.eventsFragment.getContextActivity()));
+        Glide.with(data.eventsFragment).load(data.trendingTopic.imgUrl)
+                .crossFade().centerCrop()
+                .into(imageView);
         titleView.setText(data.trendingTopic.tagName);
         contactListView.setGravity(Gravity.START);
         contactListView.setFollowers(data.eventsFragment.getContextActivity(),
@@ -64,10 +65,11 @@ public class TrendingCategoryCard extends ViewHolder {
     }
 
     public void populateExploreCategoryData(final ExploreCategoryData data) {
-        imageView.setDefaultImageResId(data.getInfoGraphId());
+        imageView.setImageResource(data.getInfoGraphId());
         titleView.setVisibility(View.GONE);
         contactListView.setGravity(Gravity.END);
-        contactListView.setFollowers(data.eventsFragment.getContextActivity(), data.socialDataProvider.getFollowers(data.tag));
+        contactListView.setFollowers(data.eventsFragment.getContextActivity(),
+                data.socialDataProvider.getFollowers(data.tag));
 
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) contactListView.getLayoutParams();
         lp.gravity = Gravity.TOP;

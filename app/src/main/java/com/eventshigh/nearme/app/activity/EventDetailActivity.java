@@ -30,8 +30,8 @@ import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
@@ -341,8 +341,10 @@ public class EventDetailActivity extends BaseActivity {
         nagDialog.setContentView(R.layout.dialog_image_preview);
 
         ImageViewTouch preview = (ImageViewTouch) nagDialog.findViewById(R.id.image_preview);
-        VolleyHelper.getImageLoader(EventDetailActivity.this).get(
-                event.imgUrl, ImageLoader.getImageListener(preview, 0, 0));
+        Glide.with(this).load(event.imgUrl)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .crossFade()
+                .into(preview);
 
         Button btnClose = (Button) nagDialog.findViewById(R.id.btn_close);
         btnClose.setOnClickListener(new OnClickListener() {
@@ -570,7 +572,7 @@ public class EventDetailActivity extends BaseActivity {
     private class EventCard {
         private final ScrollView eventScrollView;
 
-        private final NetworkImageView bgView;
+        private final ImageView bgView;
         private final ImageView recommendedImageView;
 
         private final TextView titleView;
@@ -622,7 +624,7 @@ public class EventDetailActivity extends BaseActivity {
             eventScrollView = (ScrollView) findViewById(R.id.event_scroll_view);
 
             recommendedImageView = (ImageView) findViewById(R.id.eh_recommends);
-            bgView = (NetworkImageView) findViewById(R.id.event_bg);
+            bgView = (ImageView) findViewById(R.id.event_bg);
 
             favouriteView = findViewById(R.id.action_favourite);
             favouritedView = findViewById(R.id.action_favourited);
@@ -688,9 +690,11 @@ public class EventDetailActivity extends BaseActivity {
             eventScrollView.setVisibility(View.VISIBLE);
             topProgressBar.setVisibility(View.GONE);
 
-            bgView.setDefaultImageResId(R.drawable.eh_default_event);
-            bgView.setErrorImageResId(R.drawable.eh_default_event);
-            bgView.setImageUrl(event.imgUrl, VolleyHelper.getImageLoader(EventDetailActivity.this));
+            // Image
+            Glide.with(EventDetailActivity.this).load(event.imgUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                    .into(bgView);
 
             // Set title
             titleView.setText(event.title);

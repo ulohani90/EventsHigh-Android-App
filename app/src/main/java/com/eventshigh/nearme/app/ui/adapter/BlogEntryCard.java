@@ -6,17 +6,17 @@ import android.text.format.DateUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.NetworkImageView;
+import com.bumptech.glide.Glide;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BlogEntryActivity;
 import com.eventshigh.nearme.app.data.BlogEntry;
-import com.eventshigh.nearme.app.network.VolleyHelper;
 
 public class BlogEntryCard extends ViewHolder {
-    private final NetworkImageView imageView;
+    private final ImageView imageView;
     private final TextView titleView;
     private final TextView dateView;
 
@@ -28,15 +28,15 @@ public class BlogEntryCard extends ViewHolder {
     public BlogEntryCard(View itemView) {
         super(itemView);
 
-        imageView = (NetworkImageView) itemView.findViewById(R.id.blog_image);
+        imageView = (ImageView) itemView.findViewById(R.id.blog_image);
         titleView = (TextView) itemView.findViewById(R.id.blog_title);
         dateView = (TextView) itemView.findViewById(R.id.blog_date);
     }
 
     public void bindView(final BlogEntry blogEntry, final BaseActivity activity) {
-        imageView.setDefaultImageResId(R.drawable.eh_default_event);
-        imageView.setErrorImageResId(R.drawable.eh_default_event);
-        imageView.setImageUrl(blogEntry.thumbnail, VolleyHelper.getImageLoader(activity));
+        Glide.with(activity).load(blogEntry.thumbnail)
+                .placeholder(R.drawable.ic_launcher).crossFade().centerCrop()
+                .into(imageView);
         titleView.setText(blogEntry.title);
         dateView.setText(DateUtils.getRelativeTimeSpanString(blogEntry.pubDate.getTime()));
         itemView.setOnClickListener(new OnClickListener() {
