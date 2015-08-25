@@ -26,11 +26,13 @@ public class BlogFeedActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_events);
+        setContentView(R.layout.fragment_contacts);
 
         // Setup the adapter to show data.
         adapter = new BlogEntriesAdapter(this);
-        AutofitRecyclerView gridView = (AutofitRecyclerView) findViewById(R.id.event_grid);
+        AutofitRecyclerView gridView = (AutofitRecyclerView) findViewById(R.id.grid);
+        gridView.setHorizontalSpacing(1);
+        gridView.setVerticalSpacing(1);
         gridView.setAdapter(adapter);
 
         // Setup the refresh on swipe down.

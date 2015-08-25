@@ -2,10 +2,10 @@ package com.eventshigh.nearme.app.ui.adapter;
 
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
@@ -18,7 +18,7 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 public class BlogEntryCard extends ViewHolder {
     private final NetworkImageView imageView;
     private final TextView titleView;
-    private final WebView snippetView;
+    private final TextView dateView;
 
     public static BlogEntryCard newInstance(BaseActivity activity, ViewGroup parent) {
         View view = activity.getLayoutInflater().inflate(R.layout.card_blog_entry, parent, false);
@@ -30,15 +30,15 @@ public class BlogEntryCard extends ViewHolder {
 
         imageView = (NetworkImageView) itemView.findViewById(R.id.blog_image);
         titleView = (TextView) itemView.findViewById(R.id.blog_title);
-        snippetView = (WebView) itemView.findViewById(R.id.blog_snippet);
+        dateView = (TextView) itemView.findViewById(R.id.blog_date);
     }
 
     public void bindView(final BlogEntry blogEntry, final BaseActivity activity) {
         imageView.setDefaultImageResId(R.drawable.eh_default_event);
         imageView.setErrorImageResId(R.drawable.eh_default_event);
-        imageView.setImageUrl(blogEntry.imgUrl, VolleyHelper.getImageLoader(activity));
+        imageView.setImageUrl(blogEntry.thumbnail, VolleyHelper.getImageLoader(activity));
         titleView.setText(blogEntry.title);
-        snippetView.loadDataWithBaseURL(blogEntry.url, blogEntry.snippet, "text/html", "UTF-8", "");
+        dateView.setText(DateUtils.getRelativeTimeSpanString(blogEntry.pubDate.getTime()));
         itemView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

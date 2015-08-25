@@ -19,18 +19,15 @@ public class BlogEntry implements Parcelable {
     public final String title;
     public final String snippet;
     public final String contents;
-    public final String imgUrl;
-    public final String[] tags;
+    public final String thumbnail;
     public final String url;
     public final Date pubDate;
 
-    public BlogEntry(String title, String snippet, String contents, String imgUrl, String[] tags,
-                     String url, Date pubDate) {
+    public BlogEntry(String title, String snippet, String contents, String thumbnail, String url, Date pubDate) {
         this.title = title;
         this.snippet = snippet;
         this.contents = contents;
-        this.imgUrl = imgUrl;
-        this.tags = tags;
+        this.thumbnail = thumbnail;
         this.url = url;
         this.pubDate = pubDate;
     }
@@ -48,8 +45,7 @@ public class BlogEntry implements Parcelable {
         dest.writeString(title);
         dest.writeString(snippet);
         dest.writeString(contents);
-        dest.writeString(imgUrl);
-        dest.writeStringArray(tags);
+        dest.writeString(thumbnail);
         dest.writeString(url);
         dest.writeLong(pubDate.getTime());
     }
@@ -63,7 +59,6 @@ public class BlogEntry implements Parcelable {
                             in.readString(),
                             in.readString(),
                             in.readString(),
-                            in.createStringArray(),
                             in.readString(),
                             new Date(in.readLong())
                     );
@@ -78,13 +73,12 @@ public class BlogEntry implements Parcelable {
      Helper static methods, used for JSON parsing
      *********************************/
     public static BlogEntry parse(JSONObject blogEntryJson) throws JSONException, ParseException {
-        return new BlogEntry(blogEntryJson.getString("title"),
-                blogEntryJson.getString("description"),
-                blogEntryJson.getString("description_full"),
-                blogEntryJson.getString("imgUrl"),
-                blogEntryJson.getString("tags").split(" "),
+        return new BlogEntry(blogEntryJson.getString("title_plain"),
+                blogEntryJson.getString("excerpt"),
+                blogEntryJson.getString("content"),
+                blogEntryJson.getJSONObject("thumbnail_images").getJSONObject("full").getString("url"),
                 blogEntryJson.getString("url"),
-                DateTimeUtils.parseBlogDate(blogEntryJson.getString("pub_date"))
+                DateTimeUtils.parseBlogDate(blogEntryJson.getString("date"))
             );
     }
 

@@ -145,7 +145,7 @@ public class DateTimeUtils {
         return  null;
     }
 
-    private static final SimpleDateFormat BLOG_DATE_FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
+    private static final SimpleDateFormat BLOG_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     public static Date parseBlogDate(String blogDateStr) throws ParseException {
         return BLOG_DATE_FORMAT.parse(blogDateStr);
     }

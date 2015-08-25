@@ -169,7 +169,7 @@ public class EventsHighEndpoints {
     }
 
     public static String getApiEndpointBlogFeed(City city) {
-        return API_URI_BASE + "api/get_blog_feed/" + city.toString().toLowerCase();
+        return API_URI_BASE + "api/get_blog_posts/" + city.toString().toLowerCase();
     }
 
     private static final Pattern DATE_PATTERN = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");

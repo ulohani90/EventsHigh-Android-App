@@ -65,6 +65,14 @@ public class AutofitRecyclerView extends RecyclerView {
         }
     }
 
+    public void setHorizontalSpacing(int horizontalSpacing) {
+        this.horizontalSpacing = horizontalSpacing;
+    }
+
+    public void setVerticalSpacing(int verticalSpacing) {
+        this.verticalSpacing = verticalSpacing;
+    }
+
     private int getDimensionPixelSize(Context context, AttributeSet attributeSet, int attr,
                                       int defaultValue) {
         int[] attrsArray = { attr };

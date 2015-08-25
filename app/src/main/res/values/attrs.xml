@@ -9,4 +9,7 @@
         </attr>
         <attr name="text" format="string" />
     </declare-styleable>
+    <declare-styleable name="FadeInNetworkImageView">
+        <attr name="circular" format="boolean" />
+    </declare-styleable>
 </resources>

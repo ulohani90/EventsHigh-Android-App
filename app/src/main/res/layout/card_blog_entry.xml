@@ -1,42 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:foreground="?android:attr/selectableItemBackground"
     android:descendantFocusability="blocksDescendants"
 >
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@android:color/white"
         tools:ignore="UselessParent"
     >
         <com.eventshigh.nearme.app.view.FadeInNetworkImageView
             android:id="@+id/blog_image"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/event_card_height"
-            android:scaleType="centerCrop"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            app:circular="true"
         />
         <TextView
-            style="?android:attr/textAppearanceMedium"
+            style="?android:attr/textAppearanceSmall"
+            android:id="@+id/blog_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/blog_image"
+            android:layout_toEndOf="@+id/blog_image"
+            android:layout_toLeftOf="@+id/arrow"
+            android:layout_toStartOf="@+id/arrow"
+            android:layout_margin="8dp"
+            android:textColor="#80000000"
+            tools:text="15th Aug 2015"
+        />
+        <TextView
             android:id="@+id/blog_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:fontFamily="sans-serif-medium"
-            android:textColor="#CC000000"
-            tools:text="No plans yet for the evening?"
-        />
-        <WebView
-            android:id="@+id/blog_snippet"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_below="@+id/blog_date"
+            android:layout_toRightOf="@+id/blog_image"
+            android:layout_toEndOf="@+id/blog_image"
+            android:layout_toLeftOf="@+id/arrow"
+            android:layout_toStartOf="@+id/arrow"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
-            tools:ignore="WebViewLayout"
+            android:fontFamily="sans-serif-light"
+            android:textSize="20sp"
+            android:textColor="#35C4FF"
+            android:maxLines="2"
+            android:ellipsize="end"
+            tools:text="No plans yet for the evening?"
         />
-    </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_toRightOf="@+id/blog_image"
+            android:layout_toEndOf="@+id/blog_image"
+            android:background="@color/gray400"
+        />
+
+        <ImageView
+            android:id="@+id/arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="6dp"
+            android:src="@drawable/ic_chevron_right_black_36dp"
+        />
+    </RelativeLayout>
 </FrameLayout>
