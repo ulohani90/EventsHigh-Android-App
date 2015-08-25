@@ -78,6 +78,7 @@
             android:layout_centerVertical="true"
             android:layout_margin="6dp"
             android:src="@drawable/ic_chevron_right_black_36dp"
+            tools:ignore="ContentDescription"
         />
     </RelativeLayout>
 </FrameLayout>
