@@ -229,6 +229,7 @@
         <activity
             android:name=".activity.BlogEntryActivity"
             android:label="@string/title_blog"
+            android:theme="@style/NoActionBar"
             android:screenOrientation="portrait"
             android:exported="true"
             android:parentActivityName=".activity.BlogFeedActivity"

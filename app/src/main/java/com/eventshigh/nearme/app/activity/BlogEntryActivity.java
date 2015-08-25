@@ -3,11 +3,12 @@ package com.eventshigh.nearme.app.activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.Toast;
 
 import com.android.volley.Request.Priority;
@@ -19,10 +20,13 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.BlogEntry;
 import com.eventshigh.nearme.app.network.BlogEntryRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.view.ObservableWebView;
+import com.eventshigh.nearme.app.view.ObservableWebView.OnScrollChangedCallback;
 
 public class BlogEntryActivity extends BaseActivity {
     public static final String EXTRA_BLOG_ENTRY_PARAM = BlogEntryActivity.class.getSimpleName() + "_blog_entry";
 
+    private Toolbar toolbar;
     private View topProgressBar;
     private BlogEntry blogEntry = null;
 
@@ -30,9 +34,17 @@ public class BlogEntryActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_custom_url);
+        setContentView(R.layout.activity_blog_entry);
         topProgressBar = findViewById(R.id.top_progress_bar);
-        setTitle(R.string.loading);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.loading);
+        setSupportActionBar(toolbar);
+
+        setShareVisibility(R.id.share_whatsapp, PACKAGE_NAME_WHATSAPP);
+        setShareVisibility(R.id.share_fb, PACKAGE_NAME_FACEBOOK);
+        setShareVisibility(R.id.share_twitter, PACKAGE_NAME_TWITTER);
+        setShareVisibility(R.id.share_email, PACKAGE_NAME_EMAIL);
     }
 
     protected void onStart() {
@@ -93,17 +105,50 @@ public class BlogEntryActivity extends BaseActivity {
         return topProgressBar;
     }
 
+    public void whatsapp(View view) {
+        shareBlog(blogEntry, PACKAGE_NAME_WHATSAPP);
+    }
+
+    public void facebook(View view) {
+        shareBlog(blogEntry, PACKAGE_NAME_FACEBOOK);
+    }
+
+    public void twitter(View view) {
+        shareBlog(blogEntry, PACKAGE_NAME_TWITTER);
+    }
+
+    public void email(View view) {
+        shareBlog(blogEntry, PACKAGE_NAME_EMAIL);
+    }
+
+    private void setShareVisibility(@IdRes int shareButtonId, String packageName) {
+        findViewById(shareButtonId).setVisibility(isInstalled(this, packageName) ? View.VISIBLE : View.GONE);
+    }
+
     private void populateBlog(BlogEntry blogEntry) {
         this.blogEntry = blogEntry;
         topProgressBar.setVisibility(View.GONE);
-        setTitle(blogEntry.title);
+        toolbar.setTitle(blogEntry.title);
 
-        WebView webview = (WebView) findViewById(R.id.web_view);
-        webview.loadDataWithBaseURL(blogEntry.url, blogEntry.contents, "text/html", "UTF-8", "");
+        final ObservableWebView webView = (ObservableWebView) findViewById(R.id.web_view);
+        String html = String.format(BLOG_HTML_FORMAT, blogEntry.title, blogEntry.thumbnail, blogEntry.contents);
+        webView.loadDataWithBaseURL(blogEntry.url, html, "text/html", "UTF-8", "");
+
+        final int screenHeight = getResources().getDisplayMetrics().heightPixels;
+        toolbar.setAlpha(0);
+        webView.setOnScrollChangedCallback(new OnScrollChangedCallback() {
+            @Override
+            public void onScroll(int l, int t) {
+                float opacity = Math.min(1.0f, t * 3f / screenHeight);
+                toolbar.setAlpha(opacity);
+            }
+        });
+
+        findViewById(R.id.share_row).setVisibility(View.VISIBLE);
     }
 
     private void shareBlog(BlogEntry blogEntry, @Nullable String packageName) {
-        reportActionToAnalytics("shareBlog", blogEntry.url);
+        reportActionToAnalytics("shareBlog", packageName);
 
         try {
             Intent sendIntent = new Intent();
@@ -123,4 +168,34 @@ public class BlogEntryActivity extends BaseActivity {
             showMessage(R.string.failed_share);
         }
     }
+
+    private static final String BLOG_HTML_FORMAT =
+            "<html>\n" +
+            "<head>\n" +
+            "  <link rel='stylesheet' id='foundation_pushit-css' href='https://blog.eventshigh.com/wp-content/plugins/wptouch/themes/foundation/modules/pushit/pushit.css?d62120' type='text/css' media='all'>\n" +
+            "  <link rel='stylesheet' id='wptouch-parent-theme-css-css' href='https://blog.eventshigh.com/wp-content/plugins/wptouch/themes/foundation/default/style.css?d62120' type='text/css' media='all'>\n" +
+            "  <style id='wptouch-parent-theme-css-inline-css' type='text/css'>.page-wrapper{background-color:#f9f9f8}a{color:#2d353f}body,header,.wptouch-menu,.pushit,#search-dropper,.date-circle{background-color:#2d353f}a,#slider a p:after{color:#35c4ff}.dots li.active,#switch .active{background-color:#35c4ff}.bauhaus,.wptouch-login-wrap,form#commentform button#submit{background-color:#21759b}</style>\n" +
+            "  <link rel='stylesheet' id='wptouch-theme-css-css' href='https://blog.eventshigh.com/wp-content/plugins/wptouch/themes/bauhaus/default/style.css?d62120' type='text/css' media='all'>\n" +
+            "  <meta name='viewport' content='initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width'>\n" +
+            "  <link rel='apple-touch-icon-precomposed' href='https://blog.eventshigh.com/wp-content/plugins/wptouch/admin/images/default-bookmark.png?d62120'>\n" +
+            "  <style> .applink { display: none } </style>\n" +
+            "</head>\n" +
+            "<body class='single single-post single-format-standard custom-background css-videos body-font smartphone portrait android theme-bauhaus dark-header light-body dark-post-head circles no-com-bubbles off-canvas fonts-lato_roboto'>\n" +
+            "  <div class='page-wrapper' style='position: relative; transition: -webkit-transform 0.33s cubic-bezier(0.29, 0.05, 0.14, 0.87);'>\n" +
+            "    <div id='content'>\n" +
+            "      <div class='post section post-1530 post-name-onam-in-bangalore post-author-5 single not-page has-thumbnail show-thumbs'>\n" +
+            "        <div class='post-page-head-area bauhaus'>\n" +
+            "          <h2 class='post-title heading-font'>%s</h2>\n" +
+            "        </div>\n" +
+            "        <div class='post-page-content'>\n" +
+            "          <div class='post-page-thumbnail'>\n" +
+            "            <img src='%s' class='post-thumbnail wp-post-image wp-post-image'>\n" +
+            "          </div>\n" +
+            "          %s\n" +
+            "        </div>\n" +
+            "      </div>\n" +
+            "    </div>\n" +
+            "  </div>\n" +
+            "</body>\n" +
+            "</html>";
 }

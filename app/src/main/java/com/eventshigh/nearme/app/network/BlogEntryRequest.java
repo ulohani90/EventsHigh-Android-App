@@ -70,7 +70,7 @@ public class BlogEntryRequest extends JsonRequest<BlogEntry> {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject blogEntryJson = new JSONObject(jsonString);
-            return Response.success(BlogEntry.parse(blogEntryJson),
+            return Response.success(BlogEntry.parse(blogEntryJson.getJSONObject("post")),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException | ParseException e) {
             Crashlytics.getInstance().core.logException(e);

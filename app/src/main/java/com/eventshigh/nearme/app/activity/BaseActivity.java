@@ -62,6 +62,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
     public static final String PACKAGE_NAME_FACEBOOK = "com.facebook.katana";
     public static final String PACKAGE_NAME_TWITTER = "com.twitter.android";
+    public static final String PACKAGE_NAME_EMAIL = "com.google.android.gm";
 
     // Google Analytics
     protected boolean isPlayServicesPresent;
