@@ -62,6 +62,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         if (categoryForSeeAll != null) {
             dataToShow.add(new SeeAllData(eventsFragment, categoryForSeeAll));
         }
+        dataToShow.add(new EhInviteNotificationData(eventsFragment.getContextActivity()));
         notifyDataSetChanged();
     }
 

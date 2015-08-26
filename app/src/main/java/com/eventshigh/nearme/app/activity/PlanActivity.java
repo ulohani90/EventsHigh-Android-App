@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
@@ -203,7 +204,7 @@ public class PlanActivity extends BaseActivity {
     private Listener<JSONObject> invitationResponseListener = new Listener<JSONObject>() {
         @Override
         public void onResponse(JSONObject res, boolean isIntermediate) {
-            showMessage("Invitation sent!");
+            Toast.makeText(PlanActivity.this, "Invitation sent!", Toast.LENGTH_SHORT).show();
             finish();
         }
     };

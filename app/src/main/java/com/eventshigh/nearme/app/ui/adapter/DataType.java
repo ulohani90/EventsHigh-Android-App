@@ -1,10 +1,8 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
 import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.view.View;
 import android.view.ViewGroup;
 
-import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 
 /**
@@ -21,7 +19,8 @@ public enum DataType {
     SEE_ALL(8),
     EVENT_INVITATION(9),
     SOCIAL_FRIEND(10),
-    EH_INVITE(11);
+    EH_INVITE(11),
+    EH_INVITE_NOTIFICATION(12);
 
     public final int typeId;
 
@@ -77,8 +76,11 @@ public enum DataType {
         }
 
         if (typeId == EH_INVITE.typeId) {
-            View view = activity.getLayoutInflater().inflate(R.layout.card_share_app, parent, false);
-            return new ViewHolder(view) {};
+            return EhInviteCard.newInstance(activity, parent);
+        }
+
+        if (typeId == EH_INVITE_NOTIFICATION.typeId) {
+            return EhInviteNotificationCard.newInstance(activity, parent);
         }
 
         throw new IllegalArgumentException("invalid typeid");
