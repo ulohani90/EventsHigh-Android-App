@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.ui.adapter;
 
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.text.Html;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -38,7 +39,7 @@ public class BlogEntryCard extends ViewHolder {
         Glide.with(activity).load(blogEntry.thumbnailSmall)
                 .placeholder(R.drawable.ic_launcher).crossFade().centerCrop().transform(new CircleTransform(activity))
                 .into(imageView);
-        titleView.setText(blogEntry.title);
+        titleView.setText(Html.fromHtml(blogEntry.title));
         dateView.setText(DateUtils.getRelativeTimeSpanString(blogEntry.pubDate.getTime()));
         itemView.setOnClickListener(new OnClickListener() {
             @Override

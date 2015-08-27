@@ -78,7 +78,7 @@ public class BlogEntry implements Parcelable {
      Helper static methods, used for JSON parsing
      *********************************/
     public static BlogEntry parse(JSONObject blogEntryJson) throws JSONException, ParseException {
-        return new BlogEntry(blogEntryJson.getString("title_plain"),
+        return new BlogEntry(blogEntryJson.getString("title"),
                 blogEntryJson.getString("excerpt"),
                 blogEntryJson.getString("content"),
                 blogEntryJson.getJSONObject("thumbnail_images").getJSONObject("full").getString("url"),

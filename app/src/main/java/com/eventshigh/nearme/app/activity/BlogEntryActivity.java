@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -134,7 +135,7 @@ public class BlogEntryActivity extends BaseActivity {
     private void populateBlog(BlogEntry blogEntry) {
         this.blogEntry = blogEntry;
         topProgressBar.setVisibility(View.GONE);
-        toolbar.setTitle(blogEntry.title);
+        toolbar.setTitle(Html.fromHtml(blogEntry.title));
 
         String html = String.format(BLOG_HTML_FORMAT, blogEntry.title, blogEntry.thumbnail, blogEntry.contents);
         webView.loadDataWithBaseURL(blogEntry.url, html, "text/html", "UTF-8", "");
@@ -177,12 +178,12 @@ public class BlogEntryActivity extends BaseActivity {
     private static final String BLOG_HTML_FORMAT =
             "<html>\n" +
             "<head>\n" +
-            "  <link rel='stylesheet' id='foundation_pushit-css' href='https://blog.eventshigh.com/wp-content/plugins/wptouch/themes/foundation/modules/pushit/pushit.css?d62120' type='text/css' media='all'>\n" +
-            "  <link rel='stylesheet' id='wptouch-parent-theme-css-css' href='https://blog.eventshigh.com/wp-content/plugins/wptouch/themes/foundation/default/style.css?d62120' type='text/css' media='all'>\n" +
+            "  <link rel='stylesheet' id='foundation_pushit-css' href='https://blogassets.eventshigh.com/wp-content/plugins/wptouch/themes/foundation/modules/pushit/pushit.css?d62120' type='text/css' media='all'>\n" +
+            "  <link rel='stylesheet' id='wptouch-parent-theme-css-css' href='https://blogassets.eventshigh.com/wp-content/plugins/wptouch/themes/foundation/default/style.css?d62120' type='text/css' media='all'>\n" +
             "  <style id='wptouch-parent-theme-css-inline-css' type='text/css'>.page-wrapper{background-color:#f9f9f8}a{color:#2d353f}body,header,.wptouch-menu,.pushit,#search-dropper,.date-circle{background-color:#2d353f}a,#slider a p:after{color:#35c4ff}.dots li.active,#switch .active{background-color:#35c4ff}.bauhaus,.wptouch-login-wrap,form#commentform button#submit{background-color:#21759b}</style>\n" +
-            "  <link rel='stylesheet' id='wptouch-theme-css-css' href='https://blog.eventshigh.com/wp-content/plugins/wptouch/themes/bauhaus/default/style.css?d62120' type='text/css' media='all'>\n" +
+            "  <link rel='stylesheet' id='wptouch-theme-css-css' href='https://blogassets.eventshigh.com/wp-content/plugins/wptouch/themes/bauhaus/default/style.css?d62120' type='text/css' media='all'>\n" +
             "  <meta name='viewport' content='initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width'>\n" +
-            "  <link rel='apple-touch-icon-precomposed' href='https://blog.eventshigh.com/wp-content/plugins/wptouch/admin/images/default-bookmark.png?d62120'>\n" +
+            "  <link rel='apple-touch-icon-precomposed' href='https://blogassets.eventshigh.com/wp-content/plugins/wptouch/admin/images/default-bookmark.png?d62120'>\n" +
             "  <style> .applink { display: none } </style>\n" +
             "</head>\n" +
             "<body class='single single-post single-format-standard custom-background css-videos body-font smartphone portrait android theme-bauhaus dark-header light-body dark-post-head circles no-com-bubbles off-canvas fonts-lato_roboto'>\n" +
