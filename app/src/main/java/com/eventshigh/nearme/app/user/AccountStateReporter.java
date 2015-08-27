@@ -95,10 +95,10 @@ public class AccountStateReporter {
             .appendQueryParameter("android_id", Utils.getAndroidId(context));
     }
 
-  public static Builder getBaseUriWithoutAndroidId(String path) {
-      return Uri.parse(EventsHighEndpoints.API_URI_BASE)
+    public static Builder getBaseUriWithoutAndroidId(String path) {
+        return Uri.parse(EventsHighEndpoints.API_URI_BASE)
           .buildUpon()
           .appendPath("mobileapp")
           .appendPath(path);
-  }
+    }
 }
