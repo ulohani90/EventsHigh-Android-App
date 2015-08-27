@@ -30,7 +30,7 @@ public class ZendeskUtils {
         Account account = new Account(context);
         String name = account.getUserInfo().name;
         ZendeskConfig.INSTANCE.setIdentity(new AnonymousIdentity.Builder()
-                .withExternalIdentifier("user:" + Utils.md5(Utils.getAndroidId(context)))
+                .withExternalIdentifier("user:" + Utils.md5(Utils.getAndroidId(context) + name))
                 .withNameIdentifier(name == null ? "Me" : name)
                 .build());
 
@@ -56,13 +56,9 @@ public class ZendeskUtils {
 
         public List<String> getTags() {
             List<String> tags = new ArrayList<>();
-            tags.add(Utils.getAndroidId(context));
             UserInfo userInfo = new Account(context).getUserInfo();
             if (userInfo.phoneNo != null) {
-                tags.add(userInfo.phoneNo);
-            }
-            if (userInfo.name != null) {
-                tags.add(userInfo.name);
+                tags.add("m:" + userInfo.phoneNo);
             }
             return tags;
         }
@@ -85,8 +81,14 @@ public class ZendeskUtils {
         }
 
         @Override
+        public List<String> getTags() {
+            List<String> tags = super.getTags();
+            tags.add("e:" + event.id);
+            return tags;
+        }
+
         public String getAdditionalInfo() {
-            return event.getEventDetailsURI().toString() + "\n\nUser: " + userInfo.name + " (" + userInfo.phoneNo + ")";
+            return event.getEventDetailsURI().toString();
         }
     }
 }
