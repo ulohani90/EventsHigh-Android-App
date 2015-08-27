@@ -54,7 +54,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
-    public void setEvents(List<Event> events, @Nullable String categoryForSeeAll) {
+    public void setEvents(List<Event> events, @Nullable String categoryForSeeAll,
+                          boolean showEhInviteForNotification) {
         dataToShow.clear();
         for (Event event: events) {
             dataToShow.add(new EventData("", event, false, eventsFragment, this));
@@ -62,7 +63,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         if (categoryForSeeAll != null) {
             dataToShow.add(new SeeAllData(eventsFragment, categoryForSeeAll));
         }
-        dataToShow.add(new EhInviteNotificationData(eventsFragment.getContextActivity()));
+        if (showEhInviteForNotification) {
+            dataToShow.add(new EhInviteNotificationData(eventsFragment.getContextActivity()));
+        }
         notifyDataSetChanged();
     }
 

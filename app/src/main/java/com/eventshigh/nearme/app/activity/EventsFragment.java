@@ -39,6 +39,8 @@ import java.util.concurrent.TimeUnit;
  * Fragment to show events.
  */
 public class EventsFragment extends BaseEventsFragment {
+    private static final String SHOW_EH_INVITE_NOTIFICATION_PARAM =
+            EventsFragment.class.getName() + "_show_eh_invite_param";
     private static final long REFRESH_MY_EVENTS_INTERVAL = TimeUnit.SECONDS.toMillis(2);
 
     private AutofitRecyclerView eventGridView;
@@ -49,16 +51,21 @@ public class EventsFragment extends BaseEventsFragment {
     private EventsAdapter eventsAdapter;
     private OnScrollListener onScrollListener;
 
+    private boolean showEhInviteForNotification;
+
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
-                                             boolean showCategories) {
+                                             boolean showCategories, boolean showEhInviteForNotification) {
         EventsFragment fragment = new EventsFragment();
-        fragment.setArguments(getArgs(eventsContext, showFollowCard, showCategories));
+        Bundle args = getArgs(eventsContext, showFollowCard, showCategories);
+        args.putBoolean(SHOW_EH_INVITE_NOTIFICATION_PARAM, showEhInviteForNotification);
+        fragment.setArguments(args);
         return fragment;
     }
 
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
+        showEhInviteForNotification = getArguments().getBoolean(SHOW_EH_INVITE_NOTIFICATION_PARAM);
         if (onScrollListener == null) {
             onScrollListener = new HideActionBarOnScroll(this.activity);
         }
@@ -213,8 +220,9 @@ public class EventsFragment extends BaseEventsFragment {
             }
 
             if (!isIntermediate || !eventsCollection.events.isEmpty()) {
-                eventsAdapter.setEvents(eventsCollection.events,
-                        (eventsContext.query.isEmpty() || eventsContext.dateFilter.isEmpty() ? null : eventsContext.query));
+                String seeAllQuery = eventsContext.query.isEmpty() ||
+                        eventsContext.dateFilter.isEmpty() ? null : eventsContext.query;
+                eventsAdapter.setEvents(eventsCollection.events, seeAllQuery, showEhInviteForNotification);
                 if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                             eventsCollection.numFollowers);

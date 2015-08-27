@@ -64,7 +64,7 @@ public class EventsGridActivity extends BaseEventsActivity {
         Fragment eventFragment;
         if (!eventsContext.query.isEmpty()) {
             EventsFragment eventFragment1 = EventsFragment.getInstance(
-                    eventsContext, showFollowCard, false);
+                    eventsContext, showFollowCard, false, getIntent().getAction().startsWith(NOTIFICATION_ACTION));
             eventFragment1.setOnScrollListener(
                     showFollowCard ? followCardScrollListener : doNothingScrollListener);
             eventFragment = eventFragment1;

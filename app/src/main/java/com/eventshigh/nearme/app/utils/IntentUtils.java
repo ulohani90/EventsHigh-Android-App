@@ -9,6 +9,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
+import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
@@ -50,7 +51,9 @@ public class IntentUtils {
             } else if (Intent.ACTION_VIEW.equals(inIntent.getAction())) {
                 processViewIntent(inIntent, true);
             } else if (inIntent.getAction().startsWith(BaseActivity.NOTIFICATION_ACTION)) {
-                activity.reportActionToAnalytics("openNotification", param.query);
+                if (activity instanceof LaunchActivity) {
+                    activity.reportActionToAnalytics("openNotification", param.query);
+                }
                 processViewIntent(inIntent, false);
             }
         }

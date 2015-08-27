@@ -320,8 +320,17 @@ public class LaunchActivity extends BaseContextActivity {
         if (eventsContext.query.isEmpty() && eventsContext.dateFilter.isEmpty()) {
             refreshIfOldData();
         } else {
+            String action = Intent.ACTION_VIEW;
+            Intent inIntent = getIntent();
+            if (inIntent != null) {
+                String inAction = inIntent.getAction();
+                if (inAction != null && inAction.startsWith(NOTIFICATION_ACTION)) {
+                    action = inAction;
+                }
+            }
+
             Intent outIntent = new Intent(this, EventsGridActivity.class);
-            outIntent.setAction(Intent.ACTION_VIEW);
+            outIntent.setAction(action);
             outIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
             startActivity(outIntent);
             finish();
@@ -357,7 +366,7 @@ public class LaunchActivity extends BaseContextActivity {
             if (TABS[position].equals(MY_EVENTS_TAB)) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                     EventsHighEndpoints.QUERY_MY_EVENT);
-                myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true);
+                myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false);
                 return myEventsFragment;
             }
 
