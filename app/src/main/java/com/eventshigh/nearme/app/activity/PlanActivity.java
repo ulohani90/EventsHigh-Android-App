@@ -21,13 +21,13 @@ import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.MyContactsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.utils.Signer;
-import com.eventshigh.nearme.app.ui.adapter.SocialFriendCard;
 import com.eventshigh.nearme.app.ui.adapter.ContactsAutoFillAdapter;
+import com.eventshigh.nearme.app.ui.adapter.SocialFriendCard;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.ContactUtils;
+import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView.SpanAllColumnLookup;
@@ -40,9 +40,7 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class PlanActivity extends BaseActivity {
     private Event event;
@@ -156,7 +154,11 @@ public class PlanActivity extends BaseActivity {
                     for (UserContact contact : contactsView.getObjects()) {
                         JSONObject invitation = contact.withEmails(PlanActivity.this).toJSON();
                         String[] allPhoneNos = ContactUtils.getAllPhoneNo(PlanActivity.this, contact.contactId);
-                        invitation.put("mobile_nos", new JSONArray(allPhoneNos));
+                        JSONArray mobileNosJson = new JSONArray();
+                        for (String phoneNo : allPhoneNos) {
+                            mobileNosJson.put(phoneNo);
+                        }
+                        invitation.put("mobile_nos", mobileNosJson);
                         invitations.put(invitation);
                     }
                     reportActionToAnalytics("inviteToPlan", planId, invitations.length());
