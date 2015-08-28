@@ -12,7 +12,7 @@
         android:background="#DFDED5"
         android:padding="10dp"
         android:fontFamily="sans-serif-medium"
-        android:text="Choose Your Contacts"
+        android:text="Invite Your Contacts"
         tools:ignore="HardcodedText"
     />
 
@@ -22,7 +22,18 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:textColor="#0000A0"
-        android:hint="Invite people"
+        android:hint="Enter names"
         tools:ignore="HardcodedText"
     />
+
+    <TextView
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Suggestions"
+        tools:ignore="HardcodedText"
+    />
+
 </LinearLayout>

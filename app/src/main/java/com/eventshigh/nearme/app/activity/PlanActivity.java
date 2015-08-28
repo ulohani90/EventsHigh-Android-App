@@ -148,20 +148,16 @@ public class PlanActivity extends BaseActivity {
     }
 
     private void sendInvitations() {
-        final Set<String> contactNames = new HashSet<>();
-        for (String friendData : contactsView.getText().toString().split(",")) {
-            contactNames.add(friendData.trim().toLowerCase());
-        }
-
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     JSONArray invitations = new JSONArray();
-                    for (UserContact contact : ContactUtils.getContacts(PlanActivity.this, null, null, false)) {
-                        if (contactNames.contains(contact.name.toLowerCase())) {
-                            invitations.put(contact.withEmails(PlanActivity.this).toJSON());
-                        }
+                    for (UserContact contact : contactsView.getObjects()) {
+                        JSONObject invitation = contact.withEmails(PlanActivity.this).toJSON();
+                        String[] allPhoneNos = ContactUtils.getAllPhoneNo(PlanActivity.this, contact.contactId);
+                        invitation.put("mobile_nos", new JSONArray(allPhoneNos));
+                        invitations.put(invitation);
                     }
                     reportActionToAnalytics("inviteToPlan", planId, invitations.length());
 
