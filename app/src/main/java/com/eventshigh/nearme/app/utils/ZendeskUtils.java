@@ -66,13 +66,11 @@ public class ZendeskUtils {
 
     public static class EventFeedbackConfiguration  extends FeedbackConfiguration {
         private final Event event;
-        private final UserInfo userInfo;
 
         public EventFeedbackConfiguration(Context context, Event event) {
             super(context);
 
             this.event = event;
-            this.userInfo = new Account(context).getUserInfo();
         }
 
         @Override
