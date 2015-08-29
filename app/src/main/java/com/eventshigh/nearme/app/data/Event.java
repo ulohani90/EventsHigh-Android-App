@@ -415,7 +415,27 @@ public class Event implements Parcelable {
         // Price.
         double minPrice = -1, maxPrice = -1;
         String currency = "\u20B9";
-        if (mashup != null) {
+        JSONArray ehPrices = eventJson.optJSONArray("eh_prices");
+        if (ehPrices != null) {
+            for (int j = 0 ; j < ehPrices.length(); j++) {
+                JSONObject ehPrice = ehPrices.getJSONObject(j);
+                currency = ehPrice.optString("currency", "\u20B9");
+                if (currency.equalsIgnoreCase("INR")) {
+                    currency = "\u20B9";
+                }
+
+                double value = ehPrice.optDouble("discount_value", -1);
+                if (value < 0) {
+                    value = ehPrice.optDouble("value", -1);
+                }
+                if (value > 0) {
+                    minPrice = minPrice < 0 ? value : Math.min(minPrice, value);
+                    maxPrice = maxPrice < 0 ? value : Math.max(maxPrice, value);
+                }
+            }
+        }
+
+        if (mashup != null && minPrice < 0 && maxPrice < 0) {
             JSONObject priceInfo = mashup.optJSONObject("price_info");
             if (priceInfo != null) {
                 if (priceInfo.optString("type").equalsIgnoreCase("free")) {
@@ -426,13 +446,14 @@ public class Event implements Parcelable {
                     if (currency.equalsIgnoreCase("INR")) {
                         currency = "\u20B9";
                     }
-                    double value = priceInfo.optDouble("value", -1);
-                    if (value >= 0) {
-                        minPrice = value;
-                        maxPrice = value;
-                    } else {
-                        minPrice = priceInfo.optDouble("min", -1);
-                        maxPrice = priceInfo.optDouble("min", -1);
+                    minPrice = priceInfo.optDouble("min", -1);
+                    maxPrice = priceInfo.optDouble("max", -1);
+                    if (minPrice < 0 || maxPrice < 0) {
+                        double value = priceInfo.optDouble("value", -1);
+                        if (value > 0) {
+                            minPrice = value;
+                            maxPrice = value;
+                        }
                     }
                 }
             }
