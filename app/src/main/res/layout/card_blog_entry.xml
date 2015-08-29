@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:foreground="?android:attr/selectableItemBackground"
     android:descendantFocusability="blocksDescendants"
+    tools:layout_height="80dp"
 >
     <RelativeLayout
         android:layout_width="match_parent"
@@ -14,12 +15,12 @@
     >
         <ImageView
             android:id="@+id/blog_image"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginRight="6dp"
+            android:layout_marginEnd="6dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:scaleType="centerInside"
@@ -35,7 +36,10 @@
             android:layout_toEndOf="@+id/blog_image"
             android:layout_toLeftOf="@+id/arrow"
             android:layout_toStartOf="@+id/arrow"
-            android:layout_margin="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="1dp"
             android:textColor="#80000000"
             tools:text="15th Aug 2015"
         />
@@ -50,10 +54,12 @@
             android:layout_toStartOf="@+id/arrow"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="sans-serif-light"
-            android:textSize="17sp"
+            android:textSize="20sp"
             android:textColor="#35C4FF"
             android:maxLines="2"
+            android:minLines="2"
             android:ellipsize="end"
             tools:text="No plans yet for the evening?"
         />
