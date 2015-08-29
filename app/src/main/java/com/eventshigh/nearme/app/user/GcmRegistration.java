@@ -40,7 +40,7 @@ public class GcmRegistration {
     private static final String PREF_REGISTRATION_ID_UPLOADED = "registration_id_uploaded";
     private static final String PREF_ZENDESK_UPDATED = "zendesk_updated2";
     private static final String PREF_IID_UPLOADED = "iid_updated";
-    private static final String PREF_DEVICE_INFO_UPLOADED = "device_info";
+    private static final String PREF_DEVICE_INFO_UPLOADED = "device_info2";
     private static final String PREF_FIRST_TOPICS = "first_topics";
 
     private static final String PREF_LAST_CITY = "last_city";

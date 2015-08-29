@@ -3,8 +3,10 @@ package com.eventshigh.nearme.app.activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
@@ -22,11 +24,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.android.volley.toolbox.RequestFuture;
+import com.android.volley.toolbox.StringRequest;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter.OnCitySelectionListener;
+import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
@@ -258,6 +265,28 @@ public class LaunchActivity extends BaseContextActivity {
 
             // If we have user location, start next activity.
             if (eventsContext.city != null) {
+                if (eventsContext.location != null) {
+                    try {
+                        int appVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+                        Uri reportUri = AccountStateReporter.getBaseUri(LaunchActivity.this, "reportUser")
+                            .appendQueryParameter("city", eventsContext.city.toString())
+                            .appendQueryParameter("lat", Double.toString(eventsContext.location.latitude))
+                            .appendQueryParameter("lon", Double.toString(eventsContext.location.longitude))
+                            .appendQueryParameter("version", Integer.toString(appVersion))
+                            .build();
+                        RequestFuture<String> future = RequestFuture.newFuture();
+                        VolleyHelper.addToRequestQueue(LaunchActivity.this,
+                            new StringRequest(reportUri.toString(), future, future) {
+                                @Override
+                                public Priority getPriority() {
+                                    return Priority.LOW;
+                                }
+                            }
+                        );
+                    } catch (NameNotFoundException e) {
+                        Crashlytics.getInstance().core.logException(e);
+                    }
+                }
                 showNextScreen();
                 return;
             }

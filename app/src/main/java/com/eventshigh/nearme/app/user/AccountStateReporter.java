@@ -59,7 +59,7 @@ public class AccountStateReporter {
     }
 
     public static void reportDeviceInfo(Context context, Runnable onSuccess) {
-        sendSignedRequest(context, getBaseUri(context, "reportDeviceInfo")
+        sendSignedRequest(context, getBaseUri(context, "reportDeviceInfo2")
                 .appendQueryParameter("device_name", DeviceUtils.getDeviceName())
                 .appendQueryParameter("is_rooted", Boolean.toString(DeviceUtils.isRooted()))
                 .build(), onSuccess);
