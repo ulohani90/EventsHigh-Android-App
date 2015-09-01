@@ -63,8 +63,10 @@ public class EventsGridActivity extends BaseEventsActivity {
         // Add Events Fragment.
         Fragment eventFragment;
         if (!eventsContext.query.isEmpty()) {
+            boolean showEhInviteForNotification = getIntent() != null &&
+                getIntent().getAction() != null && getIntent().getAction().startsWith(NOTIFICATION_ACTION);
             EventsFragment eventFragment1 = EventsFragment.getInstance(
-                    eventsContext, showFollowCard, false, getIntent().getAction().startsWith(NOTIFICATION_ACTION));
+                    eventsContext, showFollowCard, false, showEhInviteForNotification);
             eventFragment1.setOnScrollListener(
                     showFollowCard ? followCardScrollListener : doNothingScrollListener);
             eventFragment = eventFragment1;
@@ -145,6 +147,7 @@ public class EventsGridActivity extends BaseEventsActivity {
 
     private void setDarkToolbarIcons() {
         toolbar.post(new Runnable() {
+            @SuppressWarnings("deprecation")
             @Override
             public void run() {
                 ToolbarColorizeHelper.colorizeToolbar(toolbar,
@@ -156,6 +159,7 @@ public class EventsGridActivity extends BaseEventsActivity {
     private void setLightToolbarIcons() {
         toolbar.post(new Runnable() {
             @Override
+            @SuppressWarnings("deprecation")
             public void run() {
                 ToolbarColorizeHelper.colorizeToolbar(toolbar,
                         getResources().getColor(android.R.color.white), EventsGridActivity.this);

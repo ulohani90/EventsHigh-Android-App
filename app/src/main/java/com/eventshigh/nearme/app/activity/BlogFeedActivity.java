@@ -60,6 +60,10 @@ public class BlogFeedActivity extends BaseActivity {
         return topProgressBar;
     }
 
+    public void onRetry(View view) {
+        fetchNewListing(false);
+    }
+
     private void fetchNewListing(boolean shouldBypassCache) {
         topProgressBar.setVisibility(View.VISIBLE);
         retryView.setVisibility(View.GONE);
