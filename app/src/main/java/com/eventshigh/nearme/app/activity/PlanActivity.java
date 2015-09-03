@@ -9,6 +9,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
@@ -174,6 +175,8 @@ public class PlanActivity extends BaseActivity {
                             PlanActivity.this, "invite_to_plan").build()).toString();
                     JsonObjectRequest request = new JsonObjectRequest(url, req,
                             invitationResponseListener, tryAgainErrorListener);
+                    request.setRetryPolicy(new DefaultRetryPolicy(60_000,
+                            DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                     request.setTag(PlanActivity.this);
                     VolleyHelper.addToRequestQueue(PlanActivity.this, request);
                 } catch (JSONException | GeneralSecurityException | UnsupportedEncodingException e) {
