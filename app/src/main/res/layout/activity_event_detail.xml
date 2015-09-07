@@ -726,24 +726,6 @@
                 tools:ignore="UnusedAttribute"
             />
             <TextView
-                android:id="@+id/book_enquiry"
-                style="@style/EHButtonCTA"
-                android:background="@drawable/eh_button_book"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:layout_gravity="center"
-                android:layout_marginStart="4dp"
-                android:layout_marginLeft="4dp"
-                android:gravity="center"
-                android:elevation="4dp"
-                android:text="@string/action_book_enquiry"
-                android:onClick="openBookingEnquirySite"
-                android:visibility="gone"
-                tools:visibility="visible"
-                tools:ignore="UnusedAttribute"
-            />
-            <TextView
                 android:id="@+id/join_event"
                 style="@style/EHButtonCTA"
                 android:background="@drawable/eh_button_book"

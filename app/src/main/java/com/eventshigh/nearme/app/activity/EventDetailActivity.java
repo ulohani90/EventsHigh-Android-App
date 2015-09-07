@@ -162,15 +162,15 @@ public class EventDetailActivity extends BaseActivity {
             populateView(event);
         } else {
             EventRequest.submit(this, getIntent().getData(), Priority.IMMEDIATE, mEventListener,
-                new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(EventDetailActivity.this, R.string.failed_load,
-                                Toast.LENGTH_SHORT).show();
-                        VolleyHelper.log(EventDetailActivity.this, volleyError);
-                        finish();
-                    }
-                });
+                    new ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            Toast.makeText(EventDetailActivity.this, R.string.failed_load,
+                                    Toast.LENGTH_SHORT).show();
+                            VolleyHelper.log(EventDetailActivity.this, volleyError);
+                            finish();
+                        }
+                    });
         }
     }
 
@@ -231,7 +231,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openSourceSite(View view) {
-        reportEventAction(event, view.getId() == R.id.join_event ? "joinEvent" : "openSource");
+        reportEventAction(event, "organizer", view.getId() == R.id.join_event ? "joinEvent" : "openSource");
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.sourceUrl));
         startActivitySafe(intent);
@@ -287,30 +287,6 @@ public class EventDetailActivity extends BaseActivity {
 
         final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
         if (event.bookingUrl.contains("ticketing.eventshigh.com")) {
-            bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
-            bookingUriBuilder.appendQueryParameter("name", userInfo.name);
-            bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
-        }
-
-        CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
-                getString(R.string.title_book));
-    }
-
-    @SuppressWarnings("all")
-    public void openBookingEnquirySite(View view) {
-        Account account = new Account(this);
-        UserInfo userInfo = account.getUserInfo();
-        if (userInfo.phoneNo == null || userInfo.name == null) {
-            PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
-            return;
-        }
-
-        showRateAppDialog = true;
-        addToFavourite = true;
-        reportEventAction(event, "bookingEnquiry");
-
-        final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingEnquiryUrl).buildUpon();
-        if (event.bookingEnquiryUrl.contains("eventshigh.com")) {
             bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
             bookingUriBuilder.appendQueryParameter("name", userInfo.name);
             bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
@@ -416,7 +392,6 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void ama(View view) {
-        reportEventAction(event, "ama");
         Account account = new Account(this);
         UserInfo userInfo = account.getUserInfo();
         if (userInfo.phoneNo == null || userInfo.name == null) {
@@ -424,6 +399,14 @@ public class EventDetailActivity extends BaseActivity {
             return;
         }
 
+        Preferences preferences = Preferences.getInstance(this);
+        if (!preferences.canUploadContacts()) {
+            AskForContactsDialog.show(this, preferences);
+            return;
+        }
+
+
+        reportEventAction(event, "ama");
         ZendeskUtils.initZendesk(this);
         ZendeskUtils.setEventFeedbackConfiguration(this, event);
         Intent feedbackIntent = new Intent(this, ContactZendeskActivity.class);
@@ -434,14 +417,8 @@ public class EventDetailActivity extends BaseActivity {
         reportEventAction(event, "checkWithFriends");
 
         UserInfo userInfo = new Account(this).getUserInfo();
-        if (userInfo.name == null || userInfo.phoneNo == null || !userInfo.isVerified) {
+        if (userInfo.name == null || userInfo.phoneNo == null) {
             PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
-            return;
-        }
-
-        Preferences preferences = Preferences.getInstance(this);
-        if (!preferences.canUploadContacts()) {
-            AskForContactsDialog.show(this, preferences);
             return;
         }
 
@@ -597,7 +574,6 @@ public class EventDetailActivity extends BaseActivity {
         private final View bookView;
         private final View callView;
         private final View joinView;
-        private final View bookEnquiryView;
         private final TextView priceView;
         private final TextView offerView;
 
@@ -648,7 +624,6 @@ public class EventDetailActivity extends BaseActivity {
             bookView = findViewById(R.id.book_ticket);
             callView = findViewById(R.id.call);
             joinView = findViewById(R.id.join_event);
-            bookEnquiryView = findViewById(R.id.book_enquiry);
             priceView = (TextView) findViewById(R.id.event_price);
             offerView = (TextView) findViewById(R.id.offer_text);
 
@@ -785,13 +760,9 @@ public class EventDetailActivity extends BaseActivity {
             findViewById(R.id.action_button_group).setVisibility(View.VISIBLE);
             callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
             bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
-            bookEnquiryView.setVisibility(
-                (bookView.getVisibility() != View.VISIBLE && event.bookingEnquiryUrl != null)
-                    ? View.VISIBLE : View.GONE
-            );
             joinView.setVisibility(
-                (bookView.getVisibility() != View.VISIBLE && bookEnquiryView.getVisibility() != View.VISIBLE &&
-                    event.sourceUrl != null && event.sourceUrl.contains("facebook.com/"))
+                (bookView.getVisibility() != View.VISIBLE && event.sourceUrl != null &&
+                    event.sourceUrl.contains("facebook.com/"))
                 ? View.VISIBLE : View.GONE);
 
             // Show price.
