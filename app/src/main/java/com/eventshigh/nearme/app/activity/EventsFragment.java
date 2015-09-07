@@ -33,7 +33,6 @@ import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Fragment to show events.
@@ -41,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 public class EventsFragment extends BaseEventsFragment {
     private static final String SHOW_EH_INVITE_NOTIFICATION_PARAM =
             EventsFragment.class.getName() + "_show_eh_invite_param";
-    private static final long REFRESH_MY_EVENTS_INTERVAL = TimeUnit.SECONDS.toMillis(2);
 
     private AutofitRecyclerView eventGridView;
     private View topProgressBar;
@@ -110,7 +108,7 @@ public class EventsFragment extends BaseEventsFragment {
             @Override
             public void onClick(View v) {
                 activity.reportActionToAnalytics("retry");
-                refresh();
+                fetchNewListing(false);
             }
         });
 
@@ -121,14 +119,10 @@ public class EventsFragment extends BaseEventsFragment {
     }
 
     @Override
-    protected void refresh() {
-        fetchNewListing(false);
-    }
+    public void onStart() {
+        super.onStart();
 
-    @Override
-    protected long refreshInterval() {
-        return EventsHighEndpoints.isMyEventQuery(eventsContext.query) ?
-                REFRESH_MY_EVENTS_INTERVAL : super.refreshInterval();
+        fetchNewListing(false);
     }
 
     public void setOnScrollListener (OnScrollListener onScrollListener) {

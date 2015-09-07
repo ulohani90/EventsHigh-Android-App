@@ -1,6 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -32,7 +32,6 @@ import java.util.List;
  */
 public class ContactsFragment extends Fragment {
     private BaseActivity activity;
-    private long lastRefreshTimestamp;
 
     private View topProgressBar;
     private View retryView;
@@ -44,32 +43,10 @@ public class ContactsFragment extends Fragment {
     private boolean hasAskForContactsDialogShown = false;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
-        this.activity = (BaseActivity) activity;
-        lastRefreshTimestamp = 0;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-        VolleyHelper.getRequestQueue(activity).cancelAll(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        refreshIfneeded();
-    }
-
-    @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-
-        refreshIfneeded();
+        this.activity = (BaseActivity) context;
     }
 
     @Override
@@ -118,12 +95,17 @@ public class ContactsFragment extends Fragment {
         });
     }
 
-    private void refreshIfneeded() {
-        if (lastRefreshTimestamp <
-                System.currentTimeMillis() - BaseEventsFragment.DEFAULT_REFRESH_INTERVAL) {
-            refresh(false);
-            lastRefreshTimestamp = System.currentTimeMillis();
-        }
+    @Override
+    public void onStop() {
+        super.onStop();
+        VolleyHelper.getRequestQueue(activity).cancelAll(this);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        refresh(false);
     }
 
     private void refresh(boolean shouldBypassCache) {

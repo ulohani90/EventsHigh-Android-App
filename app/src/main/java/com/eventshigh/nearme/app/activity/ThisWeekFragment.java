@@ -70,7 +70,9 @@ public class ThisWeekFragment extends BaseEventsFragment {
     }
 
     @Override
-    protected void refresh() {
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
         viewPager.post(new Runnable() {
             @Override
             public void run() {

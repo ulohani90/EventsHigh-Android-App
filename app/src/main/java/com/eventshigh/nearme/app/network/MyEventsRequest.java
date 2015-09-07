@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Supports fetching of MyEvents for user -- it includes upcoming events which are marked as
@@ -154,8 +156,8 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
     private static void addEventsToResults(List<TopicEvents> result, String name,
                                            RequestFuture<List<Event>> eventsFuture) {
         try {
-            addToResults(result, name, eventsFuture.get());
-        } catch (InterruptedException | ExecutionException e) {
+            addToResults(result, name, eventsFuture.get(10, TimeUnit.SECONDS));
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
             Crashlytics.getInstance().core.logException(e);
         }
     }
@@ -163,8 +165,8 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
     private static void addCollectionToResults(List<TopicEvents> result, String name,
                                                RequestFuture<EventsCollection> eventsFuture) {
         try {
-            addToResults(result, name, eventsFuture.get().events);
-        } catch (InterruptedException | ExecutionException e) {
+            addToResults(result, name, eventsFuture.get(10, TimeUnit.SECONDS).events);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
             Crashlytics.getInstance().core.logException(e);
         }
     }

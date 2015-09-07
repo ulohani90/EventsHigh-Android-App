@@ -19,9 +19,8 @@ import com.eventshigh.nearme.app.network.EventInvitationsRequest;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
-import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
+import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
@@ -90,18 +89,13 @@ public class ExploreFragment extends BaseEventsFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
 
         ViewPager eventsPager = (ViewPager) exploreGridView.findViewById(R.id.events_pager);
         if (eventsPager != null) {
             eventsPager.getAdapter().notifyDataSetChanged();
         }
-    }
-
-    @Override
-    protected void refresh() {
-        VolleyHelper.getRequestQueue(activity).cancelAll(this);
         FeaturedEventsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                 false, mFetcherCallBack, mErrorListener);
     }
