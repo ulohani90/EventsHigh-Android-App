@@ -100,6 +100,13 @@ public class PlanActivity extends BaseActivity {
     }
 
     public void invite(View view) {
+        int numPeople = contactsView.getObjects().size();
+        if (numPeople == 0) {
+            showMessage("No friend added. Please enter the name of the friends you would like to invite!");
+            return;
+        }
+
+        reportActionToAnalytics("inviteToPlan", planId, numPeople);
         topProgressBar.setVisibility(View.VISIBLE);
 
         publishPlan(new Runnable() {
@@ -162,7 +169,7 @@ public class PlanActivity extends BaseActivity {
                         invitation.put("mobile_nos", mobileNosJson);
                         invitations.put(invitation);
                     }
-                    reportActionToAnalytics("inviteToPlan", planId, invitations.length());
+
 
                     JSONObject req = new JSONObject();
                     req.put("plan_id", planId);
