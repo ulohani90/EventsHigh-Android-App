@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.activity.BaseEventsFragment;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.utils.Utils;
 
 public class SeeAllCard extends ViewHolder {
@@ -24,12 +24,12 @@ public class SeeAllCard extends ViewHolder {
         this.seeAllView = (TextView) cardView.findViewById(R.id.see_all);
     }
 
-    public void bindHeaderView(final BaseEventsFragment eventsFragment, final SeeAllData seeAllData) {
+    public void bindHeaderView(final BaseContextActivity activity, final SeeAllData seeAllData) {
         seeAllView.setText("See All " + Utils.capitalize(seeAllData.category) + " Events");
         seeAllView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                eventsFragment.seeAll();
+                activity.seeAll();
             }
         });
     }

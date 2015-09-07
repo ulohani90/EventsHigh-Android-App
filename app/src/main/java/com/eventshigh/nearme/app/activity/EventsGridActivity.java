@@ -11,29 +11,37 @@ import android.view.Menu;
 import android.view.View;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
 
-
 /**
- * An {@link com.eventshigh.nearme.app.activity.BaseEventsActivity} which shows the events in Grid.
- * On Phone, we have one column in portrait mode and two columns in landscape mode. On Tablet,
- * we try to put more columns as per the width offered.
+ * Shows the events in Grid layout.
  */
-public class EventsGridActivity extends BaseEventsActivity {
+public class EventsGridActivity extends BaseContextActivity {
 
     private boolean showFollowCard;
     private View fabShare;
 
-
-    // ***********************
-    // Delegated Methods from {@link BaseEventsActivity}
-    // ***********************
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setupLayout(R.layout.activity_events_grid);
+
+        if (eventsContext.location == null) {
+            City lastCity = GcmRegistration.getInstance(this).getLastCity();
+            if (lastCity != null) {
+                reportActionToAnalytics("usedLastCity");
+                eventsContext.changeLocation(lastCity.cityBounds.getCenter());
+            }
+        }
+
+        // Show query as title.
+        if (!eventsContext.query.isEmpty()) {
+            setTitle();
+        }
 
         // Fab Share.
         fabShare = findViewById(R.id.fab_share);

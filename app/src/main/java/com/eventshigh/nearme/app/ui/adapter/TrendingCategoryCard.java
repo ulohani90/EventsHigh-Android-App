@@ -35,12 +35,12 @@ public class TrendingCategoryCard extends ViewHolder {
     }
 
     public void populateTrendingCategoryData(final TrendingCategoryData data) {
-        Glide.with(data.eventsFragment).load(data.trendingTopic.imgUrl)
+        Glide.with(data.activity).load(data.trendingTopic.imgUrl)
                 .crossFade().centerCrop()
                 .into(imageView);
         titleView.setText(data.trendingTopic.tagName);
         contactListView.setGravity(Gravity.START);
-        contactListView.setFollowers(data.eventsFragment.getContextActivity(),
+        contactListView.setFollowers(data.activity,
                 data.socialDataProvider.getFollowers(data.trendingTopic.tagName));
 
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) contactListView.getLayoutParams();
@@ -50,7 +50,7 @@ public class TrendingCategoryCard extends ViewHolder {
         itemView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                data.trendingTopic.launch(data.eventsFragment);
+                data.trendingTopic.launch(data.activity);
             }
         });
 
@@ -68,7 +68,7 @@ public class TrendingCategoryCard extends ViewHolder {
         imageView.setImageResource(data.getInfoGraphId());
         titleView.setVisibility(View.GONE);
         contactListView.setGravity(Gravity.END);
-        contactListView.setFollowers(data.eventsFragment.getContextActivity(),
+        contactListView.setFollowers(data.activity,
                 data.socialDataProvider.getFollowers(data.tag));
 
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) contactListView.getLayoutParams();
@@ -78,7 +78,7 @@ public class TrendingCategoryCard extends ViewHolder {
         itemView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                data.eventsFragment.showSearchView(data.tag);
+                data.activity.showSearchView(data.tag);
             }
         });
 

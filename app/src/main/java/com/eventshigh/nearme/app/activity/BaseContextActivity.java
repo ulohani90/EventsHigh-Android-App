@@ -3,7 +3,9 @@ package com.eventshigh.nearme.app.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,16 +20,21 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * An abstact class for activity with context.
+ * Base activity for location aware events listing. This class implements common methods to fetch
+ * fetch event listings when needed and asking the parent activity to show events as per user
+ * interactions.
+ *
+ * This class also implements base user interactions like tabs, filters etc.
  */
 public abstract class BaseContextActivity extends BaseActivity {
     protected EventsContext eventsContext;
@@ -37,6 +44,7 @@ public abstract class BaseContextActivity extends BaseActivity {
 
     // GoogleApiClient to report the page view.
     private GoogleApiClient client;
+    private Action viewAction;
 
     @Override
     protected void onStart() {
@@ -46,23 +54,15 @@ public abstract class BaseContextActivity extends BaseActivity {
         eventsMarkerManager = EventsMarkerManager.getInstance(this);
 
         // Setup GoogleApiClient
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.APP_INDEX_API).build();
-        client.registerConnectionCallbacks(new ConnectionCallbacks() {
-            @Override
-            public void onConnected(Bundle bundle) {
-                if (eventsContext != null) {
-                    Uri webUri = EventsHighEndpoints.getWebUri(eventsContext);
-                    String title = eventsContext.toString();
-                    AppIndex.AppIndexApi.view(client, BaseContextActivity.this, Utils.getAppUri(webUri),
-                            title, webUri, null);
-                }
-            }
+        if (eventsContext != null) {
+            Uri webUri = EventsHighEndpoints.getWebUri(eventsContext);
+            String title = eventsContext.toString();
+            viewAction = Action.newAction(Action.TYPE_VIEW, title, webUri, Utils.getAppUri(webUri));
 
-            @Override
-            public void onConnectionSuspended(int i) {
-                // do nothing.
-            }
-        });
+            client = new GoogleApiClient.Builder(this).addApi(AppIndex.APP_INDEX_API).build();
+            client.connect();
+            AppIndex.AppIndexApi.start(client, viewAction);
+        }
 
         // Show the verify phone snakbar if needed.
         showVerifyPhoneSnackbar();
@@ -73,13 +73,11 @@ public abstract class BaseContextActivity extends BaseActivity {
         super.onStop();
 
         if (client != null && client.isConnected()) {
-            if (eventsContext != null) {
-                Uri webUri = EventsHighEndpoints.getWebUri(eventsContext);
-                AppIndex.AppIndexApi.viewEnd(client, BaseContextActivity.this, Utils.getAppUri(webUri));
+            if (viewAction != null) {
+                AppIndex.AppIndexApi.end(client, viewAction);
             }
             client.disconnect();
         }
-
     }
 
     @Override
@@ -125,6 +123,29 @@ public abstract class BaseContextActivity extends BaseActivity {
     @Override
     public View getViewForSnackbar() {
         return toolbar;
+    }
+
+    protected void setupLayout(@LayoutRes int layoutResID) {
+        // Setup the UI.
+        setContentView(layoutResID);
+
+        // Setup action bar.
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // See if we have context passed to us within intent.
+        eventsContext = IntentUtils.processIntent(this, getIntent());
+    }
+
+    protected void setTitle() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            String title = DateTimeUtils.queryToTitle(eventsContext.query);
+            if (!eventsContext.dateFilter.isEmpty()) {
+                title += " on " +  DateTimeUtils.queryToTitle(eventsContext.dateFilter);
+            }
+            actionBar.setTitle(title);
+        }
     }
 
     protected void switchTo(Class<?> cls) {
@@ -259,5 +280,13 @@ public abstract class BaseContextActivity extends BaseActivity {
         Intent detailIntent = new Intent(this, EventDetailActivity.class);
         detailIntent.putExtra(EventDetailActivity.EXTRA_EVENT_PARAM, event);
         startActivity(detailIntent, bundle);
+    }
+
+    public void seeAll() {
+        reportActionToAnalytics("seeAll", eventsContext.getLabel());
+        EventsContext param = new EventsContext(eventsContext.location, eventsContext.query);
+        Intent intent = new Intent(this, this.getClass())
+                .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
+        startActivity(intent);
     }
 }

@@ -2,15 +2,15 @@ package com.eventshigh.nearme.app.ui.adapter;
 
 import android.support.v7.widget.RecyclerView.ViewHolder;
 
-import com.eventshigh.nearme.app.activity.BaseEventsFragment;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 
 public class SeeAllData implements AdapterData {
     public final String category;
-    public final BaseEventsFragment eventsFragment;
+    public final BaseContextActivity activity;
 
-    SeeAllData(BaseEventsFragment eventsFragment, String category) {
+    SeeAllData(BaseContextActivity activity, String category) {
         this.category = category;
-        this.eventsFragment = eventsFragment;
+        this.activity = activity;
     }
 
     @Override
@@ -20,7 +20,7 @@ public class SeeAllData implements AdapterData {
 
     @Override
     public void onBindViewHolder(ViewHolder card, int position) {
-        ((SeeAllCard) card).bindHeaderView(eventsFragment, this);
+        ((SeeAllCard) card).bindHeaderView(activity, this);
     }
 
     @Override

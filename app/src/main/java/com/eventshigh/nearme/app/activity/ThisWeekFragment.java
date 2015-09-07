@@ -1,7 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.Tab;
@@ -44,9 +44,8 @@ public class ThisWeekFragment extends BaseEventsFragment {
     private int numDays;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.activity = (BaseContextActivity) activity;
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
         numDays = getArguments().getInt(NUM_DAYS_PARAM);
     }

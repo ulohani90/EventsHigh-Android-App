@@ -14,7 +14,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
-import com.eventshigh.nearme.app.activity.BaseEventsFragment;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
@@ -82,21 +81,14 @@ public class EventCard extends ViewHolder {
     }
 
     public void bindEventView(final Event event, boolean isFirstEvent, final int position,
-                              final BaseEventsFragment eventsFragment,
+                              final BaseContextActivity activity,
                               @Nullable SocialInvite invite) {
-        bindEventView(event, eventsFragment.getContextActivity());
-        itemView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                eventsFragment.showEventDetails(event, null);
-            }
-        });
+        bindEventView(event, activity);
 
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
 
         // Set the travel time.
-        String travelTime = LocationUtils.getTravelTime(eventsFragment.getContextActivity(),
-                eventsFragment.getContextActivity().getUserLocation(), event.location);
+        String travelTime = LocationUtils.getTravelTime(activity, activity.getUserLocation(), event.location);
         if (travelTime != null) {
             travelTimeView.setText(travelTime);
             travelTimeView.setVisibility(View.VISIBLE);
@@ -106,16 +98,16 @@ public class EventCard extends ViewHolder {
 
         // Set actions handlers.
         favouriteView.setVisibility(View.VISIBLE);
-        setFavouriteView(eventsFragment.getContextActivity().getEventMark(event));
+        setFavouriteView(activity.getEventMark(event));
         favouriteView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 EventMark oldMark = (EventMark) favouriteView.getTag();
                 EventMark newMark = EventMark.isFavourite(oldMark) ? null : EventMark.FAVOURITE;
-                eventsFragment.getContextActivity().reportEventAction(event,
-                        EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
-                        position);
-                eventsFragment.getContextActivity().recordEventMark(event, newMark);
+                activity.reportEventAction(event,
+                    EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
+                    position);
+                activity.recordEventMark(event, newMark);
                 setFavouriteView(newMark);
             }
         });
@@ -123,7 +115,7 @@ public class EventCard extends ViewHolder {
         // Is user invited to this event ?
         if (invite != null && invite.getInvitedBy() != null) {
             invitedByView.setVisibility(View.VISIBLE);
-            invitedByView.setFollowers(eventsFragment.getContextActivity(), invite.getAllInvitedBy());
+            invitedByView.setFollowers(activity, invite.getAllInvitedBy());
             infoArrowView.setVisibility(View.VISIBLE);
         } else if (event.numViews > 5) {
             eventStatsView.setVisibility(View.VISIBLE);

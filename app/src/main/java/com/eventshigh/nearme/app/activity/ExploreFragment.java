@@ -80,7 +80,7 @@ public class ExploreFragment extends BaseEventsFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        eventsAdapter = new EventsAdapter(this);
+        eventsAdapter = new EventsAdapter(activity);
         exploreGridView = (AutofitRecyclerView) view.findViewById(R.id.explore_grid);
         exploreGridView.setAdapter(eventsAdapter);
         exploreGridView.addOnScrollListener(new HideActionBarOnScroll(activity));

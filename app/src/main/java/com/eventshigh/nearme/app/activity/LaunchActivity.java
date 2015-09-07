@@ -18,7 +18,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -86,17 +85,13 @@ public class LaunchActivity extends BaseContextActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setupLayout(R.layout.activity_launch);
 
         // Set View.
-        setContentView(R.layout.activity_launch);
         drawer = (DrawerLayout) findViewById(R.id.nav_drawer);
         tabsView = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         citySelector = (ListView) findViewById(R.id.city_selector);
-
-        // Setup the actionbar.
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         // Setup the Drawer Layout.
         drawerToggle = new ActionBarDrawerToggle(this, drawer, R.string.app_name, R.string.title_activity_settings);
@@ -107,6 +102,10 @@ public class LaunchActivity extends BaseContextActivity {
             actionBar.setHomeButtonEnabled(true);
         }
 
+        if (isFinishing()) {
+            return;
+        }
+
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
 
@@ -114,7 +113,6 @@ public class LaunchActivity extends BaseContextActivity {
         gcmRegistration = GcmRegistration.getInstance(this);
 
         // Process the incoming intent.
-        eventsContext = IntentUtils.processIntent(this, getIntent());
         String tabName= getIntent().getStringExtra(DEFAULT_TAB_PARAM);
         if (tabName != null) {
             for (int i = 0 ; i < TABS.length; i++) {
@@ -123,9 +121,6 @@ public class LaunchActivity extends BaseContextActivity {
                     break;
                 }
             }
-        }
-        if (isFinishing()) {
-            return;
         }
 
         // Setup the weekly alarms which are used for notification.

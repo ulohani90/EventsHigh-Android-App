@@ -5,17 +5,17 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.activity.BaseEventsFragment;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.EventCategory;
 
 public class ExploreCategoryData implements AdapterData {
     public final String tag;
-    public final BaseEventsFragment eventsFragment;
+    public final BaseContextActivity activity;
     public final SocialDataProvider socialDataProvider;
 
-    public ExploreCategoryData(String tag, BaseEventsFragment eventsFragment, SocialDataProvider socialDataProvider) {
+    public ExploreCategoryData(String tag, BaseContextActivity activity, SocialDataProvider socialDataProvider) {
         this.tag = tag;
-        this.eventsFragment = eventsFragment;
+        this.activity = activity;
         this.socialDataProvider = socialDataProvider;
     }
 

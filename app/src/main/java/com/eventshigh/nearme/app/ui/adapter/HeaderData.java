@@ -2,18 +2,21 @@ package com.eventshigh.nearme.app.ui.adapter;
 
 import android.support.v7.widget.RecyclerView.ViewHolder;
 
-import com.eventshigh.nearme.app.activity.BaseEventsFragment;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
+import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 
 public class HeaderData implements AdapterData {
     public final String header;
     public final int numEvents;
-    public final BaseEventsFragment eventsFragment;
+    public final BaseContextActivity activity;
+    public final EventsContext eventsContext;
 
-    public HeaderData(BaseEventsFragment eventsFragment, String header, int numEvents) {
+    public HeaderData(BaseContextActivity activity, EventsContext eventsContext, String header, int numEvents) {
         this.header = header;
         this.numEvents = numEvents;
-        this.eventsFragment = eventsFragment;
+        this.activity = activity;
+        this.eventsContext = eventsContext;
     }
 
     public boolean showMore() {
@@ -27,7 +30,7 @@ public class HeaderData implements AdapterData {
 
     @Override
     public void onBindViewHolder(ViewHolder card, int position) {
-        ((HeaderCard) card).bindHeaderView(eventsFragment, this);
+        ((HeaderCard) card).bindHeaderView(this);
     }
 
     @Override

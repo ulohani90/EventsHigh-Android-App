@@ -2,18 +2,18 @@ package com.eventshigh.nearme.app.ui.adapter;
 
 import android.support.v7.widget.RecyclerView.ViewHolder;
 
-import com.eventshigh.nearme.app.activity.BaseEventsFragment;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.Event;
 
 import java.util.List;
 
 public class EventPagerData implements AdapterData {
     public final List<Event> events;
-    public final BaseEventsFragment eventsFragment;
+    public final BaseContextActivity activity;
 
-    EventPagerData(BaseEventsFragment eventsFragment, List<Event> events) {
+    EventPagerData(BaseContextActivity activity, List<Event> events) {
         this.events = events;
-        this.eventsFragment = eventsFragment;
+        this.activity = activity;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class EventPagerData implements AdapterData {
 
     @Override
     public void onBindViewHolder(ViewHolder card, int position) {
-        ((EventPagerCard) card).bindHeaderView(eventsFragment.getContextActivity(), this);
+        ((EventPagerCard) card).bindHeaderView(activity, this);
     }
 
     @Override

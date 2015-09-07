@@ -1,6 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -26,8 +26,8 @@ import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
+import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
@@ -62,8 +62,8 @@ public class EventsFragment extends BaseEventsFragment {
         return fragment;
     }
 
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
         showEhInviteForNotification = getArguments().getBoolean(SHOW_EH_INVITE_NOTIFICATION_PARAM);
         if (onScrollListener == null) {
@@ -79,7 +79,7 @@ public class EventsFragment extends BaseEventsFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         // Setup the events adapter to show data.
-        eventsAdapter = new EventsAdapter(this);
+        eventsAdapter = new EventsAdapter(activity);
         eventGridView = (AutofitRecyclerView) view.findViewById(R.id.event_grid);
         eventGridView.setAdapter(eventsAdapter);
 
@@ -102,7 +102,7 @@ public class EventsFragment extends BaseEventsFragment {
         view.findViewById(R.id.explore_events).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                showSearchView("today");
+                activity.showSearchView("today");
             }
         });
 
@@ -196,7 +196,7 @@ public class EventsFragment extends BaseEventsFragment {
             }
 
             if (!isIntermediate || !myEvents.isEmpty()) {
-                eventsAdapter.setTopicEvents(myEvents, eventGridView.getSpanCount() * 2);
+                eventsAdapter.setTopicEvents(myEvents, eventsContext, eventGridView.getSpanCount() * 2);
             }
         }
     };

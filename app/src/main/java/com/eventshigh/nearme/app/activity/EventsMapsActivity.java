@@ -14,6 +14,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
@@ -21,6 +22,7 @@ import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.ui.adapter.EventCard;
 import com.eventshigh.nearme.app.ui.MapMarkerManager;
+import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -43,7 +45,7 @@ import java.util.Set;
  * Maps activity which shows users events happening in given locality. The events are marked
  * across Map and user can zoom in, zoom out or move around the map to discover more events.
  */
-public class EventsMapsActivity extends BaseEventsActivity {
+public class EventsMapsActivity extends BaseContextActivity {
 
     // ***********************
     // CONSTANTS
@@ -71,8 +73,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private FrameLayout eventCardContainer;
     // Last marker for which the event info card is shown.
     private Marker lastSelectedMarker;
-    // is the movement in camera position is because of app ?
-    private boolean isAppMovement = true;
 
     // ***********************
     // Delegated Methods from {@link BaseEventsActivity}
@@ -81,9 +81,22 @@ public class EventsMapsActivity extends BaseEventsActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setupLayout(R.layout.activity_event_maps);
 
-        // Setup the UI.
-        getLayoutInflater().inflate(R.layout.activity_event_maps, eventContainer);
+        if (eventsContext.location == null) {
+            City lastCity = GcmRegistration.getInstance(this).getLastCity();
+            if (lastCity != null) {
+                reportActionToAnalytics("usedLastCity");
+                eventsContext.changeLocation(lastCity.cityBounds.getCenter());
+            }
+        }
+
+        // Show query as title.
+        if (!eventsContext.query.isEmpty()) {
+            setTitle();
+        }
+
+        // Setup the view.
         topProgressBar = findViewById(R.id.top_progress_bar);
         setUpMap();
         setupGestureDetectorIfNeeded();
@@ -93,7 +106,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
             finish();
         }
     }
-
 
     // ***********************
     // Helper Methods
@@ -116,14 +128,13 @@ public class EventsMapsActivity extends BaseEventsActivity {
             return;
         }
 
-        isAppMovement = true;
         map.animateCamera(
-                CameraUpdateFactory.newCameraPosition(
-                        CameraPosition.builder()
-                                .target(userLocation)
-                                .zoom(Math.max(map.getCameraPosition().zoom, DEFAULT_ZOOM_LEVEL))
-                                .build()
-                )
+            CameraUpdateFactory.newCameraPosition(
+                CameraPosition.builder()
+                    .target(userLocation)
+                    .zoom(Math.max(map.getCameraPosition().zoom, DEFAULT_ZOOM_LEVEL))
+                    .build()
+            )
         );
     }
 
@@ -139,8 +150,9 @@ public class EventsMapsActivity extends BaseEventsActivity {
                 map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
                 map.setOnMapClickListener(mOnMapClickListener);
 
-                updateUserLocation(eventsContext.location);
+                LatLng location = eventsContext.location;
                 eventsContext.changeLocation(null);
+                updateUserLocation(location);
             }
         });
     }
@@ -213,9 +225,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
     private OnCameraChangeListener mOnCameraChangeListener = new OnCameraChangeListener() {
         @Override
         public void onCameraChange(CameraPosition cameraPosition) {
-            if (!isAppMovement && lastSelectedMarker == null) {
-                reportActionToAnalytics("onCameraChange");
-            }
             boolean isInfoWindowShown = mapMarkerManager.updateListingForProjection(map.getProjection());
             if (!isInfoWindowShown) {
                 mOnMapClickListener.onMapClick(null);
@@ -224,7 +233,6 @@ public class EventsMapsActivity extends BaseEventsActivity {
             if (!eventsContext.changeLocation(cameraPosition.target)) {
                 fetchEvents();
             }
-            isAppMovement = false;
         }
     };
 
