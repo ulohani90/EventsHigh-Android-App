@@ -2,7 +2,9 @@ package com.eventshigh.nearme.app.activity;
 
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
@@ -40,6 +42,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TimeZone;
 
 import io.fabric.sdk.android.Fabric;
@@ -364,5 +368,24 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (isPlayServicesPresent) {
             gaHelper.reportCampaignParams(campaignData);
         }
+    }
+
+    private static final Set<String> INSTALLED_PACKAGES = new HashSet<>();
+    protected boolean isInstalled(String packageName) {
+        return isInstalled(this, packageName);
+    }
+
+    public static boolean isInstalled(Context context, String packageName) {
+        synchronized (INSTALLED_PACKAGES) {
+            if (INSTALLED_PACKAGES.isEmpty()) {
+                for(PackageInfo packageInfo : context.getPackageManager().getInstalledPackages(0)) {
+                    if (packageInfo.versionName != null && packageInfo.applicationInfo.enabled) {
+                        INSTALLED_PACKAGES.add(packageInfo.packageName);
+                    }
+                }
+            }
+        }
+
+        return INSTALLED_PACKAGES.contains(packageName);
     }
 }

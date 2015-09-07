@@ -58,7 +58,7 @@ public class BlogEntryActivity extends BaseActivity {
         super.onStart();
 
         String action = getIntent().getAction();
-        if (BaseActivity.NOTIFICATION_ACTION.equals(action)) {
+        if (action != null && action.startsWith(BaseActivity.NOTIFICATION_ACTION)) {
             reportActionToAnalytics("openNotification", getIntent().getData().getLastPathSegment());
         }
 
