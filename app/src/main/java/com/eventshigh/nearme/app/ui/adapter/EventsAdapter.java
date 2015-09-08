@@ -20,6 +20,7 @@ import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView.SpanAllColumnLookup;
+import com.facebook.share.widget.AppInviteDialog;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -66,6 +67,15 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         }
         if (showEhInviteForNotification) {
             dataToShow.add(new EhInviteNotificationData(activity));
+        }
+
+        if (AppInviteDialog.canShow()) {
+            if (events.size() > 2) {
+                dataToShow.add(2, new FacebookAppInviteData(activity));
+            }
+            if (events.size() > 10 && !showEhInviteForNotification) {
+                dataToShow.add(new FacebookAppInviteData(activity));
+            }
         }
         notifyDataSetChanged();
     }

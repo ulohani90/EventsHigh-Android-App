@@ -701,7 +701,7 @@
                 android:layout_weight="2"
                 android:gravity="center"
                 android:elevation="4dp"
-                android:text="@string/action_check_friends"
+                android:text="@string/action_share"
                 android:onClick="checkWithFriends"
                 android:visibility="gone"
                 tools:visibility="visible"

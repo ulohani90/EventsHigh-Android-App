@@ -141,7 +141,6 @@
     <string name="invite_friends">Invite  your  friends</string>
     <string name="no_friends_on_eh">We couldn\'t find any friends for you on EventsHigh. Why not invite them?</string>
     <string name="no_friends_disclaimer">If you have recently given us the permission to your contacts, it might take us up to 30 minutes to find friends.</string>
-    <string name="invite_to_plan">Hey! %1$s has invited you to %2$s @ %3$s.\n\nTo accept the invitation, please install the EventsHigh app using this link: %4$s.\n\nCome join EventsHigh. Life is so endlessly delicious.</string>
 
     <!-- Zendesk -->
     <string name="contact_fragment_description_hint">Enter your query</string>

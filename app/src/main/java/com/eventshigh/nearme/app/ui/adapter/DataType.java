@@ -20,7 +20,8 @@ public enum DataType {
     EVENT_INVITATION(9),
     SOCIAL_FRIEND(10),
     EH_INVITE(11),
-    EH_INVITE_NOTIFICATION(12);
+    EH_INVITE_NOTIFICATION(12),
+    FACEBOOK_APP_INVITE(13);
 
     public final int typeId;
 
@@ -81,6 +82,10 @@ public enum DataType {
 
         if (typeId == EH_INVITE_NOTIFICATION.typeId) {
             return EhInviteNotificationCard.newInstance(activity, parent);
+        }
+
+        if (typeId == FACEBOOK_APP_INVITE.typeId) {
+            return FacebookAppInviteCard.newInstance(activity, parent);
         }
 
         throw new IllegalArgumentException("invalid typeid");

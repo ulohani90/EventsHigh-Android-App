@@ -46,6 +46,7 @@ import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
+import com.eventshigh.nearme.app.ui.InviteFriendsDialog;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
@@ -97,6 +98,7 @@ public class EventDetailActivity extends BaseActivity {
     private String planId = null;
     private GoogleApiClient client;
     private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
+    private boolean showInviteDialog = false;
     private boolean addToFavourite = false;
 
 
@@ -194,6 +196,9 @@ public class EventDetailActivity extends BaseActivity {
         if (showRateAppDialog) {
             RateAppDialog.show(this);
             showRateAppDialog = false;
+        } else if (showInviteDialog) {
+            InviteFriendsDialog.show(this, event, planId);
+            showInviteDialog = false;
         }
 
         if (addToFavourite && event != null && !isFavourite(event)) {
@@ -231,6 +236,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openSourceSite(View view) {
+        showInviteDialog = true;
         reportEventAction(event, "organizer", view.getId() == R.id.join_event ? "joinEvent" : "openSource");
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.sourceUrl));
@@ -248,7 +254,7 @@ public class EventDetailActivity extends BaseActivity {
             return;
         }
 
-        showRateAppDialog = true;
+        showInviteDialog = true;
         addToFavourite = true;
         reportEventAction(event, "organizer", "call");
 
@@ -258,6 +264,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openOrganizerLink(View view) {
+        showInviteDialog = true;
         reportEventAction(event, "organizer", "openLink");
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerLink));
@@ -265,6 +272,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openOrganizerWebsite(View view) {
+        showInviteDialog = true;
         reportEventAction(event, "organizer", "openWebsite");
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerWebsite));
@@ -824,6 +832,7 @@ public class EventDetailActivity extends BaseActivity {
                 organizerEmailView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        showInviteDialog = true;
                         reportEventAction(event, "organizer", "email");
                         askOverEmail();
                     }

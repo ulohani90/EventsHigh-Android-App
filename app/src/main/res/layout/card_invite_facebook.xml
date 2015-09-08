@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="160dp"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:descendantFocusability="blocksDescendants"
+    android:background="#FFF1F1E9"
+>
+    <TextView
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:gravity="center"
+        android:fontFamily="sans-serif-light"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:text="EventsHigh is better with friends"
+        tools:ignore="HardcodedText"
+    />
+    <TextView
+        style="?android:attr/textAppearanceSmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginTop="50dp"
+        android:padding="10dp"
+        android:gravity="center"
+        android:fontFamily="sans-serif-light"
+        android:textSize="14sp"
+        android:textColor="#FF383F3F"
+        android:text="The more, The merrier"
+        tools:ignore="HardcodedText"
+    />
+
+    <TextView
+        android:id="@+id/share_app"
+        style="@style/EHButtonCTA"
+        android:clickable="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="9dp"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_margin="16dp"
+        android:textColor="@android:color/white"
+        android:text="@string/invite_friends"
+    />
+</FrameLayout>
