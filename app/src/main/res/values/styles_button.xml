@@ -9,7 +9,7 @@
     </style>
     <style name="EHButtonCTA" parent="EHButton">
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-medium"</item>
+        <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-medium</item>
         <item name="android:background">@drawable/eh_button_cta</item>
     </style>
     <style name="EHButtonCTATransparent" parent="EHButton">

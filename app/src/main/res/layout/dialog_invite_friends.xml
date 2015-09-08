@@ -42,13 +42,19 @@
 
     <TextView
         android:id="@+id/invite_button"
-        style="@style/EHButtonCTA"
         android:background="@drawable/eh_button_invite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:padding="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
         android:elevation="4dp"
+        android:clickable="true"
+        android:textColor="@android:color/white"
+        android:textAllCaps="true"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/action_share"
         tools:ignore="UnusedAttribute"
     />
