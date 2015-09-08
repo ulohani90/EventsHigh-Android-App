@@ -187,9 +187,10 @@ public class EventsFragment extends BaseEventsFragment {
                 topProgressBar.setVisibility(View.GONE);
 
                 if (myEvents.isEmpty()) {
-                    if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
+                    if (EventsHighEndpoints.isMyEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
                         noMyEventsView.setVisibility(View.VISIBLE);
                     } else {
+                        noMyEventsView.setVisibility(View.GONE);
                         retryView.setVisibility(View.VISIBLE);
                     }
                 }

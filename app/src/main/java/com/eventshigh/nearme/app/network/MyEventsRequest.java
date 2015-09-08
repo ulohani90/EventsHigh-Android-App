@@ -74,6 +74,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
     private final Listener<List<TopicEvents>> listener;
     private final ErrorListener errorListener;
     private final Object tag;
+    private boolean isRequestCancelled = false;
 
     public MyEventsRequest(Context context, EventsContext eventsContext, Priority priority,
                            Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
@@ -130,16 +131,24 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
                 shouldBypassCache, true, invitedEvents, invitedEvents);
 
         // Build Result.
-        addEventsToResults(result, INVITATIONS_NAME, invitedEvents);
-        addEventsToResults(result, FAVOURITES_NAME, favEvents);
-        for (Entry<String, RequestFuture<EventsCollection>> interestEvents : interestsEvents.entrySet()) {
-            addCollectionToResults(result, interestEvents.getKey(), interestEvents.getValue());
+        try {
+            addEventsToResults(result, INVITATIONS_NAME, invitedEvents);
+            addEventsToResults(result, FAVOURITES_NAME, favEvents);
+            for (Entry<String, RequestFuture<EventsCollection>> interestEvents : interestsEvents.entrySet()) {
+                addCollectionToResults(result, interestEvents.getKey(), interestEvents.getValue());
+            }
+            return result;
+        } catch (RequestCancelledException e) {
+            isRequestCancelled = true;
+            return null;
         }
-
-        return result;
     }
 
     protected void onPostExecute(@Nullable List<TopicEvents> result) {
+        if (isRequestCancelled) {
+            return;
+        }
+
         if (result != null) {
             listener.onResponse(result, false);
         } else {
@@ -154,20 +163,30 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
     }
 
     private static void addEventsToResults(List<TopicEvents> result, String name,
-                                           RequestFuture<List<Event>> eventsFuture) {
+            RequestFuture<List<Event>> eventsFuture) throws RequestCancelledException {
         try {
             addToResults(result, name, eventsFuture.get(10, TimeUnit.SECONDS));
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            if (eventsFuture.isCancelled()) {
+                throw new RequestCancelledException();
+            }
             Crashlytics.getInstance().core.logException(e);
         }
     }
 
     private static void addCollectionToResults(List<TopicEvents> result, String name,
-                                               RequestFuture<EventsCollection> eventsFuture) {
+            RequestFuture<EventsCollection> eventsFuture) throws RequestCancelledException {
         try {
             addToResults(result, name, eventsFuture.get(10, TimeUnit.SECONDS).events);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            if (eventsFuture.isCancelled()) {
+                throw new RequestCancelledException();
+            }
             Crashlytics.getInstance().core.logException(e);
         }
+    }
+
+    private static class RequestCancelledException extends Exception {
+
     }
 }

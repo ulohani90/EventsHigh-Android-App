@@ -1,17 +1,17 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
-import android.app.Activity;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 
+import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.facebook.share.model.AppInviteContent;
 import com.facebook.share.widget.AppInviteDialog;
 
 public class FacebookAppInviteData implements AdapterData {
-    private final Activity activity;
+    private final BaseActivity activity;
 
-    public FacebookAppInviteData(Activity activity) {
+    public FacebookAppInviteData(BaseActivity activity) {
         this.activity = activity;
     }
 
@@ -25,9 +25,10 @@ public class FacebookAppInviteData implements AdapterData {
         card.itemView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                activity.reportActionToAnalytics("fbAppInvite");
                 AppInviteContent content = new AppInviteContent.Builder()
                         .setApplinkUrl("https://fb.me/419675911562215")
-                        .setPreviewImageUrl("https://assets.eventshigh.com/trending_topics/party.jpg")
+                        .setPreviewImageUrl("https://assets.eventshigh.com/trending_topics/fbinvite.jpg")
                         .build();
                 AppInviteDialog.show(activity, content);
             }

@@ -47,6 +47,7 @@
         android:layout_gravity="center_horizontal|bottom"
         android:layout_margin="16dp"
         android:textColor="@android:color/white"
-        android:text="@string/invite_friends"
+        android:text="Invite Facebook friends"
+        tools:ignore="HardcodedText"
     />
 </FrameLayout>
