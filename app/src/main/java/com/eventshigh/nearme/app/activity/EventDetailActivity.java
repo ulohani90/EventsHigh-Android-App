@@ -257,6 +257,7 @@ public class EventDetailActivity extends BaseActivity {
         showInviteDialog = true;
         addToFavourite = true;
         reportEventAction(event, "organizer", "call");
+        new UserActionHelper(this).recordAction(EventAction.CALL, event.id);
 
         Intent intent = new Intent(Intent.ACTION_DIAL)
                 .setData(Uri.parse("tel:" + (event.organizerPhone.split(",")[0])));

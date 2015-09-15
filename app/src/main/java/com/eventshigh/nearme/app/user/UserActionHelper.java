@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONException;
@@ -21,6 +22,7 @@ public class UserActionHelper {
         ADD_FAVORITE,
         REMOVE_FAVORITE,
         BOOK,
+        CALL,
         SAVE,
         SHARE,
         VIEW_EVENT,
@@ -49,7 +51,7 @@ public class UserActionHelper {
             }
             recordAction(EventAction.SHARE.name().toLowerCase(), jsonObject.toString());
         } catch (JSONException e) {
-            e.printStackTrace();
+            Crashlytics.getInstance().core.logException(e);
         }
     }
 
@@ -59,7 +61,7 @@ public class UserActionHelper {
             jsonObject.put(JSON_KEY_EVENT_ID, eventId);
             recordAction(action.name().toLowerCase(), jsonObject.toString());
         } catch (JSONException e) {
-            e.printStackTrace();
+            Crashlytics.getInstance().core.logException(e);
         }
     }
 
@@ -69,7 +71,7 @@ public class UserActionHelper {
             jsonObject.put(JSON_KEY_INTEREST, interest);
             recordAction(action.name().toLowerCase(), jsonObject.toString());
         } catch (JSONException e) {
-            e.printStackTrace();
+            Crashlytics.getInstance().core.logException(e);
         }
     }
 
