@@ -65,6 +65,8 @@ public class Event implements Parcelable {
     public final double maxPrice;
     @Nullable public final String currency;
 
+    public final EventDescriptionSection[] descriptionSections;
+
     public Event(String id, City city, String title, EventCategory category,
                  @Nullable String offerTitle, String description, String[] tags,
                  @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
@@ -75,7 +77,8 @@ public class Event implements Parcelable {
                  String[] performers,
                  String organizerName, String organizerPhone, String organizerWebsite,
                  String organizerEmail, String organizerLink,
-                 double minPrice, double maxPrice, @Nullable String currency) {
+                 double minPrice, double maxPrice, @Nullable String currency,
+                 EventDescriptionSection[] descriptionSections) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -113,6 +116,8 @@ public class Event implements Parcelable {
         this.minPrice = minPrice;
         this.maxPrice = maxPrice;
         this.currency = Utils.checkIfUnknown(currency);
+
+        this.descriptionSections = descriptionSections;
     }
 
     public Uri getEventDetailsURI() {
@@ -210,6 +215,8 @@ public class Event implements Parcelable {
         dest.writeDouble(minPrice);
         dest.writeDouble(maxPrice);
         dest.writeString(emptyIfNull(currency));
+
+        dest.writeParcelableArray(descriptionSections, flags);
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -253,7 +260,9 @@ public class Event implements Parcelable {
 
                             in.readDouble(),
                             in.readDouble(),
-                            in.readString()
+                            in.readString(),
+
+                            in.createTypedArray(EventDescriptionSection.CREATOR)
                     );
                 }
 
@@ -454,6 +463,13 @@ public class Event implements Parcelable {
             }
         }
 
+        // Event Description Sections.
+        List<EventDescriptionSection> descriptionSections = new ArrayList<>();
+        JSONArray descriptionSectionsJson = eventJson.optJSONArray("description_sections");
+        if (descriptionSectionsJson != null) {
+            descriptionSections = EventDescriptionSection.fromJSON(descriptionSectionsJson);
+        }
+
         return new Event(id,
                 city,
                 title,
@@ -490,7 +506,9 @@ public class Event implements Parcelable {
 
                 minPrice,
                 maxPrice,
-                currency
+                currency,
+
+                descriptionSections.toArray(new EventDescriptionSection[descriptionSections.size()])
         );
     }
 

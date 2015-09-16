@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -35,6 +36,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventDescriptionSection;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
@@ -663,6 +665,7 @@ public class EventDetailActivity extends BaseActivity {
             bgView.setLayoutParams(params);
         }
 
+        @SuppressLint("SetTextI18n")
         private void populateView(final Event event) {
             eventScrollView.getViewTreeObserver().addOnScrollChangedListener(
                     new OnScrollChangedListener() {
@@ -810,7 +813,6 @@ public class EventDetailActivity extends BaseActivity {
                 descriptionView.loadData(html, "text/html; charset=UTF-8", null);
                 WebSettings webSettings = descriptionView.getSettings();
                 webSettings.setDefaultFontSize(12);
-                descriptionHeaderView.setVisibility(View.VISIBLE);
             }
 
             // Organizer Info.
@@ -853,6 +855,19 @@ public class EventDetailActivity extends BaseActivity {
             }
 
             organizerHeader.setVisibility(organizerInfoShown ? View.VISIBLE : View.GONE);
+
+            // Event Description Section.
+            LinearLayout eventContainer = (LinearLayout) findViewById(R.id.event_container);
+            for (EventDescriptionSection descriptionSection : event.descriptionSections) {
+                View descriptionSectionView = getLayoutInflater().inflate(R.layout.view_description_section, eventContainer, false);
+                ((TextView) descriptionSectionView.findViewById(R.id.description_header)).setText(descriptionSection.name);
+                String html = "<body>" + descriptionSection.description + "</body>";
+                WebView descriptionView = (WebView) descriptionSectionView.findViewById(R.id.event_description);
+                descriptionView.loadData(html, "text/html; charset=UTF-8", null);
+                WebSettings webSettings = descriptionView.getSettings();
+                webSettings.setDefaultFontSize(12);
+                eventContainer.addView(descriptionSectionView);
+            }
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {

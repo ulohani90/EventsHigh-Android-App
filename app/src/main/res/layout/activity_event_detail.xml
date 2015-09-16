@@ -95,6 +95,7 @@
                     android:drawableLeft="@drawable/ic_person_black_18dp"
                     android:drawableStart="@drawable/ic_person_black_18dp"
                     android:drawablePadding="4dp"
+                    android:textIsSelectable="false"
                     tools:text="1049 views, 23 favourited"
                 />
                 <com.eventshigh.nearme.app.view.ContactListView
@@ -225,6 +226,7 @@
                     android:layout_toLeftOf="@+id/event_travel_time"
                     android:layout_toStartOf="@+id/event_travel_time"
                     android:textColor="#A3000000"
+                    android:textIsSelectable="false"
                     android:transitionName="event_venue"
                     tools:ignore="UnusedAttribute"
                     tools:text="Counter Culture"
@@ -240,6 +242,7 @@
                     android:layout_toLeftOf="@+id/event_travel_time"
                     android:layout_toStartOf="@+id/event_travel_time"
                     android:textColor="#999197A3"
+                    android:textIsSelectable="false"
                     tools:text="Whitefield, Bangalore."
                 />
                 <TextView
@@ -254,6 +257,7 @@
                     android:drawableTop="@drawable/ic_local_taxi_grey600_12dp"
                     android:drawablePadding="4dp"
                     android:transitionName="event_travel_time"
+                    android:textIsSelectable="false"
                     tools:ignore="UnusedAttribute"
                     tools:text="30 min"
                 />
@@ -303,6 +307,7 @@
                         android:layout_toRightOf="@+id/event_time_icon"
                         android:layout_toEndOf="@+id/event_time_icon"
                         android:textColor="#A3000000"
+                        android:textIsSelectable="false"
                         android:transitionName="event_time"
                         tools:ignore="UnusedAttribute"
                         tools:text="Wed, 14 Jan at 9:30 AM"
@@ -316,6 +321,7 @@
                         android:layout_toEndOf="@+id/event_time_icon"
                         android:layout_below="@+id/event_time"
                         android:textColor="#999197A3"
+                        android:textIsSelectable="false"
                         tools:text="2 days from now"
                     />
                 </RelativeLayout>
@@ -428,6 +434,7 @@
                     android:layout_marginTop="18dp"
                     android:gravity="start"
                     android:textColor="#CC383F3F"
+                    android:textIsSelectable="false"
                     tools:ignore="UnusedAttribute"
                     tools:text="₹ 200 - 500"
                 />
@@ -504,9 +511,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
-                android:ellipsize="end"
                 android:textColor="#CC383F3F"
-                tools:text="...\n,,,\n---"
             />
             <TextView
                 android:id="@+id/event_from"
@@ -560,6 +565,7 @@
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:textColor="#CC222222"
+                    android:textIsSelectable="true"
                     tools:text="Counter Culture"
                 />
             </LinearLayout>
@@ -600,6 +606,7 @@
                     android:textColor="@color/link_color"
                     android:background="?android:attr/selectableItemBackground"
                     android:clickable="true"
+                    android:textIsSelectable="true"
                     tools:text="parag@eventshigh.com"
                 />
             </LinearLayout>
@@ -627,6 +634,7 @@
                     android:textColor="@color/link_color"
                     android:background="?android:attr/selectableItemBackground"
                     android:clickable="true"
+                    android:textIsSelectable="true"
                     android:onClick="call"
                     tools:text="+91-9900439770"
                 />
@@ -655,6 +663,7 @@
                     android:textColor="@color/link_color"
                     android:background="?android:attr/selectableItemBackground"
                     android:clickable="true"
+                    android:textIsSelectable="true"
                     android:onClick="openOrganizerWebsite"
                     tools:text="www.eventshigh.com"
                 />
