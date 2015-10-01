@@ -429,7 +429,7 @@ public class Event implements Parcelable {
                 }
 
                 double value = ehPrice.optDouble("discount_value", -1);
-                if (value < 0) {
+                if (value < 0.01) {
                     value = ehPrice.optDouble("value", -1);
                 }
                 if (value > 0) {
