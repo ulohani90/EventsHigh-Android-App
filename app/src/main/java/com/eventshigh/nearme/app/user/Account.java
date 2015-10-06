@@ -201,6 +201,15 @@ public class Account {
                 lastSyncTimestamp = System.currentTimeMillis();
             }
 
+            // Record user name for Crashlytics.
+            UserInfo userInfo = getUserInfo();
+            if (userInfo.name != null) {
+                Crashlytics.setUserName(userInfo.name);
+            }
+            if (userInfo.phoneNo != null) {
+                Crashlytics.setUserIdentifier(userInfo.phoneNo);
+            }
+
             String referrer = accountInfo.getString(PREF_REFERRER, null);
             String appLink = accountInfo.getString(PREF_SHARE_APP_LINK, null);
             if (appLink != null && (referrer == null || accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false))) {
