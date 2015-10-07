@@ -17,7 +17,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnScrollChangedListener;
 import android.view.Window;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
@@ -809,10 +808,8 @@ public class EventDetailActivity extends BaseActivity {
             // Set description.
             descriptionHeaderView.setVisibility(event.description.isEmpty() ? View.GONE : View.VISIBLE);
             if (!event.description.isEmpty()) {
-                final String html = "<body>" + event.description + "</body>";
-                descriptionView.loadData(html, "text/html; charset=UTF-8", null);
-                WebSettings webSettings = descriptionView.getSettings();
-                webSettings.setDefaultFontSize(12);
+                CustomUrlActivity.setupWebView(descriptionView, EventDetailActivity.this);
+                descriptionView.loadData(toHtmlNoFrame(event.description), "text/html; charset=UTF-8", null);
             }
 
             // Organizer Info.
@@ -861,11 +858,9 @@ public class EventDetailActivity extends BaseActivity {
             for (EventDescriptionSection descriptionSection : event.descriptionSections) {
                 View descriptionSectionView = getLayoutInflater().inflate(R.layout.view_description_section, eventContainer, false);
                 ((TextView) descriptionSectionView.findViewById(R.id.description_header)).setText(descriptionSection.name);
-                String html = "<body>" + descriptionSection.description + "</body>";
                 WebView descriptionView = (WebView) descriptionSectionView.findViewById(R.id.event_description);
-                descriptionView.loadData(html, "text/html; charset=UTF-8", null);
-                WebSettings webSettings = descriptionView.getSettings();
-                webSettings.setDefaultFontSize(12);
+                CustomUrlActivity.setupWebView(descriptionView, EventDetailActivity.this);
+                descriptionView.loadData(toHtmlNoFrame(descriptionSection.description), "text/html; charset=UTF-8", null);
                 eventContainer.addView(descriptionSectionView);
             }
         }
@@ -967,5 +962,9 @@ public class EventDetailActivity extends BaseActivity {
                     })
                     .build();
         client.connect();
+    }
+
+    private static String toHtmlNoFrame(String html) {
+        return "<body>" + html.replaceAll("<iframe.*/iframe>", "") + "</body>";
     }
 }

@@ -12,7 +12,9 @@ import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
+import android.webkit.WebSettings.PluginState;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -20,6 +22,8 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.Utils;
+
+import java.io.File;
 
 public class CustomUrlActivity extends BaseActivity {
     public static final String BLOG_HOST = "blog.eventshigh.com";
@@ -38,33 +42,12 @@ public class CustomUrlActivity extends BaseActivity {
         context.startActivity(intent);
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_url);
         webView = (WebView) findViewById(R.id.web_view);
-
-        // Enable Javascript
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-        webSettings.setSupportMultipleWindows(true);
-        webSettings.setSupportZoom(true);
-        webSettings.setBuiltInZoomControls(true);
-
-        webSettings.setAllowContentAccess(true);
-        webSettings.setAllowFileAccess(true);
-        webSettings.setAppCacheEnabled(true);
-        webSettings.setBlockNetworkImage(false);
-        webSettings.setBlockNetworkLoads(false);
-        webSettings.setDatabaseEnabled(true);
-        webSettings.setDomStorageEnabled(true);
-        webSettings.setLoadsImagesAutomatically(true);
-
-        // Setup a new web view client so we can listen in on events and also customize
-        // web view behavior.
-        webView.setWebViewClient(new EHWebViewClient(this, findViewById(R.id.top_progress_bar)));
+        setupWebView(webView, this);
 
         // Set title.
         String title = getIntent().getStringExtra(EXTRA_TITLE_KEY);
@@ -151,6 +134,39 @@ public class CustomUrlActivity extends BaseActivity {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressLint("SetJavaScriptEnabled")
+    public static void setupWebView(WebView webView, BaseActivity activity) {
+        // Enable Javascript
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setSupportZoom(false);
+        webSettings.setBuiltInZoomControls(false);
+
+        // Enable Caching.
+        File dir = activity.getCacheDir();
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        webSettings.setAppCachePath(dir.getPath());
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setAppCacheEnabled(true);
+        webSettings.setAllowFileAccess(true);
+
+        // Enable rich content.
+        webSettings.setAllowContentAccess(true);
+        webSettings.setBlockNetworkImage(false);
+        webSettings.setBlockNetworkLoads(false);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setLoadsImagesAutomatically(true);
+
+        // Setup a new web view client so we can listen in on events and also customize
+        // web view behavior.
+        webView.setWebViewClient(new EHWebViewClient(activity, activity.findViewById(R.id.top_progress_bar)));
+        webView.setWebChromeClient(new WebChromeClient());
+        webSettings.setPluginState(PluginState.ON);
+    }
+
     public static class EHWebViewClient extends WebViewClient {
         private BaseActivity activity;
         private View progressBar;
@@ -170,7 +186,7 @@ public class CustomUrlActivity extends BaseActivity {
         public void onPageFinished(WebView view, String url) {
             activity.reportActionToAnalytics("finishLoading");
             progressBar.setVisibility(View.GONE);
-        }
+            }
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {

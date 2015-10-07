@@ -32,6 +32,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_above="@+id/share_row"
+        android:hardwareAccelerated="true"
     />
 
     <LinearLayout

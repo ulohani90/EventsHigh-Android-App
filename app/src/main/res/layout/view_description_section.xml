@@ -30,6 +30,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:textColor="#CC383F3F"
+        android:hardwareAccelerated="true"
         tools:ignore="WebViewLayout"
     />
 </LinearLayout>
