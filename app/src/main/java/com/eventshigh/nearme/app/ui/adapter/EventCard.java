@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -27,7 +28,6 @@ public class EventCard extends ViewHolder {
     private final boolean shouldAdjustImageHeight;
     private final ImageView bgView;
     private final ImageView recommendedView;
-    private final ImageView offerView;
     private final TextView titleView;
     private final ImageView favouriteView;
     private final TextView eventTimeView;
@@ -60,7 +60,6 @@ public class EventCard extends ViewHolder {
         this.shouldAdjustImageHeight = shouldAdjustImageHeight;
         bgView = (ImageView) cardView.findViewById(R.id.event_bg);
         recommendedView = (ImageView) cardView.findViewById(R.id.event_recommended);
-        offerView = (ImageView) cardView.findViewById(R.id.event_offer_marker);
         titleView = (TextView) cardView.findViewById(R.id.event_title);
         favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
         eventTimeView = (TextView) cardView.findViewById(R.id.event_time);
@@ -80,6 +79,7 @@ public class EventCard extends ViewHolder {
                 R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
     }
 
+    @SuppressLint("SetTextI18n")
     public void bindEventView(final Event event, boolean isFirstEvent, final int position,
                               final BaseContextActivity activity,
                               @Nullable SocialInvite invite) {
@@ -152,6 +152,7 @@ public class EventCard extends ViewHolder {
 
         // Set the title.
         titleView.setText(event.title);
+        recommendedView.setVisibility(event.ehRecommended ? View.VISIBLE : View.INVISIBLE);
 
         // Event Time.
         EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
@@ -173,9 +174,6 @@ public class EventCard extends ViewHolder {
 
         // Set the venue.
         venueView.setText(event.getShortAddress());
-
-        recommendedView.setVisibility(event.ehRecommended ? View.VISIBLE : View.INVISIBLE);
-        offerView.setVisibility(event.offerTitle != null ? View.VISIBLE : View.GONE);
 
         arrowView.setVisibility(View.GONE);
         favouriteView.setVisibility(View.GONE);

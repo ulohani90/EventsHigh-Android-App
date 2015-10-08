@@ -49,19 +49,6 @@
             android:src="@drawable/eh_recommend"
             tools:ignore="ContentDescription"
         />
-        <ImageView
-            android:id="@+id/event_offer_marker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/event_recommended"
-            android:layout_toEndOf="@+id/event_recommended"
-            android:layout_above="@id/event_title"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/ic_local_offer_white_16dp"
-            tools:ignore="ContentDescription"
-        />
-
         <TextView
             style="?android:attr/textAppearanceMedium"
             android:id="@+id/event_title"
@@ -76,6 +63,7 @@
             android:layout_marginBottom="14dp"
             android:maxLines="1"
             android:ellipsize="end"
+            android:textIsSelectable="false"
             android:textColor="@android:color/white"
             tools:text="My Awesome Event with a long long title!"
         />
@@ -104,6 +92,7 @@
             android:layout_marginRight="10dp"
             android:drawableStart="@drawable/ic_access_time_white_12dp"
             android:drawableLeft="@drawable/ic_access_time_white_12dp"
+            android:textIsSelectable="false"
             android:textSize="12sp"
             android:textColor="#CCFFFFFF"
             tools:text="Sun, 29 Mar at 8:30 pm"
@@ -118,6 +107,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="6dp"
             android:layout_marginRight="6dp"
+            android:textIsSelectable="false"
             android:textSize="12sp"
             android:textColor="#CCFFFFFF"
             tools:text="₹ 200 - 500"
@@ -136,6 +126,7 @@
             android:layout_marginBottom="10dp"
             android:drawableStart="@drawable/ic_location_on_white_12dp"
             android:drawableLeft="@drawable/ic_location_on_white_12dp"
+            android:textIsSelectable="false"
             android:textSize="12sp"
             android:textColor="#CCFFFFFF"
             tools:text="Jagriti theatre, Whitefield"
@@ -153,6 +144,7 @@
             android:layout_marginBottom="10dp"
             android:drawableStart="@drawable/ic_local_taxi_white_12dp"
             android:drawableLeft="@drawable/ic_local_taxi_white_12dp"
+            android:textIsSelectable="false"
             android:textSize="12sp"
             android:textColor="#CCFFFFFF"
             tools:text="30 mins"
@@ -187,6 +179,7 @@
                 android:drawableLeft="@drawable/ic_person_black_18dp"
                 android:drawableStart="@drawable/ic_person_black_18dp"
                 android:drawablePadding="16dp"
+                android:textIsSelectable="false"
                 android:fontFamily="sans-serif-medium"
                 tools:text="1049 views, 23 favourited"
             />

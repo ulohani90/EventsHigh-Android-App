@@ -306,13 +306,6 @@ public class EventDetailActivity extends BaseActivity {
                 getString(R.string.title_book));
     }
 
-    public void openOfferSite(View view) {
-        reportEventAction(event, "openOffer");
-        CustomUrlActivity.launchCustomUrl(this,
-                Uri.parse("http://www.eventshigh.com/get_event_contest/" + event.id),
-                event.offerTitle);
-    }
-
     public void imagePreview(View view) {
         if (event.imgUrl == null) {
             return;
@@ -585,7 +578,6 @@ public class EventDetailActivity extends BaseActivity {
         private final View callView;
         private final View joinView;
         private final TextView priceView;
-        private final TextView offerView;
 
         private final View tagsHeaderView;
         private final LinearLayout tagsView;
@@ -635,7 +627,6 @@ public class EventDetailActivity extends BaseActivity {
             callView = findViewById(R.id.call);
             joinView = findViewById(R.id.join_event);
             priceView = (TextView) findViewById(R.id.event_price);
-            offerView = (TextView) findViewById(R.id.offer_text);
 
             tagsHeaderView = findViewById(R.id.tags_header);
             tagsView = (LinearLayout) findViewById(R.id.event_tags);
@@ -758,13 +749,6 @@ public class EventDetailActivity extends BaseActivity {
                 } else {
                     alsoOnView.setVisibility(View.GONE);
                 }
-            }
-
-            // Show offer if its there.
-            offerView.setVisibility(event.offerTitle == null ? View.GONE : View.VISIBLE);
-            if (event.offerTitle != null) {
-                offerView.setVisibility(View.VISIBLE);
-                offerView.setText(event.offerTitle);
             }
 
             // Set action buttons.

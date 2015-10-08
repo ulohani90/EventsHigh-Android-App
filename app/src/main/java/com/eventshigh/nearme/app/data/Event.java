@@ -32,7 +32,6 @@ public class Event implements Parcelable {
     public final String title;
     public final EventCategory category;
 
-    @Nullable public final String offerTitle;
     public final String description;
     public final String[] tags;
 
@@ -68,7 +67,7 @@ public class Event implements Parcelable {
     public final EventDescriptionSection[] descriptionSections;
 
     public Event(String id, City city, String title, EventCategory category,
-                 @Nullable String offerTitle, String description, String[] tags,
+                 String description, String[] tags,
                  @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
                  int numViews, int numSaves, boolean ehRecommended,
                  float uberScore, long[] eventTimings,
@@ -84,7 +83,6 @@ public class Event implements Parcelable {
         this.title = title;
         this.category = category;
 
-        this.offerTitle = Utils.checkIfUnknown(offerTitle);
         this.description = description;
         this.tags = tags;
 
@@ -183,7 +181,6 @@ public class Event implements Parcelable {
         dest.writeString(title);
         dest.writeString(category.toString());
 
-        dest.writeString(emptyIfNull(offerTitle));
         dest.writeString(description);
         dest.writeStringArray(tags);
 
@@ -229,7 +226,6 @@ public class Event implements Parcelable {
                             in.readString(),
                             EventCategory.valueOf(in.readString()),
 
-                            in.readString(),
                             in.readString(),
                             in.createStringArray(),
 
@@ -336,13 +332,6 @@ public class Event implements Parcelable {
         if (address != null && venue != null &&
                 address.toLowerCase().startsWith(venue.toLowerCase())) {
             address = address.substring(venue.length()).trim();
-        }
-
-        // offer.
-        String offerTitle = null;
-        JSONObject contest = eventJson.optJSONObject("event_contest");
-        if (contest != null) {
-            offerTitle = contest.optString("title");
         }
 
         // Tags.
@@ -475,7 +464,6 @@ public class Event implements Parcelable {
                 title,
                 category,
 
-                offerTitle,
                 description,
                 tagsList.toArray(new String[tagsList.size()]),
 
