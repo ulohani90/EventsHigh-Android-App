@@ -792,7 +792,7 @@ public class EventDetailActivity extends BaseActivity {
             // Set description.
             descriptionHeaderView.setVisibility(event.description.isEmpty() ? View.GONE : View.VISIBLE);
             if (!event.description.isEmpty()) {
-                CustomUrlActivity.setupWebView(descriptionView, EventDetailActivity.this);
+                CustomUrlActivity.setupWebView(descriptionView, EventDetailActivity.this, false);
                 descriptionView.loadData(toHtmlNoFrame(event.description), "text/html; charset=UTF-8", null);
             }
 
@@ -843,7 +843,7 @@ public class EventDetailActivity extends BaseActivity {
                 View descriptionSectionView = getLayoutInflater().inflate(R.layout.view_description_section, eventContainer, false);
                 ((TextView) descriptionSectionView.findViewById(R.id.description_header)).setText(descriptionSection.name);
                 WebView descriptionView = (WebView) descriptionSectionView.findViewById(R.id.event_description);
-                CustomUrlActivity.setupWebView(descriptionView, EventDetailActivity.this);
+                CustomUrlActivity.setupWebView(descriptionView, EventDetailActivity.this, false);
                 descriptionView.loadData(toHtmlNoFrame(descriptionSection.description), "text/html; charset=UTF-8", null);
                 eventContainer.addView(descriptionSectionView);
             }

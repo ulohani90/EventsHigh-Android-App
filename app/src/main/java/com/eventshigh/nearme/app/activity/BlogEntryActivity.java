@@ -45,7 +45,7 @@ public class BlogEntryActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
         webView = (ObservableWebView) findViewById(R.id.web_view);
-        CustomUrlActivity.setupWebView(webView, this);
+        CustomUrlActivity.setupWebView(webView, this, true);
 
         setShareVisibility(R.id.share_whatsapp, PACKAGE_NAME_WHATSAPP);
         setShareVisibility(R.id.share_fb, PACKAGE_NAME_FACEBOOK);

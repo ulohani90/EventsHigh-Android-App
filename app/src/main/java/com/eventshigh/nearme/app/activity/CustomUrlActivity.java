@@ -47,7 +47,7 @@ public class CustomUrlActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_url);
         webView = (WebView) findViewById(R.id.web_view);
-        setupWebView(webView, this);
+        setupWebView(webView, this, true);
 
         // Set title.
         String title = getIntent().getStringExtra(EXTRA_TITLE_KEY);
@@ -136,7 +136,7 @@ public class CustomUrlActivity extends BaseActivity {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @SuppressLint("SetJavaScriptEnabled")
-    public static void setupWebView(WebView webView, BaseActivity activity) {
+    public static void setupWebView(WebView webView, BaseActivity activity, boolean useProgressBar) {
         // Enable Javascript
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -162,31 +162,36 @@ public class CustomUrlActivity extends BaseActivity {
 
         // Setup a new web view client so we can listen in on events and also customize
         // web view behavior.
-        webView.setWebViewClient(new EHWebViewClient(activity, activity.findViewById(R.id.top_progress_bar)));
+        webView.setWebViewClient(new EHWebViewClient(activity,
+                useProgressBar ? activity.findViewById(R.id.top_progress_bar) : null));
         webView.setWebChromeClient(new WebChromeClient());
         webSettings.setPluginState(PluginState.ON);
     }
 
     public static class EHWebViewClient extends WebViewClient {
         private BaseActivity activity;
-        private View progressBar;
+        @Nullable private View progressBar;
 
-        public EHWebViewClient(BaseActivity activity, View progressBar) {
+        public EHWebViewClient(BaseActivity activity, @Nullable View progressBar) {
             this.activity = activity;
             this.progressBar = progressBar;
         }
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            activity.reportActionToAnalytics("startLoading");
-            progressBar.setVisibility(View.VISIBLE);
+            if (progressBar != null) {
+                activity.reportActionToAnalytics("startLoading");
+                progressBar.setVisibility(View.VISIBLE);
+            }
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            activity.reportActionToAnalytics("finishLoading");
-            progressBar.setVisibility(View.GONE);
+            if (progressBar != null) {
+                activity.reportActionToAnalytics("finishLoading");
+                progressBar.setVisibility(View.GONE);
             }
+        }
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
