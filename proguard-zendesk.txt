@@ -4,6 +4,7 @@
 # Sdk
 -keep public interface com.zendesk.sdk.** { *; }
 -keep public class com.zendesk.sdk.** { *; }
+-keep public class java.awt.Color { *; }
 
 # Appcompat and support
 -keep interface android.support.v7.** { *; }
@@ -26,3 +27,4 @@
 # Picasso
 -dontwarn com.squareup.okhttp.**
 -dontwarn okio.**
+-dontwarn com.zendesk.util.ColorUtils
