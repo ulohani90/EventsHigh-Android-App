@@ -22,11 +22,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class describes one Event. Event have few attributes like title, category, location etc.
  */
 public class Event implements Parcelable {
+    private static final Pattern YOUTUBE_FINDER = Pattern.compile("www.youtube.com/embed/([^\"]*)\"");
+
     public final String id;
     public final City city;
     public final String title;
@@ -34,6 +38,7 @@ public class Event implements Parcelable {
 
     public final String description;
     public final String[] tags;
+    @Nullable public final String youtubeVideoId;
 
     @Nullable public final String imgUrl;
     @Nullable public final String sourceUrl;
@@ -67,7 +72,7 @@ public class Event implements Parcelable {
     public final EventDescriptionSection[] descriptionSections;
 
     public Event(String id, City city, String title, EventCategory category,
-                 String description, String[] tags,
+                 String description, String[] tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
                  int numViews, int numSaves, boolean ehRecommended,
                  float uberScore, long[] eventTimings,
@@ -85,6 +90,7 @@ public class Event implements Parcelable {
 
         this.description = description;
         this.tags = tags;
+        this.youtubeVideoId = Utils.checkIfUnknown(youtubeVideoId);
 
         this.imgUrl = Utils.checkIfUnknown(imgUrl);
         this.sourceUrl = Utils.checkIfUnknown(sourceUrl);
@@ -183,6 +189,7 @@ public class Event implements Parcelable {
 
         dest.writeString(description);
         dest.writeStringArray(tags);
+        dest.writeString(emptyIfNull(youtubeVideoId));
 
         dest.writeString(emptyIfNull(imgUrl));
         dest.writeString(emptyIfNull(sourceUrl));
@@ -228,6 +235,7 @@ public class Event implements Parcelable {
 
                             in.readString(),
                             in.createStringArray(),
+                            in.readString(),
 
                             in.readString(),
                             in.readString(),
@@ -459,6 +467,22 @@ public class Event implements Parcelable {
             descriptionSections = EventDescriptionSection.fromJSON(descriptionSectionsJson);
         }
 
+        // Find youtube id if any.
+        String youtubeId = null;
+        Matcher youtubeMatcher = YOUTUBE_FINDER.matcher(description);
+        if (youtubeMatcher.find()) {
+            youtubeId = youtubeMatcher.group(1);
+        }
+        if (youtubeId == null) {
+            for (EventDescriptionSection descriptionSection : descriptionSections) {
+                youtubeMatcher = YOUTUBE_FINDER.matcher(descriptionSection.description);
+                if (youtubeMatcher.find()) {
+                    youtubeId = youtubeMatcher.group(1);
+                    break;
+                }
+            }
+        }
+
         return new Event(id,
                 city,
                 title,
@@ -466,6 +490,7 @@ public class Event implements Parcelable {
 
                 description,
                 tagsList.toArray(new String[tagsList.size()]),
+                youtubeId,
 
                 img_url,
                 source_url,

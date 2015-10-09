@@ -433,6 +433,16 @@ public class EventDetailActivity extends BaseActivity {
         startActivity(intent);
     }
 
+    public void playYouTube(View view) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + event.youtubeVideoId));
+            startActivity(intent);
+        } catch (ActivityNotFoundException ex) {
+            Intent intent= new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://www.youtube.com/watch?v=" + event.youtubeVideoId));
+            startActivity(intent);
+        }
+    }
 
     /**********************************
      Helper methods
@@ -553,7 +563,8 @@ public class EventDetailActivity extends BaseActivity {
         private final ScrollView eventScrollView;
 
         private final ImageView bgView;
-        private final ImageView recommendedImageView;
+        private final View recommendedView;
+        private final View playYoutubeView;
 
         private final TextView titleView;
         private final TextView fromView;
@@ -601,8 +612,9 @@ public class EventDetailActivity extends BaseActivity {
         private EventCard() {
             eventScrollView = (ScrollView) findViewById(R.id.event_scroll_view);
 
-            recommendedImageView = (ImageView) findViewById(R.id.eh_recommends);
             bgView = (ImageView) findViewById(R.id.event_bg);
+            playYoutubeView = findViewById(R.id.play_youtube);
+            recommendedView = findViewById(R.id.eh_recommends);
 
             favouriteView = findViewById(R.id.action_favourite);
             favouritedView = findViewById(R.id.action_favourited);
@@ -690,9 +702,12 @@ public class EventDetailActivity extends BaseActivity {
             }
 
             // Set EH recommendation and favourite views.
-            recommendedImageView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
+            recommendedView.setVisibility(event.ehRecommended ? View.VISIBLE : View.GONE);
             setFavouriteView(EventsMarkerManager.getInstance(EventDetailActivity.this)
                     .isFavourite(event.id));
+
+            // Set Youtube play button.
+            playYoutubeView.setVisibility(event.youtubeVideoId == null ? View.GONE : View.VISIBLE);
 
             // Set Venue and address.
             findViewById(R.id.venue_group).setVisibility(View.VISIBLE);
