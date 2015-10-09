@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.text.util.Linkify;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.Request.Method;
@@ -31,8 +32,6 @@ import java.security.GeneralSecurityException;
  * This screen allows user to register and verify his phone number.
  */
 public class PhoneLoginActivity extends BaseActivity {
-    public static final String EXTRA_IN_ONBOARDING_FLOW = "inOnboardingFlow";
-
     private enum VerificationStatus {
         VERIFIED,
         CODE_SENT,
@@ -48,8 +47,9 @@ public class PhoneLoginActivity extends BaseActivity {
     private TextInputLayout nameView;
     private TextInputLayout phoneNoView;
     private TextInputLayout codeView;
-
-    private boolean inOnboardingFlow;
+    private EditText nameEditText;
+    private EditText phoneNoEditText;
+    private EditText codeEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +69,11 @@ public class PhoneLoginActivity extends BaseActivity {
         phoneNoView.setErrorEnabled(true);
         codeView.setErrorEnabled(true);
 
+        nameEditText = nameView.getEditText();
+        phoneNoEditText = phoneNoView.getEditText();
+        codeEditText = codeView.getEditText();
+
         account = new Account(this);
-        inOnboardingFlow = getIntent().getBooleanExtra(EXTRA_IN_ONBOARDING_FLOW, false);
         updateView();
     }
 
@@ -80,17 +83,17 @@ public class PhoneLoginActivity extends BaseActivity {
     }
 
     public void sendCode(View view) {
-        final String name = Utils.checkIfUnknown(nameView.getEditText().getText().toString());
+        final String name = Utils.checkIfUnknown(nameEditText.getText().toString());
         if (name == null || name.length() < 3) {
-            nameView.getEditText().requestFocus();
+            nameEditText.requestFocus();
             nameView.setError("Entered name is not correct");
             return;
         }
 
-        final String phoneNo = Utils.simplifyPhoneNo(phoneNoView.getEditText().getText().toString());
-        phoneNoView.getEditText().setText(phoneNo);
+        final String phoneNo = Utils.simplifyPhoneNo(phoneNoEditText.getText().toString());
+        phoneNoEditText.setText(phoneNo);
         if (phoneNo.length() < 10 || phoneNo.length() > 12) {
-            phoneNoView.getEditText().requestFocus();
+            phoneNoEditText.requestFocus();
             phoneNoView.setError("Entered phone number is not correct");
             return;
         }
@@ -118,10 +121,10 @@ public class PhoneLoginActivity extends BaseActivity {
                                     if (status == VerificationStatus.VERIFIED) {
                                         reportActionToAnalytics("sendCodeVerified");
                                         account.recordVerifiedPhoneNumber();
-                                        setVerifiedMobileNoView();
+                                        finish();
                                     } else if (status == VerificationStatus.CODE_SENT) {
                                         reportActionToAnalytics("sendCodeSuccess");
-                                        setRequestCodeView();
+                                        finish();
                                     }
                                 }
                             },
@@ -147,8 +150,8 @@ public class PhoneLoginActivity extends BaseActivity {
     public void verifyCode(View view) {
         progressBar.setVisibility(View.VISIBLE);
         Uri requestUrl = AccountStateReporter.getBaseUri(this, "verifyMobileNo")
-                .appendQueryParameter("mobile_no", phoneNoView.getEditText().getText().toString())
-                .appendQueryParameter("verification_code", codeView.getEditText().getText().toString())
+                .appendQueryParameter("mobile_no", phoneNoEditText.getText().toString())
+                .appendQueryParameter("verification_code", codeEditText.getText().toString())
                 .build();
         try {
             VolleyHelper.addToRequestQueue(this,
@@ -196,8 +199,8 @@ public class PhoneLoginActivity extends BaseActivity {
 
     private void updateView() {
         UserInfo userInfo = account.getUserInfo();
-        nameView.getEditText().setText(userInfo.name);
-        phoneNoView.getEditText().setText(userInfo.phoneNo);
+        nameEditText.setText(userInfo.name);
+        phoneNoEditText.setText(userInfo.phoneNo);
         if (userInfo.phoneNo == null || userInfo.name == null) {
             setRequestMobileNoView();
         } else if (userInfo.isVerified) {
@@ -209,7 +212,7 @@ public class PhoneLoginActivity extends BaseActivity {
 
     private void setPhoneNumberInStringResource(int viewId, int stringResourceId) {
         String codeLabelString = String.format(
-            getResources().getString(stringResourceId), nameView.getEditText().getText(), phoneNoView.getEditText().getText());
+            getResources().getString(stringResourceId), nameEditText.getText(), phoneNoEditText.getText());
         TextView codeLabelView = (TextView) findViewById(viewId);
         codeLabelView.setText(codeLabelString);
         Linkify.addLinks(codeLabelView, Linkify.PHONE_NUMBERS);
@@ -240,10 +243,6 @@ public class PhoneLoginActivity extends BaseActivity {
 
     // Set the UI elements when we need to ask for verification code.
     private void setRequestCodeView() {
-        if (inOnboardingFlow) {
-            skip(null);
-            return;
-        }
         setPhoneNumberInStringResource(R.id.code_label, R.string.ui_code);
         phoneNoParent.setVisibility(View.GONE);
         codeParent.setVisibility(View.VISIBLE);
@@ -252,20 +251,9 @@ public class PhoneLoginActivity extends BaseActivity {
 
     // Set the UI elements when user mobile no is verified.
     private void setVerifiedMobileNoView() {
-        if (inOnboardingFlow) {
-            skip(null);
-            return;
-        }
         setPhoneNumberInStringResource(R.id.verified, R.string.ui_code_verified);
         phoneNoParent.setVisibility(View.GONE);
         codeParent.setVisibility(View.GONE);
         verifiedParent.setVisibility(View.VISIBLE);
-    }
-
-    public void skip(View view) {
-        if (view != null) {
-            reportActionToAnalytics("skipPhoneLogin");
-        }
-        finish();
     }
 }

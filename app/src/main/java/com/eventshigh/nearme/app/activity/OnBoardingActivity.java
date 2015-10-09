@@ -128,9 +128,7 @@ public class OnBoardingActivity extends BaseActivity {
     }
 
     private void launchNextActivity() {
-        Intent phoneLoginIntent = new Intent(OnBoardingActivity.this,
-            PhoneLoginActivity.class);
-        phoneLoginIntent.putExtra(PhoneLoginActivity.EXTRA_IN_ONBOARDING_FLOW, true);
+        Intent phoneLoginIntent = new Intent(OnBoardingActivity.this, PhoneLoginActivity.class);
         startActivity(phoneLoginIntent);
         finish();
     }
