@@ -20,7 +20,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.os.Build;
 import android.support.v7.internal.view.menu.ActionMenuItemView;
-import android.support.v7.internal.widget.TintImageView;
 import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -112,8 +111,6 @@ public class ToolbarColorizeHelper {
                 if (outViews.isEmpty()) {
                     return;
                 }
-                TintImageView overflow=(TintImageView) outViews.get(0);
-                overflow.setColorFilter(colorFilter);
                 removeOnGlobalLayoutListener(decorView,this);
             }
         });
