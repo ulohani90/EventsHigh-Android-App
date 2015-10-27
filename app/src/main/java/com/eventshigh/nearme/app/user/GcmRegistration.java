@@ -141,12 +141,14 @@ public class GcmRegistration {
     }
 
     public static void sendUpstream(Context context, Bundle data) {
-        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
-        data.putLong("time_to_live", TimeUnit.DAYS.toSeconds(1));
-        try {
-            gcm.send(SENDER_ID + "@gcm.googleapis.com", UUID.randomUUID().toString(), data);
-        } catch (Exception e) {
-            Crashlytics.getInstance().core.logException(e);
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) {
+            GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
+            data.putLong("time_to_live", TimeUnit.DAYS.toSeconds(1));
+            try {
+                gcm.send(SENDER_ID + "@gcm.googleapis.com", UUID.randomUUID().toString(), data);
+            } catch (Exception e) {
+                Crashlytics.getInstance().core.logException(e);
+            }
         }
     }
 

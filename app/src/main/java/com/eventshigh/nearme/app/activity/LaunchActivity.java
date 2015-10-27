@@ -1,15 +1,19 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.Manifest;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
@@ -127,6 +131,7 @@ public class LaunchActivity extends BaseContextActivity {
         AlarmUtils.setMyEventsAlarm(this);
     }
 
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -206,6 +211,23 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_LOCATION) {
+            // If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // permission granted.
+                if (eventsContext.city == null && client != null) {
+                    client.connect();
+                }
+            }
+            return;
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
     public void cityChanged(City city) {
         drawer.closeDrawer(GravityCompat.START);
         reportActionToAnalytics("cityChanged");
@@ -224,14 +246,16 @@ public class LaunchActivity extends BaseContextActivity {
     private ConnectionCallbacks mConnectionCallbacks = new ConnectionCallbacks() {
         @Override
         public void onConnected(Bundle bundle) {
-            Location location = LocationServices.FusedLocationApi.getLastLocation(client);
-            if (location != null) {
-                LatLng latLng = LocationUtils.locationToLatLng(location);
-                eventsContext.changeLocation(latLng);
-                if (eventsContext.city != null) {
-                    gcmRegistration.setLastCity(eventsContext.city, latLng);
-                } else {
-                    reportActionToAnalytics("unsupportedCity");
+            if (eventsContext.city == null) {
+                Location location = LocationServices.FusedLocationApi.getLastLocation(client);
+                if (location != null) {
+                    LatLng latLng = LocationUtils.locationToLatLng(location);
+                    eventsContext.changeLocation(latLng);
+                    if (eventsContext.city != null) {
+                        gcmRegistration.setLastCity(eventsContext.city, latLng);
+                    } else {
+                        reportActionToAnalytics("unsupportedCity");
+                    }
                 }
             }
 
@@ -282,19 +306,32 @@ public class LaunchActivity extends BaseContextActivity {
                         Crashlytics.getInstance().core.logException(e);
                     }
                 }
+
+                citySelector.setVisibility(View.GONE);
+                tabsView.setVisibility(View.VISIBLE);
+                viewPager.setVisibility(View.VISIBLE);
                 showNextScreen();
                 return;
             }
 
             // We do not have user location. Lets populate the City chooser and let user
             // select the city.
-            reportActionToAnalytics("locationFailed");
-            tabsView.setVisibility(View.GONE);
-            viewPager.setVisibility(View.GONE);
-            citySelector.setVisibility(View.VISIBLE);
-            citySelector.setAdapter(new CityListAdapter(LaunchActivity.this, mCitySelectionListener));
-            if (connectionResult != null) {
-                showMessage(R.string.failed_location);
+            if (citySelector.getVisibility() != View.VISIBLE) {
+                reportActionToAnalytics("locationFailed");
+                tabsView.setVisibility(View.GONE);
+                viewPager.setVisibility(View.GONE);
+                citySelector.setVisibility(View.VISIBLE);
+                citySelector.setAdapter(new CityListAdapter(LaunchActivity.this, mCitySelectionListener));
+                if (connectionResult != null) {
+                    showMessage(R.string.failed_location);
+                }
+                if (ActivityCompat.checkSelfPermission(LaunchActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // Request missing location permission.
+                    ActivityCompat.requestPermissions(LaunchActivity.this,
+                        new String[]{ Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION },
+                        PERMISSIONS_REQUEST_LOCATION);
+                }
             }
         }
     };
@@ -336,7 +373,13 @@ public class LaunchActivity extends BaseContextActivity {
                     .addConnectionCallbacks(mConnectionCallbacks)
                     .addOnConnectionFailedListener(mOnConnectionFailedListener)
                     .build();
-            client.connect();
+            if (ActivityCompat.checkSelfPermission(LaunchActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // Request missing location permission.
+                mOnConnectionFailedListener.onConnectionFailed(null);
+            } else {
+                client.connect();
+            }
             return;
         }
 

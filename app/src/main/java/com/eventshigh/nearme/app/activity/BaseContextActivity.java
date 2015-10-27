@@ -1,10 +1,13 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -86,7 +89,8 @@ public abstract class BaseContextActivity extends BaseActivity {
 
         // Upload contacts
         Intent inIntent = getIntent();
-        if (toolbar != null && (inIntent == null || !Intent.ACTION_VIEW.equals(inIntent.getAction()))) {
+        if (eventsContext.city != null && toolbar != null &&
+            (inIntent == null || !Intent.ACTION_VIEW.equals(inIntent.getAction()))) {
             toolbar.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -94,7 +98,7 @@ public abstract class BaseContextActivity extends BaseActivity {
                         AskForContactsDialog.doNeedful(BaseContextActivity.this);
                     }
                 }
-            }, 3000);
+            }, 5000);
         }
     }
 
@@ -112,8 +116,15 @@ public abstract class BaseContextActivity extends BaseActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_show_map) {
-            reportActionToAnalytics("switchToMaps");
-            switchTo(EventsMapsActivity.class);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Request missing location permission.
+                ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
+            } else {
+                reportActionToAnalytics("switchToMaps");
+                switchTo(EventsMapsActivity.class);
+            }
             return true;
         }
 

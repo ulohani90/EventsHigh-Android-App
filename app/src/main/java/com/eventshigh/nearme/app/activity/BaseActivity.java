@@ -61,6 +61,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public static final String NOTIFICATION_ACTION = "com.eventshigh.nearme.app.notification";
     public static final int PLUS_ONE_REQUEST_CODE = 111;
     public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 34;
+    public static final int PERMISSIONS_REQUEST_LOCATION = 42;
 
     public static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
     public static final String PACKAGE_NAME_FACEBOOK = "com.facebook.katana";
@@ -200,7 +201,10 @@ public abstract class BaseActivity extends AppCompatActivity {
                 Preferences preferences = Preferences.getInstance(this);
                 preferences.setCanUploadContacts(false);
             }
+            return;
         }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     public View getViewForSnackbar() {

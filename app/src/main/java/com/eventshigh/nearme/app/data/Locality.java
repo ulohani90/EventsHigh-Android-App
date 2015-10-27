@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum  Locality {
-    BANGALORE_INDIRANAGAR(City.BANGALORE, "Indiranagar"),
+    BANGALORE_INDIRANAGAR(City.BANGALORE, "Indira Nagar"),
     BANGALORE_JAYANAGAR(City.BANGALORE, "Jayanagar"),
     BANGALORE_KORAMANGALA(City.BANGALORE, "Koramangala"),
     BANGALORE_MG_ROAD(City.BANGALORE, "MG Road"),
     DELHI_CONNAUGHT_PLACE(City.DELHI, "Connaught Place"),
     DELHI_GURGAON(City.DELHI, "Gurgaon"),
     DELHI_HAUZ_KHAS(City.DELHI, "Hauz Khas"),
-    DELHI_LODHI_COLONY(City.DELHI, "Lodhi Colony"),
+    DELHI_NOIDA(City.DELHI, "Noida"),
     MUMBAI_ANDHERI(City.MUMBAI, "Andheri"),
     MUMBAI_BANDRA(City.MUMBAI, "Bandra"),
     MUMBAI_JUHU(City.MUMBAI, "Juhu"),
@@ -37,7 +37,7 @@ public enum  Locality {
     }
 
     public String getImageUrl() {
-        return "http://assets.eventshigh.com/localities/" + toString().toLowerCase() + ".jpg";
+        return "https://assets.eventshigh.com/localities/" + toString().toLowerCase() + ".jpg";
     }
 
     public TrendingTopic asTrendingTopic() {

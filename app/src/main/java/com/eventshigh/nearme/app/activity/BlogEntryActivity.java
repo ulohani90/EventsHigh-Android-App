@@ -128,7 +128,7 @@ public class BlogEntryActivity extends BaseActivity {
     }
 
     private void setShareVisibility(@IdRes int shareButtonId, String packageName) {
-        findViewById(shareButtonId).setVisibility(isInstalled(this, packageName) ? View.VISIBLE : View.GONE);
+        findViewById(shareButtonId).setVisibility(isInstalled(packageName) ? View.VISIBLE : View.GONE);
     }
 
     private void populateBlog(BlogEntry blogEntry) {
