@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -363,6 +364,11 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.setupWithViewPager(viewPager);
         tabsView.setScrollPosition(defaultTab, 0, true);
         tabsView.setOnTabSelectedListener(adapter);
+
+        Tab tab = tabsView.getTabAt(defaultTab);
+        if (tab != null) {
+            tab.select();
+        }
     }
 
     private void showNextScreen() {
@@ -426,6 +432,11 @@ public class LaunchActivity extends BaseContextActivity {
 
         public ExploreScreenPagerAdapter() {
             super(getSupportFragmentManager());
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return (eventsContext.toString() + TABS[position]).hashCode();
         }
 
         @Override
