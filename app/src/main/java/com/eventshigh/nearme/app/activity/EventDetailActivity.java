@@ -434,6 +434,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void playYouTube(View view) {
+        reportEventAction(event, "playYoutube", event.youtubeVideoId);
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + event.youtubeVideoId));
             startActivity(intent);
