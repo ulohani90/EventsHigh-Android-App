@@ -220,7 +220,7 @@ public class Event implements Parcelable {
         dest.writeDouble(maxPrice);
         dest.writeString(emptyIfNull(currency));
 
-        dest.writeParcelableArray(descriptionSections, flags);
+        dest.writeTypedArray(descriptionSections, flags);
     }
 
     // This is used to regenerate your object. All Parcelables must have

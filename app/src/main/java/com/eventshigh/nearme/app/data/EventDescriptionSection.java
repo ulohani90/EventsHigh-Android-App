@@ -39,15 +39,15 @@ public class EventDescriptionSection implements Parcelable {
     // This is used to regenerate your object. All Parcelables must have
     // a CREATOR that implements these two methods
     public static final Parcelable.Creator<EventDescriptionSection> CREATOR =
-            new Parcelable.Creator<EventDescriptionSection>() {
-                public EventDescriptionSection createFromParcel(Parcel in) {
-                    return new EventDescriptionSection(in.readString(), in.readString());
-                }
+        new Parcelable.Creator<EventDescriptionSection>() {
+            public EventDescriptionSection createFromParcel(Parcel in) {
+                return new EventDescriptionSection(in.readString(), in.readString());
+            }
 
-                public EventDescriptionSection[] newArray(int size) {
-                    return new EventDescriptionSection[size];
-                }
-            };
+            public EventDescriptionSection[] newArray(int size) {
+                return new EventDescriptionSection[size];
+            }
+        };
 
 
     /**********************************
