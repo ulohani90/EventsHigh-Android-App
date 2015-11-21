@@ -19,6 +19,7 @@
         android:textColor="@android:color/black"
         android:textSize="17sp"
         android:textAllCaps="true"
+        android:textIsSelectable="false"
         tools:text="Music"
     />
 
@@ -32,6 +33,7 @@
         android:maxLines="1"
         android:textColor="#CC000000"
         android:textSize="14sp"
+        android:textIsSelectable="false"
         tools:text="35 Followers | 39 Events"
     />
 
@@ -50,7 +52,6 @@
         android:textSize="12sp"
         android:textStyle="bold"
         android:text="@string/ui_following"
-        android:drawableLeft="@drawable/ic_done_white_12dp"
         android:drawableStart="@drawable/ic_done_white_12dp"
         android:drawablePadding="4dp"
     />

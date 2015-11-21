@@ -59,5 +59,6 @@
         app:borderWidth="0dp"
         android:visibility="gone"
         tools:visibility="visible"
+        tools:ignore="PrivateResource"
     />
 </FrameLayout>

@@ -20,6 +20,7 @@
         android:textAllCaps="true"
         android:maxLines="1"
         android:ellipsize="end"
+        android:textIsSelectable="false"
         tools:text="Phoenix Marketcity Bangalore"
     />
     <TextView
@@ -30,6 +31,7 @@
         android:layout_marginBottom="18dp"
         android:textColor="#99212121"
         android:textSize="14sp"
+        android:textIsSelectable="false"
         tools:text="12 events"
     />
     <ImageView
@@ -40,5 +42,6 @@
         android:layout_gravity="center_vertical|end"
         android:layout_margin="6dp"
         android:paddingTop="8dp"
+        tools:ignore="ContentDescription"
     />
 </FrameLayout>

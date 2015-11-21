@@ -11,5 +11,5 @@
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/actionBarSize"
     android:elevation="8dp"
-    tools:ignore="UnusedAttribute"
+    tools:ignore="PrivateResource,UnusedAttribute"
 />

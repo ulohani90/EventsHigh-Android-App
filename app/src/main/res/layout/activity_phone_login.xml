@@ -41,8 +41,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
@@ -57,10 +55,8 @@
             android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/phone_no_info_message"
-            android:layout_toRightOf="@+id/plus_91"
             android:layout_toEndOf="@+id/plus_91"
 		>
             <EditText
@@ -89,7 +85,6 @@
             android:id="@+id/plus_91"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/name_hint"
             android:layout_alignBottom="@+id/phone_no"
@@ -101,11 +96,9 @@
             android:id="@+id/phone_no"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_marginBottom="8dp"
             android:layout_below="@+id/name_hint"
-            android:layout_toRightOf="@+id/plus_91"
             android:layout_toEndOf="@+id/plus_91"
 		>
             <EditText
@@ -123,7 +116,6 @@
             style="@style/EHButtonCTA"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/phone_no"
             android:text="@string/action_register"

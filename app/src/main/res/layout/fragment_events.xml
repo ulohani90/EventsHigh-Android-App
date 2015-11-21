@@ -51,7 +51,7 @@
             android:paddingTop="10dp"
             android:paddingBottom="20dp"
             android:clipToPadding="false"
-            tools:listitem="@layout/event_card"
+            tools:listitem="@layout/card_event"
         />
     </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

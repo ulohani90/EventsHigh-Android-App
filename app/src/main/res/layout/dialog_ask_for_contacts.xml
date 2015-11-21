@@ -21,7 +21,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:drawableLeft="@drawable/ic_info_black_24dp"
         android:drawableStart="@drawable/ic_info_black_24dp"
         android:text="@string/contacts_upload_promise"
         android:layout_gravity="center"

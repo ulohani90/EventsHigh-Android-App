@@ -34,7 +34,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:layout_marginTop="@dimen/abc_dropdownitem_text_padding_left"
+            android:layout_marginTop="8dp"
             android:background="@android:color/darker_gray"
         />
         <TextView
@@ -54,7 +54,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:layout_marginTop="@dimen/abc_dropdownitem_text_padding_left"
+            android:layout_marginTop="8dp"
             android:background="@android:color/darker_gray"
         />
         <TextView
@@ -73,7 +73,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:layout_marginTop="@dimen/abc_dropdownitem_text_padding_left"
+            android:layout_marginTop="8dp"
             android:background="@android:color/transparent"
         />
     </LinearLayout>

@@ -15,7 +15,6 @@
         android:text="@string/ui_verify_phone"
         android:textColor="@android:color/white"
         android:textSize="16sp"
-        android:layout_toLeftOf="@+id/verify_phone_close"
         android:layout_toStartOf="@+id/verify_phone_close"
     />
     <ImageButton
@@ -23,7 +22,6 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:background="@drawable/button_transparent_dark"
         android:src="@android:drawable/ic_menu_close_clear_cancel"

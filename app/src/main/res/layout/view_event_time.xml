@@ -12,6 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#CC000000"
+        android:textIsSelectable="false"
         tools:text="Thu, 15 Jan"
     />
     <TextView
@@ -19,8 +20,9 @@
         style="@style/EHText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/abc_text_size_caption_material"
+        android:textSize="12sp"
         android:textColor="#999197A3"
+        android:textIsSelectable="false"
         tools:text="9:30 am"
     />
 </LinearLayout>

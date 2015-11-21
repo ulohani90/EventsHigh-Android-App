@@ -16,7 +16,6 @@
         android:gravity="center_vertical|start"
         android:padding="8dp"
         android:text="Looking for company ?"
-        android:drawableRight="@drawable/com_facebook_close"
         android:drawableEnd="@drawable/com_facebook_close"
         android:clickable="true"
         tools:ignore="HardcodedText"
