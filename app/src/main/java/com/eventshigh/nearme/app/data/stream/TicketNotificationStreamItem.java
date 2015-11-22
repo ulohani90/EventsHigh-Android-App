@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
@@ -26,7 +25,7 @@ public class TicketNotificationStreamItem extends StreamItem {
         try {
             StreamDbHelper.addStreamToDB(context, streamItem);
         } catch (JSONException e) {
-            Crashlytics.getInstance().core.logException(e);
+            // Ignore.
         }
     }
 

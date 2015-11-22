@@ -12,7 +12,6 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.UserContact;
@@ -128,7 +127,6 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
             return Response.success(new SocialActions(eventFavourites, tagFollowers),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (Exception e) {
-            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }

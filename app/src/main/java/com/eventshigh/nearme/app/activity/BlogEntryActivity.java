@@ -16,7 +16,6 @@ import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.BlogEntry;
 import com.eventshigh.nearme.app.network.BlogEntryRequest;
@@ -169,7 +168,6 @@ public class BlogEntryActivity extends BaseActivity {
             }
             startActivity(sendIntent);
         } catch (ActivityNotFoundException e) {
-            Crashlytics.getInstance().core.logException(e);
             showMessage(R.string.failed_share);
         }
     }

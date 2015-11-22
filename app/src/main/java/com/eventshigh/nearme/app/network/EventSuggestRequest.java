@@ -7,7 +7,6 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.network.EventSuggestRequest.SuggestEvent;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -59,12 +58,10 @@ public class EventSuggestRequest extends JsonRequest<List<SuggestEvent>> {
                     suggestEvents.add(SuggestEvent.parse(suggestJSONArray.getJSONObject(i)));
                 } catch (JSONException e) {
                     // Ignore.
-                    Crashlytics.getInstance().core.logException(e);
                 }
             }
             return Response.success(suggestEvents, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
-            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }

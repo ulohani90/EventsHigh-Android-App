@@ -11,7 +11,6 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -84,7 +83,6 @@ public class EventRequest extends JsonRequest<Event> {
             return Response.success(Event.fromJSON(eventJson),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException | ParseException e) {
-            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }

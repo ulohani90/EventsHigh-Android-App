@@ -10,7 +10,6 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
-import com.crashlytics.android.Crashlytics;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,7 +58,6 @@ public class URLShortenerRequest extends JsonRequest<String> {
             return Response.success(resp.getString("id"),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
-            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }

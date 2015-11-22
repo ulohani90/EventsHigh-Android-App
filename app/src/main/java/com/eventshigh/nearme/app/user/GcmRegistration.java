@@ -6,7 +6,6 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
@@ -146,7 +145,7 @@ public class GcmRegistration {
         try {
             gcm.send(SENDER_ID + "@gcm.googleapis.com", UUID.randomUUID().toString(), data);
         } catch (Exception e) {
-            Crashlytics.getInstance().core.logException(e);
+            // Ignore.
         }
     }
 
@@ -173,7 +172,6 @@ public class GcmRegistration {
                     try {
                         registrationId = instanceID.getToken(SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
                     } catch (IOException e) {
-                        Crashlytics.getInstance().core.logException(e);
                         registrationId = null;
                     }
 
@@ -268,7 +266,7 @@ public class GcmRegistration {
 
                     gcmRegistrationInfo.edit().putBoolean(PREF_FIRST_TOPICS, true).apply();
                 } catch (Exception e) {
-                    Crashlytics.getInstance().core.logException(e);
+                    // Ignore.
                 }
             }
         }
@@ -298,7 +296,7 @@ public class GcmRegistration {
                     subscribeOrUnSubscribe(GcmPubSub.getInstance(context), registrationId, interest,
                             subscribe);
                 } catch (IOException e) {
-                    Crashlytics.getInstance().core.logException(e);
+                    // Ignore.
                 }
             }
         }).start();
@@ -314,7 +312,7 @@ public class GcmRegistration {
                 gcmPubSub.unsubscribe(registrationId, topicName);
             }
         } catch (IllegalArgumentException e) {
-            Crashlytics.getInstance().core.logException(e);
+            // Ignore.
         }
     }
 

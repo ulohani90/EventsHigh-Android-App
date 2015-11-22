@@ -1,18 +1,18 @@
 package com.eventshigh.nearme.app.task;
 
 import android.content.Context;
+import android.os.AsyncTask;
 
 import com.eventshigh.nearme.app.data.StreamDbHelper;
 import com.eventshigh.nearme.app.data.stream.StreamItem;
 
 import java.util.List;
 
-import io.fabric.sdk.android.services.concurrency.AsyncTask;
 
 /**
  * AsyncTask which can be used to load the StreamItems.
  */
-public class StreamItemLoaderTask extends AsyncTask<Void, Void, List<StreamItem>>  {
+public class StreamItemLoaderTask extends AsyncTask<Void, Void, List<StreamItem>> {
     public interface StreamItemsCallback {
         void onContactLoad(List<StreamItem> streamItems);
     }

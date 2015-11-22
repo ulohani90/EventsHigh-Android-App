@@ -10,7 +10,6 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.BlogEntry;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
@@ -86,7 +85,6 @@ public class BlogFeedRequest extends JsonRequest<List<BlogEntry>> {
             return Response.success(BlogEntry.parse(blogEntriesJson.getJSONArray("posts")),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
-            Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }
     }

@@ -11,11 +11,10 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.user.UserActionHelper.FollowingAction;
+import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONObject;
@@ -201,15 +200,6 @@ public class Account {
                 lastSyncTimestamp = System.currentTimeMillis();
             }
 
-            // Record user name for Crashlytics.
-            UserInfo userInfo = getUserInfo();
-            if (userInfo.name != null) {
-                Crashlytics.setUserName(userInfo.name);
-            }
-            if (userInfo.phoneNo != null) {
-                Crashlytics.setUserIdentifier(userInfo.phoneNo);
-            }
-
             String referrer = accountInfo.getString(PREF_REFERRER, null);
             String appLink = accountInfo.getString(PREF_SHARE_APP_LINK, null);
             if (appLink != null && (referrer == null || accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false))) {
@@ -233,7 +223,6 @@ public class Account {
                             appLinkListener, errorListener);
                     VolleyHelper.addToRequestQueue(context, request);
                 } catch (IOException | GeneralSecurityException e) {
-                    Crashlytics.getInstance().core.logException(e);
                     Log.w(Account.class.getSimpleName(), "failed to get shortlink", e);
                 }
             }
@@ -252,7 +241,7 @@ public class Account {
         private ErrorListener errorListener = new ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Crashlytics.getInstance().core.logException(volleyError.getCause());
+                // Ignore.
             }
         };
     }

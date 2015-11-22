@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.util.ArrayMap;
 import android.view.View;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.BuildConfig;
 
 import java.math.BigInteger;
@@ -83,7 +82,6 @@ public class Utils {
                         callback.run();
                     } catch (Exception e) {
                         // Ignore.
-                        Crashlytics.getInstance().core.logException(e);
                     }
                 }
             }

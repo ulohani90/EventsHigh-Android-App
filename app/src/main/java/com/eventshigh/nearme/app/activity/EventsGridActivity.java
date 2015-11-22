@@ -89,12 +89,6 @@ public class EventsGridActivity extends BaseContextActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_event, menu);
-
-        // Set visibility.
-        menu.findItem(R.id.action_show_map).setVisible(isPlayServicesPresent);
-
         if (showFollowCard || EventsHighEndpoints.isDateQuery(eventsContext.query)) {
             fabShare.setVisibility(View.VISIBLE);
         }

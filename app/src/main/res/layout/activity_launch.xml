@@ -71,18 +71,6 @@
             android:adjustViewBounds="false"
             tools:ignore="ContentDescription"
         />
-        <com.google.android.gms.plus.PlusOneButton
-            xmlns:plus="http://schemas.android.com/apk/lib/com.google.android.gms.plus"
-            android:id="@+id/plus_one_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            plus:size="standard"
-            plus:annotation="inline"
-        />
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

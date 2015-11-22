@@ -9,7 +9,6 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.SocialFriend;
@@ -95,7 +94,7 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
             }
             return eventInvitations;
         } catch (InterruptedException|ExecutionException e) {
-            Crashlytics.getInstance().core.logException(e);
+            // Ignore.
         }
 
         return null;

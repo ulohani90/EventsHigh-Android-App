@@ -32,10 +32,8 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventDescriptionSection;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
@@ -47,9 +45,7 @@ import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
-import com.eventshigh.nearme.app.ui.InviteFriendsDialog;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
-import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -67,8 +63,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.plus.PlusOneButton;
-import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 
 import java.io.UnsupportedEncodingException;
@@ -98,8 +92,6 @@ public class EventDetailActivity extends BaseActivity {
     private Account account;
     private String planId = null;
     private GoogleApiClient client;
-    private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
-    private boolean showInviteDialog = false;
     private boolean addToFavourite = false;
 
 
@@ -134,7 +126,6 @@ public class EventDetailActivity extends BaseActivity {
         int id = item.getItemId();
         if (id == R.id.action_share) {
             if (event != null) {
-                showRateAppDialog = true;
                 shareEvent(event, null);
             }
             return true;
@@ -194,32 +185,10 @@ public class EventDetailActivity extends BaseActivity {
     public void onResume() {
         super.onResume();
 
-        if (showRateAppDialog) {
-            RateAppDialog.show(this);
-            showRateAppDialog = false;
-        } else if (showInviteDialog) {
-            InviteFriendsDialog.show(this, event, planId);
-            showInviteDialog = false;
-        }
-
         if (addToFavourite && event != null && !isFavourite(event)) {
             addFavourite(null);
         }
         addToFavourite = false;
-
-        final String url = event == null ?
-            getIntent().getData().buildUpon().appendQueryParameter("src", "ehm_gp1").toString() :
-            event.getEventShareURI(this, "gp1").toString();
-
-        PlusOneButton plusOneButton = (PlusOneButton) findViewById(R.id.plus_one_button);
-        plusOneButton.initialize(url, PLUS_ONE_REQUEST_CODE);
-        plusOneButton.setOnPlusOneClickListener(new OnPlusOneClickListener() {
-            @Override
-            public void onPlusOneClick(Intent intent) {
-                reportActionToAnalytics("plusOne", url);
-                startActivityForResult(intent, PLUS_ONE_REQUEST_CODE);
-            }
-        });
     }
 
 
@@ -228,7 +197,6 @@ public class EventDetailActivity extends BaseActivity {
      **********************************/
 
     public void save(View view) {
-        showRateAppDialog = true;
         addToFavourite = true;
         reportEventAction(event, "addToCalendar");
 
@@ -237,7 +205,6 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openSourceSite(View view) {
-        showInviteDialog = true;
         reportEventAction(event, "organizer", view.getId() == R.id.join_event ? "joinEvent" : "openSource");
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.sourceUrl));
@@ -255,7 +222,6 @@ public class EventDetailActivity extends BaseActivity {
             return;
         }
 
-        showInviteDialog = true;
         addToFavourite = true;
         reportEventAction(event, "organizer", "call");
         new UserActionHelper(this).recordAction(EventAction.CALL, event.id);
@@ -266,7 +232,6 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openOrganizerLink(View view) {
-        showInviteDialog = true;
         reportEventAction(event, "organizer", "openLink");
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerLink));
@@ -274,7 +239,6 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openOrganizerWebsite(View view) {
-        showInviteDialog = true;
         reportEventAction(event, "organizer", "openWebsite");
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerWebsite));
@@ -290,7 +254,6 @@ public class EventDetailActivity extends BaseActivity {
             return;
         }
 
-        showRateAppDialog = true;
         addToFavourite = true;
         reportEventAction(event, "bookTicket");
         new UserActionHelper(this).recordAction(EventAction.BOOK, event.id);
@@ -378,7 +341,6 @@ public class EventDetailActivity extends BaseActivity {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
             // No activity to open maps.
-            Crashlytics.getInstance().core.logException(e);
             showMessage(R.string.no_map_app);
         }
     }
@@ -417,20 +379,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void checkWithFriends(View view) {
-        reportEventAction(event, "checkWithFriends");
-
-        UserInfo userInfo = new Account(this).getUserInfo();
-        if (userInfo.name == null || userInfo.phoneNo == null) {
-            PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
-            return;
-        }
-
-        Intent intent = new Intent(this, PlanActivity.class);
-        intent.putExtra(EXTRA_EVENT_PARAM, event);
-        if (planId != null) {
-            intent.putExtra(EXTRA_PLAN_ID_PARAM, planId);
-        }
-        startActivity(intent);
+        shareEvent(event, null);
     }
 
     public void playYouTube(View view) {
@@ -453,7 +402,6 @@ public class EventDetailActivity extends BaseActivity {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
             // No activity to open url. ignore.
-            Crashlytics.getInstance().core.logException(e);
         }
     }
 
@@ -555,7 +503,6 @@ public class EventDetailActivity extends BaseActivity {
             startActivitySafe(sendIntent);
         } catch (UnsupportedEncodingException e) {
             // do nothing.
-            Crashlytics.getInstance().core.logException(e);
         }
     }
 
@@ -831,7 +778,6 @@ public class EventDetailActivity extends BaseActivity {
                 organizerEmailView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showInviteDialog = true;
                         reportEventAction(event, "organizer", "email");
                         askOverEmail();
                     }
@@ -851,17 +797,6 @@ public class EventDetailActivity extends BaseActivity {
             }
 
             organizerHeader.setVisibility(organizerInfoShown ? View.VISIBLE : View.GONE);
-
-            // Event Description Section.
-            LinearLayout eventContainer = (LinearLayout) findViewById(R.id.event_container);
-            for (EventDescriptionSection descriptionSection : event.descriptionSections) {
-                View descriptionSectionView = getLayoutInflater().inflate(R.layout.view_description_section, eventContainer, false);
-                ((TextView) descriptionSectionView.findViewById(R.id.description_header)).setText(descriptionSection.name);
-                WebView descriptionView = (WebView) descriptionSectionView.findViewById(R.id.event_description);
-                CustomUrlActivity.setupWebView(descriptionView, EventDetailActivity.this, false);
-                descriptionView.loadData(toHtmlNoFrame(descriptionSection.description), "text/html; charset=UTF-8", null);
-                eventContainer.addView(descriptionSectionView);
-            }
         }
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {

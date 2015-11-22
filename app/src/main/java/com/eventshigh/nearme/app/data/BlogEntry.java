@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 
 import org.json.JSONArray;
@@ -94,7 +93,7 @@ public class BlogEntry implements Parcelable {
             try {
                 blogEntries.add(parse(blogEntriesJson.getJSONObject(i)));
             } catch (JSONException | ParseException e) {
-                Crashlytics.getInstance().core.logException(e);
+                // Ignore.
             }
         }
         return blogEntries;

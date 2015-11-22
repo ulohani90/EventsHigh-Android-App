@@ -11,10 +11,4 @@
           myApp:showAsAction="ifRoom|collapseActionView"
           myApp:actionViewClass="android.support.v7.widget.SearchView"
     />
-    <item android:id="@+id/action_show_map"
-          android:title="@string/action_show_map"
-          android:icon="@drawable/ic_location_on_white_36dp"
-          android:orderInCategory="20"
-          myApp:showAsAction="ifRoom"
-    />
 </menu>

@@ -7,7 +7,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 
 /**
@@ -42,7 +41,6 @@ public class VolleyHelper {
         String logTag = activity.getClass().getSimpleName();
         Throwable cause = volleyError.getCause();
         if (cause != null) {
-            Crashlytics.getInstance().core.logException(cause);
             Log.w(logTag, "Volley Error: " + volleyError.getMessage(), cause);
             activity.reportActionToAnalytics("failedRequest", cause.getClass().getSimpleName());
         } else {

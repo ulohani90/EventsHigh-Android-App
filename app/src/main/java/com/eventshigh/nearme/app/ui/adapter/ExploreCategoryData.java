@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.ui.adapter;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.EventCategory;
@@ -39,10 +38,8 @@ public class ExploreCategoryData implements AdapterData {
                     EventCategory.toCategoryParsableString(tag).toLowerCase()).getInt(null);
         } catch (IllegalAccessException e) {
             // Ignore
-            Crashlytics.getInstance().core.logException(e);
         } catch (NoSuchFieldException e) {
             // Ignore
-            Crashlytics.getInstance().core.logException(e);
             Log.d("", "No image for: " + tag, e);
         }
 

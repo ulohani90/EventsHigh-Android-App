@@ -25,7 +25,6 @@ import android.widget.ListView;
 
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -45,8 +44,6 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.plus.PlusOneButton;
-import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
 
 /**
  * Application Main or launch activity.
@@ -148,18 +145,6 @@ public class LaunchActivity extends BaseContextActivity {
 
         // Show next screen.
         showNextScreen();
-
-        // Setup the Google+ Button.
-        PlusOneButton plusOneButton = (PlusOneButton) findViewById(R.id.plus_one_button);
-        plusOneButton.initialize("https://play.google.com/store/apps/details?id=" + getPackageName(),
-                PLUS_ONE_REQUEST_CODE);
-        plusOneButton.setOnPlusOneClickListener(new OnPlusOneClickListener() {
-            @Override
-            public void onPlusOneClick(Intent intent) {
-                reportActionToAnalytics("plusOne");
-                startActivityForResult(intent, PLUS_ONE_REQUEST_CODE);
-            }
-        });
     }
 
     @Override
@@ -183,9 +168,6 @@ public class LaunchActivity extends BaseContextActivity {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
-        // Set visibility.
-        menu.findItem(R.id.action_show_map).setVisible(isPlayServicesPresent);
 
         return true;
     }
@@ -279,7 +261,7 @@ public class LaunchActivity extends BaseContextActivity {
                             }
                         );
                     } catch (NameNotFoundException e) {
-                        Crashlytics.getInstance().core.logException(e);
+                        // Ignore.
                     }
                 }
                 showNextScreen();

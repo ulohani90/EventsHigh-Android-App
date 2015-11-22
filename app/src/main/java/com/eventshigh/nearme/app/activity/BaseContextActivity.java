@@ -7,7 +7,6 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
@@ -105,19 +104,6 @@ public abstract class BaseContextActivity extends BaseActivity {
         appData.putParcelable(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
         startSearch(null, false, appData, false);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_show_map) {
-            reportActionToAnalytics("switchToMaps");
-            switchTo(EventsMapsActivity.class);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

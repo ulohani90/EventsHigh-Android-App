@@ -20,7 +20,6 @@ import android.widget.Toast;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -36,8 +35,6 @@ import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.GAHelper;
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
@@ -46,7 +43,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
-import io.fabric.sdk.android.Fabric;
 
 /**
  * Base activity class which does the common things like initialization of Google Analytics.
@@ -85,12 +81,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         // Animation.
         overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_translate);
-
-        // Twitter CrashAnalytics
-        Fabric.with(this, new Crashlytics());
-
-        // Report app to Facebook
-        FacebookSdk.sdkInitialize(getApplicationContext());
 
         // Setup Google Analytics.
         isPlayServicesPresent = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS;
@@ -134,9 +124,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onResume();
         isRunning = true;
 
-        // FB.
-        AppEventsLogger.activateApp(this);
-
         // Find out share action result.
         if (shareEventInitiatedTimestamp > 0) {
             long secForShare = (System.currentTimeMillis() - shareEventInitiatedTimestamp) / 1000;
@@ -162,9 +149,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         isRunning = false;
-
-        // FB.
-        AppEventsLogger.deactivateApp(this);
     }
 
     @Override
@@ -292,7 +276,6 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
             startActivity(sendIntent);
         } catch (ActivityNotFoundException e) {
-            Crashlytics.getInstance().core.logException(e);
             showMessage(R.string.failed_share);
             Log.w(LOG_TAG, "failed sharing", e);
         }
@@ -311,7 +294,6 @@ public abstract class BaseActivity extends AppCompatActivity {
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
         } catch (ActivityNotFoundException e) {
-            Crashlytics.getInstance().core.logException(e);
             showMessage(R.string.failed_share);
         }
     }
@@ -341,7 +323,6 @@ public abstract class BaseActivity extends AppCompatActivity {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
             // No activity to open cal.
-            Crashlytics.getInstance().core.logException(e);
             showMessage(R.string.no_cal_app);
         }
     }
@@ -371,9 +352,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     private static final Set<String> INSTALLED_PACKAGES = new HashSet<>();
-    protected boolean isInstalled(String packageName) {
-        return isInstalled(this, packageName);
-    }
 
     public static boolean isInstalled(Context context, String packageName) {
         synchronized (INSTALLED_PACKAGES) {

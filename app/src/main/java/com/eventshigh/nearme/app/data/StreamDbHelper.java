@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.StreamItem;
@@ -122,7 +121,7 @@ public class StreamDbHelper extends SQLiteOpenHelper {
                         streamItems.add(item);
                     }
                 } catch (JSONException e) {
-                    Crashlytics.getInstance().core.logException(e);
+                    // Do nothing.
                 }
             }
         } finally {

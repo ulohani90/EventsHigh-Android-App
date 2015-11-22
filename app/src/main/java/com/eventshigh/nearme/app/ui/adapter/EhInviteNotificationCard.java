@@ -13,7 +13,6 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -86,13 +85,11 @@ public class EhInviteNotificationCard extends ViewHolder {
                                 public void onErrorResponse(VolleyError volleyError) {
                                     // do nothing.
                                     activity.showMessage(R.string.failed_load);
-                                    Crashlytics.getInstance().core.logException(volleyError.getCause());
                                 }
                             }
                     )
             );
         } catch (IOException | GeneralSecurityException e) {
-            Crashlytics.getInstance().core.logException(e);
             Log.w(AccountStateReporter.class.getSimpleName(), "Failed to sendSignedRequest: " + uri, e);
         }
     }

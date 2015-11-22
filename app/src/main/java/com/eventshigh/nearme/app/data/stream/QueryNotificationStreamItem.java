@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.data.stream;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.StreamDbHelper;
 import com.eventshigh.nearme.app.data.StreamDbHelper.StreamType;
@@ -22,7 +21,7 @@ public class QueryNotificationStreamItem extends StreamItem {
         try {
             StreamDbHelper.addStreamToDB(context, streamItem);
         } catch (JSONException e) {
-            Crashlytics.getInstance().core.logException(e);
+            // Ignore.
         }
     }
 

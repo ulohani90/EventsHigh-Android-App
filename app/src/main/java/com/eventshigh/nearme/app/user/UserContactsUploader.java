@@ -12,7 +12,6 @@ import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.ContactsUploadRequest;
 import com.eventshigh.nearme.app.utils.ContactUtils;
@@ -87,6 +86,5 @@ public class UserContactsUploader implements Listener<JSONObject>, ErrorListener
     @Override
     public void onErrorResponse(VolleyError volleyError) {
         Log.w(LOG_TAG, volleyError.getMessage(), volleyError.getCause());
-        Crashlytics.getInstance().core.logException(volleyError.getCause());
     }
 }

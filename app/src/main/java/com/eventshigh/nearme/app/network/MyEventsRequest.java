@@ -10,7 +10,6 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
@@ -123,7 +122,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         try {
             eventIds.addAll(socialInvites.get().keySet());
         } catch (InterruptedException | ExecutionException e) {
-            Crashlytics.getInstance().core.logException(e);
+            // Ignore.
         }
 
         RequestFuture<List<Event>> invitedEvents = RequestFuture.newFuture();
@@ -170,7 +169,6 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
             if (eventsFuture.isCancelled()) {
                 throw new RequestCancelledException();
             }
-            Crashlytics.getInstance().core.logException(e);
         }
     }
 
@@ -182,7 +180,6 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
             if (eventsFuture.isCancelled()) {
                 throw new RequestCancelledException();
             }
-            Crashlytics.getInstance().core.logException(e);
         }
     }
 

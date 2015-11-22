@@ -14,13 +14,12 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
+import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONObject;
@@ -142,7 +141,6 @@ public class PhoneLoginActivity extends BaseActivity {
         } catch (IOException | GeneralSecurityException e) {
             progressBar.setVisibility(View.GONE);
             reportActionToAnalytics("sendCodeRetry");
-            Crashlytics.getInstance().core.logException(e);
             showRetryMessage();
         }
     }
@@ -186,7 +184,6 @@ public class PhoneLoginActivity extends BaseActivity {
         } catch (IOException | GeneralSecurityException e) {
             progressBar.setVisibility(View.GONE);
             reportActionToAnalytics("verifyCodeRetry");
-            Crashlytics.getInstance().core.logException(e);
             showRetryMessage();
         }
     }
@@ -229,7 +226,6 @@ public class PhoneLoginActivity extends BaseActivity {
             }
         } catch (Exception e) {
             // do nothing.
-            Crashlytics.getInstance().core.logException(e);
         }
         return VerificationStatus.RETRY;
     }

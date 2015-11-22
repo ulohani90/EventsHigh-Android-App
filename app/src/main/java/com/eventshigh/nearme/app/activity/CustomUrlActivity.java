@@ -18,7 +18,6 @@ import android.webkit.WebSettings.PluginState;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -85,7 +84,6 @@ public class CustomUrlActivity extends BaseActivity {
                     return;
                 } catch (Exception e) {
                     // do nothing
-                    Crashlytics.getInstance().core.logException(e);
                 }
             }
         }
@@ -111,7 +109,6 @@ public class CustomUrlActivity extends BaseActivity {
                 startActivity(intent);
             } catch (ActivityNotFoundException e) {
                 // No application to open url. ignore.
-                Crashlytics.getInstance().core.logException(e);
             }
             return  true;
         }

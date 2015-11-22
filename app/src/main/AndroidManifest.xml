@@ -33,27 +33,15 @@
         android:hardwareAccelerated="true"
         tools:ignore="AllowBackup"
     >
-        <!--   http://developer.android.com/preview/backup/index.html
-                android:fullBackupContent="@xml/ehbackup"
-        -->
         <!-- Setup the Google Play Services version and Google Maps api key -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"
         />
-        <meta-data
-            android:name="com.google.android.maps.v2.API_KEY"
-            android:value="@string/google_maps_key"
-        />
         <!-- Setup the Google analytics -->
         <meta-data
             android:name="com.google.android.gms.analytics.globalConfigResource"
             android:resource="@xml/analytics"
-        />
-        <!-- Setup the Crash Reporting -->
-        <meta-data
-            android:name="com.crashlytics.ApiKey"
-            android:value="88e38bba3d2788a9338644aa2f1a2b9f0ee92991"
         />
         <!-- Setup the search activity -->
         <meta-data
@@ -63,21 +51,6 @@
         <meta-data
             android:name="android.app.default_searchable"
             android:value=".activity.LaunchActivity"
-        />
-
-        <!-- FB -->
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
-        <provider
-            android:authorities="com.facebook.app.FacebookContentProvider196111897251952"
-            android:name="com.facebook.FacebookContentProvider"
-            android:exported="true"
-            tools:ignore="ExportedContentProvider"
-        />
-        <activity
-            android:name="com.facebook.FacebookActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:label="@string/app_name"
         />
 
         <!--Glide -->
@@ -146,12 +119,6 @@
             />
         </activity>
 
-        <activity
-            android:name=".activity.EventsMapsActivity"
-            android:label="@string/app_name"
-            android:theme="@style/NoActionBar"
-            android:screenOrientation="portrait"
-        />
         <activity
             android:name=".activity.EventsGridActivity"
             android:label="@string/app_name"
@@ -310,17 +277,6 @@
             />
         </activity>
 
-        <activity
-            android:name=".activity.PlanActivity"
-            android:label="@string/action_check_friends"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".activity.EventDetailActivity"
-        >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.EventDetailActivity"
-            />
-        </activity>
         <activity
             android:name=".activity.CustomUrlActivity"
             android:label="@string/app_name"

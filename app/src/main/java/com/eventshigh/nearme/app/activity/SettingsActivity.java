@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 
@@ -34,7 +33,6 @@ public class SettingsActivity extends BaseActivity {
                             Uri.parse("mailto:listings@eventshigh.com")));
                 } catch (ActivityNotFoundException e) {
                     // No activity to open url. ignore.
-                    Crashlytics.getInstance().core.logException(e);
                 }
             }
         }

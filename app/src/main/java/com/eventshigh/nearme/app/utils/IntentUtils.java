@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
@@ -71,7 +70,6 @@ public class IntentUtils {
                     param.setDateFilter(calendar);
                 } catch (Exception e) {
                     // ignore.
-                    Crashlytics.getInstance().core.logException(e);
                 }
             }
         }
@@ -121,7 +119,6 @@ public class IntentUtils {
                 deepLinkName = inUri.getPathSegments().get(0);
             } catch (IndexOutOfBoundsException e) {
                 // ignore.
-                Crashlytics.getInstance().core.logException(e);
             }
             activity.reportActionToAnalytics("deepLink", deepLinkName);
         }
@@ -146,7 +143,6 @@ public class IntentUtils {
             param.changeLocation(city.cityBounds.getCenter());
         } catch (IllegalArgumentException | NullPointerException e) {
             // Invalid city in URI. Ignore.
-            Crashlytics.getInstance().core.logException(e);
         }
     }
 
@@ -156,7 +152,6 @@ public class IntentUtils {
             param.changeLocation(city.cityBounds.getCenter());
         } catch (IllegalArgumentException | NullPointerException e) {
             // Invalid city in URI. Ignore.
-            Crashlytics.getInstance().core.logException(e);
         }
 
         String query = webUri.getQueryParameter("interest");
@@ -180,7 +175,6 @@ public class IntentUtils {
             }
         } catch (IndexOutOfBoundsException| IllegalArgumentException | NullPointerException | UnsupportedEncodingException e) {
             // Invalid city in URI. Ignore.
-            Crashlytics.getInstance().core.logException(e);
         }
     }
 
