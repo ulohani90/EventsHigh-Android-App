@@ -692,6 +692,8 @@
                 android:layout_marginStart="4dp"
                 android:gravity="center"
                 android:elevation="4dp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:text="@string/action_book"
                 android:onClick="openBookingSite"
                 android:visibility="gone"
