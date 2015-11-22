@@ -19,14 +19,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import java.io.File;
 
 public class CustomUrlActivity extends BaseActivity {
     public static final String BLOG_HOST = "blog.eventshigh.com";
-    public static final String OFFER_URL_PREFIX = "http://www.eventshigh.com/get_event_contest/";
     public static final String EXTRA_TITLE_KEY =  CustomUrlActivity.class.getName() + ".title";
 
     private WebView webView;
@@ -57,15 +55,6 @@ public class CustomUrlActivity extends BaseActivity {
             return;
         }
 
-        // Process the Offer request.
-        if (getIntent().getDataString().startsWith(OFFER_URL_PREFIX)) {
-            getIntent().setData(getIntent().getData().buildUpon()
-                .appendQueryParameter("reflink", new Account(this).getAppDownloadLink()).build());
-            if (title == null) {
-                title = getString(R.string.pref_title_offers);
-            }
-        }
-
         if (title != null) {
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
@@ -77,14 +66,12 @@ public class CustomUrlActivity extends BaseActivity {
         String action = getIntent().getAction();
         if (action != null && action.startsWith(NOTIFICATION_ACTION)) {
             reportActionToAnalytics("openNotification");
-            if (!getIntent().getDataString().startsWith(OFFER_URL_PREFIX)) {
-                try {
-                    startActivity(new Intent(Intent.ACTION_VIEW, getIntent().getData()));
-                    finish();
-                    return;
-                } catch (Exception e) {
-                    // do nothing
-                }
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, getIntent().getData()));
+                finish();
+                return;
+            } catch (Exception e) {
+                // do nothing
             }
         }
 

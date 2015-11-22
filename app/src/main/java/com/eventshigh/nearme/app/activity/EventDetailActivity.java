@@ -49,13 +49,11 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -80,7 +78,6 @@ public class EventDetailActivity extends BaseActivity {
     private LatLng userLocation = null;
     private Event event = null;
     private Account account;
-    private String planId = null;
     private GoogleApiClient client;
     private boolean addToFavourite = false;
 
@@ -344,21 +341,6 @@ public class EventDetailActivity extends BaseActivity {
         } else {
             showDirections(view);
         }
-    }
-
-    public void ama(View view) {
-        Account account = new Account(this);
-        UserInfo userInfo = account.getUserInfo();
-        if (userInfo.phoneNo == null || userInfo.name == null) {
-            PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
-            return;
-        }
-
-        reportEventAction(event, "ama");
-        ZendeskUtils.initZendesk(this);
-        ZendeskUtils.setEventFeedbackConfiguration(this, event);
-        Intent feedbackIntent = new Intent(this, ContactZendeskActivity.class);
-        startActivity(feedbackIntent);
     }
 
     public void checkWithFriends(View view) {

@@ -57,7 +57,6 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
 
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.2.2'
-    compile 'com.zendesk:sdk:1.4.1.1'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'com.splitwise:tokenautocomplete:2.0.1@aar'
     compile 'com.github.bumptech.glide:glide:3.6.1'

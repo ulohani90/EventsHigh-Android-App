@@ -13,22 +13,16 @@ import android.util.Log;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BlogEntryActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
-import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.data.FriendsStore;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
-import com.eventshigh.nearme.app.data.stream.TicketNotificationStreamItem;
 import com.eventshigh.nearme.app.notification.EHNotification;
-import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -140,12 +134,6 @@ public class GcmIntentService extends IntentService {
             intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, query));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
             QueryNotificationStreamItem.record(this, title, message, imageUrl, mobileNo, query);
-        } else if (ticket != null) {
-            ZendeskUtils.initZendesk(this);
-            Intent intent = new Intent(this, FeedbackActivity.class);
-            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
-            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
-            TicketNotificationStreamItem.record(this, title, message, imageUrl, ticket);
         } else if (target != null) {
             Intent intent = null;
             if (target.startsWith("tab:")) {

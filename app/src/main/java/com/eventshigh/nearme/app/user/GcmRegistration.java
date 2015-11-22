@@ -8,17 +8,12 @@ import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.google.android.gms.maps.model.LatLng;
-import com.zendesk.sdk.model.network.PushRegistrationResponse;
-import com.zendesk.sdk.network.impl.ZendeskConfig;
-import com.zendesk.service.ErrorResponse;
-import com.zendesk.service.ZendeskCallback;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -37,7 +32,6 @@ public class GcmRegistration {
 
     private static final String PREF_REGISTRATION_ID = "registration_id";
     private static final String PREF_REGISTRATION_ID_UPLOADED = "registration_id_uploaded";
-    private static final String PREF_ZENDESK_UPDATED = "zendesk_updated2";
     private static final String PREF_IID_UPLOADED = "iid_updated";
     private static final String PREF_DEVICE_INFO_UPLOADED = "device_info2";
     private static final String PREF_FIRST_TOPICS = "first_topics";
@@ -78,7 +72,6 @@ public class GcmRegistration {
     public synchronized void resetGcmRegistrationId() {
         Editor editor = gcmRegistrationInfo.edit();
         editor.remove(PREF_REGISTRATION_ID);
-        editor.remove(PREF_ZENDESK_UPDATED);
         editor.remove(PREF_REGISTRATION_ID_UPLOADED);
         editor.remove(PREF_FIRST_TOPICS);
         editor.apply();
@@ -179,7 +172,6 @@ public class GcmRegistration {
                         Editor editor = gcmRegistrationInfo.edit();
                         editor.putString(PREF_REGISTRATION_ID, registrationId);
                         editor.remove(PREF_REGISTRATION_ID_UPLOADED);
-                        editor.remove(PREF_ZENDESK_UPDATED);
                         editor.apply();
                     }
                 }
@@ -238,16 +230,6 @@ public class GcmRegistration {
                         gcmRegistrationInfo.edit().putBoolean(PREF_REGISTRATION_ID_UPLOADED, true).apply();
                     }
                 });
-            }
-
-            // Report the GCM registration id with zendesk.
-            if (!gcmRegistrationInfo.getBoolean(PREF_ZENDESK_UPDATED, false)) {
-                ZendeskUtils.initZendesk(context);
-                try {
-                    ZendeskConfig.INSTANCE.enablePush(registrationId, zendeskCallback);
-                } catch (Exception e) {
-                    // Wait for initialization to finish and retry later.
-                }
             }
 
             // Subscribe to topics.
@@ -315,17 +297,4 @@ public class GcmRegistration {
             // Ignore.
         }
     }
-
-    private ZendeskCallback<PushRegistrationResponse> zendeskCallback =
-            new ZendeskCallback<PushRegistrationResponse>() {
-                @Override
-                public void onSuccess(PushRegistrationResponse pushRegistrationResponse) {
-                    gcmRegistrationInfo.edit().putBoolean(PREF_ZENDESK_UPDATED, true).apply();
-                }
-
-                @Override
-                public void onError(ErrorResponse errorResponse) {
-                    // do nothing. upload will be retried.
-                }
-            };
 }

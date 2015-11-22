@@ -162,16 +162,6 @@
                     android:onClick="showDirections"
                     android:text="@string/action_direction"
                 />
-                <TextView
-                    style="@style/EHDetailActionButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableTop="@drawable/ic_help_grey600_24dp"
-                    android:clickable="true"
-                    android:onClick="ama"
-                    android:text="@string/action_ama"
-                />
             </LinearLayout>
 
             <!-- Event Venue -->

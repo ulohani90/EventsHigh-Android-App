@@ -5,11 +5,8 @@
     <bool name="ga_reportUncaughtExceptions">false</bool>
 
     <screenName name="com.eventshigh.nearme.app.activity.LaunchActivity">Launch</screenName>
-    <screenName name="com.eventshigh.nearme.app.activity.EventsMapsActivity">Maps</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.EventsGridActivity">Grid</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.EventDetailActivity">Details</screenName>
-    <screenName name="com.eventshigh.nearme.app.activity.PlanActivity">Plan</screenName>
-    <screenName name="com.eventshigh.nearme.app.activity.MyFriendsActivity">MyFriends</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.BlogFeedActivity">BlogFeed</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.BlogEntryActivity">BlogEntry</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.CustomUrlActivity">CustomUrl</screenName>

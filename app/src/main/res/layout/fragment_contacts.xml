@@ -31,17 +31,9 @@
             android:paddingRight="10dp"
             android:paddingBottom="20dp"
             android:clipToPadding="false"
-            tools:listitem="@layout/event_card"
+            tools:listitem="@layout/card_event"
         />
     </android.support.v4.widget.SwipeRefreshLayout>
-
-    <include
-        android:id="@+id/view_no_friends_on_eh"
-        layout="@layout/view_no_friends_on_eh"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-    />
 
     <include
         android:id="@+id/view_retry"

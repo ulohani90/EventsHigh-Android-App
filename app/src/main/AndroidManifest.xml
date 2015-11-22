@@ -282,11 +282,6 @@
             android:theme="@style/NoActionBar"
         />
         <activity
-            android:name=".activity.FeedbackActivity"
-            android:label="@string/pref_title_send_feedback"
-            android:screenOrientation="portrait"
-        />
-        <activity
             android:name=".activity.PhoneLoginActivity"
             android:label="@string/pref_title_phone_no"
             android:screenOrientation="portrait"

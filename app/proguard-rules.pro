@@ -16,9 +16,6 @@
 #   public *;
 #}
 
--include ../proguard-com.twitter.sdk.android.twitter.txt
--include ../proguard-zendesk.txt
-
 # Google Play Services
 -keep class * extends java.util.ListResourceBundle {
     protected Object[][] getContents();

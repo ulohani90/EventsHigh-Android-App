@@ -8,7 +8,6 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.user.Account;
-import com.zendesk.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -158,7 +157,14 @@ public class EventsHighEndpoints {
 
     public static String getApiEndpointEventsUber(List<String> eventIds) {
         Collections.sort(eventIds);
-        return String.format(API_ENDPOINT_MULTI_EVENT_UBER_FORMAT, StringUtils.toCsvString(eventIds));
+        StringBuilder sb = new StringBuilder();
+        for (String eventId : eventIds) {
+            if (sb.length() == 0) {
+                sb.append(',');
+            }
+            sb.append(eventId);
+        }
+        return String.format(API_ENDPOINT_MULTI_EVENT_UBER_FORMAT, sb.toString());
     }
 
     public static String getApiEndpointBlogEntry(String blogUrl) {
