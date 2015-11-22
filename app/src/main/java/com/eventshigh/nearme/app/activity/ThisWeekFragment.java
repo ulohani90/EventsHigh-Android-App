@@ -83,6 +83,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
         });
     }
 
+    @SuppressLint("SetTextI18n")
     private int populateTabs() {
         int selectedPosition = 0;
         for (int i = 0; i < adapter.getCount(); i++) {
@@ -138,7 +139,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
         public Fragment getItem(int position) {
             EventsContext dateContext = new EventsContext(eventsContext.location, "");
             dateContext.setDateFilter(getDate(position));
-            return EventsFragment.getInstance(dateContext, false, showCategories, false);
+            return EventsFragment.getInstance(dateContext, false, showCategories);
         }
 
         @Override

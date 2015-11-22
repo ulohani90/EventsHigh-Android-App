@@ -11,12 +11,6 @@
             android:targetClass="com.eventshigh.nearme.app.activity.PhoneLoginActivity"
         />
     </Preference>
-    <Preference android:title="@string/title_my_friends">
-        <intent
-            android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.MyFriendsActivity"
-        />
-    </Preference>
     <Preference android:title="@string/title_blog">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"

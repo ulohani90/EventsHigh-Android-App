@@ -9,15 +9,12 @@ public class FollowData implements AdapterData {
     public final int numEvents;
     public final int numFollowers;
     public final BaseContextActivity activity;
-    public final SocialDataProvider socialDataProvider;
 
-    public FollowData(String title, int numEvents, int numFollowers, BaseContextActivity activity,
-                      SocialDataProvider socialDataProvider) {
+    public FollowData(String title, int numEvents, int numFollowers, BaseContextActivity activity) {
         this.title = title;
         this.numEvents = numEvents;
         this.numFollowers = numFollowers;
         this.activity = activity;
-        this.socialDataProvider = socialDataProvider;
     }
 
     @Override

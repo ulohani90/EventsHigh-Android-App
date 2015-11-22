@@ -19,7 +19,6 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -44,8 +43,6 @@ public class EHNotification {
     public final int notificationId;
     public final int priority;
 
-    @Nullable UserContact contact;
-
     public EHNotification(Context context, Intent wakefulIntent, Event event, int notificationId) {
         this.context = context;
         this.wakefulIntent = wakefulIntent;
@@ -62,7 +59,6 @@ public class EHNotification {
         imageUrl = event.imgUrl;
 
         launchIntent = createPendingIntent(context, event.id, event.city);
-        contact = null;
 
         // Record notification in stream.
         EventNotificationStreamItem.record(context, title, message, imageUrl, null, event.id,
@@ -70,18 +66,16 @@ public class EHNotification {
     }
 
     public EHNotification(Context context, Intent wakefulIntent, String title, String message,
-            String imageUrl, PendingIntent launchIntent, int priority, @Nullable UserContact contact) {
+            String imageUrl, PendingIntent launchIntent, int priority) {
         this.context = context;
         this.wakefulIntent = wakefulIntent;
-        this.notificationId = contact == null ?
-                NotificationUtils.GCM_NOTIFICATION_ID : contact.mobileNo.hashCode();
+        this.notificationId = NotificationUtils.GCM_NOTIFICATION_ID;
         this.priority = priority;
 
         this.title = title;
         this.message = message;
         this.imageUrl = imageUrl;
         this.launchIntent = launchIntent;
-        this.contact = contact;
     }
 
     public void showNotificationAndReleaseWakeLock() {
@@ -115,7 +109,7 @@ public class EHNotification {
 
     private void showNotificationNoImage() {
         Notification notification = NotificationUtils.createNotificationBuilder(context, title,
-                message, contact, launchIntent, priority)
+                message, launchIntent, priority)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .build();
 
@@ -125,7 +119,7 @@ public class EHNotification {
 
     private void showNotificationWithImage(Bitmap bitmap) {
         Notification notification = NotificationUtils.createNotificationBuilder(
-                context, title, message, contact, launchIntent, priority)
+                context, title, message, launchIntent, priority)
                 .setStyle(new NotificationCompat.BigPictureStyle()
                                 .setSummaryText(message)
                                 .bigPicture(bitmap)

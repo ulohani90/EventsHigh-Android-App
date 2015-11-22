@@ -18,9 +18,7 @@ public enum DataType {
     EVENT_PAGER(7),
     SEE_ALL(8),
     EVENT_INVITATION(9),
-    SOCIAL_FRIEND(10),
-    EH_INVITE(11),
-    EH_INVITE_NOTIFICATION(12);
+    EH_INVITE(11);
 
     public final int typeId;
 
@@ -71,16 +69,8 @@ public enum DataType {
             return EventInvitationCard.newInstance(activity, parent);
         }
 
-        if (typeId == SOCIAL_FRIEND.typeId) {
-            return SocialFriendCard.newInstance(activity, parent);
-        }
-
         if (typeId == EH_INVITE.typeId) {
             return EhInviteCard.newInstance(activity, parent);
-        }
-
-        if (typeId == EH_INVITE_NOTIFICATION.typeId) {
-            return EhInviteNotificationCard.newInstance(activity, parent);
         }
 
         throw new IllegalArgumentException("invalid typeid");

@@ -17,12 +17,10 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
-import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.eventshigh.nearme.app.view.ContactListView;
 
 public class EventCard extends ViewHolder {
     private final boolean shouldAdjustImageHeight;
@@ -36,7 +34,6 @@ public class EventCard extends ViewHolder {
     private final TextView travelTimeView;
     private final View arrowView;
     private final TextView eventStatsView;
-    private final ContactListView invitedByView;
     private final View infoArrowView;
 
     public static EventCard newInstance(Activity activity, ViewGroup parent,
@@ -68,7 +65,6 @@ public class EventCard extends ViewHolder {
         travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
         arrowView = cardView.findViewById(R.id.arrow);
         eventStatsView = (TextView) cardView.findViewById(R.id.event_stats);
-        invitedByView = (ContactListView) cardView.findViewById(R.id.invited_by);
         infoArrowView = cardView.findViewById(R.id.info_arrow);
     }
 
@@ -81,8 +77,7 @@ public class EventCard extends ViewHolder {
 
     @SuppressLint("SetTextI18n")
     public void bindEventView(final Event event, boolean isFirstEvent, final int position,
-                              final BaseContextActivity activity,
-                              @Nullable SocialInvite invite) {
+                              final BaseContextActivity activity) {
         bindEventView(event, activity);
 
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
@@ -112,12 +107,7 @@ public class EventCard extends ViewHolder {
             }
         });
 
-        // Is user invited to this event ?
-        if (invite != null && invite.getInvitedBy() != null) {
-            invitedByView.setVisibility(View.VISIBLE);
-            invitedByView.setFollowers(activity, invite.getAllInvitedBy());
-            infoArrowView.setVisibility(View.VISIBLE);
-        } else if (event.numViews > 5) {
+        if (event.numViews > 5) {
             eventStatsView.setVisibility(View.VISIBLE);
             eventStatsView.setText("" + event.numViews + " views");
             infoArrowView.setVisibility(View.VISIBLE);
@@ -179,7 +169,6 @@ public class EventCard extends ViewHolder {
         favouriteView.setVisibility(View.GONE);
         travelTimeView.setVisibility(View.GONE);
         eventStatsView.setVisibility(View.GONE);
-        invitedByView.setVisibility(View.GONE);
         infoArrowView.setVisibility(View.GONE);
     }
 }

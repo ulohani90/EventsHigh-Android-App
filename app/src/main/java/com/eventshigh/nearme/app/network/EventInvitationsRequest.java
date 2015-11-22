@@ -11,7 +11,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -25,11 +24,9 @@ import java.util.concurrent.ExecutionException;
 public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInvitation>> {
     public static class EventInvitation {
         public final Event event;
-        public final SocialFriend invitedBy;
 
-        public EventInvitation(Event event, SocialFriend invitedBy) {
+        public EventInvitation(Event event) {
             this.event = event;
-            this.invitedBy = invitedBy;
         }
     }
 
@@ -70,10 +67,7 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
 
             List<String> eventIds = new ArrayList<>(invites.size());
             for (SocialInvite invite : invites) {
-                SocialFriend invitedBy = invite.getInvitedBy();
-                if (invitedBy != null) {
-                    eventIds.add(invite.eventId);
-                }
+                eventIds.add(invite.eventId);
             }
 
             RequestFuture<List<Event>> future2 = RequestFuture.newFuture();
@@ -87,9 +81,8 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
             List<EventInvitation> eventInvitations = new ArrayList<>(invites.size());
             for (SocialInvite invite : invites) {
                 Event event = eventsMap.get(invite.eventId);
-                SocialFriend invitedBy = invite.getInvitedBy();
-                if (event != null && invitedBy != null) {
-                    eventInvitations.add(new EventInvitation(event, invitedBy));
+                if (event != null) {
+                    eventInvitations.add(new EventInvitation(event));
                 }
             }
             return eventInvitations;

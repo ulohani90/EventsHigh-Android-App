@@ -21,10 +21,6 @@ import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
-import com.eventshigh.nearme.app.network.SocialActionsRequest;
-import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
-import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
-import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
@@ -32,15 +28,11 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Fragment to show events.
  */
 public class EventsFragment extends BaseEventsFragment {
-    private static final String SHOW_EH_INVITE_NOTIFICATION_PARAM =
-            EventsFragment.class.getName() + "_show_eh_invite_param";
-
     private AutofitRecyclerView eventGridView;
     private View topProgressBar;
     private View noMyEventsView;
@@ -49,13 +41,10 @@ public class EventsFragment extends BaseEventsFragment {
     private EventsAdapter eventsAdapter;
     private OnScrollListener onScrollListener;
 
-    private boolean showEhInviteForNotification;
-
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
-                                             boolean showCategories, boolean showEhInviteForNotification) {
+                                             boolean showCategories) {
         EventsFragment fragment = new EventsFragment();
         Bundle args = getArgs(eventsContext, showFollowCard, showCategories);
-        args.putBoolean(SHOW_EH_INVITE_NOTIFICATION_PARAM, showEhInviteForNotification);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,7 +52,6 @@ public class EventsFragment extends BaseEventsFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        showEhInviteForNotification = getArguments().getBoolean(SHOW_EH_INVITE_NOTIFICATION_PARAM);
         if (onScrollListener == null) {
             onScrollListener = new HideActionBarOnScroll(this.activity);
         }
@@ -146,34 +134,6 @@ public class EventsFragment extends BaseEventsFragment {
             EventCollectionRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
         }
-        SocialInvitationsRequest.submit(activity, Priority.NORMAL, this, false, mSocialInvitesCallback,
-                new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        VolleyHelper.log(activity, volleyError);
-                    }
-                }
-        );
-
-        // Load social actions.
-        if (showFollowCard) {
-            SocialActionsRequest.submit(activity, Priority.LOW, this, shouldBypassCache,
-                    new Listener<SocialActions>() {
-                        @Override
-                        public void onResponse(SocialActions socialActions, boolean isIntermediate) {
-                            activity.reportActionToAnalytics("showSocialInfo", "followers",
-                                    socialActions.getNumFollowers(eventsContext.query));
-                            eventsAdapter.setSocialActions(socialActions);
-                        }
-                    },
-                    new ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            VolleyHelper.log(activity, volleyError);
-                        }
-                    }
-            );
-        }
     }
 
     private Listener<List<TopicEvents>> mMyEventsFetcherCallBack = new Listener<List<TopicEvents>>() {
@@ -223,7 +183,7 @@ public class EventsFragment extends BaseEventsFragment {
             if (!isIntermediate || !eventsCollection.events.isEmpty()) {
                 String seeAllQuery = eventsContext.query.isEmpty() ||
                         eventsContext.dateFilter.isEmpty() ? null : eventsContext.query;
-                eventsAdapter.setEvents(eventsCollection.events, seeAllQuery, showEhInviteForNotification);
+                eventsAdapter.setEvents(eventsCollection.events, seeAllQuery);
                 if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                             eventsCollection.numFollowers);
@@ -231,18 +191,6 @@ public class EventsFragment extends BaseEventsFragment {
             }
         }
     };
-
-    private Listener<Map<String, SocialInvite>> mSocialInvitesCallback =
-        new Listener<Map<String, SocialInvite>>() {
-            @Override
-            public void onResponse(Map<String, SocialInvite> socialInvites, boolean isIntermediate) {
-                if (isDetached()) {
-                    return;
-                }
-
-                eventsAdapter.setSocialInvites(socialInvites);
-            }
-        };
 
     private ErrorListener mErrorListener = new ErrorListener() {
         @Override

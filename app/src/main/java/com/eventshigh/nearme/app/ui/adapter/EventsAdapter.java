@@ -10,14 +10,11 @@ import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
-import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
-import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
-import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView.SpanAllColumnLookup;
 
@@ -30,13 +27,11 @@ import java.util.Set;
 /**
  * An adapter which can be used to populate the Event card.
  */
-public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements SpanAllColumnLookup, SocialDataProvider {
+public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements SpanAllColumnLookup {
     private final BaseContextActivity activity;
     private final Map<String, Integer> eventIdToItemIdMap = Utils.getMap();
     private final Set<Integer> usedItemIds = new HashSet<>();
     private List<AdapterData> dataToShow;
-    @Nullable private SocialActions socialActions;
-    @Nullable private Map<String, SocialInvite> socialInvites;
 
     public EventsAdapter(BaseContextActivity activity) {
         this.activity = activity;
@@ -45,27 +40,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         setHasStableIds(true);
     }
 
-    public void setSocialActions(@Nullable SocialActions socialActions) {
-        this.socialActions = socialActions;
-        notifyDataSetChanged();
-    }
-
-    public void setSocialInvites(@Nullable Map<String, SocialInvite> socialInvites) {
-        this.socialInvites = socialInvites;
-        notifyDataSetChanged();
-    }
-
-    public void setEvents(List<Event> events, @Nullable String categoryForSeeAll,
-                          boolean showEhInviteForNotification) {
+    public void setEvents(List<Event> events, @Nullable String categoryForSeeAll) {
         dataToShow.clear();
         for (Event event: events) {
-            dataToShow.add(new EventData("", event, false, activity, this));
+            dataToShow.add(new EventData("", event, false, activity));
         }
         if (categoryForSeeAll != null) {
             dataToShow.add(new SeeAllData(activity, categoryForSeeAll));
-        }
-        if (showEhInviteForNotification) {
-            dataToShow.add(new EhInviteNotificationData(activity));
         }
 
         notifyDataSetChanged();
@@ -89,7 +70,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
             dataToShow.add(new HeaderData(activity, eventsContext, topicEvent.topicName, topicEvent.numEvents));
             boolean isFirstEvent = true;
             for (Event event : events) {
-                dataToShow.add(new EventData(topicEvent.topicName, event, isFirstEvent, activity, this));
+                dataToShow.add(new EventData(topicEvent.topicName, event, isFirstEvent, activity));
                 isFirstEvent = false;
             }
         }
@@ -109,7 +90,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
                 dataToShow.add(new SmallHeaderData(
                         activity.getString(R.string.ui_browse_featured)));
                 for (TrendingTopic trendingTopic : eventCollection.trendingTopics) {
-                    dataToShow.add(new TrendingCategoryData(trendingTopic, activity, this));
+                    dataToShow.add(new TrendingCategoryData(trendingTopic, activity));
                 }
             }
         }
@@ -117,13 +98,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         if (!localities.isEmpty()) {
             dataToShow.add(new SmallHeaderData(activity.getString(R.string.ui_browse_loc)));
             for (Locality locality : localities) {
-                dataToShow.add(new TrendingCategoryData(locality.asTrendingTopic(), activity, this));
+                dataToShow.add(new TrendingCategoryData(locality.asTrendingTopic(), activity));
             }
         }
 
         dataToShow.add(new SmallHeaderData(activity.getString(R.string.ui_browse_cat)));
         for (String tag : tags) {
-            dataToShow.add(new ExploreCategoryData(tag, activity, this));
+            dataToShow.add(new ExploreCategoryData(tag, activity));
         }
         notifyDataSetChanged();
     }
@@ -139,17 +120,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
     public void addFollowCard(String title, int numEvents, int numFollowers) {
-        dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity, this));
-    }
-
-    @Override
-    public @Nullable Set<SocialFriend> getFollowers(String tag) {
-        return socialActions == null ? null : socialActions.getTagFollowers(tag);
-    }
-
-    @Override
-    public @Nullable SocialInvite getSocialInvite(String eventId) {
-        return socialInvites == null ? null : socialInvites.get(eventId);
+        dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity));
     }
 
     @Override

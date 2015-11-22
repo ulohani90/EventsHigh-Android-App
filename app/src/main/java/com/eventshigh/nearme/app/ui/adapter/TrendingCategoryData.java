@@ -8,13 +8,10 @@ import com.eventshigh.nearme.app.data.TrendingTopic;
 public class TrendingCategoryData implements AdapterData {
     public final TrendingTopic trendingTopic;
     public final BaseContextActivity activity;
-    public final SocialDataProvider socialDataProvider;
 
-    public TrendingCategoryData(TrendingTopic trendingTopic, BaseContextActivity activity,
-                                SocialDataProvider socialDataProvider) {
+    public TrendingCategoryData(TrendingTopic trendingTopic, BaseContextActivity activity) {
         this.trendingTopic = trendingTopic;
         this.activity = activity;
-        this.socialDataProvider = socialDataProvider;
     }
 
     @Override

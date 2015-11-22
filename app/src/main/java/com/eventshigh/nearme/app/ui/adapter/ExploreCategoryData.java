@@ -10,12 +10,10 @@ import com.eventshigh.nearme.app.data.EventCategory;
 public class ExploreCategoryData implements AdapterData {
     public final String tag;
     public final BaseContextActivity activity;
-    public final SocialDataProvider socialDataProvider;
 
-    public ExploreCategoryData(String tag, BaseContextActivity activity, SocialDataProvider socialDataProvider) {
+    public ExploreCategoryData(String tag, BaseContextActivity activity) {
         this.tag = tag;
         this.activity = activity;
-        this.socialDataProvider = socialDataProvider;
     }
 
     @Override

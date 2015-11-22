@@ -10,7 +10,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.view.ContactListView;
 
 import java.text.MessageFormat;
 
@@ -19,7 +18,6 @@ public class FollowCard extends ViewHolder {
     private TextView subtitleView;
     private View followButton;
     private View followingButton;
-    private ContactListView followedByView;
 
     public static FollowCard newInstance(final BaseActivity activity, ViewGroup parent) {
         View view = activity.getLayoutInflater().inflate(R.layout.card_follow, parent, false);
@@ -33,7 +31,6 @@ public class FollowCard extends ViewHolder {
         subtitleView = (TextView) itemView.findViewById(R.id.subtitle);
         followButton = itemView.findViewById(R.id.follow_button);
         followingButton = itemView.findViewById(R.id.following_button);
-        followedByView = (ContactListView) itemView.findViewById(R.id.followed_by);
     }
 
     public void populate(final FollowData data) {
@@ -63,8 +60,6 @@ public class FollowCard extends ViewHolder {
                 setFollowButtons(false);
             }
         });
-
-        followedByView.setFollowers(data.activity, data.socialDataProvider.getFollowers(data.title));
     }
 
     public void setFollowButtons(boolean isFollowing) {

@@ -37,18 +37,11 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
-import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.network.EventRequest;
-import com.eventshigh.nearme.app.network.SocialActionsRequest;
-import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
-import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
-import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
-import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.user.UserActionHelper.EventAction;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -57,7 +50,6 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
-import com.eventshigh.nearme.app.view.ContactListView;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -69,8 +61,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.Map;
-import java.util.Set;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
@@ -364,13 +354,6 @@ public class EventDetailActivity extends BaseActivity {
             return;
         }
 
-        Preferences preferences = Preferences.getInstance(this);
-        if (!preferences.canUploadContacts()) {
-            AskForContactsDialog.show(this, preferences);
-            return;
-        }
-
-
         reportEventAction(event, "ama");
         ZendeskUtils.initZendesk(this);
         ZendeskUtils.setEventFeedbackConfiguration(this, event);
@@ -424,58 +407,6 @@ public class EventDetailActivity extends BaseActivity {
 
         // Connect to Google API client to notify the view.
         getGoogleApiClient();
-
-        // Show social data.
-        SocialActionsRequest.submit(this, Priority.LOW, this, false,
-                new Listener<SocialActions>() {
-                    @Override
-                    public void onResponse(SocialActions socialActions, boolean isIntermediate) {
-                        Set<SocialFriend> likedBy = socialActions.eventFavourites.get(event.id);
-                        reportActionToAnalytics("showSocialInfo", "likes",
-                                likedBy == null ? 0 : likedBy.size());
-                        ((ContactListView) findViewById(R.id.followed_by)).setFollowers(
-                                EventDetailActivity.this, likedBy);
-                    }
-                },
-                new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        VolleyHelper.log(EventDetailActivity.this, volleyError);
-                    }
-                }
-        );
-        SocialInvitationsRequest.submit(this, Priority.LOW, this, false,
-                new Listener<Map<String, SocialInvite>>() {
-                    @Override
-                    public void onResponse(Map<String, SocialInvite> invites, boolean isIntermediate) {
-                        SocialInvite invite = invites.get(event.id);
-                        if (invite == null || invite.getInvitedBy() == null) {
-                            reportActionToAnalytics("showSocialInfo", "invitedBy", 0);
-                            return;
-                        }
-
-                        planId = invite.getPlanId();
-                        Set<SocialFriend> allInvitedBy = invite.getAllInvitedBy();
-                        Set<SocialFriend> allParticipants = invite.getAllParticipants();
-                        reportActionToAnalytics("showSocialInfo", "invitedBy", allInvitedBy.size());
-
-                        String prefix = allInvitedBy.size() == 1 ?
-                                allInvitedBy.iterator().next().getName() : "";
-                        String suffix = allParticipants.size() < 3 ? "" : "and " + (allParticipants.size() - 2) + " more friends";
-
-                        ContactListView invitedByView = (ContactListView) findViewById(R.id.invited_by);
-                        invitedByView.setVisibility(View.VISIBLE);
-                        invitedByView.setText(prefix + " has invited you " + suffix);
-                        invitedByView.setFollowers(EventDetailActivity.this, allInvitedBy, allParticipants);
-                    }
-                },
-                new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        VolleyHelper.log(EventDetailActivity.this, volleyError);
-                    }
-                }
-        );
     }
 
     private void setScroll(int scrollValue) {

@@ -12,7 +12,6 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
-import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.AccountStateReporter;
@@ -26,36 +25,26 @@ import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvite>>  {
 
     public static class PlanInvite {
         public final String planId;
-        public final List<SocialFriend> invitedBy;
-        public final List<SocialFriend> allParticipants;
 
-        public PlanInvite(String planId, List<SocialFriend> invitedBy, List<SocialFriend> allParticipants) {
+        public PlanInvite(String planId) {
             this.planId = planId;
-            this.invitedBy = invitedBy;
-            this.allParticipants = allParticipants;
         }
 
-        public static PlanInvite fromJSON(JSONObject data, Context context) throws JSONException {
-            List<SocialFriend> invitedBy =
-                    SocialFriend.fromJSON(data.getJSONArray("invited_by"), context);
-            List<SocialFriend> allParticipants =
-                    SocialFriend.fromJSON(data.getJSONArray("all_participants"), context);
-            return new PlanInvite(data.getString("plan_id"), invitedBy, allParticipants);
+        public static PlanInvite fromJSON(JSONObject data) throws JSONException {
+            return new PlanInvite(data.getString("plan_id"));
         }
 
-        public static List<PlanInvite> fromJSON(JSONArray data, Context context) throws JSONException {
+        public static List<PlanInvite> fromJSON(JSONArray data) throws JSONException {
             List<PlanInvite> invites = new ArrayList<>(data.length());
             for (int i = 0; i < data.length(); i++) {
-                invites.add(fromJSON(data.getJSONObject(i), context));
+                invites.add(fromJSON(data.getJSONObject(i)));
             }
             return invites;
         }
@@ -70,24 +59,6 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
             this.planInvites = planInvites;
         }
 
-        public @Nullable SocialFriend getInvitedBy() {
-            for (PlanInvite invite : planInvites) {
-                if (! invite.invitedBy.isEmpty()) {
-                    return invite.invitedBy.get(0);
-                }
-            }
-
-            return  null;
-        }
-
-        public Set<SocialFriend> getAllParticipants() {
-            Set<SocialFriend> allParticipants = getAllInvitedBy();
-            for (PlanInvite invite : planInvites) {
-                allParticipants.addAll(invite.allParticipants);
-            }
-            return allParticipants;
-        }
-
         @SuppressWarnings("LoopStatementThatDoesntLoop")
         public @Nullable String getPlanId() {
             for (PlanInvite invite : planInvites) {
@@ -97,24 +68,16 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
             return  null;
         }
 
-        public Set<SocialFriend> getAllInvitedBy() {
-            Set<SocialFriend> allInvitedBy = new HashSet<>();
-            for (PlanInvite invite : planInvites) {
-                allInvitedBy.addAll(invite.invitedBy);
-            }
 
-            return allInvitedBy;
-        }
-
-        public static SocialInvite fromJSON(JSONObject data, Context context) throws JSONException {
+        public static SocialInvite fromJSON(JSONObject data) throws JSONException {
             return new SocialInvite(data.getString("event_id"),
-                    PlanInvite.fromJSON(data.getJSONArray("plans"), context));
+                    PlanInvite.fromJSON(data.getJSONArray("plans")));
         }
 
-        public static List<SocialInvite> fromJSON(JSONArray data, Context context) throws JSONException {
+        public static List<SocialInvite> fromJSON(JSONArray data) throws JSONException {
             List<SocialInvite> invites = new ArrayList<>(data.length());
             for (int i = 0; i < data.length(); i++) {
-                invites.add(fromJSON(data.getJSONObject(i), context));
+                invites.add(fromJSON(data.getJSONObject(i)));
             }
             return invites;
         }
@@ -171,7 +134,7 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
             JSONObject resp = new JSONObject(jsonString);
             Map<String, SocialInvite> invites = new HashMap<>();
             for (SocialInvite invite :
-                    SocialInvite.fromJSON(resp.getJSONArray("invitations"), context)) {
+                    SocialInvite.fromJSON(resp.getJSONArray("invitations"))) {
                 invites.put(invite.eventId, invite);
             }
 

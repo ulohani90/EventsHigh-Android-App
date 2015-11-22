@@ -17,7 +17,6 @@ import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.FriendsStore;
-import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.TicketNotificationStreamItem;
@@ -25,7 +24,6 @@ import com.eventshigh.nearme.app.notification.EHNotification;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.user.GcmRegistration;
-import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
@@ -111,26 +109,6 @@ public class GcmIntentService extends IntentService {
         String priority = Utils.checkIfUnknown(msg.getString("priority"));
         String mobileNo = Utils.checkIfUnknown(msg.getString("mobile"));
 
-        UserContact contact = null;
-        if (mobileNo != null) {
-            UserInfo userInfo = new Account(this).getUserInfo();
-            if (mobileNo.equals(userInfo.phoneNo)) {
-                reportAction("notificationSkipped");
-                return null;
-            }
-            contact = ContactUtils.getContactForServerPhone(this, mobileNo);
-        }
-
-        if (contact != null) {
-            if (!(new FriendsStore(this)).isFollowing(contact.contactId)) {
-                // Don't show notification if the user is not following this friend
-                return null;
-            }
-
-            title = title.replace("Your friend", contact.name);
-            message = message.replace("Your friend", contact.name);
-        }
-
         if (eventId == null && query == null && contestUrl == null && ticket == null && target == null) {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
             return null;
@@ -195,9 +173,7 @@ public class GcmIntentService extends IntentService {
 
         EHNotification EHNotification =  new EHNotification(this, alarmIntent, title, message,
                 imageUrl, contentIntent,
-                priority == null ? Notification.PRIORITY_LOW : Notification.PRIORITY_HIGH,
-                contact
-        );
+                priority == null ? Notification.PRIORITY_LOW : Notification.PRIORITY_HIGH);
         return new ParsedBundle(EHNotification, bounded ? new LatLng(lat, lon) : null, distance);
     }
 
