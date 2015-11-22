@@ -25,7 +25,6 @@ import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Base activity for location aware events listing. This class implements common methods to fetch
@@ -113,18 +112,6 @@ public abstract class BaseContextActivity extends BaseActivity {
             }
             actionBar.setTitle(title);
         }
-    }
-
-    protected void switchTo(Class<?> cls) {
-        reportActionToAnalytics("switchView");
-        Intent intent = new Intent(this, cls)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
-        startActivity(intent);
-    }
-
-    public LatLng getUserLocation() {
-        return eventsContext.location;
     }
 
     public void showActionBar() {
@@ -228,7 +215,7 @@ public abstract class BaseContextActivity extends BaseActivity {
 
     public void showSearchView(String query) {
         reportActionToAnalytics("showSearchView", query);
-        EventsContext param = new EventsContext(eventsContext.location, query);
+        EventsContext param = new EventsContext(eventsContext.city, query);
         param.dateFilter = eventsContext.dateFilter;
         Intent intent = new Intent(this, getClass())
                 .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
@@ -251,7 +238,7 @@ public abstract class BaseContextActivity extends BaseActivity {
 
     public void seeAll() {
         reportActionToAnalytics("seeAll", eventsContext.getLabel());
-        EventsContext param = new EventsContext(eventsContext.location, eventsContext.query);
+        EventsContext param = new EventsContext(eventsContext.city, eventsContext.query);
         Intent intent = new Intent(this, this.getClass())
                 .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
         startActivity(intent);

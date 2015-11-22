@@ -94,7 +94,6 @@
     <string name="failed_locality">Uh oh! Not able to find your area. Want to try again?</string>
     <string name="failed_save">That didn\'t work out. Lets try again!</string>
     <string name="failed_share">We couldn\'t share as there is no app installed at the other end. </string>
-    <string name="failed_location">Sorry! We didn\'t get your location.</string>
     <string name="failed_event_location">Sorry! We are not able to find the location for this event!</string>
     <string name="no_map_app">Maps application not found!</string>
     <string name="no_cal_app">Calendar application not found!</string>

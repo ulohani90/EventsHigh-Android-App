@@ -58,7 +58,7 @@ public class EHPreferenceFragment extends PreferenceFragment
             if (!newValue.equals(lastCityView.getValue())) {
                 City newCity = City.getCity((String) newValue);
                  if (newCity != null) {
-                    gcmRegistration.setLastCity(newCity, null);
+                    gcmRegistration.setLastCity(newCity);
                     LaunchActivity activity = (LaunchActivity) getActivity();
                     activity.cityChanged(newCity);
                 }

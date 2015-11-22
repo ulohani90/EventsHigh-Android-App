@@ -19,7 +19,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
 public class EventCard extends ViewHolder {
@@ -31,7 +30,6 @@ public class EventCard extends ViewHolder {
     private final TextView eventTimeView;
     private final TextView priceView;
     private final TextView venueView;
-    private final TextView travelTimeView;
     private final View arrowView;
     private final TextView eventStatsView;
     private final View infoArrowView;
@@ -62,7 +60,6 @@ public class EventCard extends ViewHolder {
         eventTimeView = (TextView) cardView.findViewById(R.id.event_time);
         priceView = (TextView) cardView.findViewById(R.id.event_price);
         venueView = (TextView) cardView.findViewById(R.id.event_venue);
-        travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
         arrowView = cardView.findViewById(R.id.arrow);
         eventStatsView = (TextView) cardView.findViewById(R.id.event_stats);
         infoArrowView = cardView.findViewById(R.id.info_arrow);
@@ -81,15 +78,6 @@ public class EventCard extends ViewHolder {
         bindEventView(event, activity);
 
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
-
-        // Set the travel time.
-        String travelTime = LocationUtils.getTravelTime(activity, activity.getUserLocation(), event.location);
-        if (travelTime != null) {
-            travelTimeView.setText(travelTime);
-            travelTimeView.setVisibility(View.VISIBLE);
-        } else {
-            travelTimeView.setVisibility(View.GONE);
-        }
 
         // Set actions handlers.
         favouriteView.setVisibility(View.VISIBLE);
@@ -167,7 +155,6 @@ public class EventCard extends ViewHolder {
 
         arrowView.setVisibility(View.GONE);
         favouriteView.setVisibility(View.GONE);
-        travelTimeView.setVisibility(View.GONE);
         eventStatsView.setVisibility(View.GONE);
         infoArrowView.setVisibility(View.GONE);
     }

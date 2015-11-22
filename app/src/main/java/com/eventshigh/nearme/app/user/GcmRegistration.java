@@ -13,7 +13,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -48,7 +47,6 @@ public class GcmRegistration {
 
     // City listener.
     private UserCityListener userCityListener = null;
-    private LatLng userLocation = null;
 
     private GcmRegistration(Context context) {
         this.context = context.getApplicationContext();
@@ -80,9 +78,7 @@ public class GcmRegistration {
         updateGcmRegistrationIdIfNeeded();
     }
 
-    public void setLastCity(@Nullable City city, @Nullable LatLng location) {
-        userLocation = location;
-
+    public void setLastCity(@Nullable City city) {
         if (city == null) {
             return;
         }
@@ -184,7 +180,7 @@ public class GcmRegistration {
 
             // Upload last city.
             if (!gcmRegistrationInfo.getBoolean(PREF_LAST_CITY_UPLOADED, false)) {
-                AccountStateReporter.reportLastCity(context, city, userLocation, new Runnable() {
+                AccountStateReporter.reportLastCity(context, city, new Runnable() {
                     @Override
                     public void run() {
                         gcmRegistrationInfo.edit().putBoolean(PREF_LAST_CITY_UPLOADED, true).apply();

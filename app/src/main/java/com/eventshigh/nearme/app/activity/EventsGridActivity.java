@@ -30,11 +30,11 @@ public class EventsGridActivity extends BaseContextActivity {
         super.onCreate(savedInstanceState);
         setupLayout(R.layout.activity_events_grid);
 
-        if (eventsContext.location == null) {
+        if (eventsContext.city == null) {
             City lastCity = GcmRegistration.getInstance(this).getLastCity();
             if (lastCity != null) {
                 reportActionToAnalytics("usedLastCity");
-                eventsContext.changeLocation(lastCity.cityBounds.getCenter());
+                eventsContext.changeLocation(lastCity);
             }
         }
 

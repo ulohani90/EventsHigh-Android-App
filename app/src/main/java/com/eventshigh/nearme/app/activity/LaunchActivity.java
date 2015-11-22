@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -37,13 +36,8 @@ import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
-import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Application Main or launch activity.
@@ -58,10 +52,6 @@ public class LaunchActivity extends BaseContextActivity {
     private ViewPager viewPager;
     private ListView citySelector;
     private ActionBarDrawerToggle drawerToggle;
-
-    // Client to Google api so that we can fetch the user location if
-    // its not passed in intent.
-    private GoogleApiClient client;
 
     // GCM registration helper.
     private GcmRegistration gcmRegistration;
@@ -129,7 +119,7 @@ public class LaunchActivity extends BaseContextActivity {
 
         // We show the onboarding If this is first activity and there was no
         // location/query passed through intent.
-        if (eventsContext.location == null && eventsContext.query.isEmpty() &&
+        if (eventsContext.city == null && eventsContext.query.isEmpty() &&
             eventsContext.dateFilter.isEmpty()) {
             if (Preferences.getInstance(this).shouldShowOnBoarding()) {
                 startActivity(new Intent(this, OnBoardingActivity.class));
@@ -192,7 +182,7 @@ public class LaunchActivity extends BaseContextActivity {
         drawer.closeDrawer(GravityCompat.START);
         reportActionToAnalytics("cityChanged");
 
-        eventsContext.changeLocation(city.cityBounds.getCenter());
+        eventsContext.changeLocation(city);
         showExploreScreen();
     }
 
@@ -200,33 +190,6 @@ public class LaunchActivity extends BaseContextActivity {
     // ***********************
     // Callbacks
     // ***********************
-
-    // Callback for GoogleClientApi. This is called when googleClientApi is ready to accept
-    // requests. We set the user location if needed and start next activity.
-    private ConnectionCallbacks mConnectionCallbacks = new ConnectionCallbacks() {
-        @Override
-        public void onConnected(Bundle bundle) {
-            Location location = LocationServices.FusedLocationApi.getLastLocation(client);
-            if (location != null) {
-                LatLng latLng = LocationUtils.locationToLatLng(location);
-                eventsContext.changeLocation(latLng);
-                if (eventsContext.city != null) {
-                    gcmRegistration.setLastCity(eventsContext.city, latLng);
-                } else {
-                    reportActionToAnalytics("unsupportedCity");
-                }
-            }
-
-            // Start the next activity if possible or ask user for city.
-            client.disconnect();
-            mOnConnectionFailedListener.onConnectionFailed(null);
-        }
-
-        @Override
-        public void onConnectionSuspended(int i) {
-            // do nothing.
-        }
-    };
 
     private OnConnectionFailedListener mOnConnectionFailedListener = new OnConnectionFailedListener() {
         @Override
@@ -236,33 +199,31 @@ public class LaunchActivity extends BaseContextActivity {
                 City lastCity = gcmRegistration.getLastCity();
                 if (lastCity != null) {
                     reportActionToAnalytics("usedLastCity");
-                    eventsContext.changeLocation(lastCity.cityBounds.getCenter());
+                    eventsContext.changeLocation(lastCity);
                 }
             }
 
             // If we have user location, start next activity.
             if (eventsContext.city != null) {
-                if (eventsContext.location != null) {
-                    try {
-                        int appVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-                        Uri reportUri = AccountStateReporter.getBaseUri(LaunchActivity.this, "reportUser")
-                            .appendQueryParameter("city", eventsContext.city.toString())
-                            .appendQueryParameter("lat", Double.toString(eventsContext.location.latitude))
-                            .appendQueryParameter("lon", Double.toString(eventsContext.location.longitude))
-                            .appendQueryParameter("version", Integer.toString(appVersion))
-                            .build();
-                        RequestFuture<String> future = RequestFuture.newFuture();
-                        VolleyHelper.addToRequestQueue(LaunchActivity.this,
-                            new StringRequest(reportUri.toString(), future, future) {
-                                @Override
-                                public Priority getPriority() {
-                                    return Priority.LOW;
-                                }
+                try {
+                    int appVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+                    Uri reportUri = AccountStateReporter.getBaseUri(LaunchActivity.this, "reportUser")
+                        .appendQueryParameter("city", eventsContext.city.toString())
+                        .appendQueryParameter("lat", "0")
+                        .appendQueryParameter("lon", "0")
+                        .appendQueryParameter("version", Integer.toString(appVersion))
+                        .build();
+                    RequestFuture<String> future = RequestFuture.newFuture();
+                    VolleyHelper.addToRequestQueue(LaunchActivity.this,
+                        new StringRequest(reportUri.toString(), future, future) {
+                            @Override
+                            public Priority getPriority() {
+                                return Priority.LOW;
                             }
-                        );
-                    } catch (NameNotFoundException e) {
-                        // Ignore.
-                    }
+                        }
+                    );
+                } catch (NameNotFoundException e) {
+                    // Ignore.
                 }
                 showNextScreen();
                 return;
@@ -275,9 +236,6 @@ public class LaunchActivity extends BaseContextActivity {
             viewPager.setVisibility(View.GONE);
             citySelector.setVisibility(View.VISIBLE);
             citySelector.setAdapter(new CityListAdapter(LaunchActivity.this, mCitySelectionListener));
-            if (connectionResult != null) {
-                showMessage(R.string.failed_location);
-            }
         }
     };
 
@@ -313,12 +271,7 @@ public class LaunchActivity extends BaseContextActivity {
     private void showNextScreen() {
         // If we do not have user city, use GoogleLocation api to get user location.
         if (eventsContext.city == null) {
-            client = new GoogleApiClient.Builder(this)
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(mConnectionCallbacks)
-                    .addOnConnectionFailedListener(mOnConnectionFailedListener)
-                    .build();
-            client.connect();
+            mOnConnectionFailedListener.onConnectionFailed(null);
             return;
         }
 
@@ -346,8 +299,8 @@ public class LaunchActivity extends BaseContextActivity {
     private final OnCitySelectionListener mCitySelectionListener = new OnCitySelectionListener() {
         @Override
         public void onCitySelection(City city) {
-            eventsContext.changeLocation(city.cityBounds.getCenter());
-            gcmRegistration.setLastCity(city, null);
+            eventsContext.changeLocation(city);
+            gcmRegistration.setLastCity(city);
 
             citySelector.setVisibility(View.GONE);
             tabsView.setVisibility(View.VISIBLE);
@@ -370,7 +323,7 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public Fragment getItem(int position) {
             if (TABS[position].equals(MY_EVENTS_TAB)) {
-                EventsContext myEventsContext = new EventsContext(eventsContext.location,
+                EventsContext myEventsContext = new EventsContext(eventsContext.city,
                     EventsHighEndpoints.QUERY_MY_EVENT);
                 myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true);
                 return myEventsFragment;

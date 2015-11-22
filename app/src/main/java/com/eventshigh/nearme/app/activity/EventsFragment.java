@@ -126,13 +126,13 @@ public class EventsFragment extends BaseEventsFragment {
         VolleyHelper.getRequestQueue(activity).cancelAll(this);
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
             new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
-                    shouldBypassCache, true, mMyEventsFetcherCallBack, mErrorListener).execute();
+                    shouldBypassCache, mMyEventsFetcherCallBack, mErrorListener).execute();
         } else if (eventsContext.query.isEmpty() && !eventsContext.dateFilter.isEmpty() && showCategories) {
             DateCategoryRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, mMyEventsFetcherCallBack, mErrorListener);
         } else {
             EventCollectionRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
-                    shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
+                    shouldBypassCache, mEventsFetcherCallBack, mErrorListener);
         }
     }
 

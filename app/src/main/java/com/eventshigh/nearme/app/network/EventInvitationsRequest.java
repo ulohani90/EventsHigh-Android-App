@@ -10,7 +10,6 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -30,26 +29,21 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
         }
     }
 
-    public static void submit(Context context, EventsContext eventsContext, Priority priority,
-            Object tag, boolean shouldBypassCache, Listener<List<EventInvitation>> listener,
-            ErrorListener errorListener) {
-        new EventInvitationsRequest(context, eventsContext, priority, tag, shouldBypassCache,
-                listener, errorListener).execute();
+    public static void submit(Context context, Priority priority, Object tag, boolean shouldBypassCache,
+            Listener<List<EventInvitation>> listener, ErrorListener errorListener) {
+        new EventInvitationsRequest(context, priority, tag, shouldBypassCache, listener, errorListener).execute();
     }
 
     private final Context context;
-    private final EventsContext eventsContext;
     private final Priority priority;
     private final Object tag;
     private final boolean shouldBypassCache;
     private final Listener<List<EventInvitation>> listener;
     private final ErrorListener errorListener;
 
-    public EventInvitationsRequest(Context context, EventsContext eventsContext, Priority priority,
-           Object tag, boolean shouldBypassCache, Listener<List<EventInvitation>> listener,
-           ErrorListener errorListener) {
+    public EventInvitationsRequest(Context context, Priority priority, Object tag, boolean shouldBypassCache,
+            Listener<List<EventInvitation>> listener, ErrorListener errorListener) {
         this.context = context;
-        this.eventsContext = eventsContext;
         this.priority = priority;
         this.tag = tag;
         this.shouldBypassCache = shouldBypassCache;
@@ -71,8 +65,7 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
             }
 
             RequestFuture<List<Event>> future2 = RequestFuture.newFuture();
-            MultiEventsRequest.submit(context, eventsContext, eventIds, priority, tag,
-                    shouldBypassCache, true, future2, future2);
+            MultiEventsRequest.submit(context, eventIds, priority, tag, shouldBypassCache, future2, future2);
             Map<String, Event> eventsMap = Utils.getMap();
             for (Event event: future2.get()) {
                 eventsMap.put(event.id, event);

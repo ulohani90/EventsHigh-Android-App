@@ -59,30 +59,28 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
     }
 
     public static void submit(Context context, EventsContext eventsContext, Priority priority,
-           Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
+           Object tag, boolean shouldBypassCache,
            Listener<List<TopicEvents>> listener, ErrorListener errorListener) {
         new MyEventsRequest(context, eventsContext, priority, tag, shouldBypassCache,
-                includeWithoutLocation, listener, errorListener).execute();
+                listener, errorListener).execute();
     }
 
     private final Context context;
     private final EventsContext eventsContext;
     private final Priority priority;
     private final boolean shouldBypassCache;
-    private final boolean includeWithoutLocation;
     private final Listener<List<TopicEvents>> listener;
     private final ErrorListener errorListener;
     private final Object tag;
     private boolean isRequestCancelled = false;
 
     public MyEventsRequest(Context context, EventsContext eventsContext, Priority priority,
-                           Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
+                           Object tag, boolean shouldBypassCache,
                            Listener<List<TopicEvents>> listener, ErrorListener errorListener) {
         this.context = context;
         this.eventsContext = eventsContext;
         this.priority = priority;
         this.shouldBypassCache = shouldBypassCache;
-        this.includeWithoutLocation = includeWithoutLocation;
         this.listener = listener;
         this.errorListener = errorListener;
         this.tag = tag;
@@ -105,8 +103,8 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         Map<String, RequestFuture<EventsCollection>> interestsEvents = Utils.getMap();
         for (String interest : interests) {
             RequestFuture<EventsCollection> eventsFuture = RequestFuture.newFuture();
-            EventCollectionRequest.submit(context, new EventsContext(eventsContext.location, interest),
-                priority, tag, shouldBypassCache, includeWithoutLocation, eventsFuture, eventsFuture);
+            EventCollectionRequest.submit(context, new EventsContext(eventsContext.city, interest),
+                priority, tag, shouldBypassCache, eventsFuture, eventsFuture);
             interestsEvents.put(interest, eventsFuture);
         }
 
@@ -114,8 +112,8 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         EventsMarkerManager markerManager = EventsMarkerManager.getInstance(context);
         markerManager.waitForLoading();
         RequestFuture<List<Event>> favEvents = RequestFuture.newFuture();
-        MultiEventsRequest.submit(context, eventsContext, markerManager.getFavouritedEvents(),
-                priority, tag, shouldBypassCache, includeWithoutLocation, favEvents, favEvents);
+        MultiEventsRequest.submit(context, markerManager.getFavouritedEvents(),
+                priority, tag, shouldBypassCache, favEvents, favEvents);
 
         // Look at invites and send the request for sent invitations.
         List<String> eventIds = new ArrayList<>();
@@ -126,8 +124,8 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         }
 
         RequestFuture<List<Event>> invitedEvents = RequestFuture.newFuture();
-        MultiEventsRequest.submit(context, eventsContext, eventIds, priority, tag,
-                shouldBypassCache, true, invitedEvents, invitedEvents);
+        MultiEventsRequest.submit(context, eventIds, priority, tag,
+                shouldBypassCache, invitedEvents, invitedEvents);
 
         // Build Result.
         try {

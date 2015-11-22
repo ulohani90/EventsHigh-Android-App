@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.user;
 import android.content.Context;
 import android.net.Uri;
 import android.net.Uri.Builder;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.android.volley.Request.Method;
@@ -17,7 +16,6 @@ import com.eventshigh.nearme.app.utils.DeviceUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -45,15 +43,11 @@ public class AccountStateReporter {
                 .build(), onSuccess);
     }
 
-    public static void reportLastCity(Context context, City city, @Nullable LatLng location, Runnable onSuccess) {
-        if (location == null) {
-            location = new LatLng(0, 0);
-        }
-
+    public static void reportLastCity(Context context, City city, Runnable onSuccess) {
         sendSignedRequest(context, getBaseUri(context, "reportLastCity")
                 .appendQueryParameter("last_city", city.toString())
-                .appendQueryParameter("lat", Double.toString(location.latitude))
-                .appendQueryParameter("lon", Double.toString(location.longitude))
+                .appendQueryParameter("lat", "0")
+                .appendQueryParameter("lon", "0")
                 .build(), onSuccess);
     }
 

@@ -12,7 +12,6 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
-import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONException;
@@ -35,9 +34,8 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
      * @param listener callback on success.
      * @param errorListener callback on failures.
      */
-    public static void submit(Context context, EventsContext eventsContext, List<String> eventIds,
-            Priority priority, Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
-            Listener<List<Event>> listener, ErrorListener errorListener) {
+    public static void submit(Context context, List<String> eventIds, Priority priority, Object tag,
+            boolean shouldBypassCache, Listener<List<Event>> listener, ErrorListener errorListener) {
         if (eventIds.isEmpty()) {
             listener.onResponse(new ArrayList<Event>(), false);
             return;
@@ -51,26 +49,21 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
             return;
         }
 
-        MultiEventsRequest request = new MultiEventsRequest(eventsContext, url, priority,
-                shouldBypassCache, includeWithoutLocation, listener, errorListener);
+        MultiEventsRequest request = new MultiEventsRequest(url, priority,
+                shouldBypassCache, listener, errorListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
 
-    private final EventsContext eventsContext;
     private final Priority priority;
-    private final boolean includeWithoutLocation;
 
-    public MultiEventsRequest(EventsContext eventsContext, String url, Priority priority,
-                              boolean shouldBypassCache, boolean includeWithoutLocation,
+    public MultiEventsRequest(String url, Priority priority, boolean shouldBypassCache,
                               Listener<List<Event>> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
         setShouldAllowStaleResponse(true);
 
-        this.eventsContext = eventsContext;
         this.priority = priority;
-        this.includeWithoutLocation = includeWithoutLocation;
     }
 
     @Override
@@ -89,9 +82,7 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
             while (keys.hasNext()) {
                 try {
                     Event event = Event.fromJSON(eventsJson.getJSONObject(keys.next()));
-                    if (includeWithoutLocation || event.location != null) {
-                        events.add(event);
-                    }
+                    events.add(event);
                 } catch (JSONException | ParseException e) {
                     // Ignore.
                 }
@@ -99,7 +90,7 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
             EventCollectionRequest.filterOldEvents(events);
 
             // Sort the event list to user.
-            Collections.sort(events, new EventComparator(eventsContext.location));
+            Collections.sort(events, new EventComparator());
 
             return Response.success(events, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {

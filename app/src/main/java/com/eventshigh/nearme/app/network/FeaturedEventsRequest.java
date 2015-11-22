@@ -92,7 +92,7 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
         try {
             // Parse the response.
             List<Event> events = EventCollectionRequest.parseEventsFromNetworkResponse(response,
-                    context, eventsContext, true).events;
+                    context).events;
             List<Event> filteredEvents = new ArrayList<>(MAX_FEATURED_EVENTS);
             for (Event event : events) {
                 if (event.imgUrl != null) {

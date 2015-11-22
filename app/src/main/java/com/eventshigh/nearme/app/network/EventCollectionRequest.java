@@ -54,7 +54,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, EventsContext eventsContext, Priority priority,
-                              Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
+                              Object tag, boolean shouldBypassCache,
                               Listener<EventsCollection> listener, ErrorListener errorListener) {
         if (eventsContext.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
@@ -70,28 +70,22 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         }
 
         EventCollectionRequest request = new EventCollectionRequest(
-                context, url, eventsContext, priority, shouldBypassCache, includeWithoutLocation,
-                listener, errorListener);
+                context, url, priority, shouldBypassCache, listener, errorListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
 
     private final Context context;
-    private final EventsContext eventsContext;
     private final Priority priority;
-    private final boolean includeWithoutLocation;
 
-    public EventCollectionRequest(Context context, String url, EventsContext eventsContext,
-          Priority priority, boolean shouldBypassCache, boolean includeWithoutLocation,
+    public EventCollectionRequest(Context context, String url, Priority priority, boolean shouldBypassCache,
           Listener<EventsCollection> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
         setShouldAllowStaleResponse(true);
 
         this.context = context;
-        this.eventsContext = eventsContext;
         this.priority = priority;
-        this.includeWithoutLocation = includeWithoutLocation;
     }
 
     @Override
@@ -103,8 +97,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     protected Response<EventsCollection> parseNetworkResponse(NetworkResponse response) {
         try {
             // Parse the response.
-            EventsCollection eventsCollection = parseEventsFromNetworkResponse(response, context,
-                    eventsContext, includeWithoutLocation);
+            EventsCollection eventsCollection = parseEventsFromNetworkResponse(response, context);
 
             return Response.success(eventsCollection, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
@@ -113,17 +106,16 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     }
 
     public static EventsCollection parseEventsFromNetworkResponse(
-            NetworkResponse response, Context context, EventsContext eventsContext,
-            boolean includeWithoutLocation) throws UnsupportedEncodingException, JSONException {
+            NetworkResponse response, Context context) throws UnsupportedEncodingException, JSONException {
         ReportTimingTask.report(context, "events", response.networkTimeMs);
 
         String jsonString = new String(response.data, "UTF-8");
         JSONObject eventsJson = new JSONObject(jsonString);
-        List<Event> events = Event.parseUpcomingEvents(eventsJson, includeWithoutLocation);
+        List<Event> events = Event.parseUpcomingEvents(eventsJson);
         filterOldEvents(events);
 
         // Sort the event list to user.
-        Collections.sort(events, new EventComparator(eventsContext.location));
+        Collections.sort(events, new EventComparator());
 
         return new EventsCollection(events, eventsJson.optInt("num_followers"));
     }

@@ -5,7 +5,6 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Calendar;
 
@@ -17,25 +16,23 @@ public class EventsContext implements Parcelable {
     private static final String DATE_FILTER_FORMAT = "%4d-%02d-%02d";
 
     @Nullable public City city;
-    @Nullable public LatLng location;
     public String query;
     public String dateFilter;
 
-    public EventsContext(@Nullable LatLng location, String query) {
+    public EventsContext(@Nullable City city, String query) {
+        this.city = city;
         this.query = query;
-        changeLocation(location);
         dateFilter = "";
     }
 
     public EventsContext(EventsContext other) {
-        this(other.location, other.query);
+        this(other.city, other.query);
         this.dateFilter = other.dateFilter;
     }
 
-    public boolean changeLocation(@Nullable LatLng location) {
-        this.location = location;
-        City oldCity = city;
-        city = City.getCity(location);
+    public boolean changeLocation(@Nullable City city) {
+        City oldCity = this.city;
+        this.city = city;
         return (oldCity == null && city == null) || (oldCity != null && oldCity.equals(city));
     }
 
@@ -78,7 +75,7 @@ public class EventsContext implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(location, flags);
+        dest.writeString(city == null ? "" : city.toString());
         dest.writeString(query);
         dest.writeString(dateFilter);
     }
@@ -88,9 +85,9 @@ public class EventsContext implements Parcelable {
     public static final Parcelable.Creator<EventsContext> CREATOR =
             new Parcelable.Creator<EventsContext>() {
         public EventsContext createFromParcel(Parcel in) {
-            LatLng location = in.readParcelable(LatLng.class.getClassLoader());
+            City city = City.getCity(in.readString());
             String query = in.readString();
-            EventsContext context =  new EventsContext(location, query);
+            EventsContext context =  new EventsContext(city, query);
             context.dateFilter = in.readString();
             return context;
         }

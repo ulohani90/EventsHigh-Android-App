@@ -108,7 +108,7 @@ public class ExploreFragment extends BaseEventsFragment {
                     eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS);
 
             if (!isIntermediate) {
-                EventInvitationsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
+                EventInvitationsRequest.submit(activity, Priority.IMMEDIATE, this,
                         false, mEventInvitationsCallback, mErrorListener);
             }
         }

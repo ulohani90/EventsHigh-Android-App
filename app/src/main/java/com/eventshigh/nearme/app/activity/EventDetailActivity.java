@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -47,13 +46,10 @@ import com.eventshigh.nearme.app.user.UserActionHelper.EventAction;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
-import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -69,13 +65,11 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
  */
 public class EventDetailActivity extends BaseActivity {
     public static final String EXTRA_EVENT_PARAM = EventDetailActivity.class.getSimpleName() + "_event";
-    public static final String EXTRA_PLAN_ID_PARAM = EventDetailActivity.class.getSimpleName() + "_plan_id";
 
     private Toolbar toolbar;
     private View topProgressBar;
     private EventCard eventCard;
 
-    private LatLng userLocation = null;
     private Event event = null;
     private Account account;
     private GoogleApiClient client;
@@ -435,7 +429,6 @@ public class EventDetailActivity extends BaseActivity {
 
         private final TextView venueView;
         private final TextView addressView;
-        private final TextView travelTimeView;
 
         private final View timeGroupView;
         private final View eventTimeFirstView;
@@ -485,7 +478,6 @@ public class EventDetailActivity extends BaseActivity {
 
             venueView = (TextView) findViewById(R.id.event_venue);
             addressView = (TextView) findViewById(R.id.event_address);
-            travelTimeView = (TextView) findViewById(R.id.event_travel_time);
 
             timeGroupView = findViewById(R.id.event_time_group);
             eventTimeFirstView = findViewById(R.id.event_time_first);
@@ -573,7 +565,6 @@ public class EventDetailActivity extends BaseActivity {
             findViewById(R.id.venue_group).setVisibility(View.VISIBLE);
             venueView.setText(event.getShortAddress());
             addressView.setText(event.getFullAddress());
-            travelTimeView.setVisibility(View.GONE);
 
             // Set time.
             EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
@@ -723,7 +714,7 @@ public class EventDetailActivity extends BaseActivity {
                     reportEventAction(event, action, tagName);
                     Intent searchIntent = new Intent(EventDetailActivity.this, LaunchActivity.class);
                     searchIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT,
-                            new EventsContext(userLocation, tagName.toLowerCase()));
+                            new EventsContext(event.city, tagName.toLowerCase()));
                     startActivity(searchIntent);
                 }
             });
@@ -769,34 +760,16 @@ public class EventDetailActivity extends BaseActivity {
         }
     }
 
-    private void populateEventTravelTime() {
-        Location location = LocationServices.FusedLocationApi.getLastLocation(client);
-        if (location != null) {
-            userLocation = LocationUtils.locationToLatLng(location);
-        }
-
-        String eventTravelTime = LocationUtils.getTravelTime(EventDetailActivity.this,
-            userLocation, event.location);
-        eventCard.travelTimeView.setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
-        if (eventTravelTime != null) {
-            eventCard.travelTimeView.setText(eventTravelTime);
-        }
-    }
-
     private void getGoogleApiClient() {
         if (client != null && client.isConnected()) {
-            populateEventTravelTime();
             return;
         }
 
         client = new GoogleApiClient.Builder(this)
                     .addApi(AppIndex.APP_INDEX_API)
-                    .addApi(LocationServices.API)
                     .addConnectionCallbacks(new ConnectionCallbacks() {
                         @Override
                         public void onConnected(Bundle bundle) {
-                            populateEventTravelTime();
-
                             Uri webUri = event.getEventDetailsURI();
                             AppIndex.AppIndexApi.view(client, EventDetailActivity.this,
                                     Utils.getAppUri(webUri), event.title, webUri, null);

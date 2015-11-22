@@ -72,10 +72,10 @@ public class MyEventsNotificationService extends IntentService {
         if (lastCity == null) {
             lastCity = City.BANGALORE;
         }
-        eventsContext.changeLocation(lastCity.cityBounds.getCenter());
+        eventsContext.changeLocation(lastCity);
 
         new MyEventsRequest(this, eventsContext, Request.Priority.NORMAL, this,
-                false /* shouldBypassCache */, true /* includeWithoutLocation */,
+                false /* shouldBypassCache */,
                 new MyEventsListener(wakefulIntent), new MyEventsErrorListener(wakefulIntent)).execute();
     }
 
@@ -116,7 +116,7 @@ public class MyEventsNotificationService extends IntentService {
     private void showNotification(Set<Event> eventSet, Intent wakefulIntent) {
         // Sort the events for user.
         List<Event> events = new ArrayList<>(eventSet);
-        Collections.sort(events, new EventComparator(null));
+        Collections.sort(events, new EventComparator());
 
         if (events.size() > 0) {
             preferences.edit().putLong(

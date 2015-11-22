@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,15 +20,8 @@ import com.eventshigh.nearme.app.notification.EHNotification;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.IntentUtils;
-import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 
 /**
  * See {@link com.eventshigh.nearme.app.broadcast.GcmBroadcastReceiver} for details.
@@ -65,24 +57,11 @@ public class GcmIntentService extends IntentService {
 
     private static class ParsedBundle {
         public final EHNotification EHNotification;
-        @Nullable
-        public final LatLng boundCenter;
-        public final double radiusInMeter;
+        public final boolean isBounded;
 
-        private ParsedBundle (EHNotification EHNotification,
-                              @Nullable LatLng boundCenter, double radiusInMeter) {
+        private ParsedBundle (EHNotification EHNotification, boolean isBounded) {
             this.EHNotification = EHNotification;
-            this.boundCenter = boundCenter;
-            this.radiusInMeter = radiusInMeter;
-        }
-
-        private boolean isInRadius(@Nullable LatLng location) {
-            return location != null &&
-                LocationUtils.distanceInMeters(location, boundCenter) < radiusInMeter;
-        }
-
-        private boolean isInRadius(@Nullable Location location) {
-            return location != null && isInRadius(LocationUtils.locationToLatLng(location));
+            this.isBounded = isBounded;
         }
     }
 
@@ -108,20 +87,16 @@ public class GcmIntentService extends IntentService {
             return null;
         }
 
-        double lat = 0 , lon = 0, distance = 0;
         boolean bounded = false;
         String boundsCombinedStr = msg.getString("bounds");
         if (boundsCombinedStr != null) {
             String[] boundsStr = boundsCombinedStr.split(",", 3);
             if (boundsStr.length == 3) {
-                lat = Double.parseDouble(boundsStr[0]);
-                lon = Double.parseDouble(boundsStr[1]);
-                distance = Double.parseDouble(boundsStr[2]);
                 bounded = true;
             }
         }
 
-        PendingIntent contentIntent;
+        PendingIntent contentIntent = null;
         if (eventId != null) {
             GcmRegistration gcmRegistration = GcmRegistration.getInstance(getApplicationContext());
             contentIntent = EHNotification.createPendingIntent(this, eventId,
@@ -150,7 +125,7 @@ public class GcmIntentService extends IntentService {
             if (intent == null) { return null; }
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + target);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        } else {
+        } else if (contestUrl != null) {
             Intent intent = new Intent(this,
                 contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + title);
@@ -159,75 +134,23 @@ public class GcmIntentService extends IntentService {
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         }
 
-        EHNotification EHNotification =  new EHNotification(this, alarmIntent, title, message,
-                imageUrl, contentIntent,
-                priority == null ? Notification.PRIORITY_LOW : Notification.PRIORITY_HIGH);
-        return new ParsedBundle(EHNotification, bounded ? new LatLng(lat, lon) : null, distance);
+        if (contentIntent != null) {
+            EHNotification EHNotification = new EHNotification(this, alarmIntent, title, message,
+                    imageUrl, contentIntent,
+                    priority == null ? Notification.PRIORITY_LOW : Notification.PRIORITY_HIGH);
+            return new ParsedBundle(EHNotification, bounded);
+        } else {
+            return null;
+        }
     }
 
     private void sendNotification(@Nullable ParsedBundle parsedBundle, Intent wakeupIntent) {
-        if (parsedBundle != null) {
-            if (parsedBundle.boundCenter != null) {
-                new BoundsVerifier(parsedBundle, wakeupIntent).checkAndNotify();
-            } else {
-                parsedBundle.EHNotification.showNotificationAndReleaseWakeLock();
-            }
+        if (parsedBundle != null && parsedBundle.isBounded) {
+            parsedBundle.EHNotification.showNotificationAndReleaseWakeLock();
         } else {
             // Release the wake lock provided by the WakefulBroadcastReceiver.
             reportAction("notificationSkipped");
             GcmBroadcastReceiver.completeWakefulIntent(wakeupIntent);
-        }
-    }
-
-    private  class BoundsVerifier {
-        private final ParsedBundle parsedBundle;
-        private final Intent wakeupIntent;
-        private GoogleApiClient client;
-        private boolean completeWakefulIntentCalled = false;
-
-        private BoundsVerifier(ParsedBundle parsedBundle, Intent wakeupIntent) {
-            this.parsedBundle = parsedBundle;
-            this.wakeupIntent = wakeupIntent;
-        }
-
-        private void checkAndNotify() {
-            client = new GoogleApiClient.Builder(GcmIntentService.this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(new ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(Bundle bundle) {
-                        Location location = LocationServices.FusedLocationApi.getLastLocation(client);
-                        if (parsedBundle.isInRadius(location)) {
-                            parsedBundle.EHNotification.showNotificationAndReleaseWakeLock();
-                        } else {
-                            reportAction("notificationSkippedOutOfBounds");
-                        }
-
-                        client.disconnect();
-                        completeWakefulIntent();
-                    }
-
-                    @Override
-                    public void onConnectionSuspended(int i) {
-                        completeWakefulIntent();
-                    }
-                })
-                    .addOnConnectionFailedListener(new OnConnectionFailedListener() {
-                        @Override
-                        public void onConnectionFailed(ConnectionResult connectionResult) {
-                            completeWakefulIntent();
-                        }
-                })
-                .build();
-
-            client.connect();
-        }
-
-        private synchronized void completeWakefulIntent() {
-            if (!completeWakefulIntentCalled) {
-                GcmBroadcastReceiver.completeWakefulIntent(wakeupIntent);
-                completeWakefulIntentCalled = true;
-            }
         }
     }
 }

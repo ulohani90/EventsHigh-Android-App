@@ -140,7 +140,7 @@ public class IntentUtils {
     private void processCityViewIntent(Uri webUri) {
         try {
             City city = City.valueOf(webUri.getLastPathSegment().toUpperCase());
-            param.changeLocation(city.cityBounds.getCenter());
+            param.changeLocation(city);
         } catch (IllegalArgumentException | NullPointerException e) {
             // Invalid city in URI. Ignore.
         }
@@ -149,7 +149,7 @@ public class IntentUtils {
     private void processSearchViewIntent(Uri webUri) {
         try {
             City city = City.valueOf(webUri.getQueryParameter("city").toUpperCase());
-            param.changeLocation(city.cityBounds.getCenter());
+            param.changeLocation(city);
         } catch (IllegalArgumentException | NullPointerException e) {
             // Invalid city in URI. Ignore.
         }
@@ -164,7 +164,7 @@ public class IntentUtils {
         try {
             List<String> pathSegments = webUri.getPathSegments();
             City city = City.valueOf(pathSegments.get(pathSegments.size() - 2).toUpperCase());
-            param.changeLocation(city.cityBounds.getCenter());
+            param.changeLocation(city);
 
             String query = pathSegments.get(pathSegments.size() - 1).split("-in-")[0];
             String dateQuery = DateTimeUtils.parseBrowseDate(query);
