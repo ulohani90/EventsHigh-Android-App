@@ -2,20 +2,10 @@ package com.eventshigh.nearme.app.user;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.EventCategory;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.gcm.GcmPubSub;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
 
-import java.io.IOException;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,16 +19,9 @@ public class GcmRegistration {
     // Constants used for SharedPreferences.
     private static final String PREFS_FILE_NAME = "eh_gcm_credentials";
 
-    private static final String PREF_REGISTRATION_ID = "registration_id";
-    private static final String PREF_REGISTRATION_ID_UPLOADED = "registration_id_uploaded";
-    private static final String PREF_IID_UPLOADED = "iid_updated";
     private static final String PREF_DEVICE_INFO_UPLOADED = "device_info2";
-    private static final String PREF_FIRST_TOPICS = "first_topics";
-
     private static final String PREF_LAST_CITY = "last_city";
     private static final String PREF_LAST_CITY_UPLOADED = "last_city_uploaded";
-
-    private static final String SENDER_ID = "708156551009";
 
     // Member variables used to store the user account details in preferences.
     private final Context context;
@@ -67,17 +50,6 @@ public class GcmRegistration {
         }
     }
 
-    public synchronized void resetGcmRegistrationId() {
-        Editor editor = gcmRegistrationInfo.edit();
-        editor.remove(PREF_REGISTRATION_ID);
-        editor.remove(PREF_REGISTRATION_ID_UPLOADED);
-        editor.remove(PREF_FIRST_TOPICS);
-        editor.apply();
-
-        lastSyncTimestamp = 0;
-        updateGcmRegistrationIdIfNeeded();
-    }
-
     public void setLastCity(@Nullable City city) {
         if (city == null) {
             return;
@@ -98,11 +70,6 @@ public class GcmRegistration {
                     .putString(PREF_LAST_CITY, city.toString())
                     .remove(PREF_LAST_CITY_UPLOADED)
                     .apply();
-
-            if (currentLastCity != null) {
-                subscribeOrUnSubscribe(currentLastCity.toString(), false);
-            }
-            subscribeToTopic(city.toString());
 
             userCityListener.onUserCityChanged(city);
             lastSyncTimestamp = 0;
@@ -128,16 +95,6 @@ public class GcmRegistration {
         this.userCityListener = userCityListener;
     }
 
-    public static void sendUpstream(Context context, Bundle data) {
-        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
-        data.putLong("time_to_live", TimeUnit.DAYS.toSeconds(1));
-        try {
-            gcm.send(SENDER_ID + "@gcm.googleapis.com", UUID.randomUUID().toString(), data);
-        } catch (Exception e) {
-            // Ignore.
-        }
-    }
-
     private class GcmRegistar implements Runnable {
         @Override
         public void run() {
@@ -147,30 +104,6 @@ public class GcmRegistration {
                 }
 
                 lastSyncTimestamp = System.currentTimeMillis();
-            }
-
-            boolean isPlayServicesPresent =
-                GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
-
-            InstanceID instanceID = null;
-            String registrationId = null;
-            if (isPlayServicesPresent) {
-                instanceID = InstanceID.getInstance(context);
-                registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
-                if (registrationId == null) {
-                    try {
-                        registrationId = instanceID.getToken(SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-                    } catch (IOException e) {
-                        registrationId = null;
-                    }
-
-                    if (registrationId != null) {
-                        Editor editor = gcmRegistrationInfo.edit();
-                        editor.putString(PREF_REGISTRATION_ID, registrationId);
-                        editor.remove(PREF_REGISTRATION_ID_UPLOADED);
-                        editor.apply();
-                    }
-                }
             }
 
             City city = getLastCity();
@@ -197,100 +130,6 @@ public class GcmRegistration {
                     }
                 });
             }
-
-            if (instanceID == null) {
-                return;
-            }
-
-            // Upload IID.
-            if (!gcmRegistrationInfo.getBoolean(PREF_IID_UPLOADED, false)) {
-                String iid = instanceID.getId();
-                AccountStateReporter.reportInstanceId(context, iid, new Runnable() {
-                    @Override
-                    public void run() {
-                        gcmRegistrationInfo.edit().putBoolean(PREF_IID_UPLOADED, true).apply();
-                    }
-                });
-            }
-
-            // Fetch the GCM registration id.
-            if (registrationId == null) {
-                return;
-            }
-
-            // Upload GCM registration id.
-            if (!gcmRegistrationInfo.getBoolean(PREF_REGISTRATION_ID_UPLOADED, false)) {
-                AccountStateReporter.reportGcmRegistrationId(context, registrationId, new Runnable() {
-                    @Override
-                    public void run() {
-                        gcmRegistrationInfo.edit().putBoolean(PREF_REGISTRATION_ID_UPLOADED, true).apply();
-                    }
-                });
-            }
-
-            // Subscribe to topics.
-            if (!gcmRegistrationInfo.getBoolean(PREF_FIRST_TOPICS, false)) {
-                try {
-                    GcmPubSub gcmPubSub = GcmPubSub.getInstance(context);
-
-                    // Subscribe to city.
-                    subscribeOrUnSubscribe(gcmPubSub, registrationId, city.toString(), true);
-
-                    // Subscribe to interests.
-                    Account account = new Account(context);
-                    for (String interest : account.getFollowingInterests()) {
-                        subscribeOrUnSubscribe(gcmPubSub, registrationId, interest, true);
-                    }
-
-                    gcmRegistrationInfo.edit().putBoolean(PREF_FIRST_TOPICS, true).apply();
-                } catch (Exception e) {
-                    // Ignore.
-                }
-            }
-        }
-    }
-
-    public void subscribeToTopic(final String interest) {
-        subscribeOrUnSubscribe(interest, true);
-    }
-
-    public void unSubscribeToTopic(String interest) {
-        subscribeOrUnSubscribe(interest, false);
-    }
-
-    private void subscribeOrUnSubscribe(final String interest, final boolean subscribe) {
-        if (!gcmRegistrationInfo.getBoolean(PREF_FIRST_TOPICS, false)) {
-            return;
-        }
-        final String registrationId = gcmRegistrationInfo.getString(PREF_REGISTRATION_ID, null);
-        if (registrationId == null) {
-            return;
-        }
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    subscribeOrUnSubscribe(GcmPubSub.getInstance(context), registrationId, interest,
-                            subscribe);
-                } catch (IOException e) {
-                    // Ignore.
-                }
-            }
-        }).start();
-    }
-
-    private void subscribeOrUnSubscribe(GcmPubSub gcmPubSub, String registrationId, String interest,
-            boolean subscribe) throws IOException {
-        String topicName = "/topics/" + EventCategory.toCategoryParsableString(interest);
-        try {
-            if (subscribe) {
-                gcmPubSub.subscribe(registrationId, topicName, null);
-            } else {
-                gcmPubSub.unsubscribe(registrationId, topicName);
-            }
-        } catch (IllegalArgumentException e) {
-            // Ignore.
         }
     }
 }

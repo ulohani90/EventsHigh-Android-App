@@ -41,15 +41,10 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
-import com.eventshigh.nearme.app.user.UserActionHelper;
-import com.eventshigh.nearme.app.user.UserActionHelper.EventAction;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -72,7 +67,6 @@ public class EventDetailActivity extends BaseActivity {
 
     private Event event = null;
     private Account account;
-    private GoogleApiClient client;
     private boolean addToFavourite = false;
 
 
@@ -150,19 +144,6 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-
-        if (client != null && client.isConnected()) {
-            if (event != null) {
-                Uri webUri = event.getEventDetailsURI();
-                AppIndex.AppIndexApi.viewEnd(client, this, Utils.getAppUri(webUri));
-            }
-            client.disconnect();
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
@@ -180,8 +161,6 @@ public class EventDetailActivity extends BaseActivity {
     public void save(View view) {
         addToFavourite = true;
         reportEventAction(event, "addToCalendar");
-
-        new UserActionHelper(this).recordAction(EventAction.SAVE, event.id);
         addToCalendar(event, null);
     }
 
@@ -205,7 +184,6 @@ public class EventDetailActivity extends BaseActivity {
 
         addToFavourite = true;
         reportEventAction(event, "organizer", "call");
-        new UserActionHelper(this).recordAction(EventAction.CALL, event.id);
 
         Intent intent = new Intent(Intent.ACTION_DIAL)
                 .setData(Uri.parse("tel:" + (event.organizerPhone.split(",")[0])));
@@ -237,7 +215,6 @@ public class EventDetailActivity extends BaseActivity {
 
         addToFavourite = true;
         reportEventAction(event, "bookTicket");
-        new UserActionHelper(this).recordAction(EventAction.BOOK, event.id);
 
         final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
         if (event.bookingUrl.contains("ticketing.eventshigh.com")) {
@@ -367,9 +344,6 @@ public class EventDetailActivity extends BaseActivity {
     private void populateView(final Event event) {
         this.event = event;
 
-        // Report the Event View.
-        new UserActionHelper(this).recordAction(EventAction.VIEW_EVENT, event.id);
-
         // Set Title.
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -380,9 +354,6 @@ public class EventDetailActivity extends BaseActivity {
         toolbar.setAlpha(0f);
         eventCard.populateView(event);
         findViewById(R.id.check_with_friends).setVisibility(View.VISIBLE);
-
-        // Connect to Google API client to notify the view.
-        getGoogleApiClient();
     }
 
     private void setScroll(int scrollValue) {
@@ -758,30 +729,6 @@ public class EventDetailActivity extends BaseActivity {
             favouritedView.setVisibility(isFavourite ? View.VISIBLE : View.GONE);
             favouriteView.setVisibility(isFavourite ? View.GONE : View.VISIBLE);
         }
-    }
-
-    private void getGoogleApiClient() {
-        if (client != null && client.isConnected()) {
-            return;
-        }
-
-        client = new GoogleApiClient.Builder(this)
-                    .addApi(AppIndex.APP_INDEX_API)
-                    .addConnectionCallbacks(new ConnectionCallbacks() {
-                        @Override
-                        public void onConnected(Bundle bundle) {
-                            Uri webUri = event.getEventDetailsURI();
-                            AppIndex.AppIndexApi.view(client, EventDetailActivity.this,
-                                    Utils.getAppUri(webUri), event.title, webUri, null);
-                        }
-
-                        @Override
-                        public void onConnectionSuspended(int i) {
-                            // do nothing.
-                        }
-                    })
-                    .build();
-        client.connect();
     }
 
     private static String toHtmlNoFrame(String html) {

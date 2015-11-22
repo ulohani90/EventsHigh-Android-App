@@ -28,13 +28,8 @@ import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.OneSecDialog;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.GcmRegistration;
-import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
-import com.eventshigh.nearme.app.utils.GAHelper;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -51,17 +46,11 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     // This constant defines the app specific intent action for notification.
     public static final String NOTIFICATION_ACTION = "com.eventshigh.nearme.app.notification";
-    public static final int PLUS_ONE_REQUEST_CODE = 111;
 
     public static final String PACKAGE_NAME_WHATSAPP = "com.whatsapp";
     public static final String PACKAGE_NAME_FACEBOOK = "com.facebook.katana";
     public static final String PACKAGE_NAME_TWITTER = "com.twitter.android";
     public static final String PACKAGE_NAME_EMAIL = "com.google.android.gm";
-
-    // Google Analytics
-    protected boolean isPlayServicesPresent;
-    private GAHelper gaHelper;
-    private boolean isRunning = false;
 
     // Check out the share event timings.
     protected long shareEventInitiatedTimestamp = 0;
@@ -79,29 +68,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         // Animation.
         overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_translate);
-
-        // Setup Google Analytics.
-        isPlayServicesPresent = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS;
-        if (isPlayServicesPresent) {
-            gaHelper = GAHelper.getInstance(this);
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        if (isFinishing()) {
-            return;
-        }
-
-        if (isPlayServicesPresent) {
-            // Google Analytics reporting.
-            gaHelper.reportActivityStart(this);
-
-            // Register with GCM if needed. GCM is used for notifications messages.
-            GcmRegistration.getInstance(this).updateGcmRegistrationIdIfNeeded();
-        }
     }
 
     @Override
@@ -109,18 +75,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         // Stop all requests associated with this activity.
         VolleyHelper.getRequestQueue(this).cancelAll(this);
 
-        // Google Analytics reporting.
-        if (isPlayServicesPresent) {
-            gaHelper.reportActivityStop(this);
-        }
-
         super.onStop();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        isRunning = true;
 
         // Find out share action result.
         if (shareEventInitiatedTimestamp > 0) {
@@ -136,12 +96,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         shareEventInitiatedTimestamp = 0;
         shareEventsInitiatedTimestamp = 0;
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        isRunning = false;
     }
 
     @Override
@@ -183,10 +137,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public boolean isRunning() {
-        return isRunning;
-    }
-
     /**
      * Helper method which can be used to report any action in analytics.
      * @param actionName name of action to be reported.
@@ -201,10 +151,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public void reportActionToAnalytics(String actionName, String label, long value,
                                         String... customValues) {
-        if (isPlayServicesPresent && gaHelper != null) {
-            gaHelper.reportActionToAnalytics(getClass().getSimpleName(),
-                    actionName, label, value, customValues);
-        }
     }
 
     public void shareApp() {
@@ -251,7 +197,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void shareEvent(Event event, String eventUri, @Nullable String packageName) {
         reportEventAction(event, "eventShareInitiated", packageName);
         shareEventInitiatedTimestamp = System.currentTimeMillis();
-        new UserActionHelper(this).recordShareAction(event.id, packageName, null);
 
         try {
             Intent sendIntent = new Intent();
@@ -292,8 +237,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void addToCalendar(Event event, @Nullable Date date) {
-        reportEventAction(event, "addToCalendar", GAHelper.getDateReportString(date));
-
         Intent intent = new Intent(Intent.ACTION_INSERT)
                 .setData(Events.CONTENT_URI)
                 .putExtra(Events.TITLE, event.title)
@@ -335,12 +278,6 @@ public abstract class BaseActivity extends AppCompatActivity {
                     1,
                     isFavourite(event) ? "Favourite" : "No-Favourite",
                     event.ehRecommended ? "Recommended" : "Non-Recommended");
-        }
-    }
-
-    public void reportCampaignParams(String campaignData) {
-        if (isPlayServicesPresent) {
-            gaHelper.reportCampaignParams(campaignData);
         }
     }
 

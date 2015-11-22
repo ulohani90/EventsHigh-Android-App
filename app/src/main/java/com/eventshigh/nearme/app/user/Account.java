@@ -13,7 +13,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.user.UserActionHelper.FollowingAction;
 import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
 
@@ -129,20 +128,6 @@ public class Account {
         return userInfo.phoneNo != null && !userInfo.isVerified;
     }
 
-    public boolean recordReferrer(String referrer) {
-        if (!accountInfo.contains(PREF_REFERRER)) {
-            accountInfo.edit().putString(PREF_REFERRER, referrer).apply();
-
-            synchronized (syncLock) {
-                lastSyncTimestamp = 0;
-                syncIfNeeded();
-            }
-            return true;
-        }
-
-        return false;
-    }
-
     public String getAppDownloadLink() {
         String ret = accountInfo.getString(PREF_SHARE_APP_LINK, null);
         if (ret == null) {
@@ -161,12 +146,8 @@ public class Account {
     public void setIsFollowing(String tag, boolean isFollowing) {
         if (isFollowing) {
             accountInfo.edit().putString(getKeyForTag(tag), tag).apply();
-            new UserActionHelper(context).recordAction(FollowingAction.FOLLOW, tag);
-            GcmRegistration.getInstance(context).subscribeToTopic(tag);
         } else {
             accountInfo.edit().remove(getKeyForTag(tag)).apply();
-            new UserActionHelper(context).recordAction(FollowingAction.UN_FOLLOW, tag);
-            GcmRegistration.getInstance(context).unSubscribeToTopic(tag);
         }
     }
 

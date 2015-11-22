@@ -84,10 +84,6 @@ public class IntentUtils {
             param.query = "";
             param.setDateFilter(Calendar.getInstance());
         }
-
-        if (inIntent.getDataString() != null) {
-            activity.reportCampaignParams(inIntent.getDataString());
-        }
     }
 
     private void processSearchIntent(Intent inIntent) {

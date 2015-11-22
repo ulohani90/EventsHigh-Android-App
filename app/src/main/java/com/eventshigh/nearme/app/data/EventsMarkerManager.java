@@ -5,9 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.util.Pair;
 
-import com.eventshigh.nearme.app.user.UserActionHelper;
-import com.eventshigh.nearme.app.utils.AlarmUtils;
-
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,23 +82,13 @@ public class EventsMarkerManager {
                 removeEventMark(event);
             } else {
                 eventMarkMap.put(event.id, mark);
-                if (EventMark.isFavourite(mark)) {
-                    AlarmUtils.setEventAlarm(context, event);
-                    new UserActionHelper(context).recordAction(
-                            UserActionHelper.EventAction.ADD_FAVORITE, event.id);
-                }
                 threads.add(EventMarkDbHelper.addEntry(database, event.id, mark));
             }
             return this;
         }
 
         public Editor removeEventMark(Event event) {
-            EventMark mark = eventMarkMap.remove(event.id);
-            if (EventMark.isFavourite(mark)) {
-                AlarmUtils.cancelEventAlarm(context, event);
-                new UserActionHelper(context).recordAction(
-                        UserActionHelper.EventAction.REMOVE_FAVORITE, event.id);
-            }
+            eventMarkMap.remove(event.id);
             threads.add(EventMarkDbHelper.removeEntry(database, event.id));
             return this;
         }

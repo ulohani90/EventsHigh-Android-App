@@ -19,12 +19,7 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
-import com.eventshigh.nearme.app.utils.Utils;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 /**
  * Base activity for location aware events listing. This class implements common methods to fetch
@@ -39,10 +34,6 @@ public abstract class BaseContextActivity extends BaseActivity {
 
     protected Toolbar toolbar;
 
-    // GoogleApiClient to report the page view.
-    private GoogleApiClient client;
-    private Action viewAction;
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -50,31 +41,8 @@ public abstract class BaseContextActivity extends BaseActivity {
         // Initialize the EventsMarkerManager.Editor.
         eventsMarkerManager = EventsMarkerManager.getInstance(this);
 
-        // Setup GoogleApiClient
-        if (eventsContext != null) {
-            Uri webUri = EventsHighEndpoints.getWebUri(eventsContext);
-            String title = eventsContext.toString();
-            viewAction = Action.newAction(Action.TYPE_VIEW, title, webUri, Utils.getAppUri(webUri));
-
-            client = new GoogleApiClient.Builder(this).addApi(AppIndex.APP_INDEX_API).build();
-            client.connect();
-            AppIndex.AppIndexApi.start(client, viewAction);
-        }
-
         // Show the verify phone snakbar if needed.
         showVerifyPhoneSnackbar();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        if (client != null && client.isConnected()) {
-            if (viewAction != null) {
-                AppIndex.AppIndexApi.end(client, viewAction);
-            }
-            client.disconnect();
-        }
     }
 
     @Override

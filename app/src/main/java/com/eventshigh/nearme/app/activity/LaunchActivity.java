@@ -33,11 +33,8 @@ import com.eventshigh.nearme.app.ui.adapter.CityListAdapter.OnCitySelectionListe
 import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
-import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 
 /**
  * Application Main or launch activity.
@@ -109,9 +106,6 @@ public class LaunchActivity extends BaseContextActivity {
                 }
             }
         }
-
-        // Setup the weekly alarms which are used for notification.
-        AlarmUtils.setMyEventsAlarm(this);
     }
 
     protected void onResume() {
@@ -188,61 +182,52 @@ public class LaunchActivity extends BaseContextActivity {
 
 
     // ***********************
-    // Callbacks
+    // Helper methods
     // ***********************
-
-    private OnConnectionFailedListener mOnConnectionFailedListener = new OnConnectionFailedListener() {
-        @Override
-        public void onConnectionFailed(ConnectionResult connectionResult) {
-            // Set the location from lastCity if needed.
-            if (eventsContext.city == null) {
-                City lastCity = gcmRegistration.getLastCity();
-                if (lastCity != null) {
-                    reportActionToAnalytics("usedLastCity");
-                    eventsContext.changeLocation(lastCity);
-                }
+    private void setCity() {
+        // Set the location from lastCity if needed.
+        if (eventsContext.city == null) {
+            City lastCity = gcmRegistration.getLastCity();
+            if (lastCity != null) {
+                reportActionToAnalytics("usedLastCity");
+                eventsContext.changeLocation(lastCity);
             }
+        }
 
-            // If we have user location, start next activity.
-            if (eventsContext.city != null) {
-                try {
-                    int appVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-                    Uri reportUri = AccountStateReporter.getBaseUri(LaunchActivity.this, "reportUser")
+        // If we have user location, start next activity.
+        if (eventsContext.city != null) {
+            try {
+                int appVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+                Uri reportUri = AccountStateReporter.getBaseUri(LaunchActivity.this, "reportUser")
                         .appendQueryParameter("city", eventsContext.city.toString())
                         .appendQueryParameter("lat", "0")
                         .appendQueryParameter("lon", "0")
                         .appendQueryParameter("version", Integer.toString(appVersion))
                         .build();
-                    RequestFuture<String> future = RequestFuture.newFuture();
-                    VolleyHelper.addToRequestQueue(LaunchActivity.this,
+                RequestFuture<String> future = RequestFuture.newFuture();
+                VolleyHelper.addToRequestQueue(LaunchActivity.this,
                         new StringRequest(reportUri.toString(), future, future) {
                             @Override
                             public Priority getPriority() {
                                 return Priority.LOW;
                             }
                         }
-                    );
-                } catch (NameNotFoundException e) {
-                    // Ignore.
-                }
-                showNextScreen();
-                return;
+                );
+            } catch (NameNotFoundException e) {
+                // Ignore.
             }
-
-            // We do not have user location. Lets populate the City chooser and let user
-            // select the city.
-            reportActionToAnalytics("locationFailed");
-            tabsView.setVisibility(View.GONE);
-            viewPager.setVisibility(View.GONE);
-            citySelector.setVisibility(View.VISIBLE);
-            citySelector.setAdapter(new CityListAdapter(LaunchActivity.this, mCitySelectionListener));
+            showNextScreen();
+            return;
         }
-    };
 
-
-    // ***********************
-    // Helper methods
-    // ***********************
+        // We do not have user location. Lets populate the City chooser and let user
+        // select the city.
+        reportActionToAnalytics("locationFailed");
+        tabsView.setVisibility(View.GONE);
+        viewPager.setVisibility(View.GONE);
+        citySelector.setVisibility(View.VISIBLE);
+        citySelector.setAdapter(new CityListAdapter(LaunchActivity.this, mCitySelectionListener));
+    }
 
     private void refreshIfOldData() {
         City userCity = gcmRegistration.getLastCity();
@@ -271,7 +256,7 @@ public class LaunchActivity extends BaseContextActivity {
     private void showNextScreen() {
         // If we do not have user city, use GoogleLocation api to get user location.
         if (eventsContext.city == null) {
-            mOnConnectionFailedListener.onConnectionFailed(null);
+            setCity();
             return;
         }
 
