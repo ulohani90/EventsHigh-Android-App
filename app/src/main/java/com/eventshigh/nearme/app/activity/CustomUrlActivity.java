@@ -142,6 +142,7 @@ public class CustomUrlActivity extends BaseActivity {
         webSettings.setJavaScriptEnabled(true);
         webSettings.setSupportZoom(false);
         webSettings.setBuiltInZoomControls(false);
+        WebView.setWebContentsDebuggingEnabled(true);
 
         // Enable Caching.
         File dir = activity.getCacheDir();
