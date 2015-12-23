@@ -109,15 +109,11 @@ public abstract class BaseActivity extends AppCompatActivity {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-            navigateUp();
+            finish();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void navigateUp() {
-        finish();
     }
 
     public View getViewForSnackbar() {

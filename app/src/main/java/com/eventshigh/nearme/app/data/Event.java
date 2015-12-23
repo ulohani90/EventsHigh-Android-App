@@ -41,6 +41,7 @@ public class Event implements Parcelable {
     @Nullable public final String imgUrl;
     @Nullable public final String sourceUrl;
     @Nullable public final String bookingUrl;
+    @Nullable public final String bookingText;
 
     public final int numViews;
     public final int numSaves;
@@ -68,7 +69,8 @@ public class Event implements Parcelable {
 
     public Event(String id, City city, String title, EventCategory category,
                  String description, String[] tags, @Nullable String youtubeVideoId,
-                 @Nullable String imgUrl, @Nullable String sourceUrl, @Nullable String bookingUrl,
+                 @Nullable String imgUrl, @Nullable String sourceUrl,
+                 @Nullable String bookingUrl, @Nullable String bookingText,
                  int numViews, int numSaves, boolean ehRecommended,
                  float uberScore, long[] eventTimings,
                  @Nullable String venue, @Nullable String locality,
@@ -89,6 +91,7 @@ public class Event implements Parcelable {
         this.imgUrl = Utils.checkIfUnknown(imgUrl);
         this.sourceUrl = Utils.checkIfUnknown(sourceUrl);
         this.bookingUrl = Utils.checkIfUnknown(bookingUrl);
+        this.bookingText = Utils.checkIfUnknown(bookingText);
 
         this.numViews = numViews;
         this.numSaves = numSaves;
@@ -185,6 +188,7 @@ public class Event implements Parcelable {
         dest.writeString(emptyIfNull(imgUrl));
         dest.writeString(emptyIfNull(sourceUrl));
         dest.writeString(emptyIfNull(bookingUrl));
+        dest.writeString(emptyIfNull(bookingText));
 
         dest.writeInt(numViews);
         dest.writeInt(numSaves);
@@ -225,6 +229,7 @@ public class Event implements Parcelable {
                             in.createStringArray(),
                             in.readString(),
 
+                            in.readString(),
                             in.readString(),
                             in.readString(),
                             in.readString(),
@@ -281,6 +286,7 @@ public class Event implements Parcelable {
         JSONObject mashup = eventJson.optJSONObject("mashup");
         String source_url = eventJson.optString("source_url");
         String booking_url = mashup == null ? null : mashup.optString("booking_url");
+        String booking_text = eventJson.optString("booking_text");
         String img_url = eventJson.optString("img_url");
         if ((source_url != null && source_url.toLowerCase().contains("eventviva")) ||
             (img_url != null && img_url.endsWith("missing.png"))) {
@@ -451,6 +457,7 @@ public class Event implements Parcelable {
                 img_url,
                 source_url,
                 booking_url,
+                booking_text,
 
                 num_views,
                 num_saves,

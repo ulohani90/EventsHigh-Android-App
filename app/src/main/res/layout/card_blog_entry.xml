@@ -41,6 +41,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="1dp"
             android:textColor="#80000000"
+            android:textIsSelectable="false"
             tools:text="15th Aug 2015"
         />
         <TextView
@@ -61,6 +62,7 @@
             android:maxLines="2"
             android:minLines="2"
             android:ellipsize="end"
+            android:textIsSelectable="false"
             tools:text="No plans yet for the evening?"
         />
 

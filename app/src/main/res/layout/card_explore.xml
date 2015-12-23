@@ -27,6 +27,7 @@
         android:maxLines="1"
         android:ellipsize="end"
         android:textColor="@android:color/white"
+        android:textIsSelectable="false"
         tools:text="Hip Hop Music"
     />
 </FrameLayout>

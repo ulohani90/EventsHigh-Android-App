@@ -45,6 +45,7 @@
             android:textColor="#CC000000"
             android:minLines="2"
             android:maxLines="2"
+            android:textIsSelectable="false"
             tools:text="No plans yet for the evening?"
         />
 
@@ -62,6 +63,7 @@
             android:layout_marginStart="8dp"
             android:drawableStart="@drawable/ic_access_time_grey600_12dp"
             android:drawableLeft="@drawable/ic_access_time_grey600_12dp"
+            android:textIsSelectable="false"
             tools:text="4 hours ago"
         />
     </RelativeLayout>

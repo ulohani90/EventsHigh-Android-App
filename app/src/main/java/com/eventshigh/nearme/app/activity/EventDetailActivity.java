@@ -319,6 +319,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void playYouTube(View view) {
+        reportEventAction(event, "playYoutube", event.youtubeVideoId);
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + event.youtubeVideoId));
             startActivity(intent);
@@ -409,7 +410,7 @@ public class EventDetailActivity extends BaseActivity {
         private final HorizontalScrollView futureTimesViewGroup;
         private final LinearLayout futureTimesView;
 
-        private final View bookView;
+        private final TextView bookView;
         private final View callView;
         private final View joinView;
         private final TextView priceView;
@@ -458,7 +459,7 @@ public class EventDetailActivity extends BaseActivity {
             futureTimesViewGroup = (HorizontalScrollView) findViewById(R.id.event_future_times_hs);
             futureTimesView = (LinearLayout) findViewById(R.id.event_future_times);
 
-            bookView = findViewById(R.id.book_ticket);
+            bookView = (TextView) findViewById(R.id.book_ticket);
             callView = findViewById(R.id.call);
             joinView = findViewById(R.id.join_event);
             priceView = (TextView) findViewById(R.id.event_price);
@@ -592,6 +593,9 @@ public class EventDetailActivity extends BaseActivity {
             findViewById(R.id.action_button_group).setVisibility(View.VISIBLE);
             callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
             bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
+            if (event.bookingText != null) {
+                bookView.setText(event.bookingText);
+            }
             joinView.setVisibility(
                 (bookView.getVisibility() != View.VISIBLE && event.sourceUrl != null &&
                     event.sourceUrl.contains("facebook.com/"))

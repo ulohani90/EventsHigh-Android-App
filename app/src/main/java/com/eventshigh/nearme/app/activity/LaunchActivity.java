@@ -108,6 +108,7 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -303,6 +304,11 @@ public class LaunchActivity extends BaseContextActivity {
 
         public ExploreScreenPagerAdapter() {
             super(getSupportFragmentManager());
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return (eventsContext.toString() + TABS[position]).hashCode();
         }
 
         @Override

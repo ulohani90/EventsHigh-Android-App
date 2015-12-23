@@ -20,6 +20,7 @@
         android:maxLines="1"
         android:ellipsize="end"
         android:layout_gravity="start|center_vertical"
+        android:textIsSelectable="false"
         tools:text="Comedy"
     />
     <TextView

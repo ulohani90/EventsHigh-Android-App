@@ -14,6 +14,7 @@
         android:textColor="@color/primary_dark"
         android:textSize="20sp"
         android:fontFamily="sans-serif-light"
+        android:textIsSelectable="false"
     />
     <TextView
         android:id="@+id/caption"
@@ -23,5 +24,6 @@
         android:layout_marginTop="16dp"
         tools:text="@string/onboarding_details"
         android:textColor="#CC212121"
+        android:textIsSelectable="false"
     />
 </LinearLayout>

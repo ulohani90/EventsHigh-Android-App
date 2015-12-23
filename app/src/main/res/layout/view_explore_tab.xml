@@ -10,6 +10,7 @@
     android:paddingLeft="8dp"
     android:paddingRight="8dp"
     android:textColor="@android:color/white"
+    android:textIsSelectable="false"
     android:gravity="center"
     tools:background="@color/primary"
     tools:text="Explore"
