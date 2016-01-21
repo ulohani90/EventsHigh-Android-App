@@ -16,11 +16,11 @@ import com.android.volley.toolbox.StringRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog.ContactsRequestCallback;
 import com.eventshigh.nearme.app.ui.OneSecDialog;
-import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.Signer;
 
@@ -70,7 +70,7 @@ public class EhInviteNotificationCard extends ViewHolder {
 
     private static void recordUserConsent(final BaseActivity activity) {
         final ProgressDialog dialog = OneSecDialog.show(activity);
-        Uri uri = AccountStateReporter.getBaseUri(activity, "register_ok_to_invite_friends").build();
+        Uri uri = UpdateAccountInfoService.getBaseUri(activity, "register_ok_to_invite_friends").build();
         try {
             VolleyHelper.addToRequestQueue(activity,
                     new StringRequest(Method.GET, Signer.sign(uri).toString(),
@@ -93,7 +93,7 @@ public class EhInviteNotificationCard extends ViewHolder {
             );
         } catch (IOException | GeneralSecurityException e) {
             Crashlytics.getInstance().core.logException(e);
-            Log.w(AccountStateReporter.class.getSimpleName(), "Failed to sendSignedRequest: " + uri, e);
+            Log.w(UpdateAccountInfoService.class.getSimpleName(), "Failed to sendSignedRequest: " + uri, e);
         }
     }
 }

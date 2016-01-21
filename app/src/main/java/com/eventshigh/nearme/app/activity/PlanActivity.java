@@ -17,6 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.UserContact;
@@ -26,7 +27,6 @@ import com.eventshigh.nearme.app.ui.adapter.ContactsAutoFillAdapter;
 import com.eventshigh.nearme.app.ui.adapter.SocialFriendCard;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
-import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -133,7 +133,7 @@ public class PlanActivity extends BaseActivity {
         if (!isPlanPublished) {
             try {
                 String url = Signer.sign(
-                    AccountStateReporter.getBaseUri(this, "register_event_to_plan")
+                    UpdateAccountInfoService.getBaseUri(this, "register_event_to_plan")
                             .appendQueryParameter("plan_id", planId)
                             .appendQueryParameter("event_id", event.id)
                             .appendQueryParameter("expiry_timestamp", Long.toString(max(event.eventTimings)))
@@ -178,7 +178,7 @@ public class PlanActivity extends BaseActivity {
                     req.put("invitations", invitations);
                     Log.w("debug", req.toString(2));
 
-                    String url = Signer.sign(AccountStateReporter.getBaseUri(
+                    String url = Signer.sign(UpdateAccountInfoService.getBaseUri(
                             PlanActivity.this, "invite_to_plan").build()).toString();
                     JsonObjectRequest request = new JsonObjectRequest(url, req,
                             invitationResponseListener, tryAgainErrorListener);

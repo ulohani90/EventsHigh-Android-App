@@ -1,12 +1,15 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -208,8 +211,8 @@ public class EventDetailActivity extends BaseActivity {
         addToFavourite = false;
 
         final String url = event == null ?
-            getIntent().getData().buildUpon().appendQueryParameter("src", "ehm_gp1").toString() :
-            event.getEventShareURI(this, "gp1").toString();
+                getIntent().getData().buildUpon().appendQueryParameter("src", "ehm_gp1").toString() :
+                event.getEventShareURI("gp1").toString();
 
         PlusOneButton plusOneButton = (PlusOneButton) findViewById(R.id.plus_one_button);
         plusOneButton.initialize(url, PLUS_ONE_REQUEST_CODE);
@@ -244,7 +247,7 @@ public class EventDetailActivity extends BaseActivity {
         startActivitySafe(intent);
     }
 
-    public  void call(View view) {
+    public void call(View view) {
         if (event.organizerPhone == null) {
             return;
         }
@@ -439,7 +442,7 @@ public class EventDetailActivity extends BaseActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + event.youtubeVideoId));
             startActivity(intent);
         } catch (ActivityNotFoundException ex) {
-            Intent intent= new Intent(Intent.ACTION_VIEW,
+            Intent intent = new Intent(Intent.ACTION_VIEW,
                     Uri.parse("http://www.youtube.com/watch?v=" + event.youtubeVideoId));
             startActivity(intent);
         }
@@ -775,9 +778,9 @@ public class EventDetailActivity extends BaseActivity {
                 bookView.setText(event.bookingText);
             }
             joinView.setVisibility(
-                (bookView.getVisibility() != View.VISIBLE && event.sourceUrl != null &&
-                    event.sourceUrl.contains("facebook.com/"))
-                ? View.VISIBLE : View.GONE);
+                    (bookView.getVisibility() != View.VISIBLE && event.sourceUrl != null &&
+                            event.sourceUrl.contains("facebook.com/"))
+                            ? View.VISIBLE : View.GONE);
 
             // Show price.
             findViewById(R.id.price_row).setVisibility(View.VISIBLE);
@@ -817,7 +820,7 @@ public class EventDetailActivity extends BaseActivity {
 
             // Organizer Info.
             boolean organizerInfoShown = false;
-            organizerNameRow.setVisibility(event.organizerName == null ? View.GONE :View.VISIBLE);
+            organizerNameRow.setVisibility(event.organizerName == null ? View.GONE : View.VISIBLE);
             if (event.organizerName != null) {
                 organizerInfoShown = true;
                 organizerNameView.setText(event.organizerName);
@@ -926,16 +929,19 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     private void populateEventTravelTime() {
-        Location location = LocationServices.FusedLocationApi.getLastLocation(client);
-        if (location != null) {
-            userLocation = LocationUtils.locationToLatLng(location);
-        }
+        if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Location location = LocationServices.FusedLocationApi.getLastLocation(client);
+            if (location != null) {
+                userLocation = LocationUtils.locationToLatLng(location);
+            }
 
-        String eventTravelTime = LocationUtils.getTravelTime(EventDetailActivity.this,
-            userLocation, event.location);
-        eventCard.travelTimeView.setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
-        if (eventTravelTime != null) {
-            eventCard.travelTimeView.setText(eventTravelTime);
+            String eventTravelTime = LocationUtils.getTravelTime(EventDetailActivity.this,
+                    userLocation, event.location);
+            eventCard.travelTimeView.setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
+            if (eventTravelTime != null) {
+                eventCard.travelTimeView.setText(eventTravelTime);
+            }
         }
     }
 

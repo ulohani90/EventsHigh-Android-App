@@ -13,12 +13,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -58,7 +58,7 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
             Listener<SocialActions> listener, ErrorListener errorListener) {
         try {
             Uri getSocialActionsUri =
-                    AccountStateReporter.getBaseUri(context, "get_social_actions").build();
+                    UpdateAccountInfoService.getBaseUri(context, "get_social_actions").build();
             SocialActionsRequest request = new SocialActionsRequest(
                     context, getSocialActionsUri, priority, shouldBypassCache, listener, errorListener);
             request.setTag(tag);

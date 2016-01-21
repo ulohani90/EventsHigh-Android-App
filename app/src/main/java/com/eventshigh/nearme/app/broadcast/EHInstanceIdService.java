@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.broadcast;
 
-import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.google.android.gms.iid.InstanceIDListenerService;
 
 /**
@@ -8,6 +7,6 @@ import com.google.android.gms.iid.InstanceIDListenerService;
  */
 public class EHInstanceIdService extends InstanceIDListenerService {
     public void onTokenRefresh() {
-        GcmRegistration.getInstance(this).resetGcmRegistrationId();
+        UpdateAccountInfoService.refreshGCMToken(this);
     }
 }

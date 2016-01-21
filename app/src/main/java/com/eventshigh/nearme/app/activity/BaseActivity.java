@@ -24,6 +24,7 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
@@ -31,8 +32,6 @@ import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.OneSecDialog;
-import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -41,7 +40,7 @@ import com.eventshigh.nearme.app.utils.GAHelper;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -97,7 +96,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
 
         // Setup Google Analytics.
-        isPlayServicesPresent = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS;
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        isPlayServicesPresent = apiAvailability.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS;
         if (isPlayServicesPresent) {
             gaHelper = GAHelper.getInstance(this);
         }
@@ -114,10 +114,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (isPlayServicesPresent) {
             // Google Analytics reporting.
             gaHelper.reportActivityStart(this);
-
-            // Register with GCM if needed. GCM is used for notifications messages.
-            GcmRegistration.getInstance(this).updateGcmRegistrationIdIfNeeded();
         }
+
+        UpdateAccountInfoService.run(this, false);
     }
 
     @Override
@@ -253,8 +252,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT,
-                String.format(getString(R.string.share_app_text), new Account(this).getAppDownloadLink()));
+        shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_app_text));
         shareIntent.setType("text/plain");
         shareIntent.setPackage(PACKAGE_NAME_WHATSAPP);
         startActivity(shareIntent);
@@ -268,7 +266,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (packageName != null) {
             src = packageName.split("\\.")[1];
         }
-        final String eventShareUri = event.getEventShareURI(this, src).toString();
+        final String eventShareUri = event.getEventShareURI(src).toString();
 
         final ProgressDialog dialog = OneSecDialog.show(this);
         URLShortenerRequest.submit(this, eventShareUri,
@@ -341,7 +339,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .setData(Events.CONTENT_URI)
                 .putExtra(Events.TITLE, event.title)
                 .putExtra(Events.EVENT_LOCATION, event.getFullAddress())
-                .putExtra(Events.DESCRIPTION, event.getEventShareURI(this))
+                .putExtra(Events.DESCRIPTION, event.getEventShareURI())
                 .putExtra(Events.EVENT_LOCATION, event.getShortAddress());
 
         if (date == null && event.eventTimings.length > 0) {

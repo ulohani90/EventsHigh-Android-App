@@ -22,6 +22,7 @@ import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.ui.adapter.EventCard;
 import com.eventshigh.nearme.app.ui.MapMarkerManager;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -84,7 +85,7 @@ public class EventsMapsActivity extends BaseContextActivity {
         setupLayout(R.layout.activity_event_maps);
 
         if (eventsContext.location == null) {
-            City lastCity = GcmRegistration.getInstance(this).getLastCity();
+            City lastCity = new Account(this).getLastCity();
             if (lastCity != null) {
                 reportActionToAnalytics("usedLastCity");
                 eventsContext.changeLocation(lastCity.cityBounds.getCenter());

@@ -12,9 +12,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.Signer;
 
@@ -35,7 +35,7 @@ public class MyContactsRequest extends JsonRequest<List<UserContact>> {
             Listener<List<UserContact>> listener, ErrorListener errorListener) {
         try {
             Uri socialFriendsUri =
-                    AccountStateReporter.getBaseUri(context, "get_social_friends").build();
+                    UpdateAccountInfoService.getBaseUri(context, "get_social_friends").build();
             MyContactsRequest request = new MyContactsRequest(
                     context, socialFriendsUri, priority, shouldBypassCache, listener, errorListener);
             request.setTag(tag);

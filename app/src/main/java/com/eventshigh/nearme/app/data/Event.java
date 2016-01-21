@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.data;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Parcel;
@@ -131,12 +130,12 @@ public class Event implements Parcelable {
         return EventsHighEndpoints.getEventDetailsURI(this);
     }
 
-    public Uri getEventShareURI(Context context) {
-        return getEventShareURI(context, null);
+    public Uri getEventShareURI() {
+        return getEventShareURI(null);
     }
 
-    public Uri getEventShareURI(Context context, @Nullable String src) {
-        return EventsHighEndpoints.getEventShareURI(this, src, context);
+    public Uri getEventShareURI(@Nullable String src) {
+        return EventsHighEndpoints.getEventShareURI(this, src);
     }
 
     public String getFullAddress() {

@@ -8,8 +8,8 @@ import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.user.GcmRegistration;
-import com.eventshigh.nearme.app.user.GcmRegistration.UserCityListener;
+import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.Account.UserCityListener;
 import com.eventshigh.nearme.app.utils.Utils;
 
 public class EHPreferenceFragment extends PreferenceFragment
@@ -17,7 +17,7 @@ public class EHPreferenceFragment extends PreferenceFragment
 
     private ListPreference lastCityView;
 
-    private GcmRegistration gcmRegistration;
+    private Account account;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,22 +34,22 @@ public class EHPreferenceFragment extends PreferenceFragment
         lastCityView.setOnPreferenceChangeListener(this);
 
         // shared preferences instance.
-        gcmRegistration = GcmRegistration.getInstance(getActivity());
+        account = new Account(getActivity());
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        onUserCityChanged(gcmRegistration.getLastCity());
-        gcmRegistration.setUserCityListener(this);
+        onUserCityChanged(account.getLastCity());
+        account.setUserCityListener(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        gcmRegistration.setUserCityListener(null);
+        account.setUserCityListener(null);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class EHPreferenceFragment extends PreferenceFragment
             if (!newValue.equals(lastCityView.getValue())) {
                 City newCity = City.getCity((String) newValue);
                  if (newCity != null) {
-                    gcmRegistration.setLastCity(newCity, null);
+                    account.setLastCity(newCity);
                     LaunchActivity activity = (LaunchActivity) getActivity();
                     activity.cityChanged(newCity);
                 }

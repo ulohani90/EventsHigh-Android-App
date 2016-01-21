@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.Manifest;
+import android.Manifest.permission;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.app.ActivityCompat;
@@ -32,15 +34,14 @@ import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter.OnCitySelectionListener;
-import com.eventshigh.nearme.app.user.AccountStateReporter;
-import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
-import com.eventshigh.nearme.app.utils.AlarmUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
@@ -72,7 +73,7 @@ public class LaunchActivity extends BaseContextActivity {
     private GoogleApiClient client;
 
     // GCM registration helper.
-    private GcmRegistration gcmRegistration;
+    private Account account;
 
     // Tabs.
     private int defaultTab = 1;
@@ -114,22 +115,19 @@ public class LaunchActivity extends BaseContextActivity {
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
 
-        // Read Preferences
-        gcmRegistration = GcmRegistration.getInstance(this);
+        // Read account status.
+        account = new Account(this);
 
         // Process the incoming intent.
-        String tabName= getIntent().getStringExtra(DEFAULT_TAB_PARAM);
+        String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
         if (tabName != null) {
-            for (int i = 0 ; i < TABS.length; i++) {
+            for (int i = 0; i < TABS.length; i++) {
                 if (TABS[i].equalsIgnoreCase(tabName)) {
                     defaultTab = i;
                     break;
                 }
             }
         }
-
-        // Setup the weekly alarms which are used for notification.
-        AlarmUtils.setMyEventsAlarm(this);
     }
 
     @Override
@@ -139,7 +137,7 @@ public class LaunchActivity extends BaseContextActivity {
         // We show the onboarding If this is first activity and there was no
         // location/query passed through intent.
         if (eventsContext.location == null && eventsContext.query.isEmpty() &&
-            eventsContext.dateFilter.isEmpty()) {
+                eventsContext.dateFilter.isEmpty()) {
             if (Preferences.getInstance(this).shouldShowOnBoarding()) {
                 startActivity(new Intent(this, OnBoardingActivity.class));
                 return;
@@ -205,7 +203,7 @@ public class LaunchActivity extends BaseContextActivity {
 
     @Override
     public void onBackPressed() {
-        if(drawer.isDrawerOpen(GravityCompat.START)) {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -247,13 +245,15 @@ public class LaunchActivity extends BaseContextActivity {
     private ConnectionCallbacks mConnectionCallbacks = new ConnectionCallbacks() {
         @Override
         public void onConnected(Bundle bundle) {
-            if (eventsContext.city == null) {
+            if (eventsContext.city == null &&
+                ActivityCompat.checkSelfPermission(LaunchActivity.this, permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(LaunchActivity.this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 Location location = LocationServices.FusedLocationApi.getLastLocation(client);
                 if (location != null) {
                     LatLng latLng = LocationUtils.locationToLatLng(location);
                     eventsContext.changeLocation(latLng);
                     if (eventsContext.city != null) {
-                        gcmRegistration.setLastCity(eventsContext.city, latLng);
+                        account.setLastCity(eventsContext.city);
                     } else {
                         reportActionToAnalytics("unsupportedCity");
                     }
@@ -273,10 +273,10 @@ public class LaunchActivity extends BaseContextActivity {
 
     private OnConnectionFailedListener mOnConnectionFailedListener = new OnConnectionFailedListener() {
         @Override
-        public void onConnectionFailed(ConnectionResult connectionResult) {
+        public void onConnectionFailed(@Nullable ConnectionResult connectionResult) {
             // Set the location from lastCity if needed.
             if (eventsContext.city == null) {
-                City lastCity = gcmRegistration.getLastCity();
+                City lastCity = account.getLastCity();
                 if (lastCity != null) {
                     reportActionToAnalytics("usedLastCity");
                     eventsContext.changeLocation(lastCity.cityBounds.getCenter());
@@ -288,7 +288,7 @@ public class LaunchActivity extends BaseContextActivity {
                 if (eventsContext.location != null) {
                     try {
                         int appVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-                        Uri reportUri = AccountStateReporter.getBaseUri(LaunchActivity.this, "reportUser")
+                        Uri reportUri = UpdateAccountInfoService.getBaseUri(LaunchActivity.this, "reportUser")
                             .appendQueryParameter("city", eventsContext.city.toString())
                             .appendQueryParameter("lat", Double.toString(eventsContext.location.latitude))
                             .appendQueryParameter("lon", Double.toString(eventsContext.location.longitude))
@@ -343,7 +343,7 @@ public class LaunchActivity extends BaseContextActivity {
     // ***********************
 
     private void refreshIfOldData() {
-        City userCity = gcmRegistration.getLastCity();
+        City userCity = account.getLastCity();
         if (eventsContext.city != null && userCity != null &&
                 eventsContext.city != userCity) {
             cityChanged(userCity);
@@ -414,7 +414,7 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public void onCitySelection(City city) {
             eventsContext.changeLocation(city.cityBounds.getCenter());
-            gcmRegistration.setLastCity(city, null);
+            account.setLastCity(city);
 
             citySelector.setVisibility(View.GONE);
             tabsView.setVisibility(View.VISIBLE);

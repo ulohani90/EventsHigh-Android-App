@@ -14,7 +14,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.BlogEntry;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
-import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONException;
@@ -33,7 +33,7 @@ public class BlogFeedRequest extends JsonRequest<List<BlogEntry>> {
      */
     public static void submit(Context context, Priority priority, boolean shouldBypassCache,
                               Listener<List<BlogEntry>> listener, ErrorListener errorListener) {
-        City city = GcmRegistration.getInstance(context).getLastCity();
+        City city = new Account(context).getLastCity();
         if (city == null) {
             errorListener.onErrorResponse(new VolleyError("user city is unknown"));
         } else {

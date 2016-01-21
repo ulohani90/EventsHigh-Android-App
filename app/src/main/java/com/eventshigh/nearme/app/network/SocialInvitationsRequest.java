@@ -12,10 +12,10 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
+import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.Signer;
 
 import org.json.JSONArray;
@@ -129,7 +129,7 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
                 return;
             }
 
-            Uri getSocialInvitesUri = AccountStateReporter.getBaseUri(context, "get_social_invites")
+            Uri getSocialInvitesUri = UpdateAccountInfoService.getBaseUri(context, "get_social_invites")
                     .appendQueryParameter("mobile_no", mobileNo).build();
             SocialInvitationsRequest request = new SocialInvitationsRequest(context,
                     getSocialInvitesUri, priority, shouldBypassCache, listener, errorListener);

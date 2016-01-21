@@ -16,11 +16,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
-import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONObject;
@@ -99,7 +99,7 @@ public class PhoneLoginActivity extends BaseActivity {
         }
 
         progressBar.setVisibility(View.VISIBLE);
-        Uri requestUrl = AccountStateReporter.getBaseUri(this, "registerMobileNo")
+        Uri requestUrl = UpdateAccountInfoService.getBaseUri(this, "registerMobileNo")
                 .appendQueryParameter("name", name)
                 .appendQueryParameter("mobile_no", phoneNo)
                 .build();
@@ -149,7 +149,7 @@ public class PhoneLoginActivity extends BaseActivity {
 
     public void verifyCode(View view) {
         progressBar.setVisibility(View.VISIBLE);
-        Uri requestUrl = AccountStateReporter.getBaseUri(this, "verifyMobileNo")
+        Uri requestUrl = UpdateAccountInfoService.getBaseUri(this, "verifyMobileNo")
                 .appendQueryParameter("mobile_no", phoneNoEditText.getText().toString())
                 .appendQueryParameter("verification_code", codeEditText.getText().toString())
                 .build();

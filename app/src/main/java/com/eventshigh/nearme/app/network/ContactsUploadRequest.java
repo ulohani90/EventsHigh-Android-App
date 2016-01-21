@@ -8,8 +8,8 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.UserContact;
-import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;
@@ -39,7 +39,7 @@ public class ContactsUploadRequest extends JsonObjectRequest {
             return;
         }
 
-        String url = AccountStateReporter.getBaseUriWithoutAndroidId("record_user_contacts").build().toString();
+        String url = UpdateAccountInfoService.getBaseUriWithoutAndroidId("record_user_contacts").build().toString();
         ContactsUploadRequest request = new ContactsUploadRequest(
                 url, jsonRequest, priority, listener, errorListener);
         request.setRetryPolicy(new DefaultRetryPolicy(60_000,
