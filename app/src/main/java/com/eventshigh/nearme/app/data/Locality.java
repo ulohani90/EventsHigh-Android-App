@@ -15,7 +15,11 @@ public enum  Locality {
     MUMBAI_ANDHERI(City.MUMBAI, "Andheri"),
     MUMBAI_BANDRA(City.MUMBAI, "Bandra"),
     MUMBAI_JUHU(City.MUMBAI, "Juhu"),
-    MUMBAI_NARIMAN_POINT(City.MUMBAI, "Nariman Point");
+    MUMBAI_NARIMAN_POINT(City.MUMBAI, "Nariman Point"),
+    CHENNAI_ANNA_SALAI(City.CHENNAI, "Anna Salai"),
+    CHENNAI_T_NAGAR(City.CHENNAI, "T. Nagar"),
+    CHENNAI_IIT_MADRAS(City.CHENNAI, "IIT Madras"),
+    CHENNAI_VELACHERY(City.CHENNAI, "Velachery");
 
     public final City city;
     public final String name;

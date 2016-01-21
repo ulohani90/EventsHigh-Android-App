@@ -45,6 +45,19 @@ public class ExploreFragment extends BaseEventsFragment {
             EventCategory.LITERATURE.categoryName
     };
 
+    public static final String[] EXPLORE_TAGS_CHENNAI = {
+            EventCategory.PARTIES.categoryName,
+            EventCategory.THEATRE.categoryName,
+            EventCategory.MUSIC.categoryName,
+            EventCategory.TECH.categoryName,
+            EventCategory.SPORTS.categoryName,
+            EventCategory.HEALTH_WELLNESS.categoryName,
+            EventCategory.DANCE.categoryName,
+            EventCategory.ART.categoryName,
+            EventCategory.FOOD.categoryName,
+            EventCategory.LITERATURE.categoryName
+    };
+
     public static final String[] EXPLORE_TAGS_BANGALORE = {
             EventsHighEndpoints.QUERY_FEATURED,
             EventCategory.PARTIES.categoryName,
@@ -54,12 +67,10 @@ public class ExploreFragment extends BaseEventsFragment {
             EventCategory.KIDS_ENTERTAINMENT.categoryName,
             EventCategory.TECH.categoryName,
             EventCategory.SPORTS.categoryName,
-            EventCategory.HEALTH_WELLNESS.categoryName,
             EventCategory.DANCE.categoryName,
             EventCategory.ART.categoryName,
             EventCategory.FOOD.categoryName,
             EventCategory.LITERATURE.categoryName,
-            "Workshops"
     };
 
     public static ExploreFragment getInstance(EventsContext eventsContext) {
@@ -104,8 +115,9 @@ public class ExploreFragment extends BaseEventsFragment {
         @Override
         public void onResponse(EventCollection eventCollection, boolean isIntermediate) {
             eventsAdapter.setExploreCategories(eventCollection,
-                    Locality.getLocalities(eventsContext.city),
-                    eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS);
+                Locality.getLocalities(eventsContext.city),
+                eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE :
+                    (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS));
 
             if (!isIntermediate) {
                 EventInvitationsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
