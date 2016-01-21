@@ -116,7 +116,9 @@ public class GcmRegistration {
             }
             subscribeToTopic(city.toString());
 
-            userCityListener.onUserCityChanged(city);
+            if (userCityListener != null) {
+                userCityListener.onUserCityChanged(city);
+            }
             lastSyncTimestamp = 0;
         }
 

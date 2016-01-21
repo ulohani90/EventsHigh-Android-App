@@ -129,11 +129,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
     public void addEventInvitations(List<EventInvitation> invites) {
+        int pos = dataToShow.get(0).getType() == DataType.EVENT_PAGER ? 1 : 0;
         for (EventInvitation invite : invites) {
-            dataToShow.add(1, new EventInvitationData(invite, activity));
+            dataToShow.add(pos, new EventInvitationData(invite, activity));
         }
         if (! invites.isEmpty()) {
-            dataToShow.add(1, new SmallHeaderData("Invitations"));
+            dataToShow.add(pos, new SmallHeaderData("Invitations"));
         }
         notifyDataSetChanged();
     }
