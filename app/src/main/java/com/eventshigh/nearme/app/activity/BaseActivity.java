@@ -21,6 +21,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
@@ -68,6 +69,13 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         // Animation.
         overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_translate);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        UpdateAccountInfoService.run(this, false);
     }
 
     @Override
@@ -154,8 +162,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT,
-                String.format(getString(R.string.share_app_text), new Account(this).getAppDownloadLink()));
+        shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_app_text));
         shareIntent.setType("text/plain");
         shareIntent.setPackage(PACKAGE_NAME_WHATSAPP);
         startActivity(shareIntent);
@@ -169,7 +176,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (packageName != null) {
             src = packageName.split("\\.")[1];
         }
-        final String eventShareUri = event.getEventShareURI(this, src).toString();
+        final String eventShareUri = event.getEventShareURI(src).toString();
 
         final ProgressDialog dialog = OneSecDialog.show(this);
         URLShortenerRequest.submit(this, eventShareUri,
@@ -237,7 +244,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .setData(Events.CONTENT_URI)
                 .putExtra(Events.TITLE, event.title)
                 .putExtra(Events.EVENT_LOCATION, event.getFullAddress())
-                .putExtra(Events.DESCRIPTION, event.getEventShareURI(this))
+                .putExtra(Events.DESCRIPTION, event.getEventShareURI())
                 .putExtra(Events.EVENT_LOCATION, event.getShortAddress());
 
         if (date == null && event.eventTimings.length > 0) {

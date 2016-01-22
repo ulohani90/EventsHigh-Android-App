@@ -13,7 +13,6 @@ import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
-import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 
@@ -76,7 +75,6 @@ public class DateCategoryRequest extends JsonRequest<List<TopicEvents>>  {
     protected Response<List<TopicEvents>> parseNetworkResponse(NetworkResponse response) {
         try {
             // Parse the response.
-            ReportTimingTask.report(context, "date-category-events", response.networkTimeMs);
             String jsonString = new String(response.data, "UTF-8");
             JSONObject eventsJson = new JSONObject(jsonString);
             JSONObject dateEventsJson = eventsJson.getJSONObject(eventsJson.keys().next());

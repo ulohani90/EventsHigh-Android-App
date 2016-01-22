@@ -171,7 +171,7 @@ public class EventDetailActivity extends BaseActivity {
         startActivitySafe(intent);
     }
 
-    public  void call(View view) {
+    public void call(View view) {
         if (event.organizerPhone == null) {
             return;
         }
@@ -324,7 +324,7 @@ public class EventDetailActivity extends BaseActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + event.youtubeVideoId));
             startActivity(intent);
         } catch (ActivityNotFoundException ex) {
-            Intent intent= new Intent(Intent.ACTION_VIEW,
+            Intent intent = new Intent(Intent.ACTION_VIEW,
                     Uri.parse("http://www.youtube.com/watch?v=" + event.youtubeVideoId));
             startActivity(intent);
         }
@@ -597,9 +597,9 @@ public class EventDetailActivity extends BaseActivity {
                 bookView.setText(event.bookingText);
             }
             joinView.setVisibility(
-                (bookView.getVisibility() != View.VISIBLE && event.sourceUrl != null &&
-                    event.sourceUrl.contains("facebook.com/"))
-                ? View.VISIBLE : View.GONE);
+                    (bookView.getVisibility() != View.VISIBLE && event.sourceUrl != null &&
+                            event.sourceUrl.contains("facebook.com/"))
+                            ? View.VISIBLE : View.GONE);
 
             // Show price.
             findViewById(R.id.price_row).setVisibility(View.VISIBLE);
@@ -639,7 +639,7 @@ public class EventDetailActivity extends BaseActivity {
 
             // Organizer Info.
             boolean organizerInfoShown = false;
-            organizerNameRow.setVisibility(event.organizerName == null ? View.GONE :View.VISIBLE);
+            organizerNameRow.setVisibility(event.organizerName == null ? View.GONE : View.VISIBLE);
             if (event.organizerName != null) {
                 organizerInfoShown = true;
                 organizerNameView.setText(event.organizerName);

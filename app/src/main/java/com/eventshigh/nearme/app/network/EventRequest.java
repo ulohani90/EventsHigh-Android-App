@@ -12,7 +12,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONException;
@@ -45,12 +44,11 @@ public class EventRequest extends JsonRequest<Event> {
         String eventId = eventUriPathSegments.get(eventUriPathSegments.size() - 1).split("-", 2)[0];
         String url = EventsHighEndpoints.getApiEndpointEventUber(eventId);
 
-        EventRequest request = new EventRequest(context, url, priority, listener, errorListener);
+        EventRequest request = new EventRequest(url, priority, listener, errorListener);
         request.setTag(context);
         VolleyHelper.addToRequestQueue(context, request);
     }
 
-    private final Context context;
     private final Priority priority;
 
     /**
@@ -60,10 +58,9 @@ public class EventRequest extends JsonRequest<Event> {
      * @param listener Listener to receive the JSON response
      * @param errorListener Error listener, or null to ignore errors.
      */
-    public EventRequest(Context context, String url, Priority priority,
-                        Listener<Event> listener, ErrorListener errorListener) {
+    public EventRequest(String url, Priority priority, Listener<Event> listener,
+                        ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
-        this.context = context;
         this.priority = priority;
     }
 
@@ -74,8 +71,6 @@ public class EventRequest extends JsonRequest<Event> {
 
     @Override
     protected Response<Event> parseNetworkResponse(NetworkResponse response) {
-        ReportTimingTask.report(context, "event", response.networkTimeMs);
-
         try {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));

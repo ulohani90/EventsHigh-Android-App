@@ -14,7 +14,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
-import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -70,21 +69,19 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         }
 
         EventCollectionRequest request = new EventCollectionRequest(
-                context, url, priority, shouldBypassCache, listener, errorListener);
+                url, priority, shouldBypassCache, listener, errorListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
 
-    private final Context context;
     private final Priority priority;
 
-    public EventCollectionRequest(Context context, String url, Priority priority, boolean shouldBypassCache,
+    public EventCollectionRequest(String url, Priority priority, boolean shouldBypassCache,
           Listener<EventsCollection> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
         setShouldAllowStaleResponse(true);
 
-        this.context = context;
         this.priority = priority;
     }
 
@@ -97,7 +94,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     protected Response<EventsCollection> parseNetworkResponse(NetworkResponse response) {
         try {
             // Parse the response.
-            EventsCollection eventsCollection = parseEventsFromNetworkResponse(response, context);
+            EventsCollection eventsCollection = parseEventsFromNetworkResponse(response);
 
             return Response.success(eventsCollection, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
@@ -105,10 +102,8 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         }
     }
 
-    public static EventsCollection parseEventsFromNetworkResponse(
-            NetworkResponse response, Context context) throws UnsupportedEncodingException, JSONException {
-        ReportTimingTask.report(context, "events", response.networkTimeMs);
-
+    public static EventsCollection parseEventsFromNetworkResponse( NetworkResponse response)
+    throws UnsupportedEncodingException, JSONException {
         String jsonString = new String(response.data, "UTF-8");
         JSONObject eventsJson = new JSONObject(jsonString);
         List<Event> events = Event.parseUpcomingEvents(eventsJson);

@@ -10,7 +10,6 @@ import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.data.BlogEntry;
-import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONException;
@@ -63,8 +62,6 @@ public class BlogEntryRequest extends JsonRequest<BlogEntry> {
 
     @Override
     protected Response<BlogEntry> parseNetworkResponse(NetworkResponse response) {
-        ReportTimingTask.report(context, "blogEntry", response.networkTimeMs);
-
         try {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));

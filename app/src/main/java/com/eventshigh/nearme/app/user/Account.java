@@ -2,36 +2,29 @@ package com.eventshigh.nearme.app.user;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.utils.Signer;
-import com.eventshigh.nearme.app.utils.Utils;
 
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Manages the user account on this device. The account information is stored using
  * SharedPreferences in {@code PREFS_FILE_NAME}.
  */
 public class Account {
+    public interface UserCityListener {
+        void onUserCityChanged(City newUserCity);
+    }
+
     public static class UserInfo {
-        @Nullable public final String name;
+        @Nullable
+        public final String name;
         @Nullable public final String phoneNo;
         public final Boolean isVerified;
 
@@ -50,19 +43,12 @@ public class Account {
     private static final String PREF_MOBILE_NO = "mobile_no";
     private static final String PREF_MOBILE_NO_VERIFIED = "mobile_no_verified";
 
-    // The referrer for this user. this user installed the app via this referrer.
-    private static final String PREF_REFERRER = "referrer";
-    private static final String PREF_REFERRER_UPLOADED = "referrer_uploaded";
-
-    // The app download link for the user. Each user has unique link so that we can
-    // track the number of installs.
-    private static final String PREF_SHARE_APP_LINK = "app_download_link";
+    // Last city selection by user.
+    private static final String PREF_LAST_CITY = "last_city";
 
     // The prefix to the shared prefs key used to save follow tags for this user
     private static final String PREF_FOLLOW_KEY_PREFIX = "follow_";
 
-    private static final Object syncLock = false;
-    private static long lastSyncTimestamp = 0;
     private static boolean disableSnackBar = false;
 
     // shared and static accountInfo which usages shared preference to store records.
@@ -75,14 +61,23 @@ public class Account {
 
     // Member variables used to store the user account details in preferences.
     private final Context context;
+    private UserCityListener userCityListener = null;
 
     public Account(Context context) {
         this.context = context.getApplicationContext();
 
         setAccountInfo(this.context);
-
-        // Check if we need to upload the data.
-        syncIfNeeded();
+        accountInfo.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key.equals(PREF_LAST_CITY) && userCityListener != null) {
+                    City lastCity = City.getCity(accountInfo.getString(PREF_LAST_CITY, ""));
+                    if (lastCity != null) {
+                        userCityListener.onUserCityChanged(lastCity);
+                    }
+                }
+            }
+        });
     }
 
     public UserInfo getUserInfo() {
@@ -128,16 +123,6 @@ public class Account {
         return userInfo.phoneNo != null && !userInfo.isVerified;
     }
 
-    public String getAppDownloadLink() {
-        String ret = accountInfo.getString(PREF_SHARE_APP_LINK, null);
-        if (ret == null) {
-            ret = Uri.parse("https://play.google.com/store/apps/details").buildUpon()
-                        .appendQueryParameter("id", context.getPackageName())
-                        .appendQueryParameter("referrer", Utils.getAndroidId(context))
-                        .build().toString();
-        }
-        return ret;
-    }
 
     public boolean isFollowing(String tag) {
         return accountInfo.getString(getKeyForTag(tag), null) != null;
@@ -161,69 +146,28 @@ public class Account {
         return interests;
     }
 
+    public void setLastCity(@Nullable City city) {
+        if (city == null) {
+            return;
+        }
+
+        City currentLastCity = getLastCity();
+        if (currentLastCity == null || !city.equals(currentLastCity)) {
+            accountInfo.edit().putString(PREF_LAST_CITY, city.toString()).apply();
+            UpdateAccountInfoService.refreshCity(context);
+        }
+    }
+
+    public @Nullable City getLastCity() {
+        return City.getCity(accountInfo.getString(PREF_LAST_CITY, ""));
+    }
+
+    public void setUserCityListener (@Nullable UserCityListener userCityListener) {
+        this.userCityListener = userCityListener;
+    }
+
     private static String getKeyForTag(String tag) {
         return PREF_FOLLOW_KEY_PREFIX + EventCategory.toCategoryParsableString(tag);
     }
 
-    private void syncIfNeeded() {
-        if (lastSyncTimestamp < System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1)) {
-            new Thread(new AccountStateRegistar()).start();
-        }
-    }
-
-    private class AccountStateRegistar implements Runnable {
-        @Override
-        public void run() {
-            synchronized (syncLock) {
-                if (lastSyncTimestamp > System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1)) {
-                    return;
-                }
-                lastSyncTimestamp = System.currentTimeMillis();
-            }
-
-            String referrer = accountInfo.getString(PREF_REFERRER, null);
-            String appLink = accountInfo.getString(PREF_SHARE_APP_LINK, null);
-            if (appLink != null && (referrer == null || accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false))) {
-                return;
-            }
-
-            if (referrer != null && !accountInfo.getBoolean(PREF_REFERRER_UPLOADED, false)) {
-                AccountStateReporter.reportReferrer(context, referrer, new Runnable() {
-                    @Override
-                    public void run() {
-                        accountInfo.edit().putBoolean(PREF_REFERRER_UPLOADED, true).apply();
-                    }
-                });
-            }
-
-            if (referrer != null || GcmRegistration.getInstance(context).getLastCity() != null) {
-                try {
-                    Uri uri = AccountStateReporter.getBaseUri(context, "getReferrerLink").build();
-                    String url = Signer.sign(uri).toString();
-                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
-                            appLinkListener, errorListener);
-                    VolleyHelper.addToRequestQueue(context, request);
-                } catch (IOException | GeneralSecurityException e) {
-                    Log.w(Account.class.getSimpleName(), "failed to get shortlink", e);
-                }
-            }
-        }
-
-        private Listener<JSONObject> appLinkListener = new Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject jsonObject, boolean isIntermediate) {
-                String link = jsonObject.optString("link");
-                if (link != null && !link.isEmpty()) {
-                    accountInfo.edit().putString(PREF_SHARE_APP_LINK, link).apply();
-                }
-            }
-        };
-
-        private ErrorListener errorListener = new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                // Ignore.
-            }
-        };
-    }
 }

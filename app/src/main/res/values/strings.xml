@@ -84,7 +84,7 @@
     <string name="action_invite">Share App</string>
     <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Sounds fun!\n\n%1$s\n\n%2$s</string>
     <string name="share_event_twitter_text">[via @eventshighapp]\n%1$s\n\n%2$s</string>
-    <string name="share_app_text">Hey! Pull up a chair. Take a taste. Come join EventsHigh. Life is so endlessly delicious.\n\n%s</string>
+    <string name="share_app_text">Hey! Pull up a chair. Take a taste. Come join EventsHigh. Life is so endlessly delicious.\n\nhttps://goo.gl/dzWYOW</string>
     <string name="share_app_message">Love only grows by sharing. You can only have more for yourself by sharing the app with friends. The more you share, the better would be your experience.</string>
 
     <!-- Failed messages -->

@@ -20,7 +20,7 @@ import com.eventshigh.nearme.app.network.EventSuggestRequest;
 import com.eventshigh.nearme.app.network.EventSuggestRequest.SuggestEvent;
 import com.eventshigh.nearme.app.network.TagsSuggestRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
 
@@ -134,7 +134,7 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
             return;
         }
 
-        City lastCity = GcmRegistration.getInstance(getContext()).getLastCity();
+        City lastCity = new Account(getContext()).getLastCity();
         if (lastCity == null) {
             return;
         }

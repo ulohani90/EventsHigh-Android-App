@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.Nullable;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -12,9 +11,9 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
+import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.AccountStateReporter;
 import com.eventshigh.nearme.app.utils.Signer;
 
 import org.json.JSONArray;
@@ -59,16 +58,6 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
             this.planInvites = planInvites;
         }
 
-        @SuppressWarnings("LoopStatementThatDoesntLoop")
-        public @Nullable String getPlanId() {
-            for (PlanInvite invite : planInvites) {
-                return invite.planId;
-            }
-
-            return  null;
-        }
-
-
         public static SocialInvite fromJSON(JSONObject data) throws JSONException {
             return new SocialInvite(data.getString("event_id"),
                     PlanInvite.fromJSON(data.getJSONArray("plans")));
@@ -92,9 +81,9 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
                 return;
             }
 
-            Uri getSocialInvitesUri = AccountStateReporter.getBaseUri(context, "get_social_invites")
+            Uri getSocialInvitesUri = UpdateAccountInfoService.getBaseUri(context, "get_social_invites")
                     .appendQueryParameter("mobile_no", mobileNo).build();
-            SocialInvitationsRequest request = new SocialInvitationsRequest(context,
+            SocialInvitationsRequest request = new SocialInvitationsRequest(
                     getSocialInvitesUri, priority, shouldBypassCache, listener, errorListener);
             request.setTag(tag);
             VolleyHelper.addToRequestQueue(context, request);
@@ -103,17 +92,15 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
         }
     }
 
-    private final Context context;
     private final Priority priority;
     private final Uri getSocialInvitesUri;
 
-    public SocialInvitationsRequest(Context context, Uri getSocialInvitesUri, Priority priority,
+    public SocialInvitationsRequest(Uri getSocialInvitesUri, Priority priority,
             boolean shouldBypassCache, Listener<Map<String, SocialInvite>> listener, ErrorListener errorListener)
             throws GeneralSecurityException, UnsupportedEncodingException {
         super(Method.GET, Signer.sign(getSocialInvitesUri).toString(), null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
 
-        this.context = context;
         this.priority = priority;
         this.getSocialInvitesUri = getSocialInvitesUri;
     }

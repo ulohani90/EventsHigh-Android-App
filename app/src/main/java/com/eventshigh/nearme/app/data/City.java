@@ -8,7 +8,8 @@ import com.eventshigh.nearme.app.utils.Utils;
 public enum City {
     BANGALORE("GMT+0530", "IN"),
     DELHI("GMT+0530", "IN"),
-    MUMBAI("GMT+0530", "IN");
+    MUMBAI("GMT+0530", "IN"),
+    CHENNAI("GMT+0530", "IN");
 
     public final String timeZone;
     public final String countryCode;

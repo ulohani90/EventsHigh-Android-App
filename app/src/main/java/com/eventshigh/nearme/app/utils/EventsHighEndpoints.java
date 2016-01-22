@@ -1,13 +1,11 @@
 package com.eventshigh.nearme.app.utils;
 
-import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.user.Account;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -55,10 +53,9 @@ public class EventsHighEndpoints {
         return getEventDetailsURI(event.city, sb.toString());
     }
 
-    public static Uri getEventShareURI(Event event, @Nullable String src, Context context) {
+    public static Uri getEventShareURI(Event event, @Nullable String src) {
         return getEventDetailsURI(event.city, event.id).buildUpon()
                 .appendQueryParameter("src", "ehm" + (src == null ? "" : "_" + src))
-                .appendQueryParameter("dl", new Account(context).getAppDownloadLink())
                 .build();
     }
 

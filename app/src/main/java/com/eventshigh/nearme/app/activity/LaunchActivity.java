@@ -3,9 +3,7 @@ package com.eventshigh.nearme.app.activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
@@ -22,16 +20,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
-import com.android.volley.toolbox.RequestFuture;
-import com.android.volley.toolbox.StringRequest;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter.OnCitySelectionListener;
-import com.eventshigh.nearme.app.user.AccountStateReporter;
-import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -51,19 +45,17 @@ public class LaunchActivity extends BaseContextActivity {
     private ActionBarDrawerToggle drawerToggle;
 
     // GCM registration helper.
-    private GcmRegistration gcmRegistration;
+    private Account account;
 
     // Tabs.
     private int defaultTab = 1;
     public static final String MY_EVENTS_TAB = EventsHighEndpoints.QUERY_MY_EVENT;
     public static final String EXPLORE_TAB = "explore";
-    public static final String NOTIFICATIONS_TAB = "Notifications";
     public static final String THIS_WEEK_TAB = "this week";
     public final String[] TABS = {
             MY_EVENTS_TAB,
             EXPLORE_TAB,
             THIS_WEEK_TAB,
-            NOTIFICATIONS_TAB,
     };
 
     @Override
@@ -93,13 +85,13 @@ public class LaunchActivity extends BaseContextActivity {
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
 
-        // Read Preferences
-        gcmRegistration = GcmRegistration.getInstance(this);
+        // Read account status.
+        account = new Account(this);
 
         // Process the incoming intent.
-        String tabName= getIntent().getStringExtra(DEFAULT_TAB_PARAM);
+        String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
         if (tabName != null) {
-            for (int i = 0 ; i < TABS.length; i++) {
+            for (int i = 0; i < TABS.length; i++) {
                 if (TABS[i].equalsIgnoreCase(tabName)) {
                     defaultTab = i;
                     break;
@@ -166,7 +158,7 @@ public class LaunchActivity extends BaseContextActivity {
 
     @Override
     public void onBackPressed() {
-        if(drawer.isDrawerOpen(GravityCompat.START)) {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -188,7 +180,7 @@ public class LaunchActivity extends BaseContextActivity {
     private void setCity() {
         // Set the location from lastCity if needed.
         if (eventsContext.city == null) {
-            City lastCity = gcmRegistration.getLastCity();
+            City lastCity = account.getLastCity();
             if (lastCity != null) {
                 reportActionToAnalytics("usedLastCity");
                 eventsContext.changeLocation(lastCity);
@@ -197,26 +189,6 @@ public class LaunchActivity extends BaseContextActivity {
 
         // If we have user location, start next activity.
         if (eventsContext.city != null) {
-            try {
-                int appVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-                Uri reportUri = AccountStateReporter.getBaseUri(LaunchActivity.this, "reportUser")
-                        .appendQueryParameter("city", eventsContext.city.toString())
-                        .appendQueryParameter("lat", "0")
-                        .appendQueryParameter("lon", "0")
-                        .appendQueryParameter("version", Integer.toString(appVersion))
-                        .build();
-                RequestFuture<String> future = RequestFuture.newFuture();
-                VolleyHelper.addToRequestQueue(LaunchActivity.this,
-                        new StringRequest(reportUri.toString(), future, future) {
-                            @Override
-                            public Priority getPriority() {
-                                return Priority.LOW;
-                            }
-                        }
-                );
-            } catch (NameNotFoundException e) {
-                // Ignore.
-            }
             showNextScreen();
             return;
         }
@@ -231,7 +203,7 @@ public class LaunchActivity extends BaseContextActivity {
     }
 
     private void refreshIfOldData() {
-        City userCity = gcmRegistration.getLastCity();
+        City userCity = account.getLastCity();
         if (eventsContext.city != null && userCity != null &&
                 eventsContext.city != userCity) {
             cityChanged(userCity);
@@ -286,7 +258,7 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public void onCitySelection(City city) {
             eventsContext.changeLocation(city);
-            gcmRegistration.setLastCity(city);
+            account.setLastCity(city);
 
             citySelector.setVisibility(View.GONE);
             tabsView.setVisibility(View.VISIBLE);
@@ -322,10 +294,6 @@ public class LaunchActivity extends BaseContextActivity {
 
             if (TABS[position].equals(EXPLORE_TAB)) {
                 return ExploreFragment.getInstance(eventsContext);
-            }
-
-            if (TABS[position].equals(NOTIFICATIONS_TAB)) {
-                return new StreamFragment();
             }
 
             return ThisWeekFragment.getInstance(eventsContext, true, 7);

@@ -59,11 +59,9 @@ public class EventsMarkerManager {
     public class Editor implements Closeable {
         private final SQLiteDatabase database;
         private final List<Thread> threads = new ArrayList<>();
-        private final Context context;
 
         private Editor(Context context) {
             database = new EventMarkDbHelper(context).getWritableDatabase();
-            this.context = context;
         }
 
         public void close() {

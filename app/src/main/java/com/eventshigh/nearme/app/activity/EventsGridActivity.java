@@ -12,7 +12,7 @@ import android.view.View;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
@@ -31,7 +31,7 @@ public class EventsGridActivity extends BaseContextActivity {
         setupLayout(R.layout.activity_events_grid);
 
         if (eventsContext.city == null) {
-            City lastCity = GcmRegistration.getInstance(this).getLastCity();
+            City lastCity = new Account(this).getLastCity();
             if (lastCity != null) {
                 reportActionToAnalytics("usedLastCity");
                 eventsContext.changeLocation(lastCity);

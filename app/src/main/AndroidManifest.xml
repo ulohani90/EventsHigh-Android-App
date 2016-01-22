@@ -220,6 +220,12 @@
                 android:value=".activity.LaunchActivity"
             />
         </activity>
+
+        <!-- Service to upload the account information to our servers -->
+        <service
+            android:name=".broadcast.UpdateAccountInfoService"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

@@ -14,7 +14,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
-import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONArray;
@@ -59,24 +58,19 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
 
         String url = EventsHighEndpoints.getFeaturedEventsEndpoint(eventsContext.city);
         FeaturedEventsRequest request = new FeaturedEventsRequest(
-                context, url, eventsContext, shouldBypassCache, priority, listener, errorListener);
+                url, shouldBypassCache, priority, listener, errorListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
 
-    private final Context context;
-    private final EventsContext eventsContext;
     private final Priority priority;
 
-    public FeaturedEventsRequest(Context context, String url, EventsContext eventsContext,
-                                 boolean shouldBypassCache, Priority priority,
+    public FeaturedEventsRequest(String url, boolean shouldBypassCache, Priority priority,
                                  Listener<EventCollection> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
         setShouldAllowStaleResponse(true);
 
-        this.context = context;
-        this.eventsContext = eventsContext;
         this.priority = priority;
     }
 
@@ -87,12 +81,9 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
 
     @Override
     protected Response<EventCollection> parseNetworkResponse(NetworkResponse response) {
-        ReportTimingTask.report(context, "featured-events", response.networkTimeMs);
-
         try {
             // Parse the response.
-            List<Event> events = EventCollectionRequest.parseEventsFromNetworkResponse(response,
-                    context).events;
+            List<Event> events = EventCollectionRequest.parseEventsFromNetworkResponse(response).events;
             List<Event> filteredEvents = new ArrayList<>(MAX_FEATURED_EVENTS);
             for (Event event : events) {
                 if (event.imgUrl != null) {
