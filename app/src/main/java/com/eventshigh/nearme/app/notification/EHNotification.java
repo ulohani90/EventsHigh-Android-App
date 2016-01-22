@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationCompat.Builder;
 import android.widget.ImageView.ScaleType;
 
 import com.android.volley.toolbox.ImageRequest;
@@ -92,7 +91,7 @@ public class EHNotification {
             largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
         }
 
-        Builder builder = new Builder(context)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.notification)
                 .setContentTitle(title)
                 .setContentText(message)

@@ -149,7 +149,9 @@ public class UpdateAccountInfoService extends IntentService {
                     @Override
                     public void onSuccess(PushRegistrationResponse pushRegistrationResponse) {
                         uploadStatus.edit().putBoolean(PREF_ZENDESK_UPDATED, true).apply();
-                        UpdateAccountInfoService.this.notifyAll();
+                        synchronized (UpdateAccountInfoService.this) {
+                            UpdateAccountInfoService.this.notifyAll();
+                        }
                     }
 
                     @Override
