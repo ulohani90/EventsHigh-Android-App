@@ -60,6 +60,10 @@ public class ContactUtils {
     }
 
     public static @Nullable UserContact getContactForServerPhone(Context context, String phone) {
+        if (phone == null || phone.isEmpty()) {
+            return null;
+        }
+
         UserContact contact = PHONE_TO_CONTACT_MAP.get(phone);
         if (contact != null) {
             return contact;
