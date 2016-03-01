@@ -125,10 +125,18 @@ public class EventsFragment extends BaseEventsFragment {
         fetchNewListing(false);
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(asyncRequest!=null)
+        asyncRequest.cancel(true);
+    }
+
     public void setOnScrollListener (OnScrollListener onScrollListener) {
         this.onScrollListener = onScrollListener;
     }
 
+    MyEventsRequest asyncRequest;
     private void fetchNewListing(boolean shouldBypassCache) {
         topProgressBar.setVisibility(View.VISIBLE);
         noMyEventsView.setVisibility(View.GONE);
@@ -136,8 +144,9 @@ public class EventsFragment extends BaseEventsFragment {
 
         // Stop all requests associated with this fragment and then submit new request.
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-            new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
-                    shouldBypassCache, true, mMyEventsFetcherCallBack, mErrorListener).execute();
+            asyncRequest =   new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
+                    shouldBypassCache, true, mMyEventsFetcherCallBack, mErrorListener);
+            asyncRequest.execute();
         } else if (eventsContext.query.isEmpty() && !eventsContext.dateFilter.isEmpty() && showCategories) {
             DateCategoryRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, mMyEventsFetcherCallBack, mErrorListener);
@@ -175,10 +184,17 @@ public class EventsFragment extends BaseEventsFragment {
         }
     }
 
+    boolean isFragmentDestroyed=false;
+    @Override
+    public void onDestroy() {
+        isFragmentDestroyed = true;
+        super.onDestroy();
+    }
+
     private Listener<List<TopicEvents>> mMyEventsFetcherCallBack = new Listener<List<TopicEvents>>() {
         @Override
         public void onResponse(List<TopicEvents> myEvents, boolean isIntermediate) {
-            if (isDetached()) {
+            if (isFragmentDestroyed) {
                 return;
             }
 

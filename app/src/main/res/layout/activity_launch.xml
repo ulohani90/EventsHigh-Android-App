@@ -67,6 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="24dp"
             android:src="@drawable/eh_logo"
+            android:maxHeight="96dp"
             android:layout_gravity="center"
             android:adjustViewBounds="false"
             tools:ignore="ContentDescription"

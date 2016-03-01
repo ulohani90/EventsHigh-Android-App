@@ -54,6 +54,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.PlusOneButton;
 import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
 
+import pl.snowdog.material.ui.ToolbarColorizeHelper;
+
 /**
  * Application Main or launch activity.
  */
@@ -134,6 +136,9 @@ public class LaunchActivity extends BaseContextActivity {
     protected void onResume() {
         super.onResume();
 
+        if(toolbar!=null)
+        setLightToolbarIcons();
+        //invalidateOptionsMenu();
         // We show the onboarding If this is first activity and there was no
         // location/query passed through intent.
         if (eventsContext.location == null && eventsContext.query.isEmpty() &&
@@ -162,6 +167,17 @@ public class LaunchActivity extends BaseContextActivity {
             public void onPlusOneClick(Intent intent) {
                 reportActionToAnalytics("plusOne");
                 startActivityForResult(intent, PLUS_ONE_REQUEST_CODE);
+            }
+        });
+    }
+
+    private void setLightToolbarIcons() {
+        toolbar.post(new Runnable() {
+            @Override
+            @SuppressWarnings("deprecation")
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                        getResources().getColor(android.R.color.white), LaunchActivity.this);
             }
         });
     }

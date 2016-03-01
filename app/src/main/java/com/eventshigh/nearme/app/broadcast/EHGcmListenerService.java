@@ -75,7 +75,11 @@ public class EHGcmListenerService extends GcmListenerService {
                 reportAction("notificationSkipped");
                 return null;
             }
-            contact = ContactUtils.getContactForServerPhone(this, mobileNo);
+            try {
+                contact = ContactUtils.getContactForServerPhone(this, mobileNo);
+            }catch(Exception e){
+
+            }
         }
 
         if (contact != null) {

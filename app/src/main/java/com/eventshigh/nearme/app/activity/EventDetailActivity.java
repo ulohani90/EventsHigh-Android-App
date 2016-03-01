@@ -9,7 +9,10 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -22,6 +25,7 @@ import android.view.ViewTreeObserver.OnScrollChangedListener;
 import android.view.Window;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -106,6 +110,7 @@ public class EventDetailActivity extends BaseActivity {
     private boolean addToFavourite = false;
 
 
+    CollapsingToolbarLayout collapsingToolbar;
     /*****************************************
      Activity lifecycle management utilities
      ***************************************/
@@ -118,8 +123,11 @@ public class EventDetailActivity extends BaseActivity {
         eventCard = new EventCard();
         topProgressBar = findViewById(R.id.top_progress_bar);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(getResources().getColor(android.R.color.transparent));
         setSupportActionBar(toolbar);
+       // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setTitle(R.string.loading);
+        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
         // Account.
         account = new Account(this);
@@ -467,14 +475,19 @@ public class EventDetailActivity extends BaseActivity {
         // Report the Event View.
         new UserActionHelper(this).recordAction(EventAction.VIEW_EVENT, event.id);
 
-        // Set Title.
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(event.title);
+       /* // Set Title.
+       // ActionBar actionBar = getSupportActionBar();
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(event.title);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }*/
+        if(collapsingToolbar!=null) {
+            collapsingToolbar.setTitle(event.title);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
         // Populate event details.
-        toolbar.setAlpha(0f);
+      //  toolbar.setAlpha(0f);
         eventCard.populateView(event);
         findViewById(R.id.check_with_friends).setVisibility(View.VISIBLE);
 
@@ -564,7 +577,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     private class EventCard {
-        private final ScrollView eventScrollView;
+        private final NestedScrollView eventScrollView;
 
         private final ImageView bgView;
         private final View recommendedView;
@@ -614,7 +627,7 @@ public class EventDetailActivity extends BaseActivity {
         private final TextView organizerWebsiteView;
 
         private EventCard() {
-            eventScrollView = (ScrollView) findViewById(R.id.event_scroll_view);
+            eventScrollView = (NestedScrollView) findViewById(R.id.event_scroll_view);
 
             bgView = (ImageView) findViewById(R.id.event_bg);
             playYoutubeView = findViewById(R.id.play_youtube);
@@ -669,6 +682,10 @@ public class EventDetailActivity extends BaseActivity {
             ViewGroup.LayoutParams params = bgView.getLayoutParams();
             params.height = 9 * metrics.widthPixels / 16;
             bgView.setLayoutParams(params);
+            FrameLayout frameParent = (FrameLayout)findViewById(R.id.frame_parent);
+            ViewGroup.LayoutParams lp =frameParent.getLayoutParams();
+            lp.height =  9 * metrics.widthPixels / 16;
+            frameParent.setLayoutParams(lp);
         }
 
         @SuppressLint("SetTextI18n")
@@ -677,7 +694,7 @@ public class EventDetailActivity extends BaseActivity {
                     new OnScrollChangedListener() {
                         @Override
                         public void onScrollChanged() {
-                            setScroll(eventScrollView.getScrollY());
+                           // setScroll(eventScrollView.getScrollY());
                         }
                     });
             eventScrollView.setVisibility(View.VISIBLE);

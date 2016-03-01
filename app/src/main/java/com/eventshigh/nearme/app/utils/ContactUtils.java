@@ -76,12 +76,14 @@ public class ContactUtils {
         String[] projection = { PhoneLookup._ID, PhoneLookup.DISPLAY_NAME };
 
         // Parse contacts data.
-        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        Cursor cursor=null;
+        try {
+        cursor = context.getContentResolver().query(uri, projection, null, null, null);
         if (cursor == null) {
             return null;
         }
 
-        try {
+
             if (!cursor.moveToNext()) {
                 return null;
             }
@@ -94,7 +96,9 @@ public class ContactUtils {
             PHONE_TO_CONTACT_MAP.put(phone, contact);
             return contact;
         } finally {
-            cursor.close();
+            if(cursor!=null){
+                cursor.close();
+            }
         }
     }
 
