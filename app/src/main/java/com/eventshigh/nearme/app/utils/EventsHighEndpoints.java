@@ -90,13 +90,12 @@ public class EventsHighEndpoints {
         }
 
         if (city != null) {
-            builder.appendPath("browse");
             builder.appendPath(city);
             String browseQuery = DateTimeUtils.toBrowseDate(param.query);
             if (browseQuery == null) {
                 browseQuery = URLEncoder.encode(param.query.toLowerCase());
             }
-            builder.appendEncodedPath(browseQuery + "-in-" + city);
+            builder.appendEncodedPath(browseQuery);
             return builder.build();
         } else {
             builder.appendPath("search");
