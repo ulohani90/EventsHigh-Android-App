@@ -30,6 +30,8 @@ import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 
+import pl.snowdog.material.ui.ToolbarColorizeHelper;
+
 /**
  * Application Main or launch activity.
  */
@@ -104,6 +106,9 @@ public class LaunchActivity extends BaseContextActivity {
     protected void onResume() {
         super.onResume();
 
+        if(toolbar!=null)
+        setLightToolbarIcons();
+        //invalidateOptionsMenu();
         // We show the onboarding If this is first activity and there was no
         // location/query passed through intent.
         if (eventsContext.city == null && eventsContext.query.isEmpty() &&
@@ -122,6 +127,17 @@ public class LaunchActivity extends BaseContextActivity {
 
         // Show next screen.
         showNextScreen();
+    }
+
+    private void setLightToolbarIcons() {
+        toolbar.post(new Runnable() {
+            @Override
+            @SuppressWarnings("deprecation")
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                        getResources().getColor(android.R.color.white), LaunchActivity.this);
+            }
+        });
     }
 
     @Override

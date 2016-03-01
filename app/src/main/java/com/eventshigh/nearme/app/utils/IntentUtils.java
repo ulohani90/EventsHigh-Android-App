@@ -128,7 +128,7 @@ public class IntentUtils {
         } else if (inUri.getPath().startsWith("/get_event_contest")) {
             CustomUrlActivity.launchCustomUrl(activity, inUri, null);
             activity.finish();
-        } else if (inUri.getPath().startsWith("/browse")) {
+        } else {
             processBrowseViewIntent(inUri);
         }
     }
@@ -162,7 +162,7 @@ public class IntentUtils {
             City city = City.valueOf(pathSegments.get(pathSegments.size() - 2).toUpperCase());
             param.changeLocation(city);
 
-            String query = pathSegments.get(pathSegments.size() - 1).split("-in-")[0];
+            String query = pathSegments.get(pathSegments.size() - 1);
             String dateQuery = DateTimeUtils.parseBrowseDate(query);
             if (dateQuery != null) {
                 param.query = dateQuery;
