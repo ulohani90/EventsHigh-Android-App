@@ -103,7 +103,7 @@ public class LaunchActivity extends BaseContextActivity {
 
         // Setup the Drawer Layout.
         drawerToggle = new ActionBarDrawerToggle(this, drawer, R.string.app_name, R.string.title_activity_settings);
-        drawer.setDrawerListener(drawerToggle);
+        drawer.addDrawerListener(drawerToggle);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -136,8 +136,10 @@ public class LaunchActivity extends BaseContextActivity {
     protected void onResume() {
         super.onResume();
 
-        if(toolbar!=null)
-        setLightToolbarIcons();
+        if(toolbar != null) {
+            setLightToolbarIcons();
+        }
+
         //invalidateOptionsMenu();
         // We show the onboarding If this is first activity and there was no
         // location/query passed through intent.
@@ -278,6 +280,7 @@ public class LaunchActivity extends BaseContextActivity {
 
             // Start the next activity if possible or ask user for city.
             client.disconnect();
+            //noinspection ConstantConditions
             mOnConnectionFailedListener.onConnectionFailed(null);
         }
 
@@ -398,6 +401,7 @@ public class LaunchActivity extends BaseContextActivity {
             if (ActivityCompat.checkSelfPermission(LaunchActivity.this,
                     Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // Request missing location permission.
+                //noinspection ConstantConditions
                 mOnConnectionFailedListener.onConnectionFailed(null);
             } else {
                 client.connect();
