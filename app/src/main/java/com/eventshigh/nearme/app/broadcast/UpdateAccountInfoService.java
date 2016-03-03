@@ -157,7 +157,9 @@ public class UpdateAccountInfoService extends IntentService {
                     @Override
                     public void onError(ErrorResponse errorResponse) {
                         // do nothing. upload will be retried.
-                        UpdateAccountInfoService.this.notifyAll();
+                        synchronized (UpdateAccountInfoService.this) {
+                            UpdateAccountInfoService.this.notifyAll();
+                        }
                     }
                 });
                 UpdateAccountInfoService.this.wait();
