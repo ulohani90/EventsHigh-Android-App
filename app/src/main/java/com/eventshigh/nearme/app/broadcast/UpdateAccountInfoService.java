@@ -26,7 +26,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
-import com.zendesk.sdk.model.network.PushRegistrationResponse;
+import com.zendesk.sdk.model.push.PushRegistrationResponse;
 import com.zendesk.sdk.network.impl.ZendeskConfig;
 import com.zendesk.service.ErrorResponse;
 import com.zendesk.service.ZendeskCallback;
@@ -145,7 +145,7 @@ public class UpdateAccountInfoService extends IntentService {
         if (!uploadStatus.getBoolean(PREF_ZENDESK_UPDATED, false)) {
             ZendeskUtils.initZendesk(this);
             try {
-                ZendeskConfig.INSTANCE.enablePush(registrationId, new ZendeskCallback<PushRegistrationResponse>() {
+                ZendeskConfig.INSTANCE.enablePushWithIdentifier(registrationId, new ZendeskCallback<PushRegistrationResponse>() {
                     @Override
                     public void onSuccess(PushRegistrationResponse pushRegistrationResponse) {
                         uploadStatus.edit().putBoolean(PREF_ZENDESK_UPDATED, true).apply();
