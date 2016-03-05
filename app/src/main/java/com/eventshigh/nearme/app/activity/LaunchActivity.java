@@ -73,7 +73,7 @@ public class LaunchActivity extends BaseContextActivity {
 
         // Setup the Drawer Layout.
         drawerToggle = new ActionBarDrawerToggle(this, drawer, R.string.app_name, R.string.title_activity_settings);
-        drawer.setDrawerListener(drawerToggle);
+        drawer.addDrawerListener(drawerToggle);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -106,8 +106,10 @@ public class LaunchActivity extends BaseContextActivity {
     protected void onResume() {
         super.onResume();
 
-        if(toolbar!=null)
-        setLightToolbarIcons();
+        if(toolbar != null) {
+            setLightToolbarIcons();
+        }
+
         //invalidateOptionsMenu();
         // We show the onboarding If this is first activity and there was no
         // location/query passed through intent.

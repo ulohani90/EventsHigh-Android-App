@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -26,7 +25,6 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -90,7 +88,6 @@ public class EventDetailActivity extends BaseActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setBackgroundColor(getResources().getColor(android.R.color.transparent));
         setSupportActionBar(toolbar);
-       // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setTitle(R.string.loading);
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
@@ -354,26 +351,17 @@ public class EventDetailActivity extends BaseActivity {
     private void populateView(final Event event) {
         this.event = event;
 
-       /* // Set Title.
-       // ActionBar actionBar = getSupportActionBar();
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(event.title);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }*/
         if(collapsingToolbar!=null) {
             collapsingToolbar.setTitle(event.title);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
         }
 
         // Populate event details.
-      //  toolbar.setAlpha(0f);
         eventCard.populateView(event);
         findViewById(R.id.check_with_friends).setVisibility(View.VISIBLE);
-    }
-
-    private void setScroll(int scrollValue) {
-        float opacity = Math.min(1.0f, scrollValue * 3f / getResources().getDisplayMetrics().heightPixels);
-        toolbar.setAlpha(opacity);
     }
 
     private Listener<Event> mEventListener = new Listener<Event>() {

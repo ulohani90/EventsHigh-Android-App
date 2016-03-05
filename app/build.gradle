@@ -6,10 +6,8 @@ buildscript {
     }
 }
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
 
 repositories {
-    maven { url 'https://maven.fabric.io/public' }
     maven { url 'https://zendesk.artifactoryonline.com/zendesk/repo' }
     // For drawing a circular tile with letter inside it, like in contacts
     maven { url 'http://dl.bintray.com/amulyakhare/maven' }
@@ -25,8 +23,8 @@ android {
         applicationId "com.eventshigh.nearme.app"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 246
-        versionName "2.4.6"
+        versionCode 247
+        versionName "2.4.7"
     }
     signingConfigs {
         debug {
@@ -53,3 +51,5 @@ dependencies {
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.2.2'
     compile 'com.github.bumptech.glide:glide:3.6.1'
 }
+
+apply plugin: 'com.google.gms.google-services'
