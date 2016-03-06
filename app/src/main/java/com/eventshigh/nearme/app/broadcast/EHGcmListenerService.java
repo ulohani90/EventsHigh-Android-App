@@ -77,8 +77,8 @@ public class EHGcmListenerService extends GcmListenerService {
             }
             try {
                 contact = ContactUtils.getContactForServerPhone(this, mobileNo);
-            }catch(Exception e){
-
+            } catch(Exception e) {
+                Crashlytics.getInstance().core.logException(e);
             }
         }
 

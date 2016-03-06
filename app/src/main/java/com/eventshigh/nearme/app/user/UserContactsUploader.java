@@ -91,13 +91,17 @@ public class UserContactsUploader {
                     " LIMIT " + MAX_CONTACTS_TO_UPLOAD;
 
             // Load the contacts data.
-            List<UserContact> contacts = ContactUtils.getContacts(context, selectionExtras, order, true);
-            if (contacts.isEmpty()) {
-                return;
-            }
+            try {
+                List<UserContact> contacts = ContactUtils.getContacts(context, selectionExtras, order, true);
+                if (contacts.isEmpty()) {
+                    return;
+                }
 
-            // Upload contacts data.
-            ContactsUploadRequest.submit(context, contacts, Priority.LOW, this, this);
+                // Upload contacts data.
+                ContactsUploadRequest.submit(context, contacts, Priority.LOW, this, this);
+            } catch (Exception e) {
+                Crashlytics.getInstance().core.logException(e);
+            }
         }
 
         @Override

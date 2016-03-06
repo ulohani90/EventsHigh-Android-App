@@ -27,7 +27,7 @@ public class EventNotificationStreamItem extends StreamItem {
                 System.currentTimeMillis(), title, message, imgUrl, mobileNo, id, city);
         try {
             StreamDbHelper.addStreamToDB(context, streamItem);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);
         }
     }

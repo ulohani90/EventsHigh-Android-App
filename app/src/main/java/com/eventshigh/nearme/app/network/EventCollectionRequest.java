@@ -106,7 +106,6 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             // Parse the response.
             EventsCollection eventsCollection = parseEventsFromNetworkResponse(response, context,
                     eventsContext, includeWithoutLocation);
-
             return Response.success(eventsCollection, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
             Crashlytics.getInstance().core.logException(e);
