@@ -130,6 +130,10 @@ public class EventsFragment extends BaseEventsFragment {
         super.onStop();
         if(asyncRequest!=null)
         asyncRequest.cancel(true);
+
+        if(eventsAdapter!=null){
+            eventsAdapter.clear();
+        }
     }
 
     public void setOnScrollListener (OnScrollListener onScrollListener) {

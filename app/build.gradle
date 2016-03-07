@@ -67,6 +67,7 @@ dependencies {
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'com.splitwise:tokenautocomplete:2.0.1@aar'
     compile 'com.github.bumptech.glide:glide:3.6.1'
+    compile 'io.branch.sdk.android:library:1.+'
 
     compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
         transitive = true;

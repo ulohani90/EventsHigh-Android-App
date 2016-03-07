@@ -25,6 +25,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +37,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter;
@@ -54,6 +56,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.PlusOneButton;
 import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import io.branch.referral.Branch;
+import io.branch.referral.BranchError;
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
 
 /**
@@ -133,6 +140,22 @@ public class LaunchActivity extends BaseContextActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        this.setIntent(intent);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -154,6 +177,37 @@ public class LaunchActivity extends BaseContextActivity {
                 return;
             }
         }
+       /* Branch branch = Branch.getInstance();
+
+        branch.initSession(new Branch.BranchReferralInitListener() {
+            @Override
+            public void onInitFinished(JSONObject referringParams, BranchError error) {
+                if (error == null) {
+                    //showEventDetails();
+                    if(referringParams.length() == 0){
+                        showNextScreen();
+
+                    }else {
+                        try {
+                            if(!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")){
+                                showNextScreen();
+                            }else {
+                                showEventDetails(
+                                        EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
+                                //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
+                            }
+                        } catch (JSONException e) {
+                            showNextScreen();
+                            e.printStackTrace();
+                        }
+                        System.out.println("JsonObject received" + referringParams);
+                    }
+                } else {
+                    showNextScreen();
+                    Log.i("MyApp", error.getMessage());
+                }
+            }
+        }, this.getIntent().getData(), this);*/
 
         // Show next screen.
         showNextScreen();
@@ -169,6 +223,7 @@ public class LaunchActivity extends BaseContextActivity {
                 startActivityForResult(intent, PLUS_ONE_REQUEST_CODE);
             }
         });
+
     }
 
     private void setLightToolbarIcons() {
@@ -426,6 +481,17 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        //Checking if the previous activity is launched on branch Auto deep link.
+        if(requestCode == getResources().getInteger(R.integer.EventsDetailDeepLink_code)){
+            //Decide here where  to navigate  when an auto deep linked activity finishes.
+            //For e.g. Go to HomeActivity or a  SignUp Activity.
+            showNextScreen();
+        }
+    }
     private final OnCitySelectionListener mCitySelectionListener = new OnCitySelectionListener() {
         @Override
         public void onCitySelection(City city) {
@@ -506,5 +572,8 @@ public class LaunchActivity extends BaseContextActivity {
         public void onTabReselected(TabLayout.Tab tab) {
             // do nothing.
         }
+
+
+
     }
 }
