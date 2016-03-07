@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
+import android.view.View;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -14,6 +15,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
 import com.eventshigh.nearme.app.task.ReportTimingTask;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -121,7 +123,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         String jsonString = new String(response.data, "UTF-8");
         JSONObject eventsJson = new JSONObject(jsonString);
         List<Event> events = Event.parseUpcomingEvents(eventsJson, includeWithoutLocation);
-        filterOldEvents(events);
+        filterOldEvents(context,events);
 
         // Sort the event list to user.
         Collections.sort(events, new EventComparator(eventsContext.location));
@@ -130,7 +132,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     }
 
     // Filter out the events which has started more than three hours back.
-    public static void filterOldEvents(List<Event> events) {
+    public static void filterOldEvents(Context context , List<Event> events) {
         long threeHoursBack = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(3);
         long aDayBack = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1);
 
@@ -155,6 +157,14 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
             if (isPastEvent)  {
                 it.remove();
+
+
+
+                    EventsMarkerManager.Editor eventsMarkerEditor =
+                            EventsMarkerManager.getInstance(context).getEditor();
+                    eventsMarkerEditor.recordEventMark(event, null);
+                    eventsMarkerEditor.close();
+
             }
         }
     }
