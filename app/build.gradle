@@ -4,12 +4,11 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.14.4'
+        classpath 'io.fabric.tools:gradle:1.21.2'
     }
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-apply plugin: 'com.google.gms.google-services'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -28,8 +27,8 @@ android {
         applicationId "com.eventshigh.nearme.app"
         minSdkVersion 19
         targetSdkVersion 23
-        versionCode 270
-        versionName "2.7"
+        versionCode 282
+        versionName "2.8.2"
     }
     signingConfigs {
         debug {
@@ -61,15 +60,17 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.2.0'
     compile 'com.android.support:design:23.2.0'
 
-    compile 'com.facebook.android:facebook-android-sdk:4.7.0'
+    compile 'com.facebook.android:facebook-android-sdk:4.10.0'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.2.2'
-    compile 'com.zendesk:sdk:1.4.1.1'
+    compile 'com.zendesk:sdk:1.5.1.2'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'com.splitwise:tokenautocomplete:2.0.1@aar'
     compile 'com.github.bumptech.glide:glide:3.6.1'
     compile 'io.branch.sdk.android:library:1.+'
 
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
 }
+
+apply plugin: 'com.google.gms.google-services'

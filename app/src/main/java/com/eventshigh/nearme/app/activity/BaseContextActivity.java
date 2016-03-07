@@ -29,6 +29,7 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -60,9 +61,16 @@ public abstract class BaseContextActivity extends BaseActivity {
         if (eventsContext != null) {
             Uri webUri = EventsHighEndpoints.getWebUri(eventsContext);
             String title = eventsContext.toString();
-            viewAction = Action.newAction(Action.TYPE_VIEW, title, webUri, Utils.getAppUri(webUri));
+            viewAction = new Action.Builder(Action.TYPE_VIEW)
+                    .setObject(new Thing.Builder()
+                            .setName(title)
+                            .setId(webUri.toString())
+                            .setUrl(Utils.getAppUri(webUri))
+                            .build())
+                    .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                    .build();
 
-            client = new GoogleApiClient.Builder(this).addApi(AppIndex.APP_INDEX_API).build();
+            client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
             client.connect();
             AppIndex.AppIndexApi.start(client, viewAction);
         }

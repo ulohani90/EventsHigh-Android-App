@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -29,7 +28,6 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,7 +69,9 @@ import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.eventshigh.nearme.app.view.ContactListView;
+import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.location.LocationServices;
@@ -110,6 +110,7 @@ public class EventDetailActivity extends BaseActivity {
     private Account account;
     private String planId = null;
     private GoogleApiClient client;
+    private Action viewAction = null;
     private boolean showRateAppDialog = false;  // TODO: save this in bundle and restore
     private boolean showInviteDialog = false;
     private boolean addToFavourite = false;
@@ -130,7 +131,6 @@ public class EventDetailActivity extends BaseActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setBackgroundColor(getResources().getColor(android.R.color.transparent));
         setSupportActionBar(toolbar);
-       // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setTitle(R.string.loading);
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
@@ -199,9 +199,8 @@ public class EventDetailActivity extends BaseActivity {
         super.onStop();
 
         if (client != null && client.isConnected()) {
-            if (event != null) {
-                Uri webUri = event.getEventDetailsURI();
-                AppIndex.AppIndexApi.viewEnd(client, this, Utils.getAppUri(webUri));
+            if (viewAction != null) {
+                AppIndex.AppIndexApi.end(client, viewAction);
             }
             client.disconnect();
         }
@@ -505,19 +504,16 @@ public class EventDetailActivity extends BaseActivity {
         // Report the Event View.
         new UserActionHelper(this).recordAction(EventAction.VIEW_EVENT, event.id);
 
-       /* // Set Title.
-       // ActionBar actionBar = getSupportActionBar();
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(event.title);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }*/
-        if(collapsingToolbar!=null) {
+        // Set Title.
+        if(collapsingToolbar != null) {
             collapsingToolbar.setTitle(event.title);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
         }
 
         // Populate event details.
-      //  toolbar.setAlpha(0f);
         eventCard.populateView(event);
         findViewById(R.id.check_with_friends).setVisibility(View.VISIBLE);
 
@@ -575,11 +571,6 @@ public class EventDetailActivity extends BaseActivity {
                     }
                 }
         );
-    }
-
-    private void setScroll(int scrollValue) {
-        float opacity = Math.min(1.0f, scrollValue * 3f / getResources().getDisplayMetrics().heightPixels);
-        toolbar.setAlpha(opacity);
     }
 
     private Listener<Event> mEventListener = new Listener<Event>() {
@@ -999,16 +990,12 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         client = new GoogleApiClient.Builder(this)
-                    .addApi(AppIndex.APP_INDEX_API)
+                    .addApi(AppIndex.API)
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(new ConnectionCallbacks() {
                         @Override
                         public void onConnected(Bundle bundle) {
                             populateEventTravelTime();
-
-                            Uri webUri = event.getEventDetailsURI();
-                            AppIndex.AppIndexApi.view(client, EventDetailActivity.this,
-                                    Utils.getAppUri(webUri), event.title, webUri, null);
                         }
 
                         @Override
@@ -1018,6 +1005,16 @@ public class EventDetailActivity extends BaseActivity {
                     })
                     .build();
         client.connect();
+        Uri webUri = event.getEventDetailsURI();
+        viewAction = new Action.Builder(Action.TYPE_VIEW)
+                .setObject(new Thing.Builder()
+                        .setName(event.title)
+                        .setId(webUri.toString())
+                        .setUrl(Utils.getAppUri(webUri))
+                        .build())
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+        AppIndex.AppIndexApi.start(client, viewAction);
     }
 
     private static String toHtmlNoFrame(String html) {

@@ -9,7 +9,7 @@ import android.view.View;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
-import com.zendesk.sdk.network.impl.ZendeskRequestService.RequestLoadingListener;
+import com.zendesk.sdk.network.RequestLoadingListener;
 import com.zendesk.sdk.requests.RequestListFragment;
 import com.zendesk.service.ErrorResponse;
 
