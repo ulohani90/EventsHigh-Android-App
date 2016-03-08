@@ -35,7 +35,7 @@ public class ImageUtils {
 
         float radius = Math.max(bitmap.getWidth(), bitmap.getHeight()) / 2.0f;
         Bitmap canvasBitmap = Bitmap.createBitmap(bitmap.getWidth(),
-                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                bitmap.getHeight(), Bitmap.Config.RGB_565);
         BitmapShader shader = new BitmapShader(bitmap, TileMode.CLAMP, TileMode.CLAMP);
 
         Paint paint = new Paint();

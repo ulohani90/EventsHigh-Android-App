@@ -13,6 +13,7 @@ import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
@@ -68,20 +69,22 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             return;
         }
 
-        EventCollectionRequest request = new EventCollectionRequest(
-                url, priority, shouldBypassCache, listener, errorListener);
+        EventCollectionRequest request = new EventCollectionRequest(context, url, priority,
+                shouldBypassCache, listener, errorListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
 
     private final Priority priority;
+    private final Context context;
 
-    public EventCollectionRequest(String url, Priority priority, boolean shouldBypassCache,
+    public EventCollectionRequest(Context context, String url, Priority priority, boolean shouldBypassCache,
           Listener<EventsCollection> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
         setShouldAllowStaleResponse(true);
 
+        this.context = context;
         this.priority = priority;
     }
 
@@ -94,20 +97,20 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     protected Response<EventsCollection> parseNetworkResponse(NetworkResponse response) {
         try {
             // Parse the response.
-            EventsCollection eventsCollection = parseEventsFromNetworkResponse(response);
-
+            EventsCollection eventsCollection = parseEventsFromNetworkResponse(response, context);
             return Response.success(eventsCollection, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
             return Response.error(new ParseError(e));
         }
     }
 
-    public static EventsCollection parseEventsFromNetworkResponse( NetworkResponse response)
+    public static EventsCollection parseEventsFromNetworkResponse(NetworkResponse response,
+                                                                  Context context)
     throws UnsupportedEncodingException, JSONException {
         String jsonString = new String(response.data, "UTF-8");
         JSONObject eventsJson = new JSONObject(jsonString);
         List<Event> events = Event.parseUpcomingEvents(eventsJson);
-        filterOldEvents(events);
+        filterOldEvents(context, events);
 
         // Sort the event list to user.
         Collections.sort(events, new EventComparator());
@@ -116,7 +119,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     }
 
     // Filter out the events which has started more than three hours back.
-    public static void filterOldEvents(List<Event> events) {
+    public static void filterOldEvents(Context context , List<Event> events) {
         long threeHoursBack = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(3);
         long aDayBack = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1);
 
@@ -141,6 +144,14 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
             if (isPastEvent)  {
                 it.remove();
+
+
+
+                    EventsMarkerManager.Editor eventsMarkerEditor =
+                            EventsMarkerManager.getInstance(context).getEditor();
+                    eventsMarkerEditor.recordEventMark(event, null);
+                    eventsMarkerEditor.close();
+
             }
         }
     }

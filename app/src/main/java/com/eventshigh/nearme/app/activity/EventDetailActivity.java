@@ -35,6 +35,7 @@ import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
@@ -46,14 +47,18 @@ import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
+
+import org.json.JSONException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Date;
 
+import io.branch.referral.Branch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
 /**
@@ -108,6 +113,7 @@ public class EventDetailActivity extends BaseActivity {
         if (id == R.id.action_share) {
             if (event != null) {
                 shareEvent(event, null);
+               // shareEventNew(event, null);
             }
             return true;
         }
@@ -130,8 +136,7 @@ public class EventDetailActivity extends BaseActivity {
 
         findViewById(R.id.event_container).setMinimumHeight(
                 (int) (1.33 * getResources().getDisplayMetrics().heightPixels));
-
-        // Get the event from Intent.
+// Get the event from Intent.
         if (getIntent().hasExtra(EXTRA_EVENT_PARAM)) {
             Event event = getIntent().getParcelableExtra(EXTRA_EVENT_PARAM);
             populateView(event);
@@ -147,6 +152,7 @@ public class EventDetailActivity extends BaseActivity {
                         }
                     });
         }
+
     }
 
     @Override
@@ -157,6 +163,29 @@ public class EventDetailActivity extends BaseActivity {
             addFavourite(null);
         }
         addToFavourite = false;
+
+           /* if (Branch.isAutoDeepLinkLaunch(this)) {
+                try {
+                    String eventId = Branch.getInstance().getLatestReferringParams().getString("event_id");
+                    City city = City.BANGALORE;
+                    EventRequest.submit(this, EventsHighEndpoints.getEventDetailsURI(city,eventId), Priority.IMMEDIATE, mEventListener,
+                            new ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError volleyError) {
+                                    Toast.makeText(EventDetailActivity.this, R.string.failed_load,
+                                            Toast.LENGTH_SHORT).show();
+                                    VolleyHelper.log(EventDetailActivity.this, volleyError);
+                                    finish();
+                                }
+                            });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+*/
+
+
+           // }
     }
 
 
@@ -234,7 +263,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void imagePreview(View view) {
-        if (event.imgUrl == null) {
+        if (event == null || (event!=null && event.imgUrl == null)) {
             return;
         }
 

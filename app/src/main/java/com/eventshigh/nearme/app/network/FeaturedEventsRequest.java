@@ -58,19 +58,21 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
 
         String url = EventsHighEndpoints.getFeaturedEventsEndpoint(eventsContext.city);
         FeaturedEventsRequest request = new FeaturedEventsRequest(
-                url, shouldBypassCache, priority, listener, errorListener);
+                context, url, shouldBypassCache, priority, listener, errorListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
 
+    private final Context context;
     private final Priority priority;
 
-    public FeaturedEventsRequest(String url, boolean shouldBypassCache, Priority priority,
+    public FeaturedEventsRequest(Context context, String url, boolean shouldBypassCache, Priority priority,
                                  Listener<EventCollection> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
         setShouldAllowStaleResponse(true);
 
+        this.context = context;
         this.priority = priority;
     }
 
@@ -83,7 +85,7 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
     protected Response<EventCollection> parseNetworkResponse(NetworkResponse response) {
         try {
             // Parse the response.
-            List<Event> events = EventCollectionRequest.parseEventsFromNetworkResponse(response).events;
+            List<Event> events = EventCollectionRequest.parseEventsFromNetworkResponse(response, context).events;
             List<Event> filteredEvents = new ArrayList<>(MAX_FEATURED_EVENTS);
             for (Event event : events) {
                 if (event.imgUrl != null) {

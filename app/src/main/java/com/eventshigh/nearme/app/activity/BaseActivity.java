@@ -28,7 +28,6 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.OneSecDialog;
-import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
@@ -37,6 +36,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
+import io.branch.indexing.BranchUniversalObject;
+import io.branch.referral.Branch;
+import io.branch.referral.BranchError;
+import io.branch.referral.util.LinkProperties;
 
 /**
  * Base activity class which does the common things like initialization of Google Analytics.
@@ -195,6 +198,39 @@ public abstract class BaseActivity extends AppCompatActivity {
                     }
                 }
         );
+    }
+
+    public void shareEventNew(final Event event, @Nullable final String packageName){
+
+        BranchUniversalObject branchObject = new BranchUniversalObject();
+        branchObject.setCanonicalIdentifier(event.id).setTitle(event.title)
+                .addContentMetadata("event_id",event.id)
+                .addContentMetadata("city_name",event.city.toString())
+                .setContentDescription(event.description)
+                .setContentImageUrl(event.imgUrl)
+                .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
+        branchObject.registerView();
+        LinkProperties linkProperties = new LinkProperties()
+                .setChannel("facebook")
+                .setFeature("sharing")
+                .addControlParameter("$desktop_url", "http://www.eventshigh.com")
+                .addControlParameter("$ios_url", "http://www.eventshigh.com");
+        final ProgressDialog dialog = OneSecDialog.show(this);
+        branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
+            @Override
+            public void onLinkCreate(String url, BranchError error) {
+                if(dialog!=null){
+                    dialog.dismiss();
+                }
+                if (error == null) {
+                    shareEvent(event, url, packageName);
+                }else {
+                 //   if (error.getErrorCode() == -113) {
+                        Toast.makeText(BaseActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                   // }
+                }
+            }
+        });
     }
 
     public void shareEvent(Event event, String eventUri, @Nullable String packageName) {

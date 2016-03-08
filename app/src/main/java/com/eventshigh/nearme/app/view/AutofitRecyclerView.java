@@ -26,8 +26,60 @@ public class AutofitRecyclerView extends RecyclerView {
     private int horizontalSpacing = 0;
     private int verticalSpacing = 0;
 
+    public AutofitRecyclerView(Context context) {
+        super(context);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        setHasFixedSize(true);
+
+        // use a grid layout manager
+        gridLayoutManager = new GridLayoutManager(context, 1);
+        setLayoutManager(gridLayoutManager);
+
+        // Set the proper spacing.
+        addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                outRect.left = 0;
+                outRect.right = getSpanCount() > 1 ? horizontalSpacing : 0;
+                outRect.bottom = verticalSpacing;
+                outRect.top = 0;
+            }
+        });
+    }
     public AutofitRecyclerView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        if (attrs != null) {
+            columnWidth = getDimensionPixelSize(context, attrs, android.R.attr.columnWidth, -1);
+            horizontalSpacing = getDimensionPixelSize(context, attrs,
+                    android.R.attr.horizontalSpacing, -1);
+            verticalSpacing = getDimensionPixelSize(context, attrs,
+                    android.R.attr.verticalSpacing, -1);
+        }
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        setHasFixedSize(true);
+
+        // use a grid layout manager
+        gridLayoutManager = new GridLayoutManager(context, 1);
+        setLayoutManager(gridLayoutManager);
+
+        // Set the proper spacing.
+        addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                outRect.left = 0;
+                outRect.right = getSpanCount() > 1 ? horizontalSpacing : 0;
+                outRect.bottom = verticalSpacing;
+                outRect.top = 0;
+            }
+        });
+    }
+    public AutofitRecyclerView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs,defStyle);
 
         if (attrs != null) {
             columnWidth = getDimensionPixelSize(context, attrs, android.R.attr.columnWidth, -1);

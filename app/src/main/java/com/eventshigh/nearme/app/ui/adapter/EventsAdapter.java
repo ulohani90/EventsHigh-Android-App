@@ -168,4 +168,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         }
     }
 
+    public void clear(){
+        dataToShow.clear();
+        notifyDataSetChanged();
+    }
 }

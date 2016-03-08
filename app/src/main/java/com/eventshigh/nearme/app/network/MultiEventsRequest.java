@@ -28,6 +28,9 @@ import java.util.List;
  * Fetches the multiple events information by their id.
  */
 public class MultiEventsRequest extends JsonRequest<List<Event>> {
+
+
+    static Context mContext;
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
@@ -36,6 +39,7 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
      */
     public static void submit(Context context, List<String> eventIds, Priority priority, Object tag,
             boolean shouldBypassCache, Listener<List<Event>> listener, ErrorListener errorListener) {
+        mContext = context;
         if (eventIds.isEmpty()) {
             listener.onResponse(new ArrayList<Event>(), false);
             return;
@@ -87,7 +91,7 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
                     // Ignore.
                 }
             }
-            EventCollectionRequest.filterOldEvents(events);
+            EventCollectionRequest.filterOldEvents(mContext,events);
 
             // Sort the event list to user.
             Collections.sort(events, new EventComparator());
