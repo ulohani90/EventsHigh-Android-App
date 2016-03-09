@@ -155,7 +155,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     @Override
     public boolean spanAllColumns(int position) {
-        return DataType.spanAllColumns(getItemViewType(position));
+        if(!(position>=dataToShow.size())) {
+            return DataType.spanAllColumns(getItemViewType(position));
+        }
+        return false;
     }
 
     @Override

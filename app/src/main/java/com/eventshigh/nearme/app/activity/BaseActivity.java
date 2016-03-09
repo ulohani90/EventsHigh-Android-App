@@ -293,7 +293,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         );
     }
 
-    public void shareEventNew(final Event event, @Nullable final String packageName){
+    public void shareEventWithBranch(final Event event, @Nullable final String packageName){
 
         BranchUniversalObject branchObject = new BranchUniversalObject();
         branchObject.setCanonicalIdentifier(event.id).setTitle(event.title)
@@ -304,7 +304,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
         branchObject.registerView();
         LinkProperties linkProperties = new LinkProperties()
-                .setChannel("facebook")
+                .setChannel(packageName)
                 .setFeature("sharing")
                 .addControlParameter("$desktop_url", "http://www.eventshigh.com")
                 .addControlParameter("$ios_url", "http://www.eventshigh.com");
@@ -312,15 +312,15 @@ public abstract class BaseActivity extends AppCompatActivity {
         branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
             @Override
             public void onLinkCreate(String url, BranchError error) {
-                if(dialog!=null){
+                if (dialog != null) {
                     dialog.dismiss();
                 }
                 if (error == null) {
                     shareEvent(event, url, packageName);
-                }else {
-                 //   if (error.getErrorCode() == -113) {
-                        Toast.makeText(BaseActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-                   // }
+                } else {
+                    //   if (error.getErrorCode() == -113) {
+                    Toast.makeText(BaseActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                    // }
                 }
             }
         });
@@ -369,6 +369,54 @@ public abstract class BaseActivity extends AppCompatActivity {
             Crashlytics.getInstance().core.logException(e);
             showMessage(R.string.failed_share);
         }
+    }
+
+    public void shareEventsWithBranch(final EventsContext eventsContext,@Nullable String imageUrl) {
+        String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
+                .appendQueryParameter("src", "ehm").toString();
+        BranchUniversalObject branchObject = new BranchUniversalObject();
+        branchObject.setCanonicalIdentifier(eventsContext.getLabel()).setTitle(eventsContext.toString())
+                .addContentMetadata("event_uri", uri)
+                .setContentDescription(eventsContext.toString())
+                .setContentImageUrl(imageUrl)
+                .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
+        branchObject.registerView();
+        LinkProperties linkProperties = new LinkProperties()
+                .setChannel("facebook")
+                .setFeature("sharing")
+                .addControlParameter("$desktop_url", "http://www.eventshigh.com")
+                .addControlParameter("$ios_url", "http://www.eventshigh.com");
+        final ProgressDialog dialog = OneSecDialog.show(this);
+
+        branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
+            @Override
+            public void onLinkCreate(String url, BranchError error) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+                if (error == null) {
+                    reportActionToAnalytics("eventsShareInitiated", eventsContext.getLabel());
+                    shareEventsInitiatedTimestamp = System.currentTimeMillis();
+
+
+                    try {
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + url);
+                        sendIntent.setType("text/plain");
+                        startActivity(sendIntent);
+                    } catch (ActivityNotFoundException e) {
+                        Crashlytics.getInstance().core.logException(e);
+                        showMessage(R.string.failed_share);
+                    }
+                } else {
+                    //   if (error.getErrorCode() == -113) {
+                    Toast.makeText(BaseActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                    // }
+                }
+            }
+        });
+
     }
 
     public void addToCalendar(Event event, @Nullable Date date) {

@@ -157,13 +157,10 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
             if (isPastEvent)  {
                 it.remove();
-
-
-
-                    EventsMarkerManager.Editor eventsMarkerEditor =
+                EventsMarkerManager.Editor eventsMarkerEditor =
                             EventsMarkerManager.getInstance(context).getEditor();
-                    eventsMarkerEditor.recordEventMark(event, null);
-                    eventsMarkerEditor.close();
+                eventsMarkerEditor.recordEventMark(event, null);
+                eventsMarkerEditor.close();
 
             }
         }

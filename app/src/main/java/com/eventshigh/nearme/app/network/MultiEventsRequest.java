@@ -32,7 +32,7 @@ import java.util.List;
 public class MultiEventsRequest extends JsonRequest<List<Event>> {
 
 
-    static Context mContext;
+
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
@@ -43,7 +43,7 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
             Priority priority, Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
             Listener<List<Event>> listener, ErrorListener errorListener) {
 
-        mContext = context;
+
         if (eventIds.isEmpty()) {
             listener.onResponse(new ArrayList<Event>(), false);
             return;
@@ -57,7 +57,7 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
             return;
         }
 
-        MultiEventsRequest request = new MultiEventsRequest(eventsContext, url, priority,
+        MultiEventsRequest request = new MultiEventsRequest(context,eventsContext, url, priority,
                 shouldBypassCache, includeWithoutLocation, listener, errorListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
@@ -66,8 +66,9 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
     private final EventsContext eventsContext;
     private final Priority priority;
     private final boolean includeWithoutLocation;
+    private Context mContext;
 
-    public MultiEventsRequest(EventsContext eventsContext, String url, Priority priority,
+    public MultiEventsRequest(Context context,EventsContext eventsContext, String url, Priority priority,
                               boolean shouldBypassCache, boolean includeWithoutLocation,
                               Listener<List<Event>> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
@@ -77,6 +78,7 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
         this.eventsContext = eventsContext;
         this.priority = priority;
         this.includeWithoutLocation = includeWithoutLocation;
+        this.mContext = context;
     }
 
     @Override

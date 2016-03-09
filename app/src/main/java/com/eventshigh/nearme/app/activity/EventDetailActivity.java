@@ -151,8 +151,8 @@ public class EventDetailActivity extends BaseActivity {
         if (id == R.id.action_share) {
             if (event != null) {
                 showRateAppDialog = true;
-                shareEvent(event, null);
-               // shareEventNew(event, null);
+                //shareEvent(event, null);
+                shareEventWithBranch(event, "Toolbar");
             }
             return true;
         }
@@ -473,6 +473,10 @@ public class EventDetailActivity extends BaseActivity {
         startActivity(intent);
     }
 
+    public void whatsapp(View view) {
+        shareEventWithBranch(event, PACKAGE_NAME_WHATSAPP+" bottombar");
+    }
+
     public void playYouTube(View view) {
         reportEventAction(event, "playYoutube", event.youtubeVideoId);
         try {
@@ -516,7 +520,7 @@ public class EventDetailActivity extends BaseActivity {
         // Populate event details.
         eventCard.populateView(event);
         findViewById(R.id.check_with_friends).setVisibility(View.VISIBLE);
-
+        findViewById(R.id.share_whatsapp).setVisibility(View.VISIBLE);
         // Connect to Google API client to notify the view.
         getGoogleApiClient();
 

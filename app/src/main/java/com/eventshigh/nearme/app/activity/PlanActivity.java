@@ -118,15 +118,15 @@ public class PlanActivity extends BaseActivity {
     }
 
     public void whatsapp(View view) {
-        shareEvent(event, PACKAGE_NAME_WHATSAPP);
+        shareEventWithBranch(event, PACKAGE_NAME_WHATSAPP);
     }
 
     public void facebook(View view) {
-        shareEvent(event, PACKAGE_NAME_FACEBOOK);
+        shareEventWithBranch(event, PACKAGE_NAME_FACEBOOK);
     }
 
     public void twitter(View view) {
-        shareEvent(event, PACKAGE_NAME_TWITTER);
+        shareEventWithBranch(event, PACKAGE_NAME_TWITTER);
     }
 
     private void publishPlan(Runnable callback) {

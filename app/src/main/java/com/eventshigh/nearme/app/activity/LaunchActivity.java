@@ -142,7 +142,6 @@ public class LaunchActivity extends BaseContextActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
     }
 
     @Override
@@ -179,7 +178,7 @@ public class LaunchActivity extends BaseContextActivity {
                 return;
             }
         }
-       /* Branch branch = Branch.getInstance();
+        Branch branch = Branch.getInstance();
 
         branch.initSession(new Branch.BranchReferralInitListener() {
             @Override
@@ -194,8 +193,13 @@ public class LaunchActivity extends BaseContextActivity {
                             if(!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")){
                                 showNextScreen();
                             }else {
-                                showEventDetails(
-                                        EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
+                                if(referringParams.has("event_id") ) {
+                                    showEventDetails(
+                                            EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
+                                }else if(referringParams.has("event_uri")){
+                                    Uri uri = Uri.parse(referringParams.getString("event_uri"));
+                                    showSearchView(uri.getLastPathSegment());
+                                }
                                 //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
                             }
                         } catch (JSONException e) {
@@ -209,10 +213,10 @@ public class LaunchActivity extends BaseContextActivity {
                     Log.i("MyApp", error.getMessage());
                 }
             }
-        }, this.getIntent().getData(), this);*/
+        }, this.getIntent().getData(), this);
 
         // Show next screen.
-        showNextScreen();
+      //  showNextScreen();
 
         // Setup the Google+ Button.
         PlusOneButton plusOneButton = (PlusOneButton) findViewById(R.id.plus_one_button);
@@ -513,7 +517,7 @@ public class LaunchActivity extends BaseContextActivity {
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
-            implements TabLayout.OnTabSelectedListener {
+            implements TabLayout.OnTabSelectedListener,ViewPager.OnPageChangeListener {
         private EventsFragment myEventsFragment;
 
         public ExploreScreenPagerAdapter() {
@@ -578,6 +582,19 @@ public class LaunchActivity extends BaseContextActivity {
         }
 
 
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+                reportActionToAnalytics("tabchange",TABS[position]);
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
     }
 }

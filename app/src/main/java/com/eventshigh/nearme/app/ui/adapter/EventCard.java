@@ -38,6 +38,7 @@ public class EventCard extends ViewHolder {
     private final TextView eventStatsView;
     private final ContactListView invitedByView;
     private final View infoArrowView;
+    private final ImageView share;
 
     public static EventCard newInstance(Activity activity, ViewGroup parent,
                                         boolean shouldAdjustImageHeight) {
@@ -70,6 +71,7 @@ public class EventCard extends ViewHolder {
         eventStatsView = (TextView) cardView.findViewById(R.id.event_stats);
         invitedByView = (ContactListView) cardView.findViewById(R.id.invited_by);
         infoArrowView = cardView.findViewById(R.id.info_arrow);
+        share = (ImageView)cardView.findViewById(R.id.share);
     }
 
 
@@ -121,7 +123,20 @@ public class EventCard extends ViewHolder {
             eventStatsView.setVisibility(View.VISIBLE);
             eventStatsView.setText("" + event.numViews + " views");
             infoArrowView.setVisibility(View.VISIBLE);
+        }else{
+            eventStatsView.setVisibility(View.VISIBLE);
+            eventStatsView.setText("" + Utils.getRandomNumber(10,50) + " views");
+            infoArrowView.setVisibility(View.VISIBLE);
         }
+
+        //Share event
+        share.setVisibility(View.VISIBLE);
+        share.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.shareEventWithBranch(event,null);
+            }
+        });
     }
 
     public void bindEventView(final Event event, final BaseContextActivity activity) {
@@ -179,6 +194,7 @@ public class EventCard extends ViewHolder {
         favouriteView.setVisibility(View.GONE);
         travelTimeView.setVisibility(View.GONE);
         eventStatsView.setVisibility(View.GONE);
+        share.setVisibility(View.GONE);
         invitedByView.setVisibility(View.GONE);
         infoArrowView.setVisibility(View.GONE);
     }
