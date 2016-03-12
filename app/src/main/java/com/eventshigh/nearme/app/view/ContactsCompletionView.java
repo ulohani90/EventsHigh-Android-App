@@ -20,6 +20,18 @@ public class ContactsCompletionView extends TokenCompleteTextView<UserContact> {
         setTokenClickStyle(TokenClickStyle.Delete);
     }
 
+    public ContactsCompletionView(Context context) {
+        super(context);
+        allowDuplicates(false);
+        setTokenClickStyle(TokenClickStyle.Delete);
+    }
+
+    public ContactsCompletionView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs,defStyle);
+        allowDuplicates(false);
+        setTokenClickStyle(TokenClickStyle.Delete);
+    }
+
     @Override
     protected View getViewForObject(UserContact contact) {
         LayoutInflater l = (LayoutInflater)getContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);

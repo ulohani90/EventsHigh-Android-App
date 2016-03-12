@@ -27,8 +27,31 @@ public class ContactListView extends HorizontalScrollView {
     private int gravity;
     @Nullable private String text;
 
+    public ContactListView(Context context) {
+        super(context);
+        setHorizontalScrollBarEnabled(false);
+
+        /*TypedArray typedArray = context.getTheme().obtainStyledAttributes(
+                attrs, R.styleable.ContactListView, 0, 0);*/
+        size = 12;
+        int position = 0;
+        gravity = position == 0 ? Gravity.START : (position == 1) ? Gravity.END : Gravity.CENTER;
+        text = "";
+    }
+
     public ContactListView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setHorizontalScrollBarEnabled(false);
+
+        TypedArray typedArray = context.getTheme().obtainStyledAttributes(
+                attrs, R.styleable.ContactListView, 0, 0);
+        size = typedArray.getDimensionPixelSize(R.styleable.ContactListView_contactPhotoSize, 12);
+        int position = typedArray.getInteger(R.styleable.ContactListView_contactPosition, 0);
+        gravity = position == 0 ? Gravity.START : (position == 1) ? Gravity.END : Gravity.CENTER;
+        text = typedArray.getString(R.styleable.ContactListView_text);
+    }
+    public ContactListView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
         setHorizontalScrollBarEnabled(false);
 
         TypedArray typedArray = context.getTheme().obtainStyledAttributes(

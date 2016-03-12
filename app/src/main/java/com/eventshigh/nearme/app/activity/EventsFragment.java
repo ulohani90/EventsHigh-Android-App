@@ -15,6 +15,7 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.DateCategoryRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
@@ -127,9 +128,14 @@ public class EventsFragment extends BaseEventsFragment {
 
     @Override
     public void onStop() {
-        super.onStop();
+
         if(asyncRequest!=null)
         asyncRequest.cancel(true);
+
+        if(eventsAdapter!=null){
+            eventsAdapter.clear();
+        }
+        super.onStop();
     }
 
     public void setOnScrollListener (OnScrollListener onScrollListener) {
@@ -212,6 +218,9 @@ public class EventsFragment extends BaseEventsFragment {
             }
 
             if (!isIntermediate || !myEvents.isEmpty()) {
+                if(getActivity()!=null && (getActivity()) instanceof EventsGridActivity){
+                    ((EventsGridActivity)getActivity()).setShareImageUrl(myEvents.get(0).events.get(0).imgUrl);
+                }
                 eventsAdapter.setTopicEvents(myEvents, eventsContext, eventGridView.getSpanCount() * 2);
             }
         }
@@ -238,6 +247,10 @@ public class EventsFragment extends BaseEventsFragment {
             if (!isIntermediate || !eventsCollection.events.isEmpty()) {
                 String seeAllQuery = eventsContext.query.isEmpty() ||
                         eventsContext.dateFilter.isEmpty() ? null : eventsContext.query;
+                if(getActivity()!=null && (getActivity()) instanceof EventsGridActivity){
+                    if(eventsCollection.events.size()>0)
+                    ((EventsGridActivity)getActivity()).setShareImageUrl(eventsCollection.events.get(0).imgUrl);
+                }
                 eventsAdapter.setEvents(eventsCollection.events, seeAllQuery, showEhInviteForNotification);
                 if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),

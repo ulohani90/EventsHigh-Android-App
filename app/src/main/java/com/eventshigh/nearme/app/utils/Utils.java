@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -142,5 +143,10 @@ public class Utils {
         } else {
             return new HashMap<>();
         }
+    }
+
+    public static int getRandomNumber(int low, int high){
+        Random r = new Random();
+        return r.nextInt(high-low) + low;
     }
 }

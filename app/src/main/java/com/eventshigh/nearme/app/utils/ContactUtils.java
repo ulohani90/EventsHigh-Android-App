@@ -95,11 +95,14 @@ public class ContactUtils {
             );
             PHONE_TO_CONTACT_MAP.put(phone, contact);
             return contact;
+        }catch(Exception e){
+
         } finally {
             if(cursor!=null){
                 cursor.close();
             }
         }
+        return null;
     }
 
     @SuppressWarnings("TryFinallyCanBeTryWithResources")

@@ -63,17 +63,7 @@
             android:textColor="@android:color/white"
             tools:text="My Awesome Event with a long long title!"
         />
-        <ImageView
-            android:id="@+id/action_favourite"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignTop="@id/event_title"
-            android:layout_marginTop="-8dp"
-            android:padding="8dp"
-            android:src="@drawable/ic_favorite_red_18dp"
-            tools:ignore="ContentDescription"
-        />
+
 
         <TextView
             android:id="@+id/event_time"
@@ -145,14 +135,19 @@
             android:layout_above="@id/event_info"
             android:background="@drawable/shape_info_triangle"
         />
+<LinearLayout
+    android:id="@+id/event_info"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignBottom="@+id/event_bg"
+    android:background="@android:color/white"
+    android:orientation="horizontal">
 
         <FrameLayout
-            android:id="@+id/event_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/event_bg"
-            android:background="@android:color/white"
-        >
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+
             <TextView
                 style="?android:attr/textAppearanceSmall"
                 android:id="@+id/event_stats"
@@ -177,5 +172,26 @@
                 app:text=" has invited you to this event!"
             />
         </FrameLayout>
+    <ImageView
+        android:id="@+id/share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="center"
+        android:padding="10dp"
+        android:background="@drawable/button_transparent_dark"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_share_grey_18dp"/>
+    <ImageView
+        android:id="@+id/action_favourite"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@id/event_title"
+        android:layout_gravity="center_vertical"
+        android:padding="8dp"
+        android:src="@drawable/ic_favorite_red_18dp"
+        tools:ignore="ContentDescription"
+        />
+</LinearLayout>
     </RelativeLayout>
 </FrameLayout>

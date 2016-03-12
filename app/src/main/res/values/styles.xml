@@ -68,4 +68,9 @@
         <item name="android:inputType">textMultiLine|textCapSentences</item>
         <item name="android:minLines">4</item>
     </style>
+
+    <!--Checkbox Style-->
+    <style name="CheckBoxAppTheme" parent="android:Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/apptheme_btn_check_holo_light</item>
+    </style>
 </resources>

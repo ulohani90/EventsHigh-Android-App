@@ -34,4 +34,11 @@
     <color name="fb_blue_dark">#395185</color>
     <color name="twitter">#55ACEE</color>
     <color name="twitter_dark">#5590D0</color>
+    <color name="material_color_orange">#dc602b</color>
+    <color name="material_color_pink">#c2606f</color>
+    <color name="material_color_blue">#85c4ed</color>
+    <color name="material_color_green">#5dc10d</color>
+    <color name="material_color_purple">#766d9b</color>
+    <color name="material_color_red">#e5625c</color>
+
 </resources>

@@ -25,6 +25,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +37,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter;
@@ -54,6 +56,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.PlusOneButton;
 import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import io.branch.referral.Branch;
+import io.branch.referral.BranchError;
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
 
 /**
@@ -89,6 +96,9 @@ public class LaunchActivity extends BaseContextActivity {
             THIS_WEEK_TAB,
             NOTIFICATIONS_TAB,
     };
+
+
+    boolean isPagerSwipeBlocked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +143,21 @@ public class LaunchActivity extends BaseContextActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        this.setIntent(intent);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -151,14 +176,51 @@ public class LaunchActivity extends BaseContextActivity {
             }
 
             String action = getIntent().getAction();
-            if (!isTaskRoot() && (action == null || !action.startsWith(NOTIFICATION_ACTION))) {
+            if (!isTaskRoot() && (action == null || !action.startsWith(NOTIFICATION_ACTION))
+                && (getIntent().getData() == null || !getIntent().getData().getHost().equalsIgnoreCase("branch.eventshigh.com"))) {
                 finish();
                 return;
             }
         }
+        Branch branch = Branch.getInstance();
+
+        branch.initSession(new Branch.BranchReferralInitListener() {
+            @Override
+            public void onInitFinished(JSONObject referringParams, BranchError error) {
+                if (error == null) {
+                    //showEventDetails();
+                    if(referringParams.length() == 0){
+                        showNextScreen();
+
+                    }else {
+                        try {
+                            if(!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")){
+                                showNextScreen();
+                            }else {
+                                if(referringParams.has("event_id") ) {
+                                    showEventDetails(
+                                            EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
+                                }else if(referringParams.has("event_uri")){
+                                    Uri uri = Uri.parse(referringParams.getString("event_uri"));
+                                    showSearchView(uri.getLastPathSegment());
+                                }
+                                //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
+                            }
+                        } catch (JSONException e) {
+                            showNextScreen();
+                            e.printStackTrace();
+                        }
+                        System.out.println("JsonObject received" + referringParams);
+                    }
+                } else {
+                    showNextScreen();
+                    Log.i("MyApp", error.getMessage());
+                }
+            }
+        }, this.getIntent().getData(), this);
 
         // Show next screen.
-        showNextScreen();
+      //  showNextScreen();
 
         // Setup the Google+ Button.
         PlusOneButton plusOneButton = (PlusOneButton) findViewById(R.id.plus_one_button);
@@ -171,6 +233,7 @@ public class LaunchActivity extends BaseContextActivity {
                 startActivityForResult(intent, PLUS_ONE_REQUEST_CODE);
             }
         });
+
     }
 
     private void setLightToolbarIcons() {
@@ -224,7 +287,15 @@ public class LaunchActivity extends BaseContextActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+
+            if(isPagerSwipeBlocked){
+                isPagerSwipeBlocked=false;
+                if(exploreFragment!=null){
+                    exploreFragment.animateLocalityViewOut();
+                }
+            }else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -378,7 +449,7 @@ public class LaunchActivity extends BaseContextActivity {
         ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(defaultTab, false);
-
+        viewPager.addOnPageChangeListener(listener);
         tabsView.setTabMode(TabLayout.MODE_SCROLLABLE);
         tabsView.setupWithViewPager(viewPager);
         tabsView.setScrollPosition(defaultTab, 0, true);
@@ -430,6 +501,17 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        //Checking if the previous activity is launched on branch Auto deep link.
+        if(requestCode == getResources().getInteger(R.integer.EventsDetailDeepLink_code)){
+            //Decide here where  to navigate  when an auto deep linked activity finishes.
+            //For e.g. Go to HomeActivity or a  SignUp Activity.
+            showNextScreen();
+        }
+    }
     private final OnCitySelectionListener mCitySelectionListener = new OnCitySelectionListener() {
         @Override
         public void onCitySelection(City city) {
@@ -443,11 +525,37 @@ public class LaunchActivity extends BaseContextActivity {
         }
     };
 
+
+ViewPager.OnPageChangeListener listener= new ViewPager.OnPageChangeListener() {
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        reportActionToAnalytics("tabchange",TABS[position]);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+};
+
+
+
+    public void setisPagerSwipeBlocked(boolean isPagerSwipeBlocked){
+        this.isPagerSwipeBlocked = isPagerSwipeBlocked;
+    }
+
+
+    ExploreFragment exploreFragment;
     /**
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
-            implements TabLayout.OnTabSelectedListener {
+            implements TabLayout.OnTabSelectedListener,ViewPager.OnPageChangeListener {
         private EventsFragment myEventsFragment;
 
         public ExploreScreenPagerAdapter() {
@@ -469,7 +577,10 @@ public class LaunchActivity extends BaseContextActivity {
             }
 
             if (TABS[position].equals(EXPLORE_TAB)) {
-                return ExploreFragment.getInstance(eventsContext);
+                 exploreFragment = ExploreFragment.getInstance(eventsContext);
+
+                return exploreFragment;
+
             }
 
             if (TABS[position].equals(NOTIFICATIONS_TAB)) {
@@ -491,14 +602,16 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public void onTabSelected(TabLayout.Tab tab) {
-            showActionBar();
 
-            int position = tab.getPosition();
-            if (TABS[position].equals(MY_EVENTS_TAB) && myEventsFragment != null) {
-                myEventsFragment.onResume();
-            }
+                showActionBar();
 
-            viewPager.setCurrentItem(position);
+                int position = tab.getPosition();
+                if (TABS[position].equals(MY_EVENTS_TAB) && myEventsFragment != null) {
+                    myEventsFragment.onResume();
+                }
+
+                viewPager.setCurrentItem(position);
+
         }
 
         @Override
@@ -509,6 +622,22 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public void onTabReselected(TabLayout.Tab tab) {
             // do nothing.
+        }
+
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
         }
     }
 }

@@ -89,6 +89,17 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         this.tag = tag;
     }
 
+    public @Nullable TopicEvents getNonEmptyInterest() {
+        List<TopicEvents> topicEventsList = doInBackground();
+        for (TopicEvents events : topicEventsList) {
+            if (!isSpecialTag(events.topicName) && events.numEvents > 0) {
+                return events;
+            }
+        }
+
+        return null;
+     }
+
     @Override
     protected List<TopicEvents> doInBackground(Void... params) {
         if (eventsContext.city == null) {
