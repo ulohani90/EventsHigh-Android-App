@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.utils;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -35,7 +36,7 @@ public class ImageUtils {
 
         float radius = Math.max(bitmap.getWidth(), bitmap.getHeight()) / 2.0f;
         Bitmap canvasBitmap = Bitmap.createBitmap(bitmap.getWidth(),
-                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                bitmap.getHeight(), Config.ARGB_4444);
         BitmapShader shader = new BitmapShader(bitmap, TileMode.CLAMP, TileMode.CLAMP);
 
         Paint paint = new Paint();
