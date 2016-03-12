@@ -78,7 +78,8 @@ public class EventCard extends ViewHolder {
     public void setFavouriteView(@Nullable EventMark eventMark) {
         favouriteView.setTag(eventMark);
         favouriteView.setImageResource(EventMark.isFavourite(eventMark) ?
-                R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
+                R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_border_black_18dp);
+
     }
 
     @SuppressLint("SetTextI18n")
@@ -107,10 +108,15 @@ public class EventCard extends ViewHolder {
                 EventMark oldMark = (EventMark) favouriteView.getTag();
                 EventMark newMark = EventMark.isFavourite(oldMark) ? null : EventMark.FAVOURITE;
                 activity.reportEventAction(event,
-                    EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
-                    position);
+                        EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
+                        position);
                 activity.recordEventMark(event, newMark);
                 setFavouriteView(newMark);
+               if (EventMark.isFavourite(newMark)) {
+                   activity.showMessage("Added to My Events");
+               }else{
+                   activity.showMessage("Removed from My Events");}
+
             }
         });
 
@@ -134,7 +140,7 @@ public class EventCard extends ViewHolder {
         share.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.shareEventWithBranch(event,null);
+                activity.shareEventWithBranch(event,null,null);
             }
         });
     }

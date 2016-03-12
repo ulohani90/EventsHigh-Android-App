@@ -280,20 +280,20 @@ public abstract class BaseActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String shortenUri, boolean isIntermediate) {
                         dialog.dismiss();
-                        shareEvent(event, shortenUri, packageName);
+                        shareEvent(event, shortenUri, packageName, null);
                     }
                 },
                 new ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         dialog.dismiss();
-                        shareEvent(event, eventShareUri, packageName);
+                        shareEvent(event, eventShareUri, packageName, null);
                     }
                 }
         );
     }
 
-    public void shareEventWithBranch(final Event event, @Nullable final String packageName){
+    public void shareEventWithBranch(final Event event, @Nullable final String packageName, @Nullable  final String label) {
 
         BranchUniversalObject branchObject = new BranchUniversalObject();
         branchObject.setCanonicalIdentifier(event.id).setTitle(event.title)
@@ -306,6 +306,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         LinkProperties linkProperties = new LinkProperties()
                 .setChannel(packageName)
                 .setFeature("sharing")
+                .addControlParameter("$always_deeplink","true")
                 .addControlParameter("$desktop_url", "http://www.eventshigh.com")
                 .addControlParameter("$ios_url", "http://www.eventshigh.com");
         final ProgressDialog dialog = OneSecDialog.show(this);
@@ -316,18 +317,18 @@ public abstract class BaseActivity extends AppCompatActivity {
                     dialog.dismiss();
                 }
                 if (error == null) {
-                    shareEvent(event, url, packageName);
+                    shareEvent(event, url, packageName, label);
                 } else {
                     //   if (error.getErrorCode() == -113) {
-                    Toast.makeText(BaseActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                    showMessage( error.getMessage());
                     // }
                 }
             }
         });
     }
 
-    public void shareEvent(Event event, String eventUri, @Nullable String packageName) {
-        reportEventAction(event, "eventShareInitiated", packageName);
+    public void shareEvent(Event event, String eventUri, @Nullable String packageName, @Nullable String label) {
+        reportEventAction(event, "eventShareInitiated", label == null ? packageName : label);
         shareEventInitiatedTimestamp = System.currentTimeMillis();
         new UserActionHelper(this).recordShareAction(event.id, packageName, null);
 

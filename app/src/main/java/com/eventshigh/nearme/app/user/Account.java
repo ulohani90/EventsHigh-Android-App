@@ -9,6 +9,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
+import com.eventshigh.nearme.app.data.Locality;
 import com.eventshigh.nearme.app.user.UserActionHelper.FollowingAction;
 
 import java.util.ArrayList;
@@ -46,6 +47,8 @@ public class Account {
 
     // Last city selection by user.
     private static final String PREF_LAST_CITY = "last_city";
+
+    private static final String PREF_SAVED_LOCALITY="saved_locality";
 
     // The referrer for this user. this user installed the app via this referrer.
     private static final String PREF_REFERRER = "referrer";
@@ -128,7 +131,6 @@ public class Account {
         if (disableSnackBar) {
             return false;
         }
-
         Account account = new Account(context);
         UserInfo userInfo = account.getUserInfo();
         return userInfo.phoneNo != null && !userInfo.isVerified;
@@ -180,8 +182,36 @@ public class Account {
         City currentLastCity = getLastCity();
         if (currentLastCity == null || !city.equals(currentLastCity)) {
             accountInfo.edit().putString(PREF_LAST_CITY, city.toString()).apply();
+            accountInfo.edit().putString(PREF_SAVED_LOCALITY, "").apply();
             UpdateAccountInfoService.refreshCity(context);
         }
+    }
+
+    public void setSavedLocalities(List<Locality> localities) {
+        if (localities == null) {
+            return;
+        }
+
+        StringBuilder localityName=new StringBuilder();
+        for(int i=0;i<localities.size();i++){
+            localityName.append(localities.get(i).name);
+            if(i!=localities.size()-1){
+                localityName.append(",");
+            }
+        }
+            accountInfo.edit().putString(PREF_SAVED_LOCALITY, localityName.toString()).apply();
+
+    }
+
+    public List<Locality> getSavedLocalities(){
+        List<Locality> locality = new ArrayList<Locality>();
+        if(accountInfo.getString(PREF_SAVED_LOCALITY, "").length()>0) {
+            String[] localityName = accountInfo.getString(PREF_SAVED_LOCALITY, "").split(",");
+            for (int i = 0; i < localityName.length; i++) {
+                locality.add(Locality.getLocality(localityName[i]));
+            }
+        }
+        return locality;
     }
 
     public @Nullable City getLastCity() {

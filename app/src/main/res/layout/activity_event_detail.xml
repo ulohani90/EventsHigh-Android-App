@@ -11,7 +11,7 @@
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
+
         >
 
         <android.support.design.widget.AppBarLayout
@@ -93,12 +93,13 @@
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/event_scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/action_footer"
-        android:paddingBottom="16dp"
         android:clipToPadding="false"
         android:visibility="gone"
         tools:visibility="visible"
+        android:fitsSystemWindows="true"
+        android:paddingBottom="64dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
     >
         <LinearLayout
@@ -113,24 +114,7 @@
 
 
             <!-- Event Title -->
-            <TextView
-                android:id="@+id/event_title"
-                style="?android:attr/textAppearanceMedium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginEnd="16dp"
-                android:textIsSelectable="true"
-                android:textColor="#CC000000"
-                android:visibility="gone"
-                android:transitionName="event_title"
-                tools:ignore="UnusedAttribute"
-                tools:text="The Awesome Event"
-            />
+
 
             <!-- Stats -->
             <View
@@ -433,6 +417,23 @@
                 android:layout_height="1dp"
                 android:background="#1a4d4d4d"
             />
+            <TextView
+                android:id="@+id/event_title"
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
+                android:textIsSelectable="true"
+                android:textColor="#CC000000"
+                android:transitionName="event_title"
+                tools:ignore="UnusedAttribute"
+                tools:text="The Awesome Event"
+                />
             <LinearLayout
                 android:id="@+id/price_row"
                 android:layout_width="match_parent"
@@ -698,23 +699,16 @@
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
     </android.support.design.widget.CoordinatorLayout>
-    <FrameLayout
-        android:id="@+id/action_footer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:layout_alignParentBottom="true"
-        android:paddingTop="3dp"
-    >
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@color/button_gray"
             android:padding="6dp"
             android:showDividers="middle"
-            android:divider="@drawable/shape_vertical_divider"
-        >
+            android:background="@android:color/white"
+            android:layout_alignParentBottom="true"
+            android:divider="@drawable/shape_vertical_divider">
             <ImageView
                 android:id="@+id/share_whatsapp"
                 android:layout_width="wrap_content"
@@ -727,7 +721,7 @@
                 android:background="@drawable/button_whatsapp"
                 android:onClick="whatsapp"
                 android:visibility="gone"
-                tools:visibility="visible"
+                tools:visibility="gone"
                 tools:ignore="ContentDescription"
                 />
             <TextView
@@ -782,7 +776,7 @@
                 tools:ignore="UnusedAttribute"
             />
         </LinearLayout>
-    </FrameLayout>
+
 
     <ProgressBar
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"

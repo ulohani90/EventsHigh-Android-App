@@ -97,6 +97,9 @@ public class LaunchActivity extends BaseContextActivity {
             NOTIFICATIONS_TAB,
     };
 
+
+    boolean isPagerSwipeBlocked;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,7 +176,8 @@ public class LaunchActivity extends BaseContextActivity {
             }
 
             String action = getIntent().getAction();
-            if (!isTaskRoot() && (action == null || !action.startsWith(NOTIFICATION_ACTION))) {
+            if (!isTaskRoot() && (action == null || !action.startsWith(NOTIFICATION_ACTION))
+                && (getIntent().getData() == null || !getIntent().getData().getHost().equalsIgnoreCase("branch.eventshigh.com"))) {
                 finish();
                 return;
             }
@@ -283,7 +287,15 @@ public class LaunchActivity extends BaseContextActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+
+            if(isPagerSwipeBlocked){
+                isPagerSwipeBlocked=false;
+                if(exploreFragment!=null){
+                    exploreFragment.animateLocalityViewOut();
+                }
+            }else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -437,7 +449,7 @@ public class LaunchActivity extends BaseContextActivity {
         ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(defaultTab, false);
-
+        viewPager.addOnPageChangeListener(listener);
         tabsView.setTabMode(TabLayout.MODE_SCROLLABLE);
         tabsView.setupWithViewPager(viewPager);
         tabsView.setScrollPosition(defaultTab, 0, true);
@@ -513,6 +525,32 @@ public class LaunchActivity extends BaseContextActivity {
         }
     };
 
+
+ViewPager.OnPageChangeListener listener= new ViewPager.OnPageChangeListener() {
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        reportActionToAnalytics("tabchange",TABS[position]);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+};
+
+
+
+    public void setisPagerSwipeBlocked(boolean isPagerSwipeBlocked){
+        this.isPagerSwipeBlocked = isPagerSwipeBlocked;
+    }
+
+
+    ExploreFragment exploreFragment;
     /**
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
@@ -539,7 +577,10 @@ public class LaunchActivity extends BaseContextActivity {
             }
 
             if (TABS[position].equals(EXPLORE_TAB)) {
-                return ExploreFragment.getInstance(eventsContext);
+                 exploreFragment = ExploreFragment.getInstance(eventsContext);
+
+                return exploreFragment;
+
             }
 
             if (TABS[position].equals(NOTIFICATIONS_TAB)) {
@@ -561,14 +602,16 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public void onTabSelected(TabLayout.Tab tab) {
-            showActionBar();
 
-            int position = tab.getPosition();
-            if (TABS[position].equals(MY_EVENTS_TAB) && myEventsFragment != null) {
-                myEventsFragment.onResume();
-            }
+                showActionBar();
 
-            viewPager.setCurrentItem(position);
+                int position = tab.getPosition();
+                if (TABS[position].equals(MY_EVENTS_TAB) && myEventsFragment != null) {
+                    myEventsFragment.onResume();
+                }
+
+                viewPager.setCurrentItem(position);
+
         }
 
         @Override
@@ -589,7 +632,7 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public void onPageSelected(int position) {
-                reportActionToAnalytics("tabchange",TABS[position]);
+
         }
 
         @Override

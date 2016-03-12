@@ -65,7 +65,7 @@
 
 
         <!--Branch.io-->
-        <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_test_lbkCZn1T0v2wTDpoNvAABijeqEiH7yQp" />
+        <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_nfj8qbtAAg1Hkj4K6jszCnfkwCgwGUL4" />
 
 
         <!-- FB -->
@@ -137,7 +137,7 @@
 
             <!--Branch.io filters-->
             <intent-filter>
-                <data android:scheme="https" android:host="open" />
+                <data android:scheme="http" android:host="branch.eventshigh.com" />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -331,6 +331,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
+
             <meta-data android:name="io.branch.sdk.auto_link_request_code" android:value="@integer/EventsDetailDeepLink_code" />
 
         </activity>

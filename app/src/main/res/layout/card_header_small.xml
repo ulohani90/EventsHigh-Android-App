@@ -5,10 +5,17 @@
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants"
 >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+
+
     <TextView
         style="?android:attr/textAppearanceMedium"
         android:id="@+id/header"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|start"
         android:layout_margin="24dp"
@@ -16,4 +23,13 @@
         android:textIsSelectable="false"
         tools:text="@string/ui_browse_featured"
     />
+    <ImageView
+        android:id="@+id/edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:padding="24dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_edit_black_24dp"/>
+    </LinearLayout>
 </FrameLayout>

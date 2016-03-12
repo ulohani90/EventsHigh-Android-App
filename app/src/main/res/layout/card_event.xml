@@ -63,17 +63,7 @@
             android:textColor="@android:color/white"
             tools:text="My Awesome Event with a long long title!"
         />
-        <ImageView
-            android:id="@+id/action_favourite"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignTop="@id/event_title"
-            android:layout_marginTop="-8dp"
-            android:padding="8dp"
-            android:src="@drawable/ic_favorite_red_18dp"
-            tools:ignore="ContentDescription"
-        />
+
 
         <TextView
             android:id="@+id/event_time"
@@ -190,7 +180,18 @@
         android:padding="10dp"
         android:background="@drawable/button_transparent_dark"
         android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_share_black_18dp"/>
+        android:src="@drawable/ic_share_grey_18dp"/>
+    <ImageView
+        android:id="@+id/action_favourite"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@id/event_title"
+        android:layout_gravity="center_vertical"
+        android:padding="8dp"
+        android:src="@drawable/ic_favorite_red_18dp"
+        tools:ignore="ContentDescription"
+        />
 </LinearLayout>
     </RelativeLayout>
 </FrameLayout>

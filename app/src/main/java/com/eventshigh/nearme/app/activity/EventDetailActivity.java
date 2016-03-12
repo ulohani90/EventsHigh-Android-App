@@ -152,7 +152,7 @@ public class EventDetailActivity extends BaseActivity {
             if (event != null) {
                 showRateAppDialog = true;
                 //shareEvent(event, null);
-                shareEventWithBranch(event, "Toolbar");
+                shareEventWithBranch(event, null,"Toolbar");
             }
             return true;
         }
@@ -474,7 +474,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void whatsapp(View view) {
-        shareEventWithBranch(event, PACKAGE_NAME_WHATSAPP+" bottombar");
+        shareEventWithBranch(event, PACKAGE_NAME_WHATSAPP, " bottombar");
     }
 
     public void playYouTube(View view) {
