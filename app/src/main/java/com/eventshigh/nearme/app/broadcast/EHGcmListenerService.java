@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.android.volley.Request;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BlogEntryActivity;
@@ -23,6 +24,7 @@ import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.TicketNotificationStreamItem;
+import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.notification.EHNotification;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
@@ -67,6 +69,8 @@ public class EHGcmListenerService extends GcmListenerService {
         String target = Utils.checkIfUnknown(msg.getString("target"));
         String priority = Utils.checkIfUnknown(msg.getString("priority"));
         String mobileNo = Utils.checkIfUnknown(msg.getString("mobile"));
+        String personalisedNotif = Utils.checkIfUnknown(msg.getString("personalised_notif"));
+
 
         UserContact contact = null;
         if (mobileNo != null) {
@@ -96,6 +100,8 @@ public class EHGcmListenerService extends GcmListenerService {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
             return null;
         }
+
+
 
         PendingIntent contentIntent;
         if (eventId != null) {
@@ -130,6 +136,24 @@ public class EHGcmListenerService extends GcmListenerService {
             if (intent == null) { return null; }
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + target);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        } else if(personalisedNotif!=null){
+            City city = new Account(this).getLastCity();
+            if (city == null) { return null; }
+
+                MyEventsRequest.TopicEvents interestName = new MyEventsRequest(
+                        getApplicationContext(),
+                        new EventsContext(city.cityBounds.getCenter(), ""),
+                        Request.Priority.HIGH,
+                        null, false, true, null, null
+                ).getNonEmptyInterest();
+                if (interestName==null) { return null; }
+                    // show notification
+                    //--
+                    Intent intent = new Intent(this, LaunchActivity.class);
+                    intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, EventsHighEndpoints.QUERY_MY_EVENT);
+                    intent.setAction(BaseActivity.NOTIFICATION_ACTION + target);
+                    contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
         } else {
             Intent intent = new Intent(this,
                 contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
