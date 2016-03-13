@@ -31,6 +31,8 @@ import com.zendesk.sdk.network.impl.ZendeskConfig;
 import com.zendesk.service.ErrorResponse;
 import com.zendesk.service.ZendeskCallback;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
@@ -43,9 +45,9 @@ public class UpdateAccountInfoService extends IntentService {
 
     private static final String UPLOAD_STATUS_FILENAME = "eh_upload_status";
     private static final String PREF_REFERRER_UPLOADED = "referrer_uploaded";
-    private static final String PREF_GCM_TOKEN_UPLOADED = "gcm_token_uploaded";
+    private static final String PREF_GCM_TOKEN_UPLOADED = "gcm_token_uploaded2";
     private static final String PREF_ZENDESK_UPDATED = "zendesk_updated";
-    private static final String PREF_IID_UPLOADED = "iid_uploaded";
+    private static final String PREF_IID_UPLOADED = "iid_uploaded2";
     private static final String PREF_DEVICE_INFO_UPLOADED = "device_info_uploaded";
     private static final String PREF_LAST_CITY_UPLOADED = "last_city_uploaded";
 
@@ -115,6 +117,11 @@ public class UpdateAccountInfoService extends IntentService {
             return;
         }
 
+        // Referral Link.
+        if (account.getReferrerLink() == null) {
+            account.recordReferrerLink(getReferrerLink());
+        }
+
         // Upload IID.
         InstanceID instanceID = InstanceID.getInstance(this);
         if (instanceID == null) {
@@ -124,6 +131,10 @@ public class UpdateAccountInfoService extends IntentService {
             reportInstanceId(instanceID.getId(), uploadStatus);
         }
 
+        if (uploadStatus.getBoolean(PREF_GCM_TOKEN_UPLOADED, false) &&
+            uploadStatus.getBoolean(PREF_ZENDESK_UPDATED, false)) {
+            return;
+        }
 
         String registrationId;
         try {
@@ -137,35 +148,31 @@ public class UpdateAccountInfoService extends IntentService {
         }
 
         // Upload GCM registration id.
-        if (!uploadStatus.getBoolean(PREF_GCM_TOKEN_UPLOADED, false)) {
-            reportGcmRegistrationId(registrationId, uploadStatus);
-        }
+        reportGcmRegistrationId(registrationId, uploadStatus);
 
         // Report the GCM registration id with zendesk.
-        if (!uploadStatus.getBoolean(PREF_ZENDESK_UPDATED, false)) {
-            ZendeskUtils.initZendesk(this);
-            try {
-                ZendeskConfig.INSTANCE.enablePushWithIdentifier(registrationId, new ZendeskCallback<PushRegistrationResponse>() {
-                    @Override
-                    public void onSuccess(PushRegistrationResponse pushRegistrationResponse) {
-                        uploadStatus.edit().putBoolean(PREF_ZENDESK_UPDATED, true).apply();
-                        synchronized (UpdateAccountInfoService.this) {
-                            UpdateAccountInfoService.this.notifyAll();
-                        }
+        ZendeskUtils.initZendesk(this);
+        try {
+            ZendeskConfig.INSTANCE.enablePushWithIdentifier(registrationId, new ZendeskCallback<PushRegistrationResponse>() {
+                @Override
+                public void onSuccess(PushRegistrationResponse pushRegistrationResponse) {
+                    uploadStatus.edit().putBoolean(PREF_ZENDESK_UPDATED, true).apply();
+                    synchronized (UpdateAccountInfoService.this) {
+                        UpdateAccountInfoService.this.notifyAll();
                     }
+                }
 
-                    @Override
-                    public void onError(ErrorResponse errorResponse) {
-                        // do nothing. upload will be retried.
-                        synchronized (UpdateAccountInfoService.this) {
-                            UpdateAccountInfoService.this.notifyAll();
-                        }
+                @Override
+                public void onError(ErrorResponse errorResponse) {
+                    // do nothing. upload will be retried.
+                    synchronized (UpdateAccountInfoService.this) {
+                        UpdateAccountInfoService.this.notifyAll();
                     }
-                });
-                UpdateAccountInfoService.this.wait();
-            } catch (Exception e) {
-                // Wait for initialization to finish and retry later.
-            }
+                }
+            });
+            UpdateAccountInfoService.this.wait();
+        } catch (Exception e) {
+            // Wait for initialization to finish and retry later.
         }
     }
 
@@ -212,6 +219,20 @@ public class UpdateAccountInfoService extends IntentService {
                 .appendQueryParameter("is_rooted", Boolean.toString(DeviceUtils.isRooted()))
                 .build();
         report(uri, uploadStatus, PREF_DEVICE_INFO_UPLOADED);
+    }
+
+    private String getReferrerLink() {
+        try {
+            Uri uri = getBaseUri(this, "getReferrerLink").build();
+            String resp = sendSignedRequest(uri).get();
+            JSONObject res = new JSONObject(resp);
+            res.getString("link");
+        } catch (Exception e) {
+            Crashlytics.getInstance().core.logException(e);
+            Log.w(UpdateAccountInfoService.class.getName(), "request failed: getReferrerLink", e);
+        }
+
+        return null;
     }
 
     private void report(Uri uri, SharedPreferences uploadStatus, String key) {

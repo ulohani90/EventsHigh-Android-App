@@ -15,7 +15,6 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.DateCategoryRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
@@ -150,7 +149,7 @@ public class EventsFragment extends BaseEventsFragment {
 
         // Stop all requests associated with this fragment and then submit new request.
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-            asyncRequest =   new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
+            asyncRequest = new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mMyEventsFetcherCallBack, mErrorListener);
             asyncRequest.execute();
         } else if (eventsContext.query.isEmpty() && !eventsContext.dateFilter.isEmpty() && showCategories) {

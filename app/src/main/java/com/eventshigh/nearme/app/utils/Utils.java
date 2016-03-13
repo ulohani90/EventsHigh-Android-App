@@ -123,9 +123,11 @@ public class Utils {
     static {
         DEBUG_ANDROID_ID.add("5151a4342221f321");  // Parag
         DEBUG_ANDROID_ID.add("5f0f51994cb15c85");  // Arvind
-        DEBUG_ANDROID_ID.add("a35df83d1a37a83c");  // Nikesh
+        DEBUG_ANDROID_ID.add("66440e253daf9b3d");  // Nikesh
         DEBUG_ANDROID_ID.add("56a538060a00eaa6");  // Samsung-duos
         DEBUG_ANDROID_ID.add("8fa00ccd84f6351b");  // eh
+        DEBUG_ANDROID_ID.add("b84b8ede41e9dc36");  // Umesh
+        DEBUG_ANDROID_ID.add("d5af6ff15811e26d");  // Simran
     }
 
     public static boolean isDebug(Context context) {

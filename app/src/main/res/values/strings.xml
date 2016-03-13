@@ -95,7 +95,7 @@
     <string name="action_add_friend">Add Friends</string>
     <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Sounds fun!\n\n%1$s\n\n%2$s</string>
     <string name="share_event_twitter_text">[via @eventshighapp]\n%1$s\n\n%2$s</string>
-    <string name="share_app_text">Hey! Pull up a chair. Take a taste. Come join EventsHigh. Life is so endlessly delicious.\n\nhttps://goo.gl/dzWYOW</string>
+    <string name="share_app_text">Hey! Pull up a chair. Take a taste. Come join EventsHigh. Life is so endlessly delicious.\n\n%s</string>
     <string name="share_app_message">Love only grows by sharing. You can only have more for yourself by sharing the app with friends. The more you share, the better would be your experience.</string>
     <string name="share_app_notification_message">Liked this notification? Share EventsHigh app with your contacts and they can also experience the high! Get your gang together.</string>
 
@@ -110,6 +110,7 @@
     <string name="failed_event_location">Sorry! We are not able to find the location for this event!</string>
     <string name="no_map_app">Maps application not found!</string>
     <string name="no_cal_app">Calendar application not found!</string>
+    <string name="no_whatsapp">WhatsApp application not found!</string>
     <string name="no_events">Uh oh! No events found!</string>
     <string name="retry">Oops! You\'ve stumped us. Let\'s try again.</string>
     <string name="no_price">Contact Organizer for Price.</string>
@@ -138,6 +139,7 @@
     <string name="feedback">Give Feedback</string>
 
     <!-- Social -->
+    <string name="title_refer">Refer &amp; Earn</string>
     <string name="invite_friends">Invite  your  friends</string>
     <string name="no_friends_on_eh">We couldn\'t find any friends for you on EventsHigh. Why not invite them?</string>
     <string name="no_friends_disclaimer">If you have recently given us the permission to your contacts, it might take us up to 30 minutes to find friends.</string>

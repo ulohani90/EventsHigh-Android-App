@@ -405,6 +405,17 @@
                 android:value=".activity.LaunchActivity"
             />
         </activity>
+        <activity
+            android:name=".activity.ReferralActivity"
+            android:label="@string/title_refer"
+            android:launchMode="singleTask"
+            android:parentActivityName=".activity.LaunchActivity"
+        >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.LaunchActivity"
+            />
+        </activity>
 
         <!-- Receivers within our application -->
         <!-- Receives the Install referrer from play store -->

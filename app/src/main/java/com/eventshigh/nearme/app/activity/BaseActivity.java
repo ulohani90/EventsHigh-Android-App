@@ -32,17 +32,17 @@ import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.OneSecDialog;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.GAHelper;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-
-import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -256,12 +256,21 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void shareApp() {
         reportActionToAnalytics("shareApp", PACKAGE_NAME_WHATSAPP);
 
+        String referralLink = new Account(this).getReferrerLink();
+        if (referralLink == null) {
+            referralLink = "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + Utils.getAndroidId(this);
+        }
+
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_app_text));
+        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_app_text), referralLink));
         shareIntent.setType("text/plain");
         shareIntent.setPackage(PACKAGE_NAME_WHATSAPP);
-        startActivity(shareIntent);
+        try {
+            startActivity(shareIntent);
+        } catch (ActivityNotFoundException e) {
+            showMessage(R.string.no_whatsapp);
+        }
     }
 
     /**

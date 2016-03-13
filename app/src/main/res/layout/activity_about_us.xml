@@ -9,7 +9,7 @@
     android:paddingLeft="4dp"
     android:paddingRight="4dp"
     android:clipToPadding="false"
-    tools:context=".settings.AboutUsActivity"
+    tools:context=".activity.AboutUsActivity"
 >
     <LinearLayout
         android:layout_width="match_parent"
