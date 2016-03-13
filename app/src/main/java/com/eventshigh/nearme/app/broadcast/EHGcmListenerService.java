@@ -149,6 +149,8 @@ public class EHGcmListenerService extends GcmListenerService {
                 if (interestName==null) { return null; }
                     // show notification
                     //--
+                    title = "We know you like "+interestName.topicName;
+                    message = "So we thought of you. Explore "+interestName.events.size()+" experiences happening this week";
                     Intent intent = new Intent(this, LaunchActivity.class);
                     intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, EventsHighEndpoints.QUERY_MY_EVENT);
                     intent.setAction(BaseActivity.NOTIFICATION_ACTION + target);
