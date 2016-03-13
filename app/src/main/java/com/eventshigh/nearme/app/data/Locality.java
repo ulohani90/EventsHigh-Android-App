@@ -13,7 +13,7 @@ public enum  Locality {
     BANGALORE_VASANTH_NAGAR(City.BANGALORE, "Vasanth Nagar"),
     BANGALORE_RESIDENCY_ROAD(City.BANGALORE, "Residency Road"),
     BANGALORE_HAL(City.BANGALORE, "HAL"),
-    BANGALORE_WHITE_FIELD(City.BANGALORE, "White Field"),
+    BANGALORE_WHITEFIELD(City.BANGALORE, "Whitefield"),
     BANGALORE_RICHMOND_TOWN(City.BANGALORE, "Richmond Town"),
     BANGALORE_MALLESHWARAM(City.BANGALORE, "Malleshwaram"),
     BANGALORE_HSR_LAYOUT(City.BANGALORE, "HSR Layout"),
@@ -78,10 +78,6 @@ public enum  Locality {
     CHENNAI_RAMAPURAM(City.CHENNAI, "Ramapuram"),
     CHENNAI_R_A_PURAM(City.CHENNAI, "R A Puram"),
     CHENNAI_TEYNAMPET(City.CHENNAI, "teynampet");
-
-
-
-
 
 
     public final City city;
