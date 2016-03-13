@@ -11,6 +11,8 @@ import com.google.android.gms.analytics.CampaignTrackingReceiver;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import io.branch.referral.InstallListener;
+
 /**
  * Received the Broadcast intent after app is installed. The intent contains the
  * referrer information.
@@ -34,6 +36,10 @@ public class InstallReferrer extends BroadcastReceiver {
                 Crashlytics.getInstance().core.logException(e);
             }
         }
+
+        // Branch.
+        InstallListener listener = new InstallListener();
+        listener.onReceive(context, intent);
 
         // Report the install referrer intent to Google Analytics.
         new CampaignTrackingReceiver().onReceive(context, intent);

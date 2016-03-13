@@ -419,12 +419,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".broadcast.CustomInstallListener" android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER" />
-            </intent-filter>
-        </receiver>
-
         <!-- Instance ID service is used to update the tokens -->
         <service android:name=".broadcast.EHInstanceIdService" android:exported="false">
             <intent-filter>
