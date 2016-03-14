@@ -9,10 +9,12 @@ import java.util.List;
 
 public class EventPagerData implements AdapterData {
     public final List<Event> events;
+    public final boolean showReferralOffer;
     public final BaseContextActivity activity;
 
-    EventPagerData(BaseContextActivity activity, List<Event> events) {
+    EventPagerData(BaseContextActivity activity, boolean showReferralOffer, List<Event> events) {
         this.events = events;
+        this.showReferralOffer = showReferralOffer;
         this.activity = activity;
     }
 
@@ -23,7 +25,7 @@ public class EventPagerData implements AdapterData {
 
     @Override
     public void onBindViewHolder(ViewHolder card, int position) {
-        ((EventPagerCard) card).bindHeaderView(activity, this);
+        ((EventPagerCard) card).bindHeaderView(this);
     }
 
     @Override

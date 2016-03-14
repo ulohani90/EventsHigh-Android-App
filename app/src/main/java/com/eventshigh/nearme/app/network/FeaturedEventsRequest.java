@@ -34,10 +34,12 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
 
     public static class EventCollection {
         public final List<Event> events;
+        public final boolean showReferrer;
         public final List<TrendingTopic> trendingTopics;
 
-        public EventCollection(List<Event> events, List<TrendingTopic> trendingTopics) {
+        public EventCollection(List<Event> events, boolean showReferrer, List<TrendingTopic> trendingTopics) {
             this.events = events;
+            this.showReferrer = showReferrer;
             this.trendingTopics = trendingTopics;
         }
     }
@@ -50,9 +52,9 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
      * @param listener callback on success.
      * @param errorListener callback on failures.
      */
-    public static void submit(Context context, EventsContext eventsContext,
-                              Priority priority, Object tag, boolean shouldBypassCache,
-                              Listener<EventCollection> listener, ErrorListener errorListener) {
+    public static void submit(Context context, EventsContext eventsContext, Priority priority,
+            Object tag, boolean shouldBypassCache, Listener<EventCollection> listener,
+            ErrorListener errorListener) {
         if (eventsContext.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
             return;
@@ -118,7 +120,9 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
                 }
             }
 
-            return Response.success(new EventCollection(filteredEvents, trendingTopics),
+            // Parse showReferrer?
+            boolean showReferrer = eventsJson.optBoolean("showReferrer", false);
+            return Response.success(new EventCollection(filteredEvents, showReferrer, trendingTopics),
                 HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
             Crashlytics.getInstance().core.logException(e);
