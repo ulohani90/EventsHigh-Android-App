@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
@@ -13,10 +14,14 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
 
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Calendar;
 import java.util.List;
+
+import io.branch.referral.Branch;
 
 /**
  * Helper to process the intent in EventsHigh app.
@@ -43,7 +48,7 @@ public class IntentUtils {
         if (param == null) {
             param = new EventsContext(null, "");
         }
-
+        System.out.println("Notification param"+param.query);
         if (inIntent.getAction() != null) {
             if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
                 processSearchIntent(inIntent);
@@ -51,7 +56,9 @@ public class IntentUtils {
                 processViewIntent(inIntent, true);
             } else if (inIntent.getAction().startsWith(BaseActivity.NOTIFICATION_ACTION)) {
                 if (activity instanceof LaunchActivity) {
-                    activity.reportActionToAnalytics("openNotification", param.query);
+                    String label = param.query == null ? inIntent.getStringExtra(LaunchActivity.DEFAULT_TAB_PARAM) : param.query;
+                    activity.reportActionToAnalytics("openNotification", label);
+                    Log.i("notification param", param.query);
                 }
                 processViewIntent(inIntent, false);
             }
@@ -106,6 +113,9 @@ public class IntentUtils {
     private void processViewIntent(Intent inIntent, boolean isDeepLink) {
         Uri inUri = inIntent.getData();
         if (inUri == null) {
+            return;
+        }
+        if (inUri.getHost().equalsIgnoreCase("branch.eventshigh.com")) {
             return;
         }
 
@@ -169,7 +179,7 @@ public class IntentUtils {
             } else {
                 param.query = URLDecoder.decode(query.toLowerCase(), "UTF-8").replace('+', ' ');
             }
-        } catch (IndexOutOfBoundsException| IllegalArgumentException | NullPointerException | UnsupportedEncodingException e) {
+        } catch (IndexOutOfBoundsException | IllegalArgumentException | NullPointerException | UnsupportedEncodingException e) {
             // Invalid city in URI. Ignore.
         }
     }

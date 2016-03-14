@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.ViewGroup;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.data.Locality;
 
 /**
  * Various card types used in various adapters.
@@ -18,7 +19,8 @@ public enum DataType {
     EVENT_PAGER(7),
     SEE_ALL(8),
     EVENT_INVITATION(9),
-    EH_INVITE(11);
+    EH_INVITE(11),
+    EXPLORE_LOCALITY(13);
 
     public final int typeId;
 
@@ -71,6 +73,10 @@ public enum DataType {
 
         if (typeId == EH_INVITE.typeId) {
             return EhInviteCard.newInstance(activity, parent);
+        }
+
+        if(typeId == EXPLORE_LOCALITY.typeId){
+            return LocalityCard.newInstance(activity,parent);
         }
 
         throw new IllegalArgumentException("invalid typeid");

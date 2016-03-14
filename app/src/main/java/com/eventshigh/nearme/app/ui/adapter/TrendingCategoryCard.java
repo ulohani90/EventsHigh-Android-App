@@ -1,10 +1,12 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,6 +18,7 @@ import com.eventshigh.nearme.app.utils.Utils;
 public class TrendingCategoryCard extends ViewHolder {
     private ImageView imageView;
     private TextView titleView;
+    private FrameLayout parent;
 
     public static TrendingCategoryCard newInstance(final BaseActivity activity, ViewGroup parent) {
         View view = activity.getLayoutInflater().inflate(R.layout.card_explore, parent, false);
@@ -27,6 +30,7 @@ public class TrendingCategoryCard extends ViewHolder {
 
         imageView = (ImageView) itemView.findViewById(R.id.cat_image);
         titleView = (TextView) itemView.findViewById(R.id.cat_title);
+        parent = (FrameLayout)itemView.findViewById(R.id.parent);
     }
 
     public void populateTrendingCategoryData(final TrendingCategoryData data) {
@@ -47,6 +51,8 @@ public class TrendingCategoryCard extends ViewHolder {
                 LayoutParams lp = imageView.getLayoutParams();
                 lp.height = 3 * imageView.getWidth() / 4;
                 imageView.setLayoutParams(lp);
+              /*RecyclerView.LayoutParams lp1 = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT,RecyclerView.LayoutParams.WRAP_CONTENT);
+                parent.setLayoutParams(lp1);*/
             }
         });
     }
@@ -71,3 +77,4 @@ public class TrendingCategoryCard extends ViewHolder {
         });
     }
 }
+

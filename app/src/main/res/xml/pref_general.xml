@@ -17,6 +17,13 @@
             android:targetClass="com.eventshigh.nearme.app.activity.BlogFeedActivity"
         />
     </Preference>
+    <Preference android:title="@string/title_refer">
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.activity.ReferralActivity"
+        />
+    </Preference>
+
     <Preference android:title="@string/pref_title_about_us">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"

@@ -30,7 +30,7 @@ import java.util.List;
 public class MultiEventsRequest extends JsonRequest<List<Event>> {
 
 
-    static Context mContext;
+
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
@@ -39,7 +39,6 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
      */
     public static void submit(Context context, List<String> eventIds, Priority priority, Object tag,
             boolean shouldBypassCache, Listener<List<Event>> listener, ErrorListener errorListener) {
-        mContext = context;
         if (eventIds.isEmpty()) {
             listener.onResponse(new ArrayList<Event>(), false);
             return;
@@ -53,21 +52,23 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
             return;
         }
 
-        MultiEventsRequest request = new MultiEventsRequest(url, priority,
+        MultiEventsRequest request = new MultiEventsRequest(context, url, priority,
                 shouldBypassCache, listener, errorListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
 
     private final Priority priority;
+    private final Context mContext;
 
-    public MultiEventsRequest(String url, Priority priority, boolean shouldBypassCache,
+    public MultiEventsRequest(Context context, String url, Priority priority, boolean shouldBypassCache,
                               Listener<List<Event>> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
         setShouldAllowStaleResponse(true);
 
         this.priority = priority;
+        this.mContext = context;
     }
 
     @Override

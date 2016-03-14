@@ -20,6 +20,9 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +32,7 @@ public class UpdateAccountInfoService extends IntentService {
     private static final String PARAM_REFRESH_LAST_CITY = "UpdateAccountInfoService.RefreshLastCity";
 
     private static final String UPLOAD_STATUS_FILENAME = "eh_upload_status";
+    private static final String PREF_REFERRER_UPLOADED = "referrer_uploaded";
     private static final String PREF_DEVICE_INFO_UPLOADED = "device_info_uploaded";
     private static final String PREF_LAST_CITY_UPLOADED = "last_city_uploaded";
 
@@ -61,6 +65,10 @@ public class UpdateAccountInfoService extends IntentService {
 
         // Record referrer.
         Account account = new Account(this);
+        String referrer = account.getReferrer();
+        if (referrer != null && !uploadStatus.getBoolean(PREF_REFERRER_UPLOADED, false)) {
+            reportReferrer(referrer, uploadStatus);
+        }
 
         // Upload last city.
         City city = account.getLastCity();
@@ -75,6 +83,11 @@ public class UpdateAccountInfoService extends IntentService {
         if (!uploadStatus.getBoolean(PREF_DEVICE_INFO_UPLOADED, false)) {
             reportDeviceInfo(uploadStatus);
         }
+
+        // Referral Link.
+        if (account.getReferrerLink() == null) {
+            account.recordReferrerLink(getReferrerLink());
+        }
     }
 
     private static synchronized void run(Context context, boolean skipTimeCheck, Intent intent) {
@@ -82,6 +95,13 @@ public class UpdateAccountInfoService extends IntentService {
             context.startService(intent);
             last_sync_ts = System.currentTimeMillis();
         }
+    }
+
+    private void reportReferrer(String referrer, SharedPreferences uploadStatus) {
+        Uri uri = getBaseUri(this, "reportReferrer")
+                .appendQueryParameter("referrer", referrer)
+                .build();
+        report(uri, uploadStatus, PREF_REFERRER_UPLOADED);
     }
 
 
@@ -100,6 +120,19 @@ public class UpdateAccountInfoService extends IntentService {
                 .appendQueryParameter("is_rooted", Boolean.toString(DeviceUtils.isRooted()))
                 .build();
         report(uri, uploadStatus, PREF_DEVICE_INFO_UPLOADED);
+    }
+
+    private String getReferrerLink() {
+        try {
+            Uri uri = getBaseUri(this, "getReferrerLink").build();
+            String resp = sendSignedRequest(uri).get();
+            JSONObject res = new JSONObject(resp);
+            return res.getString("link");
+        } catch (Exception e) {
+            Log.w(UpdateAccountInfoService.class.getName(), "request failed: getReferrerLink", e);
+        }
+
+        return null;
     }
 
     private void report(Uri uri, SharedPreferences uploadStatus, String key) {

@@ -112,8 +112,8 @@ public class EventDetailActivity extends BaseActivity {
         int id = item.getItemId();
         if (id == R.id.action_share) {
             if (event != null) {
-                shareEvent(event, null);
-               // shareEventNew(event, null);
+                //shareEvent(event, null);
+                shareEventWithBranch(event, null,"Toolbar");
             }
             return true;
         }
@@ -353,6 +353,10 @@ public class EventDetailActivity extends BaseActivity {
         shareEvent(event, null);
     }
 
+    public void whatsapp(View view) {
+        shareEventWithBranch(event, PACKAGE_NAME_WHATSAPP, " bottombar");
+    }
+
     public void playYouTube(View view) {
         reportEventAction(event, "playYoutube", event.youtubeVideoId);
         try {
@@ -391,6 +395,7 @@ public class EventDetailActivity extends BaseActivity {
         // Populate event details.
         eventCard.populateView(event);
         findViewById(R.id.check_with_friends).setVisibility(View.VISIBLE);
+        findViewById(R.id.share_whatsapp).setVisibility(View.VISIBLE);
     }
 
     private Listener<Event> mEventListener = new Listener<Event>() {

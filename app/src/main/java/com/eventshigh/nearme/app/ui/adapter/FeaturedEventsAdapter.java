@@ -1,29 +1,30 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
+import android.content.Intent;
 import android.support.v4.view.PagerAdapter;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
-import com.eventshigh.nearme.app.activity.BaseContextActivity;
-import com.eventshigh.nearme.app.data.Event;
-
-import java.util.List;
+import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.ReferralActivity;
 
 /**
 * A {@link android.support.v4.view.PagerAdapter} which can be used to show Featured Events.
 */
 public class FeaturedEventsAdapter extends PagerAdapter {
-    private final BaseContextActivity activity;
-    private final List<Event> events;
+    private static final int MAX_EVENTS = 5;
 
-    public FeaturedEventsAdapter(BaseContextActivity activity, List<Event> events) {
-        this.activity = activity;
-        this.events = events;
+    private final EventPagerData eventPagerData;
+
+    public FeaturedEventsAdapter(EventPagerData eventPagerData) {
+        this.eventPagerData = eventPagerData;
     }
 
     @Override
     public int getCount() {
-        return events.size();
+        return Math.max(MAX_EVENTS, eventPagerData.events.size()) +
+                (eventPagerData.showReferralOffer ? 1 : 0);
     }
 
     @Override
@@ -33,7 +34,26 @@ public class FeaturedEventsAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        View view = EventCard.getEventCard(events.get(position), activity, null, container);
+        if (eventPagerData.showReferralOffer && position == 1) {
+            // special app invite.
+            View view = eventPagerData.activity.getLayoutInflater().inflate(R.layout.card_refer, container, false);
+            view.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(eventPagerData.activity, ReferralActivity.class);
+                    eventPagerData.activity.startActivity(intent);
+                }
+            });
+            container.addView(view);
+            return view;
+        }
+
+        int eventIndex = position;
+        if (eventIndex > 1 && eventPagerData.showReferralOffer) {
+            eventIndex --;
+        }
+        View view = EventCard.getEventCard(eventPagerData.events.get(eventIndex),
+                eventPagerData.activity, null, container);
         container.addView(view);
         return view;
     }

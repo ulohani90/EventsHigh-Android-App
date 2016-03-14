@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
     android:descendantFocusability="blocksDescendants"
 >
     <TextView
         style="?android:attr/textAppearanceMedium"
         android:id="@+id/header"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|start"
         android:layout_margin="24dp"
@@ -16,4 +18,14 @@
         android:textIsSelectable="false"
         tools:text="@string/ui_browse_featured"
     />
-</FrameLayout>
+    <ImageView
+        android:id="@+id/edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:padding="24dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_edit_black_24dp"
+        tools:ignore="ContentDescription"
+    />
+</LinearLayout>

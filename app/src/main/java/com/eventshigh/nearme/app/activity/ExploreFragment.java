@@ -1,10 +1,15 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
@@ -21,6 +26,8 @@ import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
+import com.eventshigh.nearme.app.ui.adapter.LocalitiesAdapter;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
@@ -81,7 +88,13 @@ public class ExploreFragment extends BaseEventsFragment {
 
     private EventsAdapter eventsAdapter;
     private View topProgressBar;
-    private AutofitRecyclerView exploreGridView;
+
+    private LinearLayout chooseLocalityLayout;
+    private ListView localityListView;
+    private ImageView accept, close;
+
+    private List<Locality> selectedLocalities;
+    private Account account;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -90,23 +103,117 @@ public class ExploreFragment extends BaseEventsFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        account = new Account(getActivity());
         eventsAdapter = new EventsAdapter(activity);
-        exploreGridView = (AutofitRecyclerView) view.findViewById(R.id.explore_grid);
+        AutofitRecyclerView exploreGridView = (AutofitRecyclerView) view.findViewById(R.id.explore_grid);
         exploreGridView.setAdapter(eventsAdapter);
         exploreGridView.addOnScrollListener(new HideActionBarOnScroll(activity));
 
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         topProgressBar.setVisibility(View.VISIBLE);
+        chooseLocalityLayout = (LinearLayout) view.findViewById(R.id.choose_city_view);
+        localityListView = (ListView) view.findViewById(R.id.locality_list);
+        accept = (ImageView) view.findViewById(R.id.accept_tick);
+        close = (ImageView) view.findViewById(R.id.close_view);
+
+        eventsAdapter.setOnEditClickListener(new EventsAdapter.OnEditClickListener() {
+            @Override
+            public void onEditcliked() {
+                Toast.makeText(getActivity(), "Header Clicked Edited", Toast.LENGTH_SHORT).show();
+                showCitySelectionView();
+            }
+        });
+    }
+
+    public void animateLocalityViewOut() {
+        Animation anim = AnimationUtils.loadAnimation(getActivity(), R.anim.animate_up_bottom);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                ((LaunchActivity) getActivity()).setisPagerSwipeBlocked(false);
+                chooseLocalityLayout.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+
+        chooseLocalityLayout.startAnimation(anim);
+    }
+
+    public void animateLocalityViewIn() {
+        Animation anim = AnimationUtils.loadAnimation(getActivity(), R.anim.animate_bottom_up);
+        chooseLocalityLayout.startAnimation(anim);
+        chooseLocalityLayout.setVisibility(View.VISIBLE);
+        ((LaunchActivity) getActivity()).setisPagerSwipeBlocked(true);
+    }
+
+    public void showCitySelectionView() {
+        LocalitiesAdapter adapter = new LocalitiesAdapter(getActivity(),
+                Locality.getLocalities(eventsContext.city, true), selectedLocalities);
+        adapter.setOnLocalitySelectedListener(new LocalitiesAdapter.OnLocalitySelectedListener() {
+            @Override
+            public boolean onLocalitySelected(Locality locality, boolean isSelected) {
+
+                if (isSelected) {
+                    selectedLocalities.remove(locality);
+                    return false;
+                } else {
+                    if (selectedLocalities.size() == 6) {
+                        Toast.makeText(getActivity(), "You cannot select more than 6 localities.",
+                                Toast.LENGTH_LONG).show();
+                        return false;
+                    } else {
+                        selectedLocalities.add(locality);
+                        return true;
+                    }
+                }
+            }
+        });
+
+        localityListView.setAdapter(adapter);
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Animate View Down;
+                animateLocalityViewOut();
+            }
+        });
+
+        accept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedLocalities.size() >= 2) {
+                    account.setSavedLocalities(selectedLocalities);
+                    makeServerRequest();
+                    animateLocalityViewOut();
+                } else {
+                    Toast.makeText(getActivity(), "Please select atleast " + (2 - selectedLocalities.size()) + " more", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        animateLocalityViewIn();
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        ViewPager eventsPager = (ViewPager) exploreGridView.findViewById(R.id.events_pager);
-        if (eventsPager != null) {
-            eventsPager.getAdapter().notifyDataSetChanged();
+        if (account.getSavedLocalities().size() > 0) {
+            selectedLocalities = account.getSavedLocalities();
+        } else {
+            selectedLocalities = Locality.getLocalities(eventsContext.city, false);
         }
+
+        makeServerRequest();
+    }
+
+    public void makeServerRequest() {
         FeaturedEventsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                 false, mFetcherCallBack, mErrorListener);
     }
@@ -114,10 +221,10 @@ public class ExploreFragment extends BaseEventsFragment {
     private Listener<EventCollection> mFetcherCallBack = new Listener<EventCollection>() {
         @Override
         public void onResponse(EventCollection eventCollection, boolean isIntermediate) {
-            eventsAdapter.setExploreCategories(eventCollection,
-                Locality.getLocalities(eventsContext.city),
-                eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE :
-                    (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS));
+
+            eventsAdapter.setExploreCategories(eventCollection, selectedLocalities,
+                    eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE :
+                            (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS));
 
             if (!isIntermediate) {
                 EventInvitationsRequest.submit(activity, Priority.IMMEDIATE, this,
@@ -145,7 +252,7 @@ public class ExploreFragment extends BaseEventsFragment {
 
             if (eventsAdapter.getItemCount() == 0) {
                 eventsAdapter.setExploreCategories(null,
-                    Locality.getLocalities(eventsContext.city),
+                    Locality.getLocalities(eventsContext.city, false),
                     eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS);
             }
         }

@@ -1,90 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Title -->
-    <string name="app_name">EventsHigh</string>
-    <string name="title_book">Book Ticket</string>
-    <string name="title_pick_interest">Pick Your Interests</string>
-    <string name="title_my_friends">My Friends</string>
+<!-- Title -->
+<string name="app_name">EventsHigh</string>
+<string name="title_book">Book Ticket</string>
+<string name="title_pick_interest">Pick Your Interests</string>
+<string name="title_my_friends">My Friends</string>
 
-    <!-- Actions -->
-    <string name="action_skip">Skip</string>
-    <string name="action_book">Book</string>
-    <string name="action_call">Call Organizer</string>
-    <string name="action_join">Join</string>
-    <string name="action_retry">Retry</string>
-    <string name="action_verify_code">Verify Code</string>
-    <string name="action_change_no">Change</string>
-    <string name="action_register">Register</string>
-    <string name="action_find_event">Show Events</string>
-    <string name="action_reset">Reset</string>
-    <string name="action_apply_filter">Apply Filter</string>
-    <string name="action_direction">Directions</string>
-    <string name="action_calendar">Calendar</string>
-    <string name="action_check_out">Check out</string>
-    <string name="action_settings">Settings</string>
-    <string name="action_explore_events">Explore Events</string>
-    <string name="action_check_friends">Share</string>
+<!-- Actions -->
+<string name="action_skip">Skip</string>
+<string name="action_book">Book</string>
+<string name="action_call">Call Organizer</string>
+<string name="action_join">Join</string>
+<string name="action_retry">Retry</string>
+<string name="action_verify_code">Verify Code</string>
+<string name="action_change_no">Change</string>
+<string name="action_register">Register</string>
+<string name="action_find_event">Show Events</string>
+<string name="action_reset">Reset</string>
+<string name="action_apply_filter">Apply Filter</string>
+<string name="action_direction">Directions</string>
+<string name="action_calendar">Calendar</string>
+<string name="action_check_out">Check out</string>
+<string name="action_settings">Settings</string>
+<string name="action_explore_events">Explore Events</string>
+<string name="action_check_friends">Share</string>
 
-    <!-- Menu items -->
-    <string name="menu_edit_location">Change Location</string>
-    <string name="menu_open_in_browser">Open In Browser</string>
+<!-- Menu items -->
+<string name="menu_edit_location">Change Location</string>
+<string name="menu_open_in_browser">Open In Browser</string>
 
-    <!-- Blog -->
-    <string name="title_blog">EventsHigh Blog</string>
-    <string name="share_blog_text">Hey! Found a nice article by EventsHigh, check it out. \n\n%1$s\n\n%2$s</string>
+<!-- Blog -->
+<string name="title_blog">EventsHigh Blog</string>
+<string name="share_blog_text">Hey! Found a nice article by EventsHigh, check it out. \n\n%1$s\n\n%2$s</string>
 
-    <!-- Other Strings used in UI -->
-    <string name="ui_follow">Follow</string>
-    <string name="ui_following">Following</string>
-    <string name="ui_favourite">Add to My Events</string>
-    <string name="ui_favourited">Added to My Events</string>
-    <string name="ui_organizer">Organizer Details</string>
-    <string name="ui_performer">Performers</string>
-    <string name="ui_categories">Categories</string>
-    <string name="ui_description">Description</string>
-    <string name="ui_name">Name - </string>
-    <string name="ui_address">Address - </string>
-    <string name="ui_email">Email - </string>
-    <string name="ui_phone">Phone - </string>
-    <string name="ui_website">Website - </string>
-    <string name="ui_also_on">also on …</string>
-    <string name="ui_read_more">Read More …</string>
-    <string name="ui_enter_phone_number_hint">Your Phone Number</string>
-    <string name="ui_enter_name_hint">Your Name</string>
-    <string name="ui_code">%1$s, we have sent a code to %2$s. Please enter it below.</string>
-    <string name="ui_code_verified">%1$s, your phone number %2$s has been verified.</string>
-    <string name="ui_verify_phone">Verify your phone number</string>
-    <string name="ui_no_my_event">Personalize this section by clicking on ♥ to favourite events or follow categories and performers.\n\nNever miss events for\nyour interests again!</string>
-    <string name="ui_my_events_message">Checkout the events for your interests.</string>
-    <string name="ui_price">Price</string>
-    <string name="ui_browse_featured">What\'s Trending</string>
-    <string name="ui_browse_cat">Browse By Category</string>
-    <string name="ui_browse_loc">Browse By Locality</string>
-    <string name="ui_phone_verify_plan">Please register with your phone number before.</string>
-    <string name="ui_phone_verify_book">Please register with your phone number before continuing with Booking.</string>
-    <string name="ui_phone_verify_pa">Events are best with friends. Please register with your phone number for personalized recommendations.</string>
+<!-- Other Strings used in UI -->
+<string name="ui_follow">Follow</string>
+<string name="ui_following">Following</string>
+<string name="ui_favourite">Add to My Events</string>
+<string name="ui_favourited">Added to My Events</string>
+<string name="ui_organizer">Organizer Details</string>
+<string name="ui_performer">Performers</string>
+<string name="ui_categories">Categories</string>
+<string name="ui_description">Description</string>
+<string name="ui_name">Name - </string>
+<string name="ui_address">Address - </string>
+<string name="ui_email">Email - </string>
+<string name="ui_phone">Phone - </string>
+<string name="ui_website">Website - </string>
+<string name="ui_also_on">also on …</string>
+<string name="ui_read_more">Read More …</string>
+<string name="ui_enter_phone_number_hint">Your Phone Number</string>
+<string name="ui_enter_name_hint">Your Name</string>
+<string name="ui_code">%1$s, we have sent a code to %2$s. Please enter it below.</string>
+<string name="ui_code_verified">%1$s, your phone number %2$s has been verified.</string>
+<string name="ui_verify_phone">Verify your phone number</string>
+<string name="ui_no_my_event">Personalize this section by clicking on ♥ to favourite events or follow categories and performers.\n\nNever miss events for\nyour interests again!</string>
+<string name="ui_my_events_message">Checkout the events for your interests.</string>
+<string name="ui_price">Price</string>
+<string name="ui_browse_featured">What\'s Trending</string>
+<string name="ui_browse_cat">Browse By Category</string>
+<string name="ui_browse_loc">Browse By Locality</string>
+<string name="ui_phone_verify_plan">Please register with your phone number before.</string>
+<string name="ui_phone_verify_book">Please register with your phone number before continuing with Booking.</string>
+<string name="ui_phone_verify_pa">Events are best with friends. Please register with your phone number for personalized recommendations.</string>
 
-    <!-- Onbaording message -->
-    <string name="onboarding_title_details">One Stop Shop</string>
-    <string name="onboarding_title_favorites">Personlized Feed</string>
-    <string name="onboarding_title_notification">Never Miss Out</string>
-    <string name="onboarding_details">There are hundreds of places to see events online. We search them all at once so you don\'t have to. See every event in the city, ranked from best to worst.</string>
-    <string name="onboarding_favorites">Customize your feed by tracking your favorite performers and venues, letting you browse when all your favorites are in town.</string>
-    <string name="onboarding_notification">Be the first to know about newly announced &amp; upcoming events by tracking artists and venues. Our handy notifications will keep you in the loop.</string>
-    <string name="onboarding_next">Next</string>
-    <string name="onboarding_skip">Skip</string>
+<!-- Onbaording message -->
+<string name="onboarding_title_details">One Stop Shop</string>
+<string name="onboarding_title_favorites">Personlized Feed</string>
+<string name="onboarding_title_notification">Never Miss Out</string>
+<string name="onboarding_details">There are hundreds of places to see events online. We search them all at once so you don\'t have to. See every event in the city, ranked from best to worst.</string>
+<string name="onboarding_favorites">Customize your feed by tracking your favorite performers and venues, letting you browse when all your favorites are in town.</string>
+<string name="onboarding_notification">Be the first to know about newly announced &amp; upcoming events by tracking artists and venues. Our handy notifications will keep you in the loop.</string>
+<string name="onboarding_next">Next</string>
+<string name="onboarding_skip">Skip</string>
 
-    <!-- Helper messages -->
-    <string name="loading">Loading …</string>
-    <string name="zoom">Please zoom in to see interesting events!</string>
+<!-- Helper messages -->
+<string name="loading">Loading …</string>
+<string name="zoom">Please zoom in to see interesting events!</string>
 
-    <!-- Sharing -->
-    <string name="action_share">Share</string>
-    <string name="action_invite">Share App</string>
-    <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Sounds fun!\n\n%1$s\n\n%2$s</string>
+<!-- Sharing -->
+<string name="action_share">Share</string>
+<string name="action_invite">Share App</string>
+    <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Shall we go to this? Come on it’ll be fun!\n\n%1$s\n\n%2$s</string>
     <string name="share_event_twitter_text">[via @eventshighapp]\n%1$s\n\n%2$s</string>
-    <string name="share_app_text">Hey! Pull up a chair. Take a taste. Come join EventsHigh. Life is so endlessly delicious.\n\nhttps://goo.gl/dzWYOW</string>
+    <string name="share_app_text">Hey! Pull up a chair. Take a taste. Come join EventsHigh. Life is so endlessly delicious.\n\n%s</string>
     <string name="share_app_message">Love only grows by sharing. You can only have more for yourself by sharing the app with friends. The more you share, the better would be your experience.</string>
 
     <!-- Failed messages -->
@@ -97,6 +97,7 @@
     <string name="failed_event_location">Sorry! We are not able to find the location for this event!</string>
     <string name="no_map_app">Maps application not found!</string>
     <string name="no_cal_app">Calendar application not found!</string>
+    <string name="no_whatsapp">WhatsApp application not found!</string>
     <string name="no_events">Uh oh! No events found!</string>
     <string name="retry">Oops! You\'ve stumped us. Let\'s try again.</string>
     <string name="no_price">Contact Organizer for Price.</string>
@@ -116,5 +117,11 @@
     <string name="rate_app_later">Later</string>
     <string name="rate_now">Rate Now</string>
     <string name="feedback">Give Feedback</string>
+
+    <!-- Social -->
+    <string name="title_refer">Refer &amp; Earn</string>
+    <string name="invite_friends">Invite  your  friends</string>
+    <string name="no_friends_on_eh">We couldn\'t find any friends for you on EventsHigh. Why not invite them?</string>
+    <string name="no_friends_disclaimer">If you have recently given us the permission to your contacts, it might take us up to 30 minutes to find friends.</string>
 
 </resources>

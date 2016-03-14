@@ -33,6 +33,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     private final Set<Integer> usedItemIds = new HashSet<>();
     private List<AdapterData> dataToShow;
 
+    OnEditClickListener mListener;
+
     public EventsAdapter(BaseContextActivity activity) {
         this.activity = activity;
 
@@ -84,11 +86,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
         if (eventCollection != null) {
             if (!eventCollection.events.isEmpty()) {
-                dataToShow.add(new EventPagerData(activity, eventCollection.events));
+                dataToShow.add(new EventPagerData(activity, eventCollection.showReferrer,
+                        eventCollection.events));
             }
             if (!eventCollection.trendingTopics.isEmpty()) {
-                dataToShow.add(new SmallHeaderData(
-                        activity.getString(R.string.ui_browse_featured)));
+                dataToShow.add(new SmallHeaderData(activity.getString(R.string.ui_browse_featured)));
                 for (TrendingTopic trendingTopic : eventCollection.trendingTopics) {
                     dataToShow.add(new TrendingCategoryData(trendingTopic, activity));
                 }
@@ -96,9 +98,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         }
 
         if (!localities.isEmpty()) {
-            dataToShow.add(new SmallHeaderData(activity.getString(R.string.ui_browse_loc)));
-            for (Locality locality : localities) {
-                dataToShow.add(new TrendingCategoryData(locality.asTrendingTopic(), activity));
+            dataToShow.add(new SmallHeaderData(activity , activity.getString(R.string.ui_browse_loc),true));
+            for (int i=0;i<localities.size();i++) {
+                dataToShow.add(new LocalityData(localities.get(i),activity,getMaterialColor(i)));
             }
         }
 
@@ -107,6 +109,25 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
             dataToShow.add(new ExploreCategoryData(tag, activity));
         }
         notifyDataSetChanged();
+    }
+
+    public int getMaterialColor(int i) {
+        switch(i){
+            case 0:
+            return R.color.material_color_orange;
+            case 1:
+                return R.color.material_color_pink;
+            case 2:
+                return R.color.material_color_green;
+            case 3:
+                return R.color.material_color_purple;
+            case 4:
+                return R.color.material_color_blue;
+            case 5:
+                return R.color.material_color_red;
+
+        }
+        return R.color.material_color_green;
     }
 
     public void addEventInvitations(List<EventInvitation> invites) {
@@ -126,7 +147,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     @Override
     public boolean spanAllColumns(int position) {
-        return DataType.spanAllColumns(getItemViewType(position));
+        return !(position >= dataToShow.size()) && DataType.spanAllColumns(getItemViewType(position));
     }
 
     @Override
@@ -141,7 +162,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     @Override
     public void onBindViewHolder(ViewHolder card, int position) {
-        dataToShow.get(position).onBindViewHolder(card, position);
+        if (card instanceof SmallHeaderCard) {
+            ((SmallHeaderData)dataToShow.get(position)).onBindViewHolder(card, position,mListener);
+        } else {
+            dataToShow.get(position).onBindViewHolder(card, position);
+        }
     }
 
     @Override
@@ -171,5 +196,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     public void clear(){
         dataToShow.clear();
         notifyDataSetChanged();
+    }
+
+    public void setOnEditClickListener(OnEditClickListener listener){
+        this.mListener = listener;
+
+    }
+
+    public interface OnEditClickListener{
+        void onEditcliked();
     }
 }

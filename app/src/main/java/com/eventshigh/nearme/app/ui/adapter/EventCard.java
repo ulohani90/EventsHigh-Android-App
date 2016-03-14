@@ -33,6 +33,7 @@ public class EventCard extends ViewHolder {
     private final View arrowView;
     private final TextView eventStatsView;
     private final View infoArrowView;
+    private final ImageView share;
 
     public static EventCard newInstance(Activity activity, ViewGroup parent,
                                         boolean shouldAdjustImageHeight) {
@@ -63,13 +64,14 @@ public class EventCard extends ViewHolder {
         arrowView = cardView.findViewById(R.id.arrow);
         eventStatsView = (TextView) cardView.findViewById(R.id.event_stats);
         infoArrowView = cardView.findViewById(R.id.info_arrow);
+        share = (ImageView)cardView.findViewById(R.id.share);
     }
 
 
     public void setFavouriteView(@Nullable EventMark eventMark) {
         favouriteView.setTag(eventMark);
         favouriteView.setImageResource(EventMark.isFavourite(eventMark) ?
-                R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_white_18dp);
+                R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_border_black_18dp);
     }
 
     @SuppressLint("SetTextI18n")
@@ -88,10 +90,15 @@ public class EventCard extends ViewHolder {
                 EventMark oldMark = (EventMark) favouriteView.getTag();
                 EventMark newMark = EventMark.isFavourite(oldMark) ? null : EventMark.FAVOURITE;
                 activity.reportEventAction(event,
-                    EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
-                    position);
+                        EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
+                        position);
                 activity.recordEventMark(event, newMark);
                 setFavouriteView(newMark);
+               if (EventMark.isFavourite(newMark)) {
+                   activity.showMessage("Added to My Events");
+               }else{
+                   activity.showMessage("Removed from My Events");}
+
             }
         });
 
@@ -99,7 +106,20 @@ public class EventCard extends ViewHolder {
             eventStatsView.setVisibility(View.VISIBLE);
             eventStatsView.setText("" + event.numViews + " views");
             infoArrowView.setVisibility(View.VISIBLE);
+        }else{
+            eventStatsView.setVisibility(View.VISIBLE);
+            eventStatsView.setText("" + Utils.getRandomNumber(10,50) + " views");
+            infoArrowView.setVisibility(View.VISIBLE);
         }
+
+        //Share event
+        share.setVisibility(View.VISIBLE);
+        share.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.shareEventWithBranch(event,null,null);
+            }
+        });
     }
 
     public void bindEventView(final Event event, final BaseContextActivity activity) {
@@ -156,6 +176,7 @@ public class EventCard extends ViewHolder {
         arrowView.setVisibility(View.GONE);
         favouriteView.setVisibility(View.GONE);
         eventStatsView.setVisibility(View.GONE);
+        share.setVisibility(View.GONE);
         infoArrowView.setVisibility(View.GONE);
     }
 }

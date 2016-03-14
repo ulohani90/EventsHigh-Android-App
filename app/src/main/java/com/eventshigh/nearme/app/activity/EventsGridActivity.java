@@ -25,6 +25,8 @@ public class EventsGridActivity extends BaseContextActivity {
     private boolean showFollowCard;
     private View fabShare;
 
+    String shareImageUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +50,8 @@ public class EventsGridActivity extends BaseContextActivity {
         fabShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                shareEvents(eventsContext);
+                //shareEvents(eventsContext);
+                shareEventsWithBranch(eventsContext,shareImageUrl);
             }
         });
 
@@ -83,6 +86,10 @@ public class EventsGridActivity extends BaseContextActivity {
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
         tr.replace(R.id.event_container, eventFragment);
         tr.commit();
+    }
+
+    public void setShareImageUrl(String shareImageUrl) {
+        this.shareImageUrl = shareImageUrl;
     }
 
     @Override

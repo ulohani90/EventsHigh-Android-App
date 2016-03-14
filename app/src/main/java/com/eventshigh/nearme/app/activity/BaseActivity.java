@@ -30,6 +30,8 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.OneSecDialog;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -163,12 +165,21 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void shareApp() {
         reportActionToAnalytics("shareApp", PACKAGE_NAME_WHATSAPP);
 
+        String referralLink = new Account(this).getReferrerLink();
+        if (referralLink == null) {
+            referralLink = "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + Utils.getAndroidId(this);
+        }
+
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_app_text));
+        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_app_text), referralLink));
         shareIntent.setType("text/plain");
         shareIntent.setPackage(PACKAGE_NAME_WHATSAPP);
-        startActivity(shareIntent);
+        try {
+            startActivity(shareIntent);
+        } catch (ActivityNotFoundException e) {
+            showMessage(R.string.no_whatsapp);
+        }
     }
 
     /**
@@ -187,20 +198,20 @@ public abstract class BaseActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String shortenUri, boolean isIntermediate) {
                         dialog.dismiss();
-                        shareEvent(event, shortenUri, packageName);
+                        shareEvent(event, shortenUri, packageName, null);
                     }
                 },
                 new ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         dialog.dismiss();
-                        shareEvent(event, eventShareUri, packageName);
+                        shareEvent(event, eventShareUri, packageName, null);
                     }
                 }
         );
     }
 
-    public void shareEventNew(final Event event, @Nullable final String packageName){
+    public void shareEventWithBranch(final Event event, @Nullable final String packageName, @Nullable  final String label) {
 
         BranchUniversalObject branchObject = new BranchUniversalObject();
         branchObject.setCanonicalIdentifier(event.id).setTitle(event.title)
@@ -211,30 +222,31 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
         branchObject.registerView();
         LinkProperties linkProperties = new LinkProperties()
-                .setChannel("facebook")
+                .setChannel(packageName)
                 .setFeature("sharing")
+                .addControlParameter("$always_deeplink","true")
                 .addControlParameter("$desktop_url", "http://www.eventshigh.com")
                 .addControlParameter("$ios_url", "http://www.eventshigh.com");
         final ProgressDialog dialog = OneSecDialog.show(this);
         branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
             @Override
             public void onLinkCreate(String url, BranchError error) {
-                if(dialog!=null){
+                if (dialog != null) {
                     dialog.dismiss();
                 }
                 if (error == null) {
-                    shareEvent(event, url, packageName);
-                }else {
-                 //   if (error.getErrorCode() == -113) {
-                        Toast.makeText(BaseActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-                   // }
+                    shareEvent(event, url, packageName, label);
+                } else {
+                    //   if (error.getErrorCode() == -113) {
+                    showMessage( error.getMessage());
+                    // }
                 }
             }
         });
     }
 
-    public void shareEvent(Event event, String eventUri, @Nullable String packageName) {
-        reportEventAction(event, "eventShareInitiated", packageName);
+    public void shareEvent(Event event, String eventUri, @Nullable String packageName, @Nullable String label) {
+        reportEventAction(event, "eventShareInitiated", label == null ? packageName : label);
         shareEventInitiatedTimestamp = System.currentTimeMillis();
 
         try {
@@ -273,6 +285,53 @@ public abstract class BaseActivity extends AppCompatActivity {
         } catch (ActivityNotFoundException e) {
             showMessage(R.string.failed_share);
         }
+    }
+
+    public void shareEventsWithBranch(final EventsContext eventsContext,@Nullable String imageUrl) {
+        String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
+                .appendQueryParameter("src", "ehm").toString();
+        BranchUniversalObject branchObject = new BranchUniversalObject();
+        branchObject.setCanonicalIdentifier(eventsContext.getLabel()).setTitle(eventsContext.toString())
+                .addContentMetadata("event_uri", uri)
+                .setContentDescription(eventsContext.toString())
+                .setContentImageUrl(imageUrl)
+                .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
+        branchObject.registerView();
+        LinkProperties linkProperties = new LinkProperties()
+                .setChannel("facebook")
+                .setFeature("sharing")
+                .addControlParameter("$desktop_url", "http://www.eventshigh.com")
+                .addControlParameter("$ios_url", "http://www.eventshigh.com");
+        final ProgressDialog dialog = OneSecDialog.show(this);
+
+        branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
+            @Override
+            public void onLinkCreate(String url, BranchError error) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+                if (error == null) {
+                    reportActionToAnalytics("eventsShareInitiated", eventsContext.getLabel());
+                    shareEventsInitiatedTimestamp = System.currentTimeMillis();
+
+
+                    try {
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + url);
+                        sendIntent.setType("text/plain");
+                        startActivity(sendIntent);
+                    } catch (ActivityNotFoundException e) {
+                        showMessage(R.string.failed_share);
+                    }
+                } else {
+                    //   if (error.getErrorCode() == -113) {
+                    Toast.makeText(BaseActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                    // }
+                }
+            }
+        });
+
     }
 
     public void addToCalendar(Event event, @Nullable Date date) {
