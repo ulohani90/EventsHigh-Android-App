@@ -49,7 +49,7 @@ public class IntentUtils {
         if (param == null) {
             param = new EventsContext(null, "");
         }
-
+        System.out.println("Notification param"+param.query);
         if (inIntent.getAction() != null) {
             if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
                 processSearchIntent(inIntent);
@@ -57,7 +57,9 @@ public class IntentUtils {
                 processViewIntent(inIntent, true);
             } else if (inIntent.getAction().startsWith(BaseActivity.NOTIFICATION_ACTION)) {
                 if (activity instanceof LaunchActivity) {
-                    activity.reportActionToAnalytics("openNotification", param.query);
+                    String label = param.query == null ? inIntent.getStringExtra(LaunchActivity.DEFAULT_TAB_PARAM) : param.query;
+                    activity.reportActionToAnalytics("openNotification", label);
+                    Log.i("notification param", param.query);
                 }
                 processViewIntent(inIntent, false);
             }

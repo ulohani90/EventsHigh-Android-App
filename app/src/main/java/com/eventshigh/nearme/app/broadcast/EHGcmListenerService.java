@@ -124,6 +124,7 @@ public class EHGcmListenerService extends GcmListenerService {
             Intent intent = null;
             if (target.startsWith("tab:")) {
                 intent = new Intent(this, LaunchActivity.class);
+                intent.setAction(BaseActivity.NOTIFICATION_ACTION);
                 intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, target.split(":", 2)[1]);
             } else {
                 try {
@@ -144,13 +145,17 @@ public class EHGcmListenerService extends GcmListenerService {
                         getApplicationContext(),
                         new EventsContext(city.cityBounds.getCenter(), ""),
                         Request.Priority.HIGH,
-                        null, false, true, null, null
-                ).getNonEmptyInterest();
-                if (interestName==null) { return null; }
+                        null, false, true, null, null).getNonEmptyInterest();
+                if (interestName==null) {
+                    return null;
+                }
                     // show notification
                     //--
                     title = "We know you like "+interestName.topicName;
-                    message = "So we thought of you. Explore "+interestName.events.size()+" experiences happening this week";
+
+                    String interestCount = getInterestCount(interestName.events.size());
+                    message = "So we thought of you. Explore "+ interestCount +" experiences happening this week.";
+
                     Intent intent = new Intent(this, LaunchActivity.class);
                     intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, EventsHighEndpoints.QUERY_MY_EVENT);
                     intent.setAction(BaseActivity.NOTIFICATION_ACTION + target);
@@ -170,6 +175,15 @@ public class EHGcmListenerService extends GcmListenerService {
                 priority == null ? Notification.PRIORITY_LOW : Notification.PRIORITY_HIGH,
                 contact
         );
+    }
+
+
+    public String getInterestCount(int count){
+        if(count % 5 == 0){
+            return count+"";
+        }else{
+            return count-count%5+"+";
+        }
     }
 
     private void reportAction(String actionName) {
