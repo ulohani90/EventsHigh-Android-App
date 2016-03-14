@@ -121,7 +121,7 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
             }
 
             // Parse showReferrer?
-            boolean showReferrer = eventsJson.optBoolean("showReferrer", false);
+            boolean showReferrer = eventsJson.optBoolean("show_referrer", false);
             return Response.success(new EventCollection(filteredEvents, showReferrer, trendingTopics),
                 HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
