@@ -26,18 +26,20 @@ public class EventPagerCard extends ViewHolder {
         dotsView = (LinearLayout) cardView.findViewById(R.id.dots_parent);
     }
 
-    public void bindHeaderView(BaseContextActivity activity, EventPagerData eventPagerData) {
-        viewPager.setAdapter(new FeaturedEventsAdapter(activity, eventPagerData.events));
+    public void bindHeaderView(EventPagerData eventPagerData) {
+        FeaturedEventsAdapter adapter = new FeaturedEventsAdapter(eventPagerData);
+        viewPager.setAdapter(adapter);
 
         dotsView.removeAllViews();
-        for (int i = 0; i < eventPagerData.events.size(); i++) {
-            View view = activity.getLayoutInflater().inflate(R.layout.view_dot_featured, dotsView, false);
+        for (int i = 0; i < adapter.getCount(); i++) {
+            View view = eventPagerData.activity.getLayoutInflater().inflate(
+                    R.layout.view_dot_featured, dotsView, false);
             view.setSelected(i == 0);
             dotsView.addView(view);
         }
 
         viewPager.clearOnPageChangeListeners();
-        viewPager.addOnPageChangeListener(new DotsSelector(activity));
+        viewPager.addOnPageChangeListener(new DotsSelector(eventPagerData.activity));
     }
 
     private class DotsSelector implements OnPageChangeListener {

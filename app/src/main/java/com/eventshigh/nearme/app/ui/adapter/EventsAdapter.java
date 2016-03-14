@@ -105,11 +105,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
         if (eventCollection != null) {
             if (!eventCollection.events.isEmpty()) {
-                dataToShow.add(new EventPagerData(activity, eventCollection.events));
+                dataToShow.add(new EventPagerData(activity, eventCollection.showReferrer,
+                        eventCollection.events));
             }
             if (!eventCollection.trendingTopics.isEmpty()) {
-                dataToShow.add(new SmallHeaderData(
-                        activity.getString(R.string.ui_browse_featured)));
+                dataToShow.add(new SmallHeaderData(activity.getString(R.string.ui_browse_featured)));
                 for (TrendingTopic trendingTopic : eventCollection.trendingTopics) {
                     dataToShow.add(new TrendingCategoryData(trendingTopic, activity, this));
                 }
@@ -176,10 +176,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     @Override
     public boolean spanAllColumns(int position) {
-        if(!(position>=dataToShow.size())) {
-            return DataType.spanAllColumns(getItemViewType(position));
-        }
-        return false;
+        return !(position >= dataToShow.size()) && DataType.spanAllColumns(getItemViewType(position));
     }
 
     @Override
@@ -194,12 +191,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     @Override
     public void onBindViewHolder(ViewHolder card, int position) {
-        if(card instanceof SmallHeaderCard){
+        if (card instanceof SmallHeaderCard) {
             ((SmallHeaderData)dataToShow.get(position)).onBindViewHolder(card, position,mListener);
-        }else{
+        } else {
             dataToShow.get(position).onBindViewHolder(card, position);
         }
-
     }
 
     @Override

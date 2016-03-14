@@ -177,7 +177,6 @@ public class ExploreFragment extends BaseEventsFragment {
         });
 
         localityListView.setAdapter(adapter);
-
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
