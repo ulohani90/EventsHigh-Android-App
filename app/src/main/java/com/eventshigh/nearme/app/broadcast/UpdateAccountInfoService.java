@@ -226,7 +226,7 @@ public class UpdateAccountInfoService extends IntentService {
             Uri uri = getBaseUri(this, "getReferrerLink").build();
             String resp = sendSignedRequest(uri).get();
             JSONObject res = new JSONObject(resp);
-            res.getString("link");
+            return res.getString("link");
         } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);
             Log.w(UpdateAccountInfoService.class.getName(), "request failed: getReferrerLink", e);
