@@ -95,7 +95,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         // Animation.
         overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_translate);
 
-        // Twitter CrashAnalytics
+
 
 
         // Report app to Facebook

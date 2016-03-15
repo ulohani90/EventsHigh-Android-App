@@ -15,7 +15,10 @@ public class EHApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // Twitter CrashAnalytics
         Fabric.with(this, new Crashlytics());
+
         Branch.getAutoInstance(this);
     }
 }

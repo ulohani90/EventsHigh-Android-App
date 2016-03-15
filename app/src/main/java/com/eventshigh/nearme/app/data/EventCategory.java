@@ -8,7 +8,9 @@ import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,11 +45,11 @@ public enum EventCategory {
     private static final String LOG_TAG = EventCategory.class.getSimpleName();
     public final String categoryName;
 
-    EventCategory(@Nullable String categoryName) {
+     EventCategory(@Nullable String categoryName) {
         this.categoryName = categoryName == null ? Utils.capitalize(name().replace('_', ' ')) : categoryName;
     }
 
-    EventCategory() {
+     EventCategory() {
         this(null);
     }
 
@@ -93,6 +95,8 @@ public enum EventCategory {
 
         return resId;
     }
+
+
 
     public int getHighlightedIconResourceId() {
         int resId = R.drawable.icon_other_rec;
