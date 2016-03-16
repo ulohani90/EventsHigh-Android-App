@@ -35,11 +35,11 @@ public enum EventCategory {
 
     public final String categoryName;
 
-    EventCategory(@Nullable String categoryName) {
+     EventCategory(@Nullable String categoryName) {
         this.categoryName = categoryName == null ? Utils.capitalize(name().replace('_', ' ')) : categoryName;
     }
 
-    EventCategory() {
+     EventCategory() {
         this(null);
     }
 

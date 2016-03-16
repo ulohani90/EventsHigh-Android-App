@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -118,12 +119,15 @@ public class PhoneLoginActivity extends BaseActivity {
 
                                     account.recordPhoneNumber(name, phoneNo);
                                     if (status == VerificationStatus.VERIFIED) {
+
                                         reportActionToAnalytics("sendCodeVerified");
                                         account.recordVerifiedPhoneNumber();
-                                        finish();
+                                        startInterestActivity();
+                                        //finish();
                                     } else if (status == VerificationStatus.CODE_SENT) {
                                         reportActionToAnalytics("sendCodeSuccess");
-                                        finish();
+                                        startInterestActivity();
+                                        //finish();
                                     }
                                 }
                             },
@@ -143,6 +147,12 @@ public class PhoneLoginActivity extends BaseActivity {
             reportActionToAnalytics("sendCodeRetry");
             showRetryMessage();
         }
+    }
+
+    public void startInterestActivity(){
+        Intent intent = new Intent(this,SelectInterestsActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     public void verifyCode(View view) {
