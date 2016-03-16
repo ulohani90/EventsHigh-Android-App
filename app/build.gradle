@@ -12,6 +12,9 @@ repositories {
     // For drawing a circular tile with letter inside it, like in contacts
     maven { url 'http://dl.bintray.com/amulyakhare/maven' }
     mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 
@@ -40,7 +43,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile(name:'volley-release', ext:'aar')
 
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.android.support:support-v4:23.2.1'
