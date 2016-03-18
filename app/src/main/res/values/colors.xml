@@ -41,4 +41,10 @@
     <color name="material_color_purple">#766d9b</color>
     <color name="material_color_red">#e5625c</color>
 
+    <color name="done_button">#10aa14</color>
+    <color name="done_button_darker">#10aa14</color>
+
+    <color name="skip_button">#f3b832</color>
+    <color name="skip_button_dark">#f3b832</color>
+
 </resources>

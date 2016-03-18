@@ -17,6 +17,7 @@ import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
+import com.eventshigh.nearme.app.activity.SelectInterestsActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.FriendsStore;
@@ -70,6 +71,7 @@ public class EHGcmListenerService extends GcmListenerService {
         String priority = Utils.checkIfUnknown(msg.getString("priority"));
         String mobileNo = Utils.checkIfUnknown(msg.getString("mobile"));
         String personalisedNotif = Utils.checkIfUnknown(msg.getString("personalised_notif"));
+        String personalizeInterest = Utils.checkIfUnknown(msg.getString("perosnalize_interest"));
 
 
         UserContact contact = null;
@@ -96,7 +98,7 @@ public class EHGcmListenerService extends GcmListenerService {
             message = message.replace("Your friend", contact.name);
         }
 
-        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null)  {
+        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null)  {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
             return null;
         }
@@ -161,6 +163,11 @@ public class EHGcmListenerService extends GcmListenerService {
                     intent.setAction(BaseActivity.NOTIFICATION_ACTION + target);
                     contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
+        }else if(personalizeInterest != null){
+            Intent intent = new Intent(this, SelectInterestsActivity.class);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+            intent.putExtra(SelectInterestsActivity.FROM_NOTIFICATION_PARAM,true);
+            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else {
             Intent intent = new Intent(this,
                 contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);

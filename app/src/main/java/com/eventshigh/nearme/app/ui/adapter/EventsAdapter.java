@@ -40,6 +40,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     OnEditClickListener mListener;
 
+    OnItemClickedListener pListener;
+
     public EventsAdapter(BaseContextActivity activity) {
         this.activity = activity;
 
@@ -192,7 +194,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     @Override
     public void onBindViewHolder(ViewHolder card, int position) {
         if (card instanceof SmallHeaderCard) {
-            ((SmallHeaderData)dataToShow.get(position)).onBindViewHolder(card, position,mListener);
+            ((SmallHeaderData)dataToShow.get(position)).onBindViewHolder(card, position, mListener);
+        }else if(card instanceof EventCard){
+            ((EventData)dataToShow.get(position)).onBindViewHolder(card, position, pListener);
         } else {
             dataToShow.get(position).onBindViewHolder(card, position);
         }
@@ -232,7 +236,17 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     }
 
+    public void setOnItemClickedListener(OnItemClickedListener listener){
+            this.pListener = listener;
+    }
+
+
     public interface OnEditClickListener{
         void onEditcliked();
+    }
+
+
+    public interface OnItemClickedListener{
+        void onItemClicked(int pos);
     }
 }

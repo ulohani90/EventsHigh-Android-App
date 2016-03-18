@@ -76,9 +76,11 @@ public class ThisWeekFragment extends BaseEventsFragment {
         viewPager.post(new Runnable() {
             @Override
             public void run() {
-                viewPager.setAdapter(adapter);
-                tabsView.removeAllTabs();
-                select(populateTabs());
+                if(activity.isRunning()) {
+                    viewPager.setAdapter(adapter);
+                    tabsView.removeAllTabs();
+                    select(populateTabs());
+                }
             }
         });
     }

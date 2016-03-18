@@ -32,6 +32,15 @@ public class EventData implements AdapterData {
                 socialDataProvider.getSocialInvite(event.id));
     }
 
+    public void onBindViewHolder(ViewHolder card, int position,EventsAdapter.OnItemClickedListener listener) {
+        ((EventCard) card).bindEventView(event, isFirstEvent, position, activity,
+                socialDataProvider.getSocialInvite(event.id),listener);
+    }
+
+
+
+
+
     public String getId() {
         return header + ":" + event.id;
     }

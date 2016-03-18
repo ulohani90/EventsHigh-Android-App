@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.application;
 
 import android.app.Application;
+import android.os.AsyncTask;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -15,10 +16,18 @@ public class EHApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
-
+        Branch.getAutoInstance(EHApplication.this);
         // Twitter CrashAnalytics
-        Fabric.with(this, new Crashlytics());
+        new InitailizeSdks().execute();
+    }
 
-        Branch.getAutoInstance(this);
+    public class InitailizeSdks extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            Fabric.with(EHApplication.this, new Crashlytics());
+
+            return null;
+        }
     }
 }

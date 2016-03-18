@@ -51,7 +51,7 @@ public class EventCard extends ViewHolder {
                                     @Nullable View reuseView, ViewGroup parent) {
         EventCard card = reuseView != null ? new EventCard(reuseView, true) :
                 newInstance(activity, parent, true);
-        card.bindEventView(event, activity);
+        card.bindEventView(event, activity,0,null);
         return card.itemView;
     }
 
@@ -86,7 +86,7 @@ public class EventCard extends ViewHolder {
     public void bindEventView(final Event event, boolean isFirstEvent, final int position,
                               final BaseContextActivity activity,
                               @Nullable SocialInvite invite) {
-        bindEventView(event, activity);
+        bindEventView(event, activity,position,null);
 
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
 
@@ -145,11 +145,13 @@ public class EventCard extends ViewHolder {
         });
     }
 
-    public void bindEventView(final Event event, final BaseContextActivity activity) {
+    public void bindEventView(final Event event, final BaseContextActivity activity, final int position, final EventsAdapter.OnItemClickedListener listener) {
         itemView.setVisibility(View.VISIBLE);
         itemView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(listener!=null)
+                    listener.onItemClicked(position);
                 activity.showEventDetails(event, "", null);
             }
         });
@@ -204,4 +206,68 @@ public class EventCard extends ViewHolder {
         invitedByView.setVisibility(View.GONE);
         infoArrowView.setVisibility(View.GONE);
     }
+    @SuppressLint("SetTextI18n")
+    public void bindEventView(final Event event, boolean isFirstEvent, final int position,
+                              final BaseContextActivity activity,
+                              @Nullable SocialInvite invite,EventsAdapter.OnItemClickedListener listener) {
+        bindEventView(event, activity,position,listener);
+
+        arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
+
+        // Set the travel time.
+        String travelTime = LocationUtils.getTravelTime(activity, activity.getUserLocation(), event.location);
+        if (travelTime != null) {
+            travelTimeView.setText(travelTime);
+            travelTimeView.setVisibility(View.VISIBLE);
+        } else {
+            travelTimeView.setVisibility(View.GONE);
+        }
+
+        // Set actions handlers.
+        favouriteView.setVisibility(View.VISIBLE);
+        setFavouriteView(activity.getEventMark(event));
+        favouriteView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventMark oldMark = (EventMark) favouriteView.getTag();
+                EventMark newMark = EventMark.isFavourite(oldMark) ? null : EventMark.FAVOURITE;
+                activity.reportEventAction(event,
+                        EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
+                        position);
+                activity.recordEventMark(event, newMark);
+                setFavouriteView(newMark);
+                if (EventMark.isFavourite(newMark)) {
+                    activity.showMessage("Added to My Events");
+                } else {
+                    activity.showMessage("Removed from My Events");
+                }
+
+            }
+        });
+
+        // Is user invited to this event ?
+        if (invite != null && invite.getInvitedBy() != null) {
+            invitedByView.setVisibility(View.VISIBLE);
+            invitedByView.setFollowers(activity, invite.getAllInvitedBy());
+            infoArrowView.setVisibility(View.VISIBLE);
+        } else if (event.numViews > 5) {
+            eventStatsView.setVisibility(View.VISIBLE);
+            eventStatsView.setText("" + event.numViews + " views");
+            infoArrowView.setVisibility(View.VISIBLE);
+        }else{
+            eventStatsView.setVisibility(View.VISIBLE);
+            eventStatsView.setText("" + Utils.getRandomNumber(10,50) + " views");
+            infoArrowView.setVisibility(View.VISIBLE);
+        }
+
+        //Share event
+        share.setVisibility(View.VISIBLE);
+        share.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.shareEventWithBranch(event, null, null);
+            }
+        });
+    }
+
 }

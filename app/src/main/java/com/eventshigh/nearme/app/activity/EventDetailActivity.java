@@ -117,6 +117,8 @@ public class EventDetailActivity extends BaseActivity {
 
 
     CollapsingToolbarLayout collapsingToolbar;
+
+
     /*****************************************
      Activity lifecycle management utilities
      ***************************************/
@@ -650,6 +652,7 @@ public class EventDetailActivity extends BaseActivity {
         private final TextView organizerPhoneView;
         private final View organizerWebsiteRow;
         private final TextView organizerWebsiteView;
+        FrameLayout frameParent;
 
         private EventCard() {
             eventScrollView = (NestedScrollView) findViewById(R.id.event_scroll_view);
@@ -707,7 +710,7 @@ public class EventDetailActivity extends BaseActivity {
             ViewGroup.LayoutParams params = bgView.getLayoutParams();
             params.height = 9 * metrics.widthPixels / 16;
             bgView.setLayoutParams(params);
-            FrameLayout frameParent = (FrameLayout)findViewById(R.id.frame_parent);
+            frameParent = (FrameLayout)findViewById(R.id.frame_parent);
             ViewGroup.LayoutParams lp =frameParent.getLayoutParams();
             lp.height =  9 * metrics.widthPixels / 16;
             frameParent.setLayoutParams(lp);
@@ -724,7 +727,7 @@ public class EventDetailActivity extends BaseActivity {
                     });
             eventScrollView.setVisibility(View.VISIBLE);
             topProgressBar.setVisibility(View.GONE);
-
+            frameParent.setVisibility(View.VISIBLE);
             // Image
             Glide.with(EventDetailActivity.this).load(event.imgUrl)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)

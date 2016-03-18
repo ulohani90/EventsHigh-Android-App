@@ -119,6 +119,7 @@ public class ExploreFragment extends BaseEventsFragment {
         eventsAdapter.setOnEditClickListener(new EventsAdapter.OnEditClickListener() {
             @Override
             public void onEditcliked() {
+                activity.reportActionToAnalytics("editlocalitiesclick");
                 Toast.makeText(getActivity(), "Header Clicked Edited", Toast.LENGTH_SHORT).show();
                 showCitySelectionView();
             }
@@ -189,6 +190,7 @@ public class ExploreFragment extends BaseEventsFragment {
             @Override
             public void onClick(View v) {
                 if (selectedLocalities.size() >= 2) {
+                    activity.reportActionToAnalytics("selectedlocalities", getLocalitiesCommaSeparated());
                     account.setSavedLocalities(selectedLocalities);
                     makeServerRequest();
                     animateLocalityViewOut();
@@ -198,6 +200,14 @@ public class ExploreFragment extends BaseEventsFragment {
             }
         });
         animateLocalityViewIn();
+    }
+
+    public String getLocalitiesCommaSeparated(){
+        StringBuilder builder  =new StringBuilder();
+        for (Locality locality : selectedLocalities){
+            builder.append(locality.name+",");
+        }
+        return builder.toString();
     }
 
     @Override

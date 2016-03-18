@@ -51,6 +51,8 @@ public class EventsFragment extends BaseEventsFragment {
 
     private boolean showEhInviteForNotification;
 
+    int scrollPosition = 0;
+
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
                                              boolean showCategories, boolean showEhInviteForNotification) {
         EventsFragment fragment = new EventsFragment();
@@ -80,6 +82,12 @@ public class EventsFragment extends BaseEventsFragment {
         eventsAdapter = new EventsAdapter(activity);
         eventGridView = (AutofitRecyclerView) view.findViewById(R.id.event_grid);
         eventGridView.setAdapter(eventsAdapter);
+        eventsAdapter.setOnItemClickedListener(new EventsAdapter.OnItemClickedListener() {
+            @Override
+            public void onItemClicked(int pos) {
+                scrollPosition = pos;
+            }
+        });
 
         // Setup the actionbar hide/show on scroll.
         eventGridView.addOnScrollListener(onScrollListener);
@@ -121,7 +129,6 @@ public class EventsFragment extends BaseEventsFragment {
     @Override
     public void onStart() {
         super.onStart();
-
         fetchNewListing(false);
     }
 
@@ -131,9 +138,10 @@ public class EventsFragment extends BaseEventsFragment {
         if(asyncRequest!=null)
         asyncRequest.cancel(true);
 
+/*
         if(eventsAdapter!=null){
             eventsAdapter.clear();
-        }
+        }*/
         super.onStop();
     }
 
@@ -221,6 +229,8 @@ public class EventsFragment extends BaseEventsFragment {
                     ((EventsGridActivity)getActivity()).setShareImageUrl(myEvents.get(0).events.get(0).imgUrl);
                 }
                 eventsAdapter.setTopicEvents(myEvents, eventsContext, eventGridView.getSpanCount() * 2);
+
+            //    eventGridView.scrollToPosition(scrollPosition);
             }
         }
     };
@@ -255,6 +265,7 @@ public class EventsFragment extends BaseEventsFragment {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                             eventsCollection.numFollowers);
                 }
+           //     eventGridView.scrollToPosition(scrollPosition);
             }
         }
     };

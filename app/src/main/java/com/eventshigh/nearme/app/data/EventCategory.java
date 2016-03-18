@@ -40,6 +40,8 @@ public enum EventCategory {
     SPORTS,
     TECH,
     THEATRE,
+    WORKSHOP,
+    LIVE_PERFORMANCES,
     OTHER;
 
     private static final String LOG_TAG = EventCategory.class.getSimpleName();
@@ -86,6 +88,21 @@ public enum EventCategory {
         int resId = R.drawable.icon_other;
         try {
             resId = R.drawable.class.getField("icon_" + toString().toLowerCase()).getInt(null);
+        } catch (IllegalAccessException e) {
+            // Ignore
+        } catch (NoSuchFieldException e) {
+            // Ignore
+            Log.d(LOG_TAG, "no icon: " + name(), e);
+        }
+
+        return resId;
+    }
+
+
+    public int getInterestIconResourceId() {
+        int resId = R.drawable.icon_kids_entertainment_int;
+        try {
+            resId = R.drawable.class.getField("icon_" + toString().toLowerCase()+"_int").getInt(null);
         } catch (IllegalAccessException e) {
             // Ignore
         } catch (NoSuchFieldException e) {

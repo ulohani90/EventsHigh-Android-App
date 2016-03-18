@@ -42,14 +42,14 @@ public class EHPreferenceFragment extends PreferenceFragment
         super.onResume();
 
         onUserCityChanged(account.getLastCity());
-        account.setUserCityListener(this);
+        Account.setUserCityListener(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        account.setUserCityListener(null);
+        Account.setUserCityListener(null);
     }
 
     @Override
