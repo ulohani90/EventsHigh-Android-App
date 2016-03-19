@@ -40,6 +40,8 @@ public class ThisWeekFragment extends BaseEventsFragment {
     private ThisWeekPagerAdapter adapter;
     private TabLayout tabsView;
 
+    boolean isDestroyed;
+
     private final Calendar today = DateTimeUtils.toMidnight(Calendar.getInstance(), null);
     private int numDays;
 
@@ -76,11 +78,19 @@ public class ThisWeekFragment extends BaseEventsFragment {
         viewPager.post(new Runnable() {
             @Override
             public void run() {
-                viewPager.setAdapter(adapter);
-                tabsView.removeAllTabs();
-                select(populateTabs());
+                if (!isDestroyed) {
+                    viewPager.setAdapter(adapter);
+                    tabsView.removeAllTabs();
+                    select(populateTabs());
+                }
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        isDestroyed = true;
+        super.onDestroy();
     }
 
     @SuppressLint("SetTextI18n")
