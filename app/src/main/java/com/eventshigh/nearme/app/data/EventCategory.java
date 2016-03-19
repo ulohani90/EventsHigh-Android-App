@@ -1,7 +1,9 @@
 package com.eventshigh.nearme.app.data;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
+import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.utils.Utils;
 
 /**
@@ -31,9 +33,13 @@ public enum EventCategory {
     SPORTS,
     TECH,
     THEATRE,
+    WORKSHOP,
+    LIVE_PERFORMANCES,
     OTHER;
 
     public final String categoryName;
+
+    private static final String LOG_TAG = EventCategory.class.getSimpleName();
 
      EventCategory(@Nullable String categoryName) {
         this.categoryName = categoryName == null ? Utils.capitalize(name().replace('_', ' ')) : categoryName;
@@ -42,6 +48,26 @@ public enum EventCategory {
      EventCategory() {
         this(null);
     }
+
+
+    public int getInterestIconResourceId() {
+        int resId = R.drawable.icon_kids_entertainment_int;
+        try {
+            resId = R.drawable.class.getField("icon_" + toString().toLowerCase()+"_int").getInt(null);
+        } catch (IllegalAccessException e) {
+            // Ignore
+        } catch (NoSuchFieldException e) {
+            // Ignore
+            Log.d(LOG_TAG, "no icon: " + name(), e);
+        }
+
+        return resId;
+    }
+
+
+
+
+
 
     public static String toCategoryParsableString(String tag) {
         return tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "").replaceAll("'", "");

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:state_enabled="false" android:drawable="@android:color/darker_gray" />
+
+    <!-- finger down -->
+    <item android:state_pressed="true" android:drawable="@color/skip_button_dark" />
+
+    <!-- Default, "just hanging' out" state. -->
+    <item android:drawable="@color/skip_button" />
+
+</selector>

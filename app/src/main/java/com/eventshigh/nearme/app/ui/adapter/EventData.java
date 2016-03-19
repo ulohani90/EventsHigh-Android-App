@@ -29,6 +29,10 @@ public class EventData implements AdapterData {
         ((EventCard) card).bindEventView(event, isFirstEvent, position, activity);
     }
 
+    public void onBindViewHolder(ViewHolder card, int position,EventsAdapter.OnItemClickedListener listener) {
+        ((EventCard) card).bindEventView(event, isFirstEvent, position, activity,listener);
+    }
+
     public String getId() {
         return header + ":" + event.id;
     }

@@ -10,16 +10,64 @@ import java.util.List;
  * Created by umesh on 15/03/16.
  */
 public enum EventSubcategory {
-    ART_CATEGORY1(EventCategory.ART, "Category 1"),
-    ART_CATEGORY2(EventCategory.ART, "Category 2"),
-    PARTIES_CATEGORY1(EventCategory.PARTIES, "Category 1"),
-    PARTIES_CATEGORY2(EventCategory.PARTIES, "Category 2"),
-    THEATER_CATEGORY1(EventCategory.THEATRE, "Category 1"),
-    THEATER_CATEGORY2(EventCategory.THEATRE, "Category 2"),
-    MUSIC_CATEGORY1(EventCategory.MUSIC, "Category 1"),
-    MUSIC_CATEGORY2(EventCategory.MUSIC, "Category 2"),
-    SPORTS_CATEGORY1(EventCategory.SPORTS, "Category 1"),
-    SPORTS_CATEGORY2(EventCategory.SPORTS, "Category 2"),;
+    ART_SELECT_ALL(EventCategory.ART, "Select All"),
+    ART_ART_EXHIBITION(EventCategory.ART, "Art Exhibition"),
+    ART_POTTERY(EventCategory.ART, "Pottery"),
+    ART_FASHION(EventCategory.ART, "Fashion"),
+    ART_PHOTOGRAPHY(EventCategory.ART, "Photography"),
+    PARTIES_SELECT_ALL(EventCategory.PARTIES, "Select All"),
+    PARTIES_DJ(EventCategory.PARTIES, "DJ"),
+    PARTIES_LADIES_NIGHT(EventCategory.PARTIES, "Ladies Night"),
+    PARTIES_KARAOKE(EventCategory.PARTIES, "Karaoke"),
+    PARTIES_BOLLYWOOD(EventCategory.PARTIES, "Bollywood"),
+    OUTDOORS_SELECT_ALL(EventCategory.OUTDOORS, "Select All"),
+    OUTDOORS_TREKKING(EventCategory.OUTDOORS, "Trekking"),
+    OUTDOORS_CYCLING(EventCategory.OUTDOORS, "Cycling"),
+    OUTDOORS_RUNNING(EventCategory.OUTDOORS, "Running"),
+    OUTDOORS_ROCK_CLIMBING(EventCategory.OUTDOORS, "Rock Climbing"),
+    OUTDOORS_CITY_WALK(EventCategory.OUTDOORS, "City Walk"),
+    WORKSHOP_SELECT_ALL(EventCategory.WORKSHOP, "Select All"),
+    WORKSHOP_ART_WORKSHOP(EventCategory.WORKSHOP, "Art workshop"),
+    WORKSHOP_PHOTOGRAPHY(EventCategory.WORKSHOP, "Photography"),
+    WORKSHOP_TECH_WORKSHOP(EventCategory.WORKSHOP, "Tech Workshop"),
+    WORKSHOP_COOKING(EventCategory.WORKSHOP, "Cooking"),
+    LIVE_PERFORMANCES_SELECT_ALL(EventCategory.LIVE_PERFORMANCES,"Select All"),
+    LIVE_PERFORMANCES_COMEDY_SHOW(EventCategory.LIVE_PERFORMANCES,"Comedy Show"),
+    LIVE_PERFORMANCES_FASHION_SHOW(EventCategory.LIVE_PERFORMANCES,"Fashion Show"),
+    LIVE_PERFORMANCES_MUSIC_CONCERTS(EventCategory.LIVE_PERFORMANCES,"Music Concerts"),
+    LIVE_PERFORMANCES_DANCE(EventCategory.LIVE_PERFORMANCES,"Dance"),
+    LIVE_PERFORMANCES_THEATRE(EventCategory.LIVE_PERFORMANCES,"Theatre"),
+    LIVE_PERFORMANCES_KANNADA_PLAYS(EventCategory.LIVE_PERFORMANCES,"Kannada Plays"),
+    FOOD_SELECT_ALL(EventCategory.FOOD,"Select All"),
+    FOOD_FOOD_FESTIVAL(EventCategory.FOOD,"Food Festival"),
+    FOOD_BRUNCH(EventCategory.FOOD,"Brunch"),
+    FOOD_WINE(EventCategory.FOOD,"Wine"),
+    FOOD_FOOD_WALKS(EventCategory.FOOD,"Food walks"),
+    FOOD_BEER(EventCategory.FOOD,"Beer"),
+    FOOD_BARBEQUE(EventCategory.FOOD,"Barbeque"),
+    SPORTS_SELECT_ALL(EventCategory.SPORTS,"Select All"),
+    SPORTS_FOOTBALL(EventCategory.SPORTS,"Football"),
+    SPORTS_CRICKET(EventCategory.SPORTS,"Cricket"),
+    SPORTS_CHESS(EventCategory.SPORTS,"Chess"),
+    SPORTS_BADMINTON(EventCategory.SPORTS,"Badminton"),
+    SPORTS_HOCKEY(EventCategory.SPORTS,"Hockey"),
+    SPORTS_SWIMMING(EventCategory.SPORTS,"Swimming"),
+    SPORTS_TENNIS(EventCategory.SPORTS,"Tennis"),
+    HEALTH_SELECT_ALL(EventCategory.HEALTH_WELLNESS,"Select All"),
+    HEALTH_YOGA(EventCategory.HEALTH_WELLNESS,"Yoga"),
+    HEALTH_FITNESS(EventCategory.HEALTH_WELLNESS,"Fitness"),
+    HEALTH_SPRITUAL(EventCategory.HEALTH_WELLNESS,"Spritual"),
+    HEALTH_MEDITATION(EventCategory.HEALTH_WELLNESS,"Meditation"),
+    LITERATURE_SELECT_ALL(EventCategory.LITERATURE,"Select All"),
+    LITERATURE_BOOK_LAUNCH(EventCategory.LITERATURE,"Book Launch"),
+    LITERATURE_STORY_TELLING(EventCategory.LITERATURE,"Storytelling"),
+    LITERATURE_POETRY(EventCategory.LITERATURE,"Poetry"),
+    LITERATURE_BOOK_CLUB(EventCategory.LITERATURE,"Book Club"),
+    KIDS_SELECT_ALL(EventCategory.KIDS_ENTERTAINMENT,"Select All"),
+    KIDS_MAGIC_SHOW(EventCategory.KIDS_ENTERTAINMENT,"Magic Show"),
+    KIDS_SUMMER_CAMPS(EventCategory.KIDS_ENTERTAINMENT,"Summer Camps"),
+    KIDS_KIDS_WORKSHOP(EventCategory.KIDS_ENTERTAINMENT,"Kids Workshop"),
+    KIDS_CIRCUS(EventCategory.KIDS_ENTERTAINMENT,"Circus");
 
 
     public final EventCategory category;
@@ -31,8 +79,10 @@ public enum EventSubcategory {
         this.name = name;
     }
 
-    public static List<EventSubcategory> getEventCategories(EventCategory category) {
+    public static List<EventSubcategory> getEventCategories(EventCategory category,boolean addisAll) {
         List<EventSubcategory> subCategories = new ArrayList<>();
+
+
         for (EventSubcategory subcategory : EventSubcategory.values()) {
             if (subcategory.category== category) {
                 subCategories.add(subcategory);

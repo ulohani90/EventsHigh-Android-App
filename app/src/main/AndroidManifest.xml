@@ -282,8 +282,9 @@
             android:label="@string/app_name"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:hardwareAccelerated="true"
-            android:parentActivityName=".activity.EventDetailActivity"
-        />
+            android:theme="@style/NoActionBar"
+            />
+
 
         <activity
             android:name=".activity.CustomUrlActivity"

@@ -79,6 +79,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
             @Override
             public void run() {
                 if (!isDestroyed) {
+
                     viewPager.setAdapter(adapter);
                     tabsView.removeAllTabs();
                     select(populateTabs());

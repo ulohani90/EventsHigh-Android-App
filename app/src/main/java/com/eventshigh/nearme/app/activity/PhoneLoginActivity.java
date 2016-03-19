@@ -151,6 +151,7 @@ public class PhoneLoginActivity extends BaseActivity {
 
     public void startInterestActivity(){
         Intent intent = new Intent(this,SelectInterestsActivity.class);
+        intent.putExtra(SelectInterestsActivity.ONBOARDING_FLOW,true);
         startActivity(intent);
         finish();
     }

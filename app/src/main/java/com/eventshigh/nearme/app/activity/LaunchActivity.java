@@ -154,7 +154,7 @@ public class LaunchActivity extends BaseContextActivity {
             }
         }
         Branch branch = Branch.getInstance();
-
+        if(branch!=null)
         branch.initSession(new Branch.BranchReferralInitListener() {
             @Override
             public void onInitFinished(JSONObject referringParams, BranchError error) {

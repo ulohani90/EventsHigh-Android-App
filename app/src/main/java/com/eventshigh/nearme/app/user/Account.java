@@ -62,31 +62,28 @@ public class Account {
 
     // shared and static accountInfo which usages shared preference to store records.
     private static SharedPreferences accountInfo;
+    private static UserCityListener userCityListener = null;
     private static synchronized void setAccountInfo(Context context) {
         if (accountInfo == null) {
             accountInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
         }
+        accountInfo.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key.equals(PREF_LAST_CITY)) {
+                    notifyCityChange();
+                }
+            }
+        });
     }
 
     // Member variables used to store the user account details in preferences.
     private final Context context;
-    private UserCityListener userCityListener = null;
 
     public Account(Context context) {
         this.context = context.getApplicationContext();
 
         setAccountInfo(this.context);
-        accountInfo.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key.equals(PREF_LAST_CITY) && userCityListener != null) {
-                    City lastCity = City.getCity(accountInfo.getString(PREF_LAST_CITY, ""));
-                    if (lastCity != null) {
-                        userCityListener.onUserCityChanged(lastCity);
-                    }
-                }
-            }
-        });
     }
 
     public UserInfo getUserInfo() {
@@ -183,10 +180,11 @@ public class Account {
 
         City currentLastCity = getLastCity();
         if (currentLastCity == null || !city.equals(currentLastCity)) {
-            accountInfo.edit().putString(PREF_LAST_CITY, city.toString()).apply();
-            accountInfo.edit().putString(PREF_SAVED_LOCALITY, "").apply();
+            accountInfo.edit().putString(PREF_LAST_CITY, city.toString())
+                    .putString(PREF_SAVED_LOCALITY, "").apply();
             UpdateAccountInfoService.refreshCity(context);
         }
+        notifyCityChange();
     }
 
     public void setSavedLocalities(List<Locality> localities) {
@@ -220,8 +218,16 @@ public class Account {
         return City.getCity(accountInfo.getString(PREF_LAST_CITY, ""));
     }
 
-    public void setUserCityListener (@Nullable UserCityListener userCityListener) {
-        this.userCityListener = userCityListener;
+    public static synchronized void setUserCityListener (@Nullable UserCityListener newUserCityListener) {
+        userCityListener = newUserCityListener;
+    }
+    private static synchronized void notifyCityChange() {
+        if (userCityListener != null) {
+            City lastCity = City.getCity(accountInfo.getString(PREF_LAST_CITY, ""));
+            if (lastCity != null) {
+                userCityListener.onUserCityChanged(lastCity);
+            }
+        }
     }
 
     private static String getKeyForTag(String tag) {
