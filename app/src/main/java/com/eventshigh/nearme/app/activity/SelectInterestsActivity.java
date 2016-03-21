@@ -33,7 +33,9 @@ public class SelectInterestsActivity extends BaseActivity{
 
 
     public static final EventCategory[] categories = {
-            EventCategory.PARTIES,
+            EventCategory.EDITOR_PICKS,
+            EventCategory.FREE_EVENTS,
+            EventCategory.NIGHTLIFE,
             EventCategory.OUTDOORS,
             EventCategory.WORKSHOP,
             EventCategory.LIVE_PERFORMANCES,

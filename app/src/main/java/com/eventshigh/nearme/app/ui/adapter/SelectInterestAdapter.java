@@ -12,9 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.SelectInterestsActivity;
-import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.stream.EventSubcategory;
 import com.eventshigh.nearme.app.user.Account;
@@ -102,10 +100,15 @@ public class SelectInterestAdapter extends BaseExpandableListAdapter{
                 .into(holder.categoryImage);
         holder.categoryImage.setBackgroundResource(getBackgroundResource(categories[groupPosition]));
         holder.expandArrow.setVisibility(View.VISIBLE);
-        if(selectedGroup == groupPosition){
-            holder.expandArrow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
+        if(subcategories.get(categories[groupPosition]).size()>0) {
+            holder.expandArrow.setVisibility(View.VISIBLE);
+            if (selectedGroup == groupPosition) {
+                holder.expandArrow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
+            } else {
+                holder.expandArrow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+            }
         }else{
-            holder.expandArrow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+            holder.expandArrow.setVisibility(View.GONE);
         }
         holder.subcategoryName.setVisibility(View.GONE);
         holder.categoryName.setVisibility(View.VISIBLE);
@@ -115,28 +118,34 @@ public class SelectInterestAdapter extends BaseExpandableListAdapter{
             holder.followView.setVisibility(View.VISIBLE);
             holder.followView.setImageResource(R.drawable.ic_check_circle_green_24dp);
         }else{
-            holder.followView.setVisibility(View.GONE);
+            if(subcategories.get(categories[groupPosition]).size()==0){
+                holder.followView.setVisibility(View.VISIBLE);
+                holder.followView.setImageResource(R.drawable.ic_add_circle_outline_gray_24dp);
+            }else{
+                holder.followView.setVisibility(View.GONE);
+            }
+
         }
 
-        /*holder.followView.setOnClickListener(new View.OnClickListener() {
+        holder.followView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(account.isFollowing(categories[groupPosition].categoryName)){
-                    account.setIsFollowing(categories[groupPosition].categoryName,false);
+                if (account.isFollowing(categories[groupPosition].categoryName) && subcategories.get(categories[groupPosition]).size() == 0) {
+                    account.setIsFollowing(categories[groupPosition].categoryName, false);
                     holder.followView.setImageResource(R.drawable.ic_add_circle_outline_black_24dp);
-                }else{
-                    account.setIsFollowing(categories[groupPosition].categoryName,true);
+                } else {
+                    account.setIsFollowing(categories[groupPosition].categoryName, true);
                     holder.followView.setImageResource(R.drawable.ic_check_circle_green_24dp);
                 }
                 notifyDataSetChanged();
             }
         });
-        holder.followView.setImageResource((account.isFollowing(categories[groupPosition].categoryName) || checkWhetherAllSelected(categories[groupPosition])) ? R.drawable.ic_check_circle_green_24dp : R.drawable.ic_add_circle_outline_black_24dp);*/
+       // holder.followView.setImageResource((account.isFollowing(categories[groupPosition].categoryName) || checkWhetherAllSelected(categories[groupPosition])) ? R.drawable.ic_check_circle_green_24dp : R.drawable.ic_add_circle_outline_black_24dp);
         return convertView;
     }
 
     public int getBackgroundResource(EventCategory category) {
-        if (category == EventCategory.PARTIES){
+        if (category == EventCategory.NIGHTLIFE){
             return R.drawable.green_circle_bg;
         }else if(category == EventCategory.OUTDOORS){
             return R.drawable.golden_circle_bg;

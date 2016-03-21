@@ -32,7 +32,7 @@ public enum EventCategory {
     LITERATURE,
     MUSIC,
     OUTDOORS,
-    PARTIES,
+    NIGHTLIFE,
     PHOTOGRAPHY,
     SHOPPING,
     SOCIAL_CAUSES,
@@ -42,6 +42,8 @@ public enum EventCategory {
     THEATRE,
     WORKSHOP,
     LIVE_PERFORMANCES,
+    EDITOR_PICKS("Editor's Picks"),
+    FREE_EVENTS,
     OTHER;
 
     private static final String LOG_TAG = EventCategory.class.getSimpleName();
