@@ -134,9 +134,22 @@ public class SelectInterestAdapter extends BaseExpandableListAdapter{
                 if (account.isFollowing(categories[groupPosition].categoryName) && subcategories.get(categories[groupPosition]).size() == 0) {
                     account.setIsFollowing(categories[groupPosition].categoryName, false);
                     holder.followView.setImageResource(R.drawable.ic_add_circle_outline_black_24dp);
+                    if(((SelectInterestsActivity)mContext).isFromNotification()){
+                        ((SelectInterestsActivity) mContext).reportActionToAnalytics("removeFollowingPNotif", categories[groupPosition].categoryName);
+                    }else {
+                        ((SelectInterestsActivity) mContext).reportActionToAnalytics("removeFollowingP", categories[groupPosition].categoryName);
+                    }
+                    ((SelectInterestsActivity)mContext).showMessage(categories[groupPosition].categoryName+" Unfollowed");
+
                 } else {
                     account.setIsFollowing(categories[groupPosition].categoryName, true);
                     holder.followView.setImageResource(R.drawable.ic_check_circle_green_24dp);
+                    if(((SelectInterestsActivity)mContext).isFromNotification()){
+                        ((SelectInterestsActivity) mContext).reportActionToAnalytics("addFollowingPNotif", categories[groupPosition].categoryName);
+                    }else {
+                        ((SelectInterestsActivity) mContext).reportActionToAnalytics("addFollowingP", categories[groupPosition].categoryName);
+                    }
+                    ((SelectInterestsActivity)mContext).showMessage("You are now following " + categories[groupPosition].categoryName);
                 }
                 notifyDataSetChanged();
             }
