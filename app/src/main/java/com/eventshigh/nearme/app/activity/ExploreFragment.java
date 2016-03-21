@@ -39,7 +39,7 @@ import java.util.List;
 public class ExploreFragment extends BaseEventsFragment {
     public static final String[] EXPLORE_TAGS = {
             EventsHighEndpoints.QUERY_FEATURED,
-            EventCategory.PARTIES.categoryName,
+            EventCategory.NIGHTLIFE.categoryName,
             EventCategory.THEATRE.categoryName,
             EventCategory.MUSIC.categoryName,
             EventCategory.KIDS_ENTERTAINMENT.categoryName,
@@ -53,7 +53,7 @@ public class ExploreFragment extends BaseEventsFragment {
     };
 
     public static final String[] EXPLORE_TAGS_CHENNAI = {
-            EventCategory.PARTIES.categoryName,
+            EventCategory.NIGHTLIFE.categoryName,
             EventCategory.THEATRE.categoryName,
             EventCategory.MUSIC.categoryName,
             EventCategory.TECH.categoryName,
@@ -67,7 +67,7 @@ public class ExploreFragment extends BaseEventsFragment {
 
     public static final String[] EXPLORE_TAGS_BANGALORE = {
             EventsHighEndpoints.QUERY_FEATURED,
-            EventCategory.PARTIES.categoryName,
+            EventCategory.NIGHTLIFE.categoryName,
             "Free",
             EventCategory.THEATRE.categoryName,
             EventCategory.MUSIC.categoryName,

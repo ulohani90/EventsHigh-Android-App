@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.data.stream;
 
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
 
 import java.util.ArrayList;
@@ -15,11 +14,11 @@ public enum EventSubcategory {
     ART_POTTERY(EventCategory.ART, "Pottery"),
     ART_FASHION(EventCategory.ART, "Fashion"),
     ART_PHOTOGRAPHY(EventCategory.ART, "Photography"),
-    PARTIES_SELECT_ALL(EventCategory.PARTIES, "Select All"),
-    PARTIES_DJ(EventCategory.PARTIES, "DJ"),
-    PARTIES_LADIES_NIGHT(EventCategory.PARTIES, "Ladies Night"),
-    PARTIES_KARAOKE(EventCategory.PARTIES, "Karaoke"),
-    PARTIES_BOLLYWOOD(EventCategory.PARTIES, "Bollywood"),
+    PARTIES_SELECT_ALL(EventCategory.NIGHTLIFE, "Select All"),
+    PARTIES_DJ(EventCategory.NIGHTLIFE, "DJ"),
+    PARTIES_LADIES_NIGHT(EventCategory.NIGHTLIFE, "Ladies Night"),
+    PARTIES_KARAOKE(EventCategory.NIGHTLIFE, "Karaoke"),
+    PARTIES_BOLLYWOOD(EventCategory.NIGHTLIFE, "Bollywood"),
     OUTDOORS_SELECT_ALL(EventCategory.OUTDOORS, "Select All"),
     OUTDOORS_TREKKING(EventCategory.OUTDOORS, "Trekking"),
     OUTDOORS_CYCLING(EventCategory.OUTDOORS, "Cycling"),
@@ -27,10 +26,11 @@ public enum EventSubcategory {
     OUTDOORS_ROCK_CLIMBING(EventCategory.OUTDOORS, "Rock Climbing"),
     OUTDOORS_CITY_WALK(EventCategory.OUTDOORS, "City Walk"),
     WORKSHOP_SELECT_ALL(EventCategory.WORKSHOP, "Select All"),
-    WORKSHOP_ART_WORKSHOP(EventCategory.WORKSHOP, "Art workshop"),
+    WORKSHOP_ART_WORKSHOP(EventCategory.WORKSHOP, "Art workshops"),
     WORKSHOP_PHOTOGRAPHY(EventCategory.WORKSHOP, "Photography"),
-    WORKSHOP_TECH_WORKSHOP(EventCategory.WORKSHOP, "Tech Workshop"),
-    WORKSHOP_COOKING(EventCategory.WORKSHOP, "Cooking"),
+    WORKSHOP_TECH_WORKSHOP(EventCategory.WORKSHOP, "Tech Workshops"),
+    WORKSHOP_FOOD_WORKSHOP(EventCategory.WORKSHOP, "Food Workshops"),
+    WORKSHOP_DANCE_WORKSHOP(EventCategory.WORKSHOP, "Dance Workshops"),
     LIVE_PERFORMANCES_SELECT_ALL(EventCategory.LIVE_PERFORMANCES,"Select All"),
     LIVE_PERFORMANCES_COMEDY_SHOW(EventCategory.LIVE_PERFORMANCES,"Comedy Show"),
     LIVE_PERFORMANCES_FASHION_SHOW(EventCategory.LIVE_PERFORMANCES,"Fashion Show"),

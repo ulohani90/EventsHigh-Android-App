@@ -25,7 +25,7 @@ public enum EventCategory {
     LITERATURE,
     MUSIC,
     OUTDOORS,
-    PARTIES,
+    NIGHTLIFE,
     PHOTOGRAPHY,
     SHOPPING,
     SOCIAL_CAUSES,
@@ -35,6 +35,8 @@ public enum EventCategory {
     THEATRE,
     WORKSHOP,
     LIVE_PERFORMANCES,
+    EDITOR_PICKS("Editor's Picks"),
+    FREE_EVENTS,
     OTHER;
 
     public final String categoryName;
