@@ -186,10 +186,10 @@ public class EHGcmListenerService extends GcmListenerService {
 
 
     public String getInterestCount(int count){
-        if(count % 5 == 0){
+        if( count < 5 || count % 5 == 0 ){
             return count+"";
         }else{
-            return count-count%5+"+";
+            return count-(count%5)+"+";
         }
     }
 

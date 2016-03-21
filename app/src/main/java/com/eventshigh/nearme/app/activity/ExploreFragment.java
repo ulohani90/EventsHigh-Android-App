@@ -120,7 +120,6 @@ public class ExploreFragment extends BaseEventsFragment {
             @Override
             public void onEditcliked() {
                 activity.reportActionToAnalytics("editlocalitiesclick");
-                Toast.makeText(getActivity(), "Header Clicked Edited", Toast.LENGTH_SHORT).show();
                 showCitySelectionView();
             }
         });
