@@ -36,6 +36,12 @@
         android:layout_marginTop="4dp"
         android:textColor="@android:color/white"
         android:text="@string/personalize_message" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:src="@drawable/img_banner"/>
     </LinearLayout>
     <ExpandableListView
         android:id="@+id/categories_list"
