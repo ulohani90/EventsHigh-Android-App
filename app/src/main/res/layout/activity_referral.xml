@@ -13,7 +13,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="160dp"
-            android:src="@drawable/friends"
+            android:src="@drawable/invite_banner"
             android:scaleType="centerCrop"
             android:contentDescription="@string/invite_friends"
             />
@@ -44,7 +44,7 @@
                 >
                 <ImageView
                     android:id="@+id/icon"
-                    android:src="@drawable/icon_art_rec"
+                    android:src="@drawable/invite_friends"
                     android:layout_width="48dp"
                     android:layout_height="48dp" />
                 <TextView
@@ -84,7 +84,7 @@
                 >
                 <ImageView
                     android:id="@+id/icon1"
-                    android:src="@drawable/icon_art_rec"
+                    android:src="@drawable/friends_join"
                     android:layout_width="48dp"
                     android:layout_height="48dp" />
                 <TextView
@@ -112,6 +112,7 @@
                     android:layout_height="20dp"
                     android:layout_below="@id/icon1"
                     android:layout_marginStart="12dp"
+
                     android:background="@drawable/vertical_dotted_line"></View>
             </RelativeLayout>
             <RelativeLayout
@@ -122,7 +123,7 @@
                 >
                 <ImageView
                     android:id="@+id/icon2"
-                    android:src="@drawable/icon_art_rec"
+                    android:src="@drawable/earn_money"
                     android:layout_width="48dp"
                     android:layout_height="48dp" />
                 <TextView
@@ -199,7 +200,6 @@
                     android:text="Redeem Now!"
                     android:onClick="redeem"
                     android:textSize="16sp"
-                    android:elevation="4dp"
                     android:textAllCaps="true"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
@@ -213,7 +213,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:background="#f0f0f0"
@@ -265,4 +265,11 @@
         tools:visibility="visible"
         tools:ignore="UnusedAttribute"
         />
+
+    <include
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        layout="@layout/toolbar" />
 </FrameLayout>

@@ -17,6 +17,7 @@ import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
+import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.activity.SelectInterestsActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -72,6 +73,7 @@ public class EHGcmListenerService extends GcmListenerService {
         String mobileNo = Utils.checkIfUnknown(msg.getString("mobile"));
         String personalisedNotif = Utils.checkIfUnknown(msg.getString("personalised_notif"));
         String personalizeInterest = Utils.checkIfUnknown(msg.getString("perosnalize_interest"));
+        String referEarn = Utils.checkIfUnknown(msg.getString("refer_earn"));
 
 
         UserContact contact = null;
@@ -98,7 +100,7 @@ public class EHGcmListenerService extends GcmListenerService {
             message = message.replace("Your friend", contact.name);
         }
 
-        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null)  {
+        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null && referEarn == null)  {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
             return null;
         }
@@ -167,6 +169,11 @@ public class EHGcmListenerService extends GcmListenerService {
             Intent intent = new Intent(this, SelectInterestsActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             intent.putExtra(SelectInterestsActivity.FROM_NOTIFICATION_PARAM,true);
+            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        }else if(referEarn != null){
+            Intent intent = new Intent(this, ReferralActivity.class);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+            intent.putExtra(ReferralActivity.FROM_NOTIFICATION_PARAM,true);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else {
             Intent intent = new Intent(this,

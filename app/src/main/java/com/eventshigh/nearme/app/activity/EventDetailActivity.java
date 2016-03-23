@@ -868,7 +868,7 @@ public class EventDetailActivity extends BaseActivity {
                     addTagView(tagsView, tag, "tagClick");
                 }
             }
-            tagsHeaderView.setVisibility(tagsView.getChildCount() > 0 ? View.GONE : View.VISIBLE);
+            tagsHeaderView.setVisibility(tagsView.getChildCount() > 0 ? View.VISIBLE : View.GONE);
 
             // Set description.
             descriptionHeaderView.setVisibility(event.description.isEmpty() ? View.GONE : View.VISIBLE);

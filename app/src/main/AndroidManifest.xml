@@ -417,6 +417,8 @@
             android:name=".activity.ReferralActivity"
             android:label="@string/title_refer"
             android:launchMode="singleTask"
+            android:theme="@style/NoActionBar"
+            android:hardwareAccelerated="false"
             android:parentActivityName=".activity.LaunchActivity"
         >
             <meta-data
