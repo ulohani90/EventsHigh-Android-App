@@ -1,124 +1,268 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
+    android:background="#eeeeee"
     android:clipToPadding="false"
-    tools:context=".activity.ReferralActivity"
->
+    tools:context=".activity.ReferralActivity">
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-    >
+        android:layout_height="wrap_content">
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="160dp"
             android:src="@drawable/friends"
             android:scaleType="centerCrop"
             android:contentDescription="@string/invite_friends"
-        />
-        <TextView
-            style="@style/TextAppearance.AppCompat.Headline"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Tell your Friends about EventsHigh"
-            android:padding="10dp"
-            android:layout_marginBottom="10dp"
-        />
-        <TextView
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="When you invite your friends to EventsHigh App, you both earn ₹ 100."
-        />
-        <TextView
-            style="@style/EHButtonCTA"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_margin="10dp"
-            android:textColor="@android:color/white"
-            android:text="@string/invite_friends"
-            android:onClick="invite"
-        />
+            />
+    </LinearLayout>
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="144dp"
+        android:layout_marginLeft="10dp"
+        android:elevation="4dp"
+        android:background="@android:color/white"
+        android:layout_marginRight="10dp"
+        android:paddingBottom="48dp"
+        android:clipToPadding="false"
+        >
         <LinearLayout
-            android:id="@+id/my_vouchers_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone"
-            tools:visibility="visible"
-        >
+            >
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                >
+                <ImageView
+                    android:id="@+id/icon"
+                    android:src="@drawable/icon_art_rec"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp" />
+                <TextView
+                    android:id="@+id/heading"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/icon"
+                    android:paddingLeft="10dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="15sp"
+                    android:text="Invite Friends"
+                    />
+                <TextView
+                    style="@style/EHText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/icon"
+                    android:paddingLeft="10dp"
+                    android:textSize="10sp"
+
+                    android:layout_below="@id/heading"
+                    android:text="@string/ui_share_and_care_text"
+                    />
+                <View android:layout_width="24dp"
+                    android:layout_height="20dp"
+                    android:layout_below="@id/icon"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/vertical_dotted_line"></View>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                >
+                <ImageView
+                    android:id="@+id/icon1"
+                    android:src="@drawable/icon_art_rec"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp" />
+                <TextView
+                    android:id="@+id/heading1"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/icon1"
+                    android:paddingLeft="10dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="15sp"
+                    android:text="Friends join EventsHigh"
+                    />
+                <TextView
+                    style="@style/EHText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/icon1"
+                    android:paddingLeft="10dp"
+                    android:textSize="10sp"
+                    android:layout_below="@id/heading1"
+                    android:text="@string/ui_spread_word_text"
+                    />
+                <View android:layout_width="24dp"
+                    android:layout_height="20dp"
+                    android:layout_below="@id/icon1"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/vertical_dotted_line"></View>
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                >
+                <ImageView
+                    android:id="@+id/icon2"
+                    android:src="@drawable/icon_art_rec"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp" />
+                <TextView
+                    android:id="@+id/heading2"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/icon2"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingLeft="10dp"
+                    android:textSize="15sp"
+                    android:text="Both you and your friends earn"
+                    />
+                <TextView
+                    style="@style/EHText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/icon2"
+                    android:paddingLeft="10dp"
+                    android:textSize="10sp"
+                    android:layout_below="@id/heading2"
+                    android:text="@string/ui_share_earn_text"
+                    />
+
+            </RelativeLayout>
+
+
+
+            <LinearLayout
+                android:id="@+id/my_vouchers_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible"
+                >
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#f0f0f0"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    />
+                <TextView
+                    style="@android:style/TextAppearance.DeviceDefault.Large"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Your Discount Vouchers"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingTop="10dp"
+                    android:textSize="13sp"
+                    android:paddingBottom="5dp"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="You can redeem these vouchers for events ticketed with EventsHigh."
+                    android:paddingLeft="10dp"
+                    android:paddingBottom="10dp"
+                    android:textSize="11sp"
+                    android:paddingRight="10dp"
+                    />
+
+                <TextView
+
+                    android:background="@drawable/eh_button_redeem"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_gravity="bottom"
+                    android:gravity="center"
+                    android:text="Redeem Now!"
+                    android:onClick="redeem"
+                    android:textSize="16sp"
+                    android:elevation="4dp"
+                    android:textAllCaps="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@android:color/white"
+                    tools:visibility="visible"
+                    tools:ignore="UnusedAttribute"
+                    />
+            </LinearLayout>
+
             <View
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="1dp"
                 android:layout_marginTop="8dp"
-                android:background="@android:color/darker_gray"
-            />
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="#f0f0f0"
+                />
+
             <TextView
                 style="@android:style/TextAppearance.DeviceDefault.Large"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Your Discount Vouchers"
-                android:padding="10dp"
-            />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="You can redeem these vouchers for events ticketed with EventsHigh."
+                android:text="Terms &amp; Conditions"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-            />
+                android:fontFamily="sans-serif-medium"
+                android:paddingTop="10dp"
+                android:textSize="13sp"
+                android:paddingBottom="5dp"
+                />
             <TextView
-                style="@style/TextAppearance.AppCompat.Body2"
+                style="@style/EHText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/fb_blue"
-                android:gravity="end"
-                android:text="Redeem Now!"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:onClick="redeem"
-            />
+                android:lineSpacingExtra="2dp"
+                android:layout_marginBottom="4dp"
+                android:textSize="10sp"
+                android:text="Eligible on friends who installs the EventsHigh app for first time.\nBoth you and your friend needs to register using phone number.\nYou will get the discount voucher for ₹ 100 which can be redeemed only for events ticketed on eventshigh.com.\nYou can use one discount voucher per transaction.\nDiscount vouchers are not transferable.\nEventsHigh team reserves the right to cancel discount vouchers if it suspects misuse. EventsHigh team decision will be final.\nFor any queries, please write to us at support@eventshigh.com."
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:background="@android:color/transparent"
+                />
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginTop="8dp"
-            android:background="@android:color/darker_gray"
+    </ScrollView>
+    <TextView
+        android:id="@+id/done_btn"
+        android:background="@drawable/eh_button_done"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:text="@string/invite_friends"
+        android:onClick="invite"
+        android:textSize="16sp"
+        android:elevation="4dp"
+        android:textAllCaps="true"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@android:color/white"
+        tools:visibility="visible"
+        tools:ignore="UnusedAttribute"
         />
-        <TextView
-            style="@style/EHHeader"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Terms &amp; Conditions"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="4dp"
-        />
-        <TextView
-            style="@style/EHText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="4dp"
-            android:text="• Eligible on friends who installs the EventsHigh app for first time.\n• Both you and your friend needs to register using phone number.\n• You will get the discount voucher for ₹ 100 which can be redeemed only for events ticketed on eventshigh.com.\n• You can use one discount voucher per transaction.\n• Discount vouchers are not transferable.\n• EventsHigh team reserves the right to cancel discount vouchers if it suspects misuse. EventsHigh team decision will be final.\n• For any queries, please write to us at support@eventshigh.com."
-        />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:background="@android:color/transparent"
-        />
-    </LinearLayout>
-</ScrollView>
+</FrameLayout>

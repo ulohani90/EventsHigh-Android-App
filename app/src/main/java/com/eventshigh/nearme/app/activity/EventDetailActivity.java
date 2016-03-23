@@ -78,7 +78,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.PlusOneButton;
 import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
+import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
 import org.json.JSONException;
 
@@ -117,6 +120,8 @@ public class EventDetailActivity extends BaseActivity {
 
 
     CollapsingToolbarLayout collapsingToolbar;
+
+
 
 
     /*****************************************
@@ -343,9 +348,14 @@ public class EventDetailActivity extends BaseActivity {
             bookingUriBuilder.appendQueryParameter("name", userInfo.name);
             bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
         }
-
-        CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
+        try {
+            CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
                 getString(R.string.title_book));
+        }catch(Exception e){
+            Crashlytics.getInstance().core.logException(e);
+            showMessage(R.string.retry);
+
+        }
     }
 
     public void imagePreview(View view) {
@@ -485,9 +495,13 @@ public class EventDetailActivity extends BaseActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + event.youtubeVideoId));
             startActivity(intent);
         } catch (ActivityNotFoundException ex) {
-            Intent intent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("http://www.youtube.com/watch?v=" + event.youtubeVideoId));
-            startActivity(intent);
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://www.youtube.com/watch?v=" + event.youtubeVideoId));
+                startActivity(intent);
+            } catch (Exception e) {
+                Crashlytics.getInstance().core.logException(e);
+            }
         }
     }
 
@@ -914,7 +928,38 @@ public class EventDetailActivity extends BaseActivity {
                 descriptionView.loadData(toHtmlNoFrame(descriptionSection.description), "text/html; charset=UTF-8", null);
                 eventContainer.addView(descriptionSectionView);
             }
+
+
+            //Adding youtube view
+            if(event.youtubeVideoId!=null && event.youtubeVideoId.length()>0) {
+                LinearLayout linearLayout = (LinearLayout) findViewById(R.id.youtube_fragment);
+                LinearLayout ll = new LinearLayout(EventDetailActivity.this);
+                ll.setId(View.generateViewId());
+                YouTubePlayerSupportFragment youTubePlayerSupportFragment = YouTubePlayerSupportFragment.newInstance();
+                youTubePlayerSupportFragment.initialize(Utils.YOUTUBE_API_KEY, new YouTubePlayer.OnInitializedListener() {
+                    @Override
+                    public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
+                       // youTubePlayer.loadVideo(event.youtubeVideoId);
+                        youTubePlayer.cueVideo(event.youtubeVideoId);
+                        youTubePlayer.setShowFullscreenButton(false);
+                    }
+
+                    @Override
+                    public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
+
+                            String error = String.format(getString(R.string.player_error), youTubeInitializationResult.toString());
+                            showMessage(error);
+
+                    }
+                });
+                getSupportFragmentManager().beginTransaction().add(ll.getId(), youTubePlayerSupportFragment).commit();
+                linearLayout.addView(ll);
+            }else{
+                (findViewById(R.id.youtube_fragment)).setVisibility(View.GONE);
+            }
         }
+
+
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
             getLayoutInflater().inflate(R.layout.view_event_tag, parent);

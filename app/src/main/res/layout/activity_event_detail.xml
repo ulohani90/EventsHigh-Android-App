@@ -530,6 +530,13 @@
                     android:textColor="#CC383F3F"
                     android:hardwareAccelerated="true"
                 />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:id="@+id/youtube_fragment"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"/>
                 <TextView
                     android:id="@+id/event_from"
                     style="@style/EHText"

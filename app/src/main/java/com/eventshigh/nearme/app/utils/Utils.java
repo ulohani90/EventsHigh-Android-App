@@ -28,6 +28,8 @@ import java.util.regex.Pattern;
  */
 public class Utils {
 
+    public static final String YOUTUBE_API_KEY = "AIzaSyACL1eHX6pkvIAsFk1VqN-TDAgzS14Pwek";
+
     private static final int TITLE_MAX_LENGHT = 32;
     public static String shortenIfNeeded(String title) {
         return title.length() < TITLE_MAX_LENGHT ? title :

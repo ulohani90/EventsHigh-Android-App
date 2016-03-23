@@ -90,8 +90,13 @@ public class ContactListView extends HorizontalScrollView {
                 new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, gravity));
         addView(container);
 
+        int i = 0;
         for (SocialFriend friend : friends) {
             new ContactPhotoLoaderTask(container, size, text).execute(friend);
+            i++;
+            if(i==2){
+                break;
+            }
         }
 
         container.setClickable(true);
