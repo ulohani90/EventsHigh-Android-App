@@ -313,19 +313,24 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openOrganizerLink(View view) {
-        showInviteDialog = true;
-        reportEventAction(event, "organizer", "openLink");
+        if(event.organizerLink!=null) {
 
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerLink));
-        startActivitySafe(intent);
+            showInviteDialog = true;
+            reportEventAction(event, "organizer", "openLink");
+
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerLink));
+            startActivitySafe(intent);
+        }
     }
 
     public void openOrganizerWebsite(View view) {
-        showInviteDialog = true;
-        reportEventAction(event, "organizer", "openWebsite");
+        if(event.organizerWebsite!=null) {
+            showInviteDialog = true;
+            reportEventAction(event, "organizer", "openWebsite");
 
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerWebsite));
-        startActivitySafe(intent);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerWebsite));
+            startActivitySafe(intent);
+        }
     }
 
     @SuppressWarnings("all")
@@ -947,8 +952,7 @@ public class EventDetailActivity extends BaseActivity {
                     @Override
                     public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
 
-                            String error = String.format(getString(R.string.player_error), youTubeInitializationResult.toString());
-                            showMessage(error);
+                        (findViewById(R.id.youtube_fragment)).setVisibility(View.GONE);
 
                     }
                 });

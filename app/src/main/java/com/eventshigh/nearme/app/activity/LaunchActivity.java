@@ -229,8 +229,10 @@ public class LaunchActivity extends BaseContextActivity {
         plusOneButton.setOnPlusOneClickListener(new OnPlusOneClickListener() {
             @Override
             public void onPlusOneClick(Intent intent) {
-                reportActionToAnalytics("plusOne");
-                startActivityForResult(intent, PLUS_ONE_REQUEST_CODE);
+                if (intent != null) {
+                    reportActionToAnalytics("plusOne");
+                    startActivityForResult(intent, PLUS_ONE_REQUEST_CODE);
+                }
             }
         });
 

@@ -312,11 +312,15 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .setContentImageUrl(event.imgUrl)
                 .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
         branchObject.registerView();
+        String src = null;
+        if (packageName != null) {
+            src = packageName.split("\\.")[1];
+        }
         LinkProperties linkProperties = new LinkProperties()
                 .setChannel(packageName)
                 .setFeature("sharing")
                 .addControlParameter("$always_deeplink","true")
-                .addControlParameter("$desktop_url", "http://www.eventshigh.com")
+                .addControlParameter("$desktop_url", event.getEventShareURI(src).toString())
                 .addControlParameter("$ios_url", "http://www.eventshigh.com");
         final ProgressDialog dialog = OneSecDialog.show(this);
         branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
@@ -394,7 +398,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         LinkProperties linkProperties = new LinkProperties()
                 .setChannel("facebook")
                 .setFeature("sharing")
-                .addControlParameter("$desktop_url", "http://www.eventshigh.com")
+                .addControlParameter("$desktop_url", uri)
                 .addControlParameter("$ios_url", "http://www.eventshigh.com");
         final ProgressDialog dialog = OneSecDialog.show(this);
 
