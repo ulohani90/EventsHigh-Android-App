@@ -30,8 +30,8 @@ android {
         applicationId "com.eventshigh.nearme.app"
         minSdkVersion 19
         targetSdkVersion 23
-        versionCode 301
-        versionName "3.0.1"
+        versionCode 302
+        versionName "3.0.2"
     }
     signingConfigs {
         debug {
