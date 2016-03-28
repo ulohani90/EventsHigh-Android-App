@@ -51,6 +51,8 @@ public class PhoneLoginActivity extends BaseActivity {
     private EditText nameEditText;
     private EditText phoneNoEditText;
     private EditText codeEditText;
+    private boolean isOnboarding;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +75,7 @@ public class PhoneLoginActivity extends BaseActivity {
         nameEditText = nameView.getEditText();
         phoneNoEditText = phoneNoView.getEditText();
         codeEditText = codeView.getEditText();
-
+        isOnboarding = getIntent().getBooleanExtra("is_onboarding",false);
         account = new Account(this);
         updateView();
     }
@@ -123,12 +125,18 @@ public class PhoneLoginActivity extends BaseActivity {
 
                                         reportActionToAnalytics("sendCodeVerified");
                                         account.recordVerifiedPhoneNumber();
-                                        startInterestActivity();
-                                        //finish();
+                                        if(isOnboarding) {
+                                            startInterestActivity();
+                                        }else {
+                                            finish();
+                                        }
                                     } else if (status == VerificationStatus.CODE_SENT) {
                                         reportActionToAnalytics("sendCodeSuccess");
-                                        startInterestActivity();
-                                        //finish();
+                                        if(isOnboarding) {
+                                            startInterestActivity();
+                                        }else {
+                                            finish();
+                                        }
                                     }
                                 }
                             },
