@@ -1,8 +1,12 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -31,7 +35,12 @@ import java.util.List;
 import java.util.TimeZone;
 
 public class ReferralActivity extends BaseActivity {
+
+    public static final String FROM_NOTIFICATION_PARAM = "is_from_notification";
     private LinearLayout vouchersContainer;
+    boolean isFromNotification;
+    Toolbar toolbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +48,13 @@ public class ReferralActivity extends BaseActivity {
         setContentView(R.layout.activity_referral);
 
         vouchersContainer = (LinearLayout) findViewById(R.id.my_vouchers_container);
+
+        isFromNotification  = getIntent().getBooleanExtra(FROM_NOTIFICATION_PARAM,false);
+        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(Color.TRANSPARENT);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
     public View getViewForSnackbar() {
@@ -95,8 +111,17 @@ public class ReferralActivity extends BaseActivity {
                         }
 
                         LayoutInflater inflater = getLayoutInflater();
-                        for (DiscountCode code : discountCodes) {
+                        for (final DiscountCode code : discountCodes) {
                             inflater.inflate(R.layout.card_discount_voucher, vouchersContainer, true);
+
+                            (findViewById(R.id.parent_layout)).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if (!code.isUsed) {
+                                        copyTextToClipBoard("Coupon Code", code.code);
+                                    }
+                                }
+                            });
                             View parent = vouchersContainer.getChildAt(vouchersContainer.getChildCount() - 1);
                             if (code.isUsed) {
                                 //noinspection deprecation
@@ -121,6 +146,14 @@ public class ReferralActivity extends BaseActivity {
                 });
     }
 
+    public void copyTextToClipBoard(String label, String text){
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText(label, text);
+        clipboard.setPrimaryClip(clip);
+
+        showMessage(text+" coupon code copied to Clipboard");
+    }
+
     public void invite(View view) {
         shareApp();
     }
@@ -131,5 +164,14 @@ public class ReferralActivity extends BaseActivity {
         Intent intent = new Intent(this, EventsGridActivity.class)
                 .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(isFromNotification){
+            Intent intent = new Intent(this,LaunchActivity.class);
+            startActivity(intent);
+        }
+            super.onBackPressed();
     }
 }

@@ -192,6 +192,7 @@ public class LaunchActivity extends BaseContextActivity {
 
         // Show next screen.
       //  showNextScreen();
+
     }
 
     private void setLightToolbarIcons() {

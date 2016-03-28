@@ -44,6 +44,9 @@
     <color name="done_button">#10aa14</color>
     <color name="done_button_darker">#10aa14</color>
 
+    <color name="redeem_button">#fbaf41</color>
+    <color name="redeem_button_darker">#ea9e30</color>
+
     <color name="skip_button">#f3b832</color>
     <color name="skip_button_dark">#f3b832</color>
 

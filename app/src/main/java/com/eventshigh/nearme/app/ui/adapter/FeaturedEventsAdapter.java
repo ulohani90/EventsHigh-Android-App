@@ -23,7 +23,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return Math.max(MAX_EVENTS, eventPagerData.events.size()) +
+        return Math.min(MAX_EVENTS, eventPagerData.events.size()) +
                 (eventPagerData.showReferralOffer ? 1 : 0);
     }
 

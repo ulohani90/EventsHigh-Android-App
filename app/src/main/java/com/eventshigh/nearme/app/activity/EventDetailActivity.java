@@ -51,6 +51,7 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
+
 import org.json.JSONException;
 
 import java.io.UnsupportedEncodingException;
@@ -79,6 +80,8 @@ public class EventDetailActivity extends BaseActivity {
 
 
     CollapsingToolbarLayout collapsingToolbar;
+
+
 
 
     /*****************************************
@@ -228,17 +231,22 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openOrganizerLink(View view) {
-        reportEventAction(event, "organizer", "openLink");
 
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerLink));
-        startActivitySafe(intent);
+        if(event.organizerLink!=null) {
+            reportEventAction(event, "organizer", "openLink");
+
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerLink));
+            startActivitySafe(intent);
+        }
     }
 
     public void openOrganizerWebsite(View view) {
-        reportEventAction(event, "organizer", "openWebsite");
 
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerWebsite));
-        startActivitySafe(intent);
+        if(event.organizerWebsite!=null) {
+            reportEventAction(event, "organizer", "openWebsite");
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(event.organizerWebsite));
+            startActivitySafe(intent);
+        }
     }
 
     @SuppressWarnings("all")
@@ -259,9 +267,14 @@ public class EventDetailActivity extends BaseActivity {
             bookingUriBuilder.appendQueryParameter("name", userInfo.name);
             bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
         }
-
-        CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
+        try {
+            CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
                 getString(R.string.title_book));
+        }catch(Exception e){
+
+            showMessage(R.string.retry);
+
+        }
     }
 
     public void imagePreview(View view) {
@@ -365,9 +378,13 @@ public class EventDetailActivity extends BaseActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + event.youtubeVideoId));
             startActivity(intent);
         } catch (ActivityNotFoundException ex) {
-            Intent intent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("http://www.youtube.com/watch?v=" + event.youtubeVideoId));
-            startActivity(intent);
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://www.youtube.com/watch?v=" + event.youtubeVideoId));
+                startActivity(intent);
+            } catch (Exception e) {
+
+            }
         }
     }
 
@@ -671,7 +688,7 @@ public class EventDetailActivity extends BaseActivity {
                     addTagView(tagsView, tag, "tagClick");
                 }
             }
-            tagsHeaderView.setVisibility(tagsView.getChildCount() > 0 ? View.GONE : View.VISIBLE);
+            tagsHeaderView.setVisibility(tagsView.getChildCount() > 0 ? View.VISIBLE : View.GONE);
 
             // Set description.
             descriptionHeaderView.setVisibility(event.description.isEmpty() ? View.GONE : View.VISIBLE);
@@ -719,7 +736,10 @@ public class EventDetailActivity extends BaseActivity {
             }
 
             organizerHeader.setVisibility(organizerInfoShown ? View.VISIBLE : View.GONE);
+
         }
+
+
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
             getLayoutInflater().inflate(R.layout.view_event_tag, parent);

@@ -467,6 +467,7 @@
                     android:orientation="vertical"
                 />
 
+
             <!-- Event Description -->
             <TextView
                 android:id="@+id/description_header"
@@ -509,6 +510,8 @@
                 android:onClick="openSourceSite"
                 tools:text="Event details from: www.eventshigh.com"
             />
+
+
 
             <!-- Organizer Info -->
             <TextView

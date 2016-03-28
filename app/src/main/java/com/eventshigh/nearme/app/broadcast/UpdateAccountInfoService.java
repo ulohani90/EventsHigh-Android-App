@@ -57,7 +57,8 @@ public class UpdateAccountInfoService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         final SharedPreferences uploadStatus = getSharedPreferences(UPLOAD_STATUS_FILENAME, 0);
 
-        if (intent.getBooleanExtra(PARAM_REFRESH_LAST_CITY, false)) {
+        if ( intent != null && intent.getBooleanExtra(PARAM_REFRESH_LAST_CITY, false)) {
+
             Editor editor = uploadStatus.edit();
             editor.remove(PREF_LAST_CITY_UPLOADED);
             editor.apply();
