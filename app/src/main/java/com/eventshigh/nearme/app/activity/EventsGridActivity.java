@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,7 @@ import android.view.View;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
@@ -26,6 +28,8 @@ public class EventsGridActivity extends BaseContextActivity {
     private View fabShare;
 
     String shareImageUrl;
+
+    private boolean isFromNotification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +74,11 @@ public class EventsGridActivity extends BaseContextActivity {
             updateToolbar(0);
             setTitle();
         }
+        if(getIntent() != null &&
+                getIntent().getAction() != null && getIntent().getAction().startsWith(NOTIFICATION_ACTION)){
+            isFromNotification = true;
+        }
+
 
         // Add Events Fragment.
         Fragment eventFragment;
@@ -77,7 +86,7 @@ public class EventsGridActivity extends BaseContextActivity {
             boolean showEhInviteForNotification = getIntent() != null &&
                 getIntent().getAction() != null && getIntent().getAction().startsWith(NOTIFICATION_ACTION);
             EventsFragment eventFragment1 = EventsFragment.getInstance(
-                    eventsContext, showFollowCard, false, showEhInviteForNotification);
+                    eventsContext, showFollowCard, false, showEhInviteForNotification,(SocialInvitationsRequest.SpecialCoupons)getIntent().getParcelableExtra("special_obj"));
             eventFragment1.setOnScrollListener(
                     showFollowCard ? followCardScrollListener : doNothingScrollListener);
             eventFragment = eventFragment1;
@@ -88,6 +97,15 @@ public class EventsGridActivity extends BaseContextActivity {
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
         tr.replace(R.id.event_container, eventFragment);
         tr.commit();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        String action = getIntent().getAction();
+        if (BaseActivity.NOTIFICATION_ACTION.equals(action)) {
+            reportActionToAnalytics("openNotification",eventsContext.query);
+        }
     }
 
     public void setShareImageUrl(String shareImageUrl) {
@@ -180,5 +198,14 @@ public class EventsGridActivity extends BaseContextActivity {
                         getResources().getColor(android.R.color.white), EventsGridActivity.this);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(isFromNotification){
+            Intent intent  =new Intent(this,LaunchActivity.class);
+            startActivity(intent);
+        }
+        super.onBackPressed();
     }
 }

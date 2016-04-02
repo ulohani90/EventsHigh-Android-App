@@ -15,6 +15,7 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BlogEntryActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.EventDetailActivity;
+import com.eventshigh.nearme.app.activity.EventsGridActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.activity.ReferralActivity;
@@ -27,6 +28,7 @@ import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.TicketNotificationStreamItem;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.notification.EHNotification;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Account.UserInfo;
@@ -74,6 +76,7 @@ public class EHGcmListenerService extends GcmListenerService {
         String personalisedNotif = Utils.checkIfUnknown(msg.getString("personalised_notif"));
         String personalizeInterest = Utils.checkIfUnknown(msg.getString("perosnalize_interest"));
         String referEarn = Utils.checkIfUnknown(msg.getString("refer_earn"));
+        String special = Utils.checkIfUnknown(msg.getString("special"));
 
 
         UserContact contact = null;
@@ -100,7 +103,7 @@ public class EHGcmListenerService extends GcmListenerService {
             message = message.replace("Your friend", contact.name);
         }
 
-        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null && referEarn == null)  {
+        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null && referEarn == null && special == null)  {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
             return null;
         }
@@ -162,7 +165,7 @@ public class EHGcmListenerService extends GcmListenerService {
 
                     Intent intent = new Intent(this, LaunchActivity.class);
                     intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, EventsHighEndpoints.QUERY_MY_EVENT);
-                    intent.setAction(BaseActivity.NOTIFICATION_ACTION + target);
+                    intent.setAction(BaseActivity.NOTIFICATION_ACTION);
                     contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         }else if(personalizeInterest != null){
@@ -175,7 +178,14 @@ public class EHGcmListenerService extends GcmListenerService {
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             intent.putExtra(ReferralActivity.FROM_NOTIFICATION_PARAM,true);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        } else {
+        } else if(special !=null){
+            EventsContext param = new EventsContext(null, "eventshigh specials");
+            Intent intent = new Intent(this, EventsGridActivity.class)
+                    .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+            intent.putExtra("special_obj", SocialInvitationsRequest.SpecialCoupons.parseJson(special));
+            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        }else{
             Intent intent = new Intent(this,
                 contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + title);

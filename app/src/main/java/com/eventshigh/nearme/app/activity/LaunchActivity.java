@@ -574,7 +574,7 @@ ViewPager.OnPageChangeListener listener= new ViewPager.OnPageChangeListener() {
             if (TABS[position].equals(MY_EVENTS_TAB)) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                     EventsHighEndpoints.QUERY_MY_EVENT);
-                myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false);
+                myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false,null);
                 return myEventsFragment;
             }
 

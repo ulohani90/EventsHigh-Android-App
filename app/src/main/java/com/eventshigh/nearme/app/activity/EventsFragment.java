@@ -53,11 +53,14 @@ public class EventsFragment extends BaseEventsFragment {
 
     int scrollPosition = 0;
 
+    SocialInvitationsRequest.SpecialCoupons special;
+
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
-                                             boolean showCategories, boolean showEhInviteForNotification) {
+                                             boolean showCategories, boolean showEhInviteForNotification,SocialInvitationsRequest.SpecialCoupons special) {
         EventsFragment fragment = new EventsFragment();
         Bundle args = getArgs(eventsContext, showFollowCard, showCategories);
         args.putBoolean(SHOW_EH_INVITE_NOTIFICATION_PARAM, showEhInviteForNotification);
+        args.putParcelable("special_obj",special);
         fragment.setArguments(args);
         return fragment;
     }
@@ -124,6 +127,10 @@ public class EventsFragment extends BaseEventsFragment {
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         noMyEventsView = view.findViewById(R.id.view_no_my_event);
         retryView = view.findViewById(R.id.view_retry);
+
+        if(getArguments()!=null && getArguments().getParcelable("special_obj")!=null)
+                special = getArguments().getParcelable("special_obj");
+
     }
 
     @Override
@@ -263,22 +270,22 @@ public class EventsFragment extends BaseEventsFragment {
                 eventsAdapter.setEvents(eventsCollection.events, seeAllQuery, showEhInviteForNotification);
                 if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
-                            eventsCollection.numFollowers);
+                            eventsCollection.numFollowers,special);
                 }
            //     eventGridView.scrollToPosition(scrollPosition);
             }
         }
     };
 
-    private Listener<Map<String, SocialInvite>> mSocialInvitesCallback =
-        new Listener<Map<String, SocialInvite>>() {
+    private Listener<SocialInvitationsRequest.CommonInviteObject> mSocialInvitesCallback =
+        new Listener<SocialInvitationsRequest.CommonInviteObject>() {
             @Override
-            public void onResponse(Map<String, SocialInvite> socialInvites, boolean isIntermediate) {
+            public void onResponse(SocialInvitationsRequest.CommonInviteObject inviteObj, boolean isIntermediate) {
                 if (isDetached()) {
                     return;
                 }
 
-                eventsAdapter.setSocialInvites(socialInvites);
+                eventsAdapter.setSocialInvites(inviteObj.getInvites());
             }
         };
 

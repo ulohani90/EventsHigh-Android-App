@@ -42,7 +42,7 @@ public enum DataType {
         }
 
         if (typeId == EVENT.typeId) {
-            return EventCard.newInstance(activity, parent, false);
+            return EventCard.newInstance(activity, parent, false,true);
         }
 
         if (typeId == FOLLOW.typeId) {

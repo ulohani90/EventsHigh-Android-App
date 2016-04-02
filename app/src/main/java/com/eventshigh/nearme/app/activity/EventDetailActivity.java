@@ -565,10 +565,10 @@ public class EventDetailActivity extends BaseActivity {
                 }
         );
         SocialInvitationsRequest.submit(this, Priority.LOW, this, false,
-                new Listener<Map<String, SocialInvite>>() {
+                new Listener<SocialInvitationsRequest.CommonInviteObject>() {
                     @Override
-                    public void onResponse(Map<String, SocialInvite> invites, boolean isIntermediate) {
-                        SocialInvite invite = invites.get(event.id);
+                    public void onResponse(SocialInvitationsRequest.CommonInviteObject commonInviteObject, boolean isIntermediate) {
+                        SocialInvite invite = commonInviteObject.getInvites().get(event.id);
                         if (invite == null || invite.getInvitedBy() == null) {
                             reportActionToAnalytics("showSocialInfo", "invitedBy", 0);
                             return;

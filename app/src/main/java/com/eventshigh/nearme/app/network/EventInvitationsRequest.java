@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInvitation>> {
+public class EventInvitationsRequest extends AsyncTask<Void, Void, EventInvitationsRequest.InvitaionData> {
     public static class EventInvitation {
         public final Event event;
         public final SocialFriend invitedBy;
@@ -34,8 +34,19 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
         }
     }
 
+    public static class InvitaionData{
+        public final List<EventInvitation> invitations;
+        public final List<SocialInvitationsRequest.SpecialCoupons> specials;
+
+        public InvitaionData(List<EventInvitation> invitations ,List<SocialInvitationsRequest.SpecialCoupons> specials ){
+            this.invitations = invitations;
+            this.specials = specials;
+        }
+
+    }
+
     public static void submit(Context context, EventsContext eventsContext, Priority priority,
-            Object tag, boolean shouldBypassCache, Listener<List<EventInvitation>> listener,
+            Object tag, boolean shouldBypassCache, Listener<InvitaionData> listener,
             ErrorListener errorListener) {
         new EventInvitationsRequest(context, eventsContext, priority, tag, shouldBypassCache,
                 listener, errorListener).execute();
@@ -46,11 +57,11 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
     private final Priority priority;
     private final Object tag;
     private final boolean shouldBypassCache;
-    private final Listener<List<EventInvitation>> listener;
+    private final Listener<InvitaionData> listener;
     private final ErrorListener errorListener;
 
     public EventInvitationsRequest(Context context, EventsContext eventsContext, Priority priority,
-           Object tag, boolean shouldBypassCache, Listener<List<EventInvitation>> listener,
+           Object tag, boolean shouldBypassCache, Listener<InvitaionData> listener,
            ErrorListener errorListener) {
         this.context = context;
         this.eventsContext = eventsContext;
@@ -62,12 +73,13 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
     }
 
     @Override
-    protected List<EventInvitation> doInBackground(Void... params) {
-        RequestFuture<Map<String, SocialInvite>> future = RequestFuture.newFuture();
+    protected InvitaionData doInBackground(Void... params) {
+        RequestFuture<SocialInvitationsRequest.CommonInviteObject> future = RequestFuture.newFuture();
         SocialInvitationsRequest.submit(context, priority, tag, shouldBypassCache, future, future);
 
         try {
-            Collection<SocialInvite> invites = future.get().values();
+
+            Collection<SocialInvite> invites = future.get().getInvites().values();
 
             List<String> eventIds = new ArrayList<>(invites.size());
             for (SocialInvite invite : invites) {
@@ -93,7 +105,8 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
                     eventInvitations.add(new EventInvitation(event, invitedBy));
                 }
             }
-            return eventInvitations;
+            return new InvitaionData(eventInvitations ,future.get().getSpecials());
+
         } catch (InterruptedException|ExecutionException e) {
             Crashlytics.getInstance().core.logException(e);
         }
@@ -101,7 +114,7 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, List<EventInv
         return null;
     }
 
-    protected void onPostExecute(@Nullable List<EventInvitation> result) {
+    protected void onPostExecute(@Nullable InvitaionData result) {
         if (result != null) {
             listener.onResponse(result, false);
         } else {

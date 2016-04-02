@@ -187,7 +187,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-            finish();
+            onBackPressed();
             return true;
         }
 
@@ -305,6 +305,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void shareEventWithBranch(final Event event, @Nullable final String packageName, @Nullable  final String label) {
 
         BranchUniversalObject branchObject = new BranchUniversalObject();
+
+        String referralLink = new Account(this).getReferrerLink();
+        if (referralLink == null) {
+            referralLink = "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + Utils.getAndroidId(this);
+        }
         branchObject.setCanonicalIdentifier(event.id).setTitle(event.title)
                 .addContentMetadata("event_id",event.id)
                 .addContentMetadata("city_name",event.city.toString())
@@ -319,8 +324,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         LinkProperties linkProperties = new LinkProperties()
                 .setChannel(packageName)
                 .setFeature("sharing")
-                .addControlParameter("$always_deeplink","true")
+                .addControlParameter("$always_deeplink", "true")
                 .addControlParameter("$desktop_url", event.getEventShareURI(src).toString())
+                .addControlParameter("$android_url", referralLink)
                 .addControlParameter("$ios_url", "http://www.eventshigh.com");
         final ProgressDialog dialog = OneSecDialog.show(this);
         branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
@@ -388,6 +394,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void shareEventsWithBranch(final EventsContext eventsContext,@Nullable String imageUrl) {
         String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
                 .appendQueryParameter("src", "ehm").toString();
+        String referralLink = new Account(this).getReferrerLink();
+        if (referralLink == null) {
+            referralLink = "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + Utils.getAndroidId(this);
+        }
+
         BranchUniversalObject branchObject = new BranchUniversalObject();
         branchObject.setCanonicalIdentifier(eventsContext.getLabel()).setTitle(eventsContext.toString())
                 .addContentMetadata("event_uri", uri)
@@ -399,6 +410,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .setChannel("facebook")
                 .setFeature("sharing")
                 .addControlParameter("$desktop_url", uri)
+                .addControlParameter("$android_url", referralLink)
                 .addControlParameter("$ios_url", "http://www.eventshigh.com");
         final ProgressDialog dialog = OneSecDialog.show(this);
 
@@ -505,4 +517,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         return INSTALLED_PACKAGES.contains(packageName);
     }
+
+
 }

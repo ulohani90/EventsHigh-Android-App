@@ -49,5 +49,6 @@
 
     <color name="skip_button">#f3b832</color>
     <color name="skip_button_dark">#f3b832</color>
+    <color name="valid_text_grey">#6E7073</color>
 
 </resources>

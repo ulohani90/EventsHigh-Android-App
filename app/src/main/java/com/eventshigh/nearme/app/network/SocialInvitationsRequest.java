@@ -2,6 +2,8 @@ package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.android.volley.NetworkResponse;
@@ -13,10 +15,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
+import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.data.EventCategory;
+import com.eventshigh.nearme.app.data.EventDescriptionSection;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.Signer;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvite>>  {
+public class SocialInvitationsRequest extends JsonRequest<SocialInvitationsRequest.CommonInviteObject>  {
 
     public static class PlanInvite {
         public final String planId;
@@ -60,14 +66,80 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
             return invites;
         }
     }
+    public static class SpecialCoupons implements Parcelable{
+
+        public final MyDiscountVouchersRequest.DiscountCode coupon;
+
+        public final String  message;
+
+        public final String title;
+
+        public final String target;
+
+        public SpecialCoupons(MyDiscountVouchersRequest.DiscountCode coupon,String message,String title,String target){
+            this.coupon = coupon;
+            this.message =message;
+            this.title = title;
+            this.target = target;
+        }
+
+        public static List<SpecialCoupons> fromJson(JSONArray array) throws JSONException{
+            List<SpecialCoupons> specials = new ArrayList<>();
+            for(int i=0;i<array.length();i++){
+                specials.add(new SpecialCoupons(array.getJSONObject(i).has("coupon")?MyDiscountVouchersRequest.DiscountCode.parse(array.getJSONObject(i).getJSONObject("coupon")):null,array.getJSONObject(i).getString("m"),array.getJSONObject(i).getString("t"),array.getJSONObject(i).getString("target")));
+            }
+            return specials;
+        }
+        public static SpecialCoupons parseJson(String jsonString){
+            try {
+                JSONObject jsonObject = new JSONObject(jsonString);
+                return new SpecialCoupons(jsonObject.has("coupon") ? MyDiscountVouchersRequest.DiscountCode.parse(jsonObject.getJSONObject("coupon")) : null, jsonObject.getString("m"), jsonObject.getString("t"), jsonObject.getString("target"));
+            }catch(Exception e){
+                return null;
+            }
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeParcelable(coupon,flags);
+            dest.writeString(message);
+            dest.writeString(title);
+            dest.writeString(target);
+
+        }
+        public static final Parcelable.Creator<SpecialCoupons> CREATOR =
+                new Parcelable.Creator<SpecialCoupons>() {
+                    public SpecialCoupons createFromParcel(Parcel in) {
+                        return new SpecialCoupons(
+                                (MyDiscountVouchersRequest.DiscountCode) in.readParcelable(MyDiscountVouchersRequest.DiscountCode.class.getClassLoader()),
+                                in.readString(),
+                                in.readString(),
+                                in.readString()
+                        );
+                    }
+
+                    public SpecialCoupons[] newArray(int size) {
+                        return new SpecialCoupons[size];
+                    }
+                };
+
+
+    }
 
     public static class SocialInvite {
         public final String eventId;
         public final List<PlanInvite> planInvites;
 
+
         public SocialInvite(String eventId, List<PlanInvite> planInvites) {
             this.eventId = eventId;
             this.planInvites = planInvites;
+
         }
 
         public @Nullable SocialFriend getInvitedBy() {
@@ -120,8 +192,32 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
         }
     }
 
+    public static class CommonInviteObject {
+        public Map<String ,SocialInvite> invites;
+        public List<SpecialCoupons> specials;
+
+        public Map<String, SocialInvite> getInvites() {
+            return invites;
+        }
+
+        public void setInvites(Map<String, SocialInvite> invites) {
+            this.invites = invites;
+        }
+
+        public List<SpecialCoupons> getSpecials() {
+            return specials;
+        }
+
+        public void setSpecials(List<SpecialCoupons> specials) {
+            this.specials = specials;
+        }
+
+    }
+
+
+
     public static void submit(Context context, Priority priority, Object tag, boolean shouldBypassCache,
-            Listener<Map<String, SocialInvite>> listener, ErrorListener errorListener) {
+            Listener<CommonInviteObject> listener, ErrorListener errorListener) {
         try {
             String mobileNo = new Account(context).getUserInfo().phoneNo;
             if (mobileNo == null) {
@@ -145,7 +241,7 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
     private final Uri getSocialInvitesUri;
 
     public SocialInvitationsRequest(Context context, Uri getSocialInvitesUri, Priority priority,
-            boolean shouldBypassCache, Listener<Map<String, SocialInvite>> listener, ErrorListener errorListener)
+            boolean shouldBypassCache, Listener<CommonInviteObject> listener, ErrorListener errorListener)
             throws GeneralSecurityException, UnsupportedEncodingException {
         super(Method.GET, Signer.sign(getSocialInvitesUri).toString(), null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
@@ -165,8 +261,10 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
     }
 
     @Override
-    protected Response<Map<String, SocialInvite>> parseNetworkResponse(NetworkResponse response) {
+    protected Response<CommonInviteObject> parseNetworkResponse(NetworkResponse response) {
         try {
+            CommonInviteObject commonObj = new CommonInviteObject();
+
             String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
             JSONObject resp = new JSONObject(jsonString);
             Map<String, SocialInvite> invites = new HashMap<>();
@@ -174,8 +272,10 @@ public class SocialInvitationsRequest extends JsonRequest<Map<String, SocialInvi
                     SocialInvite.fromJSON(resp.getJSONArray("invitations"), context)) {
                 invites.put(invite.eventId, invite);
             }
+            commonObj.setInvites(invites);
+            commonObj.setSpecials(SpecialCoupons.fromJson(resp.getJSONArray("specials")));
 
-            return Response.success(invites, HttpHeaderParser.parseCacheHeaders(response));
+            return Response.success(commonObj, HttpHeaderParser.parseCacheHeaders(response));
         } catch (Exception e) {
             return Response.error(new ParseError(e));
         }

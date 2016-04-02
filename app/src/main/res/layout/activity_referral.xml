@@ -38,7 +38,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
+                android:paddingLeft="8dp"
                 android:paddingRight="10dp"
                 android:paddingTop="10dp"
                 >
@@ -72,14 +72,14 @@
                 <View android:layout_width="24dp"
                     android:layout_height="20dp"
                     android:layout_below="@id/icon"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="10dp"
                     android:background="@drawable/vertical_dotted_line"></View>
             </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
+                android:paddingLeft="8dp"
                 android:paddingRight="10dp"
                 >
                 <ImageView
@@ -111,14 +111,13 @@
                 <View android:layout_width="24dp"
                     android:layout_height="20dp"
                     android:layout_below="@id/icon1"
-                    android:layout_marginStart="12dp"
-
+                    android:layout_marginStart="10dp"
                     android:background="@drawable/vertical_dotted_line"></View>
             </RelativeLayout>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
+                android:paddingLeft="8dp"
                 android:paddingRight="10dp"
                 >
                 <ImageView
@@ -233,12 +232,13 @@
                 />
             <TextView
                 style="@style/EHText"
+                android:id="@+id/terms_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:lineSpacingExtra="2dp"
                 android:layout_marginBottom="4dp"
                 android:textSize="10sp"
-                android:text="Eligible on friends who installs the EventsHigh app for first time.\nBoth you and your friend needs to register using phone number.\nYou will get the discount voucher for ₹ 100 which can be redeemed only for events ticketed on eventshigh.com.\nYou can use one discount voucher per transaction.\nDiscount vouchers are not transferable.\nEventsHigh team reserves the right to cancel discount vouchers if it suspects misuse. EventsHigh team decision will be final.\nFor any queries, please write to us at support@eventshigh.com."
+
                 />
 
             <View

@@ -1,6 +1,13 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.UnderlineSpan;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -8,6 +15,7 @@ import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.view.ContactListView;
@@ -20,6 +28,13 @@ public class FollowCard extends ViewHolder {
     private View followButton;
     private View followingButton;
     private ContactListView followedByView;
+    private View discountCoupon;
+
+    private TextView couponCode;
+    private TextView discountValue;
+    private TextView discountValidty;
+    private TextView viewAll;
+
 
     public static FollowCard newInstance(final BaseActivity activity, ViewGroup parent) {
         View view = activity.getLayoutInflater().inflate(R.layout.card_follow, parent, false);
@@ -34,6 +49,11 @@ public class FollowCard extends ViewHolder {
         followButton = itemView.findViewById(R.id.follow_button);
         followingButton = itemView.findViewById(R.id.following_button);
         followedByView = (ContactListView) itemView.findViewById(R.id.followed_by);
+        discountCoupon = itemView.findViewById(R.id.discount_coupon);
+        couponCode = (TextView)itemView.findViewById(R.id.discount_code);
+        discountValue = (TextView)itemView.findViewById(R.id.discount_value);
+        discountValidty = (TextView)itemView.findViewById(R.id.discount_validity);
+        viewAll = (TextView)itemView.findViewById(R.id.view_all);
     }
 
     public void populate(final FollowData data) {
@@ -64,7 +84,43 @@ public class FollowCard extends ViewHolder {
             }
         });
 
-        followedByView.setFollowers(data.activity, data.socialDataProvider.getFollowers(data.title));
+        if(data.socialDataProvider.getFollowers(data.title)!=null && data.socialDataProvider.getFollowers(data.title).size()>0) {
+            followedByView.setVisibility(View.VISIBLE);
+            followedByView.setFollowers(data.activity, data.socialDataProvider.getFollowers(data.title));
+        }else{
+            followedByView.setVisibility(View.GONE);
+        }
+
+        if(data.special!=null){
+            discountCoupon.setVisibility(View.VISIBLE);
+            discountValue.setText("₹ " + data.special.coupon.amount);
+            couponCode.setText(data.special.coupon.code);
+            discountValidty.setText(data.special.message);
+            discountCoupon.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) data.activity.getSystemService(data.activity.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("Coupon Code", data.special.coupon.code);
+                    clipboard.setPrimaryClip(clip);
+                    data.activity.showMessage(data.special.coupon.code + " coupon code copied to Clipboard");
+                }
+            });
+            viewAll.setVisibility(View.VISIBLE);
+            SpannableString content = new SpannableString(data.activity.getResources().getString(R.string.view_all));
+            content.setSpan(new UnderlineSpan(), 0, content.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            viewAll.setText(content);
+
+            viewAll.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(data.activity, ReferralActivity.class);
+                    data.activity.startActivity(intent);
+                }
+            });
+        }else{
+            discountCoupon.setVisibility(View.GONE);
+        }
+
     }
 
     public void setFollowButtons(boolean isFollowing) {
@@ -72,4 +128,6 @@ public class FollowCard extends ViewHolder {
         followingButton.setVisibility(isFollowing ? View.VISIBLE : View.GONE);
         followingButton.setSelected(true);
     }
+
+
 }

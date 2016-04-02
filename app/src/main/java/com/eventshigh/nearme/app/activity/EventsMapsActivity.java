@@ -203,7 +203,7 @@ public class EventsMapsActivity extends BaseContextActivity {
         View eventView = eventCardContainer.getChildAt(0);
         Event event = mapMarkerManager.getEvent(lastSelectedMarker);
         eventView = EventCard.getEventCard(
-                event, EventsMapsActivity.this, eventView, eventCardContainer);
+                event, EventsMapsActivity.this, eventView, eventCardContainer,false);
         eventView.setOnTouchListener(
                 new OnTouchListener() {
                     @Override

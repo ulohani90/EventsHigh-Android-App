@@ -84,10 +84,14 @@
         app:text=" follows this."
     />
 
+    <include layout="@layout/card_discount_voucher"
+        android:id="@+id/discount_coupon"/>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/gray600"
+        android:layout_marginTop="4dp"
         android:layout_marginLeft="-4dp"
         android:layout_marginRight="-4dp"
     />

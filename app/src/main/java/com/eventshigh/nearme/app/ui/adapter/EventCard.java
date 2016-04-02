@@ -9,6 +9,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -39,23 +40,26 @@ public class EventCard extends ViewHolder {
     private final ContactListView invitedByView;
     private final View infoArrowView;
     private final ImageView share;
+    private final LinearLayout cardParent;
+    private final LinearLayout eventInfo;
+    private final boolean addShadow;
 
     public static EventCard newInstance(Activity activity, ViewGroup parent,
-                                        boolean shouldAdjustImageHeight) {
+                                        boolean shouldAdjustImageHeight,boolean isAddShadow) {
         View view = activity.getLayoutInflater().inflate(R.layout.card_event, parent, false);
-        return new EventCard(view, shouldAdjustImageHeight);
+        return new EventCard(view, shouldAdjustImageHeight,isAddShadow);
     }
 
     // Build the view, reuse existing if possible.
     public static View getEventCard(final Event event, final BaseContextActivity activity,
-                                    @Nullable View reuseView, ViewGroup parent) {
-        EventCard card = reuseView != null ? new EventCard(reuseView, true) :
-                newInstance(activity, parent, true);
+                                    @Nullable View reuseView, ViewGroup parent,boolean isAddShadow) {
+        EventCard card = reuseView != null ? new EventCard(reuseView, true,isAddShadow) :
+                newInstance(activity, parent, true,isAddShadow);
         card.bindEventView(event, activity,0,null);
         return card.itemView;
     }
 
-    public EventCard(View cardView, boolean shouldAdjustImageHeight) {
+    public EventCard(View cardView, boolean shouldAdjustImageHeight,boolean isAddShadow) {
         super(cardView);
 
         this.shouldAdjustImageHeight = shouldAdjustImageHeight;
@@ -72,6 +76,9 @@ public class EventCard extends ViewHolder {
         invitedByView = (ContactListView) cardView.findViewById(R.id.invited_by);
         infoArrowView = cardView.findViewById(R.id.info_arrow);
         share = (ImageView)cardView.findViewById(R.id.share);
+        cardParent = (LinearLayout)cardView.findViewById(R.id.card_parent);
+        eventInfo  = (LinearLayout)cardView.findViewById(R.id.event_info);
+        addShadow = isAddShadow;
     }
 
 
@@ -87,7 +94,7 @@ public class EventCard extends ViewHolder {
                               final BaseContextActivity activity,
                               @Nullable SocialInvite invite) {
         bindEventView(event, activity,position,null);
-
+        eventInfo.setVisibility(View.VISIBLE);
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
 
         // Set the travel time.
@@ -124,15 +131,15 @@ public class EventCard extends ViewHolder {
         if (invite != null && invite.getInvitedBy() != null) {
             invitedByView.setVisibility(View.VISIBLE);
             invitedByView.setFollowers(activity, invite.getAllInvitedBy());
-            infoArrowView.setVisibility(View.VISIBLE);
+            infoArrowView.setVisibility(View.GONE);
         } else if (event.numViews > 5) {
             eventStatsView.setVisibility(View.VISIBLE);
             eventStatsView.setText("" + event.numViews + " views");
-            infoArrowView.setVisibility(View.VISIBLE);
+            infoArrowView.setVisibility(View.GONE);
         }else{
             eventStatsView.setVisibility(View.VISIBLE);
             eventStatsView.setText("" + Utils.getRandomNumber(10,50) + " views");
-            infoArrowView.setVisibility(View.VISIBLE);
+            infoArrowView.setVisibility(View.GONE);
         }
 
         //Share event
@@ -195,7 +202,15 @@ public class EventCard extends ViewHolder {
             priceView.setText(priceString);
         }
 
+        //
+        if(addShadow) {
+            cardParent.setBackground(activity.getResources().getDrawable(R.drawable.card_item_bg));
+        }else{
+            cardParent.setBackground(null);
+        }
+
         // Set the venue.
+        eventInfo.setVisibility(View.GONE);
         venueView.setText(event.getShortAddress());
 
         arrowView.setVisibility(View.GONE);
@@ -211,7 +226,7 @@ public class EventCard extends ViewHolder {
                               final BaseContextActivity activity,
                               @Nullable SocialInvite invite,EventsAdapter.OnItemClickedListener listener) {
         bindEventView(event, activity,position,listener);
-
+        eventInfo.setVisibility(View.VISIBLE);
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
 
         // Set the travel time.
@@ -249,15 +264,15 @@ public class EventCard extends ViewHolder {
         if (invite != null && invite.getInvitedBy() != null) {
             invitedByView.setVisibility(View.VISIBLE);
             invitedByView.setFollowers(activity, invite.getAllInvitedBy());
-            infoArrowView.setVisibility(View.VISIBLE);
+            infoArrowView.setVisibility(View.GONE);
         } else if (event.numViews > 5) {
             eventStatsView.setVisibility(View.VISIBLE);
             eventStatsView.setText("" + event.numViews + " views");
-            infoArrowView.setVisibility(View.VISIBLE);
+            infoArrowView.setVisibility(View.GONE);
         }else{
             eventStatsView.setVisibility(View.VISIBLE);
             eventStatsView.setText("" + Utils.getRandomNumber(10,50) + " views");
-            infoArrowView.setVisibility(View.VISIBLE);
+            infoArrowView.setVisibility(View.GONE);
         }
 
         //Share event

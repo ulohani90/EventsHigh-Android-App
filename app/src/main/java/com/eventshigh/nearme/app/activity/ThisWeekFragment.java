@@ -140,7 +140,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
         public Fragment getItem(int position) {
             EventsContext dateContext = new EventsContext(eventsContext.location, "");
             dateContext.setDateFilter(getDate(position));
-            return EventsFragment.getInstance(dateContext, false, showCategories, false);
+            return EventsFragment.getInstance(dateContext, false, showCategories, false,null);
         }
 
         @Override
