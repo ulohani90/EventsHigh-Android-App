@@ -179,7 +179,6 @@ public class EHGcmListenerService extends GcmListenerService {
             intent.putExtra(ReferralActivity.FROM_NOTIFICATION_PARAM,true);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else if(special !=null){
-
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + "specials");
             intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, "eventshigh specials"));
