@@ -39,6 +39,7 @@ import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter.OnCitySelectionListener;
@@ -487,16 +488,20 @@ public class LaunchActivity extends BaseContextActivity {
             refreshIfOldData();
         } else {
             String action = Intent.ACTION_VIEW;
+            SocialInvitationsRequest.SpecialCoupons special = null;
             Intent inIntent = getIntent();
             if (inIntent != null) {
                 String inAction = inIntent.getAction();
                 if (inAction != null && inAction.startsWith(NOTIFICATION_ACTION)) {
                     action = inAction;
                 }
+                special = inIntent.getParcelableExtra("special_obj");
             }
 
             Intent outIntent = new Intent(this, EventsGridActivity.class);
             outIntent.setAction(action);
+            if(special!=null)
+            outIntent.putExtra("special_obj",special);
             outIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
             startActivity(outIntent);
             finish();

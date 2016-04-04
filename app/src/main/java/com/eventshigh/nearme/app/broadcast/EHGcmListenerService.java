@@ -179,12 +179,13 @@ public class EHGcmListenerService extends GcmListenerService {
             intent.putExtra(ReferralActivity.FROM_NOTIFICATION_PARAM,true);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else if(special !=null){
-            EventsContext param = new EventsContext(null, "eventshigh specials");
-            Intent intent = new Intent(this, EventsGridActivity.class)
-                    .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
-            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+
+            Intent intent = new Intent(this, LaunchActivity.class);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION + "specials");
+            intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, "eventshigh specials"));
             intent.putExtra("special_obj", SocialInvitationsRequest.SpecialCoupons.parseJson(special));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+            QueryNotificationStreamItem.record(this, title, message, imageUrl, mobileNo, "eventshigh specials");
         }else{
             Intent intent = new Intent(this,
                 contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);

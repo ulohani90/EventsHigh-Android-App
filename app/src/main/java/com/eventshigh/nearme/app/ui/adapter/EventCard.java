@@ -2,8 +2,10 @@ package com.eventshigh.nearme.app.ui.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -204,14 +206,22 @@ public class EventCard extends ViewHolder {
 
         //
         if(addShadow) {
+            venueView.setText(event.getShortAddress());
+            Drawable drawable = activity.getResources().getDrawable(R.drawable.ic_location_on_white_12dp);
+            drawable.setBounds(0,0,drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
+            venueView.setCompoundDrawables(drawable, null, null, null);
+            venueView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
             cardParent.setBackground(activity.getResources().getDrawable(R.drawable.card_item_bg));
         }else{
+            venueView.setText(event.title);
+            venueView.setTextSize(TypedValue.COMPLEX_UNIT_SP,16);
+            venueView.setCompoundDrawables(null,null,null,null);
             cardParent.setBackground(null);
         }
 
         // Set the venue.
         eventInfo.setVisibility(View.GONE);
-        venueView.setText(event.getShortAddress());
+
 
         arrowView.setVisibility(View.GONE);
         favouriteView.setVisibility(View.GONE);
