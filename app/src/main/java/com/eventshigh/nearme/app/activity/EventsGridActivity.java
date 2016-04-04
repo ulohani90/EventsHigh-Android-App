@@ -98,14 +98,14 @@ public class EventsGridActivity extends BaseContextActivity {
         tr.commit();
     }
 
-    @Override
+    /*@Override
     protected void onStart() {
         super.onStart();
         String action = getIntent().getAction();
         if (BaseActivity.NOTIFICATION_ACTION.equals(action)) {
             reportActionToAnalytics("openNotification",eventsContext.query);
         }
-    }
+    }*/
 
     public void setShareImageUrl(String shareImageUrl) {
         this.shareImageUrl = shareImageUrl;
