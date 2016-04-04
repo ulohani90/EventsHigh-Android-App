@@ -53,7 +53,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
             eventIndex --;
         }
         View view = EventCard.getEventCard(eventPagerData.events.get(eventIndex),
-                eventPagerData.activity, null, container);
+                eventPagerData.activity, null, container,false);
         container.addView(view);
         return view;
     }

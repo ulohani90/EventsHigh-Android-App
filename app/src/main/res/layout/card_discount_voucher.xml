@@ -8,7 +8,7 @@
     android:layout_marginTop="10dp"
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
-    android:layout_height="70dp"
+    android:layout_height="wrap_content"
     android:padding="10dp"
 >
     <TextView
@@ -34,13 +34,30 @@
     />
     <TextView
         android:id="@+id/discount_validity"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="start|bottom"
-        android:layout_alignParentBottom="true"
-        android:padding="4dp"
+        android:layout_below="@id/discount_value"
+        android:layout_toStartOf="@id/discount_value"
         android:textIsSelectable="false"
+        android:layout_marginEnd="5dp"
         android:textSize="11sp"
+        android:textColor="@color/valid_text_grey"
         tools:text="Valid Till: Thu 1 March, 6pm"
     />
+    <TextView
+        android:id="@+id/view_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|bottom"
+        android:layout_toStartOf="@id/discount_value"
+        android:layout_below="@id/discount_validity"
+        android:textIsSelectable="false"
+        android:layout_marginEnd="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dp"
+        android:textSize="11sp"
+        android:textColor="@android:color/black"
+        android:visibility="gone"
+
+        />
 </RelativeLayout>

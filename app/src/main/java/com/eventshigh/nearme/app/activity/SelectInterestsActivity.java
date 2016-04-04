@@ -24,7 +24,6 @@ import java.util.List;
 public class SelectInterestsActivity extends BaseActivity{
 
 
-
     public static final String FROM_NOTIFICATION_PARAM = "is_from_notification";
     public static final String ONBOARDING_FLOW = "is_onboarding";
     ExpandableListView categoriesList;
@@ -60,10 +59,6 @@ public class SelectInterestsActivity extends BaseActivity{
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-
-
-
         categoriesList = (ExpandableListView)findViewById(R.id.categories_list);
         topProgressBar = (ProgressBar)findViewById(R.id.top_progress_bar);
         /*findViewById(R.id.done_btn).setOnClickListener(new View.OnClickListener() {
@@ -76,6 +71,13 @@ public class SelectInterestsActivity extends BaseActivity{
         new LoadEventsSubCategories().execute();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (BaseActivity.NOTIFICATION_ACTION.equals(BaseActivity.NOTIFICATION_ACTION)) {
+            reportActionToAnalytics("openNotification");
+        }
+    }
 
     @Override
     public View getViewForSnackbar() {

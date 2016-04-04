@@ -148,10 +148,10 @@ public class Event implements Parcelable {
         }
 
         if (maxPrice - minPrice < 0.01) {
-            return currency + " " + minPrice;
+            return currency + " " + Math.round(minPrice);
         }
 
-        return currency + " " + minPrice + " - " + maxPrice;
+        return currency + " " + Math.round(minPrice) + " - " + Math.round(maxPrice);
     }
 
     @Override

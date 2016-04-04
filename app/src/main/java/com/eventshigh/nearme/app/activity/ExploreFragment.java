@@ -242,14 +242,14 @@ public class ExploreFragment extends BaseEventsFragment {
         }
     };
 
-    private Listener<List<EventInvitation>> mEventInvitationsCallback = new Listener<List<EventInvitation>>() {
+    private Listener<EventInvitationsRequest.InvitaionData> mEventInvitationsCallback = new Listener<EventInvitationsRequest.InvitaionData>() {
         @Override
-        public void onResponse(List<EventInvitation> eventInvitations, boolean isIntermediate) {
+        public void onResponse(EventInvitationsRequest.InvitaionData eventInvitations, boolean isIntermediate) {
             if (isAdded()) {
                 topProgressBar.setVisibility(View.GONE);
                 activity.reportActionToAnalytics("showSocialInfo", "eventInvitations",
-                        eventInvitations.size());
-                eventsAdapter.addEventInvitations(eventInvitations);
+                        eventInvitations.invitations.size());
+                eventsAdapter.addEventInvitations(eventInvitations.invitations,eventInvitations.specials);
             }
         }
     };

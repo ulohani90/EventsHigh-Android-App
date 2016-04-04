@@ -105,7 +105,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         }
 
         List<TopicEvents> result = new ArrayList<>();
-        RequestFuture<Map<String, SocialInvite>> socialInvites = RequestFuture.newFuture();
+        RequestFuture<SocialInvitationsRequest.CommonInviteObject> socialInvites = RequestFuture.newFuture();
         SocialInvitationsRequest.submit(context, priority, tag, shouldBypassCache,
                 socialInvites, socialInvites);
 
@@ -129,7 +129,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         // Look at invites and send the request for sent invitations.
         List<String> eventIds = new ArrayList<>();
         try {
-            eventIds.addAll(socialInvites.get().keySet());
+            eventIds.addAll(socialInvites.get().getInvites().keySet());
         } catch (InterruptedException | ExecutionException e) {
             // Ignore.
         }

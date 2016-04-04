@@ -9,6 +9,7 @@ import android.util.Log;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
+import com.eventshigh.nearme.app.activity.EventsGridActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -45,6 +46,7 @@ public class IntentUtils {
 
     private void processIntent(Intent inIntent) {
         param = inIntent.getParcelableExtra(EXTRA_EVENT_CONTEXT);
+        inIntent.getParcelableExtra("special_obj");
         if (param == null) {
             param = new EventsContext(null, "");
         }
@@ -58,7 +60,7 @@ public class IntentUtils {
                 if (activity instanceof LaunchActivity) {
                     String label = param.query == null ? inIntent.getStringExtra(LaunchActivity.DEFAULT_TAB_PARAM) : param.query;
                     activity.reportActionToAnalytics("openNotification", label);
-                    Log.i("notification param", param.query);
+                //    Log.i("notification param", param.query);
                 }
                 processViewIntent(inIntent, false);
             }

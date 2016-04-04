@@ -20,6 +20,9 @@ public class InstallReferrer extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
+
+
         if (intent.getAction().equals("com.android.vending.INSTALL_REFERRER")) {
             try {
                 String referrer = intent.getStringExtra("referrer");

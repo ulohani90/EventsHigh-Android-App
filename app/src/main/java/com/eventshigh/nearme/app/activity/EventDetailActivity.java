@@ -415,6 +415,7 @@ public class EventDetailActivity extends BaseActivity {
         eventCard.populateView(event);
         findViewById(R.id.check_with_friends).setVisibility(View.VISIBLE);
         findViewById(R.id.share_whatsapp).setVisibility(View.VISIBLE);
+
     }
 
     private Listener<Event> mEventListener = new Listener<Event>() {

@@ -2,13 +2,16 @@ package com.eventshigh.nearme.app.ui.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -34,23 +37,26 @@ public class EventCard extends ViewHolder {
     private final TextView eventStatsView;
     private final View infoArrowView;
     private final ImageView share;
+    private final LinearLayout cardParent;
+    private final LinearLayout eventInfo;
+    private final boolean addShadow;
 
     public static EventCard newInstance(Activity activity, ViewGroup parent,
-                                        boolean shouldAdjustImageHeight) {
+                                        boolean shouldAdjustImageHeight,boolean isAddShadow) {
         View view = activity.getLayoutInflater().inflate(R.layout.card_event, parent, false);
-        return new EventCard(view, shouldAdjustImageHeight);
+        return new EventCard(view, shouldAdjustImageHeight,isAddShadow);
     }
 
     // Build the view, reuse existing if possible.
     public static View getEventCard(final Event event, final BaseContextActivity activity,
-                                    @Nullable View reuseView, ViewGroup parent) {
-        EventCard card = reuseView != null ? new EventCard(reuseView, true) :
-                newInstance(activity, parent, true);
+                                    @Nullable View reuseView, ViewGroup parent,boolean isAddShadow) {
+        EventCard card = reuseView != null ? new EventCard(reuseView, true,isAddShadow) :
+                newInstance(activity, parent, true,isAddShadow);
         card.bindEventView(event, activity,0,null);
         return card.itemView;
     }
 
-    public EventCard(View cardView, boolean shouldAdjustImageHeight) {
+    public EventCard(View cardView, boolean shouldAdjustImageHeight,boolean isAddShadow) {
         super(cardView);
 
         this.shouldAdjustImageHeight = shouldAdjustImageHeight;
@@ -65,6 +71,9 @@ public class EventCard extends ViewHolder {
         eventStatsView = (TextView) cardView.findViewById(R.id.event_stats);
         infoArrowView = cardView.findViewById(R.id.info_arrow);
         share = (ImageView)cardView.findViewById(R.id.share);
+        cardParent = (LinearLayout)cardView.findViewById(R.id.card_parent);
+        eventInfo  = (LinearLayout)cardView.findViewById(R.id.event_info);
+        addShadow = isAddShadow;
     }
 
 
@@ -78,6 +87,8 @@ public class EventCard extends ViewHolder {
     public void bindEventView(final Event event, boolean isFirstEvent, final int position,
                               final BaseContextActivity activity) {
         bindEventView(event, activity,position,null);
+
+        eventInfo.setVisibility(View.VISIBLE);
 
 
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
@@ -103,14 +114,15 @@ public class EventCard extends ViewHolder {
             }
         });
 
+
         if (event.numViews > 5) {
             eventStatsView.setVisibility(View.VISIBLE);
             eventStatsView.setText("" + event.numViews + " views");
-            infoArrowView.setVisibility(View.VISIBLE);
+            infoArrowView.setVisibility(View.GONE);
         }else{
             eventStatsView.setVisibility(View.VISIBLE);
             eventStatsView.setText("" + Utils.getRandomNumber(10,50) + " views");
-            infoArrowView.setVisibility(View.VISIBLE);
+            infoArrowView.setVisibility(View.GONE);
         }
 
         //Share event
@@ -173,8 +185,24 @@ public class EventCard extends ViewHolder {
             priceView.setText(priceString);
         }
 
+        //
+        if(addShadow) {
+            venueView.setText(event.getShortAddress());
+            Drawable drawable = activity.getResources().getDrawable(R.drawable.ic_location_on_white_12dp);
+            drawable.setBounds(0,0,drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
+            venueView.setCompoundDrawables(drawable, null, null, null);
+            venueView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            cardParent.setBackground(activity.getResources().getDrawable(R.drawable.card_item_bg));
+        }else{
+            venueView.setText(event.title);
+            venueView.setTextSize(TypedValue.COMPLEX_UNIT_SP,16);
+            venueView.setCompoundDrawables(null,null,null,null);
+            cardParent.setBackground(null);
+        }
+
         // Set the venue.
-        venueView.setText(event.getShortAddress());
+        eventInfo.setVisibility(View.GONE);
+
 
         arrowView.setVisibility(View.GONE);
         favouriteView.setVisibility(View.GONE);
@@ -187,7 +215,7 @@ public class EventCard extends ViewHolder {
                               final BaseContextActivity activity,
                               EventsAdapter.OnItemClickedListener listener) {
         bindEventView(event, activity,position,listener);
-
+        eventInfo.setVisibility(View.VISIBLE);
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
 
         // Set the travel time.
@@ -216,14 +244,15 @@ public class EventCard extends ViewHolder {
         });
 
         // Is user invited to this event ?
+
         if (event.numViews > 5) {
             eventStatsView.setVisibility(View.VISIBLE);
             eventStatsView.setText("" + event.numViews + " views");
-            infoArrowView.setVisibility(View.VISIBLE);
+            infoArrowView.setVisibility(View.GONE);
         }else{
             eventStatsView.setVisibility(View.VISIBLE);
             eventStatsView.setText("" + Utils.getRandomNumber(10,50) + " views");
-            infoArrowView.setVisibility(View.VISIBLE);
+            infoArrowView.setVisibility(View.GONE);
         }
 
         //Share event

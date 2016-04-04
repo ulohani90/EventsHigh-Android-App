@@ -21,6 +21,7 @@ import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
@@ -43,11 +44,13 @@ public class EventsFragment extends BaseEventsFragment {
 
     int scrollPosition = 0;
 
+    SocialInvitationsRequest.SpecialCoupons special;
 
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
-                                             boolean showCategories) {
+                                             boolean showCategories, SocialInvitationsRequest.SpecialCoupons special) {
         EventsFragment fragment = new EventsFragment();
         Bundle args = getArgs(eventsContext, showFollowCard, showCategories);
+        args.putParcelable("special_obj",special);
         fragment.setArguments(args);
         return fragment;
     }
@@ -113,6 +116,10 @@ public class EventsFragment extends BaseEventsFragment {
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         noMyEventsView = view.findViewById(R.id.view_no_my_event);
         retryView = view.findViewById(R.id.view_retry);
+
+        if(getArguments()!=null && getArguments().getParcelable("special_obj")!=null)
+                special = getArguments().getParcelable("special_obj");
+
     }
 
     @Override
@@ -224,12 +231,13 @@ public class EventsFragment extends BaseEventsFragment {
                 eventsAdapter.setEvents(eventsCollection.events, seeAllQuery);
                 if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
-                            eventsCollection.numFollowers);
+                            eventsCollection.numFollowers,special);
                 }
                 eventGridView.scrollToPosition(scrollPosition);
             }
         }
     };
+
 
     private ErrorListener mErrorListener = new ErrorListener() {
         @Override

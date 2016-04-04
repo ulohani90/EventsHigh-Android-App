@@ -52,6 +52,7 @@ public class PhoneLoginActivity extends BaseActivity {
     private EditText codeEditText;
     private boolean isOnboarding;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

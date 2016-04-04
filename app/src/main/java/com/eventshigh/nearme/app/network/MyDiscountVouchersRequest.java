@@ -2,6 +2,8 @@ package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -88,7 +90,7 @@ public class MyDiscountVouchersRequest extends JsonRequest<List<DiscountCode>> {
         }
     }
 
-    public static class DiscountCode {
+    public static class DiscountCode implements Parcelable{
         public final String code;
         public final long validTillTimestamp;
         public final int amount;
@@ -108,5 +110,35 @@ public class MyDiscountVouchersRequest extends JsonRequest<List<DiscountCode>> {
                     jsonObject.getBoolean("used")
             );
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(code);
+            dest.writeLong(validTillTimestamp);
+            dest.writeInt(amount);
+            dest.writeByte((byte) (isUsed ? 1 : 0));
+        }
+
+        public static final Parcelable.Creator<DiscountCode> CREATOR =
+                new Parcelable.Creator<DiscountCode>() {
+                    public DiscountCode createFromParcel(Parcel in) {
+                        return new DiscountCode(
+                                in.readString(),
+                                in.readLong(),
+                                in.readInt(),
+                                in.readByte() != 0
+                        );
+                    }
+
+                    public DiscountCode[] newArray(int size) {
+                        return new DiscountCode[size];
+                    }
+                };
     }
 }
+

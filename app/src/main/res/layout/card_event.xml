@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/card_parent"
     android:foreground="?android:attr/selectableItemBackground"
-    android:descendantFocusability="blocksDescendants"
->
+    android:descendantFocusability="blocksDescendants">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,13 +21,7 @@
             android:adjustViewBounds="false"
             tools:ignore="ContentDescription"
         />
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignTop="@+id/event_bg"
-            android:layout_alignBottom="@+id/event_bg"
-            android:background="@drawable/shape_film"
-        />
+
 
         <View
             android:id="@+id/arrow"
@@ -42,58 +37,32 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_above="@id/event_title"
             android:layout_marginLeft="8dp"
+            android:layout_above="@id/event_price"
             android:layout_marginStart="8dp"
+            android:layout_marginBottom="5dp"
             android:src="@drawable/eh_recommend"
             tools:ignore="ContentDescription"
         />
-        <TextView
-            style="?android:attr/textAppearanceMedium"
-            android:id="@+id/event_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/event_time"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="14dp"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textIsSelectable="false"
-            android:textColor="@android:color/white"
-            tools:text="My Awesome Event with a long long title!"
-        />
-        <TextView
-            android:id="@+id/event_time"
-            style="@style/EventCardText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/event_venue"
-            android:layout_toLeftOf="@+id/event_price"
-            android:layout_toStartOf="@+id/event_price"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:drawableStart="@drawable/ic_access_time_white_12dp"
-            android:drawableLeft="@drawable/ic_access_time_white_12dp"
-            android:textIsSelectable="false"
-            android:textSize="12sp"
-            android:textColor="#CCFFFFFF"
-            tools:text="Sun, 29 Mar at 8:30 pm"
-        />
+
+
         <TextView
             style="@style/EventCardText"
             android:id="@+id/event_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@id/event_venue"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
             android:layout_marginEnd="6dp"
             android:layout_marginRight="6dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/price_tag_drawable_bg"
             android:textIsSelectable="false"
-            android:textSize="12sp"
+            android:textSize="15sp"
+            android:layout_marginBottom="5dp"
+            android:padding="11dp"
             android:textColor="#CCFFFFFF"
+            android:fontFamily="sans-serif-medium"
             tools:text="₹ 200 - 500"
         />
 
@@ -102,19 +71,24 @@
             android:id="@+id/event_venue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/event_info"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
+
+            android:paddingLeft="9dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="5dp"
+            android:paddingRight="5dp"
+
             android:drawableStart="@drawable/ic_location_on_white_12dp"
             android:drawableLeft="@drawable/ic_location_on_white_12dp"
             android:textIsSelectable="false"
-            android:textSize="12sp"
+            android:background="@drawable/gradient_bg"
+            android:textSize="13sp"
+            android:layout_alignBottom="@id/event_bg"
+
             android:textColor="#CCFFFFFF"
             tools:text="Jagriti theatre, Whitefield"
         />
+    </RelativeLayout>
+
 
         <View
             android:id="@+id/info_arrow"
@@ -122,59 +96,144 @@
             android:layout_height="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:layout_above="@id/event_info"
+            android:visibility="gone"
             android:background="@drawable/shape_info_triangle"
         />
-<LinearLayout
-    android:id="@+id/event_info"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignBottom="@+id/event_bg"
-    android:background="@android:color/white"
-    android:orientation="horizontal">
-
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/event_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/event_bg"
+            android:background="@android:color/white"
+            android:orientation="vertical">
 
             <TextView
-                style="?android:attr/textAppearanceSmall"
-                android:id="@+id/event_stats"
+                style="?android:attr/textAppearanceMedium"
+                android:id="@+id/event_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:layout_marginLeft="6dp"
-                android:layout_marginStart="6dp"
-                android:gravity="center_vertical"
-                android:drawableLeft="@drawable/ic_person_black_18dp"
-                android:drawableStart="@drawable/ic_person_black_18dp"
-                android:drawablePadding="16dp"
+                android:layout_above="@id/event_time"
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="8dp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textIsSelectable="false"
                 android:fontFamily="sans-serif-medium"
-                tools:text="1049 views, 23 favourited"
-            />
-        </FrameLayout>
-    <ImageView
-        android:id="@+id/share"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:scaleType="center"
-        android:padding="10dp"
-        android:background="@drawable/button_transparent_dark"
-        android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_share_grey_18dp"/>
-    <ImageView
-        android:id="@+id/action_favourite"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignTop="@id/event_title"
-        android:layout_gravity="center_vertical"
-        android:padding="8dp"
-        android:src="@drawable/ic_favorite_red_18dp"
-        tools:ignore="ContentDescription"
-        />
+                android:textColor="#555555"
+                tools:text="My Awesome Event with a long long title!"
+                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/event_time"
+                    style="@style/EventCardText"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:drawablePadding="5dp"
+                    android:drawableStart="@drawable/ic_access_time_grey_12dp"
+                    android:drawableLeft="@drawable/ic_access_time_grey_12dp"
+                    android:textIsSelectable="false"
+                    android:textSize="13sp"
+                    android:textColor="#666666"
+                    tools:text="Sun, 29 Mar at 8:30 pm"
+                    />
+                <TextView
+                    style="@style/EventCardText"
+                    android:id="@+id/event_travel_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginRight="10dp"
+                    android:drawablePadding="5dp"
+                    android:drawableStart="@drawable/ic_local_taxi_grey_12dp"
+                    android:drawableLeft="@drawable/ic_local_taxi_grey_12dp"
+                    android:textIsSelectable="false"
+                    android:textSize="13sp"
+                    android:visibility="gone"
+                    android:textColor="#666666"
+                    tools:text="30 mins"
+                    />
+
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#f0f0f0"
+                ></View>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_alignBottom="@+id/event_bg"
+                android:background="@android:color/white"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="?android:attr/textAppearanceSmall"
+                        android:id="@+id/event_stats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/ic_view"
+                        android:drawableLeft="@drawable/ic_view"
+                        android:drawablePadding="5dp"
+                        android:layout_marginStart="11dp"
+                        android:layout_marginLeft="11dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginRight="10dp"
+                        android:textSize="12sp"
+                        android:textIsSelectable="false"
+                        tools:text="1049 views, 23 favourited"
+                        android:textColor="#666666"
+                        />
+
+                </FrameLayout>
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#f0f0f0"></View>
+                <ImageView
+                    android:id="@+id/share"
+                    android:layout_width="36dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="center"
+                    android:padding="10dp"
+                    android:background="@drawable/button_transparent_dark"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_share_grey_18dp"/>
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#f0f0f0"></View>
+                <ImageView
+                    android:id="@+id/action_favourite"
+                    android:layout_width="36dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignTop="@id/event_title"
+                    android:layout_gravity="center_vertical"
+                    android:scaleType="center"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_favorite_red_18dp"
+                    tools:ignore="ContentDescription"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+
 </LinearLayout>
-    </RelativeLayout>
-</FrameLayout>

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -55,6 +56,8 @@ public class ReferralActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        ((TextView)(findViewById(R.id.terms_text))).setText(Html.fromHtml(getResources().getString(R.string.terms_condition_text)));
+
     }
 
     public View getViewForSnackbar() {
@@ -67,6 +70,15 @@ public class ReferralActivity extends BaseActivity {
         VolleyHelper.getRequestQueue(this).cancelAll(this);
 
         super.onPause();
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (BaseActivity.NOTIFICATION_ACTION.equals(BaseActivity.NOTIFICATION_ACTION)) {
+            reportActionToAnalytics("openNotification");
+        }
     }
 
     @Override
@@ -112,29 +124,39 @@ public class ReferralActivity extends BaseActivity {
 
                         LayoutInflater inflater = getLayoutInflater();
                         for (final DiscountCode code : discountCodes) {
-                            inflater.inflate(R.layout.card_discount_voucher, vouchersContainer, true);
-
-                            (findViewById(R.id.parent_layout)).setOnClickListener(new View.OnClickListener() {
+                            View view  = inflater.inflate(R.layout.card_discount_voucher, vouchersContainer, false);
+                            view.findViewById(R.id.parent_layout).setTag(code);
+                            (view.findViewById(R.id.parent_layout)).setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
+                                    DiscountCode code = (DiscountCode)v.getTag();
                                     if (!code.isUsed) {
-                                        copyTextToClipBoard("Coupon Code", code.code);
+                                        copyTextToClipBoard("Coupon Code", code.code," coupon code copied to Clipboard");
+                                    } else {
+                                        copyTextToClipBoard("Coupon Code", code.code," coupon code has already been redeemed.");
                                     }
                                 }
                             });
-                            View parent = vouchersContainer.getChildAt(vouchersContainer.getChildCount() - 1);
+                           // View parent = vouchersContainer.getChildAt(vouchersContainer.getChildCount() - 1);
                             if (code.isUsed) {
                                 //noinspection deprecation
-                                parent.setBackgroundColor(getResources().getColor(R.color.gray600));
+                                ((TextView) view.findViewById(R.id.discount_validity)).setText("Already redeemed");
+                                ((TextView) view.findViewById(R.id.discount_validity)).setTextColor(getResources().getColor(R.color.red_dark));
+                            }else{
+                                ((TextView) view.findViewById(R.id.discount_validity)).setTextColor(getResources().getColor(R.color.valid_text_grey));
+
+                                EventTime validTillTime = DateTimeUtils.dateToEventTime(
+                                        new Date(code.validTillTimestamp),
+                                        TimeZone.getTimeZone(City.BANGALORE.timeZone));
+                                ((TextView) view.findViewById(R.id.discount_validity)).setText(
+                                        "Valid Till: " + validTillTime.day + ", " + validTillTime.date);
                             }
 
-                            EventTime validTillTime = DateTimeUtils.dateToEventTime(
-                                    new Date(code.validTillTimestamp),
-                                    TimeZone.getTimeZone(City.BANGALORE.timeZone));
-                            ((TextView) parent.findViewById(R.id.discount_code)).setText(code.code);
-                            ((TextView) parent.findViewById(R.id.discount_value)).setText("₹ " + code.amount);
-                            ((TextView) parent.findViewById(R.id.discount_validity)).setText(
-                                    "Valid Till: " + validTillTime.day + ", " + validTillTime.date);
+
+                            ((TextView) view.findViewById(R.id.discount_code)).setText(code.code);
+                            ((TextView) view.findViewById(R.id.discount_value)).setText("₹ " + code.amount);
+
+                            vouchersContainer.addView(view);
                         }
                         vouchersContainer.setVisibility(View.VISIBLE);
                     }
@@ -146,12 +168,12 @@ public class ReferralActivity extends BaseActivity {
                 });
     }
 
-    public void copyTextToClipBoard(String label, String text){
+    public void copyTextToClipBoard(String label, String text,String message){
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText(label, text);
         clipboard.setPrimaryClip(clip);
 
-        showMessage(text+" coupon code copied to Clipboard");
+        showMessage(text+message);
     }
 
     public void invite(View view) {

@@ -15,6 +15,7 @@ import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView.SpanAllColumnLookup;
 
@@ -132,20 +133,33 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         return R.color.material_color_green;
     }
 
-    public void addEventInvitations(List<EventInvitation> invites) {
+    public void addEventInvitations(List<EventInvitation> invites,List<SocialInvitationsRequest.SpecialCoupons> specials) {
         int pos = dataToShow.get(0).getType() == DataType.EVENT_PAGER ? 1 : 0;
+
+
+        for(SocialInvitationsRequest.SpecialCoupons special: specials){
+            dataToShow.add(pos, new EventInvitationData(special, activity));
+        }
+        if (! specials.isEmpty()) {
+            dataToShow.add(pos, new SmallHeaderData("Specials"));
+        }
         for (EventInvitation invite : invites) {
             dataToShow.add(pos, new EventInvitationData(invite, activity));
         }
         if (! invites.isEmpty()) {
             dataToShow.add(pos, new SmallHeaderData("Invitations"));
         }
+
+
         notifyDataSetChanged();
     }
 
-    public void addFollowCard(String title, int numEvents, int numFollowers) {
-        dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity));
+
+    public void addFollowCard(String title, int numEvents, int numFollowers,SocialInvitationsRequest.SpecialCoupons coupon) {
+        dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity, coupon));
     }
+
+
 
     @Override
     public boolean spanAllColumns(int position) {
