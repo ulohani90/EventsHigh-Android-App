@@ -15,6 +15,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +47,7 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.SocialFriend;
+import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
@@ -352,6 +354,7 @@ public class EventDetailActivity extends BaseActivity {
             bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
             bookingUriBuilder.appendQueryParameter("name", userInfo.name);
             bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
+            bookingUriBuilder.appendQueryParameter("src","android");
         }
         try {
             CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
@@ -848,8 +851,33 @@ public class EventDetailActivity extends BaseActivity {
 
             // Show price.
             findViewById(R.id.price_row).setVisibility(View.VISIBLE);
-            String priceString = event.getPriceString();
-            priceView.setText(priceString == null ? getString(R.string.no_price) : priceString);
+            LinearLayout ehPriceContainer = (LinearLayout)findViewById(R.id.eh_price_container);
+            if(event.ehPrices.size() >0){
+                ehPriceContainer.removeAllViews();
+                ehPriceContainer.setVisibility(View.VISIBLE);
+                for(EhPrices ehPrice:event.ehPrices){
+                    View view = LayoutInflater.from(EventDetailActivity.this).inflate(R.layout.event_detail_price_layout,ehPriceContainer,false);
+                    ((TextView)view.findViewById(R.id.event_price)).setText(ehPrice.name+" - "+event.getPriceString(ehPrice.min,ehPrice.max,ehPrice.currency));
+                    if(ehPrice.note!=null && ehPrice.note.length()>0){
+                        TextView note = (TextView) view.findViewById(R.id.event_note);
+                        note.setVisibility(View.VISIBLE);
+                        note.setText("( "+ehPrice.note+" )");
+                    }else{
+                        ((TextView) view.findViewById(R.id.event_note)).setVisibility(View.GONE);
+                    }
+                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                    ehPriceContainer.addView(view,lp);
+                }
+                priceView.setVisibility(View.GONE);
+            }else{
+                ehPriceContainer.setVisibility(View.GONE);
+                priceView.setVisibility(View.VISIBLE);
+                String priceString = event.getPriceString(event.minPrice,event.maxPrice,event.currency);
+                priceView.setText(priceString == null ? getString(R.string.no_price) : priceString);
+
+            }
+
 
             // Show performers if any.
             performersView.removeAllViews();

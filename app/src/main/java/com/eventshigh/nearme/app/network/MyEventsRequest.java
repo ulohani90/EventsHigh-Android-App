@@ -113,7 +113,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
                 socialInvites, socialInvites);
 
         // Interest based requests.
-        List<String> interests = new Account(context).getFollowingInterests();
+        /*List<String> interests = new Account(context).getFollowingInterests();
         Map<String, RequestFuture<EventsCollection>> interestsEvents = Utils.getMap();
         for (String interest : interests) {
             RequestFuture<EventsCollection> eventsFuture = RequestFuture.newFuture();
@@ -121,6 +121,10 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
                 priority, tag, shouldBypassCache, includeWithoutLocation, eventsFuture, eventsFuture);
             interestsEvents.put(interest, eventsFuture);
         }
+*/
+        RequestFuture<List<TopicEvents>> eventsFuture = RequestFuture.newFuture();
+        MobileUserEventsRequest.submit(context, eventsContext,
+                priority, tag, shouldBypassCache, includeWithoutLocation, eventsFuture, eventsFuture);
 
         // Favourites event requests.
         EventsMarkerManager markerManager = EventsMarkerManager.getInstance(context);
@@ -145,9 +149,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         try {
             addEventsToResults(result, INVITATIONS_NAME, invitedEvents);
             addEventsToResults(result, FAVOURITES_NAME, favEvents);
-            for (Entry<String, RequestFuture<EventsCollection>> interestEvents : interestsEvents.entrySet()) {
-                addCollectionToResults(result, interestEvents.getKey(), interestEvents.getValue());
-            }
+            addTopicEventsToResult(result,eventsFuture);
             return result;
         } catch (RequestCancelledException e) {
             isRequestCancelled = true;
@@ -171,6 +173,19 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         if (! events.isEmpty()) {
             result.add(new TopicEvents(name, events));
         }
+    }
+
+    private static void addTopicEventsToResult(List<TopicEvents> result, RequestFuture<List<TopicEvents>> eventsFuture) throws RequestCancelledException {
+
+        try {
+            result.addAll(eventsFuture.get(10, TimeUnit.SECONDS));
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            if (eventsFuture.isCancelled()) {
+                throw new RequestCancelledException();
+            }
+            Crashlytics.getInstance().core.logException(e);
+        }
+
     }
 
     private static void addEventsToResults(List<TopicEvents> result, String name,

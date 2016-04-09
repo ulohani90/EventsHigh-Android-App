@@ -60,7 +60,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:orientation="vertical"
-        android:background="@android:color/white"
+        android:background="#F1F1F1"
     >
         <ImageView
             android:layout_width="wrap_content"
@@ -72,18 +72,39 @@
             android:adjustViewBounds="false"
             tools:ignore="ContentDescription"
         />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/current_city"
+            android:textSize="16sp"
+            android:layout_gravity="center_horizontal"
+            android:text="Bangalore"
+            android:textColor="#7A7A7A"
+            android:drawablePadding="10dp"
+            android:padding="5dp"
+            android:drawableLeft="@drawable/ic_location_on_grey600_24dp"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#B8B8B8"></View>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:layout_height="?android:attr/listPreferredItemHeightSmall">
         <com.google.android.gms.plus.PlusOneButton
             xmlns:plus="http://schemas.android.com/apk/lib/com.google.android.gms.plus"
             android:id="@+id/plus_one_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_marginLeft="15dp"
             android:layout_gravity="center"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
             plus:size="standard"
             plus:annotation="inline"
         />
+        </LinearLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

@@ -2,70 +2,92 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
+        android:layout="@layout/navigation_menu_white_items"
         android:key="last_city_key"
         android:title="@string/pref_title_change_location"
     />
-    <Preference android:title="@string/pref_title_phone_no">
-        <intent
-            android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.PhoneLoginActivity"
-        />
-    </Preference>
-    <Preference android:title="@string/personalize_text">
+    <Preference android:title="@string/personalize_text"
+        android:layout="@layout/navigation_menu_white_items">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.SelectInterestsActivity"
             />
     </Preference>
-    <Preference android:title="@string/title_my_friends">
+    <Preference android:title="@string/title_refer"
+        android:layout="@layout/navigation_menu_white_items">
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.activity.ReferralActivity"
+            />
+    </Preference>
+    <Preference android:title="@string/title_blog"
+        android:layout="@layout/navigation_menu_white_items">
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.activity.BlogFeedActivity"
+            />
+    </Preference>
+
+    <!--android:summary="support@eventshigh.com"-->
+    <Preference android:title="@string/pref_title_send_feedback"
+        android:layout="@layout/navigation_menu_white_items">
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.activity.FeedbackActivity"
+            />
+    </Preference>
+    <Preference android:title="@string/pref_title_rate_us"
+        android:layout="@layout/navigation_menu_white_items">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="market://details?id=com.eventshigh.nearme.app"
+            />
+    </Preference>
+
+    <Preference android:title="@string/pref_title_phone_no"
+        android:layout="@layout/navigation_menu_white_items">
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.activity.PhoneLoginActivity"
+            />
+    </Preference>
+
+    <Preference android:title="@string/title_my_friends"
+        android:layout="@layout/navigation_menu_white_items">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.MyFriendsActivity"
         />
     </Preference>
-    <Preference android:title="@string/title_blog">
+
+    <!--android:summary="listings@eventshigh.com"-->
+    <Preference android:title="@string/pref_title_add_event"
+        android:key="create_events_key"
+        android:layout="@layout/navigation_menu_items_grey">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.BlogFeedActivity"
-        />
+            android:targetClass="com.eventshigh.nearme.app.activity.SettingsActivity"
+            android:action="com.eventshigh.add_event"
+            />
     </Preference>
-    <Preference android:title="@string/title_refer">
+    <Preference android:title="@string/pref_title_about_us"
+        android:key="about_us_key"
+        android:layout="@layout/navigation_menu_items_grey">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.ReferralActivity"
-        />
+            android:targetClass="com.eventshigh.nearme.app.activity.AboutUsActivity"
+            />
     </Preference>
 
-    <Preference android:title="@string/pref_title_rate_us">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="market://details?id=com.eventshigh.nearme.app"
-        />
-    </Preference>
-    <Preference android:title="@string/pref_title_delete_query_history">
+    <Preference android:title="@string/pref_title_delete_query_history"
+        android:layout="@layout/navigation_menu_items_grey">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.SettingsActivity"
             android:action="com.eventshigh.delete_query_history"
         />
     </Preference>
-    <Preference android:title="@string/pref_title_add_event" android:summary="listings@eventshigh.com">
-        <intent
-            android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.SettingsActivity"
-            android:action="com.eventshigh.add_event"
-        />
-    </Preference>
-    <Preference android:title="@string/pref_title_send_feedback" android:summary="support@eventshigh.com">
-        <intent
-            android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.FeedbackActivity"
-        />
-    </Preference>
-    <Preference android:title="@string/pref_title_about_us">
-        <intent
-            android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.AboutUsActivity"
-        />
-    </Preference>
+
+
+
 </PreferenceScreen>

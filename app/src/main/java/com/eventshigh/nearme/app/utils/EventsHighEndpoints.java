@@ -36,6 +36,10 @@ public class EventsHighEndpoints {
             API_URI_BASE + "api/get_event_uber_info/%s?mobile=1";
     private static final String API_ENDPOINT_MULTI_EVENT_UBER_FORMAT =
             API_URI_BASE + "api/get_event_uber_infos/%s?mobile=1";
+
+    private static final String API_ENDPOINT_MULTI_EVENT_MOBILE_ID_FORMAT =
+            API_URI_BASE + "api/get_events_for_mobile_user/%s?mobile=1";
+
     private static final String API_EVENTS_SUGGEST_FORMAT =
             "https://assets.eventshigh.com/autocomplete/autocomplete_events_%s.json";
     private static final String API_TAGS_SUGGEST_URL =
@@ -157,6 +161,11 @@ public class EventsHighEndpoints {
     public static String getApiEndpointEventsUber(List<String> eventIds) {
         Collections.sort(eventIds);
         return String.format(API_ENDPOINT_MULTI_EVENT_UBER_FORMAT, StringUtils.toCsvString(eventIds));
+    }
+
+    public static String getApiEndpointEventsMobileUser(String androidId) {
+
+        return String.format(API_ENDPOINT_MULTI_EVENT_MOBILE_ID_FORMAT, androidId);
     }
 
     public static String getApiEndpointBlogEntry(String blogUrl) {
