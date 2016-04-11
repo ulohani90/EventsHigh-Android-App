@@ -25,8 +25,10 @@ import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyDiscountVouchersRequest;
 import com.eventshigh.nearme.app.network.MyDiscountVouchersRequest.DiscountCode;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -35,12 +37,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import pl.snowdog.material.ui.ToolbarColorizeHelper;
+
 public class ReferralActivity extends BaseActivity {
 
     public static final String FROM_NOTIFICATION_PARAM = "is_from_notification";
     private LinearLayout vouchersContainer;
     boolean isFromNotification;
     Toolbar toolbar;
+
+    DiscountCode code;
 
 
     @Override
@@ -59,6 +65,8 @@ public class ReferralActivity extends BaseActivity {
         ((TextView)(findViewById(R.id.terms_text))).setText(Html.fromHtml(getResources().getString(R.string.terms_condition_text)));
 
     }
+
+
 
     public View getViewForSnackbar() {
         return vouchersContainer;
@@ -84,14 +92,17 @@ public class ReferralActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
+        if(toolbar!=null)
+        setLightToolbarIcons();
         Account account = new Account(this);
         City city = account.getLastCity();
         if (city == null) {
             city = City.BANGALORE;
         }
-        EventsContext eventsContext = new EventsContext(city, "");
-        FeaturedEventsRequest.submit(this, eventsContext, Priority.IMMEDIATE, this,
+
+
+       /* FeaturedEventsRequest.submit(this, eventsContext, Priority.IMMEDIATE, this,
+>>>>>>> 1e111e90d7982f3b670e1374a8f4cdea247dc4ff
                 false, new Listener<EventCollection>() {
                     @Override
                     public void onResponse(EventCollection eventCollection, boolean isIntermediate) {
@@ -106,24 +117,42 @@ public class ReferralActivity extends BaseActivity {
                     public void onErrorResponse(VolleyError volleyError) {
                         VolleyHelper.log(ReferralActivity.this, volleyError);
                     }
-                });
+                });*/
+
+        if(!Preferences.getInstance(this).shouldShowReferral()){
+            Toast.makeText(ReferralActivity.this, "Sorry, referral contest has ended!",
+                    Toast.LENGTH_LONG).show();
+            finish();
+        }
 
         MyDiscountVouchersRequest.submit(this, Priority.HIGH, this, false,
                 new Listener<List<DiscountCode>>() {
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onResponse(List<DiscountCode> discountCodes, boolean isIntermediate) {
-                        if (discountCodes.isEmpty()) {
-                            vouchersContainer.setVisibility(View.GONE);
-                            return;
-                        }
+
 
                         while (vouchersContainer.getChildCount() > 4) {
                             vouchersContainer.removeViewAt(4);
                         }
 
                         LayoutInflater inflater = getLayoutInflater();
-                        for (final DiscountCode code : discountCodes) {
+                        View view = inflater.inflate(R.layout.card_wallet_amount, vouchersContainer, false);
+
+                        if (discountCodes.isEmpty()) {
+                            (findViewById(R.id.redeem_btn)).setVisibility(View.GONE);
+
+                            ((TextView) view.findViewById(R.id.discount_value)).setText("₹ 0");
+                        } else {
+                            (findViewById(R.id.redeem_btn)).setVisibility(View.VISIBLE);
+                            code = discountCodes.get(0);
+                            ((TextView) view.findViewById(R.id.discount_value)).setText("₹ " + code.amount);
+                        }
+
+
+                        vouchersContainer.addView(view);
+
+                        /*for (final DiscountCode code : discountCodes) {
                             View view  = inflater.inflate(R.layout.card_discount_voucher, vouchersContainer, false);
                             view.findViewById(R.id.parent_layout).setTag(code);
                             (view.findViewById(R.id.parent_layout)).setOnClickListener(new View.OnClickListener() {
@@ -157,7 +186,9 @@ public class ReferralActivity extends BaseActivity {
                             ((TextView) view.findViewById(R.id.discount_value)).setText("₹ " + code.amount);
 
                             vouchersContainer.addView(view);
-                        }
+                        }*/
+
+
                         vouchersContainer.setVisibility(View.VISIBLE);
                     }
                 }, new ErrorListener() {
@@ -173,7 +204,7 @@ public class ReferralActivity extends BaseActivity {
         ClipData clip = ClipData.newPlainText(label, text);
         clipboard.setPrimaryClip(clip);
 
-        showMessage(text+message);
+        showMessage(text + message);
     }
 
     public void invite(View view) {
@@ -185,9 +216,14 @@ public class ReferralActivity extends BaseActivity {
         EventsContext param = new EventsContext(null, "eventshigh specials");
         Intent intent = new Intent(this, EventsGridActivity.class)
                 .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
+        if(code!=null)
+            intent.putExtra("special_obj",getSpecialObj());
         startActivity(intent);
     }
 
+    public SocialInvitationsRequest.SpecialCoupons getSpecialObj(){
+       return new SocialInvitationsRequest.SpecialCoupons(code,"","","");
+    }
     @Override
     public void onBackPressed() {
         if(isFromNotification){
@@ -196,4 +232,19 @@ public class ReferralActivity extends BaseActivity {
         }
             super.onBackPressed();
     }
+
+    private void setLightToolbarIcons() {
+        toolbar.post(new Runnable() {
+            @Override
+            @SuppressWarnings("deprecation")
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                        getResources().getColor(android.R.color.white), ReferralActivity.this);
+            }
+        });
+    }
+
+
+
+
 }

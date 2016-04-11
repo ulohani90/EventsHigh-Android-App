@@ -5,6 +5,8 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
+import android.view.View;
+import android.widget.ListView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
@@ -27,29 +29,41 @@ public class EHPreferenceFragment extends PreferenceFragment
         addPreferencesFromResource(R.xml.pref_general);
 
         // Last city preference.
-        lastCityView = (ListPreference) getPreferenceScreen().findPreference("last_city_key");
+      /*  lastCityView = (ListPreference) getPreferenceScreen().findPreference("last_city_key");
         String[] cityNames = City.getValuesAsString();
         lastCityView.setEntries(cityNames);
         lastCityView.setEntryValues(cityNames);
-        lastCityView.setOnPreferenceChangeListener(this);
+        lastCityView.setOnPreferenceChangeListener(this);*/
+
+
 
         // shared preferences instance.
         account = new Account(getActivity());
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        View rootView = getView();
+        if(rootView!=null) {
+            ListView list = (ListView) rootView.findViewById(android.R.id.list);
+            list.setDivider(null);
+        }
+
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-
-        onUserCityChanged(account.getLastCity());
-        Account.setUserCityListener(this);
+       // onUserCityChanged(account.getLastCity());
+       // Account.setUserCityListener(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        Account.setUserCityListener(null);
+       // Account.setUserCityListener(null);
     }
 
     @Override
@@ -69,6 +83,8 @@ public class EHPreferenceFragment extends PreferenceFragment
 
     @Override
     public void onUserCityChanged(@Nullable City newUserCity) {
+
+        //Remove dividers from the preferences
         if (newUserCity != null) {
             lastCityView.setValue(Utils.capitalize(newUserCity.name()));
             lastCityView.setSummary(Utils.capitalize(newUserCity.name()));

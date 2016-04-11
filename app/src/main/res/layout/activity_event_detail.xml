@@ -9,8 +9,7 @@
 >
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-    >
+        android:layout_height="wrap_content">
         <android.support.design.widget.AppBarLayout
             android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
@@ -419,6 +418,14 @@
                     />
                 </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/eh_price_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginStart="8dp">
+                </LinearLayout>
                 <!-- Performers Info -->
                 <TextView
                     android:id="@+id/performer_header"

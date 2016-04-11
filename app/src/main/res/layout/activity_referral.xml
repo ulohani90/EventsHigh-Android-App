@@ -171,7 +171,7 @@
                     style="@android:style/TextAppearance.DeviceDefault.Large"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Your Discount Vouchers"
+                    android:text="Your Wallet"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:fontFamily="sans-serif-medium"
@@ -182,7 +182,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="You can redeem these vouchers for events ticketed with EventsHigh."
+                    android:text="You can redeem the wallet amount for events ticketed with EventsHigh."
                     android:paddingLeft="10dp"
                     android:paddingBottom="10dp"
                     android:textSize="11sp"
@@ -190,7 +190,7 @@
                     />
 
                 <TextView
-
+                    android:id="@+id/redeem_btn"
                     android:background="@drawable/eh_button_redeem"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"

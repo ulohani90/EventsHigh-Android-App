@@ -6,6 +6,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
+
+import com.eventshigh.nearme.app.data.stream.EhPrices;
+
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -14,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,6 +69,10 @@ public class Event implements Parcelable {
     public final double minPrice;
     public final double maxPrice;
     @Nullable public final String currency;
+    @Nullable public final String priceName;
+    @Nullable public final String priceNote;
+
+    public final ArrayList<EhPrices> ehPrices;
 
     public Event(String id, City city, String title, EventCategory category,
                  String description, String[] tags, @Nullable String youtubeVideoId,
@@ -76,8 +84,10 @@ public class Event implements Parcelable {
                  @Nullable String address, boolean isCleanVenue,
                  String[] performers,
                  String organizerName, String organizerPhone, String organizerWebsite,
-                 String organizerEmail, String organizerLink,
-                 double minPrice, double maxPrice, @Nullable String currency) {
+
+                 String organizerEmail, String organizerLink,ArrayList<EhPrices> ehPrices,
+                 double minPrice, double maxPrice, @Nullable String currency,String priceName, String priceNote) {
+
         this.id = id;
         this.city = city;
         this.title = title;
@@ -112,9 +122,60 @@ public class Event implements Parcelable {
         this.organizerEmail = Utils.checkIfUnknown(organizerEmail);
         this.organizerLink = Utils.checkIfUnknown(organizerLink);
 
+        this.ehPrices = ehPrices;
         this.minPrice = minPrice;
         this.maxPrice = maxPrice;
         this.currency = Utils.checkIfUnknown(currency);
+        this.priceName = priceName;
+        this.priceNote = priceNote;
+
+    }
+
+
+    public Event (Parcel in){
+                this.id = in.readString();
+                this.city = City.valueOf(in.readString());
+                this.title = in.readString();
+                this.category = EventCategory.valueOf(in.readString());
+
+                this.description = in.readString();
+                this.tags = in.createStringArray();
+                this.youtubeVideoId = in.readString();
+
+                this.imgUrl = in.readString();
+                this.sourceUrl = in.readString();
+                this.bookingUrl = in.readString();
+                this.bookingText = in.readString();
+
+               this.numViews =  in.readInt();
+                this.numSaves = in.readInt();
+                this.ehRecommended =in.createBooleanArray()[0];
+                this.uberScore = in.readFloat();
+
+               this.eventTimings =  in.createLongArray();
+
+
+                this.venue = in.readString();
+                this.locality = in.readString();
+                this.address = in.readString();
+                this.isCleanVenue = in.createBooleanArray()[0];
+
+                this.performers =in.createStringArray();
+
+                this.organizerName = in.readString();
+                this.organizerPhone = in.readString();
+                this.organizerWebsite = in.readString();
+                this.organizerEmail = in.readString();
+                this.organizerLink = in.readString();
+
+                ehPrices =new ArrayList<>();
+                in.readTypedList(ehPrices, EhPrices.CREATOR);
+                this.minPrice = in.readDouble();
+                this.maxPrice = in.readDouble();
+                this.currency = in.readString();
+                this.priceName = in.readString();
+                this.priceNote = in.readString();
+
     }
 
     public Uri getEventDetailsURI() {
@@ -139,6 +200,22 @@ public class Event implements Parcelable {
     }
 
     public @Nullable String getPriceString() {
+        if (minPrice < 0 || maxPrice < 0) {
+            return null;
+        }
+
+        if (minPrice < 0.01 && maxPrice < 0.01) {
+            return  "Free";
+        }
+
+        if (maxPrice - minPrice < 0.01) {
+            return currency + " " + Math.round(minPrice);
+        }
+
+        return currency + " " + Math.round(minPrice) + " - " + Math.round(maxPrice);
+    }
+
+    public @Nullable String getPriceString(double minPrice,double maxPrice,String currency) {
         if (minPrice < 0 || maxPrice < 0) {
             return null;
         }
@@ -209,9 +286,14 @@ public class Event implements Parcelable {
         dest.writeString(emptyIfNull(organizerEmail));
         dest.writeString(emptyIfNull(organizerLink));
 
+        dest.writeTypedList(ehPrices);
         dest.writeDouble(minPrice);
         dest.writeDouble(maxPrice);
         dest.writeString(emptyIfNull(currency));
+
+        dest.writeString(priceName);
+        dest.writeString(priceNote);
+
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -219,44 +301,8 @@ public class Event implements Parcelable {
     public static final Parcelable.Creator<Event> CREATOR =
             new Parcelable.Creator<Event>() {
                 public Event createFromParcel(Parcel in) {
-                    return new Event(in.readString(),
-                            City.valueOf(in.readString()),
-                            in.readString(),
-                            EventCategory.valueOf(in.readString()),
+                    return new Event(in);
 
-                            in.readString(),
-                            in.createStringArray(),
-                            in.readString(),
-
-                            in.readString(),
-                            in.readString(),
-                            in.readString(),
-                            in.readString(),
-
-                            in.readInt(),
-                            in.readInt(),
-                            in.createBooleanArray()[0],
-                            in.readFloat(),
-
-                            in.createLongArray(),
-
-                            in.readString(),
-                            in.readString(),
-                            in.readString(),
-                            in.createBooleanArray()[0],
-
-                            in.createStringArray(),
-
-                            in.readString(),
-                            in.readString(),
-                            in.readString(),
-                            in.readString(),
-                            in.readString(),
-
-                            in.readDouble(),
-                            in.readDouble(),
-                            in.readString()
-                    );
                 }
 
                 public Event[] newArray(int size) {
@@ -392,16 +438,23 @@ public class Event implements Parcelable {
 
         // Price.
         double minPrice = -1, maxPrice = -1;
+        String ehPriceName="" ;
+        String ehPriceNote="" ;
         String currency = "\u20B9";
-        JSONArray ehPrices = eventJson.optJSONArray("eh_prices");
-        if (ehPrices != null) {
-            for (int j = 0 ; j < ehPrices.length(); j++) {
-                JSONObject ehPrice = ehPrices.getJSONObject(j);
+        JSONArray prices = eventJson.optJSONArray("eh_prices");
+        ArrayList<EhPrices> ehPrices = new ArrayList<>();
+        if (prices != null) {
+
+            for (int j = 0 ; j < prices.length(); j++) {
+                minPrice = -1;
+                maxPrice = -1;
+                JSONObject ehPrice = prices.getJSONObject(j);
                 currency = ehPrice.optString("currency", "\u20B9");
                 if (currency.equalsIgnoreCase("INR")) {
                     currency = "\u20B9";
                 }
-
+                ehPriceName = ehPrice.optString("name", "");
+                ehPriceNote = ehPrice.optString("note","");
                 double value = ehPrice.optDouble("discount_value", -1);
                 if (value < 0.01) {
                     value = ehPrice.optDouble("value", -1);
@@ -409,11 +462,15 @@ public class Event implements Parcelable {
                 if (value > 0) {
                     minPrice = minPrice < 0 ? value : Math.min(minPrice, value);
                     maxPrice = maxPrice < 0 ? value : Math.max(maxPrice, value);
+                }else{
+                    minPrice = 0;
+                    maxPrice = 0;
                 }
+                ehPrices.add( EhPrices.createObject(minPrice, maxPrice, ehPriceName, ehPriceNote, currency));
             }
         }
 
-        if (mashup != null && minPrice < 0 && maxPrice < 0) {
+        if (mashup != null && ehPrices.size()==0) {
             JSONObject priceInfo = mashup.optJSONObject("price_info");
             if (priceInfo != null) {
                 if (priceInfo.optString("type").equalsIgnoreCase("free")) {
@@ -434,6 +491,8 @@ public class Event implements Parcelable {
                         }
                     }
                 }
+                ehPriceName = priceInfo.optString("name","");
+
             }
         }
 
@@ -477,11 +536,13 @@ public class Event implements Parcelable {
                 organizerWebsite,
                 organizerEmail,
                 organizerLink,
-
+                ehPrices,
                 minPrice,
                 maxPrice,
-                currency
-        );
+
+                currency,
+                ehPriceName,
+                ehPriceNote);
     }
 
     public static List<Event> fromJSON(JSONArray jsonArray) {
@@ -501,6 +562,7 @@ public class Event implements Parcelable {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
         return fromJSON(upcomingEvents);
     }
+
 
     private static String emptyIfNull(@Nullable String string) {
         return (string == null ? "" : string);
@@ -531,4 +593,6 @@ public class Event implements Parcelable {
         mapIntent.setPackage("com.google.android.apps.maps");
         return mapIntent;
     }
+
+
 }

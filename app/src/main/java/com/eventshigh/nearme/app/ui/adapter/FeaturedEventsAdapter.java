@@ -34,12 +34,13 @@ public class FeaturedEventsAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        if (eventPagerData.showReferralOffer && position == 1) {
+        if (eventPagerData.showReferralOffer && position == 0) {
             // special app invite.
             View view = eventPagerData.activity.getLayoutInflater().inflate(R.layout.card_refer, container, false);
             view.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    eventPagerData.activity.reportActionToAnalytics("headerreferralclick");
                     Intent intent = new Intent(eventPagerData.activity, ReferralActivity.class);
                     eventPagerData.activity.startActivity(intent);
                 }

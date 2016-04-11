@@ -13,6 +13,11 @@ import android.preference.PreferenceManager;
 public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_SHOW_ONBOARDING = "show_onboarding";
 
+    public static final String PREF_LAST_TIME_REFER_SHOWN = "last_time_refer_shown";
+    public static final String PREF_INTEREST_UPDATED = "interest_updated";
+    public static final String PREF_SHOW_REFERRAL = "show_referral";
+
+
     private final Context context;
     private final SharedPreferences sharedPreferences;
 
@@ -38,8 +43,35 @@ public class Preferences implements OnSharedPreferenceChangeListener {
         return sharedPreferences.getBoolean(PREF_SHOW_ONBOARDING, true);
     }
 
+
+
+    public void setLastTimeReferShown() {
+        sharedPreferences.edit().putLong(PREF_LAST_TIME_REFER_SHOWN, System.currentTimeMillis()).apply();
+    }
+
+    public long getLastTimeReferShown () {
+        return sharedPreferences.getLong(PREF_LAST_TIME_REFER_SHOWN, 0);
+    }
+
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         new BackupManager(context).dataChanged();
+    }
+
+    public void setIsInterestUpdated(boolean isInterestUpdated) {
+        sharedPreferences.edit().putBoolean(PREF_INTEREST_UPDATED, isInterestUpdated).apply();
+    }
+
+    public boolean isInterestUpdated() {
+        return sharedPreferences.getBoolean(PREF_INTEREST_UPDATED, false);
+    }
+
+    public void setShowReferral(boolean shouldShowReferal) {
+        sharedPreferences.edit().putBoolean(PREF_SHOW_REFERRAL, shouldShowReferal).apply();
+    }
+
+    public boolean shouldShowReferral() {
+        return sharedPreferences.getBoolean(PREF_SHOW_REFERRAL, false);
     }
 }

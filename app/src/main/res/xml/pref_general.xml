@@ -1,39 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ListPreference
+  <!--  <ListPreference
+        android:layout="@layout/navigation_menu_white_items"
         android:key="last_city_key"
         android:title="@string/pref_title_change_location"
-    />
-    <Preference android:title="@string/pref_title_phone_no">
-        <intent
-            android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.PhoneLoginActivity"
-        />
-    </Preference>
-    <Preference android:title="@string/personalize_text">
+    />-->
+    <Preference android:title="@string/personalize_text"
+        android:layout="@layout/navigation_menu_white_items">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.SelectInterestsActivity"
             />
     </Preference>
-    <Preference android:title="@string/title_blog">
-        <intent
-            android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.BlogFeedActivity"
-        />
-    </Preference>
-    <Preference android:title="@string/title_refer">
+
+    <Preference android:title="@string/title_refer"
+        android:layout="@layout/navigation_menu_white_items">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.ReferralActivity"
-        />
+            />
+    </Preference>
+    <Preference android:title="@string/title_blog"
+        android:layout="@layout/navigation_menu_white_items">
+
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.activity.BlogFeedActivity"
+            />
     </Preference>
 
-    <Preference android:title="@string/pref_title_about_us">
+    <Preference android:title="@string/pref_title_phone_no"
+        android:layout="@layout/navigation_menu_white_items">
+        <intent
+            android:targetPackage="com.eventshigh.nearme.app"
+            android:targetClass="com.eventshigh.nearme.app.activity.PhoneLoginActivity"
+            />
+    </Preference>
+
+    <Preference android:title="@string/pref_title_about_us"
+        android:key="about_us_key"
+        android:layout="@layout/navigation_menu_white_items">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.AboutUsActivity"
-        />
+            />
     </Preference>
+
 </PreferenceScreen>

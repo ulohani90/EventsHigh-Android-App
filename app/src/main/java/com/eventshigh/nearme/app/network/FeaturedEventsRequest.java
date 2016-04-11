@@ -14,6 +14,9 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
+
+import com.eventshigh.nearme.app.user.Preferences;
+
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONArray;
@@ -114,6 +117,9 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
 
             // Parse showReferrer?
             boolean showReferrer = eventsJson.optBoolean("show_referrer", false);
+
+            Preferences.getInstance(context).setShowReferral(showReferrer);
+
             return Response.success(new EventCollection(filteredEvents, showReferrer, trendingTopics),
                 HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {

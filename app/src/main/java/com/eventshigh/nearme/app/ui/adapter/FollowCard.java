@@ -88,7 +88,27 @@ public class FollowCard extends ViewHolder {
             discountCoupon.setVisibility(View.VISIBLE);
             discountValue.setText("₹ " + data.special.coupon.amount);
             couponCode.setText(data.special.coupon.code);
-            discountValidty.setText(data.special.message);
+
+                discountValidty.setVisibility(View.VISIBLE);
+                discountValidty.setText("Click to copy coupon code to clipboard");
+                viewAll.setVisibility(View.GONE);
+               /* viewAll.setVisibility(View.VISIBLE);
+                SpannableString content = new SpannableString(data.activity.getResources().getString(R.string.view_all));
+                content.setSpan(new UnderlineSpan(), 0, content.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                viewAll.setText(content);
+
+                viewAll.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(data.activity, ReferralActivity.class);
+                        data.activity.startActivity(intent);
+                    }
+                });
+            }else{
+                discountValidty.setVisibility(View.GONE);
+                viewAll.setVisibility(View.GONE);
+            }*/
+
             discountCoupon.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -98,19 +118,10 @@ public class FollowCard extends ViewHolder {
                     data.activity.showMessage(data.special.coupon.code + " coupon code copied to Clipboard");
                 }
             });
-            viewAll.setVisibility(View.VISIBLE);
-            SpannableString content = new SpannableString(data.activity.getResources().getString(R.string.view_all));
-            content.setSpan(new UnderlineSpan(), 0, content.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            viewAll.setText(content);
 
-            viewAll.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(data.activity, ReferralActivity.class);
-                    data.activity.startActivity(intent);
-                }
-            });
-        }else{
+
+
+        } else {
             discountCoupon.setVisibility(View.GONE);
         }
 
