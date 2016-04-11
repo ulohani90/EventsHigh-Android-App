@@ -464,8 +464,9 @@ public class EventDetailActivity extends BaseActivity {
 
         Preferences preferences = Preferences.getInstance(this);
         if (!preferences.canUploadContacts()) {
-            AskForContactsDialog.show(this, preferences);
-            return;
+            if(AskForContactsDialog.checkIfToShow(this,preferences)){
+                return;
+            }
         }
 
 
@@ -778,7 +779,7 @@ public class EventDetailActivity extends BaseActivity {
                     .isFavourite(event.id));
 
             // Set Youtube play button.
-            playYoutubeView.setVisibility(event.youtubeVideoId == null ? View.GONE : View.VISIBLE);
+            playYoutubeView.setVisibility((event.youtubeVideoId != null && event.youtubeVideoId.length()>0)? View.VISIBLE : View.GONE);
 
             // Set Venue and address.
             findViewById(R.id.venue_group).setVisibility(View.VISIBLE);

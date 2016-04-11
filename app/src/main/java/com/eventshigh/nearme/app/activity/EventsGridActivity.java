@@ -178,6 +178,11 @@ public class EventsGridActivity extends BaseContextActivity {
         toolbar.setSubtitleTextColor(Color.argb(toolbarAlpha, 255, 255, 255));
     }
 
+    @Override
+    public View getViewForSnackbar() {
+        return toolbar;
+    }
+
     private void setDarkToolbarIcons() {
         toolbar.post(new Runnable() {
             @SuppressWarnings("deprecation")

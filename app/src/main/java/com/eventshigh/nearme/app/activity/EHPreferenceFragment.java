@@ -29,11 +29,11 @@ public class EHPreferenceFragment extends PreferenceFragment
         addPreferencesFromResource(R.xml.pref_general);
 
         // Last city preference.
-        lastCityView = (ListPreference) getPreferenceScreen().findPreference("last_city_key");
+      /*  lastCityView = (ListPreference) getPreferenceScreen().findPreference("last_city_key");
         String[] cityNames = City.getValuesAsString();
         lastCityView.setEntries(cityNames);
         lastCityView.setEntryValues(cityNames);
-        lastCityView.setOnPreferenceChangeListener(this);
+        lastCityView.setOnPreferenceChangeListener(this);*/
 
 
 
@@ -55,16 +55,15 @@ public class EHPreferenceFragment extends PreferenceFragment
     @Override
     public void onResume() {
         super.onResume();
-
-        onUserCityChanged(account.getLastCity());
-        Account.setUserCityListener(this);
+       // onUserCityChanged(account.getLastCity());
+       // Account.setUserCityListener(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        Account.setUserCityListener(null);
+       // Account.setUserCityListener(null);
     }
 
     @Override

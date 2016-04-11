@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ListPreference
+  <!--  <ListPreference
         android:layout="@layout/navigation_menu_white_items"
         android:key="last_city_key"
         android:title="@string/pref_title_change_location"
-    />
+    />-->
     <Preference android:title="@string/personalize_text"
         android:layout="@layout/navigation_menu_white_items">
         <intent

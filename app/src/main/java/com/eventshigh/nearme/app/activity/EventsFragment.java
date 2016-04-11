@@ -28,6 +28,7 @@ import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
@@ -60,7 +61,7 @@ public class EventsFragment extends BaseEventsFragment {
         EventsFragment fragment = new EventsFragment();
         Bundle args = getArgs(eventsContext, showFollowCard, showCategories);
         args.putBoolean(SHOW_EH_INVITE_NOTIFICATION_PARAM, showEhInviteForNotification);
-        args.putParcelable("special_obj",special);
+        args.putParcelable("special_obj", special);
         fragment.setArguments(args);
         return fragment;
     }
@@ -133,10 +134,18 @@ public class EventsFragment extends BaseEventsFragment {
 
     }
 
+
+
     @Override
     public void onStart() {
         super.onStart();
-        fetchNewListing(false);
+        if(Preferences.getInstance(getActivity()).isInterestUpdated() && EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
+            fetchNewListing(Preferences.getInstance(getActivity()).isInterestUpdated());
+            Preferences.getInstance(getActivity()).setIsInterestUpdated(false);
+        }else{
+            fetchNewListing(false);
+        }
+
     }
 
     @Override
@@ -156,8 +165,14 @@ public class EventsFragment extends BaseEventsFragment {
         this.onScrollListener = onScrollListener;
     }
 
+    boolean isLoading;
     MyEventsRequest asyncRequest;
-    private void fetchNewListing(boolean shouldBypassCache) {
+    public void fetchNewListing(boolean shouldBypassCache) {
+        if(isLoading){
+            return;
+        }
+        isLoading =true;
+
         topProgressBar.setVisibility(View.VISIBLE);
         noMyEventsView.setVisibility(View.GONE);
         retryView.setVisibility(View.GONE);
@@ -239,6 +254,7 @@ public class EventsFragment extends BaseEventsFragment {
 
             //    eventGridView.scrollToPosition(scrollPosition);
             }
+            isLoading = false;
         }
     };
 
@@ -286,6 +302,7 @@ public class EventsFragment extends BaseEventsFragment {
                 }
 
                 eventsAdapter.setSocialInvites(inviteObj.getInvites());
+                isLoading=false;
             }
         };
 
@@ -304,6 +321,7 @@ public class EventsFragment extends BaseEventsFragment {
             }
 
             VolleyHelper.log(activity, volleyError);
+            isLoading = false;
         }
     };
 }

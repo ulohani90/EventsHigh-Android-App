@@ -11,6 +11,7 @@ import android.content.res.Configuration;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,6 +31,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
@@ -37,10 +39,11 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.ui.CitySelectDialog;
+import com.eventshigh.nearme.app.ui.ReferEarnDialog;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter.OnCitySelectionListener;
 import com.eventshigh.nearme.app.user.Account;
@@ -98,8 +101,14 @@ public class LaunchActivity extends BaseContextActivity {
             NOTIFICATIONS_TAB,
     };
 
+    //Calculate no of time user resumes on to Home
+    int screenViewCount;
 
     boolean isPagerSwipeBlocked;
+
+    TextView currentCity;
+
+    public final int MIN_SCREEN_VIEWS = 6;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +150,8 @@ public class LaunchActivity extends BaseContextActivity {
                 }
             }
         }
+
+
     }
 
     @Override
@@ -236,6 +247,23 @@ public class LaunchActivity extends BaseContextActivity {
                 }
             }
         });
+
+        currentCity = (TextView)findViewById(R.id.current_city);
+        if(account.getLastCity()!=null) {
+            currentCity.setText(account.getLastCity().name());
+            currentCity.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CitySelectDialog.show(LaunchActivity.this, account, new CitySelectDialog.CitySelectionCallback() {
+                        @Override
+                        public void onCityChanged(City city) {
+                            currentCity.setText(city.name());
+                            cityChanged(city);
+                        }
+                    });
+                }
+            });
+        }
 
     }
 
@@ -449,6 +477,8 @@ public class LaunchActivity extends BaseContextActivity {
     }
 
     private void showExploreScreen() {
+
+
         ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(defaultTab, false);
@@ -533,22 +563,23 @@ public class LaunchActivity extends BaseContextActivity {
     };
 
 
-ViewPager.OnPageChangeListener listener= new ViewPager.OnPageChangeListener() {
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    ViewPager.OnPageChangeListener listener= new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-    }
+        }
 
-    @Override
-    public void onPageSelected(int position) {
-        reportActionToAnalytics("tabchange",TABS[position]);
-    }
+        @Override
+        public void onPageSelected(int position) {
+            reportActionToAnalytics("tabchange",TABS[position]);
 
-    @Override
-    public void onPageScrollStateChanged(int state) {
+        }
 
-    }
-};
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
 
 
 
@@ -558,12 +589,13 @@ ViewPager.OnPageChangeListener listener= new ViewPager.OnPageChangeListener() {
 
 
     ExploreFragment exploreFragment;
+    private EventsFragment myEventsFragment;
     /**
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
             implements TabLayout.OnTabSelectedListener,ViewPager.OnPageChangeListener {
-        private EventsFragment myEventsFragment;
+
 
         public ExploreScreenPagerAdapter() {
             super(getSupportFragmentManager());
@@ -585,8 +617,7 @@ ViewPager.OnPageChangeListener listener= new ViewPager.OnPageChangeListener() {
 
             if (TABS[position].equals(EXPLORE_TAB)) {
                  exploreFragment = ExploreFragment.getInstance(eventsContext);
-
-                return exploreFragment;
+                 return exploreFragment;
 
             }
 

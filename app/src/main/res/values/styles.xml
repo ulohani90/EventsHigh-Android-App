@@ -73,4 +73,9 @@
     <style name="CheckBoxAppTheme" parent="android:Widget.CompoundButton.CheckBox">
         <item name="android:button">@drawable/apptheme_btn_check_holo_light</item>
     </style>
+
+    <style name="DialogAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:windowEnterAnimation">@anim/animate_slide_up</item>
+        <item name="android:windowExitAnimation">@anim/animate_slide_down</item>
+    </style>
 </resources>

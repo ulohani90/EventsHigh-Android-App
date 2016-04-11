@@ -24,6 +24,14 @@ public class AskForContactsDialog {
         }
     }
 
+    public static boolean checkIfToShow(BaseActivity activity,Preferences preferences){
+        if (preferences.getLastUploadContactsAsked() < System.currentTimeMillis() - DateUtils.WEEK_IN_MILLIS) {
+            AskForContactsDialog.show(activity, preferences);
+            return true;
+        }
+        return false;
+    }
+
     public static void show(final BaseActivity activity, final Preferences preferences) {
         show(activity, preferences, new DummyContactsRequestCallback());
     }

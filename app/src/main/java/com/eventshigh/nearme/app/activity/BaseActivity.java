@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.support.annotation.NonNull;
@@ -32,6 +33,7 @@ import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.OneSecDialog;
+import com.eventshigh.nearme.app.ui.ReferEarnDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.user.UserActionHelper;
@@ -165,6 +167,20 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         shareEventInitiatedTimestamp = 0;
         shareEventsInitiatedTimestamp = 0;
+
+        if(Preferences.getInstance(this).getLastTimeReferShown() == 0){
+            Preferences preferences = Preferences.getInstance(BaseActivity.this);
+            preferences.setLastTimeReferShown();
+        }else{
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    ReferEarnDialog.doNeedFull(BaseActivity.this);
+                }
+            },2000);
+
+        }
     }
 
     @Override
