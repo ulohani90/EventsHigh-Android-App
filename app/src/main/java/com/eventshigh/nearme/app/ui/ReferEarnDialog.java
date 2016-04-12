@@ -15,7 +15,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.user.Preferences;
-import com.eventshigh.nearme.app.user.UserContactsUploader;
 
 /**
  * Created by umesh on 09/04/16.

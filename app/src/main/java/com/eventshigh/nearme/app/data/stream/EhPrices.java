@@ -5,8 +5,7 @@ import android.os.Parcelable;
 
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.data.EventDescriptionSection;
-import com.google.android.gms.maps.model.LatLng;
+
 
 /**
  * Created by umesh on 07/04/16.

@@ -8,7 +8,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -35,7 +34,7 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, EventsContext eventsContext,
-                              Priority priority, Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
+                              Priority priority, Object tag, boolean shouldBypassCache,
                               Response.Listener<List<MyEventsRequest.TopicEvents>> listener, Response.ErrorListener errorListener) {
 
 
@@ -48,7 +47,7 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
         }
 
         MobileUserEventsRequest request = new MobileUserEventsRequest(context,eventsContext, url, priority,
-                shouldBypassCache, includeWithoutLocation, listener, errorListener);
+                shouldBypassCache, listener, errorListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
@@ -57,11 +56,11 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
 
     private final EventsContext eventsContext;
     private final Priority priority;
-    private final boolean includeWithoutLocation;
+
     private Context mContext;
 
     public MobileUserEventsRequest(Context context,EventsContext eventsContext, String url, Priority priority,
-                                   boolean shouldBypassCache, boolean includeWithoutLocation,
+                                   boolean shouldBypassCache,
                                    Response.Listener<List<MyEventsRequest.TopicEvents>> listener, Response.ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
@@ -69,7 +68,7 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
 
         this.eventsContext = eventsContext;
         this.priority = priority;
-        this.includeWithoutLocation = includeWithoutLocation;
+
         this.mContext = context;
     }
 
@@ -88,14 +87,14 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
             JSONArray eventsJsonArray = eventsJson.getJSONArray("events");
 
             for(int i=0;i<eventsJsonArray.length();i++){
-                List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"),includeWithoutLocation);
+                List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"));
 
                 MyEventsRequest.TopicEvents eventData = new MyEventsRequest.TopicEvents(eventsJsonArray.getJSONObject(i).getString("topic"),topicEvents,eventsJsonArray.getJSONObject(i).getInt("event_count"));
                 events.add(eventData);
             }
             return  Response.success(events, HttpHeaderParser.parseCacheHeaders(networkResponse));
         } catch (UnsupportedEncodingException |JSONException e) {
-            Crashlytics.getInstance().core.logException(e);
+
             return Response.error(new ParseError(e));
         }
     }

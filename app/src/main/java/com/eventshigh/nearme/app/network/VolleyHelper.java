@@ -8,7 +8,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.squareup.okhttp.OkHttpClient;
+
 
 /**
  * Volley Helper which provide the simple methods to manage VolleyRequestQueue
@@ -27,7 +27,7 @@ public class VolleyHelper {
     private final RequestQueue requestQueue;
 
     private VolleyHelper(Context context) {
-        requestQueue = Volley.newRequestQueue(context.getApplicationContext(), new OkHttpStack(new OkHttpClient()));
+        requestQueue = Volley.newRequestQueue(context.getApplicationContext());
     }
 
     public static RequestQueue getRequestQueue(Context context) {

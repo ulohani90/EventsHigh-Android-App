@@ -121,7 +121,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
 */
         RequestFuture<List<TopicEvents>> eventsFuture = RequestFuture.newFuture();
         MobileUserEventsRequest.submit(context, eventsContext,
-                priority, tag, shouldBypassCache, includeWithoutLocation, eventsFuture, eventsFuture);
+                priority, tag, shouldBypassCache, eventsFuture, eventsFuture);
 
         // Favourites event requests.
         EventsMarkerManager markerManager = EventsMarkerManager.getInstance(context);
@@ -180,7 +180,6 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
             if (eventsFuture.isCancelled()) {
                 throw new RequestCancelledException();
             }
-            Crashlytics.getInstance().core.logException(e);
         }
 
     }
