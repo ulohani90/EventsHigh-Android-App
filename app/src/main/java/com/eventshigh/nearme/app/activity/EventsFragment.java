@@ -142,7 +142,7 @@ public class EventsFragment extends BaseEventsFragment {
 
         if(asyncRequest!=null)
         asyncRequest.cancel(true);
-
+        isLoading = false;
 
         if(eventsAdapter!=null){
             eventsAdapter.clear();

@@ -18,6 +18,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -226,6 +227,9 @@ public class LaunchActivity extends BaseContextActivity {
             });
         }
 
+
+    //    ReferEarnDialog.showDialog(this);
+
     }
 
     private void setLightToolbarIcons() {
@@ -345,12 +349,72 @@ public class LaunchActivity extends BaseContextActivity {
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(defaultTab, false);
         viewPager.addOnPageChangeListener(listener);
-        tabsView.setTabMode(TabLayout.MODE_SCROLLABLE);
+        tabsView.setTabMode(TabLayout.MODE_FIXED);
+        tabsView.setTabGravity(TabLayout.GRAVITY_FILL);
         tabsView.setupWithViewPager(viewPager);
         tabsView.setScrollPosition(defaultTab, 0, true);
-        tabsView.setOnTabSelectedListener(adapter);
+
+
+        setupTabIcons();
+        tabsView.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+        TabLayout.Tab tab = tabsView.getTabAt(defaultTab);
+        if (tab != null) {
+            tab.select();
+        }
+
     }
 
+    private void setupTabIcons() {
+
+        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabOne.setText("My Events");
+        tabOne.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_events, 0, 0);
+        tabOne.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(0);
+            }
+        });
+        tabsView.getTabAt(0).setCustomView(tabOne);
+
+        TextView tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabTwo.setText("Explore");
+        tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_explore, 0, 0);
+        tabTwo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(1);
+            }
+        });
+        tabsView.getTabAt(1).setCustomView(tabTwo);
+
+        TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabThree.setText("This Week");
+        tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_week, 0, 0);
+        tabThree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(2);
+            }
+        });
+        tabsView.getTabAt(2).setCustomView(tabThree);
+
+    }
     private void showNextScreen() {
         // If we do not have user city, use GoogleLocation api to get user location.
         if (eventsContext.city == null) {

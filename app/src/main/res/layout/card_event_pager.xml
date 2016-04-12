@@ -6,7 +6,7 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/events_pager"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/event_card_height"
+        android:layout_height="170dp"
     />
 
     <LinearLayout

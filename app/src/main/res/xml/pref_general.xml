@@ -7,7 +7,8 @@
         android:title="@string/pref_title_change_location"
     />-->
     <Preference android:title="@string/personalize_text"
-        android:layout="@layout/navigation_menu_white_items">
+        android:layout="@layout/navigation_menu_white_items"
+        android:icon="@drawable/ic_personalize_nav">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.SelectInterestsActivity"
@@ -15,32 +16,41 @@
     </Preference>
 
     <Preference android:title="@string/title_refer"
-        android:layout="@layout/navigation_menu_white_items">
+        android:layout="@layout/navigation_menu_white_items"
+        android:icon="@drawable/ic_refer_earn_nav">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.ReferralActivity"
             />
     </Preference>
     <Preference android:title="@string/title_blog"
-        android:layout="@layout/navigation_menu_white_items">
+        android:layout="@layout/navigation_menu_white_items"
+    android:icon="@drawable/ic_blog_nav">
 
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
-            android:targetClass="com.eventshigh.nearme.app.activity.BlogFeedActivity"
-            />
-    </Preference>
+            android:targetClass="com.eventshigh.nearme.app.activity.BlogFeedActivity"/>
+</Preference>
+
+
+
+
 
     <Preference android:title="@string/pref_title_phone_no"
-        android:layout="@layout/navigation_menu_white_items">
+        android:layout="@layout/navigation_menu_white_items"
+        android:icon="@drawable/ic_register_no_nav">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.PhoneLoginActivity"
             />
     </Preference>
 
+
     <Preference android:title="@string/pref_title_about_us"
         android:key="about_us_key"
-        android:layout="@layout/navigation_menu_white_items">
+        android:layout="@layout/navigation_menu_items_grey"
+        android:icon="@drawable/ic_about_nav">
+
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.AboutUsActivity"

@@ -86,10 +86,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginBottom="8dp"
             android:layout_below="@+id/name_hint"
             android:layout_toRightOf="@+id/plus_91"
-            android:layout_toEndOf="@+id/plus_91"
+            android:gravity="center"
 		>
             <EditText
                 android:layout_width="match_parent"
@@ -108,6 +107,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
+
             android:layout_below="@+id/phone_no"
             android:text="@string/action_register"
             android:onClick="sendCode"
