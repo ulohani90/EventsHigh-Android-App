@@ -42,6 +42,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import pl.snowdog.material.ui.ToolbarColorizeHelper;
+
 /**
  * Maps activity which shows users events happening in given locality. The events are marked
  * across Map and user can zoom in, zoom out or move around the map to discover more events.
@@ -137,6 +139,23 @@ public class EventsMapsActivity extends BaseContextActivity {
                     .build()
             )
         );
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setLightToolbarIcons();
+    }
+
+    private void setLightToolbarIcons() {
+        toolbar.post(new Runnable() {
+            @Override
+            @SuppressWarnings("deprecation")
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                        getResources().getColor(android.R.color.white), EventsMapsActivity.this);
+            }
+        });
     }
 
     private void setUpMap() {

@@ -9,9 +9,9 @@
     <color name="gray300">#e0e0e0</color>
     <color name="gray200">#eeeeee</color>
 
-    <color name="primary">#EA5D4B</color>
-    <color name="primary_dark">#DA4D3B</color>
-    <color name="accent">#EA5D4B</color>
+    <color name="primary">#CE4a46</color>
+    <color name="primary_dark">#b43325</color>
+    <color name="accent">#CE4a46</color>
 
     <color name="card_gray">#F2F2F2</color>
     <color name="button_gray">#FAFAFA</color>
@@ -50,5 +50,6 @@
     <color name="skip_button">#f3b832</color>
     <color name="skip_button_dark">#f3b832</color>
     <color name="valid_text_grey">#6E7073</color>
+    <color name="translucent_dark">#99000000</color>
 
 </resources>

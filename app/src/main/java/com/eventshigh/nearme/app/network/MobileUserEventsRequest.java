@@ -42,6 +42,9 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
         String url;
         try {
             url = EventsHighEndpoints.getApiEndpointEventsMobileUser(Utils.getAndroidId(context));
+            if(shouldBypassCache){
+                url = url+"&cmode=override";
+            }
         } catch (IllegalArgumentException e) {
             errorListener.onErrorResponse(new VolleyError("Invalid Query", e));
             return;

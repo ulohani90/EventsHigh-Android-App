@@ -7,21 +7,24 @@
         android:title="@string/pref_title_change_location"
     />-->
     <Preference android:title="@string/personalize_text"
-        android:layout="@layout/navigation_menu_white_items">
+        android:layout="@layout/navigation_menu_white_items"
+        android:icon="@drawable/ic_personalize_nav">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.SelectInterestsActivity"
             />
     </Preference>
     <Preference android:title="@string/title_refer"
-        android:layout="@layout/navigation_menu_white_items">
+        android:layout="@layout/navigation_menu_white_items"
+        android:icon="@drawable/ic_refer_earn_nav">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.ReferralActivity"
             />
     </Preference>
     <Preference android:title="@string/title_blog"
-        android:layout="@layout/navigation_menu_white_items">
+        android:layout="@layout/navigation_menu_white_items"
+        android:icon="@drawable/ic_blog_nav">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.BlogFeedActivity"
@@ -30,14 +33,16 @@
 
     <!--android:summary="support@eventshigh.com"-->
     <Preference android:title="@string/pref_title_send_feedback"
-        android:layout="@layout/navigation_menu_white_items">
+        android:layout="@layout/navigation_menu_white_items"
+        android:icon="@drawable/ic_message_nav">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.FeedbackActivity"
             />
     </Preference>
     <Preference android:title="@string/pref_title_rate_us"
-        android:layout="@layout/navigation_menu_white_items">
+        android:layout="@layout/navigation_menu_white_items"
+        android:icon="@drawable/ic_playstore_nav">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="market://details?id=com.eventshigh.nearme.app"
@@ -45,7 +50,8 @@
     </Preference>
 
     <Preference android:title="@string/pref_title_phone_no"
-        android:layout="@layout/navigation_menu_white_items">
+        android:layout="@layout/navigation_menu_white_items"
+        android:icon="@drawable/ic_register_no_nav">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.PhoneLoginActivity"
@@ -53,7 +59,8 @@
     </Preference>
 
     <Preference android:title="@string/title_my_friends"
-        android:layout="@layout/navigation_menu_white_items">
+        android:layout="@layout/navigation_menu_white_items"
+        android:icon="@drawable/ic_my_friend_nav">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.MyFriendsActivity"
@@ -63,7 +70,8 @@
     <!--android:summary="listings@eventshigh.com"-->
     <Preference android:title="@string/pref_title_add_event"
         android:key="create_events_key"
-        android:layout="@layout/navigation_menu_items_grey">
+        android:layout="@layout/navigation_menu_items_grey"
+        android:icon="@drawable/ic_create_events_nav">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.SettingsActivity"
@@ -72,13 +80,15 @@
     </Preference>
     <Preference android:title="@string/pref_title_about_us"
         android:key="about_us_key"
-        android:layout="@layout/navigation_menu_items_grey">
+        android:layout="@layout/navigation_menu_items_grey"
+        android:icon="@drawable/ic_about_nav">
         <intent
             android:targetPackage="com.eventshigh.nearme.app"
             android:targetClass="com.eventshigh.nearme.app.activity.AboutUsActivity"
             />
     </Preference>
 
+<!--
     <Preference android:title="@string/pref_title_delete_query_history"
         android:layout="@layout/navigation_menu_items_grey">
         <intent
@@ -88,6 +98,7 @@
         />
     </Preference>
 
+-->
 
 
 </PreferenceScreen>
