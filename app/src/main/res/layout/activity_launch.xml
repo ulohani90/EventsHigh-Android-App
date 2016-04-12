@@ -102,7 +102,7 @@
             android:layout_gravity="center_horizontal"
             android:text="Bangalore"
             android:textColor="#7A7A7A"
-            android:drawablePadding="10dp"
+            android:drawablePadding="5dp"
             android:padding="5dp"
             android:drawableRight="@drawable/ic_location_edit_nav"
             android:drawableLeft="@drawable/ic_map_nav"/>
