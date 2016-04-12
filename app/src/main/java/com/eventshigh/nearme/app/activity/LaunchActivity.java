@@ -130,6 +130,10 @@ public class LaunchActivity extends BaseContextActivity {
     }
 
     @Override
+    public View getViewForSnackbar() {
+        return null;
+    }
+    @Override
     protected void onStart() {
         super.onStart();
     }
@@ -190,6 +194,9 @@ public class LaunchActivity extends BaseContextActivity {
                                 }else if(referringParams.has("event_uri")){
                                     Uri uri = Uri.parse(referringParams.getString("event_uri"));
                                     showSearchView(uri.getLastPathSegment());
+                                }else if(referringParams.has("referrer2")){
+                                    Log.i("EHLaunch_Referrer2",referringParams.getString("referrer2"));
+                                    showNextScreen();
                                 }
                                 //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
                             }
