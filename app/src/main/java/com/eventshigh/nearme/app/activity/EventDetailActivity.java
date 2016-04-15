@@ -659,7 +659,7 @@ public class EventDetailActivity extends BaseActivity {
             // Set action buttons.
             findViewById(R.id.action_button_group).setVisibility(View.VISIBLE);
             callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
-            bookView.setVisibility(event.bookingUrl != null ? View.VISIBLE : View.GONE);
+            bookView.setVisibility(event.bookingUrl != null && event.bookingUrl.length()>0 ? View.VISIBLE : View.GONE);
             if (event.bookingText != null) {
                 bookView.setText(event.bookingText);
             }

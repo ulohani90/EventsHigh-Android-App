@@ -72,6 +72,11 @@
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/city"
                 />
+                <data
+                    android:scheme="https"
+                    android:host="www.eventshigh.com"
+                    android:path="/"
+                />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -83,8 +88,9 @@
             </intent-filter>
 
             <!--Branch.io filters-->
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <data android:scheme="http" android:host="branch.eventshigh.com" />
+                <data android:scheme="https" android:host="branch.eventshigh.com" />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -110,89 +116,41 @@
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/bangalore"
                 />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true"
-                           tools:ignore="UnusedAttribute">
                 <data
                     android:scheme="https"
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/chennai"
                 />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true"
-                           tools:ignore="UnusedAttribute">
                 <data
                     android:scheme="https"
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/delhi"
                 />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true"
-                           tools:ignore="UnusedAttribute">
                 <data
                     android:scheme="https"
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/mumbai"
                 />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true"
-                           tools:ignore="UnusedAttribute">
                 <data
                     android:scheme="https"
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/Bangalore"
-                    />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true"
-                           tools:ignore="UnusedAttribute">
+                />
                 <data
                     android:scheme="https"
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/Chennai"
-                    />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true"
-                           tools:ignore="UnusedAttribute">
+                />
                 <data
                     android:scheme="https"
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/Delhi"
-                    />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true"
-                           tools:ignore="UnusedAttribute">
+                />
                 <data
                     android:scheme="https"
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/Mumbai"
-                    />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true"
-                           tools:ignore="UnusedAttribute">
+                />
                 <data
                     android:scheme="https"
                     android:host="www.eventshigh.com"

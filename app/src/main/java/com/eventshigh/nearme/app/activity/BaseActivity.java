@@ -240,10 +240,11 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (referralLink == null) {
             referralLink = "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + Utils.getAndroidId(this);
         }
-        branchObject.setCanonicalIdentifier(event.id).setTitle(event.title)
+
+        branchObject.setCanonicalIdentifier(event.id).setTitle(event.title.replaceAll("\""," &quot "))
                 .addContentMetadata("event_id",event.id)
                 .addContentMetadata("city_name",event.city.toString())
-                .setContentDescription(event.description)
+                .setContentDescription(event.description.replaceAll("\""," &quot "))
                 .setContentImageUrl(event.imgUrl)
                 .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
         branchObject.registerView();

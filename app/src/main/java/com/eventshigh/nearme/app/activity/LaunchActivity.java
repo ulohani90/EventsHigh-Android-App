@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -44,6 +45,9 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 import io.branch.referral.Branch;
 import io.branch.referral.BranchError;
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
@@ -70,6 +74,7 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String MY_EVENTS_TAB = EventsHighEndpoints.QUERY_MY_EVENT;
     public static final String EXPLORE_TAB = "explore";
     public static final String THIS_WEEK_TAB = "this week";
+    public static final String OFFERS="Offers";
     public final String[] TABS = {
             MY_EVENTS_TAB,
             EXPLORE_TAB,
@@ -173,48 +178,12 @@ public class LaunchActivity extends BaseContextActivity {
                 return;
             }
         }
-        Branch branch = Branch.getInstance();
-        if(branch!=null)
-        branch.initSession(new Branch.BranchReferralInitListener() {
-            @Override
-            public void onInitFinished(JSONObject referringParams, BranchError error) {
-                if (error == null) {
-                    //showEventDetails();
-                    if(referringParams.length() == 0){
-                        showNextScreen();
 
-                    }else {
-                        try {
-                            if(!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")){
-                                showNextScreen();
-                            }else {
-                                if(referringParams.has("event_id") ) {
-                                    showEventDetails(
-                                            EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
-                                }else if(referringParams.has("event_uri")){
-                                    Uri uri = Uri.parse(referringParams.getString("event_uri"));
-                                    showSearchView(uri.getLastPathSegment());
-                                }else if(referringParams.has("referrer2")){
-                                    Log.i("EHLaunch_Referrer2",referringParams.getString("referrer2"));
-                                    showNextScreen();
-                                }
-                                //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
-                            }
-                        } catch (JSONException e) {
-                            showNextScreen();
-                            e.printStackTrace();
-                        }
-                        System.out.println("JsonObject received" + referringParams);
-                    }
-                } else {
-                    showNextScreen();
-                    Log.i("MyApp", error.getMessage());
-                }
-            }
-        }, this.getIntent().getData(), this);
 
-        // Show next screen.
-      //  showNextScreen();
+        new InitiateBranchAsyncTask(getIntent().getData()).execute();
+
+        //Show next screen.
+          showNextScreen();
 
 
         currentCity = (TextView)findViewById(R.id.current_city);
@@ -410,8 +379,8 @@ public class LaunchActivity extends BaseContextActivity {
         });
         tabsView.getTabAt(1).setCustomView(tabTwo);
 
-        TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabThree.setText("This Week");
+        /*TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabThree.setText("Offers");
         tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_week, 0, 0);
         tabThree.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -419,7 +388,19 @@ public class LaunchActivity extends BaseContextActivity {
                 viewPager.setCurrentItem(2);
             }
         });
-        tabsView.getTabAt(2).setCustomView(tabThree);
+        tabsView.getTabAt(2).setCustomView(tabThree);*/
+
+
+        TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabFour.setText("This Week");
+        tabFour.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_week, 0, 0);
+        tabFour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(2);
+            }
+        });
+        tabsView.getTabAt(2).setCustomView(tabFour);
 
     }
     private void showNextScreen() {
@@ -537,6 +518,9 @@ public class LaunchActivity extends BaseContextActivity {
                  return exploreFragment;
 
             }
+            if(TABS[position].equals(OFFERS)){
+                return new OffersFragment();
+            }
 
             return ThisWeekFragment.getInstance(eventsContext, true, 7);
         }
@@ -588,6 +572,65 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public void onPageScrollStateChanged(int state) {
+
+        }
+    }
+
+    public class InitiateBranchAsyncTask extends AsyncTask<Void, Void, JSONObject >{
+        Uri data;
+
+        public InitiateBranchAsyncTask( Uri data){
+            this.data = data;
+        }
+
+        @Override
+        protected JSONObject doInBackground(Void... params) {
+            Branch branch = Branch.getInstance();
+            if(branch!=null)
+                branch.initSession(new Branch.BranchReferralInitListener() {
+                    @Override
+                    public void onInitFinished(JSONObject referringParams, BranchError error) {
+                        if (error == null) {
+                            //showEventDetails();
+                            if(referringParams.length() == 0){
+                               // showNextScreen();
+                                Log.i("Event_detail_missed","refering params empty");
+                            }else {
+                                try {
+                                    if(!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")){
+                                        //showNextScreen();
+                                        Log.i("Event_detail_missed",referringParams.getBoolean("+is_first_session")?"False":"true");
+                                    }else {
+                                        if(referringParams.has("event_id") ) {
+                                            showEventDetails(
+                                                    EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
+                                        }else if(referringParams.has("event_uri")){
+                                            Uri uri = Uri.parse(referringParams.getString("event_uri"));
+                                            showSearchView(uri.getLastPathSegment());
+                                        }else if(referringParams.has("referrer2")){
+                                            String referrer = referringParams.getString("referrer2");
+                                            new Account(LaunchActivity.this).recordReferrer(referrer);
+                                         //   showNextScreen();
+                                        }
+                                        //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
+                                    }
+                                } catch (JSONException e) {
+                                   // showNextScreen();
+                                    e.printStackTrace();
+                                }
+                                System.out.println("JsonObject received" + referringParams);
+                            }
+                        } else {
+                          //  showNextScreen();
+                            Log.i("MyApp", error.getMessage());
+                        }
+                    }
+                }, data, LaunchActivity.this);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject jsonObject) {
 
         }
     }

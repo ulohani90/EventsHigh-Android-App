@@ -140,12 +140,12 @@ public class Event implements Parcelable {
 
                 this.description = in.readString();
                 this.tags = in.createStringArray();
-                this.youtubeVideoId = in.readString();
+                this.youtubeVideoId = Utils.checkIfUnknown(in.readString());
 
-                this.imgUrl = in.readString();
-                this.sourceUrl = in.readString();
-                this.bookingUrl = in.readString();
-                this.bookingText = in.readString();
+                this.imgUrl = Utils.checkIfUnknown(in.readString());
+                this.sourceUrl = Utils.checkIfUnknown(in.readString());
+                this.bookingUrl = Utils.checkIfUnknown(in.readString());
+                this.bookingText = Utils.checkIfUnknown(in.readString());
 
                this.numViews =  in.readInt();
                 this.numSaves = in.readInt();
@@ -155,24 +155,25 @@ public class Event implements Parcelable {
                this.eventTimings =  in.createLongArray();
 
 
-                this.venue = in.readString();
-                this.locality = in.readString();
-                this.address = in.readString();
-                this.isCleanVenue = in.createBooleanArray()[0];
+                this.venue = Utils.checkIfUnknown(in.readString());
+                this.locality = Utils.checkIfUnknown(in.readString());
+                this.address = Utils.checkIfUnknown(in.readString());
+                this.isCleanVenue = venue!=null && in.createBooleanArray()[0];
+
 
                 this.performers =in.createStringArray();
 
-                this.organizerName = in.readString();
-                this.organizerPhone = in.readString();
-                this.organizerWebsite = in.readString();
-                this.organizerEmail = in.readString();
-                this.organizerLink = in.readString();
+                this.organizerName = Utils.checkIfUnknown(in.readString());
+                this.organizerPhone = Utils.checkIfUnknown(in.readString());
+                this.organizerWebsite = Utils.checkIfUnknown(in.readString());
+                this.organizerEmail = Utils.checkIfUnknown(in.readString());
+                this.organizerLink = Utils.checkIfUnknown(in.readString());
 
                 ehPrices =new ArrayList<>();
                 in.readTypedList(ehPrices, EhPrices.CREATOR);
                 this.minPrice = in.readDouble();
                 this.maxPrice = in.readDouble();
-                this.currency = in.readString();
+                this.currency = Utils.checkIfUnknown(in.readString());
                 this.priceName = in.readString();
                 this.priceNote = in.readString();
 

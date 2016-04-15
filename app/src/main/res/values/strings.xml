@@ -78,6 +78,10 @@
     <string name="ui_share_and_care_text">Sharing is caring. Caring about the coolest events in the city that is. Get your friends onboard EH and adventure on.</string>
     <string name="ui_spread_word_text">Spread the word. Get everyone on EH and make everyday an adventure.</string>
     <string name="ui_share_earn_text">Share with your friends. The more people, the more spectacular adventure. </string>
+    <string name="ui_voucher_text">Voucher</string>
+    <string name="ui_mobile_number_text">Mobile Number</string>
+    <string name="ui_fullname_text">Full Name</string>
+    <string name="ui_email_text">Email Id</string>
 
 
     <!-- Onbaording message -->

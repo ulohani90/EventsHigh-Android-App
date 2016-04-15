@@ -30,10 +30,10 @@ public class InstallReferrer extends BroadcastReceiver {
                 if (referrer == null) {
                     return;
                 }
-                String referrer2 = intent.getStringExtra("referrer2");
+                /*String referrer2 = intent.getStringExtra("referrer2");
                 if(referrer2!=null){
                     Log.i("EHInstall_Referrer2", referrer2);
-                }
+                }*/
                 referrer = URLDecoder.decode(referrer, "UTF-8");
                 new Account(context).recordReferrer(referrer);
             } catch (UnsupportedEncodingException e) {
