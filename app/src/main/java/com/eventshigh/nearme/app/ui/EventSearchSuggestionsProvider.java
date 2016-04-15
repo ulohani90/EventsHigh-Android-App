@@ -85,6 +85,7 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
                     Object[] newRow = new Object[columnCount];
                     newRow[idIndex] = SUGGESTION_ID_START + i;
                     newRow[queryColumnIndex] = tag;
+                    newRow[iconColumnIndex] = R.drawable.ic_search_white_36dp;
                     newRow[titleColumnIndex] = Utils.capitalize(tag);
                     suggestionsCursor.addRow(newRow);
                 }

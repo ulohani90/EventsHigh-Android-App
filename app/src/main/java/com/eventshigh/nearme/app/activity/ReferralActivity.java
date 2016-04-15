@@ -84,7 +84,7 @@ public class ReferralActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (BaseActivity.NOTIFICATION_ACTION.equals(BaseActivity.NOTIFICATION_ACTION)) {
+        if (getIntent()!=null && getIntent().getAction()!=null && getIntent().getAction().equals(BaseActivity.NOTIFICATION_ACTION)) {
             reportActionToAnalytics("openNotification");
         }
     }
