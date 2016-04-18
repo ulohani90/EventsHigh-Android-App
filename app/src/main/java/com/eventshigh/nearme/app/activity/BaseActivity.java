@@ -367,7 +367,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void shareEvent(Event event, String eventUri, @Nullable String packageName, @Nullable String label) {
         reportEventAction(event, "eventShareInitiated", label == null ? packageName : label);
         shareEventInitiatedTimestamp = System.currentTimeMillis();
-        new UserActionHelper(this).recordShareAction(event.id, packageName, null);
+        new UserActionHelper(this).recordShareAction(event.id, packageName, eventUri);
 
         try {
             Intent sendIntent = new Intent();
