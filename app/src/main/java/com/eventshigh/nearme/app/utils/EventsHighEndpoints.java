@@ -45,6 +45,8 @@ public class EventsHighEndpoints {
     private static final String API_TAGS_SUGGEST_URL =
             "https://assets.eventshigh.com/autocomplete/autocomplete_tags.json";
 
+    private static final String API_ENDPOINT_OFFERS_FORMAT = "http://ehapi.westus.cloudapp.azure.com/"+"api/get_offers/%s";
+
     public static final String QUERY_MY_EVENT = "my events";
     public static final String QUERY_FEATURED = "editor's picks";
 
@@ -152,6 +154,10 @@ public class EventsHighEndpoints {
             Crashlytics.getInstance().core.logException(e);
             throw new IllegalArgumentException(e);
         }
+    }
+
+    public static String getApiEndPointForOffers(String cityName){
+        return String.format(API_ENDPOINT_OFFERS_FORMAT, cityName);
     }
 
     public static String getApiEndpointEventUber(String eventId) {

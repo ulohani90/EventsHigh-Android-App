@@ -74,7 +74,7 @@ public class SelectInterestsActivity extends BaseActivity{
     @Override
     protected void onStart() {
         super.onStart();
-        if (BaseActivity.NOTIFICATION_ACTION.equals(BaseActivity.NOTIFICATION_ACTION)) {
+        if (getIntent()!=null && getIntent().getAction().equals(BaseActivity.NOTIFICATION_ACTION)) {
             reportActionToAnalytics("openNotification");
         }
     }
@@ -155,6 +155,11 @@ public class SelectInterestsActivity extends BaseActivity{
     }
 
     public void doneClicked(View view) {
+        if(isFromNotification) {
+            reportActionToAnalytics("donePClickedNotif");
+        }else{
+            reportActionToAnalytics("donePClicked");
+        }
         closeActivity(isFromNotification);
     }
 

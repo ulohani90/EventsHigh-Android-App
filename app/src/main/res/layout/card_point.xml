@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/point_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    >
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
+<ImageView
+    android:id="@+id/point_character"
+    android:layout_width="45dp"
+    android:layout_height="46dp"
+    android:scaleType="centerInside"
+    />
+    <TextView
+        android:id="@+id/point_count"
+        style="@style/EventCardText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="10dp"
+        android:textColor="#666666"
+        android:textIsSelectable="false"
+        android:textSize="13sp"
+        tools:text="30 points"
+        />
+    <TextView
+        android:id="@+id/point_name"
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="12dp"
+        android:layout_toEndOf="@id/point_character"
+        android:textColor="#000000"
+        android:textIsSelectable="false"
+        android:layout_toStartOf="@id/point_count"
+        android:textSize="13sp"
+        tools:text="My Awesome Event with a long long title!"
+        />
+
+
+    <TextView
+        android:id="@+id/point_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_marginTop="8dp"
+        android:textAlignment="gravity"
+        android:layout_toEndOf="@id/point_character"
+        android:layout_below="@id/point_name"
+        android:textColor="#666666"
+        android:textSize="12sp"
+        android:visibility="gone"/>
+    <TextView
+        android:id="@+id/point_action_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/eh_button_done"
+        android:padding="10dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="10dp"
+        android:gravity="center"
+        android:textAlignment="gravity"
+        android:layout_toEndOf="@id/point_character"
+        android:layout_below="@id/point_desc"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:text="Refer Friend now!"
+        android:visibility="gone"/>
+</RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#f0f0f0"
+        android:layout_alignParentBottom="true"
+        ></View>
+</LinearLayout>

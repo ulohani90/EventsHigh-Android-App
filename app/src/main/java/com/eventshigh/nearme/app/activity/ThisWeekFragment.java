@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -57,7 +58,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        adapter = new ThisWeekPagerAdapter();
+        adapter = new ThisWeekPagerAdapter(getChildFragmentManager());
 
         viewPager = (ViewPager) view.findViewById(R.id.view_pager_date);
         viewPager.setAdapter(adapter);
@@ -132,8 +133,8 @@ public class ThisWeekFragment extends BaseEventsFragment {
     }
 
     private class ThisWeekPagerAdapter extends FragmentStatePagerAdapter {
-        public ThisWeekPagerAdapter() {
-            super(activity.getSupportFragmentManager());
+        public ThisWeekPagerAdapter(FragmentManager fm) {
+            super(fm);
         }
 
         @Override

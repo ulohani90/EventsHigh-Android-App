@@ -326,6 +326,21 @@
             />
 
         <activity
+            android:name=".activity.RedeemCouponActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"
+            android:theme="@style/NoActionBar"
+            />
+
+        <activity
+            android:name=".activity.OfferSignUpActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"
+            android:theme="@style/NoActionBar"
+            android:label="@string/enter_details_text"
+            />
+
+        <activity
             android:name=".activity.CustomUrlActivity"
             android:label="@string/app_name"
             android:configChanges="orientation|keyboardHidden|screenSize"

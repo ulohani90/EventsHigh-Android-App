@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -44,6 +45,13 @@ public class SmallHeaderCard extends ViewHolder {
             });
         }else{
             editView.setVisibility(View.GONE);
+        }
+        if(header.drawableLeftResourceId!=0) {
+            Drawable drawable = activity.getResources().getDrawable(header.drawableLeftResourceId);
+            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+            titleView.setCompoundDrawables(drawable, null, null, null);
+        }else{
+            titleView.setCompoundDrawables(null, null, null, null);
         }
 
     }

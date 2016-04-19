@@ -8,17 +8,22 @@ import com.eventshigh.nearme.app.activity.BaseContextActivity;
 public class SmallHeaderData implements AdapterData {
     public final String header;
 
-    public  boolean isEditAllowed;
+    public final boolean isEditAllowed;
+
+    public final int drawableLeftResourceId;
 
     private BaseContextActivity activity;
 
     public SmallHeaderData(String header) {
         this.header = header;
+        isEditAllowed =false;
+        drawableLeftResourceId = 0;
     }
-    public SmallHeaderData(BaseContextActivity activity,String header,boolean isEditAllowed) {
+    public SmallHeaderData(BaseContextActivity activity,String header,boolean isEditAllowed,int drawableLeftResourceId) {
         this.header = header;
         this.isEditAllowed = isEditAllowed;
         this.activity = activity;
+        this.drawableLeftResourceId = drawableLeftResourceId;
     }
 
     @Override

@@ -19,7 +19,7 @@ import com.eventshigh.nearme.app.utils.Utils;
  */
 public class LocalityCard extends RecyclerView.ViewHolder {
 
-private TextView titleView;
+    private TextView titleView;
     private BaseContextActivity activity;
     public static LocalityCard newInstance(final BaseActivity activity, ViewGroup parent) {
         View view = activity.getLayoutInflater().inflate(R.layout.card_explore_location, parent, false);

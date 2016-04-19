@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/card_item_bg"
+    android:id="@+id/offer_parent"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/offer_bg"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="false"
+        android:scaleType="centerCrop"
+        tools:ignore="ContentDescription"
+        android:transitionName="@string/activity_image_trans"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white">
+    <TextView
+        android:id="@+id/offer_title"
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="3dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="#555555"
+        android:textIsSelectable="false"
+        tools:text="My Awesome Event with a long long title!"
+        />
+    <TextView
+        android:id="@+id/offer_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_weight="1"
+        android:textColor="#666666"
+        android:textIsSelectable="false"
+        android:textSize="13sp"
+        tools:text="Sun, 29 Mar at 8:30 pm"
+        />
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:paddingLeft="10dp"
+android:paddingRight="10dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
+    android:orientation="horizontal">
+    <TextView
+        android:id="@+id/offer_time"
+        style="@style/EventCardText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="#666666"
+        android:textIsSelectable="false"
+        android:textSize="13sp"
+        tools:text="Sun, 29 Mar at 8:30 pm"
+        />
+
+    <TextView
+        android:id="@+id/call_to_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:background="@drawable/eh_button_done"
+        android:padding="8dp"
+        android:text="Sign up"
+        android:textColor="@android:color/white"/>
+</LinearLayout>
+    </LinearLayout>
+</LinearLayout>

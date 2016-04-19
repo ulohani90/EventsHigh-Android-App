@@ -1,0 +1,105 @@
+package com.eventshigh.nearme.app.ui.adapter;
+
+import android.content.Intent;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
+import com.eventshigh.nearme.app.activity.ReferralActivity;
+import com.eventshigh.nearme.app.data.stream.PointsObject;
+
+/**
+ * Created by umesh on 16/04/16.
+ */
+public class PointsCard extends RecyclerView.ViewHolder{
+
+    public final LinearLayout pointCard;
+    public final ImageView pointCharacter;
+    public final TextView pointName;
+    public final TextView pointCount;
+    public final TextView pointDesc;
+    public final TextView pointActionButton;
+    boolean isDescShown;
+    public PointsCard(View itemView) {
+        super(itemView);
+        pointCharacter = (ImageView)itemView.findViewById(R.id.point_character);
+        pointName = (TextView)itemView.findViewById(R.id.point_name);
+        pointCount = (TextView)itemView.findViewById(R.id.point_count);
+        pointCard = (LinearLayout)itemView.findViewById(R.id.point_card);
+        pointDesc =(TextView)itemView.findViewById(R.id.point_desc);
+        pointActionButton = (TextView)itemView.findViewById(R.id.point_action_btn);
+
+    }
+
+    public static PointsCard newInstance(final BaseActivity activity, ViewGroup parent) {
+        View view = activity.getLayoutInflater().inflate(R.layout.card_point, parent, false);
+        return new PointsCard(view);
+    }
+
+
+    public void bindView(final PointsObject obj, final BaseContextActivity activity){
+        int resourceId;
+        if(obj.pName.equalsIgnoreCase("Refer & Earn")){
+            resourceId = R.drawable.ic_refer_action;
+
+        }else if(obj.pName.equalsIgnoreCase("Share an event")){
+            resourceId = R.drawable.ic_fb_action;
+        }else if(obj.pName.equalsIgnoreCase("Refer & Earn")){
+            resourceId = R.drawable.ic_refer_action;
+        }else if(obj.pName.equalsIgnoreCase("Book a ticket")){
+            resourceId = R.drawable.ic_book_ticket_action;
+        }else if(obj.pName.equalsIgnoreCase("Favorite an event")){
+            resourceId = R.drawable.ic_fav_action;
+        }else{
+            resourceId = R.drawable.ic_review_action;
+        }
+        Glide.with(activity).load(resourceId)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.drawable.ic_launcher).crossFade()
+                .into(pointCharacter);
+
+        pointName.setText(obj.pName);
+        pointCount.setText(obj.points + " points");
+        pointCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(pointDesc.isShown()){
+                    pointDesc.setVisibility(View.GONE);
+                    pointActionButton.setVisibility(View.GONE);
+                }else{
+                    pointDesc.setVisibility(View.VISIBLE);
+                    pointDesc.setText(obj.pDesc);
+                    if(obj.pName.equalsIgnoreCase("Refer & Earn")){
+                        pointActionButton.setVisibility(View.VISIBLE);
+                        pointActionButton.setText("Refer Friend Now!");
+                        pointActionButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(activity, ReferralActivity.class);
+                                activity.startActivity(intent);
+                            }
+                        });
+
+                    }else{
+                        pointActionButton.setVisibility(View.GONE);
+                    }
+
+                }
+            }
+        });
+
+
+
+    }
+
+
+}

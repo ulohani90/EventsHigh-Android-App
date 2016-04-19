@@ -13,6 +13,7 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|start"
+        android:drawablePadding="10dp"
         android:layout_margin="24dp"
         android:fontFamily="sans-serif-medium"
         android:textIsSelectable="false"

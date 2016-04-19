@@ -12,7 +12,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,6 +20,7 @@ import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -65,8 +65,9 @@ import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import io.branch.referral.Branch;
 import io.branch.referral.BranchError;
@@ -99,13 +100,8 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String EXPLORE_TAB = "explore";
     public static final String NOTIFICATIONS_TAB = "Notifications";
     public static final String THIS_WEEK_TAB = "this week";
-    public static final String OFFERS="Offers";
-    public final String[] TABS = {
-            MY_EVENTS_TAB,
-            EXPLORE_TAB,
-            THIS_WEEK_TAB,
-            NOTIFICATIONS_TAB,
-    };
+    public static final String OFFERS_TAB ="Offers";
+    public  ArrayList<String> TABS = new ArrayList<>();
 
     //Calculate no of time user resumes on to Home
     int screenViewCount;
@@ -147,16 +143,16 @@ public class LaunchActivity extends BaseContextActivity {
         account = new Account(this);
 
         // Process the incoming intent.
-        String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
+        /*String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
         if (tabName != null) {
-            for (int i = 0; i < TABS.length; i++) {
-                if (TABS[i].equalsIgnoreCase(tabName)) {
+            for (int i = 0; i < TABS.size(); i++) {
+                if (TABS.get(i).equalsIgnoreCase(tabName)) {
                     defaultTab = i;
                     break;
                 }
             }
         }
-
+*/
 
     }
 
@@ -206,8 +202,6 @@ public class LaunchActivity extends BaseContextActivity {
         }
 
 
-        new InitiateBranchAsyncTask(getIntent().getData()).execute();
-
         //Show next screen.
           showNextScreen();
 
@@ -242,8 +236,9 @@ public class LaunchActivity extends BaseContextActivity {
             });
         }
 
+        new InitiateBranchAsyncTask(getIntent().getData()).execute();
 
-    //    ReferEarnDialog.showDialog(this);
+       ReferEarnDialog.showDialog(this);
 
     }
 
@@ -328,13 +323,23 @@ public class LaunchActivity extends BaseContextActivity {
     }
 
     public void cityChanged(City city) {
+
+
         drawer.closeDrawer(GravityCompat.START);
         reportActionToAnalytics("cityChanged");
 
         eventsContext.changeLocation(city.cityBounds.getCenter());
         showExploreScreen();
     }
+    public static String[] removeElements(String[] input, String deleteMe) {
+        List result = new LinkedList();
 
+        for(String item : input)
+            if(!deleteMe.equals(item))
+                result.add(item);
+
+        return (String[])result.toArray(input);
+    }
 
     // ***********************
     // Callbacks
@@ -458,6 +463,29 @@ public class LaunchActivity extends BaseContextActivity {
 
     private void showExploreScreen() {
 
+        if(!(account.getLastCity() == City.BANGALORE)){
+            TABS=new ArrayList<>();
+            TABS.add(MY_EVENTS_TAB);
+            TABS.add(EXPLORE_TAB);
+            TABS.add(THIS_WEEK_TAB);
+            TABS.add(NOTIFICATIONS_TAB);
+        }else{
+            TABS=new ArrayList<>();
+            TABS.add(MY_EVENTS_TAB);
+            TABS.add(EXPLORE_TAB);
+            TABS.add(OFFERS_TAB);
+            TABS.add(THIS_WEEK_TAB);
+            TABS.add(NOTIFICATIONS_TAB);
+        }
+        String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
+        if (tabName != null) {
+            for (int i = 0; i < TABS.size(); i++) {
+                if (TABS.get(i).equalsIgnoreCase(tabName)) {
+                    defaultTab = i;
+                    break;
+                }
+            }
+        }
 
         ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
         viewPager.setAdapter(adapter);
@@ -467,8 +495,13 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.setTabGravity(TabLayout.GRAVITY_FILL);
         tabsView.setupWithViewPager(viewPager);
         tabsView.setScrollPosition(defaultTab, 0, true);
+        if(account.getLastCity() == City.BANGALORE){
+            setupTabIconsWithOffer();
+        }else{
+            setupTabIcons();
+        }
+        tabsView.invalidate();
 
-        setupTabIcons();
         tabsView.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -491,10 +524,10 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
-    private void setupTabIcons() {
+    private void setupTabIconsWithOffer() {
 
         TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabOne.setText("My Events");
+        tabOne.setText("Me");
         tabOne.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_events, 0, 0);
         tabOne.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -515,27 +548,28 @@ public class LaunchActivity extends BaseContextActivity {
         });
         tabsView.getTabAt(1).setCustomView(tabTwo);
 
-        /*TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabThree.setText("Offers");
-        tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_week, 0, 0);
-        tabThree.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewPager.setCurrentItem(2);
-            }
-        });
-        tabsView.getTabAt(2).setCustomView(tabThree);*/
+
+            TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+            tabThree.setText("Offers");
+            tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_offer, 0, 0);
+            tabThree.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewPager.setCurrentItem(2);
+                }
+            });
+            tabsView.getTabAt(2).setCustomView(tabThree);
 
         TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabFour.setText("This Week");
+        tabFour.setText("Week");
         tabFour.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_week, 0, 0);
         tabFour.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewPager.setCurrentItem(2);
+                viewPager.setCurrentItem(3);
             }
         });
-        tabsView.getTabAt(2).setCustomView(tabFour);
+        tabsView.getTabAt(3).setCustomView(tabFour);
 
         TextView tabFive = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabFive.setText("Alerts");
@@ -543,10 +577,57 @@ public class LaunchActivity extends BaseContextActivity {
         tabFive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                viewPager.setCurrentItem(4);
+            }
+        });
+        tabsView.getTabAt(4).setCustomView(tabFive);
+    }
+
+    private void setupTabIcons() {
+
+        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabOne.setText("Me");
+        tabOne.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_events, 0, 0);
+        tabOne.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(0);
+            }
+        });
+        tabsView.getTabAt(0).setCustomView(tabOne);
+
+        TextView tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabTwo.setText("Explore");
+        tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_explore, 0, 0);
+        tabTwo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(1);
+            }
+        });
+        tabsView.getTabAt(1).setCustomView(tabTwo);
+
+        TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabThree.setText("Week");
+        tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_week, 0, 0);
+        tabThree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(2);
+            }
+        });
+        tabsView.getTabAt(2).setCustomView(tabThree);
+
+        TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabFour.setText("Alerts");
+        tabFour.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_notification, 0, 0);
+        tabFour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 viewPager.setCurrentItem(3);
             }
         });
-        tabsView.getTabAt(3).setCustomView(tabFive);
+        tabsView.getTabAt(3).setCustomView(tabFour);
     }
     private void showNextScreen() {
         // If we do not have user city, use GoogleLocation api to get user location.
@@ -625,8 +706,7 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public void onPageSelected(int position) {
-            reportActionToAnalytics("tabchange",TABS[position]);
-
+            reportActionToAnalytics("tabchange",TABS.get(position));
         }
 
         @Override
@@ -634,7 +714,6 @@ public class LaunchActivity extends BaseContextActivity {
 
         }
     };
-
 
 
     public void setisPagerSwipeBlocked(boolean isPagerSwipeBlocked){
@@ -657,28 +736,28 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public long getItemId(int position) {
-            return (eventsContext.toString() + TABS[position]).hashCode();
+            return (eventsContext.toString() + TABS.get(position)).hashCode();
         }
 
         @Override
         public Fragment getItem(int position) {
-            if (TABS[position].equals(MY_EVENTS_TAB)) {
+            if (TABS.get(position).equals(MY_EVENTS_TAB)) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                     EventsHighEndpoints.QUERY_MY_EVENT);
                 myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false,null);
                 return myEventsFragment;
             }
 
-            if (TABS[position].equals(EXPLORE_TAB)) {
+            if (TABS.get(position).equals(EXPLORE_TAB)) {
                  exploreFragment = ExploreFragment.getInstance(eventsContext);
                  return exploreFragment;
 
             }
-            if(TABS[position].equals(OFFERS)){
+            if(TABS.get(position).equals(OFFERS_TAB)){
                 return new OffersFragment();
             }
 
-            if (TABS[position].equals(NOTIFICATIONS_TAB)) {
+            if (TABS.get(position).equals(NOTIFICATIONS_TAB)) {
                 return new StreamFragment();
             }
 
@@ -687,12 +766,12 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public int getCount() {
-            return TABS.length;
+            return TABS.size();
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return TABS[position];
+            return TABS.get(position);
         }
 
         @Override
@@ -701,7 +780,7 @@ public class LaunchActivity extends BaseContextActivity {
                 showActionBar();
 
                 int position = tab.getPosition();
-                if (TABS[position].equals(MY_EVENTS_TAB) && myEventsFragment != null) {
+                if (TABS.get(position).equals(MY_EVENTS_TAB) && myEventsFragment != null) {
                     myEventsFragment.onResume();
                 }
 
@@ -738,6 +817,7 @@ public class LaunchActivity extends BaseContextActivity {
 
     public class InitiateBranchAsyncTask extends AsyncTask<Void, Void, JSONObject >{
         Uri data;
+
 
         public InitiateBranchAsyncTask(@NonNull Uri data){
             this.data = data;

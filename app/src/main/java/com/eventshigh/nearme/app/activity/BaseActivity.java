@@ -29,6 +29,7 @@ import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.data.stream.OfferObject;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
@@ -357,7 +358,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                     shareEvent(event, url, packageName, label);
                 } else {
                     //   if (error.getErrorCode() == -113) {
-                    showMessage( error.getMessage());
+                    showMessage(error.getMessage());
                     // }
                 }
             }
@@ -537,4 +538,18 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
 
+    public void showRedeemCouponActivity(OfferObject offer, long totalPoints) {
+        Intent intent = new Intent(this, RedeemCouponActivity.class);
+        intent.putExtra("offer", offer);
+        intent.putExtra("total_points", totalPoints);
+        startActivity(intent);
+        //overridePendingTransition(R.anim.animate_bottom_up, R.anim.stay);
+    }
+
+    public void showOfferSignUpActivity(OfferObject offer){
+        Intent intent = new Intent(this, OfferSignUpActivity.class);
+        intent.putExtra("offer", offer);
+        startActivity(intent);
+        overridePendingTransition(R.anim.animate_bottom_up, R.anim.stay);
+    }
 }

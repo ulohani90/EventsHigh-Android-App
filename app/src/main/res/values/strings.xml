@@ -29,6 +29,8 @@
     <string name="action_explore_events">Explore Events</string>
     <string name="action_check_friends">Invite</string>
     <string name="action_done">Done</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_signup">Sign Up</string>
 
     <!-- Menu items -->
     <string name="menu_edit_location">Change Location</string>
@@ -81,6 +83,7 @@
     <string name="ui_mobile_number_text">Mobile Number</string>
     <string name="ui_fullname_text">Full Name</string>
     <string name="ui_email_text">Email Id</string>
+    <string name="ui_you_earned_points">You have earned total %1$s points</string>
 
 
     <!-- Onbaording message -->
@@ -166,4 +169,8 @@
     <string name="view_all">View all Coupons</string>
 
     <string name="terms_condition_text">\u2022 Eligible on friends who installs the EventsHigh app for first time.&lt;br> \u2022 Both you and your friend needs to register using phone number.&lt;br>\u2022 You will get the discount voucher for &lt;b> ₹ 100&lt;/b> which can be redeemed only for events ticketed on eventshigh.com.&lt;br>\u2022 You can use one discount voucher per transaction.&lt;br>\u2022 Discount vouchers are not transferable.&lt;br>\u2022 EventsHigh team reserves the right to cancel discount vouchers if it suspects misuse. EventsHigh team decision will be final.&lt;br>\u2022 For any queries, please write to us at &lt;b>support@eventshigh.com&lt;/b>.</string>
+
+    <string name="activity_image_trans">Offer Image transition</string>
+
+    <string name="enter_details_text">Enter Details</string>
 </resources>
