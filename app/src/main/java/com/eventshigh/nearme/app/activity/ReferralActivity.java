@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -14,11 +15,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.Request.Priority;
+import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
@@ -32,7 +38,13 @@ import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.IntentUtils;
+import com.eventshigh.nearme.app.utils.Signer;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -47,6 +59,8 @@ public class ReferralActivity extends BaseActivity {
     Toolbar toolbar;
 
     DiscountCode code;
+
+    public static final String REDEEM_ACTION = "redeemAction";
 
 
     @Override
@@ -123,7 +137,7 @@ public class ReferralActivity extends BaseActivity {
             finish();
         }
 
-        MyDiscountVouchersRequest.submit(this, Priority.HIGH, this, false,
+        /*MyDiscountVouchersRequest.submit(this, Priority.HIGH, this, false,
                 new Listener<List<DiscountCode>>() {
                     @SuppressLint("SetTextI18n")
                     @Override
@@ -150,7 +164,7 @@ public class ReferralActivity extends BaseActivity {
 
                         vouchersContainer.addView(view);
 
-                        /*for (final DiscountCode code : discountCodes) {
+                        *//*for (final DiscountCode code : discountCodes) {
                             View view  = inflater.inflate(R.layout.card_discount_voucher, vouchersContainer, false);
                             view.findViewById(R.id.parent_layout).setTag(code);
                             (view.findViewById(R.id.parent_layout)).setOnClickListener(new View.OnClickListener() {
@@ -184,7 +198,7 @@ public class ReferralActivity extends BaseActivity {
                             ((TextView) view.findViewById(R.id.discount_value)).setText("₹ " + code.amount);
 
                             vouchersContainer.addView(view);
-                        }*/
+                        }*//*
 
 
                         vouchersContainer.setVisibility(View.VISIBLE);
@@ -194,7 +208,49 @@ public class ReferralActivity extends BaseActivity {
                     public void onErrorResponse(VolleyError volleyError) {
                         VolleyHelper.log(ReferralActivity.this, volleyError);
                     }
-                });
+                });*/
+
+        getUserPoints();
+    }
+
+    public void getUserPoints(){
+        Uri requestUrl = UpdateAccountInfoService.getBaseUri(this, "getWalletPoints")
+                .build();
+        try {
+            VolleyHelper.addToRequestQueue(this,
+                    new JsonObjectRequest(Request.Method.GET, Signer.sign(requestUrl).toString(), null,
+                            new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject s, boolean isIntermediate) {
+                                    try {
+                                        long walletPoints = s.getLong("points");
+                                        while (vouchersContainer.getChildCount() > 2) {
+                                            vouchersContainer.removeViewAt(2);
+                                        }
+                                        LayoutInflater inflater = getLayoutInflater();
+                                        View view = inflater.inflate(R.layout.card_wallet_amount, vouchersContainer, false);
+                                        (findViewById(R.id.redeem_btn)).setVisibility(View.VISIBLE);
+                                        ((TextView) view.findViewById(R.id.discount_value)).setText( walletPoints+" Points");
+                                        vouchersContainer.addView(view);
+                                    }catch(JSONException e){
+                                        e.printStackTrace();
+                                    }
+                                    vouchersContainer.setVisibility(View.VISIBLE);
+                                }
+
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError volleyError) {
+                                    VolleyHelper.log(ReferralActivity.this, volleyError);
+                                    getUserPoints();
+                                }
+                            }
+                    )
+            );
+        } catch (IOException | GeneralSecurityException e) {
+            Crashlytics.getInstance().core.logException(e);
+        }
     }
 
     public void copyTextToClipBoard(String label, String text,String message){
@@ -211,12 +267,19 @@ public class ReferralActivity extends BaseActivity {
 
     public void redeem(View view) {
         reportActionToAnalytics("redeem");
-        EventsContext param = new EventsContext(null, "eventshigh specials");
+        /*EventsContext param = new EventsContext(null, "eventshigh specials");
         Intent intent = new Intent(this, EventsGridActivity.class)
                 .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
         if(code!=null)
             intent.putExtra("special_obj",getSpecialObj());
+        startActivity(intent);*/
+
+        Intent intent = new Intent(this,LaunchActivity.class);
+        intent.setAction(REDEEM_ACTION);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM,LaunchActivity.OFFERS_TAB);
         startActivity(intent);
+        this.finish();
     }
 
     public SocialInvitationsRequest.SpecialCoupons getSpecialObj(){
@@ -226,6 +289,7 @@ public class ReferralActivity extends BaseActivity {
     public void onBackPressed() {
         if(isFromNotification){
             Intent intent = new Intent(this,LaunchActivity.class);
+
             startActivity(intent);
         }
             super.onBackPressed();

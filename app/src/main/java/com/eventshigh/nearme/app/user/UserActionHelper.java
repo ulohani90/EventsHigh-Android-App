@@ -39,7 +39,7 @@ public class UserActionHelper {
         this.context = context;
     }
 
-    public void recordShareAction(String eventId, @Nullable String appName, @Nullable String link) {
+    public void recordShareAction(String eventId,String eventTitle, @Nullable String appName, @Nullable String link) {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(JSON_KEY_EVENT_ID, eventId);
@@ -48,6 +48,9 @@ public class UserActionHelper {
             }
             if (link != null) {
                 jsonObject.put("link", link);
+            }
+            if(eventTitle!=null){
+                jsonObject.put("event_title",eventTitle);
             }
             recordAction(EventAction.SHARE.name().toLowerCase(), jsonObject.toString());
         } catch (JSONException e) {

@@ -18,7 +18,7 @@ import java.util.Map;
  * This Icon is used in event marker on Map or on Event Info card.
  */
 public enum EventCategory {
-    ART,
+    ART("Arts & Culture"),
     COMEDY,
     DANCE,
     DJ,
@@ -28,11 +28,11 @@ public enum EventCategory {
     FILM,
     FOOD,
     HEALTH_WELLNESS("Health & Wellness"),
-    KIDS_ENTERTAINMENT,
-    LITERATURE,
+    KIDS_ENTERTAINMENT("Kids"),
+    LITERATURE("TLS(Technology, Literature & Society)"),
     MUSIC,
     OUTDOORS,
-    NIGHTLIFE,
+    NIGHTLIFE("Parties & Nightlife"),
     PHOTOGRAPHY,
     SHOPPING,
     SOCIAL_CAUSES,
@@ -41,7 +41,7 @@ public enum EventCategory {
     TECH,
     THEATRE,
     WORKSHOP,
-    LIVE_PERFORMANCES,
+    LIVE_PERFORMANCES("Live Performances & Shows"),
     EDITOR_PICKS("Editor's Picks"),
     FREE_EVENTS,
     OTHER;
@@ -133,7 +133,7 @@ public enum EventCategory {
     }
 
     public static String toCategoryParsableString(String tag) {
-        return tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "").replaceAll("'", "");
+        return tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "").replaceAll("'", "").replaceAll("\\(","_").replaceAll("\\)","").replaceAll(",","");
     }
 
     public static @Nullable EventCategory getCategoryFromCategoryParsableString(String tagU) {

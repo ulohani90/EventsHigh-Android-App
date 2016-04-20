@@ -56,7 +56,6 @@ import io.branch.indexing.BranchUniversalObject;
 import io.branch.referral.Branch;
 import io.branch.referral.BranchError;
 import io.branch.referral.util.LinkProperties;
-import io.fabric.sdk.android.Fabric;
 
 /**
  * Base activity class which does the common things like initialization of Google Analytics.
@@ -84,6 +83,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     // Check out the share event timings.
     protected long shareEventInitiatedTimestamp = 0;
     protected long shareEventsInitiatedTimestamp = 0;
+    protected long shareOfferInitiatedTimestamp = 0;
 
 
     // **********************************************
@@ -163,6 +163,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (shareEventsInitiatedTimestamp > 0) {
             long secForShare = (System.currentTimeMillis() - shareEventsInitiatedTimestamp) / 1000;
             reportActionToAnalytics(secForShare > 5 ? "shareEvents" : "eventsShareDismissed",
+                    Long.toString(secForShare));
+        }
+
+        if (shareOfferInitiatedTimestamp > 0) {
+            long secForShare = (System.currentTimeMillis() - shareOfferInitiatedTimestamp) / 1000;
+            reportActionToAnalytics(secForShare > 5 ? "shareOffers" : "offerShareDismissed",
                     Long.toString(secForShare));
         }
 
@@ -274,21 +280,51 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void shareApp() {
         reportActionToAnalytics("shareApp", PACKAGE_NAME_WHATSAPP);
 
-        String referralLink = new Account(this).getReferrerLink();
-        if (referralLink == null) {
+        BranchUniversalObject branchObject = new BranchUniversalObject();
+
+        String referralId = new Account(this).getReferrerId();
+       /* if (referralLink == null) {
             referralLink = "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + Utils.getAndroidId(this);
         }
+*/
+        branchObject.setCanonicalIdentifier("shareApp")
+                .addContentMetadata("referrer2", referralId)
+                .setContentImageUrl("https://pbs.twimg.com/profile_images/720541352556015617/xKvkzMHE.jpg")
+                .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
+        branchObject.registerView();
 
-        Intent shareIntent = new Intent();
-        shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_app_text), referralLink));
-        shareIntent.setType("text/plain");
-        shareIntent.setPackage(PACKAGE_NAME_WHATSAPP);
-        try {
-            startActivity(shareIntent);
-        } catch (ActivityNotFoundException e) {
-            showMessage(R.string.no_whatsapp);
-        }
+        LinkProperties linkProperties = new LinkProperties()
+                .setChannel(PACKAGE_NAME_WHATSAPP)
+                .setFeature("sharing")
+                .addControlParameter("$always_deeplink", "true")
+                .addControlParameter("$desktop_url", "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app");
+        final ProgressDialog dialog = OneSecDialog.show(this);
+        branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
+            @Override
+            public void onLinkCreate(String url, BranchError error) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+                if (error == null) {
+                    Intent shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_app_text), url));
+                    shareIntent.setType("text/plain");
+                    shareIntent.setPackage(PACKAGE_NAME_WHATSAPP);
+                    try {
+                        startActivity(shareIntent);
+                    } catch (ActivityNotFoundException e) {
+                        showMessage(R.string.no_whatsapp);
+                    }
+                } else {
+                    //   if (error.getErrorCode() == -113) {
+                    showMessage(error.getMessage());
+                    // }
+                }
+            }
+        });
+
+
     }
 
     /**
@@ -324,14 +360,15 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         BranchUniversalObject branchObject = new BranchUniversalObject();
 
-        String referralLink = new Account(this).getReferrerLink();
-        if (referralLink == null) {
+        String referralId = new Account(this).getReferrerId();
+       /* if (referralLink == null) {
             referralLink = "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + Utils.getAndroidId(this);
         }
-
+*/
         branchObject.setCanonicalIdentifier(event.id).setTitle(event.title.replaceAll("\""," &quot "))
                 .addContentMetadata("event_id",event.id)
-                .addContentMetadata("city_name",event.city.toString())
+                .addContentMetadata("referrer2",referralId)
+                .addContentMetadata("city_name", event.city.toString())
                 .setContentDescription(event.description.replaceAll("\""," &quot "))
                 .setContentImageUrl(event.imgUrl)
                 .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
@@ -344,9 +381,9 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .setChannel(packageName)
                 .setFeature("sharing")
                 .addControlParameter("$always_deeplink", "true")
-                .addControlParameter("$desktop_url", event.getEventShareURI(src).toString())
-                .addControlParameter("$android_url", referralLink)
-                .addControlParameter("$ios_url", "http://www.eventshigh.com");
+                .addControlParameter("$desktop_url", event.getEventShareURI(src).toString());
+                //.addControlParameter("$android_url", referralLink)
+                //.addControlParameter("$ios_url", "http://www.eventshigh.com");
         final ProgressDialog dialog = OneSecDialog.show(this);
         branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
             @Override
@@ -368,7 +405,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void shareEvent(Event event, String eventUri, @Nullable String packageName, @Nullable String label) {
         reportEventAction(event, "eventShareInitiated", label == null ? packageName : label);
         shareEventInitiatedTimestamp = System.currentTimeMillis();
-        new UserActionHelper(this).recordShareAction(event.id, packageName, eventUri);
+        new UserActionHelper(this).recordShareAction(event.id, event.title, packageName, eventUri);
 
         try {
             Intent sendIntent = new Intent();
@@ -413,14 +450,15 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void shareEventsWithBranch(final EventsContext eventsContext,@Nullable String imageUrl) {
         String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
                 .appendQueryParameter("src", "ehm").toString();
-        String referralLink = new Account(this).getReferrerLink();
-        if (referralLink == null) {
+        String referralId = new Account(this).getReferrerId();
+        /*if (referralLink == null) {
             referralLink = "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + Utils.getAndroidId(this);
-        }
+        }*/
 
         BranchUniversalObject branchObject = new BranchUniversalObject();
         branchObject.setCanonicalIdentifier(eventsContext.getLabel()).setTitle(eventsContext.toString())
                 .addContentMetadata("event_uri", uri)
+                .addContentMetadata("referrer2",referralId)
                 .setContentDescription(eventsContext.toString())
                 .setContentImageUrl(imageUrl)
                 .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
@@ -428,9 +466,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         LinkProperties linkProperties = new LinkProperties()
                 .setChannel("facebook")
                 .setFeature("sharing")
-                .addControlParameter("$desktop_url", uri)
-                .addControlParameter("$android_url", referralLink)
-                .addControlParameter("$ios_url", "http://www.eventshigh.com");
+                .addControlParameter("$desktop_url", uri);
+               // .addControlParameter("$android_url", referralLink);
+               // .addControlParameter("$ios_url", "http://www.eventshigh.com");
         final ProgressDialog dialog = OneSecDialog.show(this);
 
         branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
@@ -492,6 +530,53 @@ public abstract class BaseActivity extends AppCompatActivity {
             Crashlytics.getInstance().core.logException(e);
             showMessage(R.string.no_cal_app);
         }
+    }
+
+    public void shareCoupon(final OfferObject offer){
+        shareOfferInitiatedTimestamp = System.currentTimeMillis();
+        BranchUniversalObject branchObject = new BranchUniversalObject();
+        String referrerId = new Account(this).getReferrerId();
+        branchObject.setCanonicalIdentifier(offer.id + "").setTitle(offer.name.replaceAll("\"", " &quot "))
+                .addContentMetadata("offer_id",offer.id+"")
+                .addContentMetadata("referrer2",referrerId)
+                .setContentDescription(offer.name.replaceAll("\"", " &quot "))
+                .setContentImageUrl(offer.imgUrl)
+                .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
+        branchObject.registerView();
+
+        LinkProperties linkProperties = new LinkProperties()
+                .setFeature("sharing")
+                .addControlParameter("$always_deeplink", "true")
+                .addControlParameter("$desktop_url", "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app");
+                //.addControlParameter("$android_url", referralLink)
+                //.addControlParameter("$ios_url", "http://www.eventshigh.com");
+        final ProgressDialog dialog = OneSecDialog.show(this);
+        branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
+            @Override
+            public void onLinkCreate(String url, BranchError error) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+                if (error == null) {
+                    reportActionToAnalytics("offerShareInitiated", offer.name);
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT,
+                            String.format(
+                                    getString(
+                                            R.string.share_coupon_text ),
+                                    offer.name , url)
+                    );
+
+                    sendIntent.setType("text/plain");
+                    startActivity(sendIntent);
+                } else {
+                    //   if (error.getErrorCode() == -113) {
+                    showMessage(error.getMessage());
+                    // }
+                }
+            }
+        });
     }
 
     public boolean isFavourite(Event event) {

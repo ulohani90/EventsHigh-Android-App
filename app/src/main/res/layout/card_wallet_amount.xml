@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:text="Wallet amount"
+        android:text="Wallet Points"
         android:drawableLeft="@drawable/ic_account_balance_wallet_black_24"
         android:fontFamily="sans-serif-medium"
         android:drawablePadding="10dp"

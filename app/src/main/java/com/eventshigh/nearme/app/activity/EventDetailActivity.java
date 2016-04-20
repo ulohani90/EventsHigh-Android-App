@@ -354,7 +354,7 @@ public class EventDetailActivity extends BaseActivity {
             bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
             bookingUriBuilder.appendQueryParameter("name", userInfo.name);
             bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
-            bookingUriBuilder.appendQueryParameter("src","android");
+            bookingUriBuilder.appendQueryParameter("src","eh-android");
         }
         try {
             CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),

@@ -34,6 +34,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import pl.snowdog.material.ui.ToolbarColorizeHelper;
+
 /**
  * Created by umesh on 17/04/16.
  */
@@ -87,7 +89,7 @@ public class OfferSignUpActivity extends BaseActivity{
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
         }else if(item.getItemId() == R.id.action_share){
-
+            shareCoupon(obj);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -201,9 +203,23 @@ public class OfferSignUpActivity extends BaseActivity{
             return false;
         }
     }
+    private void setLightToolbarIcons() {
+        toolbar.post(new Runnable() {
+            @Override
+            @SuppressWarnings("deprecation")
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                        getResources().getColor(android.R.color.white), OfferSignUpActivity.this);
+            }
+        });
+    }
 
-
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(toolbar!=null)
+            setLightToolbarIcons();
+    }
     @Override
     public void onBackPressed() {
         this.finish();

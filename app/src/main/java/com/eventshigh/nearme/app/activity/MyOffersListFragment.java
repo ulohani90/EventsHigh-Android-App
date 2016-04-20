@@ -38,9 +38,9 @@ import java.util.ArrayList;
 /**
  * Created by umesh on 15/04/16.
  */
-public class MyOffersListFragment extends Fragment{
+public class MyOffersListFragment extends Fragment {
 
-    public static MyOffersListFragment newInstance( Bundle args ) {
+    public static MyOffersListFragment newInstance(Bundle args) {
         MyOffersListFragment fragment = new MyOffersListFragment();
         fragment.setArguments(args);
         return fragment;
@@ -55,11 +55,10 @@ public class MyOffersListFragment extends Fragment{
     long walletPoints;
 
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_events,container,false);
+        View view = inflater.inflate(R.layout.fragment_events, container, false);
         return view;
     }
 
@@ -67,10 +66,10 @@ public class MyOffersListFragment extends Fragment{
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        eventsAdapter = new EventsAdapter((LaunchActivity)getActivity());
+        eventsAdapter = new EventsAdapter((LaunchActivity) getActivity());
         AutofitRecyclerView exploreGridView = (AutofitRecyclerView) view.findViewById(R.id.event_grid);
         exploreGridView.setAdapter(eventsAdapter);
-        exploreGridView.addOnScrollListener(new HideActionBarOnScroll((LaunchActivity)getActivity()));
+        exploreGridView.addOnScrollListener(new HideActionBarOnScroll((LaunchActivity) getActivity()));
 
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         topProgressBar.setVisibility(View.VISIBLE);
@@ -84,6 +83,7 @@ public class MyOffersListFragment extends Fragment{
                 topProgressBar.setVisibility(View.VISIBLE);
                 swipeRefreshLayout.setRefreshing(false);
                 getUserPoints(true);
+
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
@@ -94,14 +94,14 @@ public class MyOffersListFragment extends Fragment{
     public void onStart() {
         super.onStart();
         //makeServerRequest(false);
-        if(account.getUserInfo().isVerified) {
+        if (account.getUserInfo().isVerified) {
             getUserPoints(false);
-        }else{
-            PhoneVerificationDialog.show((BaseActivity)getActivity(), R.string.ui_verify_phone, R.string.ui_phone_verify_pa);
+        } else {
+            makeServerRequest(false);
         }
     }
 
-    public void getUserPoints(final boolean shouldByPassCache){
+    public void getUserPoints(final boolean shouldByPassCache) {
         Uri requestUrl = UpdateAccountInfoService.getBaseUri(getActivity(), "getWalletPoints")
                 .build();
         try {
@@ -110,18 +110,21 @@ public class MyOffersListFragment extends Fragment{
                             new Response.Listener<JSONObject>() {
                                 @Override
                                 public void onResponse(JSONObject s, boolean isIntermediate) {
-                                    try {
-                                        walletPoints = s.getLong("points");
-                                    }catch(JSONException e){
-                                        e.printStackTrace();
+                                    if (getActivity() != null) {
+                                        try {
+                                            walletPoints = s.getLong("points");
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        makeServerRequest(shouldByPassCache);
                                     }
-                                    makeServerRequest(shouldByPassCache);
                                 }
                             },
                             new Response.ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError volleyError) {
-                                    getUserPoints(shouldByPassCache);
+                                    if (getActivity() != null)
+                                        getUserPoints(shouldByPassCache);
                                 }
                             }
                     )
@@ -131,25 +134,18 @@ public class MyOffersListFragment extends Fragment{
         }
     }
 
-    public void makeServerRequest(boolean shouldByPassCache){
+
+    public void makeServerRequest(boolean shouldByPassCache) {
         City city = new Account(getActivity()).getLastCity();
         OffersRequest.submit(getActivity(), city, Request.Priority.IMMEDIATE, this, shouldByPassCache, mListener, mErrorListener);
 
-    }
-
-    public long getTotalPoints(ArrayList<PointsObject> points){
-        long totalPoints = 0;
-        for(PointsObject obj:points){
-            totalPoints += obj.points;
-        }
-        return totalPoints;
     }
 
     private Response.Listener<OffersRequest.OffersPointsObject> mListener = new Response.Listener<OffersRequest.OffersPointsObject>() {
         @Override
         public void onResponse(OffersRequest.OffersPointsObject offersPointsObject, boolean isIntermediate) {
             topProgressBar.setVisibility(View.GONE);
-            eventsAdapter.setOffers(offersPointsObject.offers,walletPoints);
+            eventsAdapter.setOffers(offersPointsObject.offers, walletPoints);
         }
     };
 

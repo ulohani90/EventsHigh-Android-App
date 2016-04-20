@@ -66,7 +66,7 @@ public class OfferCard extends RecyclerView.ViewHolder {
         callToAction.setText(offer.actionButtonText);
         if (offer.validTill > 0) {
             offerTime.setVisibility(View.VISIBLE);
-            offerTime.setText(DateTimeUtils.getRemainingTime(offer.validTill) + " Left");
+            offerTime.setText(DateTimeUtils.getRemainingTime(offer.validTill));
         } else {
             offerTime.setVisibility(View.INVISIBLE);
         }
@@ -127,6 +127,6 @@ public class OfferCard extends RecyclerView.ViewHolder {
                 return true;
             }
         }
-        return false;
+        return true;
     }
 }

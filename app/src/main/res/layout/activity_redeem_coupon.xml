@@ -64,7 +64,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-
                     >
 
                     <EditText
@@ -72,7 +71,7 @@
                         android:layout_height="wrap_content"
                         android:drawableRight="@drawable/ic_keyboard_arrow_down_black_24dp"
                         android:editable="false"
-                        android:hint="Coupon"
+                        android:hint="Voucher"
                         android:inputType="textPersonName" />
                 </android.support.design.widget.TextInputLayout>
 
@@ -161,6 +160,7 @@
             app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/translucent_dark"
             android:minHeight="?android:attr/actionBarSize"
             android:elevation="8dp"
             tools:ignore="UnusedAttribute"

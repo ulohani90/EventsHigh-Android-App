@@ -152,11 +152,11 @@ public class Account {
     }
 
 
-    public void recordReferrerLink(String referrerLink) {
+    public void recordReferrerId(String referrerLink) {
         accountInfo.edit().putString(PREF_REFERRER_LINK, referrerLink).apply();
     }
 
-    public @Nullable String getReferrerLink() {
+    public @Nullable String getReferrerId() {
         return accountInfo.getString(PREF_REFERRER_LINK, null);
     }
 

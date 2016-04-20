@@ -84,7 +84,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         for(OfferObject offer:offers){
             dataToShow.add(new OfferData(offer,activity,totalPoints));
         }
-        dataToShow.add(0,new TotalPointsHeaderData(totalPoints,activity ));
+        if(totalPoints!=0) {
+            dataToShow.add(0, new TotalPointsHeaderData(totalPoints, activity,false));
+        }
         notifyDataSetChanged();
     }
 
@@ -96,7 +98,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
             dataToShow.add(new PointsData(point,activity));
         }
 
-        dataToShow.add(0,new TotalPointsHeaderData(totalPoints,activity ));
+        dataToShow.add(new TotalPointsHeaderData(totalPoints,activity,true ));
 
         notifyDataSetChanged();
     }

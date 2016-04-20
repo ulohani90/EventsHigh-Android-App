@@ -100,8 +100,8 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String EXPLORE_TAB = "explore";
     public static final String NOTIFICATIONS_TAB = "Notifications";
     public static final String THIS_WEEK_TAB = "this week";
-    public static final String OFFERS_TAB ="Offers";
-    public  ArrayList<String> TABS = new ArrayList<>();
+    public static final String OFFERS_TAB = "Offers";
+    public ArrayList<String> TABS = new ArrayList<>();
 
     //Calculate no of time user resumes on to Home
     int screenViewCount;
@@ -153,6 +153,7 @@ public class LaunchActivity extends BaseContextActivity {
             }
         }
 */
+        getIntent().getAction();
 
     }
 
@@ -160,6 +161,7 @@ public class LaunchActivity extends BaseContextActivity {
     public View getViewForSnackbar() {
         return null;
     }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -168,6 +170,13 @@ public class LaunchActivity extends BaseContextActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         this.setIntent(intent);
+        if (intent != null && intent.getAction() != null && intent.getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION)) {
+
+            drawer.closeDrawers();
+            showExploreScreen();
+        }
+
+
     }
 
     @Override
@@ -179,8 +188,11 @@ public class LaunchActivity extends BaseContextActivity {
     protected void onResume() {
         super.onResume();
 
-        if(toolbar != null) {
+        if (toolbar != null) {
             setLightToolbarIcons();
+        }
+        if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION)) {
+            getIntent().setAction(null);
         }
 
         //invalidateOptionsMenu();
@@ -195,7 +207,7 @@ public class LaunchActivity extends BaseContextActivity {
 
             String action = getIntent().getAction();
             if (!isTaskRoot() && (action == null || !action.startsWith(NOTIFICATION_ACTION))
-                && (getIntent().getData() == null || !getIntent().getData().getHost().equalsIgnoreCase("branch.eventshigh.com"))) {
+                    && (getIntent().getData() == null || !getIntent().getData().getHost().equalsIgnoreCase("branch.eventshigh.com"))) {
                 finish();
                 return;
             }
@@ -203,7 +215,7 @@ public class LaunchActivity extends BaseContextActivity {
 
 
         //Show next screen.
-          showNextScreen();
+        showNextScreen();
 
         // Setup the Google+ Button.
         PlusOneButton plusOneButton = (PlusOneButton) findViewById(R.id.plus_one_button);
@@ -219,8 +231,8 @@ public class LaunchActivity extends BaseContextActivity {
             }
         });
 
-        currentCity = (TextView)findViewById(R.id.current_city);
-        if(account.getLastCity()!=null) {
+        currentCity = (TextView) findViewById(R.id.current_city);
+        if (account.getLastCity() != null) {
             currentCity.setText(account.getLastCity().name());
             currentCity.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -236,9 +248,9 @@ public class LaunchActivity extends BaseContextActivity {
             });
         }
 
-        new InitiateBranchAsyncTask(getIntent().getData()).execute();
-
-       ReferEarnDialog.showDialog(this);
+       // new InitiateBranchAsyncTask(getIntent().getData()).execute();
+        loadBranchInstance();
+        // ReferEarnDialog.showDialog(this);
 
     }
 
@@ -294,12 +306,12 @@ public class LaunchActivity extends BaseContextActivity {
             drawer.closeDrawer(GravityCompat.START);
         } else {
 
-            if(isPagerSwipeBlocked){
-                isPagerSwipeBlocked=false;
-                if(exploreFragment!=null){
+            if (isPagerSwipeBlocked) {
+                isPagerSwipeBlocked = false;
+                if (exploreFragment != null) {
                     exploreFragment.animateLocalityViewOut();
                 }
-            }else {
+            } else {
                 super.onBackPressed();
             }
         }
@@ -323,22 +335,20 @@ public class LaunchActivity extends BaseContextActivity {
     }
 
     public void cityChanged(City city) {
-
-
         drawer.closeDrawer(GravityCompat.START);
         reportActionToAnalytics("cityChanged");
-
         eventsContext.changeLocation(city.cityBounds.getCenter());
         showExploreScreen();
     }
+
     public static String[] removeElements(String[] input, String deleteMe) {
         List result = new LinkedList();
 
-        for(String item : input)
-            if(!deleteMe.equals(item))
+        for (String item : input)
+            if (!deleteMe.equals(item))
                 result.add(item);
 
-        return (String[])result.toArray(input);
+        return (String[]) result.toArray(input);
     }
 
     // ***********************
@@ -351,8 +361,8 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public void onConnected(Bundle bundle) {
             if (eventsContext.city == null &&
-                ActivityCompat.checkSelfPermission(LaunchActivity.this, permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(LaunchActivity.this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.checkSelfPermission(LaunchActivity.this, permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(LaunchActivity.this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 Location location = LocationServices.FusedLocationApi.getLastLocation(client);
                 if (location != null) {
                     LatLng latLng = LocationUtils.locationToLatLng(location);
@@ -395,19 +405,19 @@ public class LaunchActivity extends BaseContextActivity {
                     try {
                         int appVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
                         Uri reportUri = UpdateAccountInfoService.getBaseUri(LaunchActivity.this, "reportUser")
-                            .appendQueryParameter("city", eventsContext.city.toString())
-                            .appendQueryParameter("lat", Double.toString(eventsContext.location.latitude))
-                            .appendQueryParameter("lon", Double.toString(eventsContext.location.longitude))
-                            .appendQueryParameter("version", Integer.toString(appVersion))
-                            .build();
+                                .appendQueryParameter("city", eventsContext.city.toString())
+                                .appendQueryParameter("lat", Double.toString(eventsContext.location.latitude))
+                                .appendQueryParameter("lon", Double.toString(eventsContext.location.longitude))
+                                .appendQueryParameter("version", Integer.toString(appVersion))
+                                .build();
                         RequestFuture<String> future = RequestFuture.newFuture();
                         VolleyHelper.addToRequestQueue(LaunchActivity.this,
-                            new StringRequest(reportUri.toString(), future, future) {
-                                @Override
-                                public Priority getPriority() {
-                                    return Priority.LOW;
+                                new StringRequest(reportUri.toString(), future, future) {
+                                    @Override
+                                    public Priority getPriority() {
+                                        return Priority.LOW;
+                                    }
                                 }
-                            }
                         );
                     } catch (NameNotFoundException e) {
                         Crashlytics.getInstance().core.logException(e);
@@ -417,6 +427,8 @@ public class LaunchActivity extends BaseContextActivity {
                 citySelector.setVisibility(View.GONE);
                 tabsView.setVisibility(View.VISIBLE);
                 viewPager.setVisibility(View.VISIBLE);
+                if (currentCity != null)
+                    currentCity.setText(eventsContext.city.name());
                 showNextScreen();
                 return;
             }
@@ -433,11 +445,11 @@ public class LaunchActivity extends BaseContextActivity {
                     showMessage(R.string.failed_location);
                 }
                 if (ActivityCompat.checkSelfPermission(LaunchActivity.this,
-                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // Request missing location permission.
                     ActivityCompat.requestPermissions(LaunchActivity.this,
-                        new String[]{ Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION },
-                        PERMISSIONS_REQUEST_LOCATION);
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                            PERMISSIONS_REQUEST_LOCATION);
                 }
             }
         }
@@ -448,6 +460,14 @@ public class LaunchActivity extends BaseContextActivity {
     // Helper methods
     // ***********************
 
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (drawer != null)
+            drawer.closeDrawers();
+    }
+
     private void refreshIfOldData() {
         City userCity = account.getLastCity();
         if (eventsContext.city != null && userCity != null &&
@@ -456,21 +476,21 @@ public class LaunchActivity extends BaseContextActivity {
             return;
         }
 
-        if (viewPager.getAdapter() == null) {
+        if (viewPager.getAdapter() == null || (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION))) {
             showExploreScreen();
         }
     }
 
     private void showExploreScreen() {
 
-        if(!(account.getLastCity() == City.BANGALORE)){
-            TABS=new ArrayList<>();
+        if (!(account.getLastCity() == City.BANGALORE)) {
+            TABS = new ArrayList<>();
             TABS.add(MY_EVENTS_TAB);
             TABS.add(EXPLORE_TAB);
             TABS.add(THIS_WEEK_TAB);
             TABS.add(NOTIFICATIONS_TAB);
-        }else{
-            TABS=new ArrayList<>();
+        } else {
+            TABS = new ArrayList<>();
             TABS.add(MY_EVENTS_TAB);
             TABS.add(EXPLORE_TAB);
             TABS.add(OFFERS_TAB);
@@ -495,9 +515,9 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.setTabGravity(TabLayout.GRAVITY_FILL);
         tabsView.setupWithViewPager(viewPager);
         tabsView.setScrollPosition(defaultTab, 0, true);
-        if(account.getLastCity() == City.BANGALORE){
+        if (account.getLastCity() == City.BANGALORE) {
             setupTabIconsWithOffer();
-        }else{
+        } else {
             setupTabIcons();
         }
         tabsView.invalidate();
@@ -549,16 +569,16 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.getTabAt(1).setCustomView(tabTwo);
 
 
-            TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-            tabThree.setText("Offers");
-            tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_offer, 0, 0);
-            tabThree.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    viewPager.setCurrentItem(2);
-                }
-            });
-            tabsView.getTabAt(2).setCustomView(tabThree);
+        TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabThree.setText("Offers");
+        tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_offer, 0, 0);
+        tabThree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(2);
+            }
+        });
+        tabsView.getTabAt(2).setCustomView(tabThree);
 
         TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabFour.setText("Week");
@@ -629,6 +649,7 @@ public class LaunchActivity extends BaseContextActivity {
         });
         tabsView.getTabAt(3).setCustomView(tabFour);
     }
+
     private void showNextScreen() {
         // If we do not have user city, use GoogleLocation api to get user location.
         if (eventsContext.city == null) {
@@ -665,8 +686,8 @@ public class LaunchActivity extends BaseContextActivity {
 
             Intent outIntent = new Intent(this, EventsGridActivity.class);
             outIntent.setAction(action);
-            if(special!=null)
-            outIntent.putExtra("special_obj",special);
+            if (special != null)
+                outIntent.putExtra("special_obj", special);
             outIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
             startActivity(outIntent);
             finish();
@@ -678,18 +699,21 @@ public class LaunchActivity extends BaseContextActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         //Checking if the previous activity is launched on branch Auto deep link.
-        if(requestCode == getResources().getInteger(R.integer.EventsDetailDeepLink_code)){
+        if (requestCode == getResources().getInteger(R.integer.EventsDetailDeepLink_code)) {
             //Decide here where  to navigate  when an auto deep linked activity finishes.
             //For e.g. Go to HomeActivity or a  SignUp Activity.
             showNextScreen();
         }
     }
+
     private final OnCitySelectionListener mCitySelectionListener = new OnCitySelectionListener() {
         @Override
         public void onCitySelection(City city) {
             eventsContext.changeLocation(city.cityBounds.getCenter());
             account.setLastCity(city);
-
+            if (currentCity != null) {
+            }
+            currentCity.setText(city.name());
             citySelector.setVisibility(View.GONE);
             tabsView.setVisibility(View.VISIBLE);
             viewPager.setVisibility(View.VISIBLE);
@@ -698,7 +722,7 @@ public class LaunchActivity extends BaseContextActivity {
     };
 
 
-    ViewPager.OnPageChangeListener listener= new ViewPager.OnPageChangeListener() {
+    ViewPager.OnPageChangeListener listener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -706,7 +730,7 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public void onPageSelected(int position) {
-            reportActionToAnalytics("tabchange",TABS.get(position));
+            reportActionToAnalytics("tabchange", TABS.get(position));
         }
 
         @Override
@@ -716,18 +740,19 @@ public class LaunchActivity extends BaseContextActivity {
     };
 
 
-    public void setisPagerSwipeBlocked(boolean isPagerSwipeBlocked){
+    public void setisPagerSwipeBlocked(boolean isPagerSwipeBlocked) {
         this.isPagerSwipeBlocked = isPagerSwipeBlocked;
     }
 
 
     ExploreFragment exploreFragment;
     private EventsFragment myEventsFragment;
+
     /**
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
-            implements TabLayout.OnTabSelectedListener,ViewPager.OnPageChangeListener {
+            implements TabLayout.OnTabSelectedListener, ViewPager.OnPageChangeListener {
 
 
         public ExploreScreenPagerAdapter() {
@@ -743,17 +768,17 @@ public class LaunchActivity extends BaseContextActivity {
         public Fragment getItem(int position) {
             if (TABS.get(position).equals(MY_EVENTS_TAB)) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
-                    EventsHighEndpoints.QUERY_MY_EVENT);
-                myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false,null);
+                        EventsHighEndpoints.QUERY_MY_EVENT);
+                myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null);
                 return myEventsFragment;
             }
 
             if (TABS.get(position).equals(EXPLORE_TAB)) {
-                 exploreFragment = ExploreFragment.getInstance(eventsContext);
-                 return exploreFragment;
+                exploreFragment = ExploreFragment.getInstance(eventsContext);
+                return exploreFragment;
 
             }
-            if(TABS.get(position).equals(OFFERS_TAB)){
+            if (TABS.get(position).equals(OFFERS_TAB)) {
                 return new OffersFragment();
             }
 
@@ -777,14 +802,14 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public void onTabSelected(TabLayout.Tab tab) {
 
-                showActionBar();
+            showActionBar();
 
-                int position = tab.getPosition();
-                if (TABS.get(position).equals(MY_EVENTS_TAB) && myEventsFragment != null) {
-                    myEventsFragment.onResume();
-                }
+            int position = tab.getPosition();
+            if (TABS.get(position).equals(MY_EVENTS_TAB) && myEventsFragment != null) {
+                myEventsFragment.onResume();
+            }
 
-                viewPager.setCurrentItem(position);
+            viewPager.setCurrentItem(position);
 
         }
 
@@ -815,53 +840,65 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
-    public class InitiateBranchAsyncTask extends AsyncTask<Void, Void, JSONObject >{
+    public class InitiateBranchAsyncTask extends AsyncTask<Void, Void, JSONObject> {
         Uri data;
 
 
-        public InitiateBranchAsyncTask(@NonNull Uri data){
+        public InitiateBranchAsyncTask(@NonNull Uri data) {
             this.data = data;
         }
 
         @Override
         protected JSONObject doInBackground(Void... params) {
             Branch branch = Branch.getInstance();
-            if(branch!=null)
+            if (branch != null)
                 branch.initSession(new Branch.BranchReferralInitListener() {
                     @Override
                     public void onInitFinished(JSONObject referringParams, BranchError error) {
                         if (error == null) {
                             //showEventDetails();
-                            if(referringParams.length() == 0){
-                               // showNextScreen();
-                                Log.i("Event_detail_missed","refering params empty");
-                            }else {
+                            if (referringParams.length() == 0) {
+                                // showNextScreen();
+                                Log.i("Event_detail_missed", "refering params empty");
+                            } else {
                                 try {
-                                    if(!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")){
+                                    if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
                                         //showNextScreen();
-                                        Log.i("Event_detail_missed",referringParams.getBoolean("+is_first_session")?"False":"true");
-                                    }else {
-                                        if(referringParams.has("event_id") ) {
+                                        Log.i("Event_detail_missed", referringParams.getBoolean("+is_first_session") ? "False" : "true");
+                                    } else {
+                                        if (referringParams.has("event_id")) {
                                             showEventDetails(
                                                     EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
-                                        }else if(referringParams.has("event_uri")){
+                                        } else if (referringParams.has("event_uri")) {
                                             Uri uri = Uri.parse(referringParams.getString("event_uri"));
                                             showSearchView(uri.getLastPathSegment());
-                                        }else if(referringParams.has("referrer2")){
+                                        } else if (referringParams.has("offer_id")) {
+                                            if (account.getLastCity() == City.BANGALORE && viewPager != null) {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        viewPager.setCurrentItem(2);
+                                                    }
+                                                });
+
+                                            }
+                                        }
+
+                                        if (referringParams.has("referrer2")) {
                                             String referrer = referringParams.getString("referrer2");
                                             new Account(LaunchActivity.this).recordReferrer(referrer);
-                                         //   showNextScreen();
+
                                         }
                                         //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
                                     }
                                 } catch (JSONException e) {
-                                   // showNextScreen();
+                                    // showNextScreen();
                                     e.printStackTrace();
                                 }
                                 System.out.println("JsonObject received" + referringParams);
                             }
                         } else {
-                          //  showNextScreen();
+                            //  showNextScreen();
                             Log.i("MyApp", error.getMessage());
                         }
                     }
@@ -873,5 +910,61 @@ public class LaunchActivity extends BaseContextActivity {
         protected void onPostExecute(JSONObject jsonObject) {
 
         }
+    }
+
+    public void loadBranchInstance(){
+        Branch branch = Branch.getInstance();
+        if (branch != null)
+            branch.initSession(new Branch.BranchReferralInitListener() {
+                @Override
+                public void onInitFinished(JSONObject referringParams, BranchError error) {
+                    if (error == null) {
+                        //showEventDetails();
+                        if (referringParams.length() == 0) {
+                            // showNextScreen();
+                            Log.i("Event_detail_missed", "refering params empty");
+                        } else {
+                            try {
+                                if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
+                                    //showNextScreen();
+                                    Log.i("Event_detail_missed", referringParams.getBoolean("+is_first_session") ? "False" : "true");
+                                } else {
+                                    if (referringParams.has("event_id")) {
+                                        showEventDetails(
+                                                EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
+                                    } else if (referringParams.has("event_uri")) {
+                                        Uri uri = Uri.parse(referringParams.getString("event_uri"));
+                                        showSearchView(uri.getLastPathSegment());
+                                    } else if (referringParams.has("offer_id")) {
+                                        if (account.getLastCity() == City.BANGALORE && viewPager != null) {
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    viewPager.setCurrentItem(2);
+                                                }
+                                            });
+
+                                        }
+                                    }
+
+                                    if (referringParams.has("referrer2")) {
+                                        String referrer = referringParams.getString("referrer2");
+                                        new Account(LaunchActivity.this).recordReferrer(referrer);
+
+                                    }
+                                    //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
+                                }
+                            } catch (JSONException e) {
+                                // showNextScreen();
+                                e.printStackTrace();
+                            }
+                            System.out.println("JsonObject received" + referringParams);
+                        }
+                    } else {
+                        //  showNextScreen();
+                        Log.i("MyApp", error.getMessage());
+                    }
+                }
+            }, getIntent().getData(), LaunchActivity.this);
     }
 }

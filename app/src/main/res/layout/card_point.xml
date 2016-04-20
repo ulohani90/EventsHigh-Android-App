@@ -15,12 +15,24 @@
     android:paddingRight="10dp"
     android:paddingTop="10dp"
     android:paddingBottom="10dp">
+
+
 <ImageView
     android:id="@+id/point_character"
     android:layout_width="45dp"
     android:layout_height="46dp"
     android:scaleType="centerInside"
     />
+    <TextView
+        android:id="@+id/point_text_img"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:textSize="16sp"
+        android:text="R"
+        android:visibility="gone"
+        android:gravity="center"
+        android:background="@drawable/red_circle_bg"
+        android:textColor="@android:color/white"/>
     <TextView
         android:id="@+id/point_count"
         style="@style/EventCardText"

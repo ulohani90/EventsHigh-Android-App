@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.SelectInterestsActivity;
-import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.stream.EventSubcategory;
 import com.eventshigh.nearme.app.user.Account;

@@ -71,7 +71,7 @@ public class OfferObject implements Parcelable{
             if(vouchers!=null ){
                 for(int i=0;i<vouchersData.length;i++){
                     String[] data = vouchersData[i].split("\\|");
-                    vouchers.add(new VoucherObject(data[0],Integer.parseInt(data[1])));
+                    vouchers.add(new VoucherObject(data[0],data.length>1?Integer.parseInt(data[1]):0));
                 }
             }
         }

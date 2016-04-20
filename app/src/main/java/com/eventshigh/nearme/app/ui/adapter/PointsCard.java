@@ -28,6 +28,7 @@ public class PointsCard extends RecyclerView.ViewHolder{
     public final TextView pointCount;
     public final TextView pointDesc;
     public final TextView pointActionButton;
+    public final TextView pointTextImage;
     boolean isDescShown;
     public PointsCard(View itemView) {
         super(itemView);
@@ -37,6 +38,7 @@ public class PointsCard extends RecyclerView.ViewHolder{
         pointCard = (LinearLayout)itemView.findViewById(R.id.point_card);
         pointDesc =(TextView)itemView.findViewById(R.id.point_desc);
         pointActionButton = (TextView)itemView.findViewById(R.id.point_action_btn);
+        pointTextImage = (TextView)itemView.findViewById(R.id.point_text_img);
 
     }
 
@@ -47,21 +49,32 @@ public class PointsCard extends RecyclerView.ViewHolder{
 
 
     public void bindView(final PointsObject obj, final BaseContextActivity activity){
-        int resourceId;
+        int resourceId = -1;
         if(obj.pName.equalsIgnoreCase("Refer & Earn")){
+            pointCharacter.setVisibility(View.VISIBLE);
             resourceId = R.drawable.ic_refer_action;
-
+            pointTextImage.setVisibility(View.GONE);
         }else if(obj.pName.equalsIgnoreCase("Share an event")){
+            pointCharacter.setVisibility(View.VISIBLE);
             resourceId = R.drawable.ic_fb_action;
+            pointTextImage.setVisibility(View.GONE);
         }else if(obj.pName.equalsIgnoreCase("Refer & Earn")){
+            pointCharacter.setVisibility(View.VISIBLE);
             resourceId = R.drawable.ic_refer_action;
+            pointTextImage.setVisibility(View.GONE);
         }else if(obj.pName.equalsIgnoreCase("Book a ticket")){
+            pointCharacter.setVisibility(View.VISIBLE);
             resourceId = R.drawable.ic_book_ticket_action;
+            pointTextImage.setVisibility(View.GONE);
         }else if(obj.pName.equalsIgnoreCase("Favorite an event")){
+            pointCharacter.setVisibility(View.VISIBLE);
             resourceId = R.drawable.ic_fav_action;
+            pointTextImage.setVisibility(View.GONE);
         }else{
-            resourceId = R.drawable.ic_review_action;
+            pointCharacter.setVisibility(View.INVISIBLE);
+            pointTextImage.setText(obj.pName.charAt(0));
         }
+        if(resourceId != -1)
         Glide.with(activity).load(resourceId)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .placeholder(R.drawable.ic_launcher).crossFade()

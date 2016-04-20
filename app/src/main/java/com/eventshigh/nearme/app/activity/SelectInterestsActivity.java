@@ -36,10 +36,10 @@ public class SelectInterestsActivity extends BaseActivity{
             EventCategory.FREE_EVENTS,
             EventCategory.NIGHTLIFE,
             EventCategory.OUTDOORS,
-            EventCategory.WORKSHOP,
             EventCategory.LIVE_PERFORMANCES,
             EventCategory.FOOD,
             EventCategory.SPORTS,
+            EventCategory.WORKSHOP,
             EventCategory.HEALTH_WELLNESS,
             EventCategory.LITERATURE,
             EventCategory.KIDS_ENTERTAINMENT,
@@ -74,7 +74,7 @@ public class SelectInterestsActivity extends BaseActivity{
     @Override
     protected void onStart() {
         super.onStart();
-        if (getIntent()!=null && getIntent().getAction().equals(BaseActivity.NOTIFICATION_ACTION)) {
+        if (getIntent()!=null && getIntent().getAction()!=null && getIntent().getAction().equals(BaseActivity.NOTIFICATION_ACTION)) {
             reportActionToAnalytics("openNotification");
         }
     }

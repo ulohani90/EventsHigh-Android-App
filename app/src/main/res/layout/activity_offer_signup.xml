@@ -143,6 +143,7 @@
             android:layout_height="wrap_content"
             android:minHeight="?android:attr/actionBarSize"
             android:elevation="8dp"
+            android:background="@color/translucent_dark"
             tools:ignore="UnusedAttribute"
             />
         <ProgressBar

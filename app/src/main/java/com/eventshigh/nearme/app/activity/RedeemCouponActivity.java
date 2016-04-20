@@ -38,6 +38,8 @@ import org.w3c.dom.Text;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 
+import pl.snowdog.material.ui.ToolbarColorizeHelper;
+
 /**
  * Created by umesh on 14/04/16.
  */
@@ -58,7 +60,7 @@ public class RedeemCouponActivity extends BaseActivity {
     View progressBar;
     ImageView offerBg;
     Account account;
-    int selectedVoucherPos = 0;
+    int selectedVoucherPos = -1;
     Toolbar toolbar;
 
     @Override
@@ -82,7 +84,16 @@ public class RedeemCouponActivity extends BaseActivity {
             setUpData();
         }
     }
-
+    private void setLightToolbarIcons() {
+        toolbar.post(new Runnable() {
+            @Override
+            @SuppressWarnings("deprecation")
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                        getResources().getColor(android.R.color.white), RedeemCouponActivity.this);
+            }
+        });
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_event_detail, menu);
@@ -94,7 +105,7 @@ public class RedeemCouponActivity extends BaseActivity {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
         }else if(item.getItemId() == R.id.action_share){
-
+                shareCoupon(obj);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -164,6 +175,12 @@ public class RedeemCouponActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(toolbar!=null)
+            setLightToolbarIcons();
+    }
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -179,6 +196,8 @@ public class RedeemCouponActivity extends BaseActivity {
                 break;
             }
         }
+
+        couponEditText.setText("Select a voucher");
     }
 
     public void confirmClicked() {
@@ -233,7 +252,16 @@ public class RedeemCouponActivity extends BaseActivity {
 
                 if (emailAddEditText.getText() != null && Utils.isValidEmail(emailAddEditText.getText())) {
                     emailAdd.setErrorEnabled(false);
-                    return true;
+                    if(selectedVoucherPos!=-1){
+                        coupon.setErrorEnabled(false);
+                        return true;
+                    }else{
+                        coupon.setErrorEnabled(true);
+                        coupon.setError("No coupon selected.");
+                        return false;
+                    }
+
+
                 } else {
                     emailAdd.setErrorEnabled(true);
                     emailAdd.setError("Valid Email Address required");

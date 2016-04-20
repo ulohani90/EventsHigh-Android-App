@@ -110,6 +110,8 @@
     <string name="share_app_text">Hey! Pull up a chair. Take a taste. Come join EventsHigh. Life is so endlessly delicious.\n\n%s</string>
     <string name="share_app_message">Love only grows by sharing. You can only have more for yourself by sharing the app with friends. The more you share, the better would be your experience.</string>
     <string name="share_app_notification_message">Liked this notification? Share EventsHigh app with your contacts and they can also experience the high! Get your gang together.</string>
+    <string name="share_coupon_text">Hey! found an Offer on EventsHigh, check it out.\n\nNote: Only available on App!\n\n%1$s\n\n%2$s</string>
+
 
     <!-- Failed messages -->
     <string name="failed_load">Oops! Something\'s gone wrong. Let\'s try that again.</string>
@@ -168,7 +170,7 @@
     <string name="player_error">Error initializing YouTube player</string>
     <string name="view_all">View all Coupons</string>
 
-    <string name="terms_condition_text">\u2022 Eligible on friends who installs the EventsHigh app for first time.&lt;br> \u2022 Both you and your friend needs to register using phone number.&lt;br>\u2022 You will get the discount voucher for &lt;b> ₹ 100&lt;/b> which can be redeemed only for events ticketed on eventshigh.com.&lt;br>\u2022 You can use one discount voucher per transaction.&lt;br>\u2022 Discount vouchers are not transferable.&lt;br>\u2022 EventsHigh team reserves the right to cancel discount vouchers if it suspects misuse. EventsHigh team decision will be final.&lt;br>\u2022 For any queries, please write to us at &lt;b>support@eventshigh.com&lt;/b>.</string>
+    <string name="terms_condition_text">\u2022 Eligible on friends who installs the EventsHigh app for first time.&lt;br> \u2022 Both you and your friend needs to register using phone number.&lt;br>\u2022 You can use use your wallet points on our Offers page.&lt;br>\u2022 Wallet points are not transferable.&lt;br>\u2022 EventsHigh team reserves the right to cancel or change any Offer. EventsHigh team decision will be final.&lt;br>\u2022 For any queries, please write to us at &lt;b>support@eventshigh.com&lt;/b>.</string>
 
     <string name="activity_image_trans">Offer Image transition</string>
 
