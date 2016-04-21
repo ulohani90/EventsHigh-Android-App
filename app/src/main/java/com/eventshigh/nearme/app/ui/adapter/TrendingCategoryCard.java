@@ -31,6 +31,8 @@ public class TrendingCategoryCard extends ViewHolder {
         imageView = (ImageView) itemView.findViewById(R.id.cat_image);
         titleView = (TextView) itemView.findViewById(R.id.cat_title);
         parent = (FrameLayout)itemView.findViewById(R.id.parent);
+
+
     }
 
     public void populateTrendingCategoryData(final TrendingCategoryData data) {
@@ -52,9 +54,9 @@ public class TrendingCategoryCard extends ViewHolder {
                 lp.height = 3 * imageView.getWidth() / 4;
                 imageView.setLayoutParams(lp);
                 LayoutParams lp1 = parent.getLayoutParams();
-                lp1.height = 3 * parent.getWidth()/4;
+                lp1.height = 3 * parent.getWidth() / 4;
                 parent.setLayoutParams(lp1);
-               // parent.postInvalidate();
+                // parent.postInvalidate();
 
             }
         });
@@ -76,7 +78,7 @@ public class TrendingCategoryCard extends ViewHolder {
                 LayoutParams lp = imageView.getLayoutParams();
                 lp.height = imageView.getWidth();
                 imageView.setLayoutParams(lp);
-               // parent.postInvalidate();
+                // parent.postInvalidate();
             }
         });
     }

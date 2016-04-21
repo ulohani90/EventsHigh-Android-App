@@ -86,8 +86,8 @@ public class UpdateAccountInfoService extends IntentService {
         }
 
         // Referral Link.
-        if (account.getReferrerLink() == null) {
-            account.recordReferrerLink(getReferrerLink());
+        if (account.getReferrerId() == null) {
+            account.recordReferrerId(getReferrerId());
         }
     }
 
@@ -125,7 +125,7 @@ public class UpdateAccountInfoService extends IntentService {
 
     private String getReferrerLink() {
         try {
-            Uri uri = getBaseUri(this, "getReferrerLink").build();
+            Uri uri = getBaseUri(this, "getReferrerId").build();
             String resp = sendSignedRequest(uri).get();
             JSONObject res = new JSONObject(resp);
             return res.getString("link");
@@ -135,6 +135,21 @@ public class UpdateAccountInfoService extends IntentService {
 
         return null;
     }
+    private String getReferrerId() {
+        try {
+            Uri uri = getBaseUri(this, "getReferrerObject").build();
+            String resp = sendSignedRequest(uri).get();
+            JSONObject res = new JSONObject(resp);
+            return res.getString("referrer_id");
+        } catch (Exception e) {
+
+            Log.w(UpdateAccountInfoService.class.getName(), "request failed: getReferrerId", e);
+        }
+
+        return null;
+    }
+
+
 
     private void report(Uri uri, SharedPreferences uploadStatus, String key) {
         try {

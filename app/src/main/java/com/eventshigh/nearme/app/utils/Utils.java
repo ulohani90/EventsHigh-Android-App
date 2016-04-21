@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.ArrayMap;
 import android.view.View;
 
@@ -150,5 +151,13 @@ public class Utils {
     public static int getRandomNumber(int low, int high){
         Random r = new Random();
         return r.nextInt(high-low) + low;
+    }
+
+    public static boolean isValidEmail(CharSequence target) {
+        if (TextUtils.isEmpty(target)) {
+            return false;
+        } else {
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        }
     }
 }

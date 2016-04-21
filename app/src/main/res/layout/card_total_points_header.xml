@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/wallet_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="15dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            android:drawableLeft="@drawable/ic_account_balance_wallet_black_24"
+            android:drawablePadding="10dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical"
+            android:text="Your Wallet has"
+            android:textIsSelectable="false"
+            android:textSize="13sp"
+            tools:text="Your Wallet has" />
+
+        <TextView
+            android:id="@+id/points"
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/point_count_bg"
+            android:drawablePadding="10dp"
+            android:fontFamily="sans-serif-medium"
+            android:padding="5dp"
+            android:textColor="@android:color/white"
+            android:textIsSelectable="false"
+            android:textSize="12sp"
+            tools:text="30 points" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/message_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:padding="10dp">
+
+        <TextView
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:drawablePadding="10dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical"
+            android:text="Feel wallet points are not getting updated?"
+            android:textIsSelectable="false"
+            android:textSize="13sp"
+            />
+
+        <TextView
+            android:id="@+id/contact_us"
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:drawablePadding="10dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical"
+            android:text="Contact us"
+            android:textIsSelectable="false"
+            android:textSize="13sp"
+            />
+    </LinearLayout>
+</FrameLayout>

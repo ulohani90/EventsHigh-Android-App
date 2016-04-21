@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -32,7 +33,6 @@ public class ReferEarnDialog {
         Preferences preferences = Preferences.getInstance(activity);
          if ((preferences.getLastTimeReferShown() < System.currentTimeMillis() - (3*DateUtils.DAY_IN_MILLIS)) && preferences.shouldShowReferral()) {
              showDialog(activity);
-             preferences.setLastTimeReferShown();
         }
     }
 
@@ -52,6 +52,8 @@ public class ReferEarnDialog {
             new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
+
+                Log.i("Error", "Something wrong");
                 // do nothing.
             }
         }));

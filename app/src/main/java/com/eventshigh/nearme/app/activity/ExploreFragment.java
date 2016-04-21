@@ -21,7 +21,6 @@ import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest;
-import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;

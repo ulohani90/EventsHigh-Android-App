@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -12,8 +13,11 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
+import com.eventshigh.nearme.app.user.Account;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -31,6 +35,9 @@ public class OffersFragment extends Fragment{
 
     private OffersPagerAdapter adapter;
 
+    private LinearLayout verifyPhnLayout;
+
+    Account account;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -41,7 +48,7 @@ public class OffersFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_this_week,container,false);
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return view;
     }
 
     @Override
@@ -55,8 +62,34 @@ public class OffersFragment extends Fragment{
 
         tabsView = (TabLayout) view.findViewById(R.id.date_filter);
 
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabsView));
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                ((BaseActivity) getActivity()).reportActionToAnalytics("offertabchange", (position == 0 ? "OfferList" : "PointsList"));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         tabsView.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+        tabsView.setupWithViewPager(viewPager);
+
+        verifyPhnLayout = (LinearLayout)view.findViewById(R.id.verify_phn_layout);
+         account = new Account(getActivity());
+
+        (view.findViewById(R.id.verify_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                verifyClicked();
+            }
+        });
 
     }
 
@@ -65,9 +98,25 @@ public class OffersFragment extends Fragment{
         super.onActivityCreated(savedInstanceState);
 
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(account!=null && !(account.getUserInfo().isVerified)){
+            verifyPhnLayout.setClickable(true);
+            verifyPhnLayout.setVisibility(View.VISIBLE);
+        }else{
+            verifyPhnLayout.setVisibility(View.GONE);
+        }
+    }
+
+    public void verifyClicked(){
+        activity.startActivity(new Intent(activity, PhoneLoginActivity.class));
+    }
+
     public class OffersPagerAdapter extends FragmentStatePagerAdapter{
 
-        String []TABS = {"Offers","Points"};
+        String []TABS = {"Offers","How to Earn"};
 
         Fragment fragment;
 

@@ -7,11 +7,11 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -45,8 +45,9 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import io.branch.referral.Branch;
 import io.branch.referral.BranchError;
@@ -74,12 +75,10 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String MY_EVENTS_TAB = EventsHighEndpoints.QUERY_MY_EVENT;
     public static final String EXPLORE_TAB = "explore";
     public static final String THIS_WEEK_TAB = "this week";
-    public static final String OFFERS="Offers";
-    public final String[] TABS = {
-            MY_EVENTS_TAB,
-            EXPLORE_TAB,
-            THIS_WEEK_TAB,
-    };
+
+    public static final String OFFERS_TAB = "Offers";
+    public ArrayList<String> TABS = new ArrayList<>();
+
 
     //Calculate no of time user resumes on to Home
     int screenViewCount;
@@ -121,16 +120,17 @@ public class LaunchActivity extends BaseContextActivity {
         account = new Account(this);
 
         // Process the incoming intent.
-        String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
+        /*String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
         if (tabName != null) {
-            for (int i = 0; i < TABS.length; i++) {
-                if (TABS[i].equalsIgnoreCase(tabName)) {
+            for (int i = 0; i < TABS.size(); i++) {
+                if (TABS.get(i).equalsIgnoreCase(tabName)) {
                     defaultTab = i;
                     break;
                 }
             }
         }
-
+*/
+        getIntent().getAction();
 
     }
 
@@ -138,6 +138,7 @@ public class LaunchActivity extends BaseContextActivity {
     public View getViewForSnackbar() {
         return null;
     }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -146,6 +147,13 @@ public class LaunchActivity extends BaseContextActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         this.setIntent(intent);
+        if (intent != null && intent.getAction() != null && intent.getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION)) {
+
+            drawer.closeDrawers();
+            showExploreScreen();
+        }
+
+
     }
 
     @Override
@@ -157,8 +165,11 @@ public class LaunchActivity extends BaseContextActivity {
     protected void onResume() {
         super.onResume();
 
-        if(toolbar != null) {
+        if (toolbar != null) {
             setLightToolbarIcons();
+        }
+        if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION)) {
+            getIntent().setAction(null);
         }
 
         //invalidateOptionsMenu();
@@ -173,21 +184,19 @@ public class LaunchActivity extends BaseContextActivity {
 
             String action = getIntent().getAction();
             if (!isTaskRoot() && (action == null || !action.startsWith(NOTIFICATION_ACTION))
-                && (getIntent().getData() == null || !getIntent().getData().getHost().equalsIgnoreCase("branch.eventshigh.com"))) {
+                    && (getIntent().getData() == null || !getIntent().getData().getHost().equalsIgnoreCase("branch.eventshigh.com"))) {
                 finish();
                 return;
             }
         }
 
 
-        new InitiateBranchAsyncTask(getIntent().getData()).execute();
-
         //Show next screen.
-          showNextScreen();
+        showNextScreen();
 
 
-        currentCity = (TextView)findViewById(R.id.current_city);
-        if(account.getLastCity()!=null) {
+        currentCity = (TextView) findViewById(R.id.current_city);
+        if (account.getLastCity() != null) {
             currentCity.setText(account.getLastCity().name());
             currentCity.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -203,8 +212,9 @@ public class LaunchActivity extends BaseContextActivity {
             });
         }
 
-
-    //    ReferEarnDialog.showDialog(this);
+       // new InitiateBranchAsyncTask(getIntent().getData()).execute();
+        loadBranchInstance();
+        // ReferEarnDialog.showDialog(this);
 
     }
 
@@ -257,12 +267,12 @@ public class LaunchActivity extends BaseContextActivity {
             drawer.closeDrawer(GravityCompat.START);
         } else {
 
-            if(isPagerSwipeBlocked){
-                isPagerSwipeBlocked=false;
-                if(exploreFragment!=null){
+            if (isPagerSwipeBlocked) {
+                isPagerSwipeBlocked = false;
+                if (exploreFragment != null) {
                     exploreFragment.animateLocalityViewOut();
                 }
-            }else {
+            } else {
                 super.onBackPressed();
             }
         }
@@ -272,14 +282,25 @@ public class LaunchActivity extends BaseContextActivity {
         drawer.closeDrawer(GravityCompat.START);
         reportActionToAnalytics("cityChanged");
 
+
         eventsContext.changeLocation(city);
         showExploreScreen();
     }
 
+    public static String[] removeElements(String[] input, String deleteMe) {
+        List result = new LinkedList();
+
+        for (String item : input)
+            if (!deleteMe.equals(item))
+                result.add(item);
+
+        return (String[]) result.toArray(input);
+    }
 
     // ***********************
     // Helper methods
     // ***********************
+
     private void setCity() {
         // Set the location from lastCity if needed.
         if (eventsContext.city == null) {
@@ -287,15 +308,17 @@ public class LaunchActivity extends BaseContextActivity {
             if (lastCity != null) {
                 reportActionToAnalytics("usedLastCity");
                 eventsContext.changeLocation(lastCity);
+
             }
         }
+
 
         // If we have user location, start next activity.
         if (eventsContext.city != null) {
             showNextScreen();
             return;
-        }
 
+        }
         // We do not have user location. Lets populate the City chooser and let user
         // select the city.
         reportActionToAnalytics("locationFailed");
@@ -303,6 +326,14 @@ public class LaunchActivity extends BaseContextActivity {
         viewPager.setVisibility(View.GONE);
         citySelector.setVisibility(View.VISIBLE);
         citySelector.setAdapter(new CityListAdapter(LaunchActivity.this, mCitySelectionListener));
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (drawer != null)
+            drawer.closeDrawers();
     }
 
     private void refreshIfOldData() {
@@ -313,13 +344,35 @@ public class LaunchActivity extends BaseContextActivity {
             return;
         }
 
-        if (viewPager.getAdapter() == null) {
+        if (viewPager.getAdapter() == null || (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION))) {
             showExploreScreen();
         }
     }
 
     private void showExploreScreen() {
 
+        if (!(account.getLastCity() == City.BANGALORE)) {
+            TABS = new ArrayList<>();
+            TABS.add(MY_EVENTS_TAB);
+            TABS.add(EXPLORE_TAB);
+            TABS.add(THIS_WEEK_TAB);
+
+        } else {
+            TABS = new ArrayList<>();
+            TABS.add(MY_EVENTS_TAB);
+            TABS.add(EXPLORE_TAB);
+            TABS.add(OFFERS_TAB);
+            TABS.add(THIS_WEEK_TAB);
+        }
+        String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
+        if (tabName != null) {
+            for (int i = 0; i < TABS.size(); i++) {
+                if (TABS.get(i).equalsIgnoreCase(tabName)) {
+                    defaultTab = i;
+                    break;
+                }
+            }
+        }
 
         ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
         viewPager.setAdapter(adapter);
@@ -329,9 +382,13 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.setTabGravity(TabLayout.GRAVITY_FILL);
         tabsView.setupWithViewPager(viewPager);
         tabsView.setScrollPosition(defaultTab, 0, true);
+        if (account.getLastCity() == City.BANGALORE) {
+            setupTabIconsWithOffer();
+        } else {
+            setupTabIcons();
+        }
+        tabsView.invalidate();
 
-
-        setupTabIcons();
         tabsView.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -355,10 +412,10 @@ public class LaunchActivity extends BaseContextActivity {
 
     }
 
-    private void setupTabIcons() {
+    private void setupTabIconsWithOffer() {
 
         TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabOne.setText("My Events");
+        tabOne.setText("Me");
         tabOne.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_events, 0, 0);
         tabOne.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -379,8 +436,58 @@ public class LaunchActivity extends BaseContextActivity {
         });
         tabsView.getTabAt(1).setCustomView(tabTwo);
 
-        /*TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+
+        TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabThree.setText("Offers");
+        tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_offer, 0, 0);
+        tabThree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(2);
+            }
+        });
+        tabsView.getTabAt(2).setCustomView(tabThree);
+
+
+        TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabFour.setText("Week");
+        tabFour.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_week, 0, 0);
+        tabFour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(3);
+            }
+        });
+        tabsView.getTabAt(3).setCustomView(tabFour);
+
+    }
+
+    private void setupTabIcons() {
+
+        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabOne.setText("Me");
+        tabOne.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_events, 0, 0);
+        tabOne.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(0);
+            }
+        });
+        tabsView.getTabAt(0).setCustomView(tabOne);
+
+        TextView tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabTwo.setText("Explore");
+        tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_explore, 0, 0);
+        tabTwo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(1);
+            }
+        });
+        tabsView.getTabAt(1).setCustomView(tabTwo);
+
+        TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabThree.setText("Week");
         tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_week, 0, 0);
         tabThree.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -388,21 +495,21 @@ public class LaunchActivity extends BaseContextActivity {
                 viewPager.setCurrentItem(2);
             }
         });
-        tabsView.getTabAt(2).setCustomView(tabThree);*/
-
+        tabsView.getTabAt(2).setCustomView(tabThree);
 
         TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabFour.setText("This Week");
-        tabFour.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_week, 0, 0);
+        tabFour.setText("Alerts");
+        tabFour.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_notification, 0, 0);
         tabFour.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewPager.setCurrentItem(2);
+                viewPager.setCurrentItem(3);
             }
         });
-        tabsView.getTabAt(2).setCustomView(tabFour);
+        tabsView.getTabAt(3).setCustomView(tabFour);
 
     }
+
     private void showNextScreen() {
         // If we do not have user city, use GoogleLocation api to get user location.
         if (eventsContext.city == null) {
@@ -427,8 +534,8 @@ public class LaunchActivity extends BaseContextActivity {
 
             Intent outIntent = new Intent(this, EventsGridActivity.class);
             outIntent.setAction(action);
-            if(special!=null)
-            outIntent.putExtra("special_obj",special);
+            if (special != null)
+                outIntent.putExtra("special_obj", special);
             outIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
             startActivity(outIntent);
             finish();
@@ -440,18 +547,21 @@ public class LaunchActivity extends BaseContextActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         //Checking if the previous activity is launched on branch Auto deep link.
-        if(requestCode == getResources().getInteger(R.integer.EventsDetailDeepLink_code)){
+        if (requestCode == getResources().getInteger(R.integer.EventsDetailDeepLink_code)) {
             //Decide here where  to navigate  when an auto deep linked activity finishes.
             //For e.g. Go to HomeActivity or a  SignUp Activity.
             showNextScreen();
         }
     }
+
     private final OnCitySelectionListener mCitySelectionListener = new OnCitySelectionListener() {
         @Override
         public void onCitySelection(City city) {
             eventsContext.changeLocation(city);
             account.setLastCity(city);
-
+            if (currentCity != null) {
+            }
+            currentCity.setText(city.name());
             citySelector.setVisibility(View.GONE);
             tabsView.setVisibility(View.VISIBLE);
             viewPager.setVisibility(View.VISIBLE);
@@ -460,7 +570,7 @@ public class LaunchActivity extends BaseContextActivity {
     };
 
 
-    ViewPager.OnPageChangeListener listener= new ViewPager.OnPageChangeListener() {
+    ViewPager.OnPageChangeListener listener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -468,8 +578,7 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public void onPageSelected(int position) {
-            reportActionToAnalytics("tabchange",TABS[position]);
-
+            reportActionToAnalytics("tabchange", TABS.get(position));
         }
 
         @Override
@@ -479,19 +588,19 @@ public class LaunchActivity extends BaseContextActivity {
     };
 
 
-
-    public void setisPagerSwipeBlocked(boolean isPagerSwipeBlocked){
+    public void setisPagerSwipeBlocked(boolean isPagerSwipeBlocked) {
         this.isPagerSwipeBlocked = isPagerSwipeBlocked;
     }
 
 
     ExploreFragment exploreFragment;
     private EventsFragment myEventsFragment;
+
     /**
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
-            implements TabLayout.OnTabSelectedListener,ViewPager.OnPageChangeListener {
+            implements TabLayout.OnTabSelectedListener, ViewPager.OnPageChangeListener {
 
 
         public ExploreScreenPagerAdapter() {
@@ -500,25 +609,26 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public long getItemId(int position) {
-            return (eventsContext.toString() + TABS[position]).hashCode();
+            return (eventsContext.toString() + TABS.get(position)).hashCode();
         }
 
         @Override
         public Fragment getItem(int position) {
-            if (TABS[position].equals(MY_EVENTS_TAB)) {
+
+            if (TABS.get(position).equals(MY_EVENTS_TAB)) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.city,
-                    EventsHighEndpoints.QUERY_MY_EVENT);
-                myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, null);
+                        EventsHighEndpoints.QUERY_MY_EVENT);
+                myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true,  null);
 
                 return myEventsFragment;
             }
 
-            if (TABS[position].equals(EXPLORE_TAB)) {
-                 exploreFragment = ExploreFragment.getInstance(eventsContext);
-                 return exploreFragment;
+            if (TABS.get(position).equals(EXPLORE_TAB)) {
+                exploreFragment = ExploreFragment.getInstance(eventsContext);
+                return exploreFragment;
 
             }
-            if(TABS[position].equals(OFFERS)){
+            if (TABS.get(position).equals(OFFERS_TAB)) {
                 return new OffersFragment();
             }
 
@@ -527,25 +637,25 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public int getCount() {
-            return TABS.length;
+            return TABS.size();
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return TABS[position];
+            return TABS.get(position);
         }
 
         @Override
         public void onTabSelected(TabLayout.Tab tab) {
 
-                showActionBar();
+            showActionBar();
 
-                int position = tab.getPosition();
-                if (TABS[position].equals(MY_EVENTS_TAB) && myEventsFragment != null) {
-                    myEventsFragment.onResume();
-                }
+            int position = tab.getPosition();
+            if (TABS.get(position).equals(MY_EVENTS_TAB) && myEventsFragment != null) {
+                myEventsFragment.onResume();
+            }
 
-                viewPager.setCurrentItem(position);
+            viewPager.setCurrentItem(position);
 
         }
 
@@ -576,52 +686,66 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
-    public class InitiateBranchAsyncTask extends AsyncTask<Void, Void, JSONObject >{
+    public class InitiateBranchAsyncTask extends AsyncTask<Void, Void, JSONObject> {
         Uri data;
 
+
         public InitiateBranchAsyncTask( Uri data){
+
             this.data = data;
         }
 
         @Override
         protected JSONObject doInBackground(Void... params) {
             Branch branch = Branch.getInstance();
-            if(branch!=null)
+            if (branch != null)
                 branch.initSession(new Branch.BranchReferralInitListener() {
                     @Override
                     public void onInitFinished(JSONObject referringParams, BranchError error) {
                         if (error == null) {
                             //showEventDetails();
-                            if(referringParams.length() == 0){
-                               // showNextScreen();
-                                Log.i("Event_detail_missed","refering params empty");
-                            }else {
+                            if (referringParams.length() == 0) {
+                                // showNextScreen();
+                                Log.i("Event_detail_missed", "refering params empty");
+                            } else {
                                 try {
-                                    if(!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")){
+                                    if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
                                         //showNextScreen();
-                                        Log.i("Event_detail_missed",referringParams.getBoolean("+is_first_session")?"False":"true");
-                                    }else {
-                                        if(referringParams.has("event_id") ) {
+                                        Log.i("Event_detail_missed", referringParams.getBoolean("+is_first_session") ? "False" : "true");
+                                    } else {
+                                        if (referringParams.has("event_id")) {
                                             showEventDetails(
                                                     EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
-                                        }else if(referringParams.has("event_uri")){
+                                        } else if (referringParams.has("event_uri")) {
                                             Uri uri = Uri.parse(referringParams.getString("event_uri"));
                                             showSearchView(uri.getLastPathSegment());
-                                        }else if(referringParams.has("referrer2")){
+                                        } else if (referringParams.has("offer_id")) {
+                                            if (account.getLastCity() == City.BANGALORE && viewPager != null) {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        viewPager.setCurrentItem(2);
+                                                    }
+                                                });
+
+                                            }
+                                        }
+
+                                        if (referringParams.has("referrer2")) {
                                             String referrer = referringParams.getString("referrer2");
                                             new Account(LaunchActivity.this).recordReferrer(referrer);
-                                         //   showNextScreen();
+
                                         }
                                         //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
                                     }
                                 } catch (JSONException e) {
-                                   // showNextScreen();
+                                    // showNextScreen();
                                     e.printStackTrace();
                                 }
                                 System.out.println("JsonObject received" + referringParams);
                             }
                         } else {
-                          //  showNextScreen();
+                            //  showNextScreen();
                             Log.i("MyApp", error.getMessage());
                         }
                     }
@@ -633,5 +757,61 @@ public class LaunchActivity extends BaseContextActivity {
         protected void onPostExecute(JSONObject jsonObject) {
 
         }
+    }
+
+    public void loadBranchInstance(){
+        Branch branch = Branch.getInstance();
+        if (branch != null)
+            branch.initSession(new Branch.BranchReferralInitListener() {
+                @Override
+                public void onInitFinished(JSONObject referringParams, BranchError error) {
+                    if (error == null) {
+                        //showEventDetails();
+                        if (referringParams.length() == 0) {
+                            // showNextScreen();
+                            Log.i("Event_detail_missed", "refering params empty");
+                        } else {
+                            try {
+                                if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
+                                    //showNextScreen();
+                                    Log.i("Event_detail_missed", referringParams.getBoolean("+is_first_session") ? "False" : "true");
+                                } else {
+                                    if (referringParams.has("event_id")) {
+                                        showEventDetails(
+                                                EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
+                                    } else if (referringParams.has("event_uri")) {
+                                        Uri uri = Uri.parse(referringParams.getString("event_uri"));
+                                        showSearchView(uri.getLastPathSegment());
+                                    } else if (referringParams.has("offer_id")) {
+                                        if (account.getLastCity() == City.BANGALORE && viewPager != null) {
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    viewPager.setCurrentItem(2);
+                                                }
+                                            });
+
+                                        }
+                                    }
+
+                                    if (referringParams.has("referrer2")) {
+                                        String referrer = referringParams.getString("referrer2");
+                                        new Account(LaunchActivity.this).recordReferrer(referrer);
+
+                                    }
+                                    //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
+                                }
+                            } catch (JSONException e) {
+                                // showNextScreen();
+                                e.printStackTrace();
+                            }
+                            System.out.println("JsonObject received" + referringParams);
+                        }
+                    } else {
+                        //  showNextScreen();
+                        Log.i("MyApp", error.getMessage());
+                    }
+                }
+            }, getIntent().getData(), LaunchActivity.this);
     }
 }

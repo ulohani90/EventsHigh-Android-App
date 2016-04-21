@@ -11,6 +11,8 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
 import com.eventshigh.nearme.app.data.TrendingTopic;
+import com.eventshigh.nearme.app.data.stream.OfferObject;
+import com.eventshigh.nearme.app.data.stream.PointsObject;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
@@ -53,6 +55,31 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         if (categoryForSeeAll != null) {
             dataToShow.add(new SeeAllData(activity, categoryForSeeAll));
         }
+
+        notifyDataSetChanged();
+    }
+
+
+    public void setOffers(ArrayList<OfferObject> offers,long totalPoints){
+        dataToShow.clear();
+        for(OfferObject offer:offers){
+            dataToShow.add(new OfferData(offer,activity,totalPoints));
+        }
+        if(totalPoints!=0) {
+            dataToShow.add(0, new TotalPointsHeaderData(totalPoints, activity,false));
+        }
+        notifyDataSetChanged();
+    }
+
+    public void setPoints(ArrayList<PointsObject> points){
+        dataToShow.clear();
+        int totalPoints = 0;
+        for(PointsObject point:points){
+            totalPoints += point.points;
+            dataToShow.add(new PointsData(point,activity));
+        }
+
+        dataToShow.add(new TotalPointsHeaderData(totalPoints,activity,true ));
 
         notifyDataSetChanged();
     }
@@ -101,7 +128,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         }
 
         if (!localities.isEmpty()) {
-            dataToShow.add(new SmallHeaderData(activity , activity.getString(R.string.ui_browse_loc),true));
+            dataToShow.add(new SmallHeaderData(activity , activity.getString(R.string.ui_browse_loc),true,0));
             for (int i=0;i<localities.size();i++) {
                 dataToShow.add(new LocalityData(localities.get(i),activity,getMaterialColor(i)));
             }

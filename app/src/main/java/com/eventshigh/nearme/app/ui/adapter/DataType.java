@@ -20,7 +20,11 @@ public enum DataType {
     SEE_ALL(8),
     EVENT_INVITATION(9),
     EH_INVITE(11),
-    EXPLORE_LOCALITY(13);
+    EXPLORE_LOCALITY(13),
+    OFFER(14),
+    POINTS(15),
+    TOTAL_POINT_HEADER(16);
+
 
     public final int typeId;
 
@@ -31,7 +35,8 @@ public enum DataType {
     public static boolean spanAllColumns(int typeId) {
         return typeId == HEADER.typeId || typeId == SMALL_HEADER.typeId
                 || typeId == EVENT_PAGER.typeId || typeId == SEE_ALL.typeId
-                || typeId == EVENT_INVITATION.typeId;
+                || typeId == EVENT_INVITATION.typeId || typeId == OFFER.typeId
+                || typeId == POINTS.typeId|| typeId == TOTAL_POINT_HEADER.typeId;
     }
 
     public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
@@ -78,6 +83,18 @@ public enum DataType {
         if(typeId == EXPLORE_LOCALITY.typeId){
             return LocalityCard.newInstance(activity,parent);
         }
+        if(typeId == OFFER.typeId){
+            return OfferCard.newInstance(activity,parent);
+        }
+
+        if(typeId == POINTS.typeId){
+            return PointsCard.newInstance(activity,parent);
+        }
+
+        if(typeId == TOTAL_POINT_HEADER.typeId){
+            return TotalPointsHeaderCard.newInstance(activity,parent);
+        }
+
 
         throw new IllegalArgumentException("invalid typeid");
     }

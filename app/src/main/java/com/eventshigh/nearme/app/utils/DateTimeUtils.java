@@ -39,6 +39,10 @@ public class DateTimeUtils {
 
     private static final SimpleDateFormat FULL_DATE_TIME_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.US);
+
+    private static final SimpleDateFormat FULL_DATE_TIME_MILLIS_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+
+
     public static @Nullable
     Date mergeDateTime(String date, String time, String timeZone) throws ParseException {
         if (date == null || date.isEmpty() || date.equalsIgnoreCase("null")) {
@@ -56,6 +60,8 @@ public class DateTimeUtils {
 
         return FULL_DATE_TIME_FORMAT.parse(date.split(":")[0] + " " + time + " " + timeZone);
     }
+
+
 
     public static int getDaysLater(Event event) {
         Date eventDate = DateTimeUtils.getEventDate(event, 0);
@@ -148,5 +154,37 @@ public class DateTimeUtils {
     private static final SimpleDateFormat BLOG_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     public static Date parseBlogDate(String blogDateStr) throws ParseException {
         return BLOG_DATE_FORMAT.parse(blogDateStr);
+    }
+
+    public static long parseOfferTime(String time){
+        Date date = new Date();
+        try {
+            date =  FULL_DATE_TIME_MILLIS_FORMAT.parse(time);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date.getTime();
+    }
+
+
+    public static String getRemainingTime(long milliseconds){
+        StringBuilder builder = new StringBuilder();
+        long timeDifference = milliseconds-System.currentTimeMillis();
+        long days = timeDifference/86400000;
+        if(days>0){
+            builder.append( days+((days>1)?" Days ":" Day "));
+            timeDifference = timeDifference%86400000;
+        }
+        long hours = timeDifference/3600000;
+        if(hours>0){
+            builder.append(hours+((hours>1)?" Hours ":" Hour "));
+            timeDifference = timeDifference%3600000;
+        }
+        long minutes = timeDifference/60000;
+        if(minutes>0){
+            builder.append(minutes+((minutes>0)?" Mins ":" Min "));
+        }
+
+        return builder.toString();
     }
 }
