@@ -37,6 +37,8 @@
         />
     </android.support.v4.widget.SwipeRefreshLayout>
 
+
+
     <include
         android:id="@+id/view_retry"
         layout="@layout/view_retry"
@@ -44,48 +46,6 @@
         android:layout_height="match_parent"
         android:visibility="gone"
     />
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:id="@+id/view_upload_contacts"
-        android:padding="12dp"
-        android:gravity="center_horizontal"
-        android:background="@android:color/white"
-        >
-        <TextView
-            style="@style/RateText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:drawablePadding="24dp"
-            android:gravity="center"
-            android:lineSpacingExtra="2dp"
-            android:text="@string/perm_upload_contacts"
-            />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:drawableStart="@drawable/ic_info_black_24dp"
-            android:text="@string/contacts_upload_promise"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textSize="12sp"
-            />
-        <TextView
-            android:id="@+id/upload_contacts_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/eh_button_done"
-            android:text="Upload Contacts"
-            android:padding="10dp"
-            android:textColor="@android:color/white"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textSize="16sp"
-            />
-    </LinearLayout>
+
 
 </FrameLayout>

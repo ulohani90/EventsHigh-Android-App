@@ -75,7 +75,6 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String MY_EVENTS_TAB = EventsHighEndpoints.QUERY_MY_EVENT;
     public static final String EXPLORE_TAB = "explore";
     public static final String THIS_WEEK_TAB = "this week";
-
     public static final String OFFERS_TAB = "Offers";
     public ArrayList<String> TABS = new ArrayList<>();
 
@@ -381,7 +380,9 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.setTabMode(TabLayout.MODE_FIXED);
         tabsView.setTabGravity(TabLayout.GRAVITY_FILL);
         tabsView.setupWithViewPager(viewPager);
+
         tabsView.setScrollPosition(defaultTab, 0, true);
+
         if (account.getLastCity() == City.BANGALORE) {
             setupTabIconsWithOffer();
         } else {
@@ -409,7 +410,6 @@ public class LaunchActivity extends BaseContextActivity {
         if (tab != null) {
             tab.select();
         }
-
     }
 
     private void setupTabIconsWithOffer() {
@@ -497,16 +497,7 @@ public class LaunchActivity extends BaseContextActivity {
         });
         tabsView.getTabAt(2).setCustomView(tabThree);
 
-        TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabFour.setText("Alerts");
-        tabFour.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_notification, 0, 0);
-        tabFour.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewPager.setCurrentItem(3);
-            }
-        });
-        tabsView.getTabAt(3).setCustomView(tabFour);
+
 
     }
 
@@ -617,9 +608,7 @@ public class LaunchActivity extends BaseContextActivity {
 
             if (TABS.get(position).equals(MY_EVENTS_TAB)) {
 
-                /*EventsContext myEventsContext = new EventsContext(eventsContext.location,
-                        EventsHighEndpoints.QUERY_MY_EVENT);
-                myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null);*/
+
                 String tabParam = "";
                 if(getIntent().hasExtra(MeFragment.TAB_PARAM)){
                     tabParam = getIntent().getStringExtra(MeFragment.TAB_PARAM);
@@ -660,9 +649,6 @@ public class LaunchActivity extends BaseContextActivity {
             showActionBar();
 
             int position = tab.getPosition();
-            if (TABS.get(position).equals(MY_EVENTS_TAB) && myEventsFragment != null) {
-                myEventsFragment.onResume();
-            }
 
             viewPager.setCurrentItem(position);
 

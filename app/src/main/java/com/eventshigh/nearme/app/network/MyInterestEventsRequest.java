@@ -9,7 +9,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
-import com.crashlytics.android.Crashlytics;
+
 import com.eventshigh.nearme.app.data.EventsContext;
 
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ public class MyInterestEventsRequest extends AsyncTask<Void, Void, List<MyEvents
 
         RequestFuture<List<TopicEvents>> eventsFuture = RequestFuture.newFuture();
         MobileUserEventsRequest.submit(context, eventsContext,
-                priority, tag, shouldBypassCache, includeWithoutLocation, eventsFuture, eventsFuture);
+                priority, tag, shouldBypassCache, eventsFuture, eventsFuture);
         try {
             addTopicEventsToResult(result, eventsFuture);
             return result;
@@ -102,7 +102,7 @@ public class MyInterestEventsRequest extends AsyncTask<Void, Void, List<MyEvents
             if (eventsFuture.isCancelled()) {
                 throw new RequestCancelledException();
             }
-            Crashlytics.getInstance().core.logException(e);
+
         }
 
     }

@@ -115,7 +115,7 @@ public class MeFragment extends Fragment {
 
     public class MePagerAdapter extends FragmentStatePagerAdapter {
 
-        String []TABS = {"My Favourites","My Events","My Friends"};
+        String []TABS = {"My Favourites","My Events"};
 
 
 
@@ -128,18 +128,15 @@ public class MeFragment extends Fragment {
         @Override
         public Fragment getItem(int position) {
             if(position == 0){
-                EventsContext myEventsContext = new EventsContext(eventsContext.location,
+                EventsContext myEventsContext = new EventsContext(eventsContext.city,
                         EventsHighEndpoints.QUERY_MY_EVENT);
-                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null);
+                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false,  null);
                 return myFavouritesFragment;
-            }else  if(position == 1){
-                EventsContext myEventsContext = new EventsContext(eventsContext.location,
+            }else {
+                EventsContext myEventsContext = new EventsContext(eventsContext.city,
                         EventsHighEndpoints.QUERY_MY_INTEREST_EVENTS);
-                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null);
+                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true,  null);
                 return myInterestEventsFragment;
-            }else{
-                ContactsFragment fragment = new ContactsFragment();
-                return fragment;
             }
 
 

@@ -8,7 +8,7 @@ import com.android.volley.ParseError;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
-import com.crashlytics.android.Crashlytics;
+
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.stream.OfferObject;
@@ -81,7 +81,7 @@ public class MyPointsBreakdownRequest extends JsonRequest<MyPointsBreakdownReque
             request.setTag(tag);
             VolleyHelper.addToRequestQueue(context, request);
         }catch(UnsupportedEncodingException| GeneralSecurityException e){
-            Crashlytics.getInstance().core.logException(e);
+
         }
     }
 
@@ -121,7 +121,7 @@ public class MyPointsBreakdownRequest extends JsonRequest<MyPointsBreakdownReque
             return Response.success(obj,
                     HttpHeaderParser.parseCacheHeaders(response));
         }catch(UnsupportedEncodingException | JSONException e){
-            Crashlytics.getInstance().core.logException(e);
+
             return Response.error(new ParseError(e));
         }
 

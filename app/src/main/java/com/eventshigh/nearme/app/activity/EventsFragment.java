@@ -186,7 +186,7 @@ public class EventsFragment extends BaseEventsFragment {
             asyncRequest.execute();
         }else if(EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query)){
             MobileUserEventsRequest.submit(activity, eventsContext,
-                    Priority.IMMEDIATE, this, shouldBypassCache, true, mMyEventsFetcherCallBack, mErrorListener);
+                    Priority.IMMEDIATE, this, shouldBypassCache,  mMyEventsFetcherCallBack, mErrorListener);
         } else if (eventsContext.query.isEmpty() && !eventsContext.dateFilter.isEmpty() && showCategories) {
             DateCategoryRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, mMyEventsFetcherCallBack, mErrorListener);
