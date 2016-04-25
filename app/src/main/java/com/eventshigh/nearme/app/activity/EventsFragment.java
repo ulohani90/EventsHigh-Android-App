@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
@@ -19,6 +21,7 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.DateCategoryRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
+import com.eventshigh.nearme.app.network.MobileUserEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
@@ -39,6 +42,9 @@ public class EventsFragment extends BaseEventsFragment {
     private View topProgressBar;
     private View noMyEventsView;
     private View retryView;
+
+    private TextView noEventHeaderText;
+    private TextView callToActionButton;
 
     private EventsAdapter eventsAdapter;
     private OnScrollListener onScrollListener;
@@ -97,11 +103,18 @@ public class EventsFragment extends BaseEventsFragment {
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
 
+        noEventHeaderText = (TextView)view.findViewById(R.id.no_my_event_heading);
+        callToActionButton = (TextView)view.findViewById(R.id.explore_events);
         // Actions Buttons.
-        view.findViewById(R.id.explore_events).setOnClickListener(new OnClickListener() {
+        callToActionButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.showSearchView("today");
+                if (EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query)){
+                    Intent intent = new Intent(getActivity(),SelectInterestsActivity.class);
+                    startActivity(intent);
+                }else {
+                    activity.showSearchView("today");
+                }
             }
         });
 
@@ -171,6 +184,9 @@ public class EventsFragment extends BaseEventsFragment {
             asyncRequest =  new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, mMyEventsFetcherCallBack, mErrorListener);
             asyncRequest.execute();
+        }else if(EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query)){
+            MobileUserEventsRequest.submit(activity, eventsContext,
+                    Priority.IMMEDIATE, this, shouldBypassCache, true, mMyEventsFetcherCallBack, mErrorListener);
         } else if (eventsContext.query.isEmpty() && !eventsContext.dateFilter.isEmpty() && showCategories) {
             DateCategoryRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, mMyEventsFetcherCallBack, mErrorListener);
@@ -200,7 +216,13 @@ public class EventsFragment extends BaseEventsFragment {
                 if (myEvents.isEmpty()) {
                     if (EventsHighEndpoints.isMyEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
                         noMyEventsView.setVisibility(View.VISIBLE);
-                    } else {
+                        noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_event));
+                        callToActionButton.setText("Explore Events");
+                    }else if(EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
+                        noMyEventsView.setVisibility(View.VISIBLE);
+                        noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_interest));
+                        callToActionButton.setText("Personalize");
+                    }else {
                         noMyEventsView.setVisibility(View.GONE);
                         retryView.setVisibility(View.VISIBLE);
                     }
@@ -211,6 +233,7 @@ public class EventsFragment extends BaseEventsFragment {
                 if(getActivity()!=null && (getActivity()) instanceof EventsGridActivity){
                     ((EventsGridActivity)getActivity()).setShareImageUrl(myEvents.get(0).events.get(0).imgUrl);
                 }
+
                 eventsAdapter.setTopicEvents(myEvents, eventsContext, eventGridView.getSpanCount() * 2);
 
                 eventGridView.scrollToPosition(scrollPosition);

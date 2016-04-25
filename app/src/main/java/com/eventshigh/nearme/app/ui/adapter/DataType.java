@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.ViewGroup;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.data.Locality;
 
 /**
  * Various card types used in various adapters.
@@ -23,7 +22,8 @@ public enum DataType {
     EXPLORE_LOCALITY(13),
     OFFER(14),
     POINTS(15),
-    TOTAL_POINT_HEADER(16);
+    TOTAL_POINT_HEADER(16),
+    POINT_BREAKDWON(17);
 
 
     public final int typeId;
@@ -36,7 +36,8 @@ public enum DataType {
         return typeId == HEADER.typeId || typeId == SMALL_HEADER.typeId
                 || typeId == EVENT_PAGER.typeId || typeId == SEE_ALL.typeId
                 || typeId == EVENT_INVITATION.typeId || typeId == OFFER.typeId
-                || typeId == POINTS.typeId|| typeId == TOTAL_POINT_HEADER.typeId;
+                || typeId == POINTS.typeId|| typeId == TOTAL_POINT_HEADER.typeId
+                || typeId == POINT_BREAKDWON.typeId;
     }
 
     public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
@@ -94,7 +95,9 @@ public enum DataType {
         if(typeId == TOTAL_POINT_HEADER.typeId){
             return TotalPointsHeaderCard.newInstance(activity,parent);
         }
-
+        if(typeId == POINT_BREAKDWON.typeId){
+            return PointBreakdownCard.newInstance(activity,parent);
+        }
 
         throw new IllegalArgumentException("invalid typeid");
     }

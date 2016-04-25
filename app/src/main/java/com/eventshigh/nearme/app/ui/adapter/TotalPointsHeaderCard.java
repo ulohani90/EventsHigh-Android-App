@@ -13,6 +13,8 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 
+import com.eventshigh.nearme.app.activity.PointsBreakdownActivity;
+
 
 /**
  * Created by umesh on 18/04/16.
@@ -23,6 +25,8 @@ public class TotalPointsHeaderCard extends RecyclerView.ViewHolder{
     LinearLayout walletLayout;
     LinearLayout messageLayout;
     TextView contactUs;
+
+    TextView clickDesc;
 
 
     public static TotalPointsHeaderCard newInstance(final BaseActivity activity, ViewGroup parent) {
@@ -36,9 +40,10 @@ public class TotalPointsHeaderCard extends RecyclerView.ViewHolder{
         walletLayout = (LinearLayout)itemView.findViewById(R.id.wallet_layout);
         messageLayout = (LinearLayout)itemView.findViewById(R.id.message_layout);
         contactUs = (TextView)itemView.findViewById(R.id.contact_us);
+        clickDesc = (TextView)itemView.findViewById(R.id.click_desc);
     }
 
-    public void bindTotalPointView(long totalPoints , final BaseContextActivity activity ,boolean showMessage ){
+    public void bindTotalPointView(long totalPoints , final BaseContextActivity activity ,boolean showMessage,boolean showCallToAction ){
         if(showMessage){
             walletLayout.setVisibility(View.GONE);
             messageLayout.setVisibility(View.VISIBLE);
@@ -51,6 +56,24 @@ public class TotalPointsHeaderCard extends RecyclerView.ViewHolder{
             walletLayout.setVisibility(View.VISIBLE);
             messageLayout.setVisibility(View.GONE);
             pointsCount.setText(totalPoints + " points");
+            if(showCallToAction){
+            walletLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(activity, PointsBreakdownActivity.class);
+
+                    activity.startActivity(intent);
+                }
+            });
+
+                clickDesc.setVisibility(View.VISIBLE);
+                SpannableString content = new SpannableString("Details");
+                content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                clickDesc.setText(content);
+
+            }else{
+                clickDesc.setVisibility(View.GONE);
+            }
         }
     }
 }

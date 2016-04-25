@@ -16,6 +16,8 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_LAST_TIME_REFER_SHOWN = "last_time_refer_shown";
     public static final String PREF_INTEREST_UPDATED = "interest_updated";
     public static final String PREF_SHOW_REFERRAL = "show_referral";
+    public static final String PREF_OFFER_ACTED_ID = "offers_acted";
+
 
 
     private final Context context;
@@ -73,5 +75,12 @@ public class Preferences implements OnSharedPreferenceChangeListener {
 
     public boolean shouldShowReferral() {
         return sharedPreferences.getBoolean(PREF_SHOW_REFERRAL, false);
+    }
+
+    public void setPrefOfferActedId(String id){
+        sharedPreferences.edit().putString(PREF_OFFER_ACTED_ID, id).apply();
+    }
+    public String getPrefOfferActedId(){
+        return sharedPreferences.getString(PREF_OFFER_ACTED_ID, "");
     }
 }

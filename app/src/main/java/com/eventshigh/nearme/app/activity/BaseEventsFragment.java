@@ -24,7 +24,6 @@ public abstract class BaseEventsFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         this.activity = (BaseContextActivity) context;
-
         eventsContext = getArguments().getParcelable(EVENT_CONTEXT_PARAM);
         showFollowCard = getArguments().getBoolean(SHOW_FOLLOW_PARAM);
         showCategories = getArguments().getBoolean(SHOW_CATEGORIES_PARAM);

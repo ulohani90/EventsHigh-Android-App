@@ -616,11 +616,20 @@ public class LaunchActivity extends BaseContextActivity {
         public Fragment getItem(int position) {
 
             if (TABS.get(position).equals(MY_EVENTS_TAB)) {
+
+                /*EventsContext myEventsContext = new EventsContext(eventsContext.location,
+                        EventsHighEndpoints.QUERY_MY_EVENT);
+                myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null);*/
+                String tabParam = "";
+                if(getIntent().hasExtra(MeFragment.TAB_PARAM)){
+                    tabParam = getIntent().getStringExtra(MeFragment.TAB_PARAM);
+                }
                 EventsContext myEventsContext = new EventsContext(eventsContext.city,
                         EventsHighEndpoints.QUERY_MY_EVENT);
-                myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true,  null);
 
-                return myEventsFragment;
+                MeFragment fragment = MeFragment.getInstance(myEventsContext,tabParam);
+                return fragment;
+
             }
 
             if (TABS.get(position).equals(EXPLORE_TAB)) {

@@ -11,6 +11,7 @@ import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.EventsGridActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
+import com.eventshigh.nearme.app.activity.PointsBreakdownActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.ui.EventSearchSuggestionsProvider;
@@ -61,6 +62,9 @@ public class IntentUtils {
                     String label = param.query == null ? inIntent.getStringExtra(LaunchActivity.DEFAULT_TAB_PARAM) : param.query;
                     activity.reportActionToAnalytics("openNotification", label);
                 //    Log.i("notification param", param.query);
+                }else if(activity instanceof PointsBreakdownActivity){
+                    activity.reportActionToAnalytics("openNotification", "PointsBreakdown");
+                       Log.i("Points Breakdown", "Repoted");
                 }
                 processViewIntent(inIntent, false);
             }

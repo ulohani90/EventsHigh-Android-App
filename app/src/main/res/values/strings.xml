@@ -85,6 +85,7 @@
     <string name="ui_fullname_text">Full Name</string>
     <string name="ui_email_text">Email Id</string>
     <string name="ui_you_earned_points">You have earned total %1$s points</string>
+    <string name="ui_no_my_interest">Personalize this section by following categories and performers.\n\nNever miss events for\nyour interests again!</string>
 
 
     <!-- Onbaording message -->
@@ -167,5 +168,7 @@
     <string name="activity_image_trans">Offer Image transition</string>
 
     <string name="enter_details_text">Enter Details</string>
+
+    <string name="points_breakdown">Points Breakdown</string>
 
 </resources>

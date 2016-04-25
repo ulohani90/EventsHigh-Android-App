@@ -16,8 +16,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -37,7 +40,15 @@ public class OffersFragment extends Fragment{
 
     private LinearLayout verifyPhnLayout;
 
+
     Account account;
+
+
+    public OffersFragment newInstance(){
+        OffersFragment fragment  = new OffersFragment();
+        return fragment;
+
+    }
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -116,7 +127,7 @@ public class OffersFragment extends Fragment{
 
     public class OffersPagerAdapter extends FragmentStatePagerAdapter{
 
-        String []TABS = {"Offers","How to Earn"};
+        String[] TABS = {"Offers", "How to Earn"};
 
         Fragment fragment;
 
@@ -126,10 +137,10 @@ public class OffersFragment extends Fragment{
 
         @Override
         public Fragment getItem(int position) {
-            if(position == 0){
+            if (position == 0) {
 
                 return MyOffersListFragment.newInstance(null);
-            }else{
+            } else {
 
                 return MyPointsListFragment.newInstance(null);
             }

@@ -51,5 +51,7 @@
     <color name="skip_button_dark">#f3b832</color>
     <color name="valid_text_grey">#6E7073</color>
     <color name="translucent_dark">#99000000</color>
+    <color name="credit_icon_bg_color">#439D16</color>
+    <color name="debit_icon_bg_color">#878889</color>
 
 </resources>

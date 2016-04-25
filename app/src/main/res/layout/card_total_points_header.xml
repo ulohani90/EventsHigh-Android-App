@@ -45,6 +45,21 @@
             android:textIsSelectable="false"
             android:textSize="12sp"
             tools:text="30 points" />
+
+        <TextView
+            android:id="@+id/click_desc"
+            style="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawablePadding="10dp"
+            android:fontFamily="sans-serif-medium"
+            android:padding="5dp"
+            android:layout_marginLeft="5dp"
+            android:textColor="@color/done_button"
+            android:textIsSelectable="false"
+            android:textSize="12sp"
+            tools:text="30 points" />
     </LinearLayout>
 
     <LinearLayout

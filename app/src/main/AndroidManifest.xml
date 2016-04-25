@@ -242,6 +242,13 @@
             android:hardwareAccelerated="true"
             android:theme="@style/NoActionBar"
             />
+        <activity
+            android:name=".activity.PointsBreakdownActivity"
+            android:label="@string/points_breakdown"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:hardwareAccelerated="true"
+            android:theme="@style/NoActionBar"
+            />
 
 
         <activity
