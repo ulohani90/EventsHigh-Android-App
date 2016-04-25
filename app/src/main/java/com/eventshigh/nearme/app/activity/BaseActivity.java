@@ -47,6 +47,8 @@ import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -636,5 +638,19 @@ public abstract class BaseActivity extends AppCompatActivity {
         intent.putExtra("offer", offer);
         startActivity(intent);
         overridePendingTransition(R.anim.animate_bottom_up, R.anim.stay);
+    }
+
+    public boolean isOfferActed(int id){
+        Preferences preferences = Preferences.getInstance(this);
+        ArrayList<String> ids = new ArrayList<>();
+        if(preferences.getPrefOfferActedId().length()>0) {
+            ids.addAll(Arrays.asList(preferences.getPrefOfferActedId().split(",")));
+            for (String value : ids) {
+                if (Integer.parseInt(value) == id)
+                    return true;
+
+            }
+        }
+        return false;
     }
 }

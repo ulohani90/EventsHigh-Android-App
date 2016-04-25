@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
@@ -43,10 +45,16 @@ public class NotificationCard extends RecyclerView.ViewHolder {
         Drawable drawable = contact == null ? null : contact.getDrawable(activity,
                 imageView.getLayoutParams().height);
 
-        if (drawable == null) {
-            imageView.setImageResource(R.drawable.ic_launcher);
-        } else {
+        if (drawable != null) {
             imageView.setImageDrawable(drawable);
+
+        }else if(streamItem.imgUrl!=null){
+            Glide.with(activity).load(streamItem.imgUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                    .into(imageView);
+        }else{
+            imageView.setImageResource(R.drawable.ic_launcher);
         }
 
         itemView.setOnClickListener(new OnClickListener() {

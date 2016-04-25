@@ -75,6 +75,9 @@ public class DateTimeUtils {
         return toMidnight(cal, event.city.timeZone).getTime();
     }
 
+
+
+
     public static Calendar toMidnight(Calendar cal, @Nullable String timeZone) {
         if (timeZone != null) {
             cal.setTimeZone(TimeZone.getTimeZone(timeZone));
@@ -187,4 +190,23 @@ public class DateTimeUtils {
 
         return builder.toString();
     }
+
+
+    public static String getPointAddedOnString(long time){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(time);
+        StringBuilder builder=new StringBuilder();
+        builder.append(cal.get(Calendar.DAY_OF_MONTH));
+        builder.append(" ");
+        builder.append(new SimpleDateFormat("MMM").format(cal.getTime()));
+        builder.append(" - ");
+        builder.append(cal.get(Calendar.HOUR)<10?"0"+cal.get(Calendar.HOUR):cal.get(Calendar.HOUR));
+        builder.append(":");
+        builder.append(cal.get(Calendar.MINUTE)<10?"0"+cal.get(Calendar.MINUTE):cal.get(Calendar.MINUTE));
+        builder.append(" ");
+        builder.append(cal.get(Calendar.AM_PM) == Calendar.PM?"PM":"AM");
+        return builder.toString();
+    }
+
+
 }

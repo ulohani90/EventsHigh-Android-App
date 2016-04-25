@@ -122,9 +122,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
             interestsEvents.put(interest, eventsFuture);
         }
 */
-        RequestFuture<List<TopicEvents>> eventsFuture = RequestFuture.newFuture();
-        MobileUserEventsRequest.submit(context, eventsContext,
-                priority, tag, shouldBypassCache, includeWithoutLocation, eventsFuture, eventsFuture);
+
 
         // Favourites event requests.
         EventsMarkerManager markerManager = EventsMarkerManager.getInstance(context);
@@ -149,7 +147,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         try {
             addEventsToResults(result, INVITATIONS_NAME, invitedEvents);
             addEventsToResults(result, FAVOURITES_NAME, favEvents);
-            addTopicEventsToResult(result,eventsFuture);
+
             return result;
         } catch (RequestCancelledException e) {
             isRequestCancelled = true;
@@ -175,18 +173,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         }
     }
 
-    private static void addTopicEventsToResult(List<TopicEvents> result, RequestFuture<List<TopicEvents>> eventsFuture) throws RequestCancelledException {
 
-        try {
-            result.addAll(eventsFuture.get(10, TimeUnit.SECONDS));
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            if (eventsFuture.isCancelled()) {
-                throw new RequestCancelledException();
-            }
-            Crashlytics.getInstance().core.logException(e);
-        }
-
-    }
 
     private static void addEventsToResults(List<TopicEvents> result, String name,
             RequestFuture<List<Event>> eventsFuture) throws RequestCancelledException {

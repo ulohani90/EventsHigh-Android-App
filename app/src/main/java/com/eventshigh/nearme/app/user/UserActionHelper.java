@@ -3,18 +3,23 @@ package com.eventshigh.nearme.app.user;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.network.RecordUserAction;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class UserActionHelper {
-    private static final String JSON_KEY_ANDROID_ID = "android_id";
-    private static final String JSON_KEY_TIMESTAMP = "timestamp";
-    private static final String JSON_KEY_ACTION = "action";
-    private static final String JSON_KEY_DATA = "data";
+    public static final String JSON_KEY_ANDROID_ID = "android_id";
+    public static final String JSON_KEY_TIMESTAMP = "timestamp";
+    public static final String JSON_KEY_ACTION = "action";
+    public static final String JSON_KEY_DATA = "data";
     private static final String JSON_KEY_EVENT_ID = "event_id";
     private static final String JSON_KEY_INTEREST = "interest";
 
@@ -80,6 +85,17 @@ public class UserActionHelper {
 
     private void recordAction(final String action, final String data) {
         recordAction(action, data, System.currentTimeMillis());
+        RecordUserAction.submit(context, action, data, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject jsonObject, boolean b) {
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+            }
+        });
     }
 
     private void recordAction(final String action, final String data, final long timestamp) {
@@ -96,4 +112,6 @@ public class UserActionHelper {
         });
         thread.start();
     }
+
+
 }

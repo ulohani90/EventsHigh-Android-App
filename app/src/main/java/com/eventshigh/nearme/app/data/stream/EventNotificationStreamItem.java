@@ -30,6 +30,7 @@ public class EventNotificationStreamItem extends StreamItem {
         } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);
         }
+
     }
 
     public EventNotificationStreamItem(long timestamp, String title, String message,

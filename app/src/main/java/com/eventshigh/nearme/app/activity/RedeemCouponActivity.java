@@ -1,16 +1,14 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,7 +31,6 @@ import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
@@ -62,13 +59,14 @@ public class RedeemCouponActivity extends BaseActivity {
     Account account;
     int selectedVoucherPos = -1;
     Toolbar toolbar;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_redeem_coupon);
         progressBar = findViewById(R.id.top_progress_bar);
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -84,6 +82,7 @@ public class RedeemCouponActivity extends BaseActivity {
             setUpData();
         }
     }
+
     private void setLightToolbarIcons() {
         toolbar.post(new Runnable() {
             @Override
@@ -94,6 +93,7 @@ public class RedeemCouponActivity extends BaseActivity {
             }
         });
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_event_detail, menu);
@@ -104,8 +104,8 @@ public class RedeemCouponActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
-        }else if(item.getItemId() == R.id.action_share){
-                shareCoupon(obj);
+        } else if (item.getItemId() == R.id.action_share) {
+            shareCoupon(obj);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -178,7 +178,7 @@ public class RedeemCouponActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(toolbar!=null)
+        if (toolbar != null)
             setLightToolbarIcons();
     }
 
@@ -198,12 +198,14 @@ public class RedeemCouponActivity extends BaseActivity {
         }
 
         couponEditText.setText("Select a voucher");
+
+
     }
 
     public void confirmClicked() {
 
         if (checkIfDetailsCorrect()) {
-
+            progressDialog = ProgressDialog.show(this, null, "Confirming.Please wait..");
             reportActionToAnalytics("redeemButtonClick");
 
             Uri requestUrl = UpdateAccountInfoService.getBaseUri(this, "offer_redeem")
@@ -220,14 +222,22 @@ public class RedeemCouponActivity extends BaseActivity {
                                 new Response.Listener<JSONObject>() {
                                     @Override
                                     public void onResponse(JSONObject s, boolean isIntermediate) {
+
+                                        updatePreferencesForOffer();
+                                        if (progressDialog != null) {
+                                            progressDialog.dismiss();
+                                        }
                                         progressBar.setVisibility(View.GONE);
-                                        showMessage("You have successfully signed up for the offer");
+                                        showMessage("You have successfully confirmed the coupon");
                                         finish();
                                     }
                                 },
                                 new Response.ErrorListener() {
                                     @Override
                                     public void onErrorResponse(VolleyError volleyError) {
+                                        if (progressDialog != null) {
+                                            progressDialog.dismiss();
+                                        }
                                         progressBar.setVisibility(View.GONE);
                                         VolleyHelper.log(RedeemCouponActivity.this, volleyError);
                                         showRetryMessage();
@@ -236,6 +246,9 @@ public class RedeemCouponActivity extends BaseActivity {
                         )
                 );
             } catch (UnsupportedEncodingException | GeneralSecurityException e) {
+                if (progressDialog != null) {
+                    progressDialog.dismiss();
+                }
                 progressBar.setVisibility(View.GONE);
                 Crashlytics.getInstance().core.logException(e);
                 showRetryMessage();
@@ -252,10 +265,10 @@ public class RedeemCouponActivity extends BaseActivity {
 
                 if (emailAddEditText.getText() != null && Utils.isValidEmail(emailAddEditText.getText())) {
                     emailAdd.setErrorEnabled(false);
-                    if(selectedVoucherPos!=-1){
+                    if (selectedVoucherPos != -1) {
                         coupon.setErrorEnabled(false);
                         return true;
-                    }else{
+                    } else {
                         coupon.setErrorEnabled(true);
                         coupon.setError("No coupon selected.");
                         return false;
@@ -290,5 +303,19 @@ public class RedeemCouponActivity extends BaseActivity {
     public void onBackPressed() {
         this.finish();
         //   overridePendingTransition(R.anim.stay,R.anim.animate_up_bottom);
+    }
+
+    public void updatePreferencesForOffer() {
+
+        Preferences preferences = Preferences.getInstance(this);
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(preferences.getPrefOfferActedId());
+        if (builder.length() > 0) {
+            builder.append(",");
+        }
+        builder.append(obj.id + "");
+        preferences.setPrefOfferActedId(builder.toString());
+
     }
 }

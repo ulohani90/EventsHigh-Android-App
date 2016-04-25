@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +47,7 @@ public class SocialFriendCard extends ViewHolder {
 
         int size = contactPhoto.getLayoutParams().height;
         contactPhoto.setImageDrawable(friend.getDrawable(context, size));
-
+        contactPhoto.setBackgroundColor(Color.TRANSPARENT);
         if (followButton != null) {
             followButton.setVisibility(View.INVISIBLE);
         }

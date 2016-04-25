@@ -32,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 
@@ -99,7 +100,10 @@ public class MyOffersListFragment extends Fragment {
         } else {
             makeServerRequest(false);
         }
+
+
     }
+
 
     public void getUserPoints(final boolean shouldByPassCache) {
         Uri requestUrl = UpdateAccountInfoService.getBaseUri(getActivity(), "getWalletPoints")

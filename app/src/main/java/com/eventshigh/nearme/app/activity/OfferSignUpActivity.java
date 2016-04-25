@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
@@ -25,6 +26,7 @@ import com.eventshigh.nearme.app.data.stream.OfferObject;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.VoucherSelectDialog;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -54,6 +56,8 @@ public class OfferSignUpActivity extends BaseActivity{
     View progressBar;
 
     Account account;
+
+    ProgressDialog progressDialog;
 
     Toolbar toolbar;
     @Override
@@ -137,7 +141,7 @@ public class OfferSignUpActivity extends BaseActivity{
 
     public void signUpClicked(){
         if(checkIfDetailsCorrect()) {
-
+            progressDialog = ProgressDialog.show(this,null,"Signing up. Please wait..");
             reportActionToAnalytics("signupButtonClicked");
 
             Uri requestUrl = UpdateAccountInfoService.getBaseUri(this, "offer_signup")
@@ -153,6 +157,10 @@ public class OfferSignUpActivity extends BaseActivity{
                                 new Response.Listener<JSONObject>() {
                                     @Override
                                     public void onResponse(JSONObject s, boolean isIntermediate) {
+                                        if(progressDialog!=null){
+                                            progressDialog.dismiss();
+                                        }
+                                        updatePreferencesForOffer();
                                         progressBar.setVisibility(View.GONE);
                                         showMessage("You have successfully signed up for the offer");
                                         finish();
@@ -161,6 +169,9 @@ public class OfferSignUpActivity extends BaseActivity{
                                 new Response.ErrorListener() {
                                     @Override
                                     public void onErrorResponse(VolleyError volleyError) {
+                                        if(progressDialog!=null){
+                                            progressDialog.dismiss();
+                                        }
                                         progressBar.setVisibility(View.GONE);
                                         VolleyHelper.log(OfferSignUpActivity.this, volleyError);
                                         showRetryMessage();
@@ -224,5 +235,19 @@ public class OfferSignUpActivity extends BaseActivity{
     public void onBackPressed() {
         this.finish();
        // overridePendingTransition(R.anim.stay,R.anim.animate_up_bottom);
+    }
+
+    public void updatePreferencesForOffer() {
+
+        Preferences preferences = Preferences.getInstance(this);
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(preferences.getPrefOfferActedId());
+        if (builder.length() > 0) {
+            builder.append(",");
+        }
+        builder.append(obj.id + "");
+        preferences.setPrefOfferActedId(builder.toString());
+
     }
 }

@@ -18,8 +18,8 @@ public class StreamAdapter extends Adapter<NotificationCard> {
         this.activity = activity;
 
         streamItems = new ArrayList<>();
-        streamItems.add(new QueryNotificationStreamItem(System.currentTimeMillis(),
-            "What's Happening Today", "Check out whats happending in city today", null, null, "today"));
+        /*streamItems.add(new QueryNotificationStreamItem(System.currentTimeMillis(),
+            "What's Happening Today", "Check out whats happending in city today", null, null, "today"));*/
     }
 
     public void setStreamItems(List<StreamItem> streamItems) {

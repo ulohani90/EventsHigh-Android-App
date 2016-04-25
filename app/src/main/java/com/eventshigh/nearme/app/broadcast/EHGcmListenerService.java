@@ -18,6 +18,8 @@ import com.eventshigh.nearme.app.activity.EventDetailActivity;
 import com.eventshigh.nearme.app.activity.EventsGridActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
+import com.eventshigh.nearme.app.activity.MeFragment;
+import com.eventshigh.nearme.app.activity.PointsBreakdownActivity;
 import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.activity.SelectInterestsActivity;
 import com.eventshigh.nearme.app.data.City;
@@ -28,6 +30,7 @@ import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.TicketNotificationStreamItem;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
+import com.eventshigh.nearme.app.network.MyInterestEventsRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.notification.EHNotification;
 import com.eventshigh.nearme.app.user.Account;
@@ -57,7 +60,9 @@ public class EHGcmListenerService extends GcmListenerService {
         }
     }
 
-    private @Nullable EHNotification parseBundle(Bundle msg) {
+    private
+    @Nullable
+    EHNotification parseBundle(Bundle msg) {
         String title = Utils.checkIfUnknown(msg.getString("t"));
         String message = Utils.checkIfUnknown(msg.getString("m"));
         if (message == null || title == null) {
@@ -77,6 +82,7 @@ public class EHGcmListenerService extends GcmListenerService {
         String personalizeInterest = Utils.checkIfUnknown(msg.getString("perosnalize_interest"));
         String referEarn = Utils.checkIfUnknown(msg.getString("refer_earn"));
         String special = Utils.checkIfUnknown(msg.getString("special"));
+        String pointsBreakdown = Utils.checkIfUnknown(msg.getString("points_breakdown"));
 
 
         UserContact contact = null;
@@ -88,7 +94,7 @@ public class EHGcmListenerService extends GcmListenerService {
             }
             try {
                 contact = ContactUtils.getContactForServerPhone(this, mobileNo);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 Crashlytics.getInstance().core.logException(e);
             }
         }
@@ -103,11 +109,10 @@ public class EHGcmListenerService extends GcmListenerService {
             message = message.replace("Your friend", contact.name);
         }
 
-        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null && referEarn == null && special == null)  {
+        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null && referEarn == null && special == null && pointsBreakdown==null) {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
             return null;
         }
-
 
 
         PendingIntent contentIntent;
@@ -141,53 +146,62 @@ public class EHGcmListenerService extends GcmListenerService {
                 }
             }
 
-            if (intent == null) { return null; }
+            if (intent == null) {
+                return null;
+            }
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + target);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        } else if(personalisedNotif!=null){
+        } else if (personalisedNotif != null) {
             City city = new Account(this).getLastCity();
-            if (city == null) { return null; }
+            if (city == null) {
+                return null;
+            }
 
-                MyEventsRequest.TopicEvents interestName = new MyEventsRequest(
-                        getApplicationContext(),
-                        new EventsContext(city.cityBounds.getCenter(), ""),
-                        Request.Priority.HIGH,
-                        null, false, true, null, null).getNonEmptyInterest();
-                if (interestName==null) {
-                    return null;
-                }
-                    // show notification
-                    //--
-                    title = "We know you like "+interestName.topicName;
+            MyEventsRequest.TopicEvents interestName = new MyInterestEventsRequest(
+                    getApplicationContext(),
+                    new EventsContext(city.cityBounds.getCenter(), ""),
+                    Request.Priority.HIGH,
+                    null, false, true, null, null).getNonEmptyInterest();
+            if (interestName == null) {
+                return null;
+            }
+            // show notification
+            //--
+            title = "We know you like " + interestName.topicName;
 
-                    String interestCount = getInterestCount(interestName.events.size());
-                    message = "So we thought of you. Explore "+ interestCount +" experiences happening this week.";
+            String interestCount = getInterestCount(interestName.events.size());
+            message = "So we thought of you. Explore " + interestCount + " experiences happening this week.";
+            Intent intent = new Intent(this, LaunchActivity.class);
+            intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, EventsHighEndpoints.QUERY_MY_EVENT);
+            intent.putExtra(MeFragment.TAB_PARAM, MeFragment.MY_INTEREST_EVENTS);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-                    Intent intent = new Intent(this, LaunchActivity.class);
-                    intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, EventsHighEndpoints.QUERY_MY_EVENT);
-                    intent.setAction(BaseActivity.NOTIFICATION_ACTION);
-                    contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-        }else if(personalizeInterest != null){
+        } else if (personalizeInterest != null) {
             Intent intent = new Intent(this, SelectInterestsActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
-            intent.putExtra(SelectInterestsActivity.FROM_NOTIFICATION_PARAM,true);
+            intent.putExtra(SelectInterestsActivity.FROM_NOTIFICATION_PARAM, true);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        }else if(referEarn != null){
+        } else if (referEarn != null) {
             Intent intent = new Intent(this, ReferralActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
-            intent.putExtra(ReferralActivity.FROM_NOTIFICATION_PARAM,true);
+            intent.putExtra(ReferralActivity.FROM_NOTIFICATION_PARAM, true);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        } else if(special !=null){
+        } else if (special != null) {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + "specials");
             intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, new EventsContext(null, "eventshigh specials"));
             intent.putExtra("special_obj", SocialInvitationsRequest.SpecialCoupons.parseJson(special));
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
             QueryNotificationStreamItem.record(this, title, message, imageUrl, mobileNo, "eventshigh specials");
-        }else{
+        } else if (pointsBreakdown != null) {
+            Intent intent = new Intent(this, PointsBreakdownActivity.class);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+            intent.putExtra(PointsBreakdownActivity.FROM_NOTIFICATION_PARAM, true);
+            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        } else {
             Intent intent = new Intent(this,
-                contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
+                    contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + title);
             intent.setData(Uri.parse(contestUrl));
             intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);
@@ -202,11 +216,11 @@ public class EHGcmListenerService extends GcmListenerService {
     }
 
 
-    public String getInterestCount(int count){
-        if( count < 5 || count % 5 == 0 ){
-            return count+"";
-        }else{
-            return count-(count%5)+"+";
+    public String getInterestCount(int count) {
+        if (count < 5 || count % 5 == 0) {
+            return count + "";
+        } else {
+            return count - (count % 5) + "+";
         }
     }
 
@@ -224,5 +238,17 @@ public class EHGcmListenerService extends GcmListenerService {
         intent.setAction(BaseActivity.NOTIFICATION_ACTION);
         intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
         return PendingIntent.getActivity(context, 0, intent, 0);
+    }
+
+    @Override
+    public void onMessageSent(String msgId) {
+        super.onMessageSent(msgId);
+        Log.i("Message sent", msgId);
+    }
+
+    @Override
+    public void onSendError(String msgId, String error) {
+        super.onSendError(msgId, error);
+        Log.i("Message Error", msgId);
     }
 }

@@ -45,9 +45,12 @@ public class EventsHighEndpoints {
     private static final String API_TAGS_SUGGEST_URL =
             "https://assets.eventshigh.com/autocomplete/autocomplete_tags.json";
 
-    private static final String API_ENDPOINT_OFFERS_FORMAT = "http://ehapi.westus.cloudapp.azure.com/"+"api/get_offers/%s";
+    private static final String API_ENDPOINT_OFFERS_FORMAT = API_URI_BASE+"api/get_offers/%s";
+
+    private static final String API_ENDPOINT_NOTIFICATIONS_FORMAT = API_URI_BASE+"api/get_latest_alerts/%s";
 
     public static final String QUERY_MY_EVENT = "my events";
+    public static final String QUERY_MY_INTEREST_EVENTS = "my_interest_events";
     public static final String QUERY_FEATURED = "editor's picks";
 
     public static Uri getEventDetailsURI(Event event) {
@@ -160,6 +163,10 @@ public class EventsHighEndpoints {
         return String.format(API_ENDPOINT_OFFERS_FORMAT, cityName);
     }
 
+    public static String getApiEndPointForAlerts(String cityName){
+        return String.format(API_ENDPOINT_NOTIFICATIONS_FORMAT,cityName);
+    }
+
     public static String getApiEndpointEventUber(String eventId) {
         return String.format(API_ENDPOINT_EVENT_UBER_FORMAT, eventId);
     }
@@ -191,6 +198,9 @@ public class EventsHighEndpoints {
 
     public static boolean isMyEventQuery(String query) {
         return query.equalsIgnoreCase(QUERY_MY_EVENT);
+    }
+    public static boolean isMyInterestEventQuery(String query) {
+        return query.equalsIgnoreCase(QUERY_MY_INTEREST_EVENTS);
     }
 
     public static boolean isFeaturedEventQuery(String query) {

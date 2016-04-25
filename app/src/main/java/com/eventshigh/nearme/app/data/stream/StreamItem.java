@@ -24,6 +24,7 @@ public abstract class StreamItem {
     @Nullable public final String imgUrl;
     @Nullable public final String mobileNo;
 
+
     protected StreamItem(long timestamp, String title, String message, @Nullable String imgUrl,
             @Nullable String mobileNo) {
         this.timestamp = timestamp;
@@ -32,6 +33,8 @@ public abstract class StreamItem {
         this.imgUrl = imgUrl;
         this.mobileNo = mobileNo;
     }
+
+
 
     protected StreamItem(long timestamp, JSONObject json) throws JSONException {
         this(timestamp, json.getString(TITLE_KEY), json.getString(MESSAGE_KEY),

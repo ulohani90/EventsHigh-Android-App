@@ -18,12 +18,14 @@ import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation
 import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
+import com.eventshigh.nearme.app.network.MyPointsBreakdownRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView.SpanAllColumnLookup;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -85,7 +87,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
             dataToShow.add(new OfferData(offer,activity,totalPoints));
         }
         if(totalPoints!=0) {
-            dataToShow.add(0, new TotalPointsHeaderData(totalPoints, activity,false));
+            dataToShow.add(0, new TotalPointsHeaderData(totalPoints, activity,false,true));
         }
         notifyDataSetChanged();
     }
@@ -98,7 +100,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
             dataToShow.add(new PointsData(point,activity));
         }
 
-        dataToShow.add(new TotalPointsHeaderData(totalPoints,activity,true ));
+        dataToShow.add(new TotalPointsHeaderData(totalPoints, activity, true,false));
 
         notifyDataSetChanged();
     }
@@ -127,6 +129,16 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         }
 
         notifyDataSetChanged();
+    }
+
+    public void addPointsBreakDown(MyPointsBreakdownRequest.PointBreakdownBaseObj objs){
+        dataToShow.clear();
+        for(MyPointsBreakdownRequest.PointBreakDown obj:objs.points){
+            dataToShow.add(new PointBreakdownData(obj,activity));
+        }
+        dataToShow.add(0,new TotalPointsHeaderData(objs.totalPoints, activity, false,false));
+        notifyDataSetChanged();
+
     }
 
     public void setExploreCategories(@Nullable EventCollection eventCollection,

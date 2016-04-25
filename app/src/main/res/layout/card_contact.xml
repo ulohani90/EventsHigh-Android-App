@@ -12,6 +12,7 @@
         android:layout_height="48dp"
         android:layout_marginEnd="16dp"
         tools:src="@drawable/ic_launcher"
+
         tools:ignore="ContentDescription"
     />
 

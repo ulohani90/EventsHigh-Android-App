@@ -31,7 +31,6 @@ public class OffersRequest extends JsonRequest<OffersRequest.OffersPointsObject>
 
 
 
-
     public static class OffersPointsObject{
         public final ArrayList<OfferObject> offers;
 

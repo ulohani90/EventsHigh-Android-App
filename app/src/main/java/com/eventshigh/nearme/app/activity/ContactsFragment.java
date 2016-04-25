@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
@@ -22,6 +23,7 @@ import com.eventshigh.nearme.app.ui.AskForContactsDialog.ContactsRequestCallback
 import com.eventshigh.nearme.app.ui.adapter.ContactsAdapter;
 import com.eventshigh.nearme.app.ui.adapter.ContactsAdapter.FriendCardType;
 import com.eventshigh.nearme.app.user.Preferences;
+import com.eventshigh.nearme.app.user.UserContactsUploader;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 import java.util.List;
@@ -41,6 +43,10 @@ public class ContactsFragment extends Fragment {
     private ContactsAdapter contactsAdapter;
 
     private boolean hasAskForContactsDialogShown = false;
+
+    private View uploadContact;
+
+    private TextView uploadContactsBtn;
 
     @Override
     public void onAttach(Context context) {
@@ -66,6 +72,9 @@ public class ContactsFragment extends Fragment {
         noFriendsOnEhView = view.findViewById(R.id.view_no_friends_on_eh);
         retryView = view.findViewById(R.id.view_retry);
         View inviteButtonView = view.findViewById(R.id.invite_button);
+
+        uploadContact = view.findViewById(R.id.view_upload_contacts);
+        uploadContactsBtn = (TextView)view.findViewById(R.id.upload_contacts_btn);
 
         // Setup the refresh on swipe down.
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
@@ -96,6 +105,12 @@ public class ContactsFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        refresh(false);
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         VolleyHelper.getRequestQueue(activity).cancelAll(this);
@@ -104,23 +119,37 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
         refresh(false);
     }
 
     private void refresh(boolean shouldBypassCache) {
-        topProgressBar.setVisibility(View.VISIBLE);
-        retryView.setVisibility(View.GONE);
-        noFriendsOnEhView.setVisibility(View.INVISIBLE);
+
         VolleyHelper.getRequestQueue(activity).cancelAll(this);
 
         Preferences preferences = Preferences.getInstance(activity);
         if (preferences.canUploadContacts()) {
+            topProgressBar.setVisibility(View.VISIBLE);
+            retryView.setVisibility(View.GONE);
+            noFriendsOnEhView.setVisibility(View.INVISIBLE);
+            uploadContact.setVisibility(View.GONE);
             MyContactsRequest.submit(activity, Priority.IMMEDIATE, this, shouldBypassCache,
                 myContactsListener, errorListener);
         } else if (!hasAskForContactsDialogShown) {
+            topProgressBar.setVisibility(View.GONE);
+            retryView.setVisibility(View.GONE);
+            noFriendsOnEhView.setVisibility(View.INVISIBLE);
             hasAskForContactsDialogShown = true;
-            AskForContactsDialog.show(activity, preferences, contactsRequestCallback);
+            uploadContact.setVisibility(View.VISIBLE);
+            uploadContactsBtn.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.reportActionToAnalytics("uploadContactsAccepted");
+                    Preferences.getInstance(getActivity()).setCanUploadContacts(true);
+                    new UserContactsUploader(activity).uploadContacts();
+
+                }
+            });
+           // AskForContactsDialog.show(activity, preferences, contactsRequestCallback);
         }
     }
 

@@ -63,7 +63,22 @@ public class OfferCard extends RecyclerView.ViewHolder {
                 .into(offerBg);
         offerTitle.setText(offer.name);
         offerDesc.setText(offer.desc);
-        callToAction.setText(offer.actionButtonText);
+        if(offer.callToAction.equalsIgnoreCase("offer_redeem")){
+            if(activity.isOfferActed(offer.id)){
+                callToAction.setText("Already Redeemed");
+            }else{
+                callToAction.setText(offer.actionButtonText);
+            }
+        }else if(offer.callToAction.equalsIgnoreCase("offer_signup")){
+            if(activity.isOfferActed(offer.id)){
+                callToAction.setText("Already Signed up");
+            }else{
+                callToAction.setText(offer.actionButtonText);
+            }
+        }else{
+            callToAction.setText(offer.actionButtonText);
+        }
+
         if (offer.validTill > 0) {
             offerTime.setVisibility(View.VISIBLE);
             offerTime.setText(DateTimeUtils.getRemainingTime(offer.validTill));
@@ -75,12 +90,38 @@ public class OfferCard extends RecyclerView.ViewHolder {
             public void onClick(View v) {
                 activity.reportActionToAnalytics("offerclicked", offer.name);
                 if (offer.callToAction.equalsIgnoreCase("offer_redeem")) {
-                    if (isValidToUseCoupon(offer.vouchers, totalPoints)) {
-                        // activity.showRedeemCouponActivity(offer, totalPoints);
+                    if(activity.isOfferActed(offer.id)){
+                        activity.showMessage("You have already redeemed this offer.");
+                    }else {
+                        if (isValidToUseCoupon(offer.vouchers, totalPoints)) {
+                            // activity.showRedeemCouponActivity(offer, totalPoints);
 
-                        Intent intent = new Intent(activity, RedeemCouponActivity.class);
+                            Intent intent = new Intent(activity, RedeemCouponActivity.class);
+                            intent.putExtra("offer", offer);
+                            intent.putExtra("total_points", totalPoints);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                ActivityOptionsCompat options = ActivityOptionsCompat.
+                                        makeSceneTransitionAnimation(activity, offerBg, activity.getString(R.string.activity_image_trans));
+
+                                activity.startActivity(intent, options.toBundle());
+                            } else {
+                                activity.startActivity(intent);
+                            }
+
+
+                        } else {
+                            activity.showMessage("You don't have enough points to claim this offer");
+
+                        }
+                    }
+
+                } else if (offer.callToAction.equalsIgnoreCase("offer_signup")) {
+                    // activity.showOfferSignUpActivity(offer);
+                    if(activity.isOfferActed(offer.id)){
+                        activity.showMessage("You have already signed up for this offer.");
+                    }else {
+                        Intent intent = new Intent(activity, OfferSignUpActivity.class);
                         intent.putExtra("offer", offer);
-                        intent.putExtra("total_points", totalPoints);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             ActivityOptionsCompat options = ActivityOptionsCompat.
                                     makeSceneTransitionAnimation(activity, offerBg, activity.getString(R.string.activity_image_trans));
@@ -89,24 +130,6 @@ public class OfferCard extends RecyclerView.ViewHolder {
                         } else {
                             activity.startActivity(intent);
                         }
-
-
-                    } else {
-                        activity.showMessage("You don't have enough points to claim this offer");
-
-                    }
-
-                } else if (offer.callToAction.equalsIgnoreCase("offer_signup")) {
-                    // activity.showOfferSignUpActivity(offer);
-                    Intent intent = new Intent(activity, OfferSignUpActivity.class);
-                    intent.putExtra("offer", offer);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        ActivityOptionsCompat options = ActivityOptionsCompat.
-                                makeSceneTransitionAnimation(activity, offerBg, activity.getString(R.string.activity_image_trans));
-
-                        activity.startActivity(intent, options.toBundle());
-                    } else {
-                        activity.startActivity(intent);
                     }
                     // activity.overridePendingTransition(R.anim.animate_bottom_up, R.anim.stay);
                 } else if(offer.callToAction.startsWith("br")){

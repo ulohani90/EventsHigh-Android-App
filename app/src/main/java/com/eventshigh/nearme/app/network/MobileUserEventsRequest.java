@@ -11,6 +11,7 @@ import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
 
@@ -28,6 +29,7 @@ import java.util.List;
 public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.TopicEvents>> {
 
 
+    Account account;
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
@@ -74,6 +76,7 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
         this.priority = priority;
         this.includeWithoutLocation = includeWithoutLocation;
         this.mContext = context;
+        account = new Account(context);
     }
 
 
@@ -92,7 +95,7 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
 
             for(int i=0;i<eventsJsonArray.length();i++){
                 List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"),includeWithoutLocation);
-
+                account.setIsFollowing(eventsJsonArray.getJSONObject(i).getString("topic"),true);
                 MyEventsRequest.TopicEvents eventData = new MyEventsRequest.TopicEvents(eventsJsonArray.getJSONObject(i).getString("topic"),topicEvents,eventsJsonArray.getJSONObject(i).getInt("event_count"));
                 events.add(eventData);
             }
