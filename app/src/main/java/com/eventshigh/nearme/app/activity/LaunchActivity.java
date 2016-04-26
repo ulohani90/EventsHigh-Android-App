@@ -813,10 +813,6 @@ public class LaunchActivity extends BaseContextActivity {
             showActionBar();
 
             int position = tab.getPosition();
-            if (TABS.get(position).equals(MY_EVENTS_TAB) && myEventsFragment != null) {
-                myEventsFragment.onResume();
-            }
-
             viewPager.setCurrentItem(position);
 
         }

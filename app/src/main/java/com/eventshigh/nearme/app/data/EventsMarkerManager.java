@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.util.Pair;
 
 import com.eventshigh.nearme.app.user.UserActionHelper;
+import com.eventshigh.nearme.app.utils.AlarmUtils;
 
 import java.io.Closeable;
 import java.util.ArrayList;
@@ -85,6 +86,7 @@ public class EventsMarkerManager {
             } else {
                 eventMarkMap.put(event.id, mark);
                 if (EventMark.isFavourite(mark)) {
+                    AlarmUtils.setEventAlarm(context, event);
                     new UserActionHelper(context).recordAction(
                             UserActionHelper.EventAction.ADD_FAVORITE, event.id);
                 }

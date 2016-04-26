@@ -40,8 +40,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     private final Map<String, Integer> eventIdToItemIdMap = Utils.getMap();
     private final Set<Integer> usedItemIds = new HashSet<>();
     private List<AdapterData> dataToShow;
-    @Nullable private SocialActions socialActions;
-    @Nullable private Map<String, SocialInvite> socialInvites;
+    @Nullable
+    private SocialActions socialActions;
+    @Nullable
+    private Map<String, SocialInvite> socialInvites;
 
     OnEditClickListener mListener;
 
@@ -67,7 +69,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     public void setEvents(List<Event> events, @Nullable String categoryForSeeAll,
                           boolean showEhInviteForNotification) {
         dataToShow.clear();
-        for (Event event: events) {
+        for (Event event : events) {
             dataToShow.add(new EventData("", event, false, activity, this));
         }
         if (categoryForSeeAll != null) {
@@ -81,26 +83,24 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
 
-    public void setOffers(ArrayList<OfferObject> offers,long totalPoints){
+    public void setOffers(ArrayList<OfferObject> offers, long totalPoints) {
         dataToShow.clear();
-        for(OfferObject offer:offers){
-            dataToShow.add(new OfferData(offer,activity,totalPoints));
+        for (OfferObject offer : offers) {
+            dataToShow.add(new OfferData(offer, activity, totalPoints));
         }
-        if(totalPoints!=0) {
-            dataToShow.add(0, new TotalPointsHeaderData(totalPoints, activity,false,true));
-        }
+        dataToShow.add(0, new TotalPointsHeaderData(totalPoints, activity, false, true,false));
         notifyDataSetChanged();
     }
 
-    public void setPoints(ArrayList<PointsObject> points){
+    public void setPoints(ArrayList<PointsObject> points) {
         dataToShow.clear();
         int totalPoints = 0;
-        for(PointsObject point:points){
+        for (PointsObject point : points) {
             totalPoints += point.points;
-            dataToShow.add(new PointsData(point,activity));
+            dataToShow.add(new PointsData(point, activity));
         }
 
-        dataToShow.add(new TotalPointsHeaderData(totalPoints, activity, true,false));
+        dataToShow.add(new TotalPointsHeaderData(totalPoints, activity, true, false,false));
 
         notifyDataSetChanged();
     }
@@ -131,18 +131,18 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
-    public void addPointsBreakDown(MyPointsBreakdownRequest.PointBreakdownBaseObj objs){
+    public void addPointsBreakDown(MyPointsBreakdownRequest.PointBreakdownBaseObj objs) {
         dataToShow.clear();
-        for(MyPointsBreakdownRequest.PointBreakDown obj:objs.points){
-            dataToShow.add(new PointBreakdownData(obj,activity));
+        for (MyPointsBreakdownRequest.PointBreakDown obj : objs.points) {
+            dataToShow.add(new PointBreakdownData(obj, activity));
         }
-        dataToShow.add(0,new TotalPointsHeaderData(objs.totalPoints, activity, false,false));
+        dataToShow.add(0, new TotalPointsHeaderData(objs.totalPoints, activity, false, false,true));
         notifyDataSetChanged();
 
     }
 
     public void setExploreCategories(@Nullable EventCollection eventCollection,
-            List<Locality> localities, String[] tags) {
+                                     List<Locality> localities, String[] tags) {
         dataToShow.clear();
 
         if (eventCollection != null) {
@@ -159,9 +159,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         }
 
         if (!localities.isEmpty()) {
-            dataToShow.add(new SmallHeaderData(activity , activity.getString(R.string.ui_browse_loc),true,0));
-            for (int i=0;i<localities.size();i++) {
-                dataToShow.add(new LocalityData(localities.get(i),activity,getMaterialColor(i)));
+            dataToShow.add(new SmallHeaderData(activity, activity.getString(R.string.ui_browse_loc), true, 0));
+            for (int i = 0; i < localities.size(); i++) {
+                dataToShow.add(new LocalityData(localities.get(i), activity, getMaterialColor(i)));
             }
         }
 
@@ -173,9 +173,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
     public int getMaterialColor(int i) {
-        switch(i){
+        switch (i) {
             case 0:
-            return R.color.material_color_orange;
+                return R.color.material_color_orange;
             case 1:
                 return R.color.material_color_pink;
             case 2:
@@ -191,20 +191,20 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         return R.color.material_color_green;
     }
 
-    public void addEventInvitations(List<EventInvitation> invites,List<SocialInvitationsRequest.SpecialCoupons> specials) {
+    public void addEventInvitations(List<EventInvitation> invites, List<SocialInvitationsRequest.SpecialCoupons> specials) {
         int pos = dataToShow.get(0).getType() == DataType.EVENT_PAGER ? 1 : 0;
 
 
-        for(SocialInvitationsRequest.SpecialCoupons special: specials){
+        for (SocialInvitationsRequest.SpecialCoupons special : specials) {
             dataToShow.add(pos, new EventInvitationData(special, activity));
         }
-        if (! specials.isEmpty()) {
+        if (!specials.isEmpty()) {
             dataToShow.add(pos, new SmallHeaderData("Specials"));
         }
         for (EventInvitation invite : invites) {
             dataToShow.add(pos, new EventInvitationData(invite, activity));
         }
-        if (! invites.isEmpty()) {
+        if (!invites.isEmpty()) {
             dataToShow.add(pos, new SmallHeaderData("Invitations"));
         }
 
@@ -212,17 +212,21 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
-    public void addFollowCard(String title, int numEvents, int numFollowers,SocialInvitationsRequest.SpecialCoupons coupon) {
-        dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity, this,coupon));
+    public void addFollowCard(String title, int numEvents, int numFollowers, SocialInvitationsRequest.SpecialCoupons coupon) {
+        dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity, this, coupon));
     }
 
     @Override
-    public @Nullable Set<SocialFriend> getFollowers(String tag) {
+    public
+    @Nullable
+    Set<SocialFriend> getFollowers(String tag) {
         return socialActions == null ? null : socialActions.getTagFollowers(tag);
     }
 
     @Override
-    public @Nullable SocialInvite getSocialInvite(String eventId) {
+    public
+    @Nullable
+    SocialInvite getSocialInvite(String eventId) {
         return socialInvites == null ? null : socialInvites.get(eventId);
     }
 
@@ -244,9 +248,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     @Override
     public void onBindViewHolder(ViewHolder card, int position) {
         if (card instanceof SmallHeaderCard) {
-            ((SmallHeaderData)dataToShow.get(position)).onBindViewHolder(card, position, mListener);
-        }else if(card instanceof EventCard){
-            ((EventData)dataToShow.get(position)).onBindViewHolder(card, position, pListener);
+            ((SmallHeaderData) dataToShow.get(position)).onBindViewHolder(card, position, mListener);
+        } else if (card instanceof EventCard) {
+            ((EventData) dataToShow.get(position)).onBindViewHolder(card, position, pListener);
         } else {
             dataToShow.get(position).onBindViewHolder(card, position);
         }
@@ -276,27 +280,27 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         }
     }
 
-    public void clear(){
+    public void clear() {
         dataToShow.clear();
         notifyDataSetChanged();
     }
 
-    public void setOnEditClickListener(OnEditClickListener listener){
+    public void setOnEditClickListener(OnEditClickListener listener) {
         this.mListener = listener;
 
     }
 
-    public void setOnItemClickedListener(OnItemClickedListener listener){
-            this.pListener = listener;
+    public void setOnItemClickedListener(OnItemClickedListener listener) {
+        this.pListener = listener;
     }
 
 
-    public interface OnEditClickListener{
+    public interface OnEditClickListener {
         void onEditcliked();
     }
 
 
-    public interface OnItemClickedListener{
+    public interface OnItemClickedListener {
         void onItemClicked(int pos);
     }
 }

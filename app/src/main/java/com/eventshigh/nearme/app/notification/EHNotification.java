@@ -5,19 +5,28 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.WakefulBroadcastReceiver;
+import android.text.format.DateUtils;
 import android.widget.ImageView.ScaleType;
 
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.EventDetailActivity;
+import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.UserContact;
+import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.Utils;
 
@@ -40,10 +49,39 @@ public class EHNotification {
     public final int notificationId;
     public final int priority;
 
-    public final @Nullable UserContact contact;
+    public final Intent wakefulIntent;
+
+    public final
+    @Nullable
+    UserContact contact;
+
+
+    public EHNotification(Context context, Intent wakefulIntent, Event event, int notificationId) {
+        this.context = context;
+        this.wakefulIntent = wakefulIntent;
+        this.notificationId = notificationId;
+        this.priority = Notification.PRIORITY_HIGH;
+
+        title = event.title;
+        CharSequence relativeTime = DateUtils.getRelativeDateTimeString(
+                context, event.eventTimings[0],
+                DateUtils.DAY_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0);
+        message = String.format(
+                context.getResources().getString(R.string.event_time_venue),
+                relativeTime, event.getShortAddress());
+        imageUrl = event.imgUrl;
+
+        launchIntent = createPendingIntent(context, event.id, event.city);
+        contact = null;
+
+        // Record notification in stream.
+        EventNotificationStreamItem.record(context, title, message, imageUrl, null, event.id,
+                event.city);
+    }
+
 
     public EHNotification(Context context, String title, String message, String imageUrl,
-            PendingIntent launchIntent, int priority, @Nullable UserContact contact) {
+                          PendingIntent launchIntent, int priority, @Nullable UserContact contact) {
         this.context = context;
         this.notificationId = contact == null ? GCM_NOTIFICATION_ID : contact.mobileNo.hashCode();
         this.priority = priority;
@@ -53,7 +91,10 @@ public class EHNotification {
         this.imageUrl = imageUrl;
         this.launchIntent = launchIntent;
         this.contact = contact;
+
+        this.wakefulIntent = null;
     }
+
 
     public void showNotification() {
         // Submit the image request to Volley.
@@ -79,6 +120,9 @@ public class EHNotification {
         GAHelper.getInstance(context).reportActionToAnalytics("background", "notificationShown",
                 title);
         notificationManager.notify(notificationId, createNotification(bitmap));
+
+        if (wakefulIntent != null)
+            WakefulBroadcastReceiver.completeWakefulIntent(wakefulIntent);
     }
 
     @SuppressLint("InlinedApi")
@@ -118,5 +162,18 @@ public class EHNotification {
         }
 
         return builder.build();
+    }
+
+
+    public static PendingIntent createPendingIntent(Context context, String eventId,
+                                                    @Nullable City city) {
+        if (city == null) {
+            // placeholder for city.
+            city = City.BANGALORE;
+        }
+        Intent intent = new Intent(context, EventDetailActivity.class);
+        intent.setAction(BaseActivity.NOTIFICATION_ACTION);
+        intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
+        return PendingIntent.getActivity(context, 0, intent, 0);
     }
 }

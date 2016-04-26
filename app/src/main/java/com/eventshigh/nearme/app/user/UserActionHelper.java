@@ -57,6 +57,7 @@ public class UserActionHelper {
             if(eventTitle!=null){
                 jsonObject.put("event_title",eventTitle);
             }
+            recordServerUserAction(EventAction.SHARE.name().toLowerCase(),jsonObject);
             recordAction(EventAction.SHARE.name().toLowerCase(), jsonObject.toString());
         } catch (JSONException e) {
             Crashlytics.getInstance().core.logException(e);
@@ -67,6 +68,7 @@ public class UserActionHelper {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(JSON_KEY_EVENT_ID, eventId);
+            recordServerUserAction(action.name().toString(),jsonObject);
             recordAction(action.name().toLowerCase(), jsonObject.toString());
         } catch (JSONException e) {
             Crashlytics.getInstance().core.logException(e);
@@ -77,6 +79,7 @@ public class UserActionHelper {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(JSON_KEY_INTEREST, interest);
+            recordServerUserAction(action.name().toString(),jsonObject);
             recordAction(action.name().toLowerCase(), jsonObject.toString());
         } catch (JSONException e) {
             Crashlytics.getInstance().core.logException(e);
@@ -84,16 +87,20 @@ public class UserActionHelper {
     }
 
     private void recordAction(final String action, final String data) {
-        recordAction(action, data, System.currentTimeMillis());
+        //recordAction(action, data, System.currentTimeMillis());
+
+    }
+
+    public void recordServerUserAction(String action,JSONObject data){
         RecordUserAction.submit(context, action, data, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject jsonObject, boolean b) {
-
+                Log.i("Message Success","true");
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-
+                Log.i("Message failure","true");
             }
         });
     }

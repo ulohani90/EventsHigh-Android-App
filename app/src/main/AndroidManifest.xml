@@ -444,6 +444,10 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
+        <!-- Receives the alarm broadcast messages, which is used for notification -->
+        <receiver android:name=".broadcast.EventAlarmBroadcastReceiver" />
+
+        <service android:name=".broadcast.EventNotificationIntentService" />
 
         <!-- Service to upload the account information to our servers -->
         <service

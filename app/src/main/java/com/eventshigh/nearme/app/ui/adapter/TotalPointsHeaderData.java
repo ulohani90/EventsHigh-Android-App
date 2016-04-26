@@ -13,13 +13,15 @@ public class TotalPointsHeaderData implements AdapterData {
     private final BaseContextActivity activity;
     final boolean showMessage;
     final boolean showCallToAction;
+    boolean showBreakdown;
 
 
-    public TotalPointsHeaderData(long totalPoints, BaseContextActivity activity,boolean showMessage,boolean showCallToAction) {
+    public TotalPointsHeaderData(long totalPoints, BaseContextActivity activity,boolean showMessage,boolean showCallToAction,boolean showBreakdown) {
         this.totalPoints = totalPoints;
         this.activity = activity;
         this.showMessage = showMessage;
         this.showCallToAction = showCallToAction;
+        this.showBreakdown = showBreakdown;
     }
 
     @Override
@@ -29,7 +31,7 @@ public class TotalPointsHeaderData implements AdapterData {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder card, int position) {
-        ((TotalPointsHeaderCard) card).bindTotalPointView(totalPoints, activity,showMessage,showCallToAction);
+        ((TotalPointsHeaderCard) card).bindTotalPointView(totalPoints, activity,showMessage,showCallToAction,showBreakdown);
     }
 
     @Override

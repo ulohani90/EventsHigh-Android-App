@@ -42,7 +42,7 @@ public class TotalPointsHeaderCard extends RecyclerView.ViewHolder{
         clickDesc = (TextView)itemView.findViewById(R.id.click_desc);
     }
 
-    public void bindTotalPointView(long totalPoints , final BaseContextActivity activity ,boolean showMessage,boolean showCallToAction ){
+    public void bindTotalPointView(long totalPoints , final BaseContextActivity activity ,boolean showMessage,boolean showCallToAction,boolean showBreakdown ){
         if(showMessage){
             walletLayout.setVisibility(View.GONE);
             messageLayout.setVisibility(View.VISIBLE);
@@ -59,14 +59,28 @@ public class TotalPointsHeaderCard extends RecyclerView.ViewHolder{
 
         }else {
             walletLayout.setVisibility(View.VISIBLE);
-            messageLayout.setVisibility(View.GONE);
+            if(showBreakdown){
+                messageLayout.setVisibility(View.VISIBLE);
+                SpannableString content = new SpannableString("Contact us");
+                content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                contactUs.setText(content);
+                contactUs.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(activity, FeedbackActivity.class);
+                        activity.startActivity(intent);
+                    }
+                });
+            }else {
+                messageLayout.setVisibility(View.GONE);
+            }
             pointsCount.setText(totalPoints + " points");
+
             if(showCallToAction){
             walletLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(activity, PointsBreakdownActivity.class);
-
                     activity.startActivity(intent);
                 }
             });

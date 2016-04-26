@@ -29,7 +29,7 @@ public class PointsCard extends RecyclerView.ViewHolder{
     public final TextView pointDesc;
     public final TextView pointActionButton;
     public final TextView pointTextImage;
-    boolean isDescShown;
+
     public PointsCard(View itemView) {
         super(itemView);
         pointCharacter = (ImageView)itemView.findViewById(R.id.point_character);
@@ -56,7 +56,7 @@ public class PointsCard extends RecyclerView.ViewHolder{
             pointTextImage.setVisibility(View.GONE);
         }else if(obj.pName.equalsIgnoreCase("Share an event")){
             pointCharacter.setVisibility(View.VISIBLE);
-            resourceId = R.drawable.ic_fb_action;
+            resourceId = R.drawable.ic_share_action;
             pointTextImage.setVisibility(View.GONE);
         }else if(obj.pName.equalsIgnoreCase("Refer & Earn")){
             pointCharacter.setVisibility(View.VISIBLE);

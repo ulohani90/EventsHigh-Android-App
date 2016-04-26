@@ -119,7 +119,7 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        refresh(false);
+       // refresh(false);
     }
 
     private void refresh(boolean shouldBypassCache) {
@@ -134,7 +134,7 @@ public class ContactsFragment extends Fragment {
             uploadContact.setVisibility(View.GONE);
             MyContactsRequest.submit(activity, Priority.IMMEDIATE, this, shouldBypassCache,
                 myContactsListener, errorListener);
-        } else if (!hasAskForContactsDialogShown) {
+        } else {
             topProgressBar.setVisibility(View.GONE);
             retryView.setVisibility(View.GONE);
             noFriendsOnEhView.setVisibility(View.INVISIBLE);

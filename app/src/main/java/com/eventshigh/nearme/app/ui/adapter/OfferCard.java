@@ -90,9 +90,7 @@ public class OfferCard extends RecyclerView.ViewHolder {
             public void onClick(View v) {
                 activity.reportActionToAnalytics("offerclicked", offer.name);
                 if (offer.callToAction.equalsIgnoreCase("offer_redeem")) {
-                    if(activity.isOfferActed(offer.id)){
-                        activity.showMessage("You have already redeemed this offer.");
-                    }else {
+
                         if (isValidToUseCoupon(offer.vouchers, totalPoints)) {
                             // activity.showRedeemCouponActivity(offer, totalPoints);
 
@@ -113,7 +111,7 @@ public class OfferCard extends RecyclerView.ViewHolder {
                             activity.showMessage("You don't have enough points to claim this offer");
 
                         }
-                    }
+
 
                 } else if (offer.callToAction.equalsIgnoreCase("offer_signup")) {
                     // activity.showOfferSignUpActivity(offer);
