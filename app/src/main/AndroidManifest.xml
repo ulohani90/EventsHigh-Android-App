@@ -328,6 +328,7 @@
             </intent-filter>
         </receiver>
 
+
         <!-- Service to upload the account information to our servers -->
         <service
             android:name=".broadcast.UpdateAccountInfoService"

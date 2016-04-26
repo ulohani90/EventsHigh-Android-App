@@ -223,7 +223,7 @@ public class RedeemCouponActivity extends BaseActivity {
                                     @Override
                                     public void onResponse(JSONObject s, boolean isIntermediate) {
 
-                                        updatePreferencesForOffer();
+                                       // updatePreferencesForOffer();
                                         if (progressDialog != null) {
                                             progressDialog.dismiss();
                                         }
