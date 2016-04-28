@@ -9,7 +9,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
-import com.eventshigh.nearme.app.data.UserContact;
+
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.Signer;
@@ -40,8 +40,8 @@ public class RecordUserAction extends JsonObjectRequest {
             actionObj.put(UserActionHelper.JSON_KEY_TIMESTAMP, Long.toString(System.currentTimeMillis()));
             actionObj.put(UserActionHelper.JSON_KEY_ACTION, action);
             actionObj.put(UserActionHelper.JSON_KEY_DATA, data);
-            actionObj.put("lat", new Account(context).getLastCity().cityBounds.getCenter().latitude);
-            actionObj.put("lon", new Account(context).getLastCity().cityBounds.getCenter().longitude);
+            actionObj.put("lat", 0);
+            actionObj.put("lon", 0);
 
             actions.put(actionObj);
 

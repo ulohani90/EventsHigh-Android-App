@@ -14,6 +14,7 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 
 import com.eventshigh.nearme.app.activity.PointsBreakdownActivity;
+import com.eventshigh.nearme.app.activity.SettingsActivity;
 
 
 /**
@@ -49,9 +50,17 @@ public class TotalPointsHeaderCard extends RecyclerView.ViewHolder{
             messageLayout.setVisibility(View.VISIBLE);
             SpannableString content = new SpannableString("Contact us");
             content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-            contactUs.setVisibility(View.GONE);
+            contactUs.setVisibility(View.VISIBLE);
+            contactUs.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
 
+                    Intent intent = new Intent(activity, SettingsActivity.class);
+                    intent.setAction("contact_support");
+                    activity.startActivity(intent);
+                }
+            });
         }else {
             walletLayout.setVisibility(View.VISIBLE);
             if(showBreakdown){
@@ -62,7 +71,10 @@ public class TotalPointsHeaderCard extends RecyclerView.ViewHolder{
                 contactUs.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(activity, FeedbackActivity.class);
+
+
+                        Intent intent = new Intent(activity, SettingsActivity.class);
+                        intent.setAction("contact_support");
                         activity.startActivity(intent);
                     }
                 });

@@ -303,6 +303,12 @@
             />
         </activity>
         <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/NoActionBar"
+            />
+
+        <activity
             android:name=".activity.ReferralActivity"
             android:label="@string/title_refer"
             android:launchMode="singleTask"
