@@ -37,7 +37,7 @@ public class InstallReferrer extends BroadcastReceiver {
                     Log.i("EHInstall_Referrer2", referrer2);
                 }*/
                 referrer = URLDecoder.decode(referrer, "UTF-8");
-                new Account(context).recordReferrer(referrer);
+                new Account(context).recordReferrer(referrer,false);
             } catch (UnsupportedEncodingException e) {
                 // Ignore.
                 Crashlytics.getInstance().core.logException(e);

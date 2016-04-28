@@ -137,10 +137,10 @@ public class Account {
         return userInfo.phoneNo != null && !userInfo.isVerified;
     }
 
-    public boolean recordReferrer(String referrer) {
-        if (!accountInfo.contains(PREF_REFERRER)) {
+    public boolean recordReferrer(String referrer,boolean isReceivedReferrer2) {
+        if (!accountInfo.contains(PREF_REFERRER) || isReceivedReferrer2) {
             accountInfo.edit().putString(PREF_REFERRER, referrer).apply();
-            UpdateAccountInfoService.run(context, true);
+            UpdateAccountInfoService.run(context, true,isReceivedReferrer2);
             return true;
         }
 

@@ -37,6 +37,19 @@ public class SettingsActivity extends BaseActivity {
                     Crashlytics.getInstance().core.logException(e);
                 }
             }
+            if(intent.getAction().equalsIgnoreCase("contact_support")){
+                reportActionToAnalytics("contact_support");
+
+                try {
+                    startActivity(new Intent(Intent.ACTION_SENDTO,
+                            Uri.parse("mailto:support@eventshigh.com")));
+                } catch (ActivityNotFoundException e) {
+                    // No activity to open url. ignore.
+                    Crashlytics.getInstance().core.logException(e);
+                }
+            }
+
+
         }
         finish();
     }

@@ -64,7 +64,7 @@ public class UserContactsUploader {
             // this thread waiting for the user's response! After the user
             // sees the explanation, try again to request the permission.
             Preferences preferences = Preferences.getInstance(activity);
-            AskForContactsDialog.show(activity, preferences);
+            AskForContactsDialog.show(activity,preferences);
         } else {
             // No explanation needed, we can request the permission.
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_CONTACTS},

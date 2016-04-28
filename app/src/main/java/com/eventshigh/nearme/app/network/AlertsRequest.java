@@ -11,6 +11,7 @@ import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.stream.CustomUrlNotificationStream;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.TicketNotificationStreamItem;
@@ -70,18 +71,30 @@ public class AlertsRequest extends JsonRequest<Boolean> {
                 String message = obj.getString("desc");
 
                 String imgUrl = obj.getString("img_url");
+                String query = null;
+                if (obj.has("query"))
+                    query = Utils.checkIfUnknown(obj.getString("query"));
 
+                String eid = null;
+                if (obj.has("eid"))
+                    eid = Utils.checkIfUnknown(obj.getString("eid"));
 
-                String query = Utils.checkIfUnknown(obj.getString("query"));
-                String eid = Utils.checkIfUnknown(obj.getString("eid"));
-                String ticket = Utils.checkIfUnknown(obj.getString("ticket"));
+                String ticket = null;
+                if (obj.has("ticket"))
+                    ticket = Utils.checkIfUnknown(obj.getString("ticket"));
 
-                if (query != null) {
+                String targetUrl = null;
+                if (obj.has("target_url")) {
+                    targetUrl = Utils.checkIfUnknown(obj.getString("target_url"));
+                }
+                if (eid != null) {
+                    EventNotificationStreamItem.record(context, title, message, imgUrl, null, eid, city);
+                } else if (query != null) {
                     QueryNotificationStreamItem.record(context, title, message, imgUrl, null, query);
-                } else if (eid != null) {
-                    EventNotificationStreamItem.record(context, title, message, imgUrl, null, eid,city);
-                }else if(ticket!=null){
-                    TicketNotificationStreamItem.record(context,title,message,imgUrl,ticket);
+                } else if (ticket != null) {
+                    TicketNotificationStreamItem.record(context, title, message, imgUrl, ticket);
+                } else if (targetUrl != null) {
+                    CustomUrlNotificationStream.record(context,title,message,imgUrl,null,targetUrl);
                 }
                 isDataReceived = true;
             }

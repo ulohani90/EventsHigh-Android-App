@@ -58,6 +58,12 @@ public class UpdateAccountInfoService extends IntentService {
         run(context, skipTimeCheck, new Intent(context, UpdateAccountInfoService.class));
     }
 
+    public static void run(Context context, boolean skipTimeCheck,boolean receivedReferrer2) {
+        Intent intent = new Intent(context, UpdateAccountInfoService.class);
+        intent.putExtra("received_referrer2",receivedReferrer2);
+        run(context, skipTimeCheck, intent);
+    }
+
     public static void refreshGCMToken(Context context) {
         Intent intent = new Intent(context, UpdateAccountInfoService.class);
         intent.putExtra(PARAM_REFRESH_GCM_TOKEN, true);
@@ -76,6 +82,8 @@ public class UpdateAccountInfoService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+
+
         final SharedPreferences uploadStatus = getSharedPreferences(UPLOAD_STATUS_FILENAME, 0);
 
         if ( intent!= null && intent.getBooleanExtra(PARAM_REFRESH_GCM_TOKEN, false)) {
@@ -92,10 +100,15 @@ public class UpdateAccountInfoService extends IntentService {
         }
 
         // Record referrer.
+
+        boolean isReceivedReferrer2=false;
+        if(intent!=null && intent.hasExtra("received_referrer2")){
+            isReceivedReferrer2 = intent.getBooleanExtra("received_referrer2",false);
+        }
         Account account = new Account(this);
         String referrer = account.getReferrer();
-        if (referrer != null && !uploadStatus.getBoolean(PREF_REFERRER_UPLOADED, false)) {
-            reportReferrer(referrer, uploadStatus);
+        if (referrer != null && (!uploadStatus.getBoolean(PREF_REFERRER_UPLOADED, false)|| isReceivedReferrer2)) {
+           reportReferrer(referrer, uploadStatus,isReceivedReferrer2);
         }
 
         // Upload last city.
@@ -183,9 +196,10 @@ public class UpdateAccountInfoService extends IntentService {
         }
     }
 
-    private void reportReferrer(String referrer, SharedPreferences uploadStatus) {
+    private void reportReferrer(String referrer, SharedPreferences uploadStatus,boolean isReceivedReferrer2) {
         Uri uri = getBaseUri(this, "reportReferrer")
                 .appendQueryParameter("referrer", referrer)
+                .appendQueryParameter("received_referrer2",isReceivedReferrer2?"true":"false")
                 .build();
         report(uri, uploadStatus, PREF_REFERRER_UPLOADED);
     }

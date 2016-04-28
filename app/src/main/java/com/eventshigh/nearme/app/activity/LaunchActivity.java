@@ -248,7 +248,7 @@ public class LaunchActivity extends BaseContextActivity {
             });
         }
 
-       // new InitiateBranchAsyncTask(getIntent().getData()).execute();
+        // new InitiateBranchAsyncTask(getIntent().getData()).execute();
         loadBranchInstance();
         // ReferEarnDialog.showDialog(this);
 
@@ -482,7 +482,7 @@ public class LaunchActivity extends BaseContextActivity {
     }
 
     private void showExploreScreen() {
-
+/*
         if (!(account.getLastCity() == City.BANGALORE)) {
             TABS = new ArrayList<>();
             TABS.add(MY_EVENTS_TAB);
@@ -496,7 +496,15 @@ public class LaunchActivity extends BaseContextActivity {
             TABS.add(OFFERS_TAB);
             TABS.add(THIS_WEEK_TAB);
             TABS.add(NOTIFICATIONS_TAB);
-        }
+        }*/
+
+        TABS = new ArrayList<>();
+        TABS.add(MY_EVENTS_TAB);
+        TABS.add(EXPLORE_TAB);
+        TABS.add(OFFERS_TAB);
+        TABS.add(THIS_WEEK_TAB);
+        TABS.add(NOTIFICATIONS_TAB);
+
         String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
         if (tabName != null) {
             for (int i = 0; i < TABS.size(); i++) {
@@ -515,11 +523,12 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.setTabGravity(TabLayout.GRAVITY_FILL);
         tabsView.setupWithViewPager(viewPager);
         tabsView.setScrollPosition(defaultTab, 0, true);
-        if (account.getLastCity() == City.BANGALORE) {
+        setupTabIconsWithOffer();
+       /* if (account.getLastCity() == City.BANGALORE) {
             setupTabIconsWithOffer();
         } else {
             setupTabIcons();
-        }
+        }*/
         tabsView.invalidate();
 
         tabsView.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -771,13 +780,13 @@ public class LaunchActivity extends BaseContextActivity {
                         EventsHighEndpoints.QUERY_MY_EVENT);
                 myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null);*/
                 String tabParam = "";
-                if(getIntent().hasExtra(MeFragment.TAB_PARAM)){
+                if (getIntent().hasExtra(MeFragment.TAB_PARAM)) {
                     tabParam = getIntent().getStringExtra(MeFragment.TAB_PARAM);
                 }
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_EVENT);
-                Log.i("ME_TAB_PARAMS",tabParam);
-                MeFragment fragment = MeFragment.getInstance(myEventsContext,tabParam);
+                Log.i("ME_TAB_PARAMS", tabParam);
+                MeFragment fragment = MeFragment.getInstance(myEventsContext, tabParam);
                 return fragment;
             }
 
@@ -844,7 +853,7 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
-    public class InitiateBranchAsyncTask extends AsyncTask<Void, Void, JSONObject> {
+   /* public class InitiateBranchAsyncTask extends AsyncTask<Void, Void, JSONObject> {
         Uri data;
 
 
@@ -889,8 +898,10 @@ public class LaunchActivity extends BaseContextActivity {
                                         }
 
                                         if (referringParams.has("referrer2")) {
+
                                             String referrer = referringParams.getString("referrer2");
-                                            new Account(LaunchActivity.this).recordReferrer(referrer);
+                                            Log.i("referrer2",referrer);
+                                            new Account(LaunchActivity.this).recordReferrer(referrer,true);
 
                                         }
                                         //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
@@ -914,9 +925,9 @@ public class LaunchActivity extends BaseContextActivity {
         protected void onPostExecute(JSONObject jsonObject) {
 
         }
-    }
+    }*/
 
-    public void loadBranchInstance(){
+    public void loadBranchInstance() {
         Branch branch = Branch.getInstance();
         if (branch != null)
             branch.initSession(new Branch.BranchReferralInitListener() {
@@ -953,8 +964,8 @@ public class LaunchActivity extends BaseContextActivity {
 
                                     if (referringParams.has("referrer2")) {
                                         String referrer = referringParams.getString("referrer2");
-                                        new Account(LaunchActivity.this).recordReferrer(referrer);
-
+                                        Log.i("referrer2", referrer);
+                                        new Account(LaunchActivity.this).recordReferrer(referrer, true);
                                     }
                                     //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
                                 }

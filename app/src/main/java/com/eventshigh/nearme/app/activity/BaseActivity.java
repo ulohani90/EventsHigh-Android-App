@@ -160,6 +160,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             Preferences preferences = Preferences.getInstance(this);
             if (secForShare > 5 && !preferences.canUploadContacts()) {
                 AskForContactsDialog.show(this, preferences);
+
             }
         }
         if (shareEventsInitiatedTimestamp > 0) {

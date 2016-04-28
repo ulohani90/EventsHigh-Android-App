@@ -50,7 +50,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
         }
 
         int eventIndex = position;
-        if (eventIndex > 1 && eventPagerData.showReferralOffer) {
+        if (eventIndex > 0 && eventPagerData.showReferralOffer) {
             eventIndex --;
         }
         View view = EventCard.getEventCard(eventPagerData.events.get(eventIndex),

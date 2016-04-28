@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.data.stream.CustomUrlNotificationStream;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.StreamItem;
@@ -38,7 +39,8 @@ public class StreamDbHelper extends SQLiteOpenHelper {
     public enum StreamType {
         EVENT_NOTIFICATION(1),
         QUERY_NOTIFICATION(2),
-        TICKET_NOTIFICATION(3);
+        TICKET_NOTIFICATION(3),
+        CUSTOM_URL_NOTIFICATION(4);
 
         public final int id;
 
@@ -97,6 +99,10 @@ public class StreamDbHelper extends SQLiteOpenHelper {
 
         if (type == StreamType.TICKET_NOTIFICATION.id) {
             return new TicketNotificationStreamItem(time, jsonObject);
+        }
+
+        if(type == StreamType.CUSTOM_URL_NOTIFICATION.id){
+            return new CustomUrlNotificationStream(time,jsonObject);
         }
 
         throw new IllegalArgumentException("invalid type: " + type);
