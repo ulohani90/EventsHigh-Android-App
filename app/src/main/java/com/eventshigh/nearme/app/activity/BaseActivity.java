@@ -110,6 +110,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             long secForShare = (System.currentTimeMillis() - shareEventInitiatedTimestamp) / 1000;
             reportActionToAnalytics(secForShare > 5 ? "shareEvent" : "eventShareDismissed",
                     Long.toString(secForShare));
+
         }
         if (shareEventsInitiatedTimestamp > 0) {
             long secForShare = (System.currentTimeMillis() - shareEventsInitiatedTimestamp) / 1000;

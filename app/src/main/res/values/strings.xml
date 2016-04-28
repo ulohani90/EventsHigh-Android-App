@@ -171,4 +171,6 @@
 
     <string name="points_breakdown">Points Breakdown</string>
 
+    <string name="no_current_offers">No offers in your city. Do check the app after sometime.</string>
+
 </resources>

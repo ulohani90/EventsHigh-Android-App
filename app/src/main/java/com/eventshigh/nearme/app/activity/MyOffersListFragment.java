@@ -1,13 +1,19 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -55,6 +61,9 @@ public class MyOffersListFragment extends Fragment {
 
     long walletPoints;
 
+    TextView contactus;
+    LinearLayout noOfferView;
+
 
     @Nullable
     @Override
@@ -72,6 +81,19 @@ public class MyOffersListFragment extends Fragment {
         exploreGridView.setAdapter(eventsAdapter);
         exploreGridView.addOnScrollListener(new HideActionBarOnScroll((LaunchActivity) getActivity()));
 
+        noOfferView = (LinearLayout) view.findViewById(R.id.no_offer_layout);
+        contactus = (TextView) view.findViewById(R.id.contact_us_text);
+
+        SpannableString string = new SpannableString("For any queries, Contact us");
+        string.setSpan(new UnderlineSpan(),17,string.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        contactus.setText(string);
+        contactus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), FeedbackActivity.class);
+                getActivity().startActivity(intent);
+            }
+        });
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         topProgressBar.setVisibility(View.VISIBLE);
 
@@ -148,7 +170,14 @@ public class MyOffersListFragment extends Fragment {
         @Override
         public void onResponse(OffersRequest.OffersPointsObject offersPointsObject, boolean isIntermediate) {
             topProgressBar.setVisibility(View.GONE);
-            eventsAdapter.setOffers(offersPointsObject.offers, walletPoints);
+            if (offersPointsObject.offers.size() == 0) {
+                noOfferView.setVisibility(View.VISIBLE);
+
+
+            } else {
+                noOfferView.setVisibility(View.GONE);
+                eventsAdapter.setOffers(offersPointsObject.offers, walletPoints);
+            }
         }
     };
 

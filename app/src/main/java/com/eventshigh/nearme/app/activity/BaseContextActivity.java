@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -209,6 +210,14 @@ public abstract class BaseContextActivity extends BaseActivity {
         EventsContext param = new EventsContext(eventsContext.city, eventsContext.query);
         Intent intent = new Intent(this, this.getClass())
                 .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
+        startActivity(intent);
+    }
+
+    public void showCustomUrlActivity(String contestUrl,String title){
+        Intent intent = new Intent(this,
+                contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
+        intent.setData(Uri.parse(contestUrl));
+        intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);
         startActivity(intent);
     }
 }

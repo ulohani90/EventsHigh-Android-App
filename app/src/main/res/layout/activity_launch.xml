@@ -8,7 +8,7 @@
     android:background="@color/gray200"
     tools:context=".activity.LaunchActivity"
 >
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -42,6 +42,8 @@
             android:paddingBottom="@dimen/abc_action_bar_default_height_material"
             tools:ignore="UnusedAttribute"
         />
+
+
             <android.support.design.widget.TabLayout
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"
@@ -62,18 +64,19 @@
                 tools:listitem="@android:layout/simple_list_item_1"
                 android:visibility="gone"
                 />
-            <include
-                android:id="@+id/verify_phone_container"
-                layout="@layout/view_phone_snack_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:visibility="gone"
-                />
+
         </android.support.design.widget.CoordinatorLayout>
 
-
-    </LinearLayout>
+        <include
+            android:id="@+id/verify_phone_container"
+            layout="@layout/view_phone_snack_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:visibility="visible"
+            android:layout_marginBottom="@dimen/abc_action_bar_default_height_material"
+            />
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="@dimen/event_card_width"
