@@ -90,7 +90,9 @@ public class MyOffersListFragment extends Fragment {
         contactus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), FeedbackActivity.class);
+
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                intent.setAction("contact_support");
                 getActivity().startActivity(intent);
             }
         });

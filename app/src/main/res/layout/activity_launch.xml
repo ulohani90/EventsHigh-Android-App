@@ -56,17 +56,17 @@
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 tools:ignore="UnusedAttribute"
                 />
-            <ListView
-                android:id="@+id/city_selector"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingTop="?android:attr/actionBarSize"
-                tools:listitem="@android:layout/simple_list_item_1"
-                android:visibility="gone"
-                />
+
 
         </android.support.design.widget.CoordinatorLayout>
-
+        <ListView
+            android:id="@+id/city_selector"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="?android:attr/actionBarSize"
+            tools:listitem="@android:layout/simple_list_item_1"
+            android:visibility="gone"
+            />
         <include
             android:id="@+id/verify_phone_container"
             layout="@layout/view_phone_snack_bar"

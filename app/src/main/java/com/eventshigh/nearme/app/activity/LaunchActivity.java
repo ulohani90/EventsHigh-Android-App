@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -23,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -76,7 +78,13 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String EXPLORE_TAB = "explore";
     public static final String THIS_WEEK_TAB = "this week";
     public static final String OFFERS_TAB = "Offers";
-    public ArrayList<String> TABS = new ArrayList<>();
+    public final String[] TABS = {
+            MY_EVENTS_TAB,
+            EXPLORE_TAB,
+            OFFERS_TAB,
+            THIS_WEEK_TAB,
+    };
+
 
 
     //Calculate no of time user resumes on to Home
@@ -118,18 +126,23 @@ public class LaunchActivity extends BaseContextActivity {
         // Read account status.
         account = new Account(this);
 
+
+
+
         // Process the incoming intent.
-        /*String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
+       /* String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
         if (tabName != null) {
-            for (int i = 0; i < TABS.size(); i++) {
-                if (TABS.get(i).equalsIgnoreCase(tabName)) {
+            for (int i = 0; i < TABS.length; i++) {
+                if (TABS[i].equalsIgnoreCase(tabName)) {
                     defaultTab = i;
                     break;
                 }
             }
-        }
-*/
+        }*/
+
         getIntent().getAction();
+
+
 
     }
 
@@ -184,8 +197,8 @@ public class LaunchActivity extends BaseContextActivity {
             String action = getIntent().getAction();
             if (!isTaskRoot() && (action == null || !action.startsWith(NOTIFICATION_ACTION))
                     && (getIntent().getData() == null || !getIntent().getData().getHost().equalsIgnoreCase("branch.eventshigh.com"))) {
-                finish();
-                return;
+               // finish();
+               // return;
             }
         }
 
@@ -314,6 +327,8 @@ public class LaunchActivity extends BaseContextActivity {
 
         // If we have user location, start next activity.
         if (eventsContext.city != null) {
+            tabsView.setVisibility(View.VISIBLE);
+            viewPager.setVisibility(View.VISIBLE);
             showNextScreen();
             return;
 
@@ -350,18 +365,21 @@ public class LaunchActivity extends BaseContextActivity {
 
     private void showExploreScreen() {
 
-
-        TABS = new ArrayList<>();
-        TABS.add(MY_EVENTS_TAB);
-        TABS.add(EXPLORE_TAB);
-        TABS.add(OFFERS_TAB);
-        TABS.add(THIS_WEEK_TAB);
+       /* String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
+        if (tabName != null) {
+            for (int i = 0; i < TABS.size(); i++) {
+                if (TABS.get(i).equalsIgnoreCase(tabName)) {
+                    defaultTab = i;
+                    break;
+                }
+            }
+        }*/
 
 
         String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
         if (tabName != null) {
-            for (int i = 0; i < TABS.size(); i++) {
-                if (TABS.get(i).equalsIgnoreCase(tabName)) {
+            for (int i = 0; i < TABS.length; i++) {
+                if (TABS[i].equalsIgnoreCase(tabName)) {
                     defaultTab = i;
                     break;
                 }
@@ -377,6 +395,11 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.setupWithViewPager(viewPager);
         tabsView.setScrollPosition(defaultTab, 0, true);
         setupTabIconsWithOffer();
+       /* if (account.getLastCity() == City.BANGALORE) {
+            setupTabIconsWithOffer();
+        } else {
+            setupTabIcons();
+        }*/
         tabsView.invalidate();
 
         tabsView.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -395,10 +418,18 @@ public class LaunchActivity extends BaseContextActivity {
 
             }
         });
-        TabLayout.Tab tab = tabsView.getTabAt(defaultTab);
-        if (tab != null) {
-            tab.select();
-        }
+
+        final TabLayout.Tab tab = tabsView.getTabAt(defaultTab);
+
+
+        ViewTreeObserver obv = tabsView.getViewTreeObserver();
+        obv.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                tabsView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                tabsView.getTabAt(defaultTab).select();
+            }
+        });
     }
 
     private void setupTabIconsWithOffer() {
@@ -436,7 +467,6 @@ public class LaunchActivity extends BaseContextActivity {
             }
         });
         tabsView.getTabAt(2).setCustomView(tabThree);
-
 
         TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabFour.setText("Week");
@@ -558,7 +588,7 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public void onPageSelected(int position) {
-            reportActionToAnalytics("tabchange", TABS.get(position));
+            reportActionToAnalytics("tabchange", TABS[position]);
         }
 
         @Override
@@ -580,7 +610,7 @@ public class LaunchActivity extends BaseContextActivity {
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
-            implements TabLayout.OnTabSelectedListener, ViewPager.OnPageChangeListener {
+            implements  ViewPager.OnPageChangeListener {
 
 
         public ExploreScreenPagerAdapter() {
@@ -589,14 +619,12 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public long getItemId(int position) {
-            return (eventsContext.toString() + TABS.get(position)).hashCode();
+            return (eventsContext.toString() + TABS[position]).hashCode();
         }
 
         @Override
         public Fragment getItem(int position) {
-
-            if (TABS.get(position).equals(MY_EVENTS_TAB)) {
-
+            if (TABS[position].equals(MY_EVENTS_TAB)) {
 
                 String tabParam = "";
                 if (getIntent().hasExtra(MeFragment.TAB_PARAM)) {
@@ -604,19 +632,17 @@ public class LaunchActivity extends BaseContextActivity {
                 }
                 EventsContext myEventsContext = new EventsContext(eventsContext.city,
                         EventsHighEndpoints.QUERY_MY_EVENT);
-
-                MeFragment fragment = MeFragment.getInstance(myEventsContext,tabParam);
-
+                Log.i("ME_TAB_PARAMS", tabParam);
+                MeFragment fragment = MeFragment.getInstance(myEventsContext, tabParam);
                 return fragment;
-
             }
 
-            if (TABS.get(position).equals(EXPLORE_TAB)) {
+            if (TABS[position].equals(EXPLORE_TAB)) {
                 exploreFragment = ExploreFragment.getInstance(eventsContext);
                 return exploreFragment;
 
             }
-            if (TABS.get(position).equals(OFFERS_TAB)) {
+            if (TABS[position].equals(OFFERS_TAB)) {
                 return new OffersFragment();
             }
 
@@ -625,33 +651,12 @@ public class LaunchActivity extends BaseContextActivity {
 
         @Override
         public int getCount() {
-            return TABS.size();
+            return TABS.length;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return TABS.get(position);
-        }
-
-        @Override
-        public void onTabSelected(TabLayout.Tab tab) {
-
-            showActionBar();
-
-            int position = tab.getPosition();
-
-            viewPager.setCurrentItem(position);
-
-        }
-
-        @Override
-        public void onTabUnselected(TabLayout.Tab tab) {
-            // do nothing.
-        }
-
-        @Override
-        public void onTabReselected(TabLayout.Tab tab) {
-            // do nothing.
+            return TABS[position];
         }
 
 

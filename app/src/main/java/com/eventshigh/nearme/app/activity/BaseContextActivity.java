@@ -43,7 +43,7 @@ public abstract class BaseContextActivity extends BaseActivity {
         eventsMarkerManager = EventsMarkerManager.getInstance(this);
 
         // Show the verify phone snakbar if needed.
-       // showVerifyPhoneSnackbar();
+        showVerifyPhoneSnackbar();
     }
 
     @Override

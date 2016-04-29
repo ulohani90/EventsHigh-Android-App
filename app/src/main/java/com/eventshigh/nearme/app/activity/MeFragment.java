@@ -98,8 +98,6 @@ public class MeFragment extends Fragment {
         String tabParam = getArguments().getString(TAB_PARAM,"");
         if(tabParam.equalsIgnoreCase(MY_INTEREST_EVENTS)){
             viewPager.setCurrentItem(1);
-        }else if(tabParam.equalsIgnoreCase(MY_FRIENDS)){
-            viewPager.setCurrentItem(2);
         }else{
             viewPager.setCurrentItem(0);
         }

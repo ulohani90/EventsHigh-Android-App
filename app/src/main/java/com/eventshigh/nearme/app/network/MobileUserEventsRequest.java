@@ -97,9 +97,10 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
                 List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"));
 
                 account.setIsFollowing(eventsJsonArray.getJSONObject(i).getString("topic"),true);
-
-                MyEventsRequest.TopicEvents eventData = new MyEventsRequest.TopicEvents(eventsJsonArray.getJSONObject(i).getString("topic"),topicEvents,eventsJsonArray.getJSONObject(i).getInt("event_count"));
-                events.add(eventData);
+                if(topicEvents.size()>0) {
+                    MyEventsRequest.TopicEvents eventData = new MyEventsRequest.TopicEvents(eventsJsonArray.getJSONObject(i).getString("topic"), topicEvents, eventsJsonArray.getJSONObject(i).getInt("event_count"));
+                    events.add(eventData);
+                }
             }
             return  Response.success(events, HttpHeaderParser.parseCacheHeaders(networkResponse));
         } catch (UnsupportedEncodingException |JSONException e) {

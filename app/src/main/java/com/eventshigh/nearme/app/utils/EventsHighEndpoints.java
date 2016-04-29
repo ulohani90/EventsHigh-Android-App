@@ -172,7 +172,7 @@ public class EventsHighEndpoints {
         Collections.sort(eventIds);
         StringBuilder sb = new StringBuilder();
         for (String eventId : eventIds) {
-            if (sb.length() == 0) {
+            if (sb.length() != 0) {
                 sb.append(',');
             }
             sb.append(eventId);

@@ -159,9 +159,12 @@ public class Account {
     public void setIsFollowing(String tag, boolean isFollowing) {
         if (isFollowing) {
             accountInfo.edit().putString(getKeyForTag(tag), tag).apply();
+            new UserActionHelper(context).recordAction(UserActionHelper.FollowingAction.FOLLOW, tag);
         } else {
             accountInfo.edit().remove(getKeyForTag(tag)).apply();
+            new UserActionHelper(context).recordAction(UserActionHelper.FollowingAction.UN_FOLLOW, tag);
         }
+
         Preferences.getInstance(context).setIsInterestUpdated(true);
     }
 
