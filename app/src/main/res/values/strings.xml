@@ -62,6 +62,7 @@
     <string name="ui_referrer_default">Like this app? Tell your friends!</string>
     <string name="ui_enter_phone_number_hint">Your Phone Number</string>
     <string name="ui_enter_name_hint">Your Name</string>
+    <string name="ui_enter_referral_code">Referral Code</string>
     <string name="ui_code">%1$s, we have sent a code to %2$s. Please enter it below.</string>
     <string name="ui_code_verified">%1$s, your phone number %2$s has been verified.</string>
     <string name="ui_verify_phone">Verify your phone number</string>
