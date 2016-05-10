@@ -31,7 +31,7 @@
             android:targetPackage="com.eventshigh.nearme.app" />
     </Preference>-->
     <Preference
-        android:icon="@drawable/ic_blog_nav"
+        android:icon="@drawable/ic_refer_code_nav"
         android:layout="@layout/navigation_menu_white_items"
         android:title="@string/title_referral_code">
         <intent
