@@ -70,16 +70,16 @@ public class ReferralActivity extends BaseActivity {
 
         vouchersContainer = (LinearLayout) findViewById(R.id.my_vouchers_container);
 
-        isFromNotification  = getIntent().getBooleanExtra(FROM_NOTIFICATION_PARAM,false);
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        isFromNotification = getIntent().getBooleanExtra(FROM_NOTIFICATION_PARAM, false);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setBackgroundColor(Color.TRANSPARENT);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        ((TextView)(findViewById(R.id.terms_text))).setText(Html.fromHtml(getResources().getString(R.string.terms_condition_text)));
+        ((TextView) (findViewById(R.id.terms_text))).setText(Html.fromHtml(getResources().getString(R.string.terms_condition_text)));
+        ((TextView) findViewById(R.id.referral_code)).setText("Referral Code: " + new Account(this).getReferrerCode());
 
     }
-
 
 
     public View getViewForSnackbar() {
@@ -98,7 +98,7 @@ public class ReferralActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (getIntent()!=null && getIntent().getAction()!=null && getIntent().getAction().equals(BaseActivity.NOTIFICATION_ACTION)) {
+        if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equals(BaseActivity.NOTIFICATION_ACTION)) {
             reportActionToAnalytics("openNotification");
         }
     }
@@ -106,8 +106,8 @@ public class ReferralActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(toolbar!=null)
-        setLightToolbarIcons();
+        if (toolbar != null)
+            setLightToolbarIcons();
         Account account = new Account(this);
         City city = account.getLastCity();
         if (city == null) {
@@ -131,7 +131,7 @@ public class ReferralActivity extends BaseActivity {
                     }
                 });*/
 
-        if(!Preferences.getInstance(this).shouldShowReferral()){
+        if (!Preferences.getInstance(this).shouldShowReferral()) {
             Toast.makeText(ReferralActivity.this, "Sorry, referral contest has ended!",
                     Toast.LENGTH_LONG).show();
             finish();
@@ -213,7 +213,7 @@ public class ReferralActivity extends BaseActivity {
         getUserPoints();
     }
 
-    public void getUserPoints(){
+    public void getUserPoints() {
         Uri requestUrl = UpdateAccountInfoService.getBaseUri(this, "getWalletPoints")
                 .build();
         try {
@@ -230,9 +230,9 @@ public class ReferralActivity extends BaseActivity {
                                         LayoutInflater inflater = getLayoutInflater();
                                         View view = inflater.inflate(R.layout.card_wallet_amount, vouchersContainer, false);
                                         (findViewById(R.id.redeem_btn)).setVisibility(View.VISIBLE);
-                                        ((TextView) view.findViewById(R.id.discount_value)).setText( walletPoints+" Points");
+                                        ((TextView) view.findViewById(R.id.discount_value)).setText(walletPoints + " Points");
                                         vouchersContainer.addView(view);
-                                    }catch(JSONException e){
+                                    } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
                                     vouchersContainer.setVisibility(View.VISIBLE);
@@ -253,7 +253,7 @@ public class ReferralActivity extends BaseActivity {
         }
     }
 
-    public void copyTextToClipBoard(String label, String text,String message){
+    public void copyTextToClipBoard(String label, String text, String message) {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText(label, text);
         clipboard.setPrimaryClip(clip);
@@ -274,25 +274,26 @@ public class ReferralActivity extends BaseActivity {
             intent.putExtra("special_obj",getSpecialObj());
         startActivity(intent);*/
 
-        Intent intent = new Intent(this,LaunchActivity.class);
+        Intent intent = new Intent(this, LaunchActivity.class);
         intent.setAction(REDEEM_ACTION);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM,LaunchActivity.OFFERS_TAB);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, LaunchActivity.OFFERS_TAB);
         startActivity(intent);
         this.finish();
     }
 
-    public SocialInvitationsRequest.SpecialCoupons getSpecialObj(){
-       return new SocialInvitationsRequest.SpecialCoupons(code,"","","");
+    public SocialInvitationsRequest.SpecialCoupons getSpecialObj() {
+        return new SocialInvitationsRequest.SpecialCoupons(code, "", "", "");
     }
+
     @Override
     public void onBackPressed() {
-        if(isFromNotification){
-            Intent intent = new Intent(this,LaunchActivity.class);
+        if (isFromNotification) {
+            Intent intent = new Intent(this, LaunchActivity.class);
 
             startActivity(intent);
         }
-            super.onBackPressed();
+        super.onBackPressed();
     }
 
     private void setLightToolbarIcons() {
@@ -305,8 +306,6 @@ public class ReferralActivity extends BaseActivity {
             }
         });
     }
-
-
 
 
 }

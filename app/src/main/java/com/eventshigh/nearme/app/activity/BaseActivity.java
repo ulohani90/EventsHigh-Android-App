@@ -29,6 +29,7 @@ import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.stream.OfferObject;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -86,6 +87,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected long shareEventInitiatedTimestamp = 0;
     protected long shareEventsInitiatedTimestamp = 0;
     protected long shareOfferInitiatedTimestamp = 0;
+    protected long shareMovieInitiatedTimestamp = 0;
 
 
     // **********************************************
@@ -99,8 +101,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         // Animation.
         overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_translate);
-
-
 
 
         // Report app to Facebook
@@ -175,20 +175,28 @@ public abstract class BaseActivity extends AppCompatActivity {
                     Long.toString(secForShare));
         }
 
-        shareEventInitiatedTimestamp = 0;
-        shareEventsInitiatedTimestamp = 0;
+        if (shareMovieInitiatedTimestamp > 0) {
+            long secForShare = (System.currentTimeMillis() - shareMovieInitiatedTimestamp) / 1000;
+            reportActionToAnalytics(secForShare > 5 ? "shareMovies" : "offerMovieDismissed",
+                    Long.toString(secForShare));
+        }
 
-        if(Preferences.getInstance(this).getLastTimeReferShown() == 0){
+        shareEventInitiatedTimestamp = 0;
+        shareMovieInitiatedTimestamp = 0;
+        shareOfferInitiatedTimestamp = 0;
+
+
+        if (Preferences.getInstance(this).getLastTimeReferShown() == 0) {
             Preferences preferences = Preferences.getInstance(BaseActivity.this);
             preferences.setLastTimeReferShown();
-        }else{
+        } else {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
 
                     ReferEarnDialog.doNeedFull(BaseActivity.this);
                 }
-            },2000);
+            }, 2000);
 
         }
     }
@@ -223,7 +231,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
-            @NonNull int[] grantResults) {
+                                           @NonNull int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
             // If request is cancelled, the result arrays are empty.
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -262,6 +270,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * Helper method which can be used to report any action in analytics.
+     *
      * @param actionName name of action to be reported.
      */
     public void reportActionToAnalytics(String actionName) {
@@ -285,13 +294,12 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         BranchUniversalObject branchObject = new BranchUniversalObject();
 
-        String referralId = new Account(this).getReferrerId();
+        final String referralCode = new Account(this).getReferrerCode();
        /* if (referralLink == null) {
             referralLink = "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + Utils.getAndroidId(this);
         }
 */
         branchObject.setCanonicalIdentifier("shareApp")
-                .addContentMetadata("referrer2", referralId)
                 .setContentImageUrl("https://pbs.twimg.com/profile_images/720541352556015617/xKvkzMHE.jpg")
                 .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
         branchObject.registerView();
@@ -311,7 +319,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 if (error == null) {
                     Intent shareIntent = new Intent();
                     shareIntent.setAction(Intent.ACTION_SEND);
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_app_text), url));
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.share_app_text), referralCode, url));
                     shareIntent.setType("text/plain");
                     shareIntent.setPackage(PACKAGE_NAME_WHATSAPP);
                     try {
@@ -359,20 +367,19 @@ public abstract class BaseActivity extends AppCompatActivity {
         );
     }
 
-    public void shareEventWithBranch(final Event event, @Nullable final String packageName, @Nullable  final String label) {
+    public void shareEventWithBranch(final Event event, @Nullable final String packageName, @Nullable final String label) {
 
         BranchUniversalObject branchObject = new BranchUniversalObject();
 
-        String referralId = new Account(this).getReferrerId();
+
        /* if (referralLink == null) {
             referralLink = "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + Utils.getAndroidId(this);
         }
 */
-        branchObject.setCanonicalIdentifier(event.id).setTitle(event.title.replaceAll("\""," &quot "))
-                .addContentMetadata("event_id",event.id)
-                .addContentMetadata("referrer2",referralId)
+        branchObject.setCanonicalIdentifier(event.id).setTitle(event.title.replaceAll("\"", " &quot "))
+                .addContentMetadata("event_id", event.id)
                 .addContentMetadata("city_name", event.city.toString())
-                .setContentDescription(event.description.replaceAll("\""," &quot "))
+                .setContentDescription(event.description.replaceAll("\"", " &quot "))
                 .setContentImageUrl(event.imgUrl)
                 .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
         branchObject.registerView();
@@ -385,8 +392,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .setFeature("sharing")
                 .addControlParameter("$always_deeplink", "true")
                 .addControlParameter("$desktop_url", event.getEventShareURI(src).toString());
-                //.addControlParameter("$android_url", referralLink)
-                //.addControlParameter("$ios_url", "http://www.eventshigh.com");
+        //.addControlParameter("$android_url", referralLink)
+        //.addControlParameter("$ios_url", "http://www.eventshigh.com");
         final ProgressDialog dialog = OneSecDialog.show(this);
         branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
             @Override
@@ -406,6 +413,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void shareEvent(Event event, String eventUri, @Nullable String packageName, @Nullable String label) {
+        String referralCode = new Account(this).getReferrerCode();
         reportEventAction(event, "eventShareInitiated", label == null ? packageName : label);
         shareEventInitiatedTimestamp = System.currentTimeMillis();
         new UserActionHelper(this).recordShareAction(event.id, event.title, packageName, eventUri);
@@ -414,10 +422,10 @@ public abstract class BaseActivity extends AppCompatActivity {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT,
-                String.format(
-                    getString(PACKAGE_NAME_TWITTER.equals(packageName) ?
-                            R.string.share_event_twitter_text : R.string.share_event_text),
-                    event.title + (event.isCleanVenue ? " @ " + event.venue : ""), eventUri)
+                    String.format(
+                            getString(PACKAGE_NAME_TWITTER.equals(packageName) ?
+                                    R.string.share_event_twitter_text : R.string.share_event_text),
+                            event.title + (event.isCleanVenue ? " @ " + event.venue : ""), eventUri, referralCode)
             );
 
             sendIntent.setType("text/plain");
@@ -450,18 +458,17 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public void shareEventsWithBranch(final EventsContext eventsContext,@Nullable String imageUrl) {
+    public void shareEventsWithBranch(final EventsContext eventsContext, @Nullable String imageUrl) {
         String uri = EventsHighEndpoints.getWebUri(eventsContext).buildUpon()
                 .appendQueryParameter("src", "ehm").toString();
-        String referralId = new Account(this).getReferrerId();
+        // String referralId = new Account(this).getReferrerId();
         /*if (referralLink == null) {
             referralLink = "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + Utils.getAndroidId(this);
         }*/
-
+        final String referralCode = new Account(this).getReferrerCode();
         BranchUniversalObject branchObject = new BranchUniversalObject();
         branchObject.setCanonicalIdentifier(eventsContext.getLabel()).setTitle(eventsContext.toString())
                 .addContentMetadata("event_uri", uri)
-                .addContentMetadata("referrer2",referralId)
                 .setContentDescription(eventsContext.toString())
                 .setContentImageUrl(imageUrl)
                 .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
@@ -470,8 +477,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .setChannel("facebook")
                 .setFeature("sharing")
                 .addControlParameter("$desktop_url", uri);
-               // .addControlParameter("$android_url", referralLink);
-               // .addControlParameter("$ios_url", "http://www.eventshigh.com");
+        // .addControlParameter("$android_url", referralLink);
+        // .addControlParameter("$ios_url", "http://www.eventshigh.com");
         final ProgressDialog dialog = OneSecDialog.show(this);
 
         branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
@@ -488,7 +495,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                     try {
                         Intent sendIntent = new Intent();
                         sendIntent.setAction(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + url);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + url + "\n\nNew User- Use Referral Code " + referralCode);
                         sendIntent.setType("text/plain");
                         startActivity(sendIntent);
                     } catch (ActivityNotFoundException e) {
@@ -535,13 +542,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public void shareCoupon(final OfferObject offer){
+    public void shareCoupon(final OfferObject offer) {
+        final String referralCode = new Account(this).getReferrerCode();
         shareOfferInitiatedTimestamp = System.currentTimeMillis();
         BranchUniversalObject branchObject = new BranchUniversalObject();
         String referrerId = new Account(this).getReferrerId();
         branchObject.setCanonicalIdentifier(offer.id + "").setTitle(offer.name.replaceAll("\"", " &quot "))
-                .addContentMetadata("offer_id",offer.id+"")
-                .addContentMetadata("referrer2",referrerId)
+                .addContentMetadata("offer_id", offer.id + "")
                 .setContentDescription(offer.name.replaceAll("\"", " &quot "))
                 .setContentImageUrl(offer.imgUrl)
                 .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
@@ -551,8 +558,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .setFeature("sharing")
                 .addControlParameter("$always_deeplink", "true")
                 .addControlParameter("$desktop_url", "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app");
-                //.addControlParameter("$android_url", referralLink)
-                //.addControlParameter("$ios_url", "http://www.eventshigh.com");
+        //.addControlParameter("$android_url", referralLink)
+        //.addControlParameter("$ios_url", "http://www.eventshigh.com");
         final ProgressDialog dialog = OneSecDialog.show(this);
         branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
             @Override
@@ -567,8 +574,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                     sendIntent.putExtra(Intent.EXTRA_TEXT,
                             String.format(
                                     getString(
-                                            R.string.share_coupon_text ),
-                                    offer.name , url)
+                                            R.string.share_coupon_text),
+                                    offer.name, url, referralCode)
                     );
 
                     sendIntent.setType("text/plain");
@@ -607,6 +614,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     private static final Set<String> INSTALLED_PACKAGES = new HashSet<>();
+
     protected boolean isInstalled(String packageName) {
         return isInstalled(this, packageName);
     }
@@ -614,7 +622,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public static boolean isInstalled(Context context, String packageName) {
         synchronized (INSTALLED_PACKAGES) {
             if (INSTALLED_PACKAGES.isEmpty()) {
-                for(PackageInfo packageInfo : context.getPackageManager().getInstalledPackages(0)) {
+                for (PackageInfo packageInfo : context.getPackageManager().getInstalledPackages(0)) {
                     if (packageInfo.versionName != null && packageInfo.applicationInfo.enabled) {
                         INSTALLED_PACKAGES.add(packageInfo.packageName);
                     }
@@ -634,17 +642,17 @@ public abstract class BaseActivity extends AppCompatActivity {
         //overridePendingTransition(R.anim.animate_bottom_up, R.anim.stay);
     }
 
-    public void showOfferSignUpActivity(OfferObject offer){
+    public void showOfferSignUpActivity(OfferObject offer) {
         Intent intent = new Intent(this, OfferSignUpActivity.class);
         intent.putExtra("offer", offer);
         startActivity(intent);
         overridePendingTransition(R.anim.animate_bottom_up, R.anim.stay);
     }
 
-    public boolean isOfferActed(int id){
+    public boolean isOfferActed(int id) {
         Preferences preferences = Preferences.getInstance(this);
         ArrayList<String> ids = new ArrayList<>();
-        if(preferences.getPrefOfferActedId().length()>0) {
+        if (preferences.getPrefOfferActedId().length() > 0) {
             ids.addAll(Arrays.asList(preferences.getPrefOfferActedId().split(",")));
             for (String value : ids) {
                 if (Integer.parseInt(value) == id)
@@ -653,5 +661,52 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    public void shareMovie(final MovieDetailObject movie) {
+        shareOfferInitiatedTimestamp = System.currentTimeMillis();
+        BranchUniversalObject branchObject = new BranchUniversalObject();
+        String referrerId = new Account(this).getReferrerId();
+        branchObject.setCanonicalIdentifier(movie.getMovieInfo().getId() + "").setTitle(movie.getMovieInfo().getName().replaceAll("\"", " &quot "))
+                .addContentMetadata("movie_id", movie.getMovieInfo().getId() + "")
+                .setContentDescription(movie.getMovieInfo().getName().replaceAll("\"", " &quot "))
+                .setContentImageUrl(movie.getMovieInfo().getImg_url())
+                .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
+        branchObject.registerView();
+        String uri = EventsHighEndpoints.WEB_URI_BASE + "movie/" + movie.getMovieInfo().getId();
+        LinkProperties linkProperties = new LinkProperties()
+                .setFeature("sharing")
+                .addControlParameter("$always_deeplink", "true")
+                .addControlParameter("$desktop_url", uri);
+        //.addControlParameter("$android_url", referralLink)
+        //.addControlParameter("$ios_url", "http://www.eventshigh.com");
+        final ProgressDialog dialog = OneSecDialog.show(this);
+        branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
+            @Override
+            public void onLinkCreate(String url, BranchError error) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+                if (error == null) {
+                    reportActionToAnalytics("movieShareInitiated", movie.getMovieInfo().getName());
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT,
+                            String.format(
+                                    getString(
+                                            R.string.share_movie_text),
+                                    movie.getMovieInfo().getName(), url)
+                    );
+
+                    sendIntent.setType("text/plain");
+                    startActivity(sendIntent);
+                } else {
+                    //   if (error.getErrorCode() == -113) {
+                    showMessage(error.getMessage());
+                    // }
+                }
+            }
+        });
+
     }
 }

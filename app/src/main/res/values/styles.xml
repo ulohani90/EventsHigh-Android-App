@@ -16,6 +16,9 @@
         <item name="android:colorBackground">@color/translucent_dark</item>
     </style>
 
+    <style name="EHActionBarTransparent" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:colorBackground">@android:color/transparent</item>
+    </style>
     <style name="EHFollowActionBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:dropDownListViewStyle">@style/DropDownListView</item>
     </style>

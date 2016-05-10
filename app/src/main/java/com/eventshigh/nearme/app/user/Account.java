@@ -57,6 +57,11 @@ public class Account {
     // The referrer link for this user.
     private static final String PREF_REFERRER_LINK = "app_share_link";
 
+    // The referrer link for this user.
+    private static final String PREF_REFERRER_ID = "app_share_id";
+
+    private static final String PREF_REFERRER_CODE = "app_referrer_code";
+
     // The prefix to the shared prefs key used to save follow tags for this user
     private static final String PREF_FOLLOW_KEY_PREFIX = "follow_";
 
@@ -153,12 +158,22 @@ public class Account {
 
 
     public void recordReferrerId(String referrerLink) {
-        accountInfo.edit().putString(PREF_REFERRER_LINK, referrerLink).apply();
+        accountInfo.edit().putString(PREF_REFERRER_ID, referrerLink).apply();
     }
 
     public @Nullable String getReferrerId() {
-        return accountInfo.getString(PREF_REFERRER_LINK, null);
+        return accountInfo.getString(PREF_REFERRER_ID, null);
     }
+
+    public void recordReferrerCode(String referrerLink) {
+        accountInfo.edit().putString(PREF_REFERRER_CODE, referrerLink).apply();
+    }
+
+    public @Nullable String getReferrerCode() {
+        return accountInfo.getString(PREF_REFERRER_CODE, null);
+    }
+
+
 
     public boolean isFollowing(String tag) {
         return accountInfo.getString(getKeyForTag(tag), null) != null;

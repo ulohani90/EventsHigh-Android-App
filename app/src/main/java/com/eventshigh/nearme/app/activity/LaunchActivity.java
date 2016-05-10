@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
+import android.graphics.Movie;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -101,6 +102,7 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String NOTIFICATIONS_TAB = "Notifications";
     public static final String THIS_WEEK_TAB = "this week";
     public static final String OFFERS_TAB = "Offers";
+    public static final String MOVIES_TAB = "movies";
     public ArrayList<String> TABS = new ArrayList<>();
 
     //Calculate no of time user resumes on to Home
@@ -503,6 +505,7 @@ public class LaunchActivity extends BaseContextActivity {
         TABS.add(EXPLORE_TAB);
         TABS.add(OFFERS_TAB);
         TABS.add(THIS_WEEK_TAB);
+     //   TABS.add(MOVIES_TAB);
         TABS.add(NOTIFICATIONS_TAB);
 
         String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
@@ -803,6 +806,10 @@ public class LaunchActivity extends BaseContextActivity {
                 return new StreamFragment();
             }
 
+           /* if(TABS.get(position).equalsIgnoreCase(MOVIES_TAB)){
+                return new MoviesListFragment();
+            }*/
+
             return ThisWeekFragment.getInstance(eventsContext, true, 7);
         }
 
@@ -960,13 +967,18 @@ public class LaunchActivity extends BaseContextActivity {
                                             });
 
                                         }
+                                    }else if(referringParams.has("movie_id")){
+                                        int id = referringParams.getInt("movie_id");
+                                        Intent intent = new Intent(LaunchActivity.this, MovieDetailActivity.class);
+                                        intent.putExtra(MovieDetailActivity.MOVIE_ID,id);
+                                        startActivity(intent);
                                     }
 
-                                    if (referringParams.has("referrer2")) {
+                                    /*if (referringParams.has("referrer2")) {
                                         String referrer = referringParams.getString("referrer2");
                                         Log.i("referrer2", referrer);
                                         new Account(LaunchActivity.this).recordReferrer(referrer, true);
-                                    }
+                                    }*/
                                     //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
                                 }
                             } catch (JSONException e) {

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="5dp">
+
+
+    <TextView
+        android:id="@+id/movie_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="The Jungle Book"
+        android:textAllCaps="true"
+        android:textColor="#3A3A3A"
+        android:textSize="24sp" />
+
+
+    <TextView
+        android:id="@+id/movie_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Adventure | Drama"
+        android:textAllCaps="true"
+        android:textColor="@color/done_button"
+        android:textSize="12sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Synopsis"
+        android:textColor="#3A3A3A"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/movie_synopsis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:lineSpacingMultiplier="1.1"
+        android:text="60 Reviews"
+        android:textColor="#666666"
+        android:textSize="13sp" />
+
+
+    <TextView
+        android:id="@+id/movie_director"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:drawableLeft="@drawable/ic_director"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:text="60 Reviews"
+        android:textColor="#666666"
+        android:textSize="14sp" />
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:background="#f0f0f0" />
+
+    <TextView
+        android:id="@+id/lead_cast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:drawableLeft="@drawable/ic_cast"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:text="Lead Cast"
+        android:textAllCaps="true"
+        android:textColor="@color/primary"
+        android:textSize="14sp" />
+
+    <com.eventshigh.nearme.app.view.ZCustomFlowLayout
+        android:id="@+id/lead_cast_flowlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:orientation="horizontal"
+        app:verticalSpacing="8dp">
+
+    </com.eventshigh.nearme.app.view.ZCustomFlowLayout>
+</LinearLayout>

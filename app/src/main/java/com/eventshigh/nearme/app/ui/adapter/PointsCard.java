@@ -82,7 +82,23 @@ public class PointsCard extends RecyclerView.ViewHolder{
 
         pointName.setText(obj.pName);
         pointCount.setText(obj.points + " points");
-        pointCard.setOnClickListener(new View.OnClickListener() {
+        pointDesc.setVisibility(View.VISIBLE);
+        pointDesc.setText(obj.pDesc);
+        if(obj.pName.equalsIgnoreCase("Refer & Earn")){
+            pointActionButton.setVisibility(View.VISIBLE);
+            pointActionButton.setText("Refer Friend Now!");
+            pointActionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(activity, ReferralActivity.class);
+                    activity.startActivity(intent);
+                }
+            });
+
+        }else{
+            pointActionButton.setVisibility(View.GONE);
+        }
+        /*pointCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(pointDesc.isShown()){
@@ -108,7 +124,7 @@ public class PointsCard extends RecyclerView.ViewHolder{
 
                 }
             }
-        });
+        });*/
 
 
 

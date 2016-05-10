@@ -95,7 +95,7 @@ public class PhoneLoginActivity extends BaseActivity {
 
         final String phoneNo = Utils.simplifyPhoneNo(phoneNoEditText.getText().toString());
         phoneNoEditText.setText(phoneNo);
-        if (phoneNo.length() < 10 || phoneNo.length() > 12) {
+        if (phoneNo.length() < 10 ) {
             phoneNoEditText.requestFocus();
             phoneNoView.setError("Entered phone number is not correct");
             return;

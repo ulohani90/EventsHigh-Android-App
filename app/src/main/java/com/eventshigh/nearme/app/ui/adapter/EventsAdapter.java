@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
+import android.graphics.Movie;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -10,6 +11,11 @@ import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
+import com.eventshigh.nearme.app.data.MovieDetailObject;
+import com.eventshigh.nearme.app.data.MovieInfoObject;
+import com.eventshigh.nearme.app.data.MovieReviewObject;
+import com.eventshigh.nearme.app.data.MovieShowTimeObject;
+import com.eventshigh.nearme.app.data.ShowDates;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.data.stream.OfferObject;
@@ -82,13 +88,21 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
+    public void setMoviesListData(ArrayList<MovieDetailObject> objs) {
+        dataToShow.clear();
+        for (MovieDetailObject obj : objs) {
+            dataToShow.add(new MovieListData(obj, activity));
+        }
+        notifyDataSetChanged();
+    }
+
 
     public void setOffers(ArrayList<OfferObject> offers, long totalPoints) {
         dataToShow.clear();
         for (OfferObject offer : offers) {
             dataToShow.add(new OfferData(offer, activity, totalPoints));
         }
-        dataToShow.add(0, new TotalPointsHeaderData(totalPoints, activity, false, true,false));
+        dataToShow.add(0, new TotalPointsHeaderData(totalPoints, activity, false, true, false));
         notifyDataSetChanged();
     }
 
@@ -100,7 +114,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
             dataToShow.add(new PointsData(point, activity));
         }
 
-        dataToShow.add(new TotalPointsHeaderData(totalPoints, activity, true, false,false));
+        dataToShow.add(new TotalPointsHeaderData(totalPoints, activity, true, false, false));
 
         notifyDataSetChanged();
     }
@@ -131,12 +145,36 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
+
+    public void setInfoObject(MovieInfoObject obj) {
+        dataToShow.clear();
+        dataToShow.add(new MovieInfoData(obj, activity));
+        notifyDataSetChanged();
+    }
+
+    public void setMovieReviews(ArrayList<MovieReviewObject> objs) {
+        dataToShow.clear();
+        for (MovieReviewObject obj : objs) {
+            dataToShow.add(new MovieReviewData(obj, activity));
+        }
+        notifyDataSetChanged();
+    }
+
+    public void setMovieShowTimes(ArrayList<MovieShowTimeObject> objs) {
+        dataToShow.clear();
+        for (MovieShowTimeObject obj : objs) {
+            dataToShow.add(new ShowTimeData(obj, activity));
+        }
+        notifyDataSetChanged();
+    }
+
+
     public void addPointsBreakDown(MyPointsBreakdownRequest.PointBreakdownBaseObj objs) {
         dataToShow.clear();
         for (MyPointsBreakdownRequest.PointBreakDown obj : objs.points) {
             dataToShow.add(new PointBreakdownData(obj, activity));
         }
-        dataToShow.add(0, new TotalPointsHeaderData(objs.totalPoints, activity, false, false,true));
+        dataToShow.add(0, new TotalPointsHeaderData(objs.totalPoints, activity, false, false, true));
         notifyDataSetChanged();
 
     }
