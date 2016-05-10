@@ -42,6 +42,8 @@ public class DateTimeUtils {
 
     private static final SimpleDateFormat FULL_DATE_TIME_MILLIS_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
+    private static final SimpleDateFormat DD_MM_YYYY_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
 
     public static @Nullable
     Date mergeDateTime(String date, String time, String timeZone) throws ParseException {
@@ -207,6 +209,29 @@ public class DateTimeUtils {
         builder.append(cal.get(Calendar.AM_PM) == Calendar.PM?"PM":"AM");
         return builder.toString();
     }
+
+    public static String getMovieShowDate(long time){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(time);
+        StringBuilder builder=new StringBuilder();
+        builder.append(cal.get(Calendar.DAY_OF_MONTH));
+        builder.append(" ");
+        builder.append(new SimpleDateFormat("MMM").format(cal.getTime()));
+        builder.append(" ");
+        builder.append(cal.get(Calendar.YEAR));
+        return builder.toString();
+    }
+
+    public static long parseMovieTime(String time){
+        Date date = new Date();
+        try {
+            date =  DD_MM_YYYY_FORMAT.parse(time);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date.getTime();
+    }
+
 
 
 }

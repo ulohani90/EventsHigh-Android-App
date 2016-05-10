@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@android:color/white"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/venue_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="14sp"
+        android:textColor="#575757"/>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="10dp"
+    android:visibility="gone"
+    android:paddingRight="10dp"
+    android:paddingBottom="10dp">
+    <TextView
+        android:id="@+id/date1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:background="@drawable/green_btn_selector"
+        android:padding="10dp"
+        android:textColor="@color/offer_btn_text_selector"/>
+    <View
+        android:layout_width="8dp"
+        android:layout_height="match_parent"/>
+    <TextView
+        android:id="@+id/date2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:padding="8dp"
+        android:background="@drawable/green_btn_selector"
+        android:textColor="@color/offer_btn_text_selector"/>
+</LinearLayout>
+
+    <com.eventshigh.nearme.app.view.ZCustomFlowLayout
+        android:id="@+id/showtimes"
+        android:layout_width="match_parent"
+        app:orientation="horizontal"
+        app:horizontalSpacing="8dp"
+        app:verticalSpacing="8dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:layout_height="wrap_content"
+        >
+    </com.eventshigh.nearme.app.view.ZCustomFlowLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="#f0f0f0"/>
+</LinearLayout>

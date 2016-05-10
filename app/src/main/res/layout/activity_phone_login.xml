@@ -95,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/ui_enter_phone_number_hint"
                 android:inputType="phone"
-                android:maxLength="11"
+                android:maxLength="10"
                 tools:ignore="TextFields"
             />
         </android.support.design.widget.TextInputLayout>

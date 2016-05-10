@@ -23,7 +23,11 @@ public enum DataType {
     OFFER(14),
     POINTS(15),
     TOTAL_POINT_HEADER(16),
-    POINT_BREAKDWON(17);
+    POINT_BREAKDWON(17),
+    MOVIE_REVIEW(18),
+    SHOWTIME(19),
+    MOVIE_INFO(20),
+    MOVIE_LIST_CARD(21);
 
 
     public final int typeId;
@@ -99,6 +103,18 @@ public enum DataType {
             return PointBreakdownCard.newInstance(activity,parent);
         }
 
+        if(typeId == MOVIE_REVIEW.typeId){
+            return MovieReviewCard.newInstance(activity,parent);
+        }
+        if(typeId == SHOWTIME.typeId){
+            return ShowTimeCard.newInstance(activity,parent);
+        }
+        if(typeId == MOVIE_INFO.typeId){
+            return MovieInfoCard.newInstance(activity,parent);
+        }
+        if(typeId == MOVIE_LIST_CARD.typeId){
+            return MovieListCard.newInstance(activity,parent);
+        }
         throw new IllegalArgumentException("invalid typeid");
     }
 }

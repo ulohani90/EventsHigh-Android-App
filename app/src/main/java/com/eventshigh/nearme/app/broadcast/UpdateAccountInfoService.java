@@ -43,9 +43,9 @@ public class UpdateAccountInfoService extends IntentService {
         run(context, skipTimeCheck, new Intent(context, UpdateAccountInfoService.class));
     }
 
-    public static void run(Context context, boolean skipTimeCheck,boolean receivedReferrer2) {
+    public static void run(Context context, boolean skipTimeCheck, boolean receivedReferrer2) {
         Intent intent = new Intent(context, UpdateAccountInfoService.class);
-        intent.putExtra("received_referrer2",receivedReferrer2);
+        intent.putExtra("received_referrer2", receivedReferrer2);
         run(context, skipTimeCheck, intent);
     }
 
@@ -66,7 +66,8 @@ public class UpdateAccountInfoService extends IntentService {
 
         final SharedPreferences uploadStatus = getSharedPreferences(UPLOAD_STATUS_FILENAME, 0);
 
-        if ( intent != null && intent.getBooleanExtra(PARAM_REFRESH_LAST_CITY, false)) {
+
+        if (intent != null && intent.getBooleanExtra(PARAM_REFRESH_LAST_CITY, false)) {
 
             Editor editor = uploadStatus.edit();
             editor.remove(PREF_LAST_CITY_UPLOADED);
@@ -75,14 +76,14 @@ public class UpdateAccountInfoService extends IntentService {
 
         // Record referrer.
 
-        boolean isReceivedReferrer2=false;
-        if(intent!=null && intent.hasExtra("received_referrer2")){
-            isReceivedReferrer2 = intent.getBooleanExtra("received_referrer2",false);
+        boolean isReceivedReferrer2 = false;
+        if (intent != null && intent.hasExtra("received_referrer2")) {
+            isReceivedReferrer2 = intent.getBooleanExtra("received_referrer2", false);
         }
         Account account = new Account(this);
         String referrer = account.getReferrer();
-        if (referrer != null && (!uploadStatus.getBoolean(PREF_REFERRER_UPLOADED, false)|| isReceivedReferrer2)) {
-           reportReferrer(referrer, uploadStatus,isReceivedReferrer2);
+        if (referrer != null && (!uploadStatus.getBoolean(PREF_REFERRER_UPLOADED, false) || isReceivedReferrer2)) {
+            reportReferrer(referrer, uploadStatus, isReceivedReferrer2);
         }
 
         // Upload last city.
@@ -100,9 +101,14 @@ public class UpdateAccountInfoService extends IntentService {
         }
 
         // Referral Link.
-        if (account.getReferrerId() == null) {
+       /* if (account.getReferrerId() == null) {
             account.recordReferrerId(getReferrerId());
+        }*/
+        if (account.getReferrerCode() == null) {
+            account.recordReferrerCode(getReferrerCode());
+
         }
+
     }
 
     private static synchronized void run(Context context, boolean skipTimeCheck, Intent intent) {
@@ -112,10 +118,10 @@ public class UpdateAccountInfoService extends IntentService {
         }
     }
 
-    private void reportReferrer(String referrer, SharedPreferences uploadStatus,boolean isReceivedReferrer2) {
+    private void reportReferrer(String referrer, SharedPreferences uploadStatus, boolean isReceivedReferrer2) {
         Uri uri = getBaseUri(this, "reportReferrer")
                 .appendQueryParameter("referrer", referrer)
-                .appendQueryParameter("received_referrer2",isReceivedReferrer2?"true":"false")
+                .appendQueryParameter("received_referrer2", isReceivedReferrer2 ? "true" : "false")
                 .build();
         report(uri, uploadStatus, PREF_REFERRER_UPLOADED);
     }
@@ -150,6 +156,7 @@ public class UpdateAccountInfoService extends IntentService {
 
         return null;
     }
+
     private String getReferrerId() {
         try {
             Uri uri = getBaseUri(this, "getReferrerObject").build();
@@ -164,6 +171,19 @@ public class UpdateAccountInfoService extends IntentService {
         return null;
     }
 
+    private String getReferrerCode() {
+        try {
+            Uri uri = getBaseUri(this, "getReferrerObject").build();
+            String resp = sendSignedRequest(uri).get();
+            JSONObject res = new JSONObject(resp);
+            return res.getString("my_code");
+        } catch (Exception e) {
+
+            Log.w(UpdateAccountInfoService.class.getName(), "request failed: getReferrerId", e);
+        }
+
+        return null;
+    }
 
 
     private void report(Uri uri, SharedPreferences uploadStatus, String key) {
@@ -179,7 +199,7 @@ public class UpdateAccountInfoService extends IntentService {
             throws GeneralSecurityException, UnsupportedEncodingException {
         RequestFuture<String> future = RequestFuture.newFuture();
         VolleyHelper.addToRequestQueue(this,
-            new StringRequest(Method.GET, Signer.sign(uri).toString(), future, future));
+                new StringRequest(Method.GET, Signer.sign(uri).toString(), future, future));
         return future;
     }
 

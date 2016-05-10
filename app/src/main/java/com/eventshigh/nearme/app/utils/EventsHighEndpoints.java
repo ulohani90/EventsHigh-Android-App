@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * Defines various end points for EH api.
  */
 public class EventsHighEndpoints {
-    private static final String WEB_URI_BASE = "https://www.eventshigh.com/";
+    public static final String WEB_URI_BASE = "https://www.eventshigh.com/";
     public static final String API_URI_BASE = "https://api.eventshigh.com/";
 
     private static final String API_ENDPOINT_DATE_FORMAT =
@@ -37,6 +37,11 @@ public class EventsHighEndpoints {
 
     private static final String API_ENDPOINT_MULTI_EVENT_MOBILE_ID_FORMAT =
             API_URI_BASE + "api/get_events_for_mobile_user/%s?mobile=1";
+    private static final String API_ENDPOINT_MOVIES_LIST_FORMAT =
+            API_URI_BASE + "api/get_movies_home/%s?mobile=1";
+
+
+    private static final String API_ENDPOINT_MOVIE_UBER_INFO_FORMAT=API_URI_BASE+"api/get_movie_uber_info/%s";
 
     private static final String API_EVENTS_SUGGEST_FORMAT =
             "https://assets.eventshigh.com/autocomplete/autocomplete_events_%s.json";
@@ -168,6 +173,11 @@ public class EventsHighEndpoints {
         return String.format(API_ENDPOINT_EVENT_UBER_FORMAT, eventId);
     }
 
+    public static String getApiEndpointForMoviesList(String cityName){
+        return String.format(API_ENDPOINT_MOVIES_LIST_FORMAT, cityName);
+
+    }
+
     public static String getApiEndpointEventsUber(List<String> eventIds) {
         Collections.sort(eventIds);
         StringBuilder sb = new StringBuilder();
@@ -209,5 +219,9 @@ public class EventsHighEndpoints {
 
     public static boolean isFeaturedEventQuery(String query) {
         return query.equalsIgnoreCase(QUERY_FEATURED);
+    }
+
+    public static String getApiEndpointForMovieUberDetail(int id){
+        return String.format(API_ENDPOINT_MOVIE_UBER_INFO_FORMAT,id+"");
     }
 }

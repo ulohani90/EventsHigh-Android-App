@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -78,13 +79,13 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String EXPLORE_TAB = "explore";
     public static final String THIS_WEEK_TAB = "this week";
     public static final String OFFERS_TAB = "Offers";
+
     public final String[] TABS = {
             MY_EVENTS_TAB,
             EXPLORE_TAB,
             OFFERS_TAB,
             THIS_WEEK_TAB,
     };
-
 
 
     //Calculate no of time user resumes on to Home
@@ -127,8 +128,6 @@ public class LaunchActivity extends BaseContextActivity {
         account = new Account(this);
 
 
-
-
         // Process the incoming intent.
        /* String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
         if (tabName != null) {
@@ -141,7 +140,6 @@ public class LaunchActivity extends BaseContextActivity {
         }*/
 
         getIntent().getAction();
-
 
 
     }
@@ -188,7 +186,7 @@ public class LaunchActivity extends BaseContextActivity {
         // We show the onboarding If this is first activity and there was no
         // location/query passed through intent.
         if (eventsContext.city == null && eventsContext.query.isEmpty() &&
-            eventsContext.dateFilter.isEmpty()) {
+                eventsContext.dateFilter.isEmpty()) {
             if (Preferences.getInstance(this).shouldShowOnBoarding()) {
                 startActivity(new Intent(this, OnBoardingActivity.class));
                 return;
@@ -197,8 +195,8 @@ public class LaunchActivity extends BaseContextActivity {
             String action = getIntent().getAction();
             if (!isTaskRoot() && (action == null || !action.startsWith(NOTIFICATION_ACTION))
                     && (getIntent().getData() == null || !getIntent().getData().getHost().equalsIgnoreCase("branch.eventshigh.com"))) {
-               // finish();
-               // return;
+                // finish();
+                // return;
             }
         }
 
@@ -517,7 +515,6 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.getTabAt(2).setCustomView(tabThree);
 
 
-
     }
 
     private void showNextScreen() {
@@ -610,7 +607,7 @@ public class LaunchActivity extends BaseContextActivity {
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
-            implements  ViewPager.OnPageChangeListener {
+            implements ViewPager.OnPageChangeListener {
 
 
         public ExploreScreenPagerAdapter() {
@@ -645,6 +642,7 @@ public class LaunchActivity extends BaseContextActivity {
             if (TABS[position].equals(OFFERS_TAB)) {
                 return new OffersFragment();
             }
+
 
             return ThisWeekFragment.getInstance(eventsContext, true, 7);
         }
@@ -784,13 +782,18 @@ public class LaunchActivity extends BaseContextActivity {
                                             });
 
                                         }
+                                    } else if (referringParams.has("movie_id")) {
+                                        int id = referringParams.getInt("movie_id");
+                                        Intent intent = new Intent(LaunchActivity.this, MovieDetailActivity.class);
+                                        intent.putExtra(MovieDetailActivity.MOVIE_ID, id);
+                                        startActivity(intent);
                                     }
 
-                                    if (referringParams.has("referrer2")) {
+                                    /*if (referringParams.has("referrer2")) {
                                         String referrer = referringParams.getString("referrer2");
                                         Log.i("referrer2", referrer);
                                         new Account(LaunchActivity.this).recordReferrer(referrer, true);
-                                    }
+                                    }*/
                                     //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
                                 }
                             } catch (JSONException e) {

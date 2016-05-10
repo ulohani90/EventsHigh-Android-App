@@ -32,6 +32,7 @@
     <string name="action_done">Done</string>
     <string name="action_confirm">Confirm</string>
     <string name="action_signup">Sign Up</string>
+    <string name="action_submit">Submit</string>
 
     <!-- Menu items -->
     <string name="menu_edit_location">Change Location</string>
@@ -109,13 +110,14 @@
     <string name="action_invite">Share App</string>
     <string name="action_add_friend">Add Friends</string>
 
-    <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Shall we go to this? Come on it’ll be fun!\n\n%1$s\n\n%2$s</string>
-    <string name="share_event_twitter_text">[via @eventshighapp]\n%1$s\n\n%2$s</string>
-    <string name="share_app_text">Hey! Pull up a chair. Take a taste. Come join EventsHigh. Life is so endlessly delicious.\n\n%s</string>
+    <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Shall we go to this? Come on it’ll be fun!\n\n%1$s\n\n%2$s\n\n New user- Use Referral Code %3$s</string>
+    <string name="share_event_twitter_text">[via @eventshighapp]\n%1$s\n\n%2$s\n\n New user- Use Referral Code %3$s</string>
+    <string name="share_app_text">Hey! Pull up a chair. Take a taste. Come join EventsHigh. Life is so endlessly delicious.\n\n Use my referral code %1$s\n\n%2$s</string>
+
     <string name="share_app_message">Love only grows by sharing. You can only have more for yourself by sharing the app with friends. The more you share, the better would be your experience.</string>
     <string name="share_app_notification_message">Liked this notification? Share EventsHigh app with your contacts and they can also experience the high! Get your gang together.</string>
-    <string name="share_coupon_text">Hey! found an Offer on EventsHigh, check it out.\n\nNote: Only available on App!\n\n%1$s\n\n%2$s</string>
-
+    <string name="share_coupon_text">Hey! found an Offer on EventsHigh, check it out.\n\nNote: Only available on App!\n\n%1$s\n\n%2$s\n\n New user- Use Referral Code %3$s</string>
+    <string name="share_movie_text">Hey! found a Movie on EventsHigh, check it out.\n\n%1$s\n\n%2$s</string>
 
 
     <!-- Failed messages -->
@@ -156,6 +158,7 @@
     <string name="no_friends_disclaimer">If you have recently given us the permission to your contacts, it might take us up to 30 minutes to find friends.</string>
 
 
+
     <!--Select Interest Activity-->
     <string name="personalize_exp_text">Personalize your experience</string>
     <string name="personalize_message">We\'ll get you hooked up with the stuff you love the most.</string>
@@ -167,11 +170,17 @@
     <string name="terms_condition_text">\u2022 Eligible on friends who installs the EventsHigh app for first time.&lt;br> \u2022 Both you and your friend needs to register using phone number.&lt;br>\u2022 You can use use your wallet points on our Offers page.&lt;br>\u2022 Wallet points are not transferable.&lt;br>\u2022 EventsHigh team reserves the right to cancel or change any Offer. EventsHigh team decision will be final.&lt;br>\u2022 For any queries, please write to us at &lt;b>support@eventshigh.com&lt;/b>.</string>
 
     <string name="activity_image_trans">Offer Image transition</string>
+    <string name="activity_movie_trans">Movie Image transition</string>
 
     <string name="enter_details_text">Enter Details</string>
 
     <string name="points_breakdown">Points Breakdown</string>
 
     <string name="no_current_offers">No offers in your city. Do check the app after sometime.</string>
+
+
+    <!--Movies-->
+    <string name="title_movies">Movies</string>
+    <string name="title_referral_code">Referral Code</string>
 
 </resources>

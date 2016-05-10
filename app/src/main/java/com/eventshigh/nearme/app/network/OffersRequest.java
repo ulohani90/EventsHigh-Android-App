@@ -46,6 +46,7 @@ public class OffersRequest extends JsonRequest<OffersRequest.OffersPointsObject>
                               Response.ErrorListener errorListener) {
 
         String url = EventsHighEndpoints.getApiEndPointForOffers(city.name());
+
         OffersRequest request = new OffersRequest(
                 context, url,  shouldBypassCache, priority, listener, errorListener);
         request.setTag(tag);

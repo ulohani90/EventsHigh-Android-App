@@ -132,6 +132,7 @@ public class MyOffersListFragment extends Fragment {
     public void getUserPoints(final boolean shouldByPassCache) {
         Uri requestUrl = UpdateAccountInfoService.getBaseUri(getActivity(), "getWalletPoints")
                 .build();
+
         try {
             VolleyHelper.addToRequestQueue(getActivity(),
                     new JsonObjectRequest(Request.Method.GET, Signer.sign(requestUrl).toString(), null,
