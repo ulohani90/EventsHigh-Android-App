@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,6 +8,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -42,6 +44,8 @@ public class ReferralCodeActivity extends BaseActivity {
     private EditText referralCodeEditText;
     ProgressBar topProgressBar;
     Account account;
+    private LinearLayout verifyPhnLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +54,7 @@ public class ReferralCodeActivity extends BaseActivity {
         topProgressBar = (ProgressBar) findViewById(R.id.top_progress_bar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Enter Referral Code");
         toolbar.setTitle("Enter Referral Code");
         account = new Account(this);
         referralCode = (TextInputLayout) findViewById(R.id.referral_code);
@@ -61,65 +66,82 @@ public class ReferralCodeActivity extends BaseActivity {
             }
         });
 
-        checkisPhoneVerified();
+        verifyPhnLayout = (LinearLayout) findViewById(R.id.verify_phn_layout);
+
+        (findViewById(R.id.verify_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                verifyClicked();
+            }
+        });
+
+        //checkisPhoneVerified();
     }
 
-    public boolean checkisPhoneVerified() {
+   /* public boolean checkisPhoneVerified() {
         if (!account.getUserInfo().isVerified) {
             PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_pa);
             return false;
         }
         return true;
-    }
-
+    }*/
+   public void verifyClicked(){
+       startActivity(new Intent(this, PhoneLoginActivity.class));
+   }
     @Override
     protected void onResume() {
         super.onResume();
+        if (account != null && !(account.getUserInfo().isVerified)) {
+            verifyPhnLayout.setClickable(true);
+            verifyPhnLayout.setVisibility(View.VISIBLE);
+        } else {
+            verifyPhnLayout.setVisibility(View.GONE);
+        }
     }
 
     public void sendCodeToServer() {
-        if (checkisPhoneVerified()) {
-            if (checkIsValid()) {
-                topProgressBar.setVisibility(View.VISIBLE);
-                reportActionToAnalytics("submitReferCodenClick");
 
-                Uri requestUrl = UpdateAccountInfoService.getBaseUri(this, "reportRefCode")
-                        .appendQueryParameter("ref_code", referralCodeEditText.getText().toString())
-                        .build();
+        if (checkIsValid()) {
+            topProgressBar.setVisibility(View.VISIBLE);
+            reportActionToAnalytics("submitReferCodenClick");
 
-                try {
-                    VolleyHelper.addToRequestQueue(this,
-                            new JsonObjectRequest(Request.Method.GET, Signer.sign(requestUrl).toString(), null,
-                                    new Response.Listener<JSONObject>() {
-                                        @Override
-                                        public void onResponse(JSONObject s, boolean isIntermediate) {
-                                            topProgressBar.setVisibility(View.GONE);
-                                            VerificationStatus status = parseStatus(s.optString("status"));
-                                            if (status == VerificationStatus.FAILURE) {
-                                                showMessage(s.optString("message"));
-                                                return;
-                                            }
-                                            showMessage("You have successfully submitted the referrer code");
-                                            finish();
+            Uri requestUrl = UpdateAccountInfoService.getBaseUri(this, "reportRefCode")
+                    .appendQueryParameter("ref_code", referralCodeEditText.getText().toString())
+                    .build();
+
+            try {
+                VolleyHelper.addToRequestQueue(this,
+                        new JsonObjectRequest(Request.Method.GET, Signer.sign(requestUrl).toString(), null,
+                                new Response.Listener<JSONObject>() {
+                                    @Override
+                                    public void onResponse(JSONObject s, boolean isIntermediate) {
+                                        topProgressBar.setVisibility(View.GONE);
+                                        VerificationStatus status = parseStatus(s.optString("status"));
+                                        if (status == VerificationStatus.FAILURE) {
+                                            showMessage(s.optString("message"));
+                                            return;
                                         }
-                                    },
-                                    new Response.ErrorListener() {
-                                        @Override
-                                        public void onErrorResponse(VolleyError volleyError) {
-                                            topProgressBar.setVisibility(View.GONE);
-                                            VolleyHelper.log(ReferralCodeActivity.this, volleyError);
-                                            showMessage(volleyError.getMessage());
-                                        }
+                                        showMessage("You have successfully submitted the referrer code");
+                                        finish();
                                     }
-                            )
-                    );
-                } catch (UnsupportedEncodingException | GeneralSecurityException e) {
-                    topProgressBar.setVisibility(View.GONE);
-                    Crashlytics.getInstance().core.logException(e);
-                    showRetryMessage();
-                }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError volleyError) {
+                                        topProgressBar.setVisibility(View.GONE);
+                                        VolleyHelper.log(ReferralCodeActivity.this, volleyError);
+                                        showMessage(volleyError.getMessage());
+                                    }
+                                }
+                        )
+                );
+            } catch (UnsupportedEncodingException | GeneralSecurityException e) {
+                topProgressBar.setVisibility(View.GONE);
+                Crashlytics.getInstance().core.logException(e);
+                showRetryMessage();
             }
         }
+
 
     }
 

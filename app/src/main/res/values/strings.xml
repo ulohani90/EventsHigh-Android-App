@@ -107,12 +107,12 @@
     <string name="action_share">Share</string>
     <string name="action_invite">Share App</string>
     <string name="action_add_friend">Add Friends</string>
-    <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Shall we go to this? Come on it’ll be fun!\n\n%1$s\n\n%2$s\n\n New user- Use Referral Code %3$s</string>
-    <string name="share_event_twitter_text">[via @eventshighapp]\n%1$s\n\n%2$s\n\n New user- Use Referral Code %3$s</string>
+    <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Shall we go to this? Come on it’ll be fun!\n\n%1$s\n\n%2$s\n\n Use my referral code %3$s</string>
+    <string name="share_event_twitter_text">[via @eventshighapp]\n%1$s\n\n%2$s\n\n Use my referral code %3$s</string>
     <string name="share_app_text">Hey! Pull up a chair. Take a taste. Come join EventsHigh. Life is so endlessly delicious.\n\n Use my referral code %1$s\n\n%2$s</string>
     <string name="share_app_message">Love only grows by sharing. You can only have more for yourself by sharing the app with friends. The more you share, the better would be your experience.</string>
     <string name="share_app_notification_message">Liked this notification? Share EventsHigh app with your contacts and they can also experience the high! Get your gang together.</string>
-    <string name="share_coupon_text">Hey! found an Offer on EventsHigh, check it out.\n\nNote: Only available on App!\n\n%1$s\n\n%2$s\n\n New user- Use Referral Code %3$s</string>
+    <string name="share_coupon_text">Hey! found an Offer on EventsHigh, check it out.\n\nNote: Only available on App!\n\n%1$s\n\n%2$s\n\n Use my referral code %3$s</string>
     <string name="share_movie_text">Hey! found a Movie on EventsHigh, check it out.\n\n%1$s\n\n%2$s</string>
 
     <!-- Failed messages -->
