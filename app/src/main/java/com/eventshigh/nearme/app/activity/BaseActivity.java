@@ -411,7 +411,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                     try {
                         Intent sendIntent = new Intent();
                         sendIntent.setAction(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + url + "\n\nNew User- Use Referral Code " + referralCode);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + url + "\n\nUse my referral code " + referralCode);
                         sendIntent.setType("text/plain");
                         startActivity(sendIntent);
                     } catch (ActivityNotFoundException e) {
