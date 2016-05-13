@@ -1,7 +1,11 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.SpannableString;
@@ -12,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -31,7 +36,8 @@ import java.util.ArrayList;
 public class MovieInfoCard extends RecyclerView.ViewHolder {
 
     TextView movieCertificate, movieName, movieReviews, movieCategory, movieDirector;
-    TextView movieSynopsis;
+    TextView movieSynopsis,movieRatingCount;
+    RatingBar movieRatingBar;
 
     ZCustomFlowLayout leadCastFlowLayout;
 
@@ -47,6 +53,8 @@ public class MovieInfoCard extends RecyclerView.ViewHolder {
         movieCategory = (TextView) view.findViewById(R.id.movie_category);
         movieSynopsis = (TextView) view.findViewById(R.id.movie_synopsis);
         movieDirector = (TextView) view.findViewById(R.id.movie_director);
+        movieRatingBar = (RatingBar)view.findViewById(R.id.movie_rating_bar);
+        movieRatingCount = (TextView)view.findViewById(R.id.movie_rating_count);
         leadCastFlowLayout = (ZCustomFlowLayout) view.findViewById(R.id.lead_cast_flowlayout);
     }
 
@@ -63,6 +71,25 @@ public class MovieInfoCard extends RecyclerView.ViewHolder {
         movieDirector.setText(string);
         leadCastFlowLayout.setReceipentsForMoVieCasts(movie.getCast(), false);
 
+        if(movie.getImdbRatingValue() < 1){
+            movieRatingBar.setVisibility(View.INVISIBLE);
+            movieRatingCount.setVisibility(View.INVISIBLE);
+        }
+        else {
+            movieRatingBar.setVisibility(View.VISIBLE);
+            movieRatingCount.setVisibility(View.VISIBLE);
+            LayerDrawable layerDrawable = (LayerDrawable) movieRatingBar.getProgressDrawable();
+
+            DrawableCompat.setTint(DrawableCompat.wrap(layerDrawable.getDrawable(0)),
+                    Color.GRAY);  // Empty star
+            DrawableCompat.setTint(DrawableCompat.wrap(layerDrawable.getDrawable(1)),
+                    Color.rgb(255, 215, 0)); // Partial star
+            DrawableCompat.setTint(DrawableCompat.wrap(layerDrawable.getDrawable(2)),
+                    Color.rgb(255,215,0));
+            movieRatingBar.setRating((float) (movie.getImdbRatingValue() / 2));
+
+            movieRatingCount.setText(" | "+movie.getImdbRatingCount()+" Ratings");
+        }
 
     }
 
@@ -86,6 +113,7 @@ public class MovieInfoCard extends RecyclerView.ViewHolder {
                 break;
             }
         }
+
         if(position!=-1){
             return movieName.substring(0,position);
         }
