@@ -125,6 +125,10 @@ public class UpdateAccountInfoService extends IntentService {
             reportDeviceInfo(uploadStatus);
         }
 
+        if (account.getReferrerCode() == null) {
+            account.recordReferrerCode(getReferrerCode());
+        }
+
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         if (apiAvailability.isGooglePlayServicesAvailable(this) != ConnectionResult.SUCCESS) {
             return;
@@ -134,10 +138,6 @@ public class UpdateAccountInfoService extends IntentService {
        /* if (account.getReferrerId() == null) {
             account.recordReferrerId(getReferrerId());
         }*/
-        if (account.getReferrerCode() == null) {
-            account.recordReferrerCode(getReferrerCode());
-            ;
-        }
 
         // Upload IID.
         InstanceID instanceID = InstanceID.getInstance(this);
