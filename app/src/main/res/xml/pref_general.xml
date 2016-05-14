@@ -22,14 +22,14 @@
             android:targetClass="com.eventshigh.nearme.app.activity.ReferralActivity"
             android:targetPackage="com.eventshigh.nearme.app" />
     </Preference>
-    <Preference
+    <!--<Preference
         android:icon="@drawable/ic_blog_nav"
         android:layout="@layout/navigation_menu_white_items"
         android:title="@string/title_movies">
         <intent
             android:targetClass="com.eventshigh.nearme.app.activity.MovieBrowseActivity"
             android:targetPackage="com.eventshigh.nearme.app" />
-    </Preference>
+    </Preference>-->
     <Preference
         android:icon="@drawable/ic_refer_code_nav"
         android:layout="@layout/navigation_menu_white_items"
