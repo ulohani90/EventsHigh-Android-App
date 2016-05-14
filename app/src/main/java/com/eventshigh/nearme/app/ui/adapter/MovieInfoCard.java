@@ -78,6 +78,7 @@ public class MovieInfoCard extends RecyclerView.ViewHolder {
         else {
             movieRatingBar.setVisibility(View.VISIBLE);
             movieRatingCount.setVisibility(View.VISIBLE);
+           /*
             LayerDrawable layerDrawable = (LayerDrawable) movieRatingBar.getProgressDrawable();
 
             DrawableCompat.setTint(DrawableCompat.wrap(layerDrawable.getDrawable(0)),
@@ -86,6 +87,7 @@ public class MovieInfoCard extends RecyclerView.ViewHolder {
                     Color.rgb(255, 215, 0)); // Partial star
             DrawableCompat.setTint(DrawableCompat.wrap(layerDrawable.getDrawable(2)),
                     Color.rgb(255,215,0));
+            */
             movieRatingBar.setRating((float) (movie.getImdbRatingValue() / 2));
 
             movieRatingCount.setText(" | "+movie.getImdbRatingCount()+" Ratings");

@@ -31,37 +31,35 @@
         android:textColor="@color/done_button"
         android:textSize="12sp" />
 
-        <LinearLayout
-            android:layout_width="fill_parent"
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal" >
+
+
+        <RatingBar
+            android:id="@+id/movie_rating_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:progressDrawable="@drawable/movie_rating_bar_draw"
+            android:stepSize="0.2"
+            android:isIndicator="true"
+            />
+
+
+        <TextView
+            android:id="@+id/movie_rating_count"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal" >
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#3A3A3A"
+            android:textSize="14sp"
+            android:layout_marginBottom="1dp"
+            />
 
-
-            <RatingBar
-                android:id="@+id/movie_rating_bar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="?android:attr/ratingBarStyleSmall"
-                android:layout_centerHorizontal="true"
-                android:numStars="5"
-                android:stepSize="0.2"
-                android:isIndicator="true"
-                />
-
-
-            <TextView
-                android:id="@+id/movie_rating_count"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:text="Reviews"
-                android:textColor="#3A3A3A"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
+    </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
