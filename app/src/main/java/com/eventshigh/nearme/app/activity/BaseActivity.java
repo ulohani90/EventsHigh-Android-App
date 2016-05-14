@@ -27,6 +27,8 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
+import com.eventshigh.nearme.app.data.MovieInfoObject;
+import com.eventshigh.nearme.app.data.MovieMarkerManager;
 import com.eventshigh.nearme.app.data.stream.OfferObject;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -129,7 +131,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         if (shareMovieInitiatedTimestamp > 0) {
             long secForShare = (System.currentTimeMillis() - shareMovieInitiatedTimestamp) / 1000;
-            reportActionToAnalytics(secForShare > 5 ? "shareMovies" : "offerMovieDismissed",
+            reportActionToAnalytics(secForShare > 5 ? "shareMovies" : "movieShareDismissed",
                     Long.toString(secForShare));
         }
 
@@ -505,6 +507,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         return EventsMarkerManager.getInstance(this).isFavourite(event.id);
     }
 
+    public boolean isMovieFavourite(MovieInfoObject movie) {
+        return MovieMarkerManager.getInstance(this).isFavourite(movie.getId() + "");
+    }
+
     public void reportEventAction(Event event, String actionName) {
         reportEventAction(event, actionName, null);
     }
@@ -516,6 +522,16 @@ public abstract class BaseActivity extends AppCompatActivity {
                     1,
                     isFavourite(event) ? "Favourite" : "No-Favourite",
                     event.ehRecommended ? "Recommended" : "Non-Recommended");
+        }
+    }
+
+
+    public void reportMovieAction(MovieInfoObject movieInfoObject, String actionName, @Nullable String label) {
+        if (movieInfoObject != null) {
+            reportActionToAnalytics(actionName,
+                    label == null ? "" : label,
+                    1,
+                    isMovieFavourite(movieInfoObject) ? "Favourite" : "No-Favourite");
         }
     }
 
@@ -567,7 +583,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void shareMovie(final MovieDetailObject movie) {
-        shareOfferInitiatedTimestamp = System.currentTimeMillis();
+        shareMovieInitiatedTimestamp = System.currentTimeMillis();
         BranchUniversalObject branchObject = new BranchUniversalObject();
         String referrerId = new Account(this).getReferrerId();
         branchObject.setCanonicalIdentifier(movie.getMovieInfo().getId() + "").setTitle(movie.getMovieInfo().getName().replaceAll("\"", " &quot "))

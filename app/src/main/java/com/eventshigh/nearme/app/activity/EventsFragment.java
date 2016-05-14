@@ -181,8 +181,10 @@ public class EventsFragment extends BaseEventsFragment {
 
         // Stop all requests associated with this fragment and then submit new request.
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-            asyncRequest =  new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
-                    shouldBypassCache, mMyEventsFetcherCallBack, mErrorListener);
+
+            asyncRequest = new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
+                    shouldBypassCache,  mMyFavEventsMoviesFetcherCallBack, mErrorListener);
+
             asyncRequest.execute();
         }else if(EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query)){
             MobileUserEventsRequest.submit(activity, eventsContext,
@@ -237,6 +239,49 @@ public class EventsFragment extends BaseEventsFragment {
                 eventsAdapter.setTopicEvents(myEvents, eventsContext, eventGridView.getSpanCount() * 2);
 
                 eventGridView.scrollToPosition(scrollPosition);
+            }
+            isLoading = false;
+        }
+    };
+
+    private Listener<MyEventsRequest.MeEventFavouriteObject> mMyFavEventsMoviesFetcherCallBack = new Listener<MyEventsRequest.MeEventFavouriteObject>() {
+        @Override
+        public void onResponse(MyEventsRequest.MeEventFavouriteObject myEvents, boolean isIntermediate) {
+            if (isFragmentDestroyed) {
+                return;
+            }
+
+            if (!isIntermediate) {
+                topProgressBar.setVisibility(View.GONE);
+
+                if (myEvents.topicEvents.isEmpty() && myEvents.movies.isEmpty()) {
+                    if (EventsHighEndpoints.isMyEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
+                        noMyEventsView.setVisibility(View.VISIBLE);
+                        noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_event));
+                        callToActionButton.setText("Explore Events");
+                    }else if(EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
+                        noMyEventsView.setVisibility(View.VISIBLE);
+                        noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_interest));
+                        callToActionButton.setText("Personalize");
+                    }else {
+                        noMyEventsView.setVisibility(View.GONE);
+                        retryView.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+
+            if (!isIntermediate) {
+                if( !myEvents.topicEvents.isEmpty()) {
+                    if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
+                        ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.topicEvents.get(0).events.get(0).imgUrl);
+                    }
+
+                    eventsAdapter.setTopicEvents(myEvents.topicEvents, eventsContext, eventGridView.getSpanCount() * 2);
+                }
+                if(!myEvents.movies.isEmpty()){
+                    eventsAdapter.setMoviesListData(myEvents.movies,eventsContext, true,myEvents.topicEvents.isEmpty()?true:false);
+                }
+                //    eventGridView.scrollToPosition(scrollPosition);
             }
             isLoading = false;
         }

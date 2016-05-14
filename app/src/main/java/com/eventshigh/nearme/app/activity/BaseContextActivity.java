@@ -18,6 +18,9 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+
+import com.eventshigh.nearme.app.data.MovieInfoObject;
+import com.eventshigh.nearme.app.data.MovieMarkerManager;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -32,6 +35,7 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 public abstract class BaseContextActivity extends BaseActivity {
     protected EventsContext eventsContext;
     protected EventsMarkerManager eventsMarkerManager;
+    protected MovieMarkerManager moviesMarkerManager;
 
     protected Toolbar toolbar;
 
@@ -41,6 +45,7 @@ public abstract class BaseContextActivity extends BaseActivity {
 
         // Initialize the EventsMarkerManager.Editor.
         eventsMarkerManager = EventsMarkerManager.getInstance(this);
+        moviesMarkerManager = MovieMarkerManager.getInstance(this);
 
         // Show the verify phone snakbar if needed.
         showVerifyPhoneSnackbar();
@@ -171,6 +176,20 @@ public abstract class BaseContextActivity extends BaseActivity {
     public void recordEventMark(Event event, @Nullable EventMark mark) {
         eventsMarkerManager.getEditor().recordEventMark(event, mark).close();
     }
+
+    public void recordMovieMark(MovieInfoObject movie, @Nullable MovieMarkerManager.MovieMark mark) {
+        moviesMarkerManager.getEditor().recordMovieMark(movie, mark).close();
+    }
+
+    public boolean isMovieFavourite(MovieInfoObject movie) {
+        return moviesMarkerManager.isFavourite(movie.getId()+"");
+    }
+
+    public @Nullable
+    MovieMarkerManager.MovieMark getMovieMark(MovieInfoObject movie) {
+        return moviesMarkerManager.getMovieMark(movie.getId()+"");
+    }
+
 
     public void reportEventAction(Event event, String actionName, int position) {
         reportActionToAnalytics(actionName,

@@ -37,7 +37,8 @@ public enum EventCategory {
     LIVE_PERFORMANCES("Live Performances & Shows"),
     EDITOR_PICKS("Editor's Picks"),
     FREE_EVENTS,
-    OTHER;
+    OTHER,
+    MOVIES;
 
     public final String categoryName;
 

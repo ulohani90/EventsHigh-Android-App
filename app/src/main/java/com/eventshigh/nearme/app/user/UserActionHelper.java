@@ -20,6 +20,7 @@ public class UserActionHelper {
     public static final String JSON_KEY_ACTION = "action";
     public static final String JSON_KEY_DATA = "data";
     private static final String JSON_KEY_EVENT_ID = "event_id";
+    private static final String JSON_KEY_MOVIE_ID = "movie_id";
     private static final String JSON_KEY_INTEREST = "interest";
 
     public enum EventAction {
@@ -30,6 +31,11 @@ public class UserActionHelper {
         SAVE,
         SHARE,
         VIEW_EVENT,
+    }
+
+    public enum MovieAction {
+        ADD_FAVORITE,
+        REMOVE_FAVORITE,
     }
 
     public enum FollowingAction {
@@ -67,6 +73,17 @@ public class UserActionHelper {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(JSON_KEY_EVENT_ID, eventId);
+            recordServerUserAction(action.name().toString(),jsonObject);
+            recordAction(action.name().toLowerCase(), jsonObject.toString());
+        } catch (JSONException e) {
+
+        }
+    }
+
+    public void recordMovieAction(MovieAction action, String movieId) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(JSON_KEY_MOVIE_ID, movieId);
             recordServerUserAction(action.name().toString(),jsonObject);
             recordAction(action.name().toLowerCase(), jsonObject.toString());
         } catch (JSONException e) {

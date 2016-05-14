@@ -48,7 +48,8 @@ public class ExploreFragment extends BaseEventsFragment {
             EventCategory.DANCE.categoryName,
             EventCategory.ART.categoryName,
             EventCategory.FOOD.categoryName,
-            EventCategory.LITERATURE.categoryName
+            EventCategory.LITERATURE.categoryName,
+
     };
 
     public static final String[] EXPLORE_TAGS_CHENNAI = {
@@ -61,7 +62,8 @@ public class ExploreFragment extends BaseEventsFragment {
             EventCategory.DANCE.categoryName,
             EventCategory.ART.categoryName,
             EventCategory.FOOD.categoryName,
-            EventCategory.LITERATURE.categoryName
+            EventCategory.LITERATURE.categoryName,
+
     };
 
     public static final String[] EXPLORE_TAGS_BANGALORE = {
@@ -200,10 +202,10 @@ public class ExploreFragment extends BaseEventsFragment {
         animateLocalityViewIn();
     }
 
-    public String getLocalitiesCommaSeparated(){
-        StringBuilder builder  =new StringBuilder();
-        for (Locality locality : selectedLocalities){
-            builder.append(locality.name+",");
+    public String getLocalitiesCommaSeparated() {
+        StringBuilder builder = new StringBuilder();
+        for (Locality locality : selectedLocalities) {
+            builder.append(locality.name + ",");
         }
         return builder.toString();
     }
@@ -232,7 +234,7 @@ public class ExploreFragment extends BaseEventsFragment {
 
             eventsAdapter.setExploreCategories(eventCollection, selectedLocalities,
                     eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE :
-                            (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS));
+                            (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS), "movies");
 
             if (!isIntermediate) {
                 EventInvitationsRequest.submit(activity, Priority.IMMEDIATE, this,
@@ -248,7 +250,7 @@ public class ExploreFragment extends BaseEventsFragment {
                 topProgressBar.setVisibility(View.GONE);
                 activity.reportActionToAnalytics("showSocialInfo", "eventInvitations",
                         eventInvitations.invitations.size());
-                eventsAdapter.addEventInvitations(eventInvitations.invitations,eventInvitations.specials);
+                eventsAdapter.addEventInvitations(eventInvitations.invitations, eventInvitations.specials);
             }
         }
     };
@@ -260,8 +262,8 @@ public class ExploreFragment extends BaseEventsFragment {
 
             if (eventsAdapter.getItemCount() == 0) {
                 eventsAdapter.setExploreCategories(null,
-                    Locality.getLocalities(eventsContext.city, false),
-                    eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS);
+                        Locality.getLocalities(eventsContext.city, false),
+                        eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS, "movies");
             }
         }
     };

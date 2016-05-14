@@ -108,7 +108,6 @@ public class MovieDetailObject implements Parcelable {
 
     @Override
     public int describeContents() {
-
         return 0;
     }
 

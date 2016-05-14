@@ -142,6 +142,7 @@
     <string name="event_time_venue">%1$s, %2$s</string>
     <string name="event_distance_and_time">%d mins</string>
     <string name="num_events">{0,choice,10&lt;{1} Events|11&lt;{0} Followers \'|\' {1} Events}</string>
+    <string name="num_movies">{0,choice,10&lt;{1} Movies|11&lt;{0} Followers \'|\' {1} Movies}</string>
 
     <!-- Rating -->
     <string name="rate_app_text">Loving EventsHigh? Give us 5 stars!</string>

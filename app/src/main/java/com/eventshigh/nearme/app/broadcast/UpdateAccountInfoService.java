@@ -100,14 +100,10 @@ public class UpdateAccountInfoService extends IntentService {
             reportDeviceInfo(uploadStatus);
         }
 
-        // Referral Link.
-       /* if (account.getReferrerId() == null) {
-            account.recordReferrerId(getReferrerId());
-        }*/
         if (account.getReferrerCode() == null) {
             account.recordReferrerCode(getReferrerCode());
-
         }
+
 
     }
 

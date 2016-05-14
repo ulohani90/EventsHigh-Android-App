@@ -28,8 +28,8 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
 
-        versionCode 299
-        versionName "2.9.9"
+        versionCode 310
+        versionName "3.1.0"
 
     }
     signingConfigs {
