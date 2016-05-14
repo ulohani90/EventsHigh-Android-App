@@ -88,8 +88,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
-    public void setMoviesListData(ArrayList<MovieDetailObject> objs) {
-        dataToShow.clear();
+    public void setMoviesListData(List<MovieDetailObject> objs, EventsContext eventsContext, boolean addHeader, boolean clearOldData) {
+        if (clearOldData)
+            dataToShow.clear();
+        if (addHeader) {
+            dataToShow.add(new HeaderData(activity, eventsContext, MyEventsRequest.MOVIES_NAME, objs.size(), HeaderData.TYPE_MOVIE));
+        }
         for (MovieDetailObject obj : objs) {
             dataToShow.add(new MovieListData(obj, activity));
         }
@@ -134,7 +138,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
                 events = events.subList(0, maxPerCategory);
             }
 
-            dataToShow.add(new HeaderData(activity, eventsContext, topicEvent.topicName, topicEvent.numEvents));
+            dataToShow.add(new HeaderData(activity, eventsContext, topicEvent.topicName, topicEvent.numEvents, HeaderData.TYPE_EVENT));
             boolean isFirstEvent = true;
             for (Event event : events) {
                 dataToShow.add(new EventData(topicEvent.topicName, event, isFirstEvent, activity, this));
@@ -180,7 +184,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
     public void setExploreCategories(@Nullable EventCollection eventCollection,
-                                     List<Locality> localities, String[] tags) {
+                                     List<Locality> localities, String[] tags, String movies) {
         dataToShow.clear();
 
         if (eventCollection != null) {
@@ -204,6 +208,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         }
 
         dataToShow.add(new SmallHeaderData(activity.getString(R.string.ui_browse_cat)));
+
+        dataToShow.add(new MovieCategoryData("movies", activity, this));
         for (String tag : tags) {
             dataToShow.add(new ExploreCategoryData(tag, activity, this));
         }

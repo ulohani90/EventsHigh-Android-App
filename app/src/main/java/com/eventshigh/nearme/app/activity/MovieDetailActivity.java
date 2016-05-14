@@ -46,6 +46,10 @@ public class MovieDetailActivity extends BaseContextActivity {
 
     ImageView backArrow;
 
+
+    public static final String FROM_NOTIFICATION_PARAM = "from notification";
+    public static final String MOVIE_PARAM = "movie";
+
     public static final String MOVIE_ID = "movie_id";
     public static final String CRITICS_REVIEWS = "reviews";
     public static final String SHOWTIMES = "showtimes";
@@ -79,11 +83,11 @@ public class MovieDetailActivity extends BaseContextActivity {
             }
         });
         topProgressBar.setVisibility(View.VISIBLE);
-        if(getIntent().hasExtra("movie")) {
-            MovieDetailObject movie = getIntent().getParcelableExtra("movie");
+        if (getIntent().hasExtra(MOVIE_PARAM)) {
+            MovieDetailObject movie = getIntent().getParcelableExtra(MOVIE_PARAM);
             populateView(movie);
-        }else{
-            movieId = getIntent().getIntExtra("movie_id",-1);
+        } else {
+            movieId = getIntent().getIntExtra(MOVIE_ID, -1);
             if (movieId != -1) {
                 makeServerRequest();
             } else {
@@ -95,6 +99,11 @@ public class MovieDetailActivity extends BaseContextActivity {
         }
     }
 
+
+    @Override
+    public View getViewForSnackbar() {
+        return null;
+    }
 
     ImageView movieBg, playVideo;
     LinearLayout headerParent;
@@ -182,7 +191,7 @@ public class MovieDetailActivity extends BaseContextActivity {
     }
 
 
-    public class MovieDetailPagerAdapter extends FragmentPagerAdapter {
+    public class MovieDetailPagerAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener {
 
         MovieDetailObject movieObject;
 
@@ -194,17 +203,18 @@ public class MovieDetailActivity extends BaseContextActivity {
         @Override
         public Fragment getItem(int position) {
             Bundle bundle = new Bundle();
-            if (position == 0) {
+            if (TABS.get(position).equalsIgnoreCase(INFO)) {
 
                 bundle.putParcelable(MOVIE_INFO, movieObject.getMovieInfo());
                 return MovieInfoLayoutFragment.newInstance(bundle);
-            } else if (position == 1) {
+            }
+            if (TABS.get(position).equalsIgnoreCase(CRITICS_REVIEWS)) {
                 bundle.putParcelableArrayList(CRITICS_REVIEWS, movieObject.getReviews());
                 return CriticsReviewsFragment.newInstance(bundle);
-            } else {
-                bundle.putParcelableArrayList(SHOWTIMES, movieObject.getShowtimes());
-                return ShowtimeFragment.newInstance(bundle);
             }
+
+            bundle.putParcelableArrayList(SHOWTIMES, movieObject.getShowtimes());
+            return ShowtimeFragment.newInstance(bundle);
 
         }
 
@@ -217,10 +227,30 @@ public class MovieDetailActivity extends BaseContextActivity {
         public int getCount() {
             return TABS.size();
         }
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            reportActionToAnalytics("movie_detail_tab_change", TABS.get(position));
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
     }
 
     @Override
     public void onBackPressed() {
+        if (getIntent().getBooleanExtra(FROM_NOTIFICATION_PARAM, false)) {
+            Intent intent = new Intent(this, LaunchActivity.class);
+            startActivity(intent);
+        }
         super.onBackPressed();
+
     }
 }

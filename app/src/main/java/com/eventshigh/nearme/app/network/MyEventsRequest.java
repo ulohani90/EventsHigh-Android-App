@@ -14,6 +14,8 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
+import com.eventshigh.nearme.app.data.MovieDetailObject;
+import com.eventshigh.nearme.app.data.MovieMarkerManager;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
@@ -32,11 +34,25 @@ import java.util.concurrent.TimeoutException;
  * Supports fetching of MyEvents for user -- it includes upcoming events which are marked as
  * favourite and few events for all follow.
  */
-public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
+public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEventFavouriteObject> {
     private static final String LOG_TAG = MyEventsRequest.class.getSimpleName();
 
     private static String FAVOURITES_NAME = "favourites";
     private static String INVITATIONS_NAME = "invitations";
+    public static String MOVIES_NAME = "my movies";
+
+
+    public static class MeEventFavouriteObject {
+        public final List<TopicEvents> topicEvents;
+
+        public final List<MovieDetailObject> movies;
+
+        public MeEventFavouriteObject(List<TopicEvents> topicEvents, List<MovieDetailObject> movies) {
+            this.topicEvents = topicEvents;
+            this.movies = movies;
+        }
+
+    }
 
     public static class TopicEvents {
         public final String topicName;
@@ -56,12 +72,12 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
 
     public static boolean isSpecialTag(String name) {
         name = name.toLowerCase();
-        return name.equals(FAVOURITES_NAME) || name.equals(INVITATIONS_NAME);
+        return name.equals(FAVOURITES_NAME) || name.equals(INVITATIONS_NAME) || name.equals(MOVIES_NAME);
     }
 
     public static void submit(Context context, EventsContext eventsContext, Priority priority,
-           Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
-           Listener<List<TopicEvents>> listener, ErrorListener errorListener) {
+                              Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
+                              Listener<MeEventFavouriteObject> listener, ErrorListener errorListener) {
         new MyEventsRequest(context, eventsContext, priority, tag, shouldBypassCache,
                 includeWithoutLocation, listener, errorListener).execute();
     }
@@ -71,14 +87,14 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
     private final Priority priority;
     private final boolean shouldBypassCache;
     private final boolean includeWithoutLocation;
-    private final Listener<List<TopicEvents>> listener;
+    private final Listener<MeEventFavouriteObject> listener;
     private final ErrorListener errorListener;
     private final Object tag;
     private boolean isRequestCancelled = false;
 
     public MyEventsRequest(Context context, EventsContext eventsContext, Priority priority,
                            Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
-                           Listener<List<TopicEvents>> listener, ErrorListener errorListener) {
+                           Listener<MeEventFavouriteObject> listener, ErrorListener errorListener) {
         this.context = context;
         this.eventsContext = eventsContext;
         this.priority = priority;
@@ -89,40 +105,34 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         this.tag = tag;
     }
 
-    public @Nullable TopicEvents getNonEmptyInterest() {
-        List<TopicEvents> topicEventsList = doInBackground();
-        for (TopicEvents events : topicEventsList) {
-            if (!isSpecialTag(events.topicName) && events.numEvents > 0) {
-                return events;
-            }
-        }
-
-        return null;
-     }
-
     @Override
-    protected List<TopicEvents> doInBackground(Void... params) {
+    protected MeEventFavouriteObject doInBackground(Void... params) {
         if (eventsContext.city == null) {
             Log.w(LOG_TAG, "No City for: " + eventsContext.toString());
             return null;
         }
 
-        List<TopicEvents> result = new ArrayList<>();
+        List<MovieDetailObject> movies = new ArrayList<>();
+        List<TopicEvents> events = new ArrayList<>();
         RequestFuture<SocialInvitationsRequest.CommonInviteObject> socialInvites = RequestFuture.newFuture();
         SocialInvitationsRequest.submit(context, priority, tag, shouldBypassCache,
                 socialInvites, socialInvites);
 
-        // Interest based requests.
-        /*List<String> interests = new Account(context).getFollowingInterests();
-        Map<String, RequestFuture<EventsCollection>> interestsEvents = Utils.getMap();
-        for (String interest : interests) {
-            RequestFuture<EventsCollection> eventsFuture = RequestFuture.newFuture();
-            EventCollectionRequest.submit(context, new EventsContext(eventsContext.location, interest),
-                priority, tag, shouldBypassCache, includeWithoutLocation, eventsFuture, eventsFuture);
-            interestsEvents.put(interest, eventsFuture);
-        }
-*/
 
+        MovieMarkerManager movieMarkerManager = MovieMarkerManager.getInstance(context);
+        movieMarkerManager.waitForLoading();
+
+        for (String movieId : movieMarkerManager.getFavouritedMovies()) {
+            RequestFuture<MovieDetailObject> movieObj = RequestFuture.newFuture();
+            MovieDetailRequest.submit(context, Integer.parseInt(movieId),
+                    priority, movieObj, movieObj);
+            try {
+                addMoviesToResults(movies, movieObj);
+            } catch (RequestCancelledException e) {
+                isRequestCancelled = true;
+                return null;
+            }
+        }
 
         // Favourites event requests.
         EventsMarkerManager markerManager = EventsMarkerManager.getInstance(context);
@@ -145,17 +155,17 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
 
         // Build Result.
         try {
-            addEventsToResults(result, INVITATIONS_NAME, invitedEvents);
-            addEventsToResults(result, FAVOURITES_NAME, favEvents);
+            addEventsToResults(events, INVITATIONS_NAME, invitedEvents);
+            addEventsToResults(events, FAVOURITES_NAME, favEvents);
 
-            return result;
+            return new MeEventFavouriteObject(events, movies);
         } catch (RequestCancelledException e) {
             isRequestCancelled = true;
             return null;
         }
     }
 
-    protected void onPostExecute(@Nullable List<TopicEvents> result) {
+    protected void onPostExecute(@Nullable MeEventFavouriteObject result) {
         if (isRequestCancelled) {
             return;
         }
@@ -168,15 +178,14 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
     }
 
     private static void addToResults(List<TopicEvents> result, String name, List<Event> events) {
-        if (! events.isEmpty()) {
+        if (!events.isEmpty()) {
             result.add(new TopicEvents(name, events));
         }
     }
 
 
-
     private static void addEventsToResults(List<TopicEvents> result, String name,
-            RequestFuture<List<Event>> eventsFuture) throws RequestCancelledException {
+                                           RequestFuture<List<Event>> eventsFuture) throws RequestCancelledException {
         try {
             addToResults(result, name, eventsFuture.get(10, TimeUnit.SECONDS));
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -187,8 +196,20 @@ public class MyEventsRequest extends AsyncTask<Void, Void, List<TopicEvents>> {
         }
     }
 
+    private static void addMoviesToResults(List<MovieDetailObject> result,
+                                           RequestFuture<MovieDetailObject> movieFuture) throws RequestCancelledException {
+        try {
+            result.add(movieFuture.get(10, TimeUnit.SECONDS));
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            if (movieFuture.isCancelled()) {
+                throw new RequestCancelledException();
+            }
+            Crashlytics.getInstance().core.logException(e);
+        }
+    }
+
     private static void addCollectionToResults(List<TopicEvents> result, String name,
-            RequestFuture<EventsCollection> eventsFuture) throws RequestCancelledException {
+                                               RequestFuture<EventsCollection> eventsFuture) throws RequestCancelledException {
         try {
             addToResults(result, name, eventsFuture.get(10, TimeUnit.SECONDS).events);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {

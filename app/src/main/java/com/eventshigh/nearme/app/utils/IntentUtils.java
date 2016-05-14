@@ -12,6 +12,8 @@ import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
 import com.eventshigh.nearme.app.activity.EventsGridActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
+import com.eventshigh.nearme.app.activity.MovieBrowseActivity;
+import com.eventshigh.nearme.app.activity.MovieDetailActivity;
 import com.eventshigh.nearme.app.activity.PointsBreakdownActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -52,7 +54,7 @@ public class IntentUtils {
         if (param == null) {
             param = new EventsContext(null, "");
         }
-        System.out.println("Notification param"+param.query);
+        System.out.println("Notification param" + param.query);
         if (inIntent.getAction() != null) {
             if (Intent.ACTION_SEARCH.equals(inIntent.getAction())) {
                 processSearchIntent(inIntent);
@@ -62,10 +64,18 @@ public class IntentUtils {
                 if (activity instanceof LaunchActivity) {
                     String label = param.query == null ? inIntent.getStringExtra(LaunchActivity.DEFAULT_TAB_PARAM) : param.query;
                     activity.reportActionToAnalytics("openNotification", label);
-                //    Log.i("notification param", param.query);
-                }else if(activity instanceof PointsBreakdownActivity){
+                    //    Log.i("notification param", param.query);
+                } else if (activity instanceof PointsBreakdownActivity) {
                     activity.reportActionToAnalytics("openNotification", "PointsBreakdown");
-                       Log.i("Points Breakdown", "Repoted");
+                    Log.i("Points Breakdown", "Reported");
+                } else if (activity instanceof MovieBrowseActivity) {
+                    String language = inIntent.getAction().substring(BaseActivity.NOTIFICATION_ACTION.length() + 1, inIntent.getAction().length());
+                    activity.reportActionToAnalytics("openNotification", "Browse Movies", 0, language);
+                    Log.i("Browse Movies", "Reported");
+                } else if (activity instanceof MovieDetailActivity) {
+                    String movieId = inIntent.getAction().substring(BaseActivity.NOTIFICATION_ACTION.length() + 1, inIntent.getAction().length());
+                    activity.reportActionToAnalytics("openNotification", "Movie Detail", 0, movieId);
+                    Log.i("Movie Detail", "Reported");
                 }
                 processViewIntent(inIntent, false);
             }
