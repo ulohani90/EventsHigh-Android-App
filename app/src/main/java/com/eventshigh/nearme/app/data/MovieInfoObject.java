@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -34,6 +35,9 @@ public class MovieInfoObject implements Parcelable {
 
     private String certification;
 
+    private int imdbRatingCount;
+    private double imdbRatingValue;
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
@@ -47,6 +51,8 @@ public class MovieInfoObject implements Parcelable {
         dest.writeStringList(genre);
         dest.writeStringList(launguages);
         dest.writeString(youtubeVideoId);
+        dest.writeInt(imdbRatingCount);
+        dest.writeDouble(imdbRatingValue);
         dest.writeString(certification);
     }
 
@@ -65,6 +71,8 @@ public class MovieInfoObject implements Parcelable {
         this.launguages = new ArrayList<>();
         in.readStringList(launguages);
         this.youtubeVideoId = in.readString();
+        this.imdbRatingCount = in.readInt();
+        this.imdbRatingValue = in.readDouble();
         this.certification = in.readString();
     }
 
@@ -100,6 +108,13 @@ public class MovieInfoObject implements Parcelable {
                 }
             }
             this.youtubeVideoId = Utils.checkIfUnknown(obj.getJSONObject("movie_attributes").getString("youtube_video"));
+
+                this.imdbRatingCount = obj.getJSONObject("movie_attributes").getJSONObject("imdb_rating")
+                        .getInt("rating_count");
+                this.imdbRatingValue = obj.getJSONObject("movie_attributes").getJSONObject("imdb_rating")
+                        .getDouble("rating_value");
+
+
             this.certification = Utils.checkIfUnknown(obj.getString("certification"));
         } catch (Exception e) {
 
@@ -193,6 +208,23 @@ public class MovieInfoObject implements Parcelable {
     public void setYoutubeVideoId(String youtubeVideoId) {
         this.youtubeVideoId = youtubeVideoId;
     }
+
+    public Double getImdbRatingValue() {
+        return imdbRatingValue;
+    }
+
+    public void setImdbRatingValue(Double imdbRatingValue) {
+        this.imdbRatingValue = imdbRatingValue;
+    }
+
+    public int getImdbRatingCount() {
+        return imdbRatingCount;
+    }
+
+    public void setImdbRatingCount(int imdbRatingValue) {
+        this.imdbRatingValue = imdbRatingCount;
+    }
+
 
     public String getCertification() {
         return certification;

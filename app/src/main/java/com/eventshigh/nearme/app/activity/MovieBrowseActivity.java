@@ -18,6 +18,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.network.BrowseMoviesRequest;
 import com.eventshigh.nearme.app.network.OffersRequest;
+import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 
 import java.lang.reflect.Array;
@@ -41,6 +42,8 @@ public class MovieBrowseActivity extends BaseContextActivity {
     Account account;
     TabLayout tabsView;
 
+    private View retryView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,12 +51,20 @@ public class MovieBrowseActivity extends BaseContextActivity {
         topProgressBar = (ProgressBar) findViewById(R.id.top_progress_bar);
         tabsView = (TabLayout) findViewById(R.id.tabs);
         pager = (ViewPager) findViewById(R.id.view_pager);
+        retryView = findViewById(R.id.view_retry);
+        findViewById(R.id.retry).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reportActionToAnalytics("retry");
+                makeServerRequest();
+            }
+        });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("Movies");
         account = new Account(this);
         tabsView.setVisibility(View.GONE);
-        topProgressBar.setVisibility(View.VISIBLE);
+
         makeServerRequest();
         defalutTab = 0;
     }
@@ -82,6 +93,8 @@ public class MovieBrowseActivity extends BaseContextActivity {
     }
 
     public void makeServerRequest() {
+        topProgressBar.setVisibility(View.VISIBLE);
+        retryView.setVisibility(View.GONE);
         BrowseMoviesRequest.submit(this, account.getLastCity(), Request.Priority.IMMEDIATE, this, false, mListener, mErrorListener);
     }
 
@@ -90,6 +103,7 @@ public class MovieBrowseActivity extends BaseContextActivity {
         public void onResponse(BrowseMoviesRequest.MovieBrowseListobject listObject, boolean isIntermediate) {
             moviesObject = listObject;
             topProgressBar.setVisibility(View.GONE);
+            retryView.setVisibility(View.GONE);
             setAdapter();
         }
     };
@@ -99,6 +113,10 @@ public class MovieBrowseActivity extends BaseContextActivity {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
             topProgressBar.setVisibility(View.GONE);
+
+            topProgressBar.setVisibility(View.GONE);
+            retryView.setVisibility(View.VISIBLE);
+            VolleyHelper.log(MovieBrowseActivity.this, volleyError);
         }
     };
 

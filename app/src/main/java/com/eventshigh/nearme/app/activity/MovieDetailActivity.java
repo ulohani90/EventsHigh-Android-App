@@ -63,6 +63,8 @@ public class MovieDetailActivity extends BaseContextActivity {
     int movieId = 1798;
     ProgressBar topProgressBar;
 
+    private View retryView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +85,9 @@ public class MovieDetailActivity extends BaseContextActivity {
             }
         });
         topProgressBar.setVisibility(View.VISIBLE);
+
+
+
         if (getIntent().hasExtra(MOVIE_PARAM)) {
             MovieDetailObject movie = getIntent().getParcelableExtra(MOVIE_PARAM);
             populateView(movie);
@@ -128,6 +133,8 @@ public class MovieDetailActivity extends BaseContextActivity {
     }
 
     public void makeServerRequest() {
+        topProgressBar.setVisibility(View.VISIBLE);
+
         MovieDetailRequest.submit(this, movieId, Request.Priority.IMMEDIATE, mEventListener,
                 new Response.ErrorListener() {
                     @Override
@@ -165,10 +172,17 @@ public class MovieDetailActivity extends BaseContextActivity {
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                 .into(movieBg);
+        if (movie.getMovieInfo().getYoutubeVideoId() != null && movie.getMovieInfo().getYoutubeVideoId().length() > 0) {
+            playVideo.setVisibility(View.VISIBLE);
+        } else {
+            playVideo.setVisibility(View.GONE);
+        }
         movieBg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(movie.getMovieInfo().getYoutubeVideoId())));
+                if (movie.getMovieInfo().getYoutubeVideoId() != null && movie.getMovieInfo().getYoutubeVideoId().length() > 0) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(movie.getMovieInfo().getYoutubeVideoId())));
+                }
             }
         });
         scrimView.setVisibility(View.VISIBLE);
