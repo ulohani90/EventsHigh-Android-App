@@ -316,7 +316,7 @@ public class EventsFragment extends BaseEventsFragment {
                     eventsAdapter.setTopicEvents(myEvents.topicEvents, eventsContext, eventGridView.getSpanCount() * 2);
                 }
                 if(!myEvents.movies.isEmpty()){
-                    eventsAdapter.setMoviesListData(myEvents.movies,eventsContext, true,false);
+                    eventsAdapter.setMoviesListData(myEvents.movies,eventsContext, true,myEvents.topicEvents.isEmpty()?true:false);
                 }
                 //    eventGridView.scrollToPosition(scrollPosition);
             }
