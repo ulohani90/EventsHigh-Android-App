@@ -29,6 +29,8 @@ public class MovieDetailObject implements Parcelable {
         in.readTypedList(reviews, MovieReviewObject.CREATOR);
         showtimes = new ArrayList<>();
         in.readTypedList(showtimes, MovieShowTimeObject.CREATOR);
+        userReviews = new ArrayList<>();
+        in.readTypedList(userReviews, MovieUserReviewObject.CREATOR);
     }
 
     private MovieInfoObject movieInfo;
@@ -36,6 +38,8 @@ public class MovieDetailObject implements Parcelable {
     private ArrayList<MovieReviewObject> reviews;
 
     private ArrayList<MovieShowTimeObject> showtimes;
+
+    private ArrayList<MovieUserReviewObject> userReviews;
 
 
     public MovieDetailObject(Context context, JSONObject obj) {
@@ -50,6 +54,7 @@ public class MovieDetailObject implements Parcelable {
                     }
                 }
             }
+
             this.showtimes = new ArrayList<>();
             if (obj.has("movie_showtimes")) {
                 JSONObject showTimesObject = obj.getJSONObject("movie_showtimes");
@@ -60,6 +65,16 @@ public class MovieDetailObject implements Parcelable {
                         for (int i = 0; i < showTimesArray.length(); i++) {
                             showtimes.add(new MovieShowTimeObject(showTimesArray.getJSONObject(i)));
                         }
+                    }
+                }
+            }
+
+            this.userReviews = new ArrayList<>();
+            if (obj.has("reviews")){
+                JSONArray userReviewsArray = obj.getJSONArray("reviews");
+                if (userReviewsArray != null) {
+                    for (int i = 0; i < userReviewsArray.length(); i++) {
+                        userReviews.add(new MovieUserReviewObject(userReviewsArray.getJSONObject(i)));
                     }
                 }
             }
@@ -98,6 +113,15 @@ public class MovieDetailObject implements Parcelable {
         this.reviews = reviews;
     }
 
+    public ArrayList<MovieUserReviewObject> getUserReviews() {
+        return userReviews;
+    }
+
+    public void setUserReviews(ArrayList<MovieUserReviewObject> userReviews) {
+        this.userReviews = userReviews;
+    }
+
+
     public ArrayList<MovieShowTimeObject> getShowtimes() {
         return showtimes;
     }
@@ -115,6 +139,7 @@ public class MovieDetailObject implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(movieInfo, flags);
         dest.writeTypedList(reviews);
+        dest.writeTypedList(userReviews);
         dest.writeTypedList(showtimes);
     }
 

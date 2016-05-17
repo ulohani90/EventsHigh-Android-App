@@ -16,38 +16,63 @@ import java.net.URL;
 
 
 public class MovieUserReviewObject implements Parcelable {
-    private String reviewTitle;
-    private String reviewBlob;
-    private String imageUrl;
 
-    private String reviewerName;
-    private String sourceUrl;
-    private int id;
+    private String reviewId;
+    private String reviewerId;
+    private String reviewFor;
+    private String reviewBy;
+
+
+    private String reviewEntity;
+    private int reviewRating;
+    private String reviewTitle;
+    private String reviewText;
+
+    private String reviewPlatform;
+    private String reviewDeviceId;
+
+    public MovieUserReviewObject(){
+    }
 
     public MovieUserReviewObject(Parcel in) {
-        this.id = in.readInt();
+        this.reviewId = in.readString();
+        this.reviewerId = in.readString();
+        this.reviewFor = in.readString();
+        this.reviewBy = in.readString();
+        this.reviewEntity = in.readString();
+        this.reviewRating = in.readInt();
         this.reviewTitle = in.readString();
-        this.reviewBlob = in.readString();
-        this.imageUrl = in.readString();
-        this.reviewerName = in.readString();
-        this.sourceUrl = in.readString();
+        this.reviewText = in.readString();
+        this.reviewPlatform = in.readString();
+        this.reviewDeviceId = in.readString();
     }
 
 
     public MovieUserReviewObject(JSONObject obj) {
         try {
-            id = obj.getInt("id");
-            reviewTitle = Utils.checkIfUnknown(obj.getString("review_title"));
-            reviewBlob = Utils.checkIfUnknown(obj.getString("review_blob"));
-            imageUrl = Utils.checkIfUnknown(obj.getString("image_url"));
-            sourceUrl = obj.getString("review_url");
-            URL url = new URL(sourceUrl);
-            reviewerName = url.getHost();
+            reviewId = Utils.checkIfUnknown(obj.getString("review_id"));
+            reviewerId = Utils.checkIfUnknown(obj.getString("reviewer_id"));
+            reviewFor = Utils.checkIfUnknown(obj.getString("review_for"));
+            reviewEntity = Utils.checkIfUnknown(obj.getString("reviewed_entity"));
+            reviewBy = Utils.checkIfUnknown(obj.getString("review_by"));
+            reviewRating = obj.getInt("ratings");
+            reviewText = Utils.checkIfUnknown(obj.getString("review_text"));
+            reviewPlatform = Utils.checkIfUnknown(obj.getString("review_platform"));
+            reviewDeviceId = Utils.checkIfUnknown(obj.getString("review_device_id"));
 
         } catch (Exception e) {
 
         }
 
+    }
+
+    //setters and getters
+    public String getReviewText() {
+        return reviewText;
+    }
+
+    public void setReviewText(String reviewText) {
+        this.reviewText = reviewText;
     }
 
     public String getReviewTitle() {
@@ -58,45 +83,73 @@ public class MovieUserReviewObject implements Parcelable {
         this.reviewTitle = reviewTitle;
     }
 
-    public String getReviewBlob() {
-        return reviewBlob;
+    public int getReviewRating() {
+        return reviewRating;
     }
 
-    public void setReviewBlob(String reviewBlob) {
-        this.reviewBlob = reviewBlob;
+    public void setReviewRating(int reviewRating) {
+        this.reviewRating = reviewRating;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getReviewEntity() {
+        return reviewEntity;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setReviewEntity(String reviewEntity) {
+        this.reviewEntity = reviewEntity;
     }
 
-    public String getReviewerName() {
-        return reviewerName;
+    public String getReviewBy() {
+        return reviewBy;
     }
 
-    public void setReviewerName(String reviewerName) {
-        this.reviewerName = reviewerName;
+    public void setReviewBy(String reviewBy) {
+        this.reviewBy = reviewBy;
     }
 
-    public int getId() {
-        return id;
+    public String getReviewFor() {
+        return reviewFor;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setReviewFor(String reviewFor) {
+        this.reviewFor = reviewFor;
     }
 
-    public String getSourceUrl() {
-        return sourceUrl;
+    public String getReviewerId() {
+        return reviewerId;
     }
 
-    public void setSourceUrl(String sourceUrl) {
-        this.sourceUrl = sourceUrl;
+    public void setReviewerId(String reviewerId) {
+        this.reviewerId = reviewerId;
     }
+
+    public String getReviewId() {
+        return reviewId;
+    }
+
+    public void setReviewId(String reviewId) {
+        this.reviewId = reviewId;
+    }
+
+    public String getReviewPlatform() {
+        return reviewPlatform;
+    }
+
+    public void setReviewPlatform(String reviewPlatform) {
+        this.reviewPlatform = reviewPlatform;
+    }
+
+    public String getReviewDeviceId() {
+        return reviewDeviceId;
+    }
+
+    public void setReviewDeviceId(String reviewDeviceId) {
+        this.reviewDeviceId = reviewDeviceId;
+    }
+
+
+
+
 
     @Override
     public int describeContents() {
@@ -105,12 +158,16 @@ public class MovieUserReviewObject implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
+        dest.writeString(reviewId);
+        dest.writeString(reviewerId);
+        dest.writeString(reviewFor);
+        dest.writeString(reviewBy);
+        dest.writeString(reviewEntity);
+        dest.writeInt(reviewRating);
         dest.writeString(reviewTitle);
-        dest.writeString(reviewBlob);
-        dest.writeString(imageUrl);
-        dest.writeString(reviewerName);
-        dest.writeString(sourceUrl);
+        dest.writeString(reviewText);
+        dest.writeString(reviewPlatform);
+        dest.writeString(reviewDeviceId);
 
     }
 
@@ -118,7 +175,6 @@ public class MovieUserReviewObject implements Parcelable {
             new Parcelable.Creator<MovieUserReviewObject>() {
                 public MovieUserReviewObject createFromParcel(Parcel in) {
                     return new MovieUserReviewObject(in);
-
                 }
 
                 public MovieUserReviewObject[] newArray(int size) {

@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 
 
@@ -24,13 +26,8 @@ public class WriteReviewRatingFragment extends Fragment{
     TextView tvMovieName;
     RatingBar rbMovieRating;
 
-    // Container Activity must implement this interface
-    public interface OnMovieRatedListener {
-        public void onMovieRated(int rating);
-    }
 
     WriteReviewActivity writeReviewActivity;
-    OnMovieRatedListener mCallback;
 
     public static WriteReviewRatingFragment newInstance(WriteReviewActivity writeReviewActivity){
         return new WriteReviewRatingFragment();
@@ -40,13 +37,6 @@ public class WriteReviewRatingFragment extends Fragment{
     public void onAttach(Context context) {
         writeReviewActivity = (WriteReviewActivity)context;
         super.onAttach(context);
-        try {
-            mCallback = (OnMovieRatedListener) writeReviewActivity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(writeReviewActivity.toString()
-                    + " must implement OnMovieRatedListener");
-        }
-
     }
 
     @Nullable
@@ -54,11 +44,16 @@ public class WriteReviewRatingFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_write_review_rating, container, false);
         ivMoviePicture = (ImageView)rootView.findViewById(R.id.iv_write_review_movie_pic);
-        tvMovieName = (TextView)rootView.findViewById(R.id.tv_write_review_description_movie_name);
+        tvMovieName = (TextView)rootView.findViewById(R.id.tv_write_review_movie_name);
         rbMovieRating = (RatingBar)rootView.findViewById(R.id.rb_write_rating);
         rbMovieRating.setOnTouchListener(writeReviewActivity);
-
+        if(writeReviewActivity.movieDetailObject != null){
+            Glide.with(writeReviewActivity).load(writeReviewActivity.movieDetailObject.getMovieInfo().getImg_url())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                    .into(ivMoviePicture);
+            tvMovieName.setText(writeReviewActivity.movieDetailObject.getMovieInfo().getName());
+        }
         return rootView;
     }
-
 }

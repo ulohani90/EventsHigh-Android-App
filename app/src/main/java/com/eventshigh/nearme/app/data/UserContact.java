@@ -187,7 +187,7 @@ public class UserContact implements Comparable<UserContact>, Serializable {
         String[] emails = null;
         if (emailCursor != null && emailCursor.getCount() > 0) {
             emails = new String[emailCursor.getCount()];
-            for (int i = 0; i < emails.length; i++) {
+            for (int i = 0; i < emails.length; i++){
                 emailCursor.moveToNext();
                 emails[i] = emailCursor.getString(
                         emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS));

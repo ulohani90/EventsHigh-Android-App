@@ -44,6 +44,9 @@ public class UserReviewsFragment extends android.support.v4.app.Fragment {
         return view;
     }
 
+
+
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -58,4 +61,5 @@ public class UserReviewsFragment extends android.support.v4.app.Fragment {
 
         eventsAdapter.setUserMovieReviews(reviews);
     }
+
 }

@@ -22,52 +22,23 @@ import com.eventshigh.nearme.app.view.CircularImageView;
  * @since 16/5/16.
  */
 public class MovieUserReviewCard extends RecyclerView.ViewHolder{
-
-
-    TextView reviewTitle,reviewDesc,reviewSource;
-    CircularImageView imageView;
-    LinearLayout parentLayout;
+    TextView tvReviewTitle,tvReviewText,tvReviewBy;
 
     public static MovieUserReviewCard newInstance(final BaseActivity activity, ViewGroup parent) {
-        View view = activity.getLayoutInflater().inflate(R.layout.card_movie_review, parent, false);
+        View view = activity.getLayoutInflater().inflate(R.layout.card_user_movie_review, parent, false);
         return new MovieUserReviewCard(view);
     }
 
     public MovieUserReviewCard(View itemView) {
         super(itemView);
-        reviewTitle = (TextView)itemView.findViewById(R.id.source_title);
-        reviewDesc = (TextView)itemView.findViewById(R.id.source_desc);
-        reviewSource = (TextView)itemView.findViewById(R.id.source_name);
-        imageView =(CircularImageView)itemView.findViewById(R.id.source_img);
-        parentLayout = (LinearLayout)itemView.findViewById(R.id.review_parent);
+        tvReviewTitle = (TextView)itemView.findViewById(R.id.tv_user_review_title);
+        tvReviewText = (TextView)itemView.findViewById(R.id.tv_user_review_text);
+        tvReviewBy = (TextView)itemView.findViewById(R.id.tv_user_review_by);
     }
 
-
-
     public void bindData(final BaseContextActivity activity, final MovieUserReviewObject review){
-
-        Glide.with(activity).load(review.getImageUrl())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.drawable.ic_launcher).crossFade().centerCrop()
-                .into(imageView);
-
-        reviewTitle.setText(Html.fromHtml(review.getReviewTitle()));
-        reviewDesc.setText(review.getReviewBlob());
-        if(review.getReviewerName()!=null) {
-            SpannableString sourceText = new SpannableString("Source: " + review.getReviewerName());
-            sourceText.setSpan(new ForegroundColorSpan(activity.getResources().getColor(R.color.primary)), 0, 7, SpannableString.SPAN_INCLUSIVE_EXCLUSIVE);
-            reviewSource.setText(sourceText);
-        }else{
-            reviewSource.setVisibility(View.GONE);
-        }
-
-        parentLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.showCustomUrlActivity(review.getSourceUrl(),review.getReviewerName());
-            }
-        });
-
-
+        tvReviewTitle.setText(review.getReviewTitle());
+        tvReviewText.setText(review.getReviewText());
+        tvReviewBy.setText("by " + review.getReviewBy());
     }
 }

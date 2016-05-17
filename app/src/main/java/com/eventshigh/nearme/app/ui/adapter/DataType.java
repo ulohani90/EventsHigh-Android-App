@@ -30,7 +30,8 @@ public enum DataType {
     SHOWTIME(19),
     MOVIE_INFO(20),
     MOVIE_LIST_CARD(21),
-    MOVIE_CATEGORY(22);
+    MOVIE_CATEGORY(22),
+    MOVIE_USER_REVIEW(23);
 
     public final int typeId;
 
@@ -115,6 +116,9 @@ public enum DataType {
 
         if (typeId == MOVIE_REVIEW.typeId) {
             return MovieReviewCard.newInstance(activity, parent);
+        }
+        if (typeId == MOVIE_USER_REVIEW.typeId) {
+            return MovieUserReviewCard.newInstance(activity, parent);
         }
         if (typeId == SHOWTIME.typeId) {
             return ShowTimeCard.newInstance(activity, parent);

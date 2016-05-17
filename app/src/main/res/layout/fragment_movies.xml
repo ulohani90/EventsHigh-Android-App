@@ -47,6 +47,7 @@
             android:outlineProvider="bounds"
 
             tools:listitem="@layout/card_event" />
+
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <LinearLayout

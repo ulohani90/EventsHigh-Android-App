@@ -186,7 +186,7 @@
     <!--Movies-->
     <string name="title_movies">Movies</string>
     <string name="title_referral_code">Referral Code</string>
-    <string name="title_activity_write_review">Review it</string>
+    <string name="title_activity_write_review">Rate and Review</string>
 
     <!--WriteReview-->
     <string name="write_review_title">Title</string>

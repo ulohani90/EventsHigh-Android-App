@@ -23,7 +23,7 @@ public class MovieUserReviewData implements AdapterData{
 
     @Override
     public DataType getType() {
-        return DataType.MOVIE_REVIEW;
+        return DataType.MOVIE_USER_REVIEW;
     }
 
     @Override
@@ -33,6 +33,6 @@ public class MovieUserReviewData implements AdapterData{
 
     @Override
     public String getId() {
-        return reviewObj.getId()+"";
+        return reviewObj.getReviewId()+"";
     }
 }

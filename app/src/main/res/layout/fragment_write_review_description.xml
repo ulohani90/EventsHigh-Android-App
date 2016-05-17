@@ -8,15 +8,15 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:background="@color/movie_header_grey_color"
                 android:padding="4dp"
-                android:background="@color/articles_search_secondary_text_color">
+                android:layout_marginTop="4dp">
 
                 <com.eventshigh.nearme.app.view.CircularImageView
                     android:id="@+id/civ_movie_pic"
@@ -28,7 +28,6 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-
                     android:orientation="vertical">
 
                     <TextView
@@ -39,13 +38,14 @@
                         android:layout_marginTop="4dp"
                         android:text="Movie Name"
                         android:id="@+id/tv_write_review_description_movie_name"
+                        android:textColor="@color/red_movie_text_color"
                         />
 
                     <RatingBar
                         android:id="@+id/rb_write_rating_description"
                         android:layout_width="wrap_content"
                         android:layout_height="24dp"
-                        android:progressDrawable="@drawable/movie_rating_bar_draw"
+                        android:progressDrawable="@drawable/movie_review_rating_bar"
                         android:stepSize="1"
                         android:isIndicator="true"
                         />
@@ -59,6 +59,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:layout_marginTop="10dp"
+                android:textColor="@color/movie_text_grey_color"
                 android:id="@+id/et_write_review_title"
                 android:hint="@string/write_review_title" />
 
@@ -66,8 +67,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="10dp"
                 android:minHeight="100dp"
+                android:textColor="@color/movie_text_grey_color"
                 android:id="@+id/et_write_review_description"
                 android:hint="@string/write_review_description" />
 
@@ -77,9 +79,14 @@
 
         <Button
             android:id="@+id/btn_write_review"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Submit"
+            android:text="Submit Review"
+            android:textColor="@android:color/white"
+            android:background="@color/movie_submit_green_color"
+            android:textSize="14dp"
+            android:padding="4dp"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_gravity="bottom"/>
 
 

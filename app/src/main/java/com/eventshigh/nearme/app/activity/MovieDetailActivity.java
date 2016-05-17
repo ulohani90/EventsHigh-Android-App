@@ -11,10 +11,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,16 +28,16 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
+import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.network.MovieDetailRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.view.ZCustomFlowLayout;
 
 import java.util.ArrayList;
 
 /**
  * Created by umesh on 29/04/16.
  */
-public class MovieDetailActivity extends BaseContextActivity implements ViewPager.OnPageChangeListener{
+public class MovieDetailActivity extends BaseContextActivity implements ViewPager.OnPageChangeListener,View.OnClickListener{
 
     Toolbar toolbar;
 
@@ -58,7 +54,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     public static final String SHOWTIMES = "showtimes";
     public static final String MOVIE_INFO = "movie_info";
     public static final String USER_REVIEWS = "user_reviews";
-
+    public static final String MOVIE_DETAIL_OBJECT = "movie_detail_object";
 
     private final String CRITICS = "reviews";
     private final String SHOWTIME = "showtime";
@@ -70,6 +66,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     FloatingActionButton fabWriteReviews;
 
     private View retryView;
+    private MovieDetailObject movieDetailOject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,11 +92,13 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
         //write review
         fabWriteReviews = (FloatingActionButton)findViewById(R.id.fab_write_review);
         pager.addOnPageChangeListener(this);
-
+        fabWriteReviews.setOnClickListener(this);
+        fabWriteReviews.setVisibility(View.GONE);
 
 
         if (getIntent().hasExtra(MOVIE_PARAM)) {
             MovieDetailObject movie = getIntent().getParcelableExtra(MOVIE_PARAM);
+            movieDetailOject = movie;
             populateView(movie);
         } else {
             movieId = getIntent().getIntExtra(MOVIE_ID, -1);
@@ -156,6 +155,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     private Response.Listener<MovieDetailObject> mEventListener = new Response.Listener<MovieDetailObject>() {
         @Override
         public void onResponse(final MovieDetailObject movie, boolean isIntermediate) {
+            movieDetailOject = movie;
             populateView(movie);
         }
     };
@@ -173,6 +173,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
             TABS.add(SHOWTIMES);
         }
         TABS.add(USER_REVIEWS);
+
         movieBg.setVisibility(View.VISIBLE);
         playVideo.setVisibility(View.VISIBLE);
         Glide.with(this).load(movie.getMovieInfo().getImg_url())
@@ -194,7 +195,8 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
         });
         scrimView.setVisibility(View.VISIBLE);
         pager.setVisibility(View.VISIBLE);
-        MovieDetailPagerAdapter adapter = new MovieDetailPagerAdapter(getSupportFragmentManager(), movie);
+        MovieDetailPagerAdapter adapter
+                = new MovieDetailPagerAdapter(getSupportFragmentManager(), movie);
         pager.setAdapter(adapter);
         TabLayout tabsView = (TabLayout) findViewById(R.id.tabs);
         tabsView.setVisibility(View.VISIBLE);
@@ -232,15 +234,25 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
             if (TABS.get(position).equalsIgnoreCase(CRITICS_REVIEWS)) {
                 bundle.putParcelableArrayList(CRITICS_REVIEWS, movieObject.getReviews());
                 return CriticsReviewsFragment.newInstance(bundle);
-            } else if(position == 2) {
+            } else if(TABS.get(position).equalsIgnoreCase(SHOWTIMES)){
                 bundle.putParcelableArrayList(SHOWTIMES, movieObject.getShowtimes());
                 return ShowtimeFragment.newInstance(bundle);
             }
-            else{
-                bundle.putParcelableArrayList(USER_REVIEWS, movieObject.getReviews());
+            else if(TABS.get(position).equalsIgnoreCase(USER_REVIEWS)){
+                //Dummy Object - ArrayList<MovieUserReviewObject>
+                ArrayList<MovieUserReviewObject> movieUserReviewObjects = new ArrayList<>();
+                MovieUserReviewObject movieUserReviewObject = new MovieUserReviewObject();
+                movieUserReviewObject.setReviewBy("Shubham");
+                movieUserReviewObject.setReviewText("Movie is superb!");
+                movieUserReviewObject.setReviewTitle("Worth Watch");
+                movieUserReviewObjects.add(movieUserReviewObject);
+                movieObject.setUserReviews(movieUserReviewObjects);
+                //dummy
+                bundle.putParcelableArrayList(USER_REVIEWS, movieObject.getUserReviews());
                 return UserReviewsFragment.newInstance(bundle);
+            }else{
+                return null;
             }
-
 
         }
 
@@ -299,9 +311,33 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
 
 
     protected void animateFab(int position){
-        fabWriteReviews.clearAnimation();
-        TranslateAnimation translateAnimation =  new TranslateAnimation(0,0,0,0);
-
+        if(!TABS.get(position).equalsIgnoreCase(USER_REVIEWS)){
+            fabWriteReviews.setVisibility(View.GONE);
+            TranslateAnimation translateAnimation = new TranslateAnimation(0,0,0,250);
+            translateAnimation.setDuration(300);
+            fabWriteReviews.startAnimation(translateAnimation);
+        }else {
+            fabWriteReviews.clearAnimation();
+            fabWriteReviews.setVisibility(View.VISIBLE);
+            TranslateAnimation translateAnimation = new TranslateAnimation(0,0,250,0);
+            translateAnimation.setDuration(300);
+            fabWriteReviews.startAnimation(translateAnimation);
+        }
     }
+
+    @Override
+    public void onClick(View v){
+        switch(v.getId()){
+            case R.id.fab_write_review:
+                Intent i = new Intent(this, WriteReviewActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(MOVIE_DETAIL_OBJECT,movieDetailOject);
+                i.putExtras(bundle);
+                startActivity(i);
+                overridePendingTransition( R.anim.animate_slide_up, R.anim.animate_slide_down );
+                break;
+        }
+    }
+
 
 }
