@@ -185,4 +185,14 @@
     <!--Movies-->
     <string name="title_movies">Movies</string>
     <string name="title_referral_code">Referral Code</string>
+    <string name="title_activity_write_review">Review it</string>
+
+    <!--WriteReview-->
+    <string name="write_review_title">Title</string>
+    <string name="write_review_description">Description</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
 </resources>

@@ -1,0 +1,86 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    tools:context="com.eventshigh.nearme.app.activity.WriteReviewDescriptionFragment"
+    android:orientation="vertical"
+    >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="4dp"
+                android:background="@color/articles_search_secondary_text_color">
+
+                <com.eventshigh.nearme.app.view.CircularImageView
+                    android:id="@+id/civ_movie_pic"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_marginRight="5dp"/>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="4dp"
+                        android:text="Movie Name"
+                        android:id="@+id/tv_write_review_description_movie_name"
+                        />
+
+                    <RatingBar
+                        android:id="@+id/rb_write_rating_description"
+                        android:layout_width="wrap_content"
+                        android:layout_height="24dp"
+                        android:progressDrawable="@drawable/movie_rating_bar_draw"
+                        android:stepSize="1"
+                        android:isIndicator="true"
+                        />
+                </LinearLayout>
+
+        </LinearLayout>
+
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:layout_marginTop="10dp"
+                android:id="@+id/et_write_review_title"
+                android:hint="@string/write_review_title" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:layout_marginTop="4dp"
+                android:minHeight="100dp"
+                android:id="@+id/et_write_review_description"
+                android:hint="@string/write_review_description" />
+
+
+    </LinearLayout>
+
+
+        <Button
+            android:id="@+id/btn_write_review"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit"
+            android:layout_gravity="bottom"/>
+
+
+</FrameLayout>

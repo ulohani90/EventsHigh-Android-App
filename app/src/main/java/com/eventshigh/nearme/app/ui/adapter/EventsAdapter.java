@@ -15,6 +15,7 @@ import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.MovieInfoObject;
 import com.eventshigh.nearme.app.data.MovieReviewObject;
 import com.eventshigh.nearme.app.data.MovieShowTimeObject;
+import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.data.ShowDates;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.TrendingTopic;
@@ -156,6 +157,15 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         dataToShow.clear();
         for (MovieReviewObject obj : objs) {
             dataToShow.add(new MovieReviewData(obj, activity));
+        }
+        notifyDataSetChanged();
+    }
+
+
+    public void setUserMovieReviews(ArrayList<MovieUserReviewObject> objs) {
+        dataToShow.clear();
+        for (MovieUserReviewObject obj : objs) {
+            dataToShow.add(new MovieUserReviewData(obj, activity));
         }
         notifyDataSetChanged();
     }

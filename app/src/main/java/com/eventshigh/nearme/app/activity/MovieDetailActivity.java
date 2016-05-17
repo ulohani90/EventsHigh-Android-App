@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,8 +15,10 @@ import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -38,7 +41,7 @@ import java.util.ArrayList;
 /**
  * Created by umesh on 29/04/16.
  */
-public class MovieDetailActivity extends BaseContextActivity {
+public class MovieDetailActivity extends BaseContextActivity implements ViewPager.OnPageChangeListener{
 
     Toolbar toolbar;
 
@@ -47,9 +50,11 @@ public class MovieDetailActivity extends BaseContextActivity {
     ImageView backArrow;
 
     public static final String MOVIE_ID = "movie_id";
-    public static final String CRITICS_REVIEWS = "reviews";
+    public static final String CRITICS_REVIEWS = "critic_reviews";
     public static final String SHOWTIMES = "showtimes";
     public static final String MOVIE_INFO = "movie_info";
+    public static final String USER_REVIEWS = "user_reviews";
+
 
     private final String CRITICS = "reviews";
     private final String SHOWTIME = "showtime";
@@ -58,6 +63,7 @@ public class MovieDetailActivity extends BaseContextActivity {
 
     int movieId = 1798;
     ProgressBar topProgressBar;
+    FloatingActionButton fabWriteReviews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +85,12 @@ public class MovieDetailActivity extends BaseContextActivity {
             }
         });
         topProgressBar.setVisibility(View.VISIBLE);
+
+        //write review
+        fabWriteReviews = ( FloatingActionButton)findViewById(R.id.fab_write_review);
+        pager.addOnPageChangeListener(this);
+
+
         if(getIntent().hasExtra("movie")) {
             MovieDetailObject movie = getIntent().getParcelableExtra("movie");
             populateView(movie);
@@ -150,6 +162,7 @@ public class MovieDetailActivity extends BaseContextActivity {
         if (movie.getShowtimes() != null && movie.getShowtimes().size() > 0) {
             TABS.add(SHOWTIMES);
         }
+        TABS.add(USER_REVIEWS);
         movieBg.setVisibility(View.VISIBLE);
         playVideo.setVisibility(View.VISIBLE);
         Glide.with(this).load(movie.getMovieInfo().getImg_url())
@@ -201,9 +214,13 @@ public class MovieDetailActivity extends BaseContextActivity {
             } else if (position == 1) {
                 bundle.putParcelableArrayList(CRITICS_REVIEWS, movieObject.getReviews());
                 return CriticsReviewsFragment.newInstance(bundle);
-            } else {
+            } else if(position == 2) {
                 bundle.putParcelableArrayList(SHOWTIMES, movieObject.getShowtimes());
                 return ShowtimeFragment.newInstance(bundle);
+            }
+            else{
+                bundle.putParcelableArrayList(USER_REVIEWS, movieObject.getReviews());
+                return UserReviewsFragment.newInstance(bundle);
             }
 
         }
@@ -223,4 +240,29 @@ public class MovieDetailActivity extends BaseContextActivity {
     public void onBackPressed() {
         super.onBackPressed();
     }
+
+
+    //OnPageListerner Methods
+    @Override
+    public void onPageSelected(int position) {
+        animateFab(position);
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state){
+        Log.e("",state + " state changed");
+    }
+
+
+    protected void animateFab(int position){
+        fabWriteReviews.clearAnimation();
+        TranslateAnimation translateAnimation =  new TranslateAnimation(0,0,0,0);
+
+    }
+
 }
