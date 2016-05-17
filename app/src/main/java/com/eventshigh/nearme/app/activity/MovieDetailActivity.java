@@ -49,6 +49,10 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
 
     ImageView backArrow;
 
+
+    public static final String FROM_NOTIFICATION_PARAM = "from notification";
+    public static final String MOVIE_PARAM = "movie";
+
     public static final String MOVIE_ID = "movie_id";
     public static final String CRITICS_REVIEWS = "critic_reviews";
     public static final String SHOWTIMES = "showtimes";
@@ -64,6 +68,8 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     int movieId = 1798;
     ProgressBar topProgressBar;
     FloatingActionButton fabWriteReviews;
+
+    private View retryView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,15 +93,16 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
         topProgressBar.setVisibility(View.VISIBLE);
 
         //write review
-        fabWriteReviews = ( FloatingActionButton)findViewById(R.id.fab_write_review);
+        fabWriteReviews = (FloatingActionButton)findViewById(R.id.fab_write_review);
         pager.addOnPageChangeListener(this);
 
 
-        if(getIntent().hasExtra("movie")) {
-            MovieDetailObject movie = getIntent().getParcelableExtra("movie");
+
+        if (getIntent().hasExtra(MOVIE_PARAM)) {
+            MovieDetailObject movie = getIntent().getParcelableExtra(MOVIE_PARAM);
             populateView(movie);
-        }else{
-            movieId = getIntent().getIntExtra("movie_id",-1);
+        } else {
+            movieId = getIntent().getIntExtra(MOVIE_ID, -1);
             if (movieId != -1) {
                 makeServerRequest();
             } else {
@@ -106,6 +113,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
             }
         }
     }
+
 
 
     ImageView movieBg, playVideo;
@@ -131,6 +139,8 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     }
 
     public void makeServerRequest() {
+        topProgressBar.setVisibility(View.VISIBLE);
+
         MovieDetailRequest.submit(this, movieId, Request.Priority.IMMEDIATE, mEventListener,
                 new Response.ErrorListener() {
                     @Override
@@ -169,10 +179,17 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                 .into(movieBg);
+        if (movie.getMovieInfo().getYoutubeVideoId() != null && movie.getMovieInfo().getYoutubeVideoId().length() > 0) {
+            playVideo.setVisibility(View.VISIBLE);
+        } else {
+            playVideo.setVisibility(View.GONE);
+        }
         movieBg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(movie.getMovieInfo().getYoutubeVideoId())));
+                if (movie.getMovieInfo().getYoutubeVideoId() != null && movie.getMovieInfo().getYoutubeVideoId().length() > 0) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(movie.getMovieInfo().getYoutubeVideoId())));
+                }
             }
         });
         scrimView.setVisibility(View.VISIBLE);
@@ -195,7 +212,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     }
 
 
-    public class MovieDetailPagerAdapter extends FragmentPagerAdapter {
+    public class MovieDetailPagerAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener {
 
         MovieDetailObject movieObject;
 
@@ -207,11 +224,12 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
         @Override
         public Fragment getItem(int position) {
             Bundle bundle = new Bundle();
-            if (position == 0) {
+            if (TABS.get(position).equalsIgnoreCase(INFO)) {
 
                 bundle.putParcelable(MOVIE_INFO, movieObject.getMovieInfo());
                 return MovieInfoLayoutFragment.newInstance(bundle);
-            } else if (position == 1) {
+            }
+            if (TABS.get(position).equalsIgnoreCase(CRITICS_REVIEWS)) {
                 bundle.putParcelableArrayList(CRITICS_REVIEWS, movieObject.getReviews());
                 return CriticsReviewsFragment.newInstance(bundle);
             } else if(position == 2) {
@@ -222,6 +240,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
                 bundle.putParcelableArrayList(USER_REVIEWS, movieObject.getReviews());
                 return UserReviewsFragment.newInstance(bundle);
             }
+
 
         }
 
@@ -234,11 +253,31 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
         public int getCount() {
             return TABS.size();
         }
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            reportActionToAnalytics("movie_detail_tab_change", TABS.get(position));
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
     }
 
     @Override
     public void onBackPressed() {
+        if (getIntent().getBooleanExtra(FROM_NOTIFICATION_PARAM, false)) {
+            Intent intent = new Intent(this, LaunchActivity.class);
+            startActivity(intent);
+        }
         super.onBackPressed();
+
     }
 
 

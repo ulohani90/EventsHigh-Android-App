@@ -29,7 +29,8 @@ public enum DataType {
     MOVIE_REVIEW(18),
     SHOWTIME(19),
     MOVIE_INFO(20),
-    MOVIE_LIST_CARD(21);
+    MOVIE_LIST_CARD(21),
+    MOVIE_CATEGORY(22);
 
     public final int typeId;
 
@@ -41,8 +42,8 @@ public enum DataType {
         return typeId == HEADER.typeId || typeId == SMALL_HEADER.typeId
                 || typeId == EVENT_PAGER.typeId || typeId == SEE_ALL.typeId
                 || typeId == EVENT_INVITATION.typeId || typeId == OFFER.typeId
-                || typeId == POINTS.typeId|| typeId == TOTAL_POINT_HEADER.typeId
-                || typeId == POINT_BREAKDWON.typeId;
+                || typeId == POINTS.typeId || typeId == TOTAL_POINT_HEADER.typeId
+                || typeId == POINT_BREAKDWON.typeId || typeId == MOVIE_CATEGORY.typeId;
     }
 
     public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
@@ -51,7 +52,7 @@ public enum DataType {
         }
 
         if (typeId == EVENT.typeId) {
-            return EventCard.newInstance(activity, parent, false,true);
+            return EventCard.newInstance(activity, parent, false, true);
         }
 
         if (typeId == FOLLOW.typeId) {
@@ -94,35 +95,38 @@ public enum DataType {
             return EhInviteNotificationCard.newInstance(activity, parent);
         }
 
-        if(typeId == EXPLORE_LOCALITY.typeId){
-            return LocalityCard.newInstance(activity,parent);
+        if (typeId == EXPLORE_LOCALITY.typeId) {
+            return LocalityCard.newInstance(activity, parent);
         }
-        if(typeId == OFFER.typeId){
-            return OfferCard.newInstance(activity,parent);
-        }
-
-        if(typeId == POINTS.typeId){
-            return PointsCard.newInstance(activity,parent);
+        if (typeId == OFFER.typeId) {
+            return OfferCard.newInstance(activity, parent);
         }
 
-        if(typeId == TOTAL_POINT_HEADER.typeId){
-            return TotalPointsHeaderCard.newInstance(activity,parent);
-        }
-        if(typeId == POINT_BREAKDWON.typeId){
-            return PointBreakdownCard.newInstance(activity,parent);
+        if (typeId == POINTS.typeId) {
+            return PointsCard.newInstance(activity, parent);
         }
 
-        if(typeId == MOVIE_REVIEW.typeId){
-            return MovieReviewCard.newInstance(activity,parent);
+        if (typeId == TOTAL_POINT_HEADER.typeId) {
+            return TotalPointsHeaderCard.newInstance(activity, parent);
         }
-        if(typeId == SHOWTIME.typeId){
-            return ShowTimeCard.newInstance(activity,parent);
+        if (typeId == POINT_BREAKDWON.typeId) {
+            return PointBreakdownCard.newInstance(activity, parent);
         }
-        if(typeId == MOVIE_INFO.typeId){
-            return MovieInfoCard.newInstance(activity,parent);
+
+        if (typeId == MOVIE_REVIEW.typeId) {
+            return MovieReviewCard.newInstance(activity, parent);
         }
-        if(typeId == MOVIE_LIST_CARD.typeId){
-            return MovieListCard.newInstance(activity,parent);
+        if (typeId == SHOWTIME.typeId) {
+            return ShowTimeCard.newInstance(activity, parent);
+        }
+        if (typeId == MOVIE_INFO.typeId) {
+            return MovieInfoCard.newInstance(activity, parent);
+        }
+        if (typeId == MOVIE_LIST_CARD.typeId) {
+            return MovieListCard.newInstance(activity, parent);
+        }
+        if (typeId == MOVIE_CATEGORY.typeId) {
+            return TrendingCategoryCard.newInstance(activity, parent);
         }
         throw new IllegalArgumentException("invalid typeid");
     }

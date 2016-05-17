@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.ui.adapter;
 import android.support.v7.widget.RecyclerView;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
 
 /**
@@ -10,14 +11,14 @@ import com.eventshigh.nearme.app.data.MovieDetailObject;
  */
 public class MovieListData implements AdapterData {
     MovieDetailObject movie;
-    BaseActivity activity;
+    BaseContextActivity activity;
 
     @Override
     public DataType getType() {
         return DataType.MOVIE_LIST_CARD;
     }
 
-    public MovieListData(MovieDetailObject movie, BaseActivity activity) {
+    public MovieListData(MovieDetailObject movie, BaseContextActivity activity) {
         this.movie = movie;
         this.activity = activity;
     }

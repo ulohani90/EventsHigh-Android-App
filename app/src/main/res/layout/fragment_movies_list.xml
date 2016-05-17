@@ -39,6 +39,8 @@
         android:gravity="center"
         android:textAllCaps="true"
         android:padding="10dp"
+        android:background="@drawable/movie_tag_selector_bg"
+
         android:textSize="14sp"
         android:text="Showing"/>
     <TextView
@@ -47,6 +49,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:gravity="center"
+        android:background="@drawable/movie_tag_selector_bg"
         android:textAllCaps="true"
         android:textSize="14sp"
         android:text="Upcoming"/>

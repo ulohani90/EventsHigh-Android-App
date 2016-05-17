@@ -75,6 +75,7 @@ public final class TrendingTopic {
                      // Ignore.
                 }
             }
+
         }
 
         activity.showSearchView(tagName);

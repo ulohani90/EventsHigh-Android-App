@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.Context;
 import android.graphics.Movie;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
@@ -27,6 +29,14 @@ public class MovieListingFragment extends Fragment {
     ArrayList<MovieDetailObject> movies;
     ArrayList<MovieDetailObject> upcomingMovies;
     TextView upcoming, showing;
+
+    int currentState = 0;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+    }
 
     public static MovieListingFragment newInstance(Bundle bundle) {
         MovieListingFragment fragment = new MovieListingFragment();
@@ -57,27 +67,39 @@ public class MovieListingFragment extends Fragment {
             }
 
 
-            if (movies == null || (movies!=null && movies.size()==0)) {
+            if (movies == null || (movies != null && movies.size() == 0)) {
                 showing.setVisibility(View.GONE);
             } else {
                 showing.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        setAdapterData(movies);
+                        if (currentState != 0) {
+                            showing.setSelected(true);
+                            if (upcoming.isShown())
+                                upcoming.setSelected(false);
+                            setAdapterData(movies);
+                            currentState = 0;
+                        }
                     }
                 });
             }
-            if (upcomingMovies == null || (upcomingMovies!=null && upcomingMovies.size()==0)) {
+            if (upcomingMovies == null || (upcomingMovies != null && upcomingMovies.size() == 0)) {
                 upcoming.setVisibility(View.GONE);
             } else {
                 upcoming.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        setAdapterData(upcomingMovies);
+                        if (currentState != 1) {
+                            showing.setSelected(false);
+                            upcoming.setSelected(true);
+                            setAdapterData(upcomingMovies);
+                            currentState = 1;
+                        }
                     }
                 });
             }
-
+            showing.setSelected(true);
+            currentState = 0;
             setAdapterData(movies);
         }
 
@@ -86,7 +108,7 @@ public class MovieListingFragment extends Fragment {
     public void setAdapterData(ArrayList<MovieDetailObject> objs) {
         EventsAdapter adapter = new EventsAdapter((MovieBrowseActivity) getActivity());
         moviesList.setAdapter(adapter);
-        adapter.setMoviesListData(objs);
+        adapter.setMoviesListData(objs, null, false, true);
 
     }
 }
