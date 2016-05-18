@@ -30,14 +30,6 @@
             android:paddingTop="8dp">
 
             <TextView
-                android:id="@+id/tv_user_review_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="#262626"
-                android:textSize="14sp" />
-
-            <TextView
                 android:id="@+id/tv_user_review_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -35,4 +35,5 @@ public class MovieUserReviewData implements AdapterData{
     public String getId() {
         return reviewObj.getReviewId()+"";
     }
+
 }

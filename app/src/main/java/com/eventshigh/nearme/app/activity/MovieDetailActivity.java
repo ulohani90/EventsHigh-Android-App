@@ -32,6 +32,8 @@ import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.network.MovieDetailRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 /**
@@ -94,7 +96,6 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
         pager.addOnPageChangeListener(this);
         fabWriteReviews.setOnClickListener(this);
         fabWriteReviews.setVisibility(View.GONE);
-
 
         if (getIntent().hasExtra(MOVIE_PARAM)) {
             MovieDetailObject movie = getIntent().getParcelableExtra(MOVIE_PARAM);
@@ -244,10 +245,10 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
                 MovieUserReviewObject movieUserReviewObject = new MovieUserReviewObject();
                 movieUserReviewObject.setReviewBy("Shubham");
                 movieUserReviewObject.setReviewText("Movie is superb!");
-                movieUserReviewObject.setReviewTitle("Worth Watch");
                 movieUserReviewObjects.add(movieUserReviewObject);
-                movieObject.setUserReviews(movieUserReviewObjects);
+                //movieObject.setUserReviews(movieUserReviewObjects);
                 //dummy
+                Log.e("Count of user reviews ",movieObject.getUserReviews().size()+"");
                 bundle.putParcelableArrayList(USER_REVIEWS, movieObject.getUserReviews());
                 return UserReviewsFragment.newInstance(bundle);
             }else{
@@ -312,11 +313,14 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
 
     protected void animateFab(int position){
         if(!TABS.get(position).equalsIgnoreCase(USER_REVIEWS)){
-            fabWriteReviews.setVisibility(View.GONE);
-            TranslateAnimation translateAnimation = new TranslateAnimation(0,0,0,250);
-            translateAnimation.setDuration(300);
-            fabWriteReviews.startAnimation(translateAnimation);
+            if(fabWriteReviews.getVisibility() == View.VISIBLE) {
+                fabWriteReviews.setVisibility(View.GONE);
+                TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, 250);
+                translateAnimation.setDuration(300);
+                fabWriteReviews.startAnimation(translateAnimation);
+            }
         }else {
+            //Set First Reviewer Text Visible
             fabWriteReviews.clearAnimation();
             fabWriteReviews.setVisibility(View.VISIBLE);
             TranslateAnimation translateAnimation = new TranslateAnimation(0,0,250,0);

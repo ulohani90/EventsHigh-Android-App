@@ -136,11 +136,12 @@ public class MovieDetailObject implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(Parcel dest, int flags){
         dest.writeParcelable(movieInfo, flags);
         dest.writeTypedList(reviews);
-        dest.writeTypedList(userReviews);
+
         dest.writeTypedList(showtimes);
+        dest.writeTypedList(userReviews);
     }
 
 

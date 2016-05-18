@@ -11,6 +11,7 @@
         android:orientation="vertical">
 
         <LinearLayout
+                android:id="@+id/ll_review_description_header"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -53,22 +54,13 @@
 
         </LinearLayout>
 
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:layout_marginTop="10dp"
-                android:textColor="@color/movie_text_grey_color"
-                android:id="@+id/et_write_review_title"
-                android:hint="@string/write_review_title" />
-
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:layout_marginTop="10dp"
                 android:minHeight="100dp"
+                android:maxLength="5000"
                 android:textColor="@color/movie_text_grey_color"
                 android:id="@+id/et_write_review_description"
                 android:hint="@string/write_review_description" />

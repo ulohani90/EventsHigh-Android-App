@@ -25,7 +25,6 @@ public class MovieUserReviewObject implements Parcelable {
 
     private String reviewEntity;
     private int reviewRating;
-    private String reviewTitle;
     private String reviewText;
 
     private String reviewPlatform;
@@ -41,7 +40,6 @@ public class MovieUserReviewObject implements Parcelable {
         this.reviewBy = in.readString();
         this.reviewEntity = in.readString();
         this.reviewRating = in.readInt();
-        this.reviewTitle = in.readString();
         this.reviewText = in.readString();
         this.reviewPlatform = in.readString();
         this.reviewDeviceId = in.readString();
@@ -75,13 +73,6 @@ public class MovieUserReviewObject implements Parcelable {
         this.reviewText = reviewText;
     }
 
-    public String getReviewTitle() {
-        return reviewTitle;
-    }
-
-    public void setReviewTitle(String reviewTitle) {
-        this.reviewTitle = reviewTitle;
-    }
 
     public int getReviewRating() {
         return reviewRating;
@@ -164,7 +155,6 @@ public class MovieUserReviewObject implements Parcelable {
         dest.writeString(reviewBy);
         dest.writeString(reviewEntity);
         dest.writeInt(reviewRating);
-        dest.writeString(reviewTitle);
         dest.writeString(reviewText);
         dest.writeString(reviewPlatform);
         dest.writeString(reviewDeviceId);

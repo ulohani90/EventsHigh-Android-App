@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
@@ -7,12 +8,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
+import com.eventshigh.nearme.app.user.Account;
 
 public class WriteReviewActivity extends AppCompatActivity implements View.OnTouchListener{
+
+    private LinearLayout verifyPhnLayout;
+    Account account;
+
 
     WriteReviewRatingFragment writeReviewRatingFragment;
     WriteReviewDescriptionFragment writeReviewDescriptionFragment;
@@ -23,6 +30,17 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write_review);
+
+        //phone verify
+        account = new Account(this);
+        verifyPhnLayout = (LinearLayout)findViewById(R.id.verify_phn_layout);
+        (findViewById(R.id.verify_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                verifyClicked();
+            }
+        });
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Bundle bundle = this.getIntent().getExtras();
         if(bundle !=null){
@@ -40,14 +58,23 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(account!=null && !(account.getUserInfo().isVerified)){
+            verifyPhnLayout.setClickable(true);
+            verifyPhnLayout.setVisibility(View.VISIBLE);
+        }else{
+            verifyPhnLayout.setVisibility(View.GONE);
+        }
+    }
+
 
     public void onMovieRated(){
 
         writeReviewDescriptionFragment =
                 WriteReviewDescriptionFragment.newInstance(this);
         Bundle args = new Bundle();
-            args.putInt(WriteReviewDescriptionFragment.RATING_COUNT,
-                    (int)writeReviewRatingFragment.rbMovieRating.getRating() );
             writeReviewDescriptionFragment.setArguments(args);
             // Commit the transaction
             Handler handler = new Handler();
@@ -87,6 +114,17 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void verifyClicked(){
+        startActivity(new Intent(this, PhoneLoginActivity.class));
+    }
+
+    @Override
+    public void onBackPressed() {
+       super.onBackPressed();
+       overridePendingTransition(R.anim.animate_slide_down, R.anim.animate_slide_up);
+
     }
 }
 
