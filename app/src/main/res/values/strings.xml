@@ -137,6 +137,7 @@
     <string name="event_time_venue">%1$s, %2$s</string>
     <string name="event_distance_and_time">%d mins</string>
     <string name="num_events">{0,choice,10&lt;{1} Events|11&lt;{0} Followers \'|\' {1} Events}</string>
+    <string name="num_movies">{0,choice,10&lt;{1} Movies|11&lt;{0} Followers \'|\' {1} Movies}</string>
 
     <!-- Contacts Upload -->
     <string name="perm_upload_contacts">Events are best with friends. We would like to upload your contacts to our servers so that we can find friends for you.</string>
@@ -185,4 +186,15 @@
     <!--Movies-->
     <string name="title_movies">Movies</string>
     <string name="title_referral_code">Referral Code</string>
+    <string name="title_activity_write_review">Rate and Review</string>
+
+    <!--WriteReview-->
+    <string name="write_review_title">Title</string>
+    <string name="write_review_description">Write review</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_user_profile">UserProfileActivity</string>
+
+
 </resources>

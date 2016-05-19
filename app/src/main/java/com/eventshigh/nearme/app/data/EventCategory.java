@@ -44,7 +44,8 @@ public enum EventCategory {
     LIVE_PERFORMANCES("Live Performances & Shows"),
     EDITOR_PICKS("Editor's Picks"),
     FREE_EVENTS,
-    OTHER;
+    OTHER,
+    MOVIES;
 
     private static final String LOG_TAG = EventCategory.class.getSimpleName();
     public final String categoryName;

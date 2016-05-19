@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_gravity="center_vertical"
+    tools:context="com.eventshigh.nearme.app.activity.WriteReviewActivity">
+
+
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/verify_phn_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#99000000"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="48dp"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:drawableLeft="@drawable/ic_verify"
+                android:drawablePadding="10dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center_vertical"
+                android:text="Your phone number is not verified."
+                android:textColor="#555555"
+                android:textIsSelectable="false" />
+
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Please verify your phone number to enter the referral code."
+                android:textColor="#555555"
+                android:textIsSelectable="false"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/verify_btn"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/eh_button_done"
+                android:elevation="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:text="Verify"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                tools:ignore="UnusedAttribute"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</FrameLayout>

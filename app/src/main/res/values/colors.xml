@@ -54,4 +54,12 @@
     <color name="credit_icon_bg_color">#439D16</color>
     <color name="debit_icon_bg_color">#878889</color>
 
+    //rate and review
+    <color name="red_movie_text_color">#ce4a46</color>
+    <color name="movie_header_grey_color">#eeeeee</color>
+    <color name="movie_text_grey_color">#999999</color>
+    <color name="movie_submit_green_color">#4caf50</color>
+
+
+
 </resources>

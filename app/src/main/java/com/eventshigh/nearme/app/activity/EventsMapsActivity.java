@@ -118,7 +118,7 @@ public class EventsMapsActivity extends BaseContextActivity {
         topProgressBar.setVisibility(View.VISIBLE);
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
             new MyEventsRequest(this, eventsContext, Priority.IMMEDIATE, this,
-                    false, false, mMyEventsFetcherCallBack, mErrorListener).execute();
+                    false, false, mMyFavEventsFetcherCallBack, mErrorListener).execute();
         } else {
             EventCollectionRequest.submit(this, eventsContext, Priority.IMMEDIATE, this,
                     false, false, mEventsFetcherCallBack, mErrorListener);
@@ -132,12 +132,12 @@ public class EventsMapsActivity extends BaseContextActivity {
         }
 
         map.animateCamera(
-            CameraUpdateFactory.newCameraPosition(
-                CameraPosition.builder()
-                    .target(userLocation)
-                    .zoom(Math.max(map.getCameraPosition().zoom, DEFAULT_ZOOM_LEVEL))
-                    .build()
-            )
+                CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.builder()
+                                .target(userLocation)
+                                .zoom(Math.max(map.getCameraPosition().zoom, DEFAULT_ZOOM_LEVEL))
+                                .build()
+                )
         );
     }
 
@@ -198,7 +198,7 @@ public class EventsMapsActivity extends BaseContextActivity {
                     if (Math.abs(velocityY) > Math.abs(velocityX)) {
                         // this is either up or down movement, ignore.
                         reportActionToAnalytics("swipeVertical");
-                        return  false;
+                        return false;
                     }
 
                     reportActionToAnalytics("swipe");
@@ -222,7 +222,7 @@ public class EventsMapsActivity extends BaseContextActivity {
         View eventView = eventCardContainer.getChildAt(0);
         Event event = mapMarkerManager.getEvent(lastSelectedMarker);
         eventView = EventCard.getEventCard(
-                event, EventsMapsActivity.this, eventView, eventCardContainer,false);
+                event, EventsMapsActivity.this, eventView, eventCardContainer, false);
         eventView.setOnTouchListener(
                 new OnTouchListener() {
                     @Override
@@ -302,6 +302,22 @@ public class EventsMapsActivity extends BaseContextActivity {
         }
     };
 
+    private Listener<MyEventsRequest.MeEventFavouriteObject> mMyFavEventsFetcherCallBack = new Listener<MyEventsRequest.MeEventFavouriteObject>() {
+        @Override
+        public void onResponse(MyEventsRequest.MeEventFavouriteObject myEvents, boolean isIntermediate) {
+            if (isFinishing()) {
+                return;
+            }
+
+            Set<Event> events = new HashSet<>();
+            for (TopicEvents topicEvents : myEvents.topicEvents) {
+                events.addAll(topicEvents.events);
+            }
+
+            mEventsFetcherCallBack.onResponse(new EventsCollection(new ArrayList<>(events), 0),
+                    isIntermediate);
+        }
+    };
     private Listener<List<TopicEvents>> mMyEventsFetcherCallBack = new Listener<List<TopicEvents>>() {
         @Override
         public void onResponse(List<TopicEvents> myEvents, boolean isIntermediate) {

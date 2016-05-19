@@ -19,12 +19,15 @@ import com.eventshigh.nearme.app.activity.EventsGridActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.activity.MeFragment;
+import com.eventshigh.nearme.app.activity.MovieBrowseActivity;
+import com.eventshigh.nearme.app.activity.MovieDetailActivity;
 import com.eventshigh.nearme.app.activity.PointsBreakdownActivity;
 import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.activity.SelectInterestsActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.FriendsStore;
+import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
@@ -83,6 +86,8 @@ public class EHGcmListenerService extends GcmListenerService {
         String referEarn = Utils.checkIfUnknown(msg.getString("refer_earn"));
         String special = Utils.checkIfUnknown(msg.getString("special"));
         String pointsBreakdown = Utils.checkIfUnknown(msg.getString("points_breakdown"));
+        String browseMovies = Utils.checkIfUnknown(msg.getString("browse_movies"));
+        String movieId = Utils.checkIfUnknown(msg.getString("movie_id"));
 
 
         UserContact contact = null;
@@ -109,7 +114,7 @@ public class EHGcmListenerService extends GcmListenerService {
             message = message.replace("Your friend", contact.name);
         }
 
-        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null && referEarn == null && special == null && pointsBreakdown==null) {
+        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null && referEarn == null && special == null && pointsBreakdown == null && browseMovies == null && movieId == null) {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
             return null;
         }
@@ -199,6 +204,18 @@ public class EHGcmListenerService extends GcmListenerService {
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             intent.putExtra(PointsBreakdownActivity.FROM_NOTIFICATION_PARAM, true);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        } else if (browseMovies != null) {
+            Intent intent = new Intent(this, MovieBrowseActivity.class);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION + browseMovies);
+            intent.putExtra(MovieBrowseActivity.FROM_NOTIFICATION_PARAM, true);
+            intent.putExtra(MovieBrowseActivity.TAB_NAME, browseMovies);
+            contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        } else if (movieId != null) {
+            Intent intent = new Intent(this, MovieDetailActivity.class);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION + movieId);
+            intent.putExtra(MovieDetailActivity.FROM_NOTIFICATION_PARAM, true);
+            intent.putExtra(MovieDetailActivity.MOVIE_ID, Integer.parseInt(movieId));
+            contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         } else {
             Intent intent = new Intent(this,
                     contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);

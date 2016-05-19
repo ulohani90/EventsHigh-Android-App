@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.Gravity;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
+import com.eventshigh.nearme.app.activity.MovieBrowseActivity;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.ContactListView;
 
@@ -86,7 +88,10 @@ public class TrendingCategoryCard extends ViewHolder {
         itemView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 data.activity.showSearchView(data.tag);
+
+
             }
         });
 
@@ -95,6 +100,32 @@ public class TrendingCategoryCard extends ViewHolder {
             public void run() {
                 LayoutParams lp = imageView.getLayoutParams();
                 lp.height = imageView.getWidth();
+                imageView.setLayoutParams(lp);
+                // parent.postInvalidate();
+            }
+        });
+    }
+
+    public void populateMovieCategoryData(final MovieCategoryData data) {
+        imageView.setImageResource(R.drawable.ic_movies_cat);
+        titleView.setVisibility(View.GONE);
+        contactListView.setVisibility(View.GONE);
+        contactListView.setGravity(Gravity.END);
+        itemView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(data.activity, MovieBrowseActivity.class);
+                data.activity.startActivity(intent);
+
+
+            }
+        });
+        Utils.waitForViewVisible(imageView, new Runnable() {
+            @Override
+            public void run() {
+                LayoutParams lp = imageView.getLayoutParams();
+                lp.height = imageView.getWidth()/3;
                 imageView.setLayoutParams(lp);
                 // parent.postInvalidate();
             }

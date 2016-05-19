@@ -36,7 +36,7 @@ public abstract class BaseEventsFragment extends Fragment {
     }
 
     protected static Bundle getArgs(EventsContext eventsContext, boolean showFollowCard,
-            boolean showCategories) {
+            boolean showCategories){
         Bundle args = new Bundle();
         args.putParcelable(EVENT_CONTEXT_PARAM, eventsContext);
         args.putBoolean(SHOW_FOLLOW_PARAM, showFollowCard);

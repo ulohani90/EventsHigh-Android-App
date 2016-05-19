@@ -40,8 +40,13 @@ public class HeaderCard extends ViewHolder {
             numEventsView.setVisibility(View.GONE);
         } else {
             numEventsView.setVisibility(View.VISIBLE);
-            numEventsView.setText(MessageFormat.format(
-                header.activity.getString(R.string.num_events), 0, header.numEvents));
+            if (header.objType.equalsIgnoreCase(HeaderData.TYPE_EVENT)) {
+                numEventsView.setText(MessageFormat.format(
+                        header.activity.getString(R.string.num_events), 0, header.numEvents));
+            } else {
+                numEventsView.setText(MessageFormat.format(
+                        header.activity.getString(R.string.num_movies), 0, header.numEvents));
+            }
         }
 
         if (header.showMore()) {
