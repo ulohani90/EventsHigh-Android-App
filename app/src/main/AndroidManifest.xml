@@ -107,10 +107,8 @@
             android:theme="@style/NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter
                 android:autoVerify="true"
                 tools:ignore="UnusedAttribute" >
@@ -371,7 +369,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LaunchActivity" />
         </activity>
-
         <activity
             android:name=".activity.AboutUsActivity"
             android:label="@string/pref_title_about_us"
@@ -446,7 +443,12 @@
 
         <activity
             android:name=".activity.WriteReviewActivity"
-            android:label="@string/title_activity_write_review">
+            android:label="@string/title_activity_write_review" >
+        </activity>
+
+        <activity
+            android:name=".activity.UserProfileActivity"
+            android:label="@string/title_activity_user_profile" >
         </activity>
     </application>
 

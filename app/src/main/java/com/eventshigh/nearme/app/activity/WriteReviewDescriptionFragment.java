@@ -114,8 +114,8 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
 
                     jsonObject.put(JSON_KEY_REVIEW_PLATFORM, "android");
                     jsonObject.put(JSON_KEY_REVIEW_DEVICE_ID, Settings.Secure.getString
-                            (getContext().getContentResolver(),Settings.Secure.ANDROID_ID));
-                    placeReviewAction(jsonObject);
+                            (getContext().getContentResolver(), Settings.Secure.ANDROID_ID));
+                        placeReviewAction(jsonObject);
                 } catch (JSONException e) {
                     Crashlytics.getInstance().core.logException(e);
                 }

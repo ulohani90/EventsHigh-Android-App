@@ -52,10 +52,10 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     public static final String MOVIE_PARAM = "movie";
 
     public static final String MOVIE_ID = "movie_id";
-    public static final String CRITICS_REVIEWS = "critic_reviews";
+    public static final String CRITICS_REVIEWS = "critic reviews";
     public static final String SHOWTIMES = "showtimes";
     public static final String MOVIE_INFO = "movie_info";
-    public static final String USER_REVIEWS = "user_reviews";
+    public static final String USER_REVIEWS = "user reviews";
     public static final String MOVIE_DETAIL_OBJECT = "movie_detail_object";
 
     private final String CRITICS = "reviews";
@@ -201,9 +201,8 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
         pager.setAdapter(adapter);
         TabLayout tabsView = (TabLayout) findViewById(R.id.tabs);
         tabsView.setVisibility(View.VISIBLE);
-        tabsView.setupWithViewPager(pager);
-        tabsView.setTabMode(TabLayout.MODE_FIXED);
         tabsView.setTabGravity(TabLayout.GRAVITY_FILL);
+        tabsView.setTabMode(TabLayout.MODE_SCROLLABLE);
         tabsView.setupWithViewPager(pager);
         tabsView.setScrollPosition(0, 0, true);
         (findViewById(R.id.share)).setOnClickListener(new View.OnClickListener() {

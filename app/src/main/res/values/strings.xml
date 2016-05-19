@@ -190,10 +190,11 @@
 
     <!--WriteReview-->
     <string name="write_review_title">Title</string>
-    <string name="write_review_description"> Description</string>
+    <string name="write_review_description">Write review</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_user_profile">UserProfileActivity</string>
 
 
 </resources>
