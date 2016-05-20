@@ -45,7 +45,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    dexOptions {
+        jumboMode = true
+    }
+
+
 }
+
 
 dependencies {
     compile(name:'volley-release', ext:'aar')
@@ -77,7 +84,7 @@ dependencies {
         transitive = true;
     }
     compile files('libs/YouTubeAndroidPlayerApi.jar')
-
+    compile 'com.facebook.android:facebook-android-sdk:4.+'
 }
 
 apply plugin: 'com.google.gms.google-services'

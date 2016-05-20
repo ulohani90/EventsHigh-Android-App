@@ -22,10 +22,9 @@ import com.eventshigh.nearme.app.R;
 public class WriteReviewRatingFragment extends Fragment{
 
 
-    ImageView ivMoviePicture;
     TextView tvMovieName;
     RatingBar rbMovieRating;
-
+    ImageView ivMoviePicture;
 
     WriteReviewActivity writeReviewActivity;
 
@@ -43,17 +42,19 @@ public class WriteReviewRatingFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_write_review_rating, container, false);
-        ivMoviePicture = (ImageView)rootView.findViewById(R.id.iv_write_review_movie_pic);
         tvMovieName = (TextView)rootView.findViewById(R.id.tv_write_review_movie_name);
         rbMovieRating = (RatingBar)rootView.findViewById(R.id.rb_write_rating);
         rbMovieRating.setOnTouchListener(writeReviewActivity);
+        ivMoviePicture = (ImageView)rootView.findViewById(R.id.iv_write_review_movie_pic);
+
         if(writeReviewActivity.movieDetailObject != null){
-            Glide.with(writeReviewActivity).load(writeReviewActivity.movieDetailObject.getMovieInfo().getImg_url())
+            tvMovieName.setText(writeReviewActivity.movieDetailObject.getMovieInfo().getName());
+            Glide.with(this).load(writeReviewActivity.movieDetailObject.getMovieInfo().getImg_url())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                     .into(ivMoviePicture);
-            tvMovieName.setText(writeReviewActivity.movieDetailObject.getMovieInfo().getName());
         }
+
         return rootView;
     }
 }

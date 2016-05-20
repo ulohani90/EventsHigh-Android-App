@@ -8,9 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.user.Account;
@@ -48,6 +51,7 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
         }else{
             //Do something here if data not received
         }
+
         if(savedInstanceState == null){
             writeReviewRatingFragment = WriteReviewRatingFragment.newInstance(this);
             getSupportFragmentManager()
