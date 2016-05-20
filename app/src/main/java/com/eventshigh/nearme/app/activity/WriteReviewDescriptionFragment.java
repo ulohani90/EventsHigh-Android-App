@@ -129,18 +129,18 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
 
     }
 
-    public void placeReviewAction(final JSONObject data) {
+    public void placeReviewAction(final JSONObject data){
         MovieReviewSubmitRequest.submit(writeReviewActivity,
                 data, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject, boolean b) {
                         Log.i("Message Success", "true");
+                        Toast.makeText(getContext(), "Your review has been added successfully", Toast.LENGTH_SHORT);
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        Log.i("Message failure", "true"+data.toString());
-                        Toast.makeText(getContext(),"You review has been added sucessfully",Toast.LENGTH_SHORT);
+                        Log.i("Message failure", "true" + data.toString());
                     }
                 });
     }
