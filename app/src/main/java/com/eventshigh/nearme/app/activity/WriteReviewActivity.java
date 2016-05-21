@@ -111,7 +111,7 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()){
             case android.R.id.home:
                 this.finish();
