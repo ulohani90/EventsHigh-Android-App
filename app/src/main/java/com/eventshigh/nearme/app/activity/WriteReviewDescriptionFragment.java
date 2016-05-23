@@ -90,13 +90,24 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
         etWriteReviewDescription = (EditText) rootView.findViewById(R.id.et_write_review_description);
 
         btnReviewSubmit = (TextView) rootView.findViewById(R.id.btn_write_review);
-        if (writeReviewActivity.movieDetailObject != null) {
+
+        if (writeReviewActivity.movieDetailObject != null && writeReviewActivity.type.equals("movie")) {
             Glide.with(writeReviewActivity).load(writeReviewActivity.movieDetailObject.getMovieInfo().getImg_url())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                     .into(ivMoviePicture);
             tvMovieName.setText(writeReviewActivity.movieDetailObject.getMovieInfo().getName());
         }
+
+        if (writeReviewActivity.event != null && writeReviewActivity.type.equals("event")) {
+            Glide.with(writeReviewActivity).load(writeReviewActivity.event.imgUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                    .into(ivMoviePicture);
+            tvMovieName.setText(writeReviewActivity.event.title);
+        }
+
+
         writeReviewActivity.movie_rated =
                 (int) writeReviewActivity.writeReviewRatingFragment.rbMovieRating.getRating();
         rbMovieRating.setRating(writeReviewActivity.movie_rated);
@@ -110,7 +121,11 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
         switch (v.getId()) {
             case R.id.btn_write_review:
                 if (etWriteReviewDescription != null && etWriteReviewDescription.getText() != null && etWriteReviewDescription.getText().toString().length() > 0) {
-                    placeReviewAction();
+                    if(writeReviewActivity.type.equals("movie")){
+                        placeReviewActionIfMovie();
+                    }else{
+                        placeReviewActionIfEvent();
+                    }
                 } else {
                     showNoDescDialog();
                 }
@@ -131,7 +146,11 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
                     @Override
 
                     public void onClick(DialogInterface dialog, int which) {
-                        placeReviewAction();
+                        if(writeReviewActivity.type.equals("movie")){
+                            placeReviewActionIfMovie();
+                        }else{
+                            placeReviewActionIfEvent();
+                        }
                     }
                 })
                 .setCancelable(true)
@@ -145,12 +164,53 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
     }
 
 
-    public void placeReviewAction() {
+    public void placeReviewActionIfMovie() {
         try {
             final JSONObject jsonObject = new JSONObject();
             jsonObject.put(JSON_KEY_REVIEWER_ID, (new Account(writeReviewActivity)).getUserInfo().phoneNo);
             jsonObject.put(JSON_KEY_REVIEW_FOR, "movie");
             jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.movieDetailObject.getMovieInfo().getId() + "");
+            jsonObject.put(JSON_KEY_REVIEW_ENTITY, tvMovieName.getText().toString());
+            jsonObject.put(JSON_KEY_REVIEW_RATINGS, (int) rbMovieRating.getRating());
+            jsonObject.put(JSON_KEY_REVIEW_TEXT, etWriteReviewDescription.getText().toString());
+            jsonObject.put(JSON_KEY_REVIEW_BY, (new Account(writeReviewActivity)).getUserInfo().name);
+            jsonObject.put(JSON_KEY_CITY, (new Account(writeReviewActivity)).getLastCity().name());
+            jsonObject.put(JSON_KEY_REVIEW_PLATFORM, "android");
+            jsonObject.put(JSON_KEY_REVIEW_DEVICE_ID, Settings.Secure.getString
+                    (getContext().getContentResolver(), Settings.Secure.ANDROID_ID));
+
+            progress = ProgressDialog.show(getActivity(), null, "Submitting Review.Please Wait...");
+            MovieReviewSubmitRequest.submit(writeReviewActivity,
+                    jsonObject, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject jsonObject, boolean b) {
+                            if (getActivity() != null) {
+                                if (progress != null)
+                                    progress.dismiss();
+                                Log.i("Message Success", "true");
+                                Toast.makeText(getActivity(), "Your review has been added successfully", Toast.LENGTH_SHORT).show();
+                                closeParentActivity();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            if (progress != null)
+                                progress.dismiss();
+                            Log.i("Message failure", "true" + jsonObject.toString());
+                        }
+                    });
+        } catch (JSONException e) {
+            Crashlytics.getInstance().core.logException(e);
+        }
+    }
+
+    public void placeReviewActionIfEvent() {
+        try {
+            final JSONObject jsonObject = new JSONObject();
+            jsonObject.put(JSON_KEY_REVIEWER_ID, (new Account(writeReviewActivity)).getUserInfo().phoneNo);
+            jsonObject.put(JSON_KEY_REVIEW_FOR, "event");
+            jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.event.id + "");
             jsonObject.put(JSON_KEY_REVIEW_ENTITY, tvMovieName.getText().toString());
             jsonObject.put(JSON_KEY_REVIEW_RATINGS, (int) rbMovieRating.getRating());
             jsonObject.put(JSON_KEY_REVIEW_TEXT, etWriteReviewDescription.getText().toString());

@@ -46,10 +46,17 @@ public class WriteReviewRatingFragment extends Fragment{
         rbMovieRating = (RatingBar)rootView.findViewById(R.id.rb_write_rating);
         rbMovieRating.setOnTouchListener(writeReviewActivity);
         ivMoviePicture = (ImageView)rootView.findViewById(R.id.iv_write_review_movie_pic);
-
-        if(writeReviewActivity.movieDetailObject != null){
-            tvMovieName.setText(writeReviewActivity.movieDetailObject.getMovieInfo().getName());
-            Glide.with(this).load(writeReviewActivity.movieDetailObject.getMovieInfo().getImg_url())
+        if(writeReviewActivity.type.equals("movie")){
+            if (writeReviewActivity.movieDetailObject != null) {
+                tvMovieName.setText(writeReviewActivity.movieDetailObject.getMovieInfo().getName());
+                Glide.with(this).load(writeReviewActivity.movieDetailObject.getMovieInfo().getImg_url())
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                        .into(ivMoviePicture);
+            }
+        }else{
+            tvMovieName.setText(writeReviewActivity.event.title);
+            Glide.with(this).load(writeReviewActivity.event.imgUrl)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                     .into(ivMoviePicture);

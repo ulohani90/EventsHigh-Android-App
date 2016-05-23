@@ -668,5 +668,4 @@ public class Event implements Parcelable {
         return mapIntent;
     }
 
-
 }

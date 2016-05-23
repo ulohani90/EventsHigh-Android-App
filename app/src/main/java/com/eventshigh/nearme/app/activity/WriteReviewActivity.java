@@ -15,6 +15,7 @@ import android.widget.RatingBar;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.user.Account;
 
@@ -27,8 +28,9 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
     WriteReviewRatingFragment writeReviewRatingFragment;
     WriteReviewDescriptionFragment writeReviewDescriptionFragment;
     MovieDetailObject movieDetailObject;
+    Event event;
     protected int movie_rated;
-
+    String type = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +49,12 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Bundle bundle = this.getIntent().getExtras();
         if (bundle != null) {
-            movieDetailObject = bundle.getParcelable(MovieDetailActivity.MOVIE_DETAIL_OBJECT);
+            type = bundle.getString(MovieDetailActivity.OBJECT_TYPE);
+            if(type.equals("movie")){
+                movieDetailObject = bundle.getParcelable(MovieDetailActivity.MOVIE_DETAIL_OBJECT);
+            }else{
+                event = bundle.getParcelable(EventDetailActivity.EVENT_OBJECT);
+            }
         } else {
             //Do something here if data not received
         }

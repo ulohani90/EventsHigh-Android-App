@@ -122,11 +122,12 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
     private boolean showInviteDialog = false;
     private boolean addToFavourite = false;
 
-    private LinearLayout llEventWriteReview;
+    private LinearLayout llEventContainer;
     private TextView btnAddReview;
 
     CollapsingToolbarLayout collapsingToolbar;
 
+    public static final String EVENT_OBJECT = "movie_detail_object";
 
     /*****************************************
      * Activity lifecycle management utilities
@@ -150,10 +151,9 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
 
         //my_review
         btnAddReview = (TextView)findViewById(R.id.btn_add_review);
-        llEventWriteReview = (LinearLayout)findViewById(R.id.ll_event_write_review);
+        llEventContainer = (LinearLayout)findViewById(R.id.event_container);
         btnAddReview.setOnClickListener(this);
-
-
+        makeMyReviewsServerRequest();
     }
 
 
@@ -161,8 +161,18 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.btn_add_review:
-            makeMyReviewsServerRequest();
-            break;
+                if (account.getUserInfo().phoneNo == null || account.getUserInfo().name == null) {
+                    PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
+                    return;
+                }
+                Intent i = new Intent(this, WriteReviewActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(EVENT_OBJECT, event);
+                bundle.putString(MovieDetailActivity.OBJECT_TYPE,"event");
+                i.putExtras(bundle);
+                startActivity(i);
+                overridePendingTransition(R.anim.animate_slide_up, R.anim.stay);
+                break;
         }
     }
 
@@ -198,18 +208,20 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
         }
     }
 
-
     private void updateReview(){
         if(myUserReview != null){
             LinearLayout llGuestLayout = (LinearLayout)getLayoutInflater()
                     .inflate(R.layout.card_user_movie_review, null);
-            ((TextView)findViewById(R.id.tv_user_review_by)).setText(myUserReview.getReviewBy());
-            ((RatingBar)findViewById(R.id.rb_user_review_rating)).setRating(myUserReview.getReviewRating());
+            ((TextView)llGuestLayout.findViewById(R.id.tv_user_review_by)).setText(myUserReview.getReviewBy());
+            ((RatingBar)llGuestLayout.findViewById(R.id.rb_user_review_rating)).setRating(myUserReview.getReviewRating());
+            ((TextView)llGuestLayout.findViewById(R.id.tv_user_review_text)).setText(myUserReview.getReviewText());
+            /*
             Glide.with(this).load("url")
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                     .into((CircularImageView)findViewById(R.id.civ_user_review));
-            llEventWriteReview.addView(llGuestLayout);
+            */
+            llEventContainer.addView(llGuestLayout);
         }
     }
 
