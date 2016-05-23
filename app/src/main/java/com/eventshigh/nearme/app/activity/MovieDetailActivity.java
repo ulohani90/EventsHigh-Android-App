@@ -61,6 +61,8 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     public static final String USER_REVIEWS = "user reviews";
     public static final String MY_REVIEW = "my_review";
     public static final String MOVIE_DETAIL_OBJECT = "movie_detail_object";
+    public static final String OBJECT_TYPE = "movie";
+
 
     private final String CRITICS = "reviews";
     private final String SHOWTIME = "showtime";
@@ -385,6 +387,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
                 Intent i = new Intent(this, WriteReviewActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(MOVIE_DETAIL_OBJECT, movieDetailOject);
+                bundle.putString(OBJECT_TYPE,"movie");
                 i.putExtras(bundle);
                 startActivity(i);
                 // overridePendingTransition(R.anim.animate_slide_up, R.anim.stay);

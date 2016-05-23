@@ -54,7 +54,7 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     }
 
     public boolean isReviewAdded() {
-        return sharedPreferences.getBoolean(PREF_REVIEW_ADDED, true);
+        return sharedPreferences.getBoolean(PREF_REVIEW_ADDED, false);
     }
 
 

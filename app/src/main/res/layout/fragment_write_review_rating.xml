@@ -6,65 +6,74 @@
     android:orientation="vertical"
     tools:context="com.eventshigh.nearme.app.activity.WriteReviewRatingFragment">
 
-
-    <ImageView
-        android:id="@+id/iv_write_review_movie_pic"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
-
-
-    <TextView
-        android:id="@+id/tv_write_review_movie_name"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:hint="Movie Name"
-        android:textColor="@color/red_movie_text_color"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/rating_gui" />
-
-        <View
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/movie_text_grey_color" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="14dp"
-            android:gravity="center_horizontal"
-            android:text="Please rate this movie!"
-            android:textSize="18dp" />
+            <ImageView
+                android:id="@+id/iv_write_review_movie_pic"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
 
-        <RatingBar
-            android:id="@+id/rb_write_rating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-            android:isIndicator="false"
 
-            android:progressDrawable="@drawable/movie_write_rating_bar"
-            android:stepSize="1" />
+            <TextView
+                android:id="@+id/tv_write_review_movie_name"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:hint="Movie Name"
+                android:textColor="@color/red_movie_text_color"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/rating_gui" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/movie_text_grey_color" />
+
+                <TextView
+                    android:id="@+id/rate_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="14dp"
+                    android:gravity="center_horizontal"
+                    android:text="Please rate this movie!"
+                    android:textSize="16sp" />
+
+                <RatingBar
+                    android:id="@+id/rb_write_rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:isIndicator="false"
+                    android:progressDrawable="@drawable/movie_write_rating_bar"
+                    android:stepSize="1" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

@@ -33,7 +33,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.Request.Priority;
+import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
@@ -41,15 +43,17 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventDescriptionSection;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.data.SocialFriend;
+import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.network.EventRequest;
+import com.eventshigh.nearme.app.network.MyReviewsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
@@ -66,7 +70,6 @@ import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.user.UserActionHelper.EventAction;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -87,16 +90,13 @@ import com.google.android.youtube.player.YouTubePlayer;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
-import org.json.JSONException;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
-import io.branch.referral.Branch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
 /**
@@ -104,7 +104,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
  * link or from Events{Grid,Maps}Activity. In both cases, event data is not available so
  * this activity fetches the event data and shows it using the EventDetailFragment.
  */
-public class EventDetailActivity extends BaseActivity {
+public class EventDetailActivity extends BaseActivity implements OnClickListener {
     public static final String EXTRA_EVENT_PARAM = EventDetailActivity.class.getSimpleName() + "_event";
     public static final String EXTRA_PLAN_ID_PARAM = EventDetailActivity.class.getSimpleName() + "_plan_id";
 
@@ -114,7 +114,7 @@ public class EventDetailActivity extends BaseActivity {
 
 
     private LatLng userLocation = null;
-    private Event event = null;
+
     private Account account;
     private String planId = null;
     private GoogleApiClient client;
@@ -123,9 +123,12 @@ public class EventDetailActivity extends BaseActivity {
     private boolean showInviteDialog = false;
     private boolean addToFavourite = false;
 
+    private LinearLayout llEventContainer;
+    private TextView btnAddReview;
 
     CollapsingToolbarLayout collapsingToolbar;
 
+    public static final String EVENT_OBJECT = "movie_detail_object";
 
     /*****************************************
      * Activity lifecycle management utilities
@@ -148,6 +151,84 @@ public class EventDetailActivity extends BaseActivity {
         account = new Account(this);
 
         //my_review
+
+        btnAddReview = (TextView) findViewById(R.id.btn_add_review);
+        llEventContainer = (LinearLayout) findViewById(R.id.event_container);
+        btnAddReview.setOnClickListener(this);
+
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_add_review:
+                if (account.getUserInfo().phoneNo == null || account.getUserInfo().name == null) {
+                    PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
+                    return;
+                }
+                Intent i = new Intent(this, WriteReviewActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(EVENT_OBJECT, event);
+                bundle.putString(MovieDetailActivity.OBJECT_TYPE, "event");
+                i.putExtras(bundle);
+                startActivity(i);
+                overridePendingTransition(R.anim.animate_slide_up, R.anim.stay);
+                break;
+        }
+    }
+
+    MovieUserReviewObject myUserReview;
+
+    public void makeMyReviewsServerRequest(boolean shouldByPassCache) {
+        MyReviewsRequest.submit(this, account.getUserInfo().phoneNo, Request.Priority.IMMEDIATE, this, shouldByPassCache, mReviewListener, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(EventDetailActivity.this, R.string.failed_load,
+                        Toast.LENGTH_SHORT).show();
+                VolleyHelper.log(EventDetailActivity.this, volleyError);
+                finish();
+            }
+        });
+    }
+
+    private Response.Listener<List<MovieUserReviewObject>> mReviewListener = new Response.Listener<List<MovieUserReviewObject>>() {
+        @Override
+        public void onResponse(List<MovieUserReviewObject> reviews, boolean isIntermediate) {
+            findReviewsByUserForMovie(reviews);
+
+            updateReview();
+        }
+    };
+
+    public void findReviewsByUserForMovie(List<MovieUserReviewObject> reviews) {
+        for (MovieUserReviewObject obj : reviews) {
+            if (obj.getReviewerId().equalsIgnoreCase(account.getUserInfo().phoneNo)
+                    && obj.getReviewedEntityId().equalsIgnoreCase(event.id + "")) {
+                myUserReview = obj;
+                break;
+            }
+        }
+    }
+
+    private void updateReview() {
+        if (myUserReview != null) {
+            findViewById(R.id.review_card).setVisibility(View.VISIBLE);
+            ((TextView) findViewById(R.id.tv_user_review_by)).setText(myUserReview.getReviewBy());
+            ((RatingBar) findViewById(R.id.rb_user_review_rating)).setRating(myUserReview.getReviewRating());
+            ((TextView) findViewById(R.id.tv_user_review_text)).setText(myUserReview.getReviewText());
+            ImageView reviewerImage = (ImageView) findViewById(R.id.civ_user_review);
+            int size = reviewerImage.getLayoutParams().height;
+            reviewerImage.setImageDrawable(UserContact.getDrawableForName(myUserReview.getReviewBy(), size));
+            /*
+            Glide.with(this).load("url")
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                    .into((CircularImageView)findViewById(R.id.civ_user_review));
+            */
+            findViewById(R.id.ll_event_write_review).setVisibility(View.GONE);
+            Preferences.getInstance(this).setIsReviewAdded(false);
+        }
 
     }
 
@@ -173,6 +254,8 @@ public class EventDetailActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    Event event = null;
+
     @Override
     public View getViewForSnackbar() {
         return toolbar;
@@ -190,7 +273,8 @@ public class EventDetailActivity extends BaseActivity {
                 (int) (1.33 * getResources().getDisplayMetrics().heightPixels));
 // Get the event from Intent.
         if (getIntent().hasExtra(EXTRA_EVENT_PARAM)) {
-            Event event = getIntent().getParcelableExtra(EXTRA_EVENT_PARAM);
+            event = getIntent().getParcelableExtra(EXTRA_EVENT_PARAM);
+            makeMyReviewsServerRequest(false);
             populateView(event);
         } else {
             EventRequest.submit(this, getIntent().getData(), Priority.IMMEDIATE, mEventListener,
@@ -273,6 +357,10 @@ public class EventDetailActivity extends BaseActivity {
 
 
         // }
+        if (Preferences.getInstance(this).isReviewAdded()) {
+            makeMyReviewsServerRequest(true);
+        }
+
     }
 
 
@@ -355,22 +443,22 @@ public class EventDetailActivity extends BaseActivity {
 
         final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
         if (event.bookingUrl.contains("ticketing.eventshigh.com")) {
-           /* bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
+            bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
             bookingUriBuilder.appendQueryParameter("name", userInfo.name);
             bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
-            bookingUriBuilder.appendQueryParameter("src", "eh-android");*/
-            Intent intent = new Intent(this, EventBookingDetailActivity.class);
+            bookingUriBuilder.appendQueryParameter("src", "eh-android");
+           /* Intent intent = new Intent(this, EventBookingDetailActivity.class);
             intent.putExtra("event", event);
-            startActivity(intent);
-        } else {
-            try {
-                CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
-                        getString(R.string.title_book));
-            } catch (Exception e) {
-                Crashlytics.getInstance().core.logException(e);
-                showMessage(R.string.retry);
-            }
+            startActivity(intent);*/
         }
+        try {
+            CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
+                    getString(R.string.title_book));
+        } catch (Exception e) {
+            Crashlytics.getInstance().core.logException(e);
+            showMessage(R.string.retry);
+        }
+
 
     }
 
@@ -613,7 +701,10 @@ public class EventDetailActivity extends BaseActivity {
     private Listener<Event> mEventListener = new Listener<Event>() {
         @Override
         public void onResponse(final Event event, boolean isIntermediate) {
+            EventDetailActivity.this.event = event;
+            makeMyReviewsServerRequest(false);
             populateView(event);
+
         }
     };
 
@@ -966,13 +1057,14 @@ public class EventDetailActivity extends BaseActivity {
             organizerHeader.setVisibility(organizerInfoShown ? View.VISIBLE : View.GONE);
 
             // Event Description Section.
-            LinearLayout eventContainer = (LinearLayout) findViewById(R.id.event_container);
+            LinearLayout eventContainer = (LinearLayout) findViewById(R.id.event_description_info);
+            eventContainer.removeAllViews();
             for (EventDescriptionSection descriptionSection : event.descriptionSections) {
                 View descriptionSectionView = getLayoutInflater().inflate(R.layout.view_description_section, eventContainer, false);
                 ((TextView) descriptionSectionView.findViewById(R.id.description_header)).setText(descriptionSection.name);
                 WebView descriptionView = (WebView) descriptionSectionView.findViewById(R.id.event_description);
                 CustomUrlActivity.setupWebView(descriptionView, EventDetailActivity.this, false);
-                descriptionView.loadData(toHtmlNoFrame(descriptionSection.description), "text/html; charset=UTF-8", null);
+                descriptionView.loadData(toHtmlNoFrame(descriptionSection.description.trim()), "text/html; charset=UTF-8", null);
                 eventContainer.addView(descriptionSectionView);
             }
 

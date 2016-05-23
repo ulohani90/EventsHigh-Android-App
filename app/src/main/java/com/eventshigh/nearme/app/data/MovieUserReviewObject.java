@@ -30,11 +30,12 @@ public class MovieUserReviewObject implements Parcelable {
 
     private String reviewPlatform;
     private String reviewDeviceId;
+    private String reviewState;
 
     public MovieUserReviewObject() {
     }
 
-    public MovieUserReviewObject(Parcel in){
+    public MovieUserReviewObject(Parcel in) {
         this.reviewId = in.readString();
         this.reviewerId = in.readString();
         this.reviewFor = in.readString();
@@ -45,6 +46,7 @@ public class MovieUserReviewObject implements Parcelable {
         this.reviewPlatform = in.readString();
         this.reviewDeviceId = in.readString();
         this.reviewedEntityId = in.readString();
+        this.reviewState = in.readString();
     }
 
 
@@ -60,6 +62,7 @@ public class MovieUserReviewObject implements Parcelable {
             reviewPlatform = Utils.checkIfUnknown(obj.getString("review_platform"));
             reviewDeviceId = Utils.checkIfUnknown(obj.getString("review_device_id"));
             reviewedEntityId = Utils.checkIfUnknown(obj.getString("reviewed_entity_id"));
+            reviewState = Utils.checkIfUnknown(obj.getString("state"));
         } catch (Exception e) {
 
         }
@@ -149,6 +152,14 @@ public class MovieUserReviewObject implements Parcelable {
     }
 
 
+    public String getReviewState() {
+        return reviewState;
+    }
+
+    public void setReviewState(String reviewState) {
+        this.reviewState = reviewState;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -166,6 +177,7 @@ public class MovieUserReviewObject implements Parcelable {
         dest.writeString(reviewPlatform);
         dest.writeString(reviewDeviceId);
         dest.writeString(reviewedEntityId);
+        dest.writeString(reviewState);
 
     }
 

@@ -73,11 +73,14 @@ public class MovieDetailObject implements Parcelable {
             }
 
             this.userReviews = new ArrayList<>();
-            if (obj.has("reviews")) {
-                JSONArray userReviewsArray = obj.getJSONArray("reviews");
+            if (obj.has("movie_user_reviews")) {
+                JSONArray userReviewsArray = obj.getJSONArray("movie_user_reviews");
                 if (userReviewsArray != null) {
                     for (int i = 0; i < userReviewsArray.length(); i++) {
-                        userReviews.add(new MovieUserReviewObject(userReviewsArray.getJSONObject(i)));
+                        MovieUserReviewObject reviewObj = new MovieUserReviewObject(userReviewsArray.getJSONObject(i));
+                        if (reviewObj.getReviewState().equalsIgnoreCase("published")) {
+                            userReviews.add(reviewObj);
+                        }
                     }
                 }
             }
