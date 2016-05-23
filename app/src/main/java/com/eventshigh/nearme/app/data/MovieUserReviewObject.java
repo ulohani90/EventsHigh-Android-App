@@ -165,6 +165,7 @@ public class MovieUserReviewObject implements Parcelable {
         dest.writeString(reviewText);
         dest.writeString(reviewPlatform);
         dest.writeString(reviewDeviceId);
+        dest.writeString(reviewedEntityId);
 
     }
 

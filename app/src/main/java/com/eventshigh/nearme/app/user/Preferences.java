@@ -19,6 +19,7 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_SHOW_REFERRAL = "show_referral";
     public static final String PREF_OFFER_ACTED_ID = "offers_acted";
     public static final String PREF_NOTIFICATION_ACTIVE = "notification_active";
+    public static final String PREF_REVIEW_ADDED = "is_review_added";
 
 
 
@@ -47,6 +48,16 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public boolean shouldShowOnBoarding() {
         return sharedPreferences.getBoolean(PREF_SHOW_ONBOARDING, true);
     }
+
+    public void setIsReviewAdded(boolean isReviewAdded) {
+        sharedPreferences.edit().putBoolean(PREF_REVIEW_ADDED, isReviewAdded).apply();
+    }
+
+    public boolean isReviewAdded() {
+        return sharedPreferences.getBoolean(PREF_REVIEW_ADDED, true);
+    }
+
+
     public void setIsNotificationActive(boolean isNotificationActive) {
         sharedPreferences.edit().putBoolean(PREF_NOTIFICATION_ACTIVE, isNotificationActive).apply();
     }

@@ -36,6 +36,7 @@ import com.eventshigh.nearme.app.network.MovieReviewSubmitRequest;
 import com.eventshigh.nearme.app.network.RecordUserAction;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.GcmRegistration;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.CircularImageView;
 
@@ -167,6 +168,7 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
                             if (getActivity() != null) {
                                 if (progress != null)
                                     progress.dismiss();
+                                Preferences.getInstance(getActivity()).setIsReviewAdded(true);
                                 Log.i("Message Success", "true");
                                 Toast.makeText(getActivity(), "Your review has been added successfully", Toast.LENGTH_SHORT).show();
                                 closeParentActivity();
@@ -190,7 +192,7 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
             @Override
             public void run() {
                 writeReviewActivity.finish();
-                writeReviewActivity.overridePendingTransition(R.anim.animate_slide_down, R.anim.animate_slide_up);
+                // writeReviewActivity.overridePendingTransition(R.anim.animate_slide_down, R.anim.animate_slide_up);
             }
         }, 1000);
     }

@@ -19,32 +19,33 @@ import java.util.ArrayList;
 /**
  * Created by umesh on 04/05/16.
  */
-public class ShowtimeFragment extends Fragment{
+public class ShowtimeFragment extends Fragment {
 
     private EventsAdapter eventsAdapter;
 
     ArrayList<MovieShowTimeObject> showTimes;
 
     AutofitRecyclerView reviewList;
-    public static ShowtimeFragment newInstance(Bundle bundle){
-        ShowtimeFragment fragment  =new ShowtimeFragment();
+
+    public static ShowtimeFragment newInstance(Bundle bundle) {
+        ShowtimeFragment fragment = new ShowtimeFragment();
         fragment.setArguments(bundle);
-        return  fragment;
+        return fragment;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view  = inflater.inflate(R.layout.fragment_movies,container,false);
+        View view = inflater.inflate(R.layout.fragment_movies, container, false);
         view.findViewById(R.id.top_progress_bar).setVisibility(View.GONE);
-        reviewList = (AutofitRecyclerView)view.findViewById(R.id.event_grid);
+        reviewList = (AutofitRecyclerView) view.findViewById(R.id.event_grid);
         return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if(getArguments()!=null && getArguments().getParcelableArrayList(MovieDetailActivity.SHOWTIMES)!=null){
+        if (getArguments() != null && getArguments().getParcelableArrayList(MovieDetailActivity.SHOWTIMES) != null) {
             showTimes = getArguments().getParcelableArrayList(MovieDetailActivity.SHOWTIMES);
         }
         eventsAdapter = new EventsAdapter((MovieDetailActivity) getActivity());

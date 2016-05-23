@@ -79,7 +79,7 @@ public class MovieListCard extends RecyclerView.ViewHolder {
         movieName.setText(string);
         if (movie.getReviews().size() > 0) {
             movieReviews.setVisibility(View.VISIBLE);
-            movieReviews.setText(movie.getReviews().size() + "Reviews");
+            movieReviews.setText(movie.getReviews().size() + " Reviews");
         } else {
             movieReviews.setVisibility(View.GONE);
         }

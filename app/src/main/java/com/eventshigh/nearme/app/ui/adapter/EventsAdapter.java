@@ -168,6 +168,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     public void setUserMovieReviews(ArrayList<MovieUserReviewObject> objs) {
         dataToShow.clear();
+
         for (MovieUserReviewObject obj : objs) {
             dataToShow.add(new MovieUserReviewData(obj, activity));
         }
@@ -300,16 +301,16 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder card, int position){
+    public void onBindViewHolder(ViewHolder card, int position) {
         if (card instanceof SmallHeaderCard) {
             ((SmallHeaderData) dataToShow.get(position)).onBindViewHolder(card, position, mListener);
         } else if (card instanceof EventCard) {
             ((EventData) dataToShow.get(position)).onBindViewHolder(card, position, pListener);
-        } else if (card instanceof MovieReviewCard){
-            ((MovieReviewData)dataToShow.get(position)).onBindViewHolder(card, position);
-        }else if(card instanceof MovieUserReviewCard){
-            ((MovieUserReviewData)dataToShow.get(position)).onBindViewHolder(card, position);
-        }else{
+        } else if (card instanceof MovieReviewCard) {
+            ((MovieReviewData) dataToShow.get(position)).onBindViewHolder(card, position);
+        } else if (card instanceof MovieUserReviewCard) {
+            ((MovieUserReviewData) dataToShow.get(position)).onBindViewHolder(card, position);
+        } else {
             dataToShow.get(position).onBindViewHolder(card, position);
         }
     }

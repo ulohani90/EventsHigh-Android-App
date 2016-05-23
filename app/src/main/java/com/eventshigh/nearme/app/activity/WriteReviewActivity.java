@@ -128,7 +128,7 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.stay, R.anim.animate_slide_down);
+       // overridePendingTransition(R.anim.stay, R.anim.animate_slide_down);
     }
 }
 

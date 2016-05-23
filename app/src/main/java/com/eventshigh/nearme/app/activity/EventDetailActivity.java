@@ -148,17 +148,7 @@ public class EventDetailActivity extends BaseActivity {
         account = new Account(this);
 
         //my_review
-        if(false){
-         }else{
-            LinearLayout llGuestLayout = (LinearLayout)getLayoutInflater()
-                    .inflate(R.layout.card_user_movie_review, null);
-            ((TextView)findViewById(R.id.tv_user_review_by)).setText("");
-            ((RatingBar)findViewById(R.id.rb_user_review_rating)).setRating(0);
-            Glide.with(this).load("url")
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
-                    .into((CircularImageView)findViewById(R.id.civ_user_review));
-        }
+
     }
 
     @Override

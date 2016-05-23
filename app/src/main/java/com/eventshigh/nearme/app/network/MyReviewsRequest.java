@@ -31,7 +31,9 @@ public class MyReviewsRequest extends JsonRequest<List<MovieUserReviewObject>> {
                               Response.ErrorListener errorListener) {
 
         String url = EventsHighEndpoints.getApiEndpPointForMyReviews(phoneNo);
-
+        if (shouldBypassCache) {
+            url += "?cmode=bypass";
+        }
         MyReviewsRequest request = new MyReviewsRequest(
                 context, url, shouldBypassCache, priority, listener, errorListener);
         request.setTag(tag);
