@@ -135,7 +135,6 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
                     @Override
                     public void onResponse(JSONObject jsonObject, boolean b) {
                         Log.i("Message Success", "true");
-                        Toast.makeText(getContext(), "Your review has been added successfully", Toast.LENGTH_SHORT);
                     }
                 }, new Response.ErrorListener() {
                     @Override
