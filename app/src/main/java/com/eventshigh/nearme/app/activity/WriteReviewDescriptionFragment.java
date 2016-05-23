@@ -128,8 +128,8 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
                 .setMessage("Do you want to submit your rating without any review?")
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
 
+                    public void onClick(DialogInterface dialog, int which) {
                         placeReviewAction();
                     }
                 })

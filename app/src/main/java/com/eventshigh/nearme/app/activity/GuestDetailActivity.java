@@ -76,7 +76,11 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onClick(View v) {
+        switch(v.getId()){
+            case R.id.btn_guest_detail_next:
 
+                break;
+        }
     }
 
     @Override

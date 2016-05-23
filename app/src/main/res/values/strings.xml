@@ -200,6 +200,7 @@
     <string name="title_activity_user_profile">Profile</string>
     <string name="title_activity_guest_detail">Guest Details</string>
     <string name="title_activity_booking_details">BookingDetailsActivity</string>
+    <string name="title_activity_review">ReviewActivity</string>
 
 
 </resources>
