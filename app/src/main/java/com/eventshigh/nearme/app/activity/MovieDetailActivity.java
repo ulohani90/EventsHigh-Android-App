@@ -18,7 +18,6 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -30,16 +29,18 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.network.MovieDetailRequest;
+import com.eventshigh.nearme.app.network.MyReviewsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-
-import org.w3c.dom.Text;
+import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
+import com.eventshigh.nearme.app.user.Account;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by umesh on 29/04/16.
  */
-public class MovieDetailActivity extends BaseContextActivity implements ViewPager.OnPageChangeListener,View.OnClickListener{
+public class MovieDetailActivity extends BaseContextActivity implements ViewPager.OnPageChangeListener, View.OnClickListener {
 
     Toolbar toolbar;
 
@@ -56,6 +57,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     public static final String SHOWTIMES = "showtimes";
     public static final String MOVIE_INFO = "movie_info";
     public static final String USER_REVIEWS = "user reviews";
+    public static final String MY_REVIEW = "my_review";
     public static final String MOVIE_DETAIL_OBJECT = "movie_detail_object";
 
     private final String CRITICS = "reviews";
@@ -69,6 +71,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
 
     private View retryView;
     private MovieDetailObject movieDetailOject;
+    Account account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +95,12 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
         topProgressBar.setVisibility(View.VISIBLE);
 
         //write review
-        fabWriteReviews = (FloatingActionButton)findViewById(R.id.fab_write_review);
+        fabWriteReviews = (FloatingActionButton) findViewById(R.id.fab_write_review);
         pager.addOnPageChangeListener(this);
         fabWriteReviews.setOnClickListener(this);
         fabWriteReviews.setVisibility(View.GONE);
+
+        account = new Account(this);
 
         if (getIntent().hasExtra(MOVIE_PARAM)) {
             MovieDetailObject movie = getIntent().getParcelableExtra(MOVIE_PARAM);
@@ -112,8 +117,9 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
                 finish();
             }
         }
-    }
 
+
+    }
 
 
     ImageView movieBg, playVideo;
@@ -157,9 +163,42 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
         @Override
         public void onResponse(final MovieDetailObject movie, boolean isIntermediate) {
             movieDetailOject = movie;
+            makeMyReviewsServerRequest();
             populateView(movie);
         }
     };
+
+    private Response.Listener<List<MovieUserReviewObject>> mReviewListener = new Response.Listener<List<MovieUserReviewObject>>() {
+        @Override
+        public void onResponse(List<MovieUserReviewObject> reviews, boolean isIntermediate) {
+            findReviewsByUserForMovie(reviews);
+            populateView(movieDetailOject);
+        }
+    };
+
+
+    MovieUserReviewObject myReview;
+
+    public void findReviewsByUserForMovie(List<MovieUserReviewObject> reviews) {
+        for (MovieUserReviewObject obj : reviews) {
+            if (obj.getReviewerId().equalsIgnoreCase(account.getUserInfo().phoneNo) && obj.getReviewedEntityId().equalsIgnoreCase(movieDetailOject.getMovieInfo().getId() + "")) {
+                myReview = obj;
+                break;
+            }
+        }
+    }
+
+    public void makeMyReviewsServerRequest() {
+        MyReviewsRequest.submit(this, account.getUserInfo().phoneNo, Request.Priority.IMMEDIATE, this, false, mReviewListener, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(MovieDetailActivity.this, R.string.failed_load,
+                        Toast.LENGTH_SHORT).show();
+                VolleyHelper.log(MovieDetailActivity.this, volleyError);
+                finish();
+            }
+        });
+    }
 
     public void populateView(final MovieDetailObject movie) {
         topProgressBar.setVisibility(View.GONE);
@@ -234,23 +273,15 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
             if (TABS.get(position).equalsIgnoreCase(CRITICS_REVIEWS)) {
                 bundle.putParcelableArrayList(CRITICS_REVIEWS, movieObject.getReviews());
                 return CriticsReviewsFragment.newInstance(bundle);
-            } else if(TABS.get(position).equalsIgnoreCase(SHOWTIMES)){
+            } else if (TABS.get(position).equalsIgnoreCase(SHOWTIMES)) {
                 bundle.putParcelableArrayList(SHOWTIMES, movieObject.getShowtimes());
                 return ShowtimeFragment.newInstance(bundle);
-            }
-            else if(TABS.get(position).equalsIgnoreCase(USER_REVIEWS)){
-                //Dummy Object - ArrayList<MovieUserReviewObject>
-                ArrayList<MovieUserReviewObject> movieUserReviewObjects = new ArrayList<>();
-                MovieUserReviewObject movieUserReviewObject = new MovieUserReviewObject();
-                movieUserReviewObject.setReviewBy("Shubham");
-                movieUserReviewObject.setReviewText("Movie is superb!");
-                movieUserReviewObjects.add(movieUserReviewObject);
-                //movieObject.setUserReviews(movieUserReviewObjects);
-                //dummy
-                Log.e("Count of user reviews ",movieObject.getUserReviews().size()+"");
+            } else if (TABS.get(position).equalsIgnoreCase(USER_REVIEWS)) {
+                if (myReview != null)
+                    bundle.putParcelable(MY_REVIEW, myReview);
                 bundle.putParcelableArrayList(USER_REVIEWS, movieObject.getUserReviews());
                 return UserReviewsFragment.newInstance(bundle);
-            }else{
+            } else {
                 return null;
             }
 
@@ -296,7 +327,8 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     //OnPageListerner Methods
     @Override
     public void onPageSelected(int position) {
-        animateFab(position);
+        if (myReview == null)
+            animateFab(position);
     }
 
     @Override
@@ -305,39 +337,43 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     }
 
     @Override
-    public void onPageScrollStateChanged(int state){
-        Log.e("",state + " state changed");
+    public void onPageScrollStateChanged(int state) {
+        Log.e("", state + " state changed");
     }
 
 
-    protected void animateFab(int position){
-        if(!TABS.get(position).equalsIgnoreCase(USER_REVIEWS)){
-            if(fabWriteReviews.getVisibility() == View.VISIBLE) {
+    protected void animateFab(int position) {
+        if (!TABS.get(position).equalsIgnoreCase(USER_REVIEWS)) {
+            if (fabWriteReviews.getVisibility() == View.VISIBLE) {
                 fabWriteReviews.setVisibility(View.GONE);
                 TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, 250);
                 translateAnimation.setDuration(300);
                 fabWriteReviews.startAnimation(translateAnimation);
             }
-        }else {
+        } else {
             //Set First Reviewer Text Visible
             fabWriteReviews.clearAnimation();
             fabWriteReviews.setVisibility(View.VISIBLE);
-            TranslateAnimation translateAnimation = new TranslateAnimation(0,0,250,0);
+            TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 250, 0);
             translateAnimation.setDuration(300);
             fabWriteReviews.startAnimation(translateAnimation);
         }
     }
 
     @Override
-    public void onClick(View v){
-        switch(v.getId()){
+    public void onClick(View v) {
+        switch (v.getId()) {
             case R.id.fab_write_review:
+                if (account.getUserInfo().phoneNo == null || account.getUserInfo().name == null) {
+                    PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
+                    return;
+                }
                 Intent i = new Intent(this, WriteReviewActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putParcelable(MOVIE_DETAIL_OBJECT,movieDetailOject);
+                bundle.putParcelable(MOVIE_DETAIL_OBJECT, movieDetailOject);
                 i.putExtras(bundle);
                 startActivity(i);
-                overridePendingTransition( R.anim.animate_slide_up, R.anim.animate_slide_down );
+                overridePendingTransition(R.anim.animate_slide_up, R.anim.stay);
                 break;
         }
     }

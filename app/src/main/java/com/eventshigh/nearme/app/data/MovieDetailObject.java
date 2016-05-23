@@ -63,14 +63,17 @@ public class MovieDetailObject implements Parcelable {
                     JSONArray showTimesArray = showTimesObject.getJSONArray(cityName.toLowerCase());
                     if (showTimesArray != null) {
                         for (int i = 0; i < showTimesArray.length(); i++) {
-                            showtimes.add(new MovieShowTimeObject(showTimesArray.getJSONObject(i)));
+                            MovieShowTimeObject showTimeObject = new MovieShowTimeObject(showTimesArray.getJSONObject(i));
+                            if (showTimeObject.getShowDates() != null && showTimeObject.getShowDates().size() > 0) {
+                                showtimes.add(showTimeObject);
+                            }
                         }
                     }
                 }
             }
 
             this.userReviews = new ArrayList<>();
-            if (obj.has("reviews")){
+            if (obj.has("reviews")) {
                 JSONArray userReviewsArray = obj.getJSONArray("reviews");
                 if (userReviewsArray != null) {
                     for (int i = 0; i < userReviewsArray.length(); i++) {
@@ -136,16 +139,13 @@ public class MovieDetailObject implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags){
+    public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(movieInfo, flags);
         dest.writeTypedList(reviews);
 
         dest.writeTypedList(showtimes);
         dest.writeTypedList(userReviews);
     }
-
-
-
 
 
 }

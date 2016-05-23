@@ -55,6 +55,8 @@ public class EventsHighEndpoints {
 
     private static final String API_ENDPOINT_OFFERS_FORMAT = API_URI_BASE + "api/get_offers/%s";
 
+    private static final String API_ENDPOINTS_MY_REVIEWS_FORMAT = API_URI_BASE + "reviews/get_reviews_by_reviewer_id/%s";
+
     private static final String API_ENDPOINT_NOTIFICATIONS_FORMAT = API_URI_BASE + "api/get_latest_alerts/%s";
 
     public static final String QUERY_MY_EVENT = "my events";
@@ -169,6 +171,10 @@ public class EventsHighEndpoints {
 
     public static String getApiEndPointForOffers(String cityName) {
         return String.format(API_ENDPOINT_OFFERS_FORMAT, cityName);
+    }
+
+    public static String getApiEndpPointForMyReviews(String phoneNo) {
+        return String.format(API_ENDPOINTS_MY_REVIEWS_FORMAT, phoneNo);
     }
 
     public static String getApiEndPointForAlerts(String cityName) {

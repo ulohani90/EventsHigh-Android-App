@@ -18,7 +18,7 @@ public class ShowDates implements Parcelable {
     private long date;
     private ArrayList<String> showTimes;
 
-    public ShowDates(Parcel in){
+    public ShowDates(Parcel in) {
         this.date = in.readLong();
         showTimes = new ArrayList<>();
         in.readStringList(showTimes);
@@ -27,6 +27,7 @@ public class ShowDates implements Parcelable {
     public ShowDates(JSONObject obj) {
         try {
             date = DateTimeUtils.parseMovieTime(obj.getString("date"));
+
             showTimes = new ArrayList<>();
             JSONArray showTimesJson = obj.getJSONArray("showtimes");
             if (showTimesJson != null) {
@@ -34,6 +35,7 @@ public class ShowDates implements Parcelable {
                     showTimes.add((String) showTimesJson.get(i));
                 }
             }
+
         } catch (JSONException e) {
 
         }
@@ -65,6 +67,7 @@ public class ShowDates implements Parcelable {
         dest.writeLong(date);
         dest.writeStringList(showTimes);
     }
+
     public static final Parcelable.Creator<ShowDates> CREATOR =
             new Parcelable.Creator<ShowDates>() {
                 public ShowDates createFromParcel(Parcel in) {

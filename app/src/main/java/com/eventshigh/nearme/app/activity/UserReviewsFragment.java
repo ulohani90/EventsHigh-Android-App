@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
+import android.graphics.Movie;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -29,37 +30,38 @@ public class UserReviewsFragment extends android.support.v4.app.Fragment {
     TextView tvFirstReviewText;
 
 
-    public static UserReviewsFragment newInstance(Bundle bundle){
+    public static UserReviewsFragment newInstance(Bundle bundle) {
         UserReviewsFragment fragment = new UserReviewsFragment();
         fragment.setArguments(bundle);
-        return  fragment;
+        return fragment;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view  = inflater.inflate(R.layout.fragment_movie_user_review,container,false);
+        View view = inflater.inflate(R.layout.fragment_movie_user_review, container, false);
         view.findViewById(R.id.top_progress_bar).setVisibility(View.GONE);
-        tvFirstReviewText = (TextView)view.findViewById(R.id.tv_first_movie_review_text);
-        reviewList = (AutofitRecyclerView)view.findViewById(R.id.event_grid);
+        tvFirstReviewText = (TextView) view.findViewById(R.id.tv_first_movie_review_text);
+        reviewList = (AutofitRecyclerView) view.findViewById(R.id.event_grid);
         return view;
     }
-
-
 
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if(getArguments()!=null && getArguments().getParcelableArrayList(MovieDetailActivity.USER_REVIEWS)!=null){
+        if (getArguments() != null && getArguments().getParcelableArrayList(MovieDetailActivity.USER_REVIEWS) != null) {
             reviews = getArguments().getParcelableArrayList(MovieDetailActivity.USER_REVIEWS);
+            if (getArguments().containsKey(MovieDetailActivity.MY_REVIEW) && getArguments().getParcelable(MovieDetailActivity.MY_REVIEW) != null) {
+                reviews.add(0, (MovieUserReviewObject) getArguments().getParcelable(MovieDetailActivity.MY_REVIEW));
+            }
         }
         eventsAdapter = new EventsAdapter((MovieDetailActivity) getActivity());
         reviewList.setAdapter(eventsAdapter);
         //reviewList.addOnScrollListener(new HideActionBarOnScroll((LaunchActivity) getActivity()));
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setEnabled(false);
-        if(reviews.size()>0)tvFirstReviewText.setVisibility(View.GONE);
+        if (reviews.size() > 0) tvFirstReviewText.setVisibility(View.GONE);
         eventsAdapter.setUserMovieReviews(reviews);
     }
 

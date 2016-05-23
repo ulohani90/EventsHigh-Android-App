@@ -17,6 +17,20 @@ import java.util.regex.Pattern;
  * Helper methods for managing date and time.
  */
 public class DateTimeUtils {
+    public static boolean isCurrentDate(long date) {
+        Calendar c = Calendar.getInstance();
+
+
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        if (date == c.getTime().getTime())
+            return true;
+        return false;
+    }
+
     public static class EventTime {
         public final String day;
         public final String date;
