@@ -32,6 +32,18 @@
         android:layout_weight="1000"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/tv_first_movie_review_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:textSize="18dp"
+        android:layout_marginTop="150dp"
+        android:textColor="@color/movie_text_grey_color"
+        android:text="No Reviews!"
+        />
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
@@ -49,6 +61,7 @@
             tools:listitem="@layout/card_event" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
+
 
     <LinearLayout
         android:id="@+id/no_offer_layout"

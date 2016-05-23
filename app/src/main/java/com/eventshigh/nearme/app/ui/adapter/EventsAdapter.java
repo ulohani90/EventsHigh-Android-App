@@ -15,6 +15,7 @@ import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.MovieInfoObject;
 import com.eventshigh.nearme.app.data.MovieReviewObject;
 import com.eventshigh.nearme.app.data.MovieShowTimeObject;
+import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.data.ShowDates;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.TrendingTopic;
@@ -164,6 +165,15 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
+
+    public void setUserMovieReviews(ArrayList<MovieUserReviewObject> objs) {
+        dataToShow.clear();
+        for (MovieUserReviewObject obj : objs) {
+            dataToShow.add(new MovieUserReviewData(obj, activity));
+        }
+        notifyDataSetChanged();
+    }
+
     public void setMovieShowTimes(ArrayList<MovieShowTimeObject> objs) {
         dataToShow.clear();
         for (MovieShowTimeObject obj : objs) {
@@ -290,12 +300,16 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder card, int position) {
+    public void onBindViewHolder(ViewHolder card, int position){
         if (card instanceof SmallHeaderCard) {
             ((SmallHeaderData) dataToShow.get(position)).onBindViewHolder(card, position, mListener);
         } else if (card instanceof EventCard) {
             ((EventData) dataToShow.get(position)).onBindViewHolder(card, position, pListener);
-        } else {
+        } else if (card instanceof MovieReviewCard){
+            ((MovieReviewData)dataToShow.get(position)).onBindViewHolder(card, position);
+        }else if(card instanceof MovieUserReviewCard){
+            ((MovieUserReviewData)dataToShow.get(position)).onBindViewHolder(card, position);
+        }else{
             dataToShow.get(position).onBindViewHolder(card, position);
         }
     }

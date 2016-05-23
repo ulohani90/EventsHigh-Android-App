@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.eventshigh.nearme.app"
     android:installLocation="auto">
+
     <!-- Ask for permissions, we need internet access and Google Maps access -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -21,6 +22,7 @@
     <permission
         android:name="com.eventshigh.nearme.app.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="com.eventshigh.nearme.app.permission.C2D_MESSAGE" />
 
     <application
@@ -31,6 +33,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
+
         <!-- Setup the Google Play Services version and Google Maps api key -->
         <meta-data
             android:name="com.google.android.gms.version"
@@ -54,29 +57,29 @@
             android:name="android.app.default_searchable"
             android:value=".activity.LaunchActivity" />
 
-
-        <!--Branch.io-->
+        <!-- Branch.io -->
         <meta-data
             android:name="io.branch.sdk.BranchKey"
             android:value="key_live_nfj8qbtAAg1Hkj4K6jszCnfkwCgwGUL4" />
-
 
         <!-- FB -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
+
         <provider
             android:name="com.facebook.FacebookContentProvider"
             android:authorities="com.facebook.app.FacebookContentProvider196111897251952"
             android:exported="true"
             tools:ignore="ExportedContentProvider" />
+        <!--
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
-        <!--Glide -->
+        -->
+        <!-- Glide -->
         <meta-data
             android:name="com.bumptech.glide.integration.volley.VolleyGlideModule"
             android:value="GlideModule" />
@@ -102,11 +105,6 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
             <intent-filter
                 android:autoVerify="true"
                 tools:ignore="UnusedAttribute">
@@ -125,12 +123,18 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
 
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
             <!-- Accept Search requests withing app -->
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
 
-            <!--Branch.io filters-->
+            <!-- Branch.io filters -->
             <intent-filter android:autoVerify="true">
                 <data
                     android:host="branch.eventshigh.com"
@@ -149,7 +153,6 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-
         <activity
             android:name=".activity.EventsMapsActivity"
             android:label="@string/app_name"
@@ -207,7 +210,6 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.BlogFeedActivity"
             android:exported="true"
@@ -217,6 +219,7 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LaunchActivity" />
+
             <intent-filter
                 android:autoVerify="true"
                 tools:ignore="UnusedAttribute">
@@ -224,6 +227,7 @@
                     android:host="blog.eventshigh.com"
                     android:path="/"
                     android:scheme="https" />
+
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -241,6 +245,7 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.BlogFeedActivity" />
+
             <intent-filter
                 android:autoVerify="true"
                 tools:ignore="UnusedAttribute">
@@ -248,13 +253,13 @@
                     android:host="blog.eventshigh.com"
                     android:pathPrefix="/2"
                     android:scheme="https" />
+
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.EventDetailActivity"
             android:exported="true"
@@ -269,6 +274,7 @@
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/detail"
                     android:scheme="https" />
+
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -278,9 +284,7 @@
             <meta-data
                 android:name="io.branch.sdk.auto_link_request_code"
                 android:value="@integer/EventsDetailDeepLink_code" />
-
         </activity>
-
         <activity
             android:name=".activity.MyFriendsActivity"
             android:label="@string/title_my_friends"
@@ -290,7 +294,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LaunchActivity" />
         </activity>
-
         <activity
             android:name=".activity.PlanActivity"
             android:label="@string/action_check_friends"
@@ -312,7 +315,6 @@
             android:hardwareAccelerated="true"
             android:label="@string/app_name"
             android:theme="@style/NoActionBar" />
-
         <activity
             android:name=".activity.PointsBreakdownActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -324,8 +326,6 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:hardwareAccelerated="true"
             android:theme="@style/NoActionBar" />
-
-
         <activity
             android:name=".activity.RedeemCouponActivity"
             android:screenOrientation="portrait"
@@ -336,6 +336,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar"
             android:windowSoftInputMode="stateHidden" />
+
         <activity
             android:name=".activity.EventBookingDetailActivity"
             android:screenOrientation="portrait"
@@ -348,7 +349,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar"
             android:windowSoftInputMode="stateHidden" />
-
         <activity
             android:name=".activity.CustomUrlActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -402,6 +402,7 @@
         <!-- Receivers within our application -->
         <!-- Receives the Install referrer from play store -->
         <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
+
         <receiver
             android:name=".broadcast.InstallReferrer"
             android:exported="true"
@@ -427,6 +428,7 @@
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="com.eventshigh.nearme.app" />
             </intent-filter>
         </receiver>
@@ -437,6 +439,7 @@
 
             </intent-filter>
         </receiver>
+
 
         <service
             android:name=".broadcast.EHGcmListenerService"
@@ -453,7 +456,41 @@
         <!-- Service to upload the account information to our servers -->
         <service
             android:name=".broadcast.UpdateAccountInfoService"
-            android:exported="false"></service>
+            android:exported="false" />
+
+        <activity
+            android:name=".activity.WriteReviewActivity"
+            android:label="@string/title_activity_write_review"></activity>
+
+        <!-- Facebook-log for user profile activity -->
+        <activity
+            android:name=".activity.UserProfileActivity"
+            android:label="@string/title_activity_user_profile">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".activity.GuestDetailActivity"
+            android:label="@string/title_activity_guest_detail"
+            android:windowSoftInputMode="adjustPan">
+
+        </activity>
     </application>
 
 </manifest>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.eventshigh.nearme.app.activity.GuestDetailActivity"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent">
+
+        <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fillViewport="true">
+                <LinearLayout
+                        android:id="@+id/ll_guest_detail_layout_container"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:paddingBottom="60dp"
+                        android:layout_margin="8dp"
+                        android:background="@color/movie_header_grey_color"
+                        android:orientation="vertical">
+                </LinearLayout>
+        </ScrollView>
+
+        <Button
+            android:id="@+id/btn_guest_detail_next"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Next"
+            android:textColor="@android:color/white"
+            android:background="@color/red_movie_text_color"
+            android:textSize="14dp"
+            android:padding="4dp"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_gravity="bottom"
+            />
+
+</FrameLayout>
