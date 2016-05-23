@@ -693,14 +693,20 @@
                     plus:annotation="inline"
                     plus:size="standard" />
 
-                <TextView
+                <LinearLayout
+                    android:id="@+id/ll_event_write_review"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/grey_rounded_corner_bg"
-                    android:gravity="center"
-                    android:text="Write A Review"
-                    android:textColor="#353535"
-                    android:textSize="22sp" />
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/grey_rounded_corner_bg"
+                        android:gravity="center"
+                        android:text="Write A Review"
+                        android:textColor="#353535"
+                        android:textSize="22sp" />
+                </LinearLayout>
+
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
     </android.support.design.widget.CoordinatorLayout>

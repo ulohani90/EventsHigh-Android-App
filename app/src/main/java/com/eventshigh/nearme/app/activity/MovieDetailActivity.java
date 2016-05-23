@@ -276,9 +276,11 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
             } else if (TABS.get(position).equalsIgnoreCase(SHOWTIMES)) {
                 bundle.putParcelableArrayList(SHOWTIMES, movieObject.getShowtimes());
                 return ShowtimeFragment.newInstance(bundle);
+
             } else if (TABS.get(position).equalsIgnoreCase(USER_REVIEWS)) {
                 if (myReview != null)
                     bundle.putParcelable(MY_REVIEW, myReview);
+
                 bundle.putParcelableArrayList(USER_REVIEWS, movieObject.getUserReviews());
                 return UserReviewsFragment.newInstance(bundle);
             } else {

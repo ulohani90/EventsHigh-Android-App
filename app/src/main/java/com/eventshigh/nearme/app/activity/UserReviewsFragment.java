@@ -34,6 +34,7 @@ public class UserReviewsFragment extends android.support.v4.app.Fragment {
         UserReviewsFragment fragment = new UserReviewsFragment();
         fragment.setArguments(bundle);
         return fragment;
+
     }
 
     @Nullable

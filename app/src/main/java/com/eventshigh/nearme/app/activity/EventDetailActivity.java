@@ -29,6 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,6 +71,7 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
+import com.eventshigh.nearme.app.view.CircularImageView;
 import com.eventshigh.nearme.app.view.ContactListView;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -110,6 +112,7 @@ public class EventDetailActivity extends BaseActivity {
     private View topProgressBar;
     private EventCard eventCard;
 
+
     private LatLng userLocation = null;
     private Event event = null;
     private Account account;
@@ -143,6 +146,19 @@ public class EventDetailActivity extends BaseActivity {
 
         // Account.
         account = new Account(this);
+
+        //my_review
+        if(false){
+         }else{
+            LinearLayout llGuestLayout = (LinearLayout)getLayoutInflater()
+                    .inflate(R.layout.card_user_movie_review, null);
+            ((TextView)findViewById(R.id.tv_user_review_by)).setText("");
+            ((RatingBar)findViewById(R.id.rb_user_review_rating)).setRating(0);
+            Glide.with(this).load("url")
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                    .into((CircularImageView)findViewById(R.id.civ_user_review));
+        }
     }
 
     @Override
