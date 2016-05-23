@@ -18,6 +18,9 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_INTEREST_UPDATED = "interest_updated";
     public static final String PREF_SHOW_REFERRAL = "show_referral";
     public static final String PREF_OFFER_ACTED_ID = "offers_acted";
+    public static final String PREF_NOTIFICATION_ACTIVE = "notification_active";
+
+
 
 
     private final Context context;
@@ -44,6 +47,14 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public boolean shouldShowOnBoarding() {
         return sharedPreferences.getBoolean(PREF_SHOW_ONBOARDING, true);
     }
+    public void setIsNotificationActive(boolean isNotificationActive) {
+        sharedPreferences.edit().putBoolean(PREF_NOTIFICATION_ACTIVE, isNotificationActive).apply();
+    }
+
+    public boolean isNotificationActive() {
+        return sharedPreferences.getBoolean(PREF_NOTIFICATION_ACTIVE, false);
+    }
+
 
     public void setCanUploadContacts(boolean shouldUploadContacts) {
         sharedPreferences.edit().putBoolean(PREF_UPLOAD_CONTACTS, shouldUploadContacts).apply();

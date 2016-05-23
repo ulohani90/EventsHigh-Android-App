@@ -40,19 +40,22 @@ public class EventsHighEndpoints {
     private static final String API_ENDPOINT_MULTI_EVENT_MOBILE_ID_FORMAT =
             API_URI_BASE + "api/get_events_for_mobile_user/%s?mobile=1";
     private static final String API_ENDPOINT_MOVIES_LIST_FORMAT =
-            API_URI_BASE + "api/get_movies_home/%s?mobile=1";
+            API_URI_BASE + "api/get_mobile_movies_home/%s";
+
+    private static final String API_ENDPOINT_MULTI_MOVIE_UBER_FORMAT =
+            API_URI_BASE + "api/get_movie_infos/%s/%s";
 
 
-    private static final String API_ENDPOINT_MOVIE_UBER_INFO_FORMAT=API_URI_BASE+"api/get_movie_uber_info/%s";
+    private static final String API_ENDPOINT_MOVIE_UBER_INFO_FORMAT = API_URI_BASE + "api/get_movie_uber_info/%s";
 
     private static final String API_EVENTS_SUGGEST_FORMAT =
             "https://assets.eventshigh.com/autocomplete/autocomplete_events_%s.json";
     private static final String API_TAGS_SUGGEST_URL =
             "https://assets.eventshigh.com/autocomplete/autocomplete_tags.json";
 
-    private static final String API_ENDPOINT_OFFERS_FORMAT = API_URI_BASE+"api/get_offers/%s";
+    private static final String API_ENDPOINT_OFFERS_FORMAT = API_URI_BASE + "api/get_offers/%s";
 
-    private static final String API_ENDPOINT_NOTIFICATIONS_FORMAT = API_URI_BASE+"api/get_latest_alerts/%s";
+    private static final String API_ENDPOINT_NOTIFICATIONS_FORMAT = API_URI_BASE + "api/get_latest_alerts/%s";
 
     public static final String QUERY_MY_EVENT = "my events";
     public static final String QUERY_MY_INTEREST_EVENTS = "my_interest_events";
@@ -60,7 +63,7 @@ public class EventsHighEndpoints {
 
     public static Uri getEventDetailsURI(Event event) {
         StringBuilder sb = new StringBuilder(event.id);
-        String [] titleKgrams = event.title.replaceAll("\\p{C}", "").split("[\\p{Punct}\\s]+");
+        String[] titleKgrams = event.title.replaceAll("\\p{C}", "").split("[\\p{Punct}\\s]+");
         for (int i = 0; i < 5 && i < titleKgrams.length; i++) {
             sb.append("-");
             sb.append(titleKgrams[i]);
@@ -79,11 +82,11 @@ public class EventsHighEndpoints {
         return String.format(API_EVENTS_SUGGEST_FORMAT, city.toString().toLowerCase());
     }
 
-  public static String getTagSuggestURI() {
-    return API_TAGS_SUGGEST_URL;
-  }
+    public static String getTagSuggestURI() {
+        return API_TAGS_SUGGEST_URL;
+    }
 
-  public static Uri getEventDetailsURI(City city, String eventId) {
+    public static Uri getEventDetailsURI(City city, String eventId) {
         return Uri.parse(WEB_URI_BASE).buildUpon()
                 .appendPath("detail")
                 .appendPath(Utils.capitalize(city.toString()))
@@ -133,8 +136,8 @@ public class EventsHighEndpoints {
 
         if (eventsContext.query.isEmpty() || isMyEventQuery(eventsContext.query)) {
             return String.format(API_ENDPOINT_DATE_FORMAT,
-                eventsContext.city.toString().toLowerCase(),
-                eventsContext.dateFilter.isEmpty() ? "this+week" : eventsContext.dateFilter);
+                    eventsContext.city.toString().toLowerCase(),
+                    eventsContext.dateFilter.isEmpty() ? "this+week" : eventsContext.dateFilter);
         }
 
         if (isFeaturedEventQuery(eventsContext.query)) {
@@ -144,39 +147,39 @@ public class EventsHighEndpoints {
         try {
             if (isDateQuery(eventsContext.query)) {
                 return String.format(API_ENDPOINT_DATE_FORMAT,
-                    eventsContext.city.toString().toLowerCase(),
-                    URLEncoder.encode(eventsContext.query, "UTF-8"));
+                        eventsContext.city.toString().toLowerCase(),
+                        URLEncoder.encode(eventsContext.query, "UTF-8"));
             }
 
             if (eventsContext.dateFilter.isEmpty()) {
                 return String.format(API_ENDPOINT_QUERY_FORMAT,
-                    eventsContext.city.toString().toLowerCase(),
-                    URLEncoder.encode(eventsContext.query, "UTF-8"));
+                        eventsContext.city.toString().toLowerCase(),
+                        URLEncoder.encode(eventsContext.query, "UTF-8"));
             }
 
             return String.format(API_ENDPOINT_QUERY_DATE_FORMAT,
-                eventsContext.city.toString().toLowerCase(),
-                URLEncoder.encode(eventsContext.query, "UTF-8"),
-                eventsContext.dateFilter);
+                    eventsContext.city.toString().toLowerCase(),
+                    URLEncoder.encode(eventsContext.query, "UTF-8"),
+                    eventsContext.dateFilter);
         } catch (UnsupportedEncodingException e) {
             Crashlytics.getInstance().core.logException(e);
             throw new IllegalArgumentException(e);
         }
     }
 
-    public static String getApiEndPointForOffers(String cityName){
+    public static String getApiEndPointForOffers(String cityName) {
         return String.format(API_ENDPOINT_OFFERS_FORMAT, cityName);
     }
 
-    public static String getApiEndPointForAlerts(String cityName){
-        return String.format(API_ENDPOINT_NOTIFICATIONS_FORMAT,cityName);
+    public static String getApiEndPointForAlerts(String cityName) {
+        return String.format(API_ENDPOINT_NOTIFICATIONS_FORMAT, cityName);
     }
 
     public static String getApiEndpointEventUber(String eventId) {
         return String.format(API_ENDPOINT_EVENT_UBER_FORMAT, eventId);
     }
 
-    public static String getApiEndpointForMoviesList(String cityName){
+    public static String getApiEndpointForMoviesList(String cityName) {
         return String.format(API_ENDPOINT_MOVIES_LIST_FORMAT, cityName);
 
     }
@@ -184,6 +187,12 @@ public class EventsHighEndpoints {
     public static String getApiEndpointEventsUber(List<String> eventIds) {
         Collections.sort(eventIds);
         return String.format(API_ENDPOINT_MULTI_EVENT_UBER_FORMAT, StringUtils.toCsvString(eventIds));
+    }
+
+
+    public static String getApiEndpointMoviesUber(List<String> movieIds, String cityName) {
+        Collections.sort(movieIds);
+        return String.format(API_ENDPOINT_MULTI_MOVIE_UBER_FORMAT, StringUtils.toCsvString(movieIds), cityName);
     }
 
     public static String getApiEndpointEventsMobileUser(String androidId) {
@@ -201,14 +210,16 @@ public class EventsHighEndpoints {
     }
 
     private static final Pattern DATE_PATTERN = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+
     public static boolean isDateQuery(String query) {
         // this week, this weekend are valid date queries
-        return query.toLowerCase().startsWith("this") ||  DATE_PATTERN.matcher(query).matches();
+        return query.toLowerCase().startsWith("this") || DATE_PATTERN.matcher(query).matches();
     }
 
     public static boolean isMyEventQuery(String query) {
         return query.equalsIgnoreCase(QUERY_MY_EVENT);
     }
+
     public static boolean isMyInterestEventQuery(String query) {
         return query.equalsIgnoreCase(QUERY_MY_INTEREST_EVENTS);
     }
@@ -217,7 +228,7 @@ public class EventsHighEndpoints {
         return query.equalsIgnoreCase(QUERY_FEATURED);
     }
 
-    public static String getApiEndpointForMovieUberDetail(int id){
-        return String.format(API_ENDPOINT_MOVIE_UBER_INFO_FORMAT,id+"");
+    public static String getApiEndpointForMovieUberDetail(int id) {
+        return String.format(API_ENDPOINT_MOVIE_UBER_INFO_FORMAT, id + "");
     }
 }

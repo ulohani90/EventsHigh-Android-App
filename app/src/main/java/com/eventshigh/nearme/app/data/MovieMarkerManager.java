@@ -93,7 +93,7 @@ public class MovieMarkerManager {
         }
 
         public Editor removeMovieMark(MovieInfoObject movie) {
-            MovieMark mark = movieMarkMap.remove(movie.getId()+"");
+            MovieMark mark = movieMarkMap.remove(movie.getId() + "");
             if (MovieMark.isFavourite(mark)) {
                 new UserActionHelper(context).recordMovieAction(
                         UserActionHelper.MovieAction.REMOVE_FAVORITE, movie.getId() + "");
@@ -101,7 +101,18 @@ public class MovieMarkerManager {
             threads.add(MovieMarkDbHelper.removeEntry(database, movie.getId() + ""));
             return this;
         }
+
+        public Editor removeMovieMark(String movieId) {
+            MovieMark mark = movieMarkMap.remove(movieId);
+            if (MovieMark.isFavourite(mark)) {
+                new UserActionHelper(context).recordMovieAction(
+                        UserActionHelper.MovieAction.REMOVE_FAVORITE, movieId);
+            }
+            threads.add(MovieMarkDbHelper.removeEntry(database, movieId + ""));
+            return this;
+        }
     }
+
 
     /**
      * Singleton Instance.

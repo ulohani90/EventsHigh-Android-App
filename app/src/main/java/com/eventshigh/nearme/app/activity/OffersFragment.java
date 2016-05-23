@@ -28,7 +28,7 @@ import java.util.Locale;
 /**
  * Created by umesh on 15/04/16.
  */
-public class OffersFragment extends Fragment{
+public class OffersFragment extends Fragment {
 
     public BaseContextActivity activity;
 
@@ -44,11 +44,12 @@ public class OffersFragment extends Fragment{
     Account account;
 
 
-    public OffersFragment newInstance(){
-        OffersFragment fragment  = new OffersFragment();
+    public OffersFragment newInstance() {
+        OffersFragment fragment = new OffersFragment();
         return fragment;
 
     }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -58,7 +59,7 @@ public class OffersFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_this_week,container,false);
+        View view = inflater.inflate(R.layout.fragment_this_week, container, false);
         return view;
     }
 
@@ -66,7 +67,7 @@ public class OffersFragment extends Fragment{
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        adapter=new OffersPagerAdapter(getChildFragmentManager());
+        adapter = new OffersPagerAdapter(getChildFragmentManager());
 
         viewPager = (ViewPager) view.findViewById(R.id.view_pager_date);
         viewPager.setAdapter(adapter);
@@ -92,8 +93,8 @@ public class OffersFragment extends Fragment{
         tabsView.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
         tabsView.setupWithViewPager(viewPager);
 
-        verifyPhnLayout = (LinearLayout)view.findViewById(R.id.verify_phn_layout);
-         account = new Account(getActivity());
+        verifyPhnLayout = (LinearLayout) view.findViewById(R.id.verify_phn_layout);
+        account = new Account(getActivity());
 
         (view.findViewById(R.id.verify_btn)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,19 +114,19 @@ public class OffersFragment extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
-        if(account!=null && !(account.getUserInfo().isVerified)){
+        if (account != null && !(account.getUserInfo().isVerified)) {
             verifyPhnLayout.setClickable(true);
             verifyPhnLayout.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             verifyPhnLayout.setVisibility(View.GONE);
         }
     }
 
-    public void verifyClicked(){
+    public void verifyClicked() {
         activity.startActivity(new Intent(activity, PhoneLoginActivity.class));
     }
 
-    public class OffersPagerAdapter extends FragmentStatePagerAdapter{
+    public class OffersPagerAdapter extends FragmentStatePagerAdapter {
 
         String[] TABS = {"Offers", "How to Earn"};
 

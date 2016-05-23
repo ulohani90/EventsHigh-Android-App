@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/ticket_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="Standing"
+            android:textColor="#353535"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/ticket_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Standing"
+            android:textColor="#C0C0C0"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/ticket_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:text="Rs 500"
+        android:textColor="#353535"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/ticket_discounted_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:text="Rs 400"
+        android:textColor="#353535"
+        android:textSize="14sp"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/ticket_count_increment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:padding="10dp"
+        android:text="+"
+        android:textColor="#353535"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/ticket_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/grey_rounded_corner_bg"
+        android:padding="10dp"
+        android:text="4"
+        android:textColor="#353535"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/ticket_count_decrement"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:padding="10dp"
+        android:text="-"
+        android:textColor="#353535"
+        android:textSize="16sp" />
+
+</LinearLayout>

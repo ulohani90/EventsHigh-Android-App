@@ -336,7 +336,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar"
             android:windowSoftInputMode="stateHidden" />
-
+        <activity
+            android:name=".activity.EventBookingDetailActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
 
         <activity
             android:name=".activity.OfferSignUpActivity"
@@ -426,6 +430,14 @@
                 <category android:name="com.eventshigh.nearme.app" />
             </intent-filter>
         </receiver>
+
+        <receiver android:name=".broadcast.NotificationDeleteBroadcastReciever">
+            <intent-filter>
+                <action android:name="notification_deleted_intent" />
+
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".broadcast.EHGcmListenerService"
             android:exported="false">
