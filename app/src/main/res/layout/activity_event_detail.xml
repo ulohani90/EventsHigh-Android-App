@@ -109,7 +109,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                tools:ignore="WebViewLayout">
+                tools:ignore="WebViewLayout"
+                >
                 <!-- Stats -->
                 <View
                     android:layout_width="match_parent"
@@ -698,15 +699,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp">
+                    android:layout_marginRight="8dp"
+                    android:layout_marginBottom="40dp">
                     <TextView
+                        android:id="@+id/btn_add_review"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:background="@drawable/grey_rounded_corner_bg"
                         android:gravity="center"
                         android:text="Write A Review"
                         android:textColor="#353535"
-                        android:textSize="22sp" />
+                        android:textSize="22sp"
+                        android:background="@drawable/button_write_review"/>
+
                 </LinearLayout>
 
             </LinearLayout>

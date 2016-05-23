@@ -33,7 +33,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.Request.Priority;
+import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
@@ -41,15 +43,16 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventDescriptionSection;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.network.EventRequest;
+import com.eventshigh.nearme.app.network.MyReviewsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
@@ -66,7 +69,6 @@ import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.user.UserActionHelper.EventAction;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -87,16 +89,13 @@ import com.google.android.youtube.player.YouTubePlayer;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
-import org.json.JSONException;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
-import io.branch.referral.Branch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
 /**
@@ -104,7 +103,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
  * link or from Events{Grid,Maps}Activity. In both cases, event data is not available so
  * this activity fetches the event data and shows it using the EventDetailFragment.
  */
-public class EventDetailActivity extends BaseActivity {
+public class EventDetailActivity extends BaseActivity implements OnClickListener{
     public static final String EXTRA_EVENT_PARAM = EventDetailActivity.class.getSimpleName() + "_event";
     public static final String EXTRA_PLAN_ID_PARAM = EventDetailActivity.class.getSimpleName() + "_plan_id";
 
@@ -124,6 +123,7 @@ public class EventDetailActivity extends BaseActivity {
     private boolean addToFavourite = false;
 
     private LinearLayout llEventWriteReview;
+    private TextView btnAddReview;
 
     CollapsingToolbarLayout collapsingToolbar;
 
@@ -149,20 +149,68 @@ public class EventDetailActivity extends BaseActivity {
         account = new Account(this);
 
         //my_review
+        btnAddReview = (TextView)findViewById(R.id.btn_add_review);
         llEventWriteReview = (LinearLayout)findViewById(R.id.ll_event_write_review);
-        if(false){
-         }else{
+        btnAddReview.setOnClickListener(this);
+
+
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+            case R.id.btn_add_review:
+            makeMyReviewsServerRequest();
+            break;
+        }
+    }
+
+    MovieUserReviewObject myUserReview;
+
+    public void makeMyReviewsServerRequest() {
+        MyReviewsRequest.submit(this, account.getUserInfo().phoneNo, Request.Priority.IMMEDIATE, this, false, mReviewListener, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(EventDetailActivity.this, R.string.failed_load,
+                        Toast.LENGTH_SHORT).show();
+                VolleyHelper.log(EventDetailActivity.this, volleyError);
+                finish();
+            }
+        });
+    }
+
+    private Response.Listener<List<MovieUserReviewObject>> mReviewListener = new Response.Listener<List<MovieUserReviewObject>>() {
+        @Override
+        public void onResponse(List<MovieUserReviewObject> reviews, boolean isIntermediate) {
+            findReviewsByUserForMovie(reviews);
+            updateReview();
+        }
+    };
+
+    public void findReviewsByUserForMovie(List<MovieUserReviewObject> reviews) {
+        for (MovieUserReviewObject obj : reviews) {
+            if (obj.getReviewerId().equalsIgnoreCase(account.getUserInfo().phoneNo)
+                    && obj.getReviewedEntityId().equalsIgnoreCase(event.id + "")) {
+                myUserReview = obj;
+                break;
+            }
+        }
+    }
+
+
+    private void updateReview(){
+        if(myUserReview != null){
             LinearLayout llGuestLayout = (LinearLayout)getLayoutInflater()
                     .inflate(R.layout.card_user_movie_review, null);
-            ((TextView)findViewById(R.id.tv_user_review_by)).setText("");
-            ((RatingBar)findViewById(R.id.rb_user_review_rating)).setRating(0);
+            ((TextView)findViewById(R.id.tv_user_review_by)).setText(myUserReview.getReviewBy());
+            ((RatingBar)findViewById(R.id.rb_user_review_rating)).setRating(myUserReview.getReviewRating());
             Glide.with(this).load("url")
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                     .into((CircularImageView)findViewById(R.id.civ_user_review));
             llEventWriteReview.addView(llGuestLayout);
         }
-
     }
 
     @Override
