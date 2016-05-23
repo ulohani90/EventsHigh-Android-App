@@ -121,8 +121,11 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
 
         MovieMarkerManager movieMarkerManager = MovieMarkerManager.getInstance(context);
         movieMarkerManager.waitForLoading();
+        RequestFuture<List<MovieDetailObject>> moviesList = RequestFuture.newFuture();
+        MultiMovieRequest.submit(context, eventsContext, movieMarkerManager.getFavouritedMovies(),
+                priority, tag, shouldBypassCache, includeWithoutLocation, moviesList, moviesList);
 
-        for (String movieId : movieMarkerManager.getFavouritedMovies()) {
+       /* for (String movieId : movieMarkerManager.getFavouritedMovies()) {
             RequestFuture<MovieDetailObject> movieObj = RequestFuture.newFuture();
             MovieDetailRequest.submit(context, Integer.parseInt(movieId),
                     priority, movieObj, movieObj);
@@ -132,7 +135,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
                 isRequestCancelled = true;
                 return null;
             }
-        }
+        }*/
 
         // Favourites event requests.
         EventsMarkerManager markerManager = EventsMarkerManager.getInstance(context);
@@ -157,6 +160,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
         try {
             addEventsToResults(events, INVITATIONS_NAME, invitedEvents);
             addEventsToResults(events, FAVOURITES_NAME, favEvents);
+            addMoviesToResults(movies, moviesList);
 
             return new MeEventFavouriteObject(events, movies);
         } catch (RequestCancelledException e) {
@@ -197,9 +201,9 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
     }
 
     private static void addMoviesToResults(List<MovieDetailObject> result,
-                                           RequestFuture<MovieDetailObject> movieFuture) throws RequestCancelledException {
+                                           RequestFuture<List<MovieDetailObject>> movieFuture) throws RequestCancelledException {
         try {
-            result.add(movieFuture.get(10, TimeUnit.SECONDS));
+            result.addAll(movieFuture.get(10, TimeUnit.SECONDS));
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             if (movieFuture.isCancelled()) {
                 throw new RequestCancelledException();

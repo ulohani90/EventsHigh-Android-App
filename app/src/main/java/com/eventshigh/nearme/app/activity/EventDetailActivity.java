@@ -124,10 +124,8 @@ public class EventDetailActivity extends BaseActivity {
     CollapsingToolbarLayout collapsingToolbar;
 
 
-
-
     /*****************************************
-     Activity lifecycle management utilities
+     * Activity lifecycle management utilities
      ***************************************/
 
     @Override
@@ -161,7 +159,7 @@ public class EventDetailActivity extends BaseActivity {
             if (event != null) {
                 showRateAppDialog = true;
                 //shareEvent(event, null);
-                shareEventWithBranch(event, null,"Toolbar");
+                shareEventWithBranch(event, null, "Toolbar");
             }
             return true;
         }
@@ -268,12 +266,12 @@ public class EventDetailActivity extends BaseActivity {
 */
 
 
-           // }
+        // }
     }
 
 
     /**********************************
-     Callbacks, action handlers
+     * Callbacks, action handlers
      **********************************/
 
     public void save(View view) {
@@ -315,7 +313,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openOrganizerLink(View view) {
-        if(event.organizerLink!=null) {
+        if (event.organizerLink != null) {
 
             showInviteDialog = true;
             reportEventAction(event, "organizer", "openLink");
@@ -326,7 +324,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openOrganizerWebsite(View view) {
-        if(event.organizerWebsite!=null) {
+        if (event.organizerWebsite != null) {
             showInviteDialog = true;
             reportEventAction(event, "organizer", "openWebsite");
 
@@ -351,23 +349,27 @@ public class EventDetailActivity extends BaseActivity {
 
         final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
         if (event.bookingUrl.contains("ticketing.eventshigh.com")) {
-            bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
+           /* bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
             bookingUriBuilder.appendQueryParameter("name", userInfo.name);
             bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
-            bookingUriBuilder.appendQueryParameter("src","eh-android");
+            bookingUriBuilder.appendQueryParameter("src", "eh-android");*/
+            Intent intent = new Intent(this, EventBookingDetailActivity.class);
+            intent.putExtra("event", event);
+            startActivity(intent);
+        } else {
+            try {
+                CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
+                        getString(R.string.title_book));
+            } catch (Exception e) {
+                Crashlytics.getInstance().core.logException(e);
+                showMessage(R.string.retry);
+            }
         }
-        try {
-            CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
-                getString(R.string.title_book));
-        }catch(Exception e){
-            Crashlytics.getInstance().core.logException(e);
-            showMessage(R.string.retry);
 
-        }
     }
 
     public void imagePreview(View view) {
-        if (event == null || (event!=null && event.imgUrl == null)) {
+        if (event == null || (event != null && event.imgUrl == null)) {
             return;
         }
 
@@ -464,7 +466,7 @@ public class EventDetailActivity extends BaseActivity {
 
         Preferences preferences = Preferences.getInstance(this);
         if (!preferences.canUploadContacts()) {
-            if(AskForContactsDialog.checkIfToShow(this,preferences)){
+            if (AskForContactsDialog.checkIfToShow(this, preferences)) {
                 return;
             }
         }
@@ -515,7 +517,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     /**********************************
-     Helper methods
+     * Helper methods
      **********************************/
 
     private void startActivitySafe(Intent intent) {
@@ -534,7 +536,7 @@ public class EventDetailActivity extends BaseActivity {
         new UserActionHelper(this).recordAction(EventAction.VIEW_EVENT, event.id);
 
         // Set Title.
-        if(collapsingToolbar != null) {
+        if (collapsingToolbar != null) {
             collapsingToolbar.setTitle(event.title);
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
@@ -733,9 +735,9 @@ public class EventDetailActivity extends BaseActivity {
             ViewGroup.LayoutParams params = bgView.getLayoutParams();
             params.height = 9 * metrics.widthPixels / 16;
             bgView.setLayoutParams(params);
-            frameParent = (FrameLayout)findViewById(R.id.frame_parent);
-            ViewGroup.LayoutParams lp =frameParent.getLayoutParams();
-            lp.height =  9 * metrics.widthPixels / 16;
+            frameParent = (FrameLayout) findViewById(R.id.frame_parent);
+            ViewGroup.LayoutParams lp = frameParent.getLayoutParams();
+            lp.height = 9 * metrics.widthPixels / 16;
             frameParent.setLayoutParams(lp);
         }
 
@@ -745,7 +747,7 @@ public class EventDetailActivity extends BaseActivity {
                     new OnScrollChangedListener() {
                         @Override
                         public void onScrollChanged() {
-                           // setScroll(eventScrollView.getScrollY());
+                            // setScroll(eventScrollView.getScrollY());
                         }
                     });
             eventScrollView.setVisibility(View.VISIBLE);
@@ -779,7 +781,7 @@ public class EventDetailActivity extends BaseActivity {
                     .isFavourite(event.id));
 
             // Set Youtube play button.
-            playYoutubeView.setVisibility((event.youtubeVideoId != null && event.youtubeVideoId.length()>0)? View.VISIBLE : View.GONE);
+            playYoutubeView.setVisibility((event.youtubeVideoId != null && event.youtubeVideoId.length() > 0) ? View.VISIBLE : View.GONE);
 
             // Set Venue and address.
             findViewById(R.id.venue_group).setVisibility(View.VISIBLE);
@@ -841,7 +843,7 @@ public class EventDetailActivity extends BaseActivity {
             // Set action buttons.
             findViewById(R.id.action_button_group).setVisibility(View.VISIBLE);
             callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
-            bookView.setVisibility(event.bookingUrl != null && event.bookingUrl.length()>0 ? View.VISIBLE : View.GONE);
+            bookView.setVisibility(event.bookingUrl != null && event.bookingUrl.length() > 0 ? View.VISIBLE : View.GONE);
             if (event.bookingText != null) {
                 bookView.setText(event.bookingText);
             }
@@ -852,29 +854,29 @@ public class EventDetailActivity extends BaseActivity {
 
             // Show price.
             findViewById(R.id.price_row).setVisibility(View.VISIBLE);
-            LinearLayout ehPriceContainer = (LinearLayout)findViewById(R.id.eh_price_container);
-            if(event.ehPrices.size() >0){
+            LinearLayout ehPriceContainer = (LinearLayout) findViewById(R.id.eh_price_container);
+            if (event.ehPrices.size() > 0) {
                 ehPriceContainer.removeAllViews();
                 ehPriceContainer.setVisibility(View.VISIBLE);
-                for(EhPrices ehPrice:event.ehPrices){
-                    View view = LayoutInflater.from(EventDetailActivity.this).inflate(R.layout.event_detail_price_layout,ehPriceContainer,false);
-                    ((TextView)view.findViewById(R.id.event_price)).setText(ehPrice.name+" - "+event.getPriceString(ehPrice.min,ehPrice.max,ehPrice.currency));
-                    if(ehPrice.note!=null && ehPrice.note.length()>0){
+                for (EhPrices ehPrice : event.ehPrices) {
+                    View view = LayoutInflater.from(EventDetailActivity.this).inflate(R.layout.event_detail_price_layout, ehPriceContainer, false);
+                    ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " + event.getPriceString(ehPrice.min, ehPrice.max, ehPrice.currency));
+                    if (ehPrice.note != null && ehPrice.note.length() > 0) {
                         TextView note = (TextView) view.findViewById(R.id.event_note);
                         note.setVisibility(View.VISIBLE);
-                        note.setText("( "+ehPrice.note+" )");
-                    }else{
+                        note.setText("( " + ehPrice.note + " )");
+                    } else {
                         ((TextView) view.findViewById(R.id.event_note)).setVisibility(View.GONE);
                     }
-                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
-                    ehPriceContainer.addView(view,lp);
+                    ehPriceContainer.addView(view, lp);
                 }
                 priceView.setVisibility(View.GONE);
-            }else{
+            } else {
                 ehPriceContainer.setVisibility(View.GONE);
                 priceView.setVisibility(View.VISIBLE);
-                String priceString = event.getPriceString(event.minPrice,event.maxPrice,event.currency);
+                String priceString = event.getPriceString(event.minPrice, event.maxPrice, event.currency);
                 priceView.setText(priceString == null ? getString(R.string.no_price) : priceString);
 
             }
@@ -965,7 +967,7 @@ public class EventDetailActivity extends BaseActivity {
 
 
             //Adding youtube view
-            if(event.youtubeVideoId!=null && event.youtubeVideoId.length()>0) {
+            if (event.youtubeVideoId != null && event.youtubeVideoId.length() > 0) {
                 LinearLayout linearLayout = (LinearLayout) findViewById(R.id.youtube_fragment);
                 LinearLayout ll = new LinearLayout(EventDetailActivity.this);
                 ll.setId(View.generateViewId());
@@ -973,7 +975,7 @@ public class EventDetailActivity extends BaseActivity {
                 youTubePlayerSupportFragment.initialize(Utils.YOUTUBE_API_KEY, new YouTubePlayer.OnInitializedListener() {
                     @Override
                     public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
-                       // youTubePlayer.loadVideo(event.youtubeVideoId);
+                        // youTubePlayer.loadVideo(event.youtubeVideoId);
                         youTubePlayer.cueVideo(event.youtubeVideoId);
                         youTubePlayer.setShowFullscreenButton(false);
                     }
@@ -987,11 +989,10 @@ public class EventDetailActivity extends BaseActivity {
                 });
                 getSupportFragmentManager().beginTransaction().add(ll.getId(), youTubePlayerSupportFragment).commit();
                 linearLayout.addView(ll);
-            }else{
+            } else {
                 (findViewById(R.id.youtube_fragment)).setVisibility(View.GONE);
             }
         }
-
 
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
@@ -1053,7 +1054,7 @@ public class EventDetailActivity extends BaseActivity {
 
     private void populateEventTravelTime() {
         if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Location location = LocationServices.FusedLocationApi.getLastLocation(client);
             if (location != null) {
                 userLocation = LocationUtils.locationToLatLng(location);
@@ -1075,20 +1076,20 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         client = new GoogleApiClient.Builder(this)
-                    .addApi(AppIndex.API)
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(new ConnectionCallbacks() {
-                        @Override
-                        public void onConnected(Bundle bundle) {
-                            populateEventTravelTime();
-                        }
+                .addApi(AppIndex.API)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(new ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(Bundle bundle) {
+                        populateEventTravelTime();
+                    }
 
-                        @Override
-                        public void onConnectionSuspended(int i) {
-                            // do nothing.
-                        }
-                    })
-                    .build();
+                    @Override
+                    public void onConnectionSuspended(int i) {
+                        // do nothing.
+                    }
+                })
+                .build();
         client.connect();
         Uri webUri = event.getEventDetailsURI();
         viewAction = new Action.Builder(Action.TYPE_VIEW)

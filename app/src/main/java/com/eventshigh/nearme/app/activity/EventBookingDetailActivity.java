@@ -1,0 +1,282 @@
+package com.eventshigh.nearme.app.activity;
+
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.stream.EhPrices;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TimeZone;
+
+import pl.snowdog.material.ui.ToolbarColorizeHelper;
+
+/**
+ * Created by umesh on 19/05/16.
+ */
+public class EventBookingDetailActivity extends BaseActivity {
+
+
+    Event event;
+    Toolbar toolbar;
+    boolean isPromoCodeApplied;
+    double total = 0;
+    double noOfTickets = 0;
+    TextView totalPrice;
+    TextView numberOfTickets;
+    String currency;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_event_booking_detail);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        ScrollView scrollView = (ScrollView) findViewById(R.id.booking_scrollview);
+        if (getIntent().hasExtra("event")) {
+            event = getIntent().getParcelableExtra("event");
+        }
+
+        totalPrice = (TextView) findViewById(R.id.total_price);
+        numberOfTickets = (TextView) findViewById(R.id.total_tickets);
+        getTimingSlots();
+        addDateContainerData();
+        addTimeContainerData(0);
+        addEventTickets(0, 0);
+        updateTotalPrice();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (toolbar != null)
+            setLightToolbarIcons();
+    }
+
+    private void setLightToolbarIcons() {
+        toolbar.post(new Runnable() {
+            @Override
+            @SuppressWarnings("deprecation")
+            public void run() {
+                ToolbarColorizeHelper.colorizeToolbar(toolbar,
+                        getResources().getColor(android.R.color.white), EventBookingDetailActivity.this);
+            }
+        });
+    }
+
+    HashMap<String, ArrayList<EventTime>> eventTimes;
+
+    TextView dateLayoutSelectedLast;
+
+    TextView timeLayoutLastSelected;
+
+    public void addDateContainerData() {
+        LinearLayout dateContainer = (LinearLayout) findViewById(R.id.date_container);
+        for (int i = 0; i < dates.size(); i++) {
+            View view = LayoutInflater.from(this).inflate(R.layout.ticket_date_time_count_container, dateContainer, false);
+
+            final TextView dayText = (TextView) view.findViewById(R.id.event_day);
+            dayText.setVisibility(View.VISIBLE);
+
+            if (i == 0) {
+                dayText.setSelected(true);
+                dateLayoutSelectedLast = dayText;
+            }
+            TextView timeLayout = (TextView) view.findViewById(R.id.time_textview);
+            timeLayout.setVisibility(View.GONE);
+            SpannableString date = new SpannableString(eventTimes.get(dates.get(i)).get(0).day + "\n" + eventTimes.get(dates.get(i)).get(0).date);
+            date.setSpan(new RelativeSizeSpan(0.8f), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            dayText.setText(date);
+            view.setTag(i);
+            dateContainer.addView(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = (Integer) v.getTag();
+                    if (dateLayoutSelectedLast != null) {
+                        dateLayoutSelectedLast.setSelected(false);
+                    }
+                    dayText.setSelected(true);
+                    dateLayoutSelectedLast = dayText;
+                    addTimeContainerData(position);
+                    addEventTickets(position, 0);
+                }
+            });
+        }
+
+    }
+
+    public void addTimeContainerData(final int position) {
+        LinearLayout timeContainer = (LinearLayout) findViewById(R.id.time_container);
+        ArrayList<EventTime> timings = eventTimes.get(dates.get(position));
+        timeContainer.removeAllViews();
+        for (int i = 0; i < timings.size(); i++) {
+
+            View view = LayoutInflater.from(this).inflate(R.layout.ticket_date_time_count_container, timeContainer, false);
+            TextView dayText = (TextView) view.findViewById(R.id.event_day);
+            dayText.setVisibility(View.GONE);
+            final TextView timeLayout = (TextView) view.findViewById(R.id.time_textview);
+            timeLayout.setVisibility(View.VISIBLE);
+            timeLayout.setText(timings.get(i).time);
+            if (i == 0) {
+                timeLayout.setSelected(true);
+                timeLayoutLastSelected = timeLayout;
+            }
+            view.setTag(i);
+            timeContainer.addView(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int timeIndex = (Integer) v.getTag();
+                    if (timeLayoutLastSelected != null) {
+                        timeLayoutLastSelected.setSelected(false);
+                    }
+                    timeLayout.setSelected(true);
+                    timeLayoutLastSelected = timeLayout;
+                    addEventTickets(position, timeIndex);
+
+                }
+            });
+        }
+    }
+
+    List<String> dates;
+
+    public void getTimingSlots() {
+        dates = new ArrayList<>();
+        eventTimes = new HashMap<>();
+        for (int i = 0; i < event.eventTimings.length; i++) {
+            EventTime time = DateTimeUtils.getEventTime(event, i);
+            if (eventTimes.containsKey(time.date)) {
+                eventTimes.get(time.date).add(time);
+            } else {
+                ArrayList<EventTime> timings = new ArrayList<>();
+                timings.add(time);
+                eventTimes.put(time.date, timings);
+                dates.add(time.date);
+            }
+        }
+    }
+
+    public void addEventTickets(int dateIndex, int timeIndex) {
+        ArrayList<EhPrices> prices = getEhPrices(dateIndex, timeIndex);
+        LinearLayout ticketTypes = (LinearLayout) findViewById(R.id.options_container);
+        for (int i = 0; i < prices.size(); i++) {
+            final EhPrices price = prices.get(i);
+            View view = LayoutInflater.from(this).inflate(R.layout.eh_ticket_type_layout, ticketTypes, false);
+            TextView ticketType = (TextView) view.findViewById(R.id.ticket_name);
+            TextView ticketDesc = (TextView) view.findViewById(R.id.ticket_desc);
+            TextView ticketPrice = (TextView) view.findViewById(R.id.ticket_price);
+            TextView ticketDiscountedPrice = (TextView) view.findViewById(R.id.ticket_discounted_price);
+            final TextView ticketCount = (TextView) view.findViewById(R.id.ticket_count);
+            TextView ticketCountIncrement = (TextView) view.findViewById(R.id.ticket_count_increment);
+            TextView ticketCountDecrement = (TextView) view.findViewById(R.id.ticket_count_decrement);
+            ticketType.setText(price.name);
+            if (price.note != null && price.note.length() > 0) {
+                ticketDesc.setText(price.note);
+                ticketDesc.setVisibility(View.VISIBLE);
+            } else {
+                ticketDesc.setVisibility(View.GONE);
+            }
+            currency = price.currency;
+            ticketCount.setText(0 + "");
+            ticketCountIncrement.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    int ticketNo = Integer.parseInt(ticketCount.getText().toString());
+                    if (ticketNo < 50) {
+                        ticketNo++;
+                        ticketCount.setText(ticketNo + "");
+                        noOfTickets += 1;
+                        if (price.discountValue < 0.01) {
+                            total += price.value;
+                        } else {
+                            total += price.discountValue;
+                        }
+                        updateTotalPrice();
+                    }
+                }
+            });
+            ticketCountDecrement.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int ticketNo = Integer.parseInt(ticketCount.getText().toString());
+                    if (ticketNo != 0) {
+                        ticketNo--;
+                        ticketCount.setText(ticketNo + "");
+                        noOfTickets -= 1;
+                        if (price.discountValue < 0) {
+                            total -= price.value;
+                        } else {
+                            total -= price.discountValue;
+                        }
+                        updateTotalPrice();
+                    }
+                }
+            });
+            if (price.discountValue > 0) {
+                ticketPrice.setTextColor(Color.parseColor("#C0C0C0"));
+                ticketPrice.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);
+                ticketPrice.setText(price.currency + " " + price.value);
+                ticketDiscountedPrice.setText(price.currency + " " + price.discountValue);
+                ticketPrice.setPaintFlags(ticketPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            } else {
+                ticketPrice.setTextColor(Color.parseColor("#353535"));
+                ticketPrice.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+                ticketPrice.setText(price.currency + " " + price.value);
+                ticketPrice.setPaintFlags(ticketPrice.getPaintFlags());
+            }
+            ticketTypes.addView(view);
+        }
+
+    }
+
+    public ArrayList<EhPrices> getEhPrices(int dateIndex, int timeIndex) {
+        ArrayList<EhPrices> results = new ArrayList<>();
+        EventTime eventTime = eventTimes.get(dates.get(dateIndex)).get(timeIndex);
+        for (int i = 0; i < event.ehPrices.size(); i++) {
+            EhPrices ehPrices = event.ehPrices.get(i);
+            for (int j = 0; j < event.ehPrices.get(i).occurences.size(); j++) {
+                EventTime time = DateTimeUtils.dateToEventTime(new Date(ehPrices.occurences.get(j)), TimeZone.getTimeZone(event.city.timeZone));
+                if (eventTime.equals(time)) {
+                    results.add(ehPrices);
+                }
+
+            }
+
+        }
+        return results;
+
+    }
+
+    public void updateTotalPrice() {
+        totalPrice.setText(currency + " " + Math.round(total));
+        numberOfTickets.setText(Math.round(noOfTickets) + "");
+    }
+}

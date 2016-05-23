@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.user.Account;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.HitBuilders.EventBuilder;
@@ -23,12 +24,19 @@ public class GAHelper {
 
     private final GoogleAnalytics googleAnalytics;
     private final Tracker tracker;
+    private static String referrerId;
+    private final Account account;
+
 
     private GAHelper(Context context) {
         googleAnalytics = GoogleAnalytics.getInstance(context.getApplicationContext());
         tracker = googleAnalytics.newTracker(R.xml.analytics);
         tracker.enableAdvertisingIdCollection(true);
-
+        account = new Account(context);
+        referrerId = account.getReferrerId();
+        if (referrerId != null) {
+            tracker.setClientId(referrerId);
+        }
         // Disable GA reporting in debug build.
         if (Utils.isDebug(context)) {
             googleAnalytics.setAppOptOut(true);
@@ -39,11 +47,11 @@ public class GAHelper {
         if (instance == null) {
             instance = new GAHelper(context);
         }
-
         return instance;
     }
 
     public void reportActivityStart(Activity activity) {
+
         googleAnalytics.reportActivityStart(activity);
     }
 
@@ -60,9 +68,15 @@ public class GAHelper {
     }
 
     public void reportCampaignParams(String campaignData) {
+        if (referrerId == null) {
+            referrerId = account.getReferrerId();
+            if (referrerId != null) {
+                tracker.setClientId(referrerId);
+            }
+        }
         tracker.send(new HitBuilders.ScreenViewBuilder()
-            .setCampaignParamsFromUrl(campaignData)
-            .build()
+                        .setCampaignParamsFromUrl(campaignData)
+                        .build()
         );
     }
 
@@ -77,12 +91,18 @@ public class GAHelper {
             for (int i = 0; i < customValues.length; i++) {
                 builder.setCustomDimension(i + 1, customValues[i]);
             }
+            if (referrerId == null) {
+                referrerId = account.getReferrerId();
+                if (referrerId != null) {
+                    tracker.setClientId(referrerId);
+                }
+            }
             tracker.send(builder.build());
         }
     }
 
     public static String getDateReportString(@Nullable Date date) {
-        Date today = DateTimeUtils.toMidnight(Calendar.getInstance(),null).getTime();
+        Date today = DateTimeUtils.toMidnight(Calendar.getInstance(), null).getTime();
         if (date == null || today.after(date)) {
             return "";
         }
