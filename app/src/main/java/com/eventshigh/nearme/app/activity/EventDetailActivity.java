@@ -123,6 +123,7 @@ public class EventDetailActivity extends BaseActivity {
     private boolean showInviteDialog = false;
     private boolean addToFavourite = false;
 
+    private LinearLayout llEventWriteReview;
 
     CollapsingToolbarLayout collapsingToolbar;
 
@@ -148,6 +149,7 @@ public class EventDetailActivity extends BaseActivity {
         account = new Account(this);
 
         //my_review
+        llEventWriteReview = (LinearLayout)findViewById(R.id.ll_event_write_review);
         if(false){
          }else{
             LinearLayout llGuestLayout = (LinearLayout)getLayoutInflater()
@@ -158,7 +160,9 @@ public class EventDetailActivity extends BaseActivity {
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                     .into((CircularImageView)findViewById(R.id.civ_user_review));
+            llEventWriteReview.addView(llGuestLayout);
         }
+
     }
 
     @Override
@@ -171,8 +175,8 @@ public class EventDetailActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_share) {
-            if (event != null) {
+        if (id == R.id.action_share){
+            if (event != null){
                 showRateAppDialog = true;
                 //shareEvent(event, null);
                 shareEventWithBranch(event, null, "Toolbar");

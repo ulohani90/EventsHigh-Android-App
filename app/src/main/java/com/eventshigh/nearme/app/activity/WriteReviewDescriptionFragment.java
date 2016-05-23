@@ -55,6 +55,7 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
     private static String JSON_KEY_REVIEW_PLATFORM = "review_platform";
     private static String JSON_KEY_REVIEW_DEVICE_ID = "review_device_id";
     private static String JSON_KEY_REVIEW_RATINGS = "ratings";
+    private static String JSON_KEY_CITY = "reviewed_entity_city";
 
     AppCompatActivity mAppCompatActivity;
     EditText etWriteReviewDescription;
@@ -154,7 +155,7 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
             jsonObject.put(JSON_KEY_REVIEW_RATINGS, (int) rbMovieRating.getRating());
             jsonObject.put(JSON_KEY_REVIEW_TEXT, etWriteReviewDescription.getText().toString());
             jsonObject.put(JSON_KEY_REVIEW_BY, (new Account(writeReviewActivity)).getUserInfo().name);
-
+            jsonObject.put(JSON_KEY_CITY, (new Account(writeReviewActivity)).getLastCity().name());
             jsonObject.put(JSON_KEY_REVIEW_PLATFORM, "android");
             jsonObject.put(JSON_KEY_REVIEW_DEVICE_ID, Settings.Secure.getString
                     (getContext().getContentResolver(), Settings.Secure.ANDROID_ID));
