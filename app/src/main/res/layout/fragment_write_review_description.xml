@@ -1,9 +1,10 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
+    xmlns:app1="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
     android:layout_height="match_parent"
-    tools:context="com.eventshigh.nearme.app.activity.WriteReviewDescriptionFragment"
     android:orientation="vertical"
-    >
+    tools:context="com.eventshigh.nearme.app.activity.WriteReviewDescriptionFragment">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -11,75 +12,81 @@
         android:orientation="vertical">
 
         <LinearLayout
-                android:id="@+id/ll_review_description_header"
+            android:id="@+id/ll_review_description_header"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/movie_header_grey_color"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <com.eventshigh.nearme.app.view.CircularImageView
+                android:id="@+id/civ_movie_pic"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginRight="8dp"
+                app1:border="false"
+                app1:border_width="0dp" />
+
+            <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@color/movie_header_grey_color"
-                android:padding="4dp"
-                android:layout_marginTop="4dp">
+                android:layout_gravity="center_vertical"
+                android:orientation="vertical">
 
-                <com.eventshigh.nearme.app.view.CircularImageView
-                    android:id="@+id/civ_movie_pic"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_marginRight="5dp"/>
-
-                <LinearLayout
-                    android:layout_width="fill_parent"
+                <TextView
+                    android:id="@+id/tv_write_review_description_movie_name"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="vertical">
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
+                    android:text="Movie Name"
+                    android:textColor="@color/red_movie_text_color"
+                    android:textSize="18sp" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="18sp"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="4dp"
-                        android:text="Movie Name"
-                        android:id="@+id/tv_write_review_description_movie_name"
-                        android:textColor="@color/red_movie_text_color"
-                        />
-
-                    <RatingBar
-                        android:id="@+id/rb_write_rating_description"
-                        android:layout_width="wrap_content"
-                        android:layout_height="24dp"
-                        android:progressDrawable="@drawable/movie_review_rating_bar"
-                        android:stepSize="1"
-                        android:isIndicator="true"
-                        />
-                </LinearLayout>
+                <RatingBar
+                    android:id="@+id/rb_write_rating_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:isIndicator="true"
+                    android:progressDrawable="@drawable/movie_review_rating_bar"
+                    android:stepSize="1" />
+            </LinearLayout>
 
         </LinearLayout>
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:layout_marginTop="10dp"
-                android:minHeight="100dp"
-                android:maxLength="5000"
-                android:textColor="@color/movie_text_grey_color"
-                android:id="@+id/et_write_review_description"
-                android:hint="@string/write_review_description" />
+        <EditText
+            android:id="@+id/et_write_review_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="56dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:hint="@string/write_review_description"
+            android:maxLength="5000"
+            android:minHeight="100dp"
+            android:textColor="#353535"
+            android:textColorHint="@color/movie_text_grey_color"
+            android:textSize="16sp" />
 
 
     </LinearLayout>
 
 
-        <Button
-            android:id="@+id/btn_write_review"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Submit Review"
-            android:textColor="@android:color/white"
-            android:background="@color/movie_submit_green_color"
-            android:textSize="14dp"
-            android:padding="4dp"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_gravity="bottom"/>
-
+    <TextView
+        android:id="@+id/btn_write_review"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/eh_button_done"
+        android:elevation="4dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:text="@string/action_confirm"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        tools:ignore="UnusedAttribute"
+        tools:visibility="visible" />
 
 </FrameLayout>
