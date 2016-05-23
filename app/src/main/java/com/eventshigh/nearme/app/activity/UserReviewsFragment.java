@@ -32,6 +32,7 @@ public class UserReviewsFragment extends android.support.v4.app.Fragment {
     public static UserReviewsFragment newInstance(Bundle bundle){
         UserReviewsFragment fragment = new UserReviewsFragment();
         fragment.setArguments(bundle);
+
         return  fragment;
     }
 

@@ -103,6 +103,15 @@ public class Utils {
                 : string);
     }
 
+    public static boolean checkIfStringEmpty(@Nullable String string) {
+        return (string == null ||
+                string.isEmpty() ||
+                string.equalsIgnoreCase("null") ||
+                string.equalsIgnoreCase("unknown")
+                ? false
+                : true);
+    }
+
     public static int dpToPx(Context context, float dp) {
         return (int) (dp * context.getResources().getDisplayMetrics().density);
     }

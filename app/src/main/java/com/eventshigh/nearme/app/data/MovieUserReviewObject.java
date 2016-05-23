@@ -33,7 +33,7 @@ public class MovieUserReviewObject implements Parcelable {
     public MovieUserReviewObject(){
     }
 
-    public MovieUserReviewObject(Parcel in) {
+    public MovieUserReviewObject(Parcel in){
         this.reviewId = in.readString();
         this.reviewerId = in.readString();
         this.reviewFor = in.readString();

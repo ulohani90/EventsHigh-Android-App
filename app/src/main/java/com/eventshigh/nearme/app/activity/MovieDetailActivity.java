@@ -240,7 +240,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
             }
             else if(TABS.get(position).equalsIgnoreCase(USER_REVIEWS)){
                 //Dummy Object - ArrayList<MovieUserReviewObject>
-                ArrayList<MovieUserReviewObject> movieUserReviewObjects = new ArrayList<>();
+                /*ArrayList<MovieUserReviewObject> movieUserReviewObjects = new ArrayList<>();
                 MovieUserReviewObject movieUserReviewObject = new MovieUserReviewObject();
                 movieUserReviewObject.setReviewBy("Shubham");
                 movieUserReviewObject.setReviewText("Movie is superb!");
@@ -248,6 +248,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
                 //movieObject.setUserReviews(movieUserReviewObjects);
                 //dummy
                 Log.e("Count of user reviews ",movieObject.getUserReviews().size()+"");
+                */
                 bundle.putParcelableArrayList(USER_REVIEWS, movieObject.getUserReviews());
                 return UserReviewsFragment.newInstance(bundle);
             }else{
