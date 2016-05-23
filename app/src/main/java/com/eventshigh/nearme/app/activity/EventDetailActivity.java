@@ -860,7 +860,12 @@ public class EventDetailActivity extends BaseActivity {
                 ehPriceContainer.setVisibility(View.VISIBLE);
                 for (EhPrices ehPrice : event.ehPrices) {
                     View view = LayoutInflater.from(EventDetailActivity.this).inflate(R.layout.event_detail_price_layout, ehPriceContainer, false);
-                    ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " + event.getPriceString(ehPrice.min, ehPrice.max, ehPrice.currency));
+                    if (ehPrice.discountValue > 0) {
+                        ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " + ehPrice.currency + " " + ehPrice.discountValue);
+                    } else {
+                        ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " + ehPrice.currency + " " + ehPrice.value);
+                    }
+
                     if (ehPrice.note != null && ehPrice.note.length() > 0) {
                         TextView note = (TextView) view.findViewById(R.id.event_note);
                         note.setVisibility(View.VISIBLE);
