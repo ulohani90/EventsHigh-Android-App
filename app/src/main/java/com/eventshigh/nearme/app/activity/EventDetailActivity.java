@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Paint;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +15,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.UnderlineSpan;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -108,6 +112,9 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
     public static final String EXTRA_EVENT_PARAM = EventDetailActivity.class.getSimpleName() + "_event";
     public static final String EXTRA_PLAN_ID_PARAM = EventDetailActivity.class.getSimpleName() + "_plan_id";
 
+    public static final String EVENT_REVIEWS = "event_reviews";
+    public static final String EVENT_ID = "event_id";
+
     private Toolbar toolbar;
     private View topProgressBar;
     private EventCard eventCard;
@@ -162,6 +169,7 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.btn_add_review1:
             case R.id.btn_add_review:
                 if (account.getUserInfo().phoneNo == null || account.getUserInfo().name == null) {
                     PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
@@ -196,37 +204,46 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
         @Override
         public void onResponse(List<MovieUserReviewObject> reviews, boolean isIntermediate) {
             findReviewsByUserForMovie(reviews);
-
-            updateReview();
+            populateView(event);
+            // updateReview();
         }
     };
+
+    boolean isMyReviewWritten;
 
     public void findReviewsByUserForMovie(List<MovieUserReviewObject> reviews) {
         for (MovieUserReviewObject obj : reviews) {
             if (obj.getReviewerId().equalsIgnoreCase(account.getUserInfo().phoneNo)
                     && obj.getReviewedEntityId().equalsIgnoreCase(event.id + "")) {
-                myUserReview = obj;
+                event.reviewObjects.add(0, obj);
+                isMyReviewWritten = true;
                 break;
             }
         }
     }
 
     private void updateReview() {
-        if (myUserReview != null) {
+        if (event.reviewObjects.size() > 0) {
             findViewById(R.id.review_card).setVisibility(View.VISIBLE);
-            ((TextView) findViewById(R.id.tv_user_review_by)).setText(myUserReview.getReviewBy());
-            ((RatingBar) findViewById(R.id.rb_user_review_rating)).setRating(myUserReview.getReviewRating());
-            ((TextView) findViewById(R.id.tv_user_review_text)).setText(myUserReview.getReviewText());
+            ((TextView) findViewById(R.id.tv_user_review_by)).setText(event.reviewObjects.get(0).getReviewBy());
+            ((RatingBar) findViewById(R.id.rb_user_review_rating)).setRating(event.reviewObjects.get(0).getReviewRating());
+            ((TextView) findViewById(R.id.tv_user_review_text)).setText(event.reviewObjects.get(0).getReviewText());
+            if ((event.reviewObjects.get(0).getReviewedEntityId() == null || !event.reviewObjects.get(0).getReviewedEntityId().equalsIgnoreCase(event.id)) && event.reviewObjects.get(0).getReviewEntity() != null) {
+                ((TextView) findViewById(R.id.tv_user_review_for)).setVisibility(View.VISIBLE);
+                ((TextView) findViewById(R.id.tv_user_review_for)).setText("This review was for " + event.reviewObjects.get(0).getReviewEntity());
+            } else {
+                ((TextView) findViewById(R.id.tv_user_review_for)).setVisibility(View.GONE);
+            }
             ImageView reviewerImage = (ImageView) findViewById(R.id.civ_user_review);
             int size = reviewerImage.getLayoutParams().height;
-            reviewerImage.setImageDrawable(UserContact.getDrawableForName(myUserReview.getReviewBy(), size));
+            reviewerImage.setImageDrawable(UserContact.getDrawableForName(event.reviewObjects.get(0).getReviewBy(), size));
             /*
             Glide.with(this).load("url")
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                     .into((CircularImageView)findViewById(R.id.civ_user_review));
             */
-            findViewById(R.id.ll_event_write_review).setVisibility(View.GONE);
+            //  findViewById(R.id.ll_event_write_review).setVisibility(View.GONE);
             Preferences.getInstance(this).setIsReviewAdded(false);
         }
 
@@ -275,7 +292,7 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
         if (getIntent().hasExtra(EXTRA_EVENT_PARAM)) {
             event = getIntent().getParcelableExtra(EXTRA_EVENT_PARAM);
             makeMyReviewsServerRequest(false);
-            populateView(event);
+
         } else {
             EventRequest.submit(this, getIntent().getData(), Priority.IMMEDIATE, mEventListener,
                     new ErrorListener() {
@@ -703,7 +720,7 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
         public void onResponse(final Event event, boolean isIntermediate) {
             EventDetailActivity.this.event = event;
             makeMyReviewsServerRequest(false);
-            populateView(event);
+            // populateView(event);
 
         }
     };
@@ -1068,6 +1085,40 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
                 eventContainer.addView(descriptionSectionView);
             }
 
+            //Add Reviews Code
+            if (event.reviewObjects.size() == 0) {
+                findViewById(R.id.btn_add_review).setVisibility(View.GONE);
+                ((LinearLayout) findViewById(R.id.no_review_layout)).setVisibility(View.VISIBLE);
+                TextView addReviewBtn1 = (TextView)findViewById(R.id.btn_add_review1);
+                SpannableString string = new SpannableString("Write a Review");
+                string.setSpan(new UnderlineSpan(), 0, string.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                addReviewBtn1.setText(string);
+                findViewById(R.id.btn_add_review1).setOnClickListener(EventDetailActivity.this);
+                (findViewById(R.id.review_layout)).setVisibility(View.GONE);
+
+            } else {
+                if (isMyReviewWritten) {
+                    findViewById(R.id.btn_add_review).setVisibility(View.GONE);
+                } else {
+                    TextView btnAddReview = (TextView) findViewById(R.id.btn_add_review);
+                    SpannableString string = new SpannableString("Write a Review");
+                    string.setSpan(new UnderlineSpan(), 0, string.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    btnAddReview.setText(string);
+                }
+                (findViewById(R.id.review_layout)).setVisibility(View.VISIBLE);
+                updateReview();
+                ((LinearLayout) findViewById(R.id.no_review_layout)).setVisibility(View.GONE);
+                (findViewById(R.id.show_more_text)).setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(EventDetailActivity.this, EventAllReviewsActivity.class);
+                        intent.putParcelableArrayListExtra(EVENT_REVIEWS, event.reviewObjects);
+                        intent.putExtra(EVENT_ID, event.id);
+                        startActivity(intent);
+                    }
+                });
+
+            }
 
             //Adding youtube view
             if (event.youtubeVideoId != null && event.youtubeVideoId.length() > 0) {

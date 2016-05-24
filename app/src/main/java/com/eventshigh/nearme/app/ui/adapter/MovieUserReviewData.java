@@ -11,14 +11,16 @@ import com.eventshigh.nearme.app.data.MovieUserReviewObject;
  * @since 16/5/16.
  */
 
-public class MovieUserReviewData implements AdapterData{
+public class MovieUserReviewData implements AdapterData {
 
     MovieUserReviewObject reviewObj;
     BaseContextActivity activity;
+    String reviewForId;
 
-    public MovieUserReviewData(MovieUserReviewObject reviewObj,BaseContextActivity activity){
+    public MovieUserReviewData(MovieUserReviewObject reviewObj, BaseContextActivity activity, String reviewForId) {
         this.reviewObj = reviewObj;
         this.activity = activity;
+        this.reviewForId = reviewForId;
     }
 
     @Override
@@ -28,12 +30,12 @@ public class MovieUserReviewData implements AdapterData{
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder card, int position) {
-        ((MovieUserReviewCard)card).bindData(activity, reviewObj);
+        ((MovieUserReviewCard) card).bindData(activity, reviewObj, reviewForId);
     }
 
     @Override
     public String getId() {
-        return reviewObj.getReviewId()+"";
+        return reviewObj.getReviewId() + "";
     }
 
 }

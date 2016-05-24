@@ -86,7 +86,6 @@ public class MovieMarkerManager {
                 removeMovieMark(movie);
             } else {
                 movieMarkMap.put(movie.getId() + "", mark);
-
                 threads.add(MovieMarkDbHelper.addEntry(database, movie.getId() + "", mark));
             }
             return this;

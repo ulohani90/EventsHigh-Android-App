@@ -25,6 +25,7 @@ public class UserReviewsFragment extends android.support.v4.app.Fragment {
 
     private EventsAdapter eventsAdapter;
 
+    private String movieId;
 
     AutofitRecyclerView reviewList;
 
@@ -56,6 +57,7 @@ public class UserReviewsFragment extends android.support.v4.app.Fragment {
 
         if (getArguments() != null && getArguments().getParcelableArrayList(MovieDetailActivity.USER_REVIEWS) != null) {
             reviews = getArguments().getParcelableArrayList(MovieDetailActivity.USER_REVIEWS);
+            movieId = getArguments().getString(MovieDetailActivity.MOVIE_ID);
 
         }
         eventsAdapter = new EventsAdapter((MovieDetailActivity) getActivity());
@@ -63,14 +65,13 @@ public class UserReviewsFragment extends android.support.v4.app.Fragment {
         //reviewList.addOnScrollListener(new HideActionBarOnScroll((LaunchActivity) getActivity()));
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setEnabled(false);
-        if (reviews.size() == 0 ) {
+        if (reviews.size() == 0) {
             tvFirstReviewText.setVisibility(View.VISIBLE);
         } else {
             tvFirstReviewText.setVisibility(View.GONE);
         }
-        eventsAdapter.setUserMovieReviews(reviews);
+        eventsAdapter.setUserMovieReviews(reviews, movieId);
     }
-
 
 
     @Override
