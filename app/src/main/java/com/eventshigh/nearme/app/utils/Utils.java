@@ -108,8 +108,8 @@ public class Utils {
                 string.isEmpty() ||
                 string.equalsIgnoreCase("null") ||
                 string.equalsIgnoreCase("unknown")
-                ? false
-                : true);
+                ? true
+                : false);
     }
 
     public static int dpToPx(Context context, float dp) {
@@ -169,6 +169,16 @@ public class Utils {
             return false;
         } else {
             return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        }
+    }
+
+    public static boolean isValidPhone(String phoneNo){
+        String Regex = "[^\\d]";
+        String PhoneDigits = phoneNo.replaceAll(Regex, "");
+        if (PhoneDigits.length()!=10){
+            return false;
+        }else{
+            return true;
         }
     }
 }

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.eventshigh.nearme.app"
-    android:installLocation="auto">
+    android:installLocation="auto" >
 
     <!-- Ask for permissions, we need internet access and Google Maps access -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -32,7 +32,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        tools:ignore="AllowBackup">
+        tools:ignore="AllowBackup" >
 
         <!-- Setup the Google Play Services version and Google Maps api key -->
         <meta-data
@@ -91,7 +91,7 @@
             android:exported="true"
             android:grantUriPermissions="true"
             android:readPermission="com.eventshigh.nearme.app.provider.READ_MY_DATA"
-            android:writePermission="com.eventshigh.nearme.app.provider.WRITE_MY_DATA">
+            android:writePermission="com.eventshigh.nearme.app.provider.WRITE_MY_DATA" >
             <path-permission
                 android:pathPrefix="/search_suggest_query"
                 android:readPermission="android.permission.GLOBAL_SEARCH" />
@@ -107,7 +107,7 @@
             android:theme="@style/NoActionBar" >
             <intent-filter
                 android:autoVerify="true"
-                tools:ignore="UnusedAttribute">
+                tools:ignore="UnusedAttribute" >
                 <data
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/city"
@@ -116,11 +116,12 @@
                     android:host="www.eventshigh.com"
                     android:path="/"
                     android:scheme="https" />
+
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -133,7 +134,7 @@
             </intent-filter>
 
             <!-- Branch.io filters -->
-            <intent-filter android:autoVerify="true">
+            <intent-filter android:autoVerify="true" >
                 <data
                     android:host="branch.eventshigh.com"
                     android:scheme="http" />
@@ -161,10 +162,10 @@
             android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/NoActionBar">
+            android:theme="@style/NoActionBar" >
             <intent-filter
                 android:autoVerify="true"
-                tools:ignore="UnusedAttribute">
+                tools:ignore="UnusedAttribute" >
                 <data
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/bangalore"
@@ -213,14 +214,14 @@
             android:exported="true"
             android:label="@string/title_blog"
             android:parentActivityName=".activity.LaunchActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LaunchActivity" />
 
             <intent-filter
                 android:autoVerify="true"
-                tools:ignore="UnusedAttribute">
+                tools:ignore="UnusedAttribute" >
                 <data
                     android:host="blog.eventshigh.com"
                     android:path="/"
@@ -239,14 +240,14 @@
             android:label="@string/title_blog"
             android:parentActivityName=".activity.BlogFeedActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/NoActionBar">
+            android:theme="@style/NoActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.BlogFeedActivity" />
 
             <intent-filter
                 android:autoVerify="true"
-                tools:ignore="UnusedAttribute">
+                tools:ignore="UnusedAttribute" >
                 <data
                     android:host="blog.eventshigh.com"
                     android:pathPrefix="/2"
@@ -264,10 +265,10 @@
             android:hardwareAccelerated="true"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/NoActionBar">
+            android:theme="@style/NoActionBar" >
             <intent-filter
                 android:autoVerify="true"
-                tools:ignore="UnusedAttribute">
+                tools:ignore="UnusedAttribute" >
                 <data
                     android:host="www.eventshigh.com"
                     android:pathPrefix="/detail"
@@ -287,7 +288,7 @@
             android:name=".activity.MyFriendsActivity"
             android:label="@string/title_my_friends"
             android:parentActivityName=".activity.LaunchActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LaunchActivity" />
@@ -296,7 +297,7 @@
             android:name=".activity.PlanActivity"
             android:label="@string/action_check_friends"
             android:parentActivityName=".activity.EventDetailActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.EventDetailActivity" />
@@ -334,13 +335,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar"
             android:windowSoftInputMode="stateHidden" />
-
         <activity
             android:name=".activity.EventBookingDetailActivity"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar"
             android:windowSoftInputMode="stateHidden" />
-
         <activity
             android:name=".activity.OfferSignUpActivity"
             android:label="@string/enter_details_text"
@@ -371,7 +370,7 @@
             android:name=".activity.PhoneLoginActivity"
             android:label="@string/pref_title_phone_no"
             android:parentActivityName=".activity.LaunchActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LaunchActivity" />
@@ -380,7 +379,7 @@
             android:name=".activity.AboutUsActivity"
             android:label="@string/pref_title_about_us"
             android:launchMode="singleTask"
-            android:parentActivityName=".activity.LaunchActivity">
+            android:parentActivityName=".activity.LaunchActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LaunchActivity" />
@@ -391,7 +390,7 @@
             android:label="@string/title_refer"
             android:launchMode="singleTask"
             android:parentActivityName=".activity.LaunchActivity"
-            android:theme="@style/NoActionBar">
+            android:theme="@style/NoActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LaunchActivity" />
@@ -404,7 +403,7 @@
         <receiver
             android:name=".broadcast.InstallReferrer"
             android:exported="true"
-            tools:ignore="ExportedReceiver">
+            tools:ignore="ExportedReceiver" >
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>
@@ -413,7 +412,7 @@
         <!-- Instance ID service is used to update the tokens -->
         <service
             android:name=".broadcast.EHInstanceIdService"
-            android:exported="false">
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
@@ -423,25 +422,22 @@
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND">
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
                 <category android:name="com.eventshigh.nearme.app" />
             </intent-filter>
         </receiver>
-
-        <receiver android:name=".broadcast.NotificationDeleteBroadcastReciever">
+        <receiver android:name=".broadcast.NotificationDeleteBroadcastReciever" >
             <intent-filter>
                 <action android:name="notification_deleted_intent" />
-
             </intent-filter>
         </receiver>
 
-
         <service
             android:name=".broadcast.EHGcmListenerService"
-            android:exported="false">
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
@@ -458,12 +454,12 @@
 
         <activity
             android:name=".activity.WriteReviewActivity"
-            android:label="@string/title_activity_write_review"></activity>
+            android:label="@string/title_activity_write_review" />
 
         <!-- Facebook-log for user profile activity -->
         <activity
             android:name=".activity.UserProfileActivity"
-            android:label="@string/title_activity_user_profile">
+            android:label="@string/title_activity_user_profile" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -490,7 +486,12 @@
         </activity>
         <activity
             android:name=".activity.TicketReviewActivity"
-            android:label="@string/title_activity_review">
+            android:label="@string/title_activity_review" >
+        </activity>
+        <activity
+            android:name=".activity.TicketConfirmationActivity"
+            android:label="@string/title_activity_ticket_confirmation" >
         </activity>
     </application>
+
 </manifest>

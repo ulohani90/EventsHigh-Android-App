@@ -1,5 +1,7 @@
 package com.eventshigh.nearme.app.utils;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.data.Event;
@@ -31,7 +33,7 @@ public class DateTimeUtils {
         return false;
     }
 
-    public static class EventTime {
+    public static class EventTime implements Parcelable{
         public final String day;
         public final String date;
         public final
@@ -58,6 +60,31 @@ public class DateTimeUtils {
                 return true;
             return false;
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(day);
+            dest.writeString(date);
+            dest.writeString(time);
+        }
+
+        // This is used to regenerate your object. All Parcelables must have
+        // a CREATOR that implements these two methods
+        public static final Parcelable.Creator<EventTime> CREATOR =
+                new Parcelable.Creator<EventTime>() {
+                    public EventTime createFromParcel(Parcel in) {
+                        return new EventTime(in.readString(), in.readString(),in.readString());
+                    }
+                    public EventTime[] newArray(int size) {
+                        return new EventTime[size];
+                    }
+
+                };
     }
 
     private static final SimpleDateFormat FULL_DATE_TIME_FORMAT =

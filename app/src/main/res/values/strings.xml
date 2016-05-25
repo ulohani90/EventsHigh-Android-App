@@ -199,8 +199,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_user_profile">Profile</string>
     <string name="title_activity_guest_detail">Guest Details</string>
-    <string name="title_activity_booking_details">BookingDetailsActivity</string>
-    <string name="title_activity_review">ReviewActivity</string>
+    <string name="title_activity_review">Review</string>
+    <string name="title_activity_ticket_confirmation">TicketConfirmationActivity</string>
 
 
 </resources>

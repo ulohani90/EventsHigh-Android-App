@@ -208,6 +208,7 @@
         </ScrollView>
 
         <TextView
+            android:id="@+id/tv_next_event_booking"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_gravity="bottom"
