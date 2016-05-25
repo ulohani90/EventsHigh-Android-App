@@ -54,10 +54,21 @@
         android:id="@+id/tv_user_review_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
         android:layout_marginLeft="64dp"
         android:paddingRight="8dp"
         android:textColor="#2E2E2E"
         android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/tv_user_review_for"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|end"
+        android:layout_marginLeft="64dp"
+        android:paddingRight="8dp"
+        android:textColor="#959595"
+        android:textSize="12sp" />
 
     <View
         android:layout_width="match_parent"

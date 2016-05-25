@@ -87,6 +87,7 @@
     <string name="ui_you_earned_points">You have earned total %1$s points</string>
     <string name="ui_no_my_interest">Personalize this section by following categories and performers.\n\nNever miss events for\nyour interests again!</string>
     <string name="ui_enter_referral_code">Referral Code</string>
+    <string name="ui_reviews_text">Reviews</string>
 
     <!-- Onbaording message -->
     <string name="onboarding_title_details">One Stop Shop</string>

@@ -55,13 +55,17 @@ public class MovieUserReviewObject implements Parcelable {
             reviewId = Utils.checkIfUnknown(obj.getString("review_id"));
             reviewerId = Utils.checkIfUnknown(obj.getString("reviewer_id"));
             reviewFor = Utils.checkIfUnknown(obj.getString("review_for"));
-            reviewEntity = Utils.checkIfUnknown(obj.getString("reviewed_entity"));
+            if (obj.has("reviewed_entity")) {
+                reviewEntity = Utils.checkIfUnknown(obj.getString("reviewed_entity"));
+            }
             reviewBy = Utils.checkIfUnknown(obj.getString("review_by"));
             reviewRating = obj.getInt("ratings");
             reviewText = Utils.checkIfUnknown(obj.getString("review_text"));
             reviewPlatform = Utils.checkIfUnknown(obj.getString("review_platform"));
             reviewDeviceId = Utils.checkIfUnknown(obj.getString("review_device_id"));
-            reviewedEntityId = Utils.checkIfUnknown(obj.getString("reviewed_entity_id"));
+            if (obj.has("reviewed_entity_id")) {
+                reviewedEntityId = Utils.checkIfUnknown(obj.getString("reviewed_entity_id"));
+            }
             reviewState = Utils.checkIfUnknown(obj.getString("state"));
         } catch (Exception e) {
 

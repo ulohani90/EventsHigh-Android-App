@@ -80,32 +80,50 @@ public class BrowseMoviesRequest extends JsonRequest<BrowseMoviesRequest.MovieBr
             JSONObject jsonObject = new JSONObject(jsonString);
             ArrayList<MovieDetailObject> movies = new ArrayList<>();
             JSONArray moviesArray = jsonObject.getJSONArray("movies");
-            if(moviesArray!=null ){
-                for(int i=0;i<moviesArray.length();i++){
-                    movies.add(new MovieDetailObject(context,moviesArray.getJSONObject(i)));
+            if (moviesArray != null) {
+                for (int i = 0; i < moviesArray.length(); i++) {
+                    movies.add(new MovieDetailObject(context, moviesArray.getJSONObject(i)));
                 }
             }
             ArrayList<MovieDetailObject> upcomingMovies = new ArrayList<>();
             JSONArray upcomingMoviessArray = jsonObject.getJSONArray("coming_soon_movies");
-            if(upcomingMoviessArray!=null ){
-                for(int i=0;i<upcomingMoviessArray.length();i++){
-                    upcomingMovies.add(new MovieDetailObject(context,upcomingMoviessArray.getJSONObject(i)));
+            if (upcomingMoviessArray != null) {
+                for (int i = 0; i < upcomingMoviessArray.length(); i++) {
+                    upcomingMovies.add(new MovieDetailObject(context, upcomingMoviessArray.getJSONObject(i)));
                 }
             }
             ArrayList<String> languages = new ArrayList<>();
             JSONArray languagesArray = jsonObject.getJSONArray("languages");
-            if(languagesArray!=null){
-                for(int i=0;i<languagesArray.length();i++){
+            if (languagesArray != null) {
+                for (int i = 0; i < languagesArray.length(); i++) {
                     languages.add(languagesArray.getJSONObject(i).getString("language"));
                 }
+                sortLaunguagesArray(languages);
             }
 
-            return Response.success(new MovieBrowseListobject(movies,upcomingMovies,languages),
+            return Response.success(new MovieBrowseListobject(movies, upcomingMovies, languages),
                     HttpHeaderParser.parseCacheHeaders(response));
 
-        } catch (JSONException |UnsupportedEncodingException e) {
+        } catch (JSONException | UnsupportedEncodingException e) {
             Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
+        }
+
+    }
+
+    public void sortLaunguagesArray(ArrayList<String> languages) {
+        for (int i = 0; i < languages.size(); i++) {
+            if (languages.get(i).equalsIgnoreCase("English")) {
+                languages.remove(i);
+                languages.add(0, "English");
+            }
+
+        }
+        for (int i = 0; i < languages.size(); i++) {
+            if (languages.get(i).equalsIgnoreCase("Hindi")) {
+                languages.remove(i);
+                languages.add(1, "Hindi");
+            }
         }
 
     }

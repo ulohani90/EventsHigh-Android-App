@@ -38,12 +38,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="EVENTS NAME"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="2dp"/>
                 <TextView
                     android:id="@+id/tv_event_location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="14sp"
                     android:textColor="@color/movie_text_grey_color"
                     android:text="EVENTS LOCATION"/>
             </LinearLayout>
@@ -61,6 +63,7 @@
                     android:id="@+id/tv_no_of_tickets"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="14sp"
                     android:text="X Ticket(s)"/>
             </LinearLayout>
         </LinearLayout>
@@ -150,7 +153,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
-                android:textSize="18dp"/>
+                android:textSize="16dp"/>
             <TextView
                 android:id="@+id/tv_total_amt"
                 android:gravity="right|center_vertical"
@@ -197,6 +200,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:text="PERSONAL DETAILS"
+                android:textStyle="bold"
                 android:layout_marginBottom="4dp"/>
         </LinearLayout>
         <ImageButton

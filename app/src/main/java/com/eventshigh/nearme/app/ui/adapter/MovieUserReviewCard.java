@@ -28,6 +28,7 @@ import com.eventshigh.nearme.app.view.CircularImageView;
 public class MovieUserReviewCard extends RecyclerView.ViewHolder {
     TextView tvReviewText, tvReviewBy;
     ImageView ivReviewerImage;
+    TextView tvReviewFor;
     RatingBar reviewRating;
 
     public static MovieUserReviewCard newInstance(final BaseActivity activity, ViewGroup parent) {
@@ -41,14 +42,21 @@ public class MovieUserReviewCard extends RecyclerView.ViewHolder {
         tvReviewBy = (TextView) itemView.findViewById(R.id.tv_user_review_by);
         ivReviewerImage = (ImageView) itemView.findViewById(R.id.civ_user_review);
         reviewRating = (RatingBar) itemView.findViewById(R.id.rb_user_review_rating);
+        tvReviewFor = (TextView) itemView.findViewById(R.id.tv_user_review_for);
     }
 
-    public void bindData(final BaseContextActivity activity, final MovieUserReviewObject review) {
+    public void bindData(final BaseContextActivity activity, final MovieUserReviewObject review, String reviewForId) {
         tvReviewText.setText(review.getReviewText().trim());
         tvReviewBy.setText(review.getReviewBy());
         int size = ivReviewerImage.getLayoutParams().height;
         ivReviewerImage.setImageDrawable(UserContact.getDrawableForName(review.getReviewBy(), size));
         reviewRating.setRating(review.getReviewRating());
+        if ((review.getReviewedEntityId() == null || !reviewForId.equalsIgnoreCase(review.getReviewedEntityId())) && review.getReviewEntity() != null) {
+            tvReviewFor.setVisibility(View.VISIBLE);
+            tvReviewFor.setText("This review was for " + review.getReviewEntity());
+        } else {
+            tvReviewFor.setVisibility(View.GONE);
+        }
     }
 
 }

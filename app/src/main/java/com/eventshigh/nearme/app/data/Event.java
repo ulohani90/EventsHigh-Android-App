@@ -94,6 +94,8 @@ public class Event implements Parcelable {
 
     public final EventDescriptionSection[] descriptionSections;
 
+    public final ArrayList<MovieUserReviewObject> reviewObjects;
+
     public Event(String id, City city, String title, EventCategory category,
                  String description, String[] tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, @Nullable String sourceUrl,
@@ -106,7 +108,7 @@ public class Event implements Parcelable {
                  String organizerName, String organizerPhone, String organizerWebsite,
                  String organizerEmail, String organizerLink, ArrayList<EhPrices> ehPrices,
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
-                 EventDescriptionSection[] descriptionSections) {
+                 EventDescriptionSection[] descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -150,6 +152,7 @@ public class Event implements Parcelable {
         this.priceNote = priceNote;
 
         this.descriptionSections = descriptionSections;
+        this.reviewObjects = reviewObjects;
     }
 
 
@@ -197,6 +200,8 @@ public class Event implements Parcelable {
         this.priceName = in.readString();
         this.priceNote = in.readString();
         this.descriptionSections = in.createTypedArray(EventDescriptionSection.CREATOR);
+        reviewObjects = new ArrayList<>();
+        in.readTypedList(reviewObjects, MovieUserReviewObject.CREATOR);
     }
 
     public Uri getEventDetailsURI() {
@@ -319,6 +324,7 @@ public class Event implements Parcelable {
         dest.writeString(priceName);
         dest.writeString(priceNote);
         dest.writeTypedArray(descriptionSections, flags);
+        dest.writeTypedList(reviewObjects);
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -546,6 +552,19 @@ public class Event implements Parcelable {
             }
         }
 
+        //User Reviews
+
+        ArrayList<MovieUserReviewObject> reviews = new ArrayList<>();
+        JSONArray reviewsArray = eventJson.getJSONArray("reviews");
+        if (reviewsArray != null) {
+            for (int l = 0; l < reviewsArray.length(); l++) {
+                MovieUserReviewObject obj = new MovieUserReviewObject(reviewsArray.getJSONObject(l));
+                if (obj.getReviewState() == null || obj.getReviewState().equalsIgnoreCase("published")) {
+                    reviews.add(obj);
+                }
+            }
+        }
+
         // Event Description Sections.
         List<EventDescriptionSection> descriptionSections = new ArrayList<>();
         JSONArray descriptionSectionsJson = eventJson.optJSONArray("description_sections");
@@ -609,7 +628,8 @@ public class Event implements Parcelable {
                 currency,
                 ehPriceName,
                 ehPriceNote,
-                descriptionSections.toArray(new EventDescriptionSection[descriptionSections.size()])
+                descriptionSections.toArray(new EventDescriptionSection[descriptionSections.size()]),
+                reviews
         );
     }
 

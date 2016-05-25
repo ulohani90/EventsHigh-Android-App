@@ -306,6 +306,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
                 return ShowtimeFragment.newInstance(bundle);
 
             } else if (TABS.get(position).equalsIgnoreCase(USER_REVIEWS)) {
+                bundle.putString(MOVIE_ID, movieDetailOject.getMovieInfo().getId() + "");
                 bundle.putParcelableArrayList(USER_REVIEWS, movieDetailOject.getUserReviews());
                 userReviewFragment = UserReviewsFragment.newInstance(bundle);
                 return userReviewFragment;
@@ -387,7 +388,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
                 Intent i = new Intent(this, WriteReviewActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(MOVIE_DETAIL_OBJECT, movieDetailOject);
-                bundle.putString(OBJECT_TYPE,"movie");
+                bundle.putString(OBJECT_TYPE, "movie");
                 i.putExtras(bundle);
                 startActivity(i);
                 // overridePendingTransition(R.anim.animate_slide_up, R.anim.stay);

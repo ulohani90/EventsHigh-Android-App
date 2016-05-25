@@ -166,11 +166,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
 
-    public void setUserMovieReviews(ArrayList<MovieUserReviewObject> objs) {
+    public void setUserMovieReviews(ArrayList<MovieUserReviewObject> objs, String reviewForId) {
         dataToShow.clear();
 
         for (MovieUserReviewObject obj : objs) {
-            dataToShow.add(new MovieUserReviewData(obj, activity));
+            dataToShow.add(new MovieUserReviewData(obj, activity, reviewForId));
         }
         notifyDataSetChanged();
     }
