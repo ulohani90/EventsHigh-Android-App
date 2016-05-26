@@ -230,6 +230,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
     public void addEventTickets(int dateIndex, int timeIndex) {
         prices = getEhPrices(dateIndex, timeIndex);
         LinearLayout ticketTypes = (LinearLayout) findViewById(R.id.options_container);
+        ticketTypes.removeAllViews();
         for (int i = 0; i < prices.size(); i++){
             final EhPrices price = prices.get(i);
             View view = LayoutInflater.from(this).inflate(R.layout.eh_ticket_type_layout, ticketTypes, false);

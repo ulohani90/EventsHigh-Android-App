@@ -201,7 +201,7 @@
     <string name="title_activity_user_profile">Profile</string>
     <string name="title_activity_guest_detail">Guest Details</string>
     <string name="title_activity_review">Review</string>
-    <string name="title_activity_ticket_confirmation">TicketConfirmationActivity</string>
+    <string name="title_activity_ticket_confirmation">Confirmation</string>
 
 
 </resources>

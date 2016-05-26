@@ -17,11 +17,19 @@
         android:background="@color/support_list_separator_border_color"
         >
 
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ticket_header"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/white"
-            android:padding="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -38,12 +46,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="EVENTS NAME"
-                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:fontFamily="sens-serif-medium"
                         android:layout_marginBottom="2dp"/>
                     <TextView
                         android:id="@+id/tv_event_location"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textSize="14sp"
                         android:textColor="@color/movie_text_grey_color"
                         android:text="EVENTS LOCATION"/>
                 </LinearLayout>
@@ -61,10 +71,100 @@
                         android:id="@+id/tv_no_of_tickets"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textSize="14sp"
                         android:text="X Ticket(s)"/>
                 </LinearLayout>
+
             </LinearLayout>
 
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:minHeight="80dp"
+                android:layout_marginTop="10dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal">
+                    <TextView
+                        android:text="Booking ID"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="4dp"/>
+                    <TextView
+                        android:id="@+id/tv_event_booking_id"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal">
+                    <TextView
+                        android:text="Name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableTop="@drawable/man_yellow"
+                        android:drawablePadding="4dp"/>
+                    <TextView
+                        android:id="@+id/tv_event_guest_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal">
+                    <TextView
+                        android:text="Email ID"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableTop="@drawable/email"
+                        android:drawablePadding="4dp"/>
+                    <TextView
+                        android:id="@+id/tv_event_guest_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal">
+                    <TextView
+                        android:text="Phone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableTop="@drawable/call_yellow"
+                        android:drawablePadding="4dp"/>
+                    <TextView
+                        android:id="@+id/tv_event_guest_phone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/movie_text_grey_color"/>
 
 
             <LinearLayout
@@ -142,65 +242,51 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp">
-                <TextView
-                    android:text="TOTAL AMOUNT"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:textSize="18dp"/>
-                <TextView
-                    android:id="@+id/tv_total_amt"
-                    android:gravity="right|center_vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:background="@color/movie_text_grey_color"/>
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/paid"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:gravity="center">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_vertical"
                     android:drawableLeft="@drawable/map"
                     android:text="Map Location"
                     android:textColor="@color/red_movie_text_color"/>
             </LinearLayout>
 
         </LinearLayout>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ticket_footer"/>
+
 
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_gravity="center_horizontal"
             android:src="@drawable/paid"/>
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@drawable/yellow_rectamgle_bg"
+            android:gravity="center">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:layout_gravity="center_horizontal"
+                android:layout_margin="8dp"
+                android:gravity="center_vertical"
+                android:drawablePadding="4dp"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:fontFamily="sens-serif-medium"
                 android:drawableLeft="@drawable/share"
                 android:text="Share This Ticket"/>
         </LinearLayout>
+
     </LinearLayout>
+
 </ScrollView>
