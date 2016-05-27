@@ -90,4 +90,5 @@ public class BlogFeedRequest extends JsonRequest<List<BlogEntry>> {
             return Response.error(new ParseError(e));
         }
     }
+
 }

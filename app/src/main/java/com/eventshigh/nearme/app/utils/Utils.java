@@ -165,7 +165,7 @@ public class Utils {
     }
 
     public static boolean isValidEmail(CharSequence target) {
-        if (TextUtils.isEmpty(target)) {
+        if (TextUtils.isEmpty(target)){
             return false;
         } else {
             return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
@@ -173,7 +173,7 @@ public class Utils {
     }
 
     public static boolean isValidPhone(String phoneNo){
-        String Regex = "[^\\d]";
+        String Regex = "[^\\d] ";
         String PhoneDigits = phoneNo.replaceAll(Regex, "");
         if (PhoneDigits.length()!=10){
             return false;
@@ -181,4 +181,5 @@ public class Utils {
             return true;
         }
     }
+
 }

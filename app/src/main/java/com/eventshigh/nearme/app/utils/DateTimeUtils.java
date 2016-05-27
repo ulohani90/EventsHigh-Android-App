@@ -39,12 +39,21 @@ public class DateTimeUtils {
         public final
         @Nullable
         String time;
+        public long longtime;
+
+        public EventTime(String day, String date, @Nullable String time, long longtime) {
+            this.day = day;
+            this.date = date;
+            this.time = time;
+            this.longtime = longtime;
+        }
 
         public EventTime(String day, String date, @Nullable String time) {
             this.day = day;
             this.date = date;
             this.time = time;
         }
+
 
         public String toString() {
             return day + ", " + date + (time == null ? "" : " at " + time);
@@ -71,6 +80,7 @@ public class DateTimeUtils {
             dest.writeString(day);
             dest.writeString(date);
             dest.writeString(time);
+            dest.writeLong(longtime);
         }
 
         // This is used to regenerate your object. All Parcelables must have
@@ -78,7 +88,7 @@ public class DateTimeUtils {
         public static final Parcelable.Creator<EventTime> CREATOR =
                 new Parcelable.Creator<EventTime>() {
                     public EventTime createFromParcel(Parcel in) {
-                        return new EventTime(in.readString(), in.readString(),in.readString());
+                        return new EventTime(in.readString(), in.readString(),in.readString(), in.readLong());
                     }
                     public EventTime[] newArray(int size) {
                         return new EventTime[size];
@@ -151,7 +161,7 @@ public class DateTimeUtils {
         }
 
         return dateToEventTime(new Date(event.eventTimings[index]),
-                TimeZone.getTimeZone(event.city.timeZone));
+                TimeZone.getTimeZone(event.city.timeZone),event.eventTimings[index]);
     }
 
 
@@ -162,6 +172,15 @@ public class DateTimeUtils {
             return new EventTime(SIMPLE_DAY_FORMAT.format(date),
                     SIMPLE_DATE_FORMAT.format(date),
                     getTimeString(date, timeZone));
+        }
+    }
+    public static EventTime dateToEventTime(Date date, TimeZone timeZone, long longtime) {
+        synchronized (SIMPLE_DATE_FORMAT) {
+            SIMPLE_DAY_FORMAT.setTimeZone(timeZone);
+            SIMPLE_DATE_FORMAT.setTimeZone(timeZone);
+            return new EventTime(SIMPLE_DAY_FORMAT.format(date),
+                    SIMPLE_DATE_FORMAT.format(date),
+                    getTimeString(date, timeZone),longtime);
         }
     }
 
