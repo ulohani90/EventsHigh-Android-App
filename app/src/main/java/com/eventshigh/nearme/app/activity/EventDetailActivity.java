@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Paint;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +15,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.UnderlineSpan;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,10 +33,13 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.Request.Priority;
+import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
@@ -40,15 +47,17 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventDescriptionSection;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.data.SocialFriend;
+import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.network.EventRequest;
+import com.eventshigh.nearme.app.network.MyReviewsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
@@ -65,11 +74,11 @@ import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.user.UserActionHelper.EventAction;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
+import com.eventshigh.nearme.app.view.CircularImageView;
 import com.eventshigh.nearme.app.view.ContactListView;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -85,16 +94,13 @@ import com.google.android.youtube.player.YouTubePlayer;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
-import org.json.JSONException;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
-import io.branch.referral.Branch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
 /**
@@ -102,16 +108,20 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
  * link or from Events{Grid,Maps}Activity. In both cases, event data is not available so
  * this activity fetches the event data and shows it using the EventDetailFragment.
  */
-public class EventDetailActivity extends BaseActivity {
+public class EventDetailActivity extends BaseActivity implements OnClickListener {
     public static final String EXTRA_EVENT_PARAM = EventDetailActivity.class.getSimpleName() + "_event";
     public static final String EXTRA_PLAN_ID_PARAM = EventDetailActivity.class.getSimpleName() + "_plan_id";
+
+    public static final String EVENT_REVIEWS = "event_reviews";
+    public static final String EVENT_ID = "event_id";
 
     private Toolbar toolbar;
     private View topProgressBar;
     private EventCard eventCard;
 
+
     private LatLng userLocation = null;
-    private Event event = null;
+
     private Account account;
     private String planId = null;
     private GoogleApiClient client;
@@ -120,14 +130,15 @@ public class EventDetailActivity extends BaseActivity {
     private boolean showInviteDialog = false;
     private boolean addToFavourite = false;
 
+    private LinearLayout llEventContainer;
+    private TextView btnAddReview;
 
     CollapsingToolbarLayout collapsingToolbar;
 
-
-
+    public static final String EVENT_OBJECT = "movie_detail_object";
 
     /*****************************************
-     Activity lifecycle management utilities
+     * Activity lifecycle management utilities
      ***************************************/
 
     @Override
@@ -145,6 +156,97 @@ public class EventDetailActivity extends BaseActivity {
 
         // Account.
         account = new Account(this);
+
+        //my_review
+
+        btnAddReview = (TextView) findViewById(R.id.btn_add_review);
+        llEventContainer = (LinearLayout) findViewById(R.id.event_container);
+        btnAddReview.setOnClickListener(this);
+
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_add_review1:
+            case R.id.btn_add_review:
+                if (account.getUserInfo().phoneNo == null || account.getUserInfo().name == null) {
+                    PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
+                    return;
+                }
+                Intent i = new Intent(this, WriteReviewActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(EVENT_OBJECT, event);
+                bundle.putString(MovieDetailActivity.OBJECT_TYPE, "event");
+                i.putExtras(bundle);
+                startActivity(i);
+                overridePendingTransition(R.anim.animate_slide_up, R.anim.stay);
+                break;
+        }
+    }
+
+    MovieUserReviewObject myUserReview;
+
+    public void makeMyReviewsServerRequest(boolean shouldByPassCache) {
+        MyReviewsRequest.submit(this, account.getUserInfo().phoneNo, Request.Priority.IMMEDIATE, this, shouldByPassCache, mReviewListener, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(EventDetailActivity.this, R.string.failed_load,
+                        Toast.LENGTH_SHORT).show();
+                VolleyHelper.log(EventDetailActivity.this, volleyError);
+                finish();
+            }
+        });
+    }
+
+    private Response.Listener<List<MovieUserReviewObject>> mReviewListener = new Response.Listener<List<MovieUserReviewObject>>() {
+        @Override
+        public void onResponse(List<MovieUserReviewObject> reviews, boolean isIntermediate) {
+            findReviewsByUserForMovie(reviews);
+            populateView(event);
+            // updateReview();
+        }
+    };
+
+    boolean isMyReviewWritten;
+
+    public void findReviewsByUserForMovie(List<MovieUserReviewObject> reviews) {
+        for (MovieUserReviewObject obj : reviews) {
+            if (obj.getReviewerId().equalsIgnoreCase(account.getUserInfo().phoneNo)
+                    && obj.getReviewedEntityId().equalsIgnoreCase(event.id + "")) {
+                event.reviewObjects.add(0, obj);
+                isMyReviewWritten = true;
+                break;
+            }
+        }
+    }
+
+    private void updateReview() {
+        if (event.reviewObjects.size() > 0) {
+            findViewById(R.id.review_card).setVisibility(View.VISIBLE);
+            ((TextView) findViewById(R.id.tv_user_review_by)).setText(event.reviewObjects.get(0).getReviewBy());
+            ((RatingBar) findViewById(R.id.rb_user_review_rating)).setRating(event.reviewObjects.get(0).getReviewRating());
+            ((TextView) findViewById(R.id.tv_user_review_text)).setText(event.reviewObjects.get(0).getReviewText());
+            if ((event.reviewObjects.get(0).getReviewedEntityId() == null || !event.reviewObjects.get(0).getReviewedEntityId().equalsIgnoreCase(event.id)) && event.reviewObjects.get(0).getReviewEntity() != null) {
+                ((TextView) findViewById(R.id.tv_user_review_for)).setVisibility(View.VISIBLE);
+                ((TextView) findViewById(R.id.tv_user_review_for)).setText("This review was for " + event.reviewObjects.get(0).getReviewEntity());
+            } else {
+                ((TextView) findViewById(R.id.tv_user_review_for)).setVisibility(View.GONE);
+            }
+            ImageView reviewerImage = (ImageView) findViewById(R.id.civ_user_review);
+            int size = reviewerImage.getLayoutParams().height;
+            reviewerImage.setImageDrawable(UserContact.getDrawableForName(event.reviewObjects.get(0).getReviewBy(), size));
+            /*
+            Glide.with(this).load("url")
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                    .into((CircularImageView)findViewById(R.id.civ_user_review));
+            */
+            //  findViewById(R.id.ll_event_write_review).setVisibility(View.GONE);
+            Preferences.getInstance(this).setIsReviewAdded(false);
+        }
+
     }
 
     @Override
@@ -161,13 +263,15 @@ public class EventDetailActivity extends BaseActivity {
             if (event != null) {
                 showRateAppDialog = true;
                 //shareEvent(event, null);
-                shareEventWithBranch(event, null,"Toolbar");
+                shareEventWithBranch(event, null, "Toolbar");
             }
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    Event event = null;
 
     @Override
     public View getViewForSnackbar() {
@@ -186,8 +290,9 @@ public class EventDetailActivity extends BaseActivity {
                 (int) (1.33 * getResources().getDisplayMetrics().heightPixels));
 // Get the event from Intent.
         if (getIntent().hasExtra(EXTRA_EVENT_PARAM)) {
-            Event event = getIntent().getParcelableExtra(EXTRA_EVENT_PARAM);
-            populateView(event);
+            event = getIntent().getParcelableExtra(EXTRA_EVENT_PARAM);
+            makeMyReviewsServerRequest(false);
+
         } else {
             EventRequest.submit(this, getIntent().getData(), Priority.IMMEDIATE, mEventListener,
                     new ErrorListener() {
@@ -268,12 +373,16 @@ public class EventDetailActivity extends BaseActivity {
 */
 
 
-           // }
+        // }
+        if (Preferences.getInstance(this).isReviewAdded()) {
+            makeMyReviewsServerRequest(true);
+        }
+
     }
 
 
     /**********************************
-     Callbacks, action handlers
+     * Callbacks, action handlers
      **********************************/
 
     public void save(View view) {
@@ -315,7 +424,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openOrganizerLink(View view) {
-        if(event.organizerLink!=null) {
+        if (event.organizerLink != null) {
 
             showInviteDialog = true;
             reportEventAction(event, "organizer", "openLink");
@@ -326,7 +435,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     public void openOrganizerWebsite(View view) {
-        if(event.organizerWebsite!=null) {
+        if (event.organizerWebsite != null) {
             showInviteDialog = true;
             reportEventAction(event, "organizer", "openWebsite");
 
@@ -351,23 +460,30 @@ public class EventDetailActivity extends BaseActivity {
 
         final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
         if (event.bookingUrl.contains("ticketing.eventshigh.com")) {
+            /*
             bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
             bookingUriBuilder.appendQueryParameter("name", userInfo.name);
             bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
-            bookingUriBuilder.appendQueryParameter("src","eh-android");
-        }
-        try {
-            CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
-                getString(R.string.title_book));
-        }catch(Exception e){
-            Crashlytics.getInstance().core.logException(e);
-            showMessage(R.string.retry);
+            bookingUriBuilder.appendQueryParameter("src", "eh-android");
+            */
+           Intent intent = new Intent(this, EventBookingDetailActivity.class);
+           intent.putExtra("event", event);
+           startActivity(intent);
 
+        }else {
+            try {
+                CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
+                        getString(R.string.title_book));
+            } catch (Exception e) {
+                Crashlytics.getInstance().core.logException(e);
+                showMessage(R.string.retry);
+            }
         }
+
     }
 
     public void imagePreview(View view) {
-        if (event == null || (event!=null && event.imgUrl == null)) {
+        if (event == null || (event != null && event.imgUrl == null)) {
             return;
         }
 
@@ -464,7 +580,7 @@ public class EventDetailActivity extends BaseActivity {
 
         Preferences preferences = Preferences.getInstance(this);
         if (!preferences.canUploadContacts()) {
-            if(AskForContactsDialog.checkIfToShow(this,preferences)){
+            if (AskForContactsDialog.checkIfToShow(this, preferences)) {
                 return;
             }
         }
@@ -515,7 +631,7 @@ public class EventDetailActivity extends BaseActivity {
     }
 
     /**********************************
-     Helper methods
+     * Helper methods
      **********************************/
 
     private void startActivitySafe(Intent intent) {
@@ -534,7 +650,7 @@ public class EventDetailActivity extends BaseActivity {
         new UserActionHelper(this).recordAction(EventAction.VIEW_EVENT, event.id);
 
         // Set Title.
-        if(collapsingToolbar != null) {
+        if (collapsingToolbar != null) {
             collapsingToolbar.setTitle(event.title);
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
@@ -605,7 +721,10 @@ public class EventDetailActivity extends BaseActivity {
     private Listener<Event> mEventListener = new Listener<Event>() {
         @Override
         public void onResponse(final Event event, boolean isIntermediate) {
-            populateView(event);
+            EventDetailActivity.this.event = event;
+            makeMyReviewsServerRequest(false);
+            // populateView(event);
+
         }
     };
 
@@ -733,9 +852,9 @@ public class EventDetailActivity extends BaseActivity {
             ViewGroup.LayoutParams params = bgView.getLayoutParams();
             params.height = 9 * metrics.widthPixels / 16;
             bgView.setLayoutParams(params);
-            frameParent = (FrameLayout)findViewById(R.id.frame_parent);
-            ViewGroup.LayoutParams lp =frameParent.getLayoutParams();
-            lp.height =  9 * metrics.widthPixels / 16;
+            frameParent = (FrameLayout) findViewById(R.id.frame_parent);
+            ViewGroup.LayoutParams lp = frameParent.getLayoutParams();
+            lp.height = 9 * metrics.widthPixels / 16;
             frameParent.setLayoutParams(lp);
         }
 
@@ -745,7 +864,7 @@ public class EventDetailActivity extends BaseActivity {
                     new OnScrollChangedListener() {
                         @Override
                         public void onScrollChanged() {
-                           // setScroll(eventScrollView.getScrollY());
+                            // setScroll(eventScrollView.getScrollY());
                         }
                     });
             eventScrollView.setVisibility(View.VISIBLE);
@@ -779,7 +898,7 @@ public class EventDetailActivity extends BaseActivity {
                     .isFavourite(event.id));
 
             // Set Youtube play button.
-            playYoutubeView.setVisibility((event.youtubeVideoId != null && event.youtubeVideoId.length()>0)? View.VISIBLE : View.GONE);
+            playYoutubeView.setVisibility((event.youtubeVideoId != null && event.youtubeVideoId.length() > 0) ? View.VISIBLE : View.GONE);
 
             // Set Venue and address.
             findViewById(R.id.venue_group).setVisibility(View.VISIBLE);
@@ -841,7 +960,7 @@ public class EventDetailActivity extends BaseActivity {
             // Set action buttons.
             findViewById(R.id.action_button_group).setVisibility(View.VISIBLE);
             callView.setVisibility(event.organizerPhone != null ? View.VISIBLE : View.GONE);
-            bookView.setVisibility(event.bookingUrl != null && event.bookingUrl.length()>0 ? View.VISIBLE : View.GONE);
+            bookView.setVisibility(event.bookingUrl != null && event.bookingUrl.length() > 0 ? View.VISIBLE : View.GONE);
             if (event.bookingText != null) {
                 bookView.setText(event.bookingText);
             }
@@ -852,29 +971,34 @@ public class EventDetailActivity extends BaseActivity {
 
             // Show price.
             findViewById(R.id.price_row).setVisibility(View.VISIBLE);
-            LinearLayout ehPriceContainer = (LinearLayout)findViewById(R.id.eh_price_container);
-            if(event.ehPrices.size() >0){
+            LinearLayout ehPriceContainer = (LinearLayout) findViewById(R.id.eh_price_container);
+            if (event.ehPrices.size() > 0) {
                 ehPriceContainer.removeAllViews();
                 ehPriceContainer.setVisibility(View.VISIBLE);
-                for(EhPrices ehPrice:event.ehPrices){
-                    View view = LayoutInflater.from(EventDetailActivity.this).inflate(R.layout.event_detail_price_layout,ehPriceContainer,false);
-                    ((TextView)view.findViewById(R.id.event_price)).setText(ehPrice.name+" - "+event.getPriceString(ehPrice.min,ehPrice.max,ehPrice.currency));
-                    if(ehPrice.note!=null && ehPrice.note.length()>0){
+                for (EhPrices ehPrice : event.ehPrices) {
+                    View view = LayoutInflater.from(EventDetailActivity.this).inflate(R.layout.event_detail_price_layout, ehPriceContainer, false);
+                    if (ehPrice.discountValue > 0) {
+                        ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " + ehPrice.currency + " " + ehPrice.discountValue);
+                    } else {
+                        ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " + ehPrice.currency + " " + ehPrice.value);
+                    }
+
+                    if (ehPrice.note != null && ehPrice.note.length() > 0) {
                         TextView note = (TextView) view.findViewById(R.id.event_note);
                         note.setVisibility(View.VISIBLE);
-                        note.setText("( "+ehPrice.note+" )");
-                    }else{
+                        note.setText("( " + ehPrice.note + " )");
+                    } else {
                         ((TextView) view.findViewById(R.id.event_note)).setVisibility(View.GONE);
                     }
-                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
-                    ehPriceContainer.addView(view,lp);
+                    ehPriceContainer.addView(view, lp);
                 }
                 priceView.setVisibility(View.GONE);
-            }else{
+            } else {
                 ehPriceContainer.setVisibility(View.GONE);
                 priceView.setVisibility(View.VISIBLE);
-                String priceString = event.getPriceString(event.minPrice,event.maxPrice,event.currency);
+                String priceString = event.getPriceString(event.minPrice, event.maxPrice, event.currency);
                 priceView.setText(priceString == null ? getString(R.string.no_price) : priceString);
 
             }
@@ -953,19 +1077,54 @@ public class EventDetailActivity extends BaseActivity {
             organizerHeader.setVisibility(organizerInfoShown ? View.VISIBLE : View.GONE);
 
             // Event Description Section.
-            LinearLayout eventContainer = (LinearLayout) findViewById(R.id.event_container);
+            LinearLayout eventContainer = (LinearLayout) findViewById(R.id.event_description_info);
+            eventContainer.removeAllViews();
             for (EventDescriptionSection descriptionSection : event.descriptionSections) {
                 View descriptionSectionView = getLayoutInflater().inflate(R.layout.view_description_section, eventContainer, false);
                 ((TextView) descriptionSectionView.findViewById(R.id.description_header)).setText(descriptionSection.name);
                 WebView descriptionView = (WebView) descriptionSectionView.findViewById(R.id.event_description);
                 CustomUrlActivity.setupWebView(descriptionView, EventDetailActivity.this, false);
-                descriptionView.loadData(toHtmlNoFrame(descriptionSection.description), "text/html; charset=UTF-8", null);
+                descriptionView.loadData(toHtmlNoFrame(descriptionSection.description.trim()), "text/html; charset=UTF-8", null);
                 eventContainer.addView(descriptionSectionView);
             }
 
+            //Add Reviews Code
+            if (event.reviewObjects.size() == 0) {
+                findViewById(R.id.btn_add_review).setVisibility(View.GONE);
+                ((LinearLayout) findViewById(R.id.no_review_layout)).setVisibility(View.VISIBLE);
+                TextView addReviewBtn1 = (TextView)findViewById(R.id.btn_add_review1);
+                SpannableString string = new SpannableString("Write a Review");
+                string.setSpan(new UnderlineSpan(), 0, string.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                addReviewBtn1.setText(string);
+                findViewById(R.id.btn_add_review1).setOnClickListener(EventDetailActivity.this);
+                (findViewById(R.id.review_layout)).setVisibility(View.GONE);
+
+            } else {
+                if (isMyReviewWritten) {
+                    findViewById(R.id.btn_add_review).setVisibility(View.GONE);
+                } else {
+                    TextView btnAddReview = (TextView) findViewById(R.id.btn_add_review);
+                    SpannableString string = new SpannableString("Write a Review");
+                    string.setSpan(new UnderlineSpan(), 0, string.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    btnAddReview.setText(string);
+                }
+                (findViewById(R.id.review_layout)).setVisibility(View.VISIBLE);
+                updateReview();
+                ((LinearLayout) findViewById(R.id.no_review_layout)).setVisibility(View.GONE);
+                (findViewById(R.id.show_more_text)).setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(EventDetailActivity.this, EventAllReviewsActivity.class);
+                        intent.putParcelableArrayListExtra(EVENT_REVIEWS, event.reviewObjects);
+                        intent.putExtra(EVENT_ID, event.id);
+                        startActivity(intent);
+                    }
+                });
+
+            }
 
             //Adding youtube view
-            if(event.youtubeVideoId!=null && event.youtubeVideoId.length()>0) {
+            if (event.youtubeVideoId != null && event.youtubeVideoId.length() > 0) {
                 LinearLayout linearLayout = (LinearLayout) findViewById(R.id.youtube_fragment);
                 LinearLayout ll = new LinearLayout(EventDetailActivity.this);
                 ll.setId(View.generateViewId());
@@ -973,7 +1132,7 @@ public class EventDetailActivity extends BaseActivity {
                 youTubePlayerSupportFragment.initialize(Utils.YOUTUBE_API_KEY, new YouTubePlayer.OnInitializedListener() {
                     @Override
                     public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
-                       // youTubePlayer.loadVideo(event.youtubeVideoId);
+                        // youTubePlayer.loadVideo(event.youtubeVideoId);
                         youTubePlayer.cueVideo(event.youtubeVideoId);
                         youTubePlayer.setShowFullscreenButton(false);
                     }
@@ -987,11 +1146,10 @@ public class EventDetailActivity extends BaseActivity {
                 });
                 getSupportFragmentManager().beginTransaction().add(ll.getId(), youTubePlayerSupportFragment).commit();
                 linearLayout.addView(ll);
-            }else{
+            } else {
                 (findViewById(R.id.youtube_fragment)).setVisibility(View.GONE);
             }
         }
-
 
 
         private void addTagView(LinearLayout parent, final String tagName, final String action) {
@@ -1053,7 +1211,7 @@ public class EventDetailActivity extends BaseActivity {
 
     private void populateEventTravelTime() {
         if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Location location = LocationServices.FusedLocationApi.getLastLocation(client);
             if (location != null) {
                 userLocation = LocationUtils.locationToLatLng(location);
@@ -1075,20 +1233,20 @@ public class EventDetailActivity extends BaseActivity {
         }
 
         client = new GoogleApiClient.Builder(this)
-                    .addApi(AppIndex.API)
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(new ConnectionCallbacks() {
-                        @Override
-                        public void onConnected(Bundle bundle) {
-                            populateEventTravelTime();
-                        }
+                .addApi(AppIndex.API)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(new ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(Bundle bundle) {
+                        populateEventTravelTime();
+                    }
 
-                        @Override
-                        public void onConnectionSuspended(int i) {
-                            // do nothing.
-                        }
-                    })
-                    .build();
+                    @Override
+                    public void onConnectionSuspended(int i) {
+                        // do nothing.
+                    }
+                })
+                .build();
         client.connect();
         Uri webUri = event.getEventDetailsURI();
         viewAction = new Action.Builder(Action.TYPE_VIEW)

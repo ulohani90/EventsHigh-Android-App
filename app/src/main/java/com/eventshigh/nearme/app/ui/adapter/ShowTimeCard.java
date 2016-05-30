@@ -20,7 +20,7 @@ import java.util.ArrayList;
 /**
  * Created by umesh on 05/05/16.
  */
-public class ShowTimeCard  extends RecyclerView.ViewHolder{
+public class ShowTimeCard extends RecyclerView.ViewHolder {
 
     TextView date1;
     TextView date2;
@@ -35,23 +35,23 @@ public class ShowTimeCard  extends RecyclerView.ViewHolder{
 
     public ShowTimeCard(View itemView) {
         super(itemView);
-        date1 = (TextView)itemView.findViewById(R.id.date1);
-        date2 = (TextView)itemView.findViewById(R.id.date2);
-        timeLayout = (ZCustomFlowLayout)itemView.findViewById(R.id.showtimes);
-        venueName = (TextView)itemView.findViewById(R.id.venue_name);
+        date1 = (TextView) itemView.findViewById(R.id.date1);
+        date2 = (TextView) itemView.findViewById(R.id.date2);
+        timeLayout = (ZCustomFlowLayout) itemView.findViewById(R.id.showtimes);
+        venueName = (TextView) itemView.findViewById(R.id.venue_name);
     }
 
-    public void bindData(final MovieShowTimeObject obj,BaseActivity activity){
-        int nearestDate  = getNearestDate(obj.getShowDates());
-        timeLayout.setReceipentsForShowTimes(obj.getShowDates().get(nearestDate).getShowTimes(), true);
+    public void bindData(final MovieShowTimeObject obj, BaseActivity activity) {
+        //int nearestDate  = getNearestDate(obj.getShowDates());
+        timeLayout.setReceipentsForShowTimes(obj.getShowDates().get(0).getShowTimes(), true);
 
         venueName.setText(obj.getVenueName());
     }
 
-    public int getNearestDate(ArrayList<ShowDates> dates){
-        int smallest =0;
-        for(int i=1;i<dates.size();i++){
-            if(dates.get(i).getDate()<dates.get(smallest).getDate()){
+    public int getNearestDate(ArrayList<ShowDates> dates) {
+        int smallest = 0;
+        for (int i = 1; i < dates.size(); i++) {
+            if (dates.get(i).getDate() < dates.get(smallest).getDate()) {
 
             }
         }

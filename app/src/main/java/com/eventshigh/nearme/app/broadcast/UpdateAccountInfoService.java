@@ -126,7 +126,18 @@ public class UpdateAccountInfoService extends IntentService {
         }
 
         if (account.getReferrerCode() == null) {
-            account.recordReferrerCode(getReferrerCode());
+            String[] keys = getReferrerCode();
+            if (keys != null && keys.length > 1) {
+                account.recordReferrerCode(keys[0]);
+            }
+
+        }
+        if (account.getReferrerId() == null) {
+            String[] keys = getReferrerCode();
+            if (keys != null && keys.length > 1) {
+
+                account.recordReferrerId(keys[1]);
+            }
         }
 
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
@@ -135,9 +146,7 @@ public class UpdateAccountInfoService extends IntentService {
         }
 
         // Referral Link.
-       /* if (account.getReferrerId() == null) {
-            account.recordReferrerId(getReferrerId());
-        }*/
+
 
         // Upload IID.
         InstanceID instanceID = InstanceID.getInstance(this);
@@ -267,12 +276,13 @@ public class UpdateAccountInfoService extends IntentService {
         return null;
     }
 
-    private String getReferrerCode() {
+    private String[] getReferrerCode() {
         try {
             Uri uri = getBaseUri(this, "getReferrerObject").build();
             String resp = sendSignedRequest(uri).get();
             JSONObject res = new JSONObject(resp);
-            return res.getString("my_code");
+            String[] keys = {res.getString("my_code"), res.getString("referrer_id")};
+            return keys;
         } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);
             Log.w(UpdateAccountInfoService.class.getName(), "request failed: getReferrerId", e);

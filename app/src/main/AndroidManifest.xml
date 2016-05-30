@@ -72,13 +72,13 @@
             android:authorities="com.facebook.app.FacebookContentProvider196111897251952"
             android:exported="true"
             tools:ignore="ExportedContentProvider" />
-<!--
+        <!--
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
--->
+        -->
         <!-- Glide -->
         <meta-data
             android:name="com.bumptech.glide.integration.volley.VolleyGlideModule"
@@ -104,11 +104,7 @@
             android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/NoActionBar" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:theme="@style/NoActionBar">
             <intent-filter
                 android:autoVerify="true"
                 tools:ignore="UnusedAttribute" >
@@ -125,6 +121,11 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
             <!-- Accept Search requests withing app -->
@@ -335,6 +336,11 @@
             android:theme="@style/NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
+            android:name=".activity.EventBookingDetailActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
             android:name=".activity.OfferSignUpActivity"
             android:label="@string/enter_details_text"
             android:screenOrientation="portrait"
@@ -389,6 +395,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LaunchActivity" />
         </activity>
+        <activity
+            android:name=".activity.EventAllReviewsActivity"
+            android:label="@string/ui_reviews_text"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar" />
 
         <!-- Receivers within our application -->
         <!-- Receives the Install referrer from play store -->
@@ -423,6 +434,11 @@
                 <category android:name="com.eventshigh.nearme.app" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".broadcast.NotificationDeleteBroadcastReciever" >
+            <intent-filter>
+                <action android:name="notification_deleted_intent" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".broadcast.EHGcmListenerService"
@@ -443,8 +459,7 @@
 
         <activity
             android:name=".activity.WriteReviewActivity"
-            android:label="@string/title_activity_write_review" >
-        </activity>
+            android:label="@string/title_activity_write_review" />
 
         <!-- Facebook-log for user profile activity -->
         <activity
@@ -452,18 +467,40 @@
             android:label="@string/title_activity_user_profile" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
-        <activity android:name="com.facebook.FacebookActivity"
-            android:configChanges=
-                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:label="@string/app_name" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".activity.GuestDetailActivity"
+            android:label="@string/title_activity_guest_detail"
+            android:windowSoftInputMode="adjustPan"></activity>
+        <activity
+            android:name=".activity.TicketReviewActivity"
+            android:label="@string/title_activity_review"></activity>
+
+        <activity
+            android:name=".activity.TicketConfirmationActivity"
+            android:label="@string/title_activity_ticket_confirmation" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

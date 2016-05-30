@@ -103,6 +103,15 @@ public class Utils {
                 : string);
     }
 
+    public static boolean checkIfStringEmpty(@Nullable String string) {
+        return (string == null ||
+                string.isEmpty() ||
+                string.equalsIgnoreCase("null") ||
+                string.equalsIgnoreCase("unknown")
+                ? true
+                : false);
+    }
+
     public static int dpToPx(Context context, float dp) {
         return (int) (dp * context.getResources().getDisplayMetrics().density);
     }
@@ -156,10 +165,21 @@ public class Utils {
     }
 
     public static boolean isValidEmail(CharSequence target) {
-        if (TextUtils.isEmpty(target)) {
+        if (TextUtils.isEmpty(target)){
             return false;
         } else {
             return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
         }
     }
+
+    public static boolean isValidPhone(String phoneNo){
+        String Regex = "[^\\d] ";
+        String PhoneDigits = phoneNo.replaceAll(Regex, "");
+        if (PhoneDigits.length()!=10){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
 }

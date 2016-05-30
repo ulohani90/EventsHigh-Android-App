@@ -15,10 +15,11 @@ import android.widget.RatingBar;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.user.Account;
 
-public class WriteReviewActivity extends AppCompatActivity implements View.OnTouchListener{
+public class WriteReviewActivity extends AppCompatActivity implements View.OnTouchListener {
 
     private LinearLayout verifyPhnLayout;
     Account account;
@@ -27,8 +28,9 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
     WriteReviewRatingFragment writeReviewRatingFragment;
     WriteReviewDescriptionFragment writeReviewDescriptionFragment;
     MovieDetailObject movieDetailObject;
+    Event event;
     protected int movie_rated;
-
+    String type = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +38,7 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
 
         //phone verify
         account = new Account(this);
-        verifyPhnLayout = (LinearLayout)findViewById(R.id.verify_phn_layout);
+        verifyPhnLayout = (LinearLayout) findViewById(R.id.verify_phn_layout);
         (findViewById(R.id.verify_btn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,17 +48,22 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Bundle bundle = this.getIntent().getExtras();
-        if(bundle !=null){
-            movieDetailObject = bundle.getParcelable(MovieDetailActivity.MOVIE_DETAIL_OBJECT);
-        }else{
+        if (bundle != null) {
+            type = bundle.getString(MovieDetailActivity.OBJECT_TYPE);
+            if(type.equals("movie")){
+                movieDetailObject = bundle.getParcelable(MovieDetailActivity.MOVIE_DETAIL_OBJECT);
+            }else{
+                event = bundle.getParcelable(EventDetailActivity.EVENT_OBJECT);
+            }
+        } else {
             //Do something here if data not received
         }
 
-        if(savedInstanceState == null){
+        if (savedInstanceState == null) {
             writeReviewRatingFragment = WriteReviewRatingFragment.newInstance(this);
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.fragment_container,writeReviewRatingFragment)
+                    .add(R.id.fragment_container, writeReviewRatingFragment)
                     .commit();
         }
 
@@ -65,44 +72,45 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
     @Override
     public void onResume() {
         super.onResume();
-        if(account!=null && !(account.getUserInfo().isVerified)){
+        if (account != null && !(account.getUserInfo().isVerified)) {
             verifyPhnLayout.setClickable(true);
             verifyPhnLayout.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             verifyPhnLayout.setVisibility(View.GONE);
         }
     }
 
 
-    public void onMovieRated(){
+    public void onMovieRated() {
 
         writeReviewDescriptionFragment =
                 WriteReviewDescriptionFragment.newInstance(this);
         Bundle args = new Bundle();
-            writeReviewDescriptionFragment.setArguments(args);
-            // Commit the transaction
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top);
-                    transaction.replace(R.id.fragment_container, writeReviewDescriptionFragment);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                }
-            }, 500);
+        writeReviewDescriptionFragment.setArguments(args);
+        // Commit the transaction
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top);
+                transaction.replace(R.id.fragment_container, writeReviewDescriptionFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        }, 500);
     }
 
     float xDown;
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
             // save down X coordinate
             xDown = event.getX();
-        } else if(event.getAction() == MotionEvent.ACTION_UP){
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
             // if user moves do not move the finger, update RatingBar value
-            if(Math.abs(xDown - event.getX()) < 5){
+            if (Math.abs(xDown - event.getX()) < 5) {
                 onMovieRated();
                 return false;
             }
@@ -112,23 +120,22 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
-                this.finish();
+                onBackPressed();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void verifyClicked(){
+    public void verifyClicked() {
         startActivity(new Intent(this, PhoneLoginActivity.class));
     }
 
     @Override
     public void onBackPressed() {
-       super.onBackPressed();
-       overridePendingTransition(R.anim.animate_slide_down, R.anim.animate_slide_up);
-
+        super.onBackPressed();
+       // overridePendingTransition(R.anim.stay, R.anim.animate_slide_down);
     }
 }
 

@@ -3,6 +3,8 @@ package com.eventshigh.nearme.app.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,7 +40,9 @@ public class MovieShowTimeObject implements Parcelable {
             JSONArray dates = obj.getJSONArray("dates");
             if (dates != null) {
                 for (int i = 0; i < dates.length(); i++) {
-                    showDates.add(new ShowDates(dates.getJSONObject(i)));
+                    if (DateTimeUtils.isCurrentDate(DateTimeUtils.parseMovieTime(dates.getJSONObject(i).getString("date")))) {
+                        showDates.add(new ShowDates(dates.getJSONObject(i)));
+                    }
                 }
             }
         } catch (JSONException e) {

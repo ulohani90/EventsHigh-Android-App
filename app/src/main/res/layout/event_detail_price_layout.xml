@@ -27,7 +27,6 @@
         android:visibility="gone"
         android:textIsSelectable="false"
         tools:ignore="UnusedAttribute"
-
         tools:text="₹ 200 - 500"
         />
 

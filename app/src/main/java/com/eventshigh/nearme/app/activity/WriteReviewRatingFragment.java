@@ -19,7 +19,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 
 
-public class WriteReviewRatingFragment extends Fragment{
+public class WriteReviewRatingFragment extends Fragment {
 
 
     TextView tvMovieName;
@@ -28,13 +28,15 @@ public class WriteReviewRatingFragment extends Fragment{
 
     WriteReviewActivity writeReviewActivity;
 
-    public static WriteReviewRatingFragment newInstance(WriteReviewActivity writeReviewActivity){
+    TextView ratingHeaderText;
+
+    public static WriteReviewRatingFragment newInstance(WriteReviewActivity writeReviewActivity) {
         return new WriteReviewRatingFragment();
     }
 
     @Override
     public void onAttach(Context context) {
-        writeReviewActivity = (WriteReviewActivity)context;
+        writeReviewActivity = (WriteReviewActivity) context;
         super.onAttach(context);
     }
 
@@ -42,17 +44,28 @@ public class WriteReviewRatingFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_write_review_rating, container, false);
-        tvMovieName = (TextView)rootView.findViewById(R.id.tv_write_review_movie_name);
-        rbMovieRating = (RatingBar)rootView.findViewById(R.id.rb_write_rating);
+        tvMovieName = (TextView) rootView.findViewById(R.id.tv_write_review_movie_name);
+        rbMovieRating = (RatingBar) rootView.findViewById(R.id.rb_write_rating);
         rbMovieRating.setOnTouchListener(writeReviewActivity);
-        ivMoviePicture = (ImageView)rootView.findViewById(R.id.iv_write_review_movie_pic);
+        ivMoviePicture = (ImageView) rootView.findViewById(R.id.iv_write_review_movie_pic);
+        ratingHeaderText = (TextView) rootView.findViewById(R.id.rate_header);
+        if (writeReviewActivity.type.equals("movie")) {
 
-        if(writeReviewActivity.movieDetailObject != null){
-            tvMovieName.setText(writeReviewActivity.movieDetailObject.getMovieInfo().getName());
-            Glide.with(this).load(writeReviewActivity.movieDetailObject.getMovieInfo().getImg_url())
+            if (writeReviewActivity.movieDetailObject != null) {
+                tvMovieName.setText(writeReviewActivity.movieDetailObject.getMovieInfo().getName());
+                Glide.with(this).load(writeReviewActivity.movieDetailObject.getMovieInfo().getImg_url())
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                        .into(ivMoviePicture);
+            }
+            ratingHeaderText.setText("Please rate the Movie!");
+        } else {
+            tvMovieName.setText(writeReviewActivity.event.title);
+            Glide.with(this).load(writeReviewActivity.event.imgUrl)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                     .into(ivMoviePicture);
+            ratingHeaderText.setText("Please rate the Event!");
         }
 
         return rootView;

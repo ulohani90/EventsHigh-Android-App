@@ -4,8 +4,10 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
@@ -26,6 +28,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.GAHelper;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -54,6 +57,8 @@ public class EHNotification {
     public final
     @Nullable
     UserContact contact;
+
+    public static final String NOTIFICATION_DELETED_ACTION = "notification_deleted_intent";
 
 
     public EHNotification(Context context, Intent wakefulIntent, Event event, int notificationId) {
@@ -120,7 +125,7 @@ public class EHNotification {
         GAHelper.getInstance(context).reportActionToAnalytics("background", "notificationShown",
                 title);
         notificationManager.notify(notificationId, createNotification(bitmap));
-
+        Preferences.getInstance(context).setIsNotificationActive(true);
         if (wakefulIntent != null)
             WakefulBroadcastReceiver.completeWakefulIntent(wakefulIntent);
     }
@@ -135,6 +140,9 @@ public class EHNotification {
             largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
         }
 
+        Intent intent = new Intent(NOTIFICATION_DELETED_ACTION);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.notification)
                 .setContentTitle(title)
@@ -145,9 +153,9 @@ public class EHNotification {
                 .setPriority(priority)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setLargeIcon(largeIcon)
-                .setContentIntent(launchIntent);
+                .setContentIntent(launchIntent).setDeleteIntent(pendingIntent);
 
-        if (priority >= Notification.PRIORITY_DEFAULT) {
+        if (!Preferences.getInstance(context).isNotificationActive()) {
             builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
         }
         if (contact != null) {
@@ -176,4 +184,6 @@ public class EHNotification {
         intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
         return PendingIntent.getActivity(context, 0, intent, 0);
     }
+
+
 }

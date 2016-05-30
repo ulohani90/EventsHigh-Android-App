@@ -79,7 +79,7 @@ public class MovieListCard extends RecyclerView.ViewHolder {
         movieName.setText(string);
         if (movie.getReviews().size() > 0) {
             movieReviews.setVisibility(View.VISIBLE);
-            movieReviews.setText(movie.getReviews().size() + "Reviews");
+            movieReviews.setText(movie.getReviews().size() + " Reviews");
         } else {
             movieReviews.setVisibility(View.GONE);
         }
@@ -116,7 +116,7 @@ public class MovieListCard extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, MovieDetailActivity.class);
-                intent.putExtra(MovieDetailActivity.MOVIE_PARAM, movie);
+                intent.putExtra(MovieDetailActivity.MOVIE_ID, movie.getMovieInfo().getId());
                 activity.startActivity(intent);
 
 

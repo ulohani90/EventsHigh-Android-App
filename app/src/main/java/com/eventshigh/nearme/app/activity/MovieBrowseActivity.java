@@ -199,8 +199,7 @@ public class MovieBrowseActivity extends BaseContextActivity {
         }
     }
 
-    public ArrayList<MovieDetailObject> getLanguageBasedMovies(String
-                                                                       language, ArrayList<MovieDetailObject> movies) {
+    public ArrayList<MovieDetailObject> getLanguageBasedMovies(String language, ArrayList<MovieDetailObject> movies) {
         ArrayList<MovieDetailObject> result = new ArrayList<>();
         for (MovieDetailObject obj : movies) {
             for (String launguageObj : obj.getMovieInfo().getLaunguages()) {
