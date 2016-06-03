@@ -283,7 +283,7 @@ public abstract class BaseContextActivity extends BaseActivity {
 
     public @Nullable
     MovieMarkerManager.MovieMark getMovieMark(MovieInfoObject movie) {
-        return moviesMarkerManager.getMovieMark(movie.getId()+"");
+        return moviesMarkerManager.getMovieMark(movie.getId() + "");
     }
 
 
@@ -298,6 +298,15 @@ public abstract class BaseContextActivity extends BaseActivity {
     }
 
     public void showSearchView(String query) {
+        reportActionToAnalytics("showSearchView", query);
+        EventsContext param = new EventsContext(eventsContext.location, query);
+        param.dateFilter = eventsContext.dateFilter;
+        Intent intent = new Intent(this, getClass())
+                .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
+        startActivity(intent);
+    }
+
+    public void showCategorySearchView(String query) {
         reportActionToAnalytics("showSearchView", query);
         EventsContext param = new EventsContext(eventsContext.location, query);
         param.dateFilter = eventsContext.dateFilter;

@@ -50,11 +50,11 @@ public enum EventCategory {
     private static final String LOG_TAG = EventCategory.class.getSimpleName();
     public final String categoryName;
 
-     EventCategory(@Nullable String categoryName) {
+    EventCategory(@Nullable String categoryName) {
         this.categoryName = categoryName == null ? Utils.capitalize(name().replace('_', ' ')) : categoryName;
     }
 
-     EventCategory() {
+    EventCategory() {
         this(null);
     }
 
@@ -105,7 +105,7 @@ public enum EventCategory {
     public int getInterestIconResourceId() {
         int resId = R.drawable.icon_kids_entertainment_int;
         try {
-            resId = R.drawable.class.getField("icon_" + toString().toLowerCase()+"_int").getInt(null);
+            resId = R.drawable.class.getField("icon_" + toString().toLowerCase() + "_int").getInt(null);
         } catch (IllegalAccessException e) {
             // Ignore
         } catch (NoSuchFieldException e) {
@@ -115,7 +115,6 @@ public enum EventCategory {
 
         return resId;
     }
-
 
 
     public int getHighlightedIconResourceId() {
@@ -134,19 +133,32 @@ public enum EventCategory {
     }
 
     public static String toCategoryParsableString(String tag) {
-        return tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "").replaceAll("'", "").replaceAll("\\(","_").replaceAll("\\)","").replaceAll(",","");
+        return tag.toUpperCase().replaceAll(" ", "_").replaceAll("&_", "").replaceAll("'", "").replaceAll("\\(", "_").replaceAll("\\)", "").replaceAll(",", "");
     }
 
-    public static @Nullable EventCategory getCategoryFromCategoryParsableString(String tagU) {
+    public static
+    @Nullable
+    EventCategory getCategoryFromCategoryParsableString(String tagU) {
         try {
             return valueOf(tagU);
         } catch (IllegalArgumentException e) {
             // Ignore. Unsupported category.
         }
-        return  null;
+        return null;
     }
 
-    public static @Nullable EventCategory parseCategory(String tag) {
+    public static boolean isACategory(String categoryName) {
+        for(EventCategory category: EventCategory.values()){
+            if(category.categoryName.equalsIgnoreCase(categoryName))
+                return true;
+        }
+        return false;
+    }
+
+
+    public static
+    @Nullable
+    EventCategory parseCategory(String tag) {
         return getCategoryFromCategoryParsableString(toCategoryParsableString(tag));
     }
 

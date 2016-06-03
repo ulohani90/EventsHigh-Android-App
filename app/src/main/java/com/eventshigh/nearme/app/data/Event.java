@@ -38,7 +38,7 @@ public class Event implements Parcelable {
     public final EventCategory category;
 
     public final String description;
-    public final String[] tags;
+    public final ArrayList<String> tags;
     @Nullable
     public final String youtubeVideoId;
 
@@ -97,7 +97,7 @@ public class Event implements Parcelable {
     public final ArrayList<MovieUserReviewObject> reviewObjects;
 
     public Event(String id, City city, String title, EventCategory category,
-                 String description, String[] tags, @Nullable String youtubeVideoId,
+                 String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, @Nullable String sourceUrl,
                  @Nullable String bookingUrl, @Nullable String bookingText,
                  int numViews, int numSaves, boolean ehRecommended,
@@ -163,7 +163,8 @@ public class Event implements Parcelable {
         this.category = EventCategory.valueOf(in.readString());
 
         this.description = in.readString();
-        this.tags = in.createStringArray();
+        this.tags = new ArrayList<>();
+        in.readStringList(tags);
         this.youtubeVideoId = Utils.checkIfUnknown(in.readString());
 
         this.imgUrl = Utils.checkIfUnknown(in.readString());
@@ -288,7 +289,7 @@ public class Event implements Parcelable {
         dest.writeString(category.toString());
 
         dest.writeString(description);
-        dest.writeStringArray(tags);
+        dest.writeStringList(tags);
         dest.writeString(emptyIfNull(youtubeVideoId));
 
         dest.writeString(emptyIfNull(imgUrl));
@@ -512,14 +513,17 @@ public class Event implements Parcelable {
                 double value = ehPrice.optDouble("value", -1);
                 /*if (value < 0.01) {
                     value = ehPrice.optDouble("value", -1);
-                }
-                if (value > 0) {
+                }*/
+                if (discountValue > 0) {
+                    minPrice = minPrice < 0 ? value : Math.min(minPrice, value);
+                    maxPrice = maxPrice < 0 ? value : Math.max(maxPrice, value);
+                } else if (value > 0) {
                     minPrice = minPrice < 0 ? value : Math.min(minPrice, value);
                     maxPrice = maxPrice < 0 ? value : Math.max(maxPrice, value);
                 } else {
                     minPrice = 0;
                     maxPrice = 0;
-                }*/
+                }
                 ehPrices.add(EhPrices.createObject(minPrice, maxPrice, ehPriceName, ehPriceNote, currency, value, discountValue, ehOccurences));
             }
         }
@@ -592,7 +596,7 @@ public class Event implements Parcelable {
                 category,
 
                 description,
-                tagsList.toArray(new String[tagsList.size()]),
+                tagsList,
                 youtubeId,
 
                 img_url,

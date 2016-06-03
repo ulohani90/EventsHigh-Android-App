@@ -505,7 +505,7 @@ public class LaunchActivity extends BaseContextActivity {
         TABS.add(EXPLORE_TAB);
         TABS.add(OFFERS_TAB);
         TABS.add(THIS_WEEK_TAB);
-     //   TABS.add(MOVIES_TAB);
+        //   TABS.add(MOVIES_TAB);
         TABS.add(NOTIFICATIONS_TAB);
 
         String tabName = getIntent().getStringExtra(DEFAULT_TAB_PARAM);
@@ -809,8 +809,8 @@ public class LaunchActivity extends BaseContextActivity {
            /* if(TABS.get(position).equalsIgnoreCase(MOVIES_TAB)){
                 return new MoviesListFragment();
             }*/
-
-            return ThisWeekFragment.getInstance(eventsContext, true, 7);
+            return NewWeekEventsFragment.getInstance(eventsContext, false);
+            // return ThisWeekFragment.getInstance(eventsContext, true, 7);
         }
 
         @Override
@@ -967,10 +967,10 @@ public class LaunchActivity extends BaseContextActivity {
                                             });
 
                                         }
-                                    }else if(referringParams.has("movie_id")){
+                                    } else if (referringParams.has("movie_id")) {
                                         int id = referringParams.getInt("movie_id");
                                         Intent intent = new Intent(LaunchActivity.this, MovieDetailActivity.class);
-                                        intent.putExtra(MovieDetailActivity.MOVIE_ID,id);
+                                        intent.putExtra(MovieDetailActivity.MOVIE_ID, id);
                                         startActivity(intent);
                                     }
 

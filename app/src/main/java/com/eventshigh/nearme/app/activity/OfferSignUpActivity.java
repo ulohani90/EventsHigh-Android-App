@@ -34,6 +34,7 @@ import com.eventshigh.nearme.app.utils.Utils;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
@@ -41,7 +42,7 @@ import pl.snowdog.material.ui.ToolbarColorizeHelper;
 /**
  * Created by umesh on 17/04/16.
  */
-public class OfferSignUpActivity extends BaseActivity{
+public class OfferSignUpActivity extends BaseActivity {
 
 
     OfferObject obj;
@@ -60,24 +61,25 @@ public class OfferSignUpActivity extends BaseActivity{
     ProgressDialog progressDialog;
 
     Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_offer_signup);
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         progressBar = findViewById(R.id.top_progress_bar);
-        if(getIntent()!=null){
+        if (getIntent() != null) {
             obj = getIntent().getParcelableExtra("offer");
 
         }
 
         account = new Account(this);
-        if(obj!=null){
+        if (obj != null) {
             setUpData();
         }
     }
@@ -92,40 +94,40 @@ public class OfferSignUpActivity extends BaseActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
-        }else if(item.getItemId() == R.id.action_share){
+        } else if (item.getItemId() == R.id.action_share) {
             shareCoupon(obj);
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void setUpData(){
-        offerBg = (ImageView)findViewById(R.id.offer_bg);
+    public void setUpData() {
+        offerBg = (ImageView) findViewById(R.id.offer_bg);
         Glide.with(this).load(obj.imgUrl)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                 .into(offerBg);
-        ((TextView)findViewById(R.id.title)).setText(obj.name);
-        ((TextView)findViewById(R.id.subtitle)).setText(obj.desc);
-        mobileNum = (TextInputLayout)findViewById(R.id.mobile_no);
-        fullName = (TextInputLayout)findViewById(R.id.fullname);
-        emailAdd = (TextInputLayout)findViewById(R.id.email_id);
+        ((TextView) findViewById(R.id.title)).setText(obj.name);
+        ((TextView) findViewById(R.id.subtitle)).setText(obj.desc);
+        mobileNum = (TextInputLayout) findViewById(R.id.mobile_no);
+        fullName = (TextInputLayout) findViewById(R.id.fullname);
+        emailAdd = (TextInputLayout) findViewById(R.id.email_id);
         mobileEditText = mobileNum.getEditText();
         fullNameEditText = fullName.getEditText();
         emailAddEditText = emailAdd.getEditText();
-        if(account.getUserInfo().isVerified) {
+        if (account.getUserInfo().isVerified) {
             mobileEditText.setText(account.getUserInfo().phoneNo);
             fullNameEditText.setText(account.getUserInfo().name);
         }
-        termsText = (TextView)findViewById(R.id.terms_text);
+        termsText = (TextView) findViewById(R.id.terms_text);
 
-        ((TextView)findViewById(R.id.signup_btn)).setOnClickListener(new View.OnClickListener() {
+        ((TextView) findViewById(R.id.signup_btn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signUpClicked();
             }
         });
         String[] terms = obj.termsConditions.split("\\.");
-        if(terms.length>0) {
+        if (terms.length > 0) {
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < terms.length; i++) {
                 builder.append("\u2022 ");
@@ -138,26 +140,26 @@ public class OfferSignUpActivity extends BaseActivity{
     }
 
 
-
-    public void signUpClicked(){
-        if(checkIfDetailsCorrect()) {
-            progressDialog = ProgressDialog.show(this,null,"Signing up. Please wait..");
+    public void signUpClicked() {
+        if (checkIfDetailsCorrect()) {
+            progressDialog = ProgressDialog.show(this, null, "Signing up. Please wait..");
             reportActionToAnalytics("signupButtonClicked");
 
             Uri requestUrl = UpdateAccountInfoService.getBaseUri(this, "offer_signup")
                     .appendQueryParameter("mobile_no", mobileEditText.getText().toString())
-                    .appendQueryParameter("offer_id", obj.id+"")
+                    .appendQueryParameter("offer_id", obj.id + "")
                     .appendQueryParameter("name", fullNameEditText.getText().toString())
                     .appendQueryParameter("email", emailAddEditText.getText().toString())
                     .build();
 
 
+            try {
                 VolleyHelper.addToRequestQueue(this,
-                        new JsonObjectRequest(Request.Method.GET,requestUrl.toString(), null,
+                        new JsonObjectRequest(Request.Method.GET, Signer.sign(requestUrl).toString(), null,
                                 new Response.Listener<JSONObject>() {
                                     @Override
                                     public void onResponse(JSONObject s, boolean isIntermediate) {
-                                        if(progressDialog!=null){
+                                        if (progressDialog != null) {
                                             progressDialog.dismiss();
                                         }
                                         updatePreferencesForOffer();
@@ -169,7 +171,7 @@ public class OfferSignUpActivity extends BaseActivity{
                                 new Response.ErrorListener() {
                                     @Override
                                     public void onErrorResponse(VolleyError volleyError) {
-                                        if(progressDialog!=null){
+                                        if (progressDialog != null) {
                                             progressDialog.dismiss();
                                         }
                                         progressBar.setVisibility(View.GONE);
@@ -179,6 +181,11 @@ public class OfferSignUpActivity extends BaseActivity{
                                 }
                         )
                 );
+            } catch (GeneralSecurityException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
 
 
         }
@@ -188,32 +195,33 @@ public class OfferSignUpActivity extends BaseActivity{
         showMessage(R.string.retry);
     }
 
-    public boolean checkIfDetailsCorrect(){
-        if(fullNameEditText.getText()!=null && fullNameEditText.getText().toString().length()>0){
+    public boolean checkIfDetailsCorrect() {
+        if (fullNameEditText.getText() != null && fullNameEditText.getText().toString().length() > 0) {
             fullName.setErrorEnabled(false);
-            if(mobileEditText.getText()!=null && mobileEditText.getText().toString().length()==10){
+            if (mobileEditText.getText() != null && mobileEditText.getText().toString().length() == 10) {
                 mobileNum.setErrorEnabled(false);
 
-                if(emailAddEditText.getText()!=null && Utils.isValidEmail(emailAddEditText.getText())){
+                if (emailAddEditText.getText() != null && Utils.isValidEmail(emailAddEditText.getText())) {
                     emailAdd.setErrorEnabled(false);
                     return true;
-                }else{
+                } else {
                     emailAdd.setErrorEnabled(true);
                     emailAdd.setError("Valid Email Address required");
                     return false;
                 }
 
-            }else{
+            } else {
                 mobileNum.setErrorEnabled(true);
                 mobileNum.setError("Valid Mobile number required");
                 return false;
             }
-        }else{
+        } else {
             fullName.setErrorEnabled(true);
             fullName.setError("Full Name required");
             return false;
         }
     }
+
     private void setLightToolbarIcons() {
         toolbar.post(new Runnable() {
             @Override
@@ -228,13 +236,14 @@ public class OfferSignUpActivity extends BaseActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        if(toolbar!=null)
+        if (toolbar != null)
             setLightToolbarIcons();
     }
+
     @Override
     public void onBackPressed() {
         this.finish();
-       // overridePendingTransition(R.anim.stay,R.anim.animate_up_bottom);
+        // overridePendingTransition(R.anim.stay,R.anim.animate_up_bottom);
     }
 
     public void updatePreferencesForOffer() {

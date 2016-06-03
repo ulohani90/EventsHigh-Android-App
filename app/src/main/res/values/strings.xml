@@ -32,6 +32,7 @@
     <string name="action_confirm">Confirm</string>
     <string name="action_signup">Sign Up</string>
     <string name="action_submit">Submit</string>
+    <string name="action_cancel">Cancel</string>
 
     <!-- Menu items -->
     <string name="menu_edit_location">Change Location</string>
@@ -202,6 +203,6 @@
     <string name="title_activity_guest_detail">Guest Details</string>
     <string name="title_activity_booking_details">BookingDetailsActivity</string>
     <string name="title_activity_review">ReviewActivity</string>
-
+    <string name="ui_add_follow">+Follow</string>
 
 </resources>

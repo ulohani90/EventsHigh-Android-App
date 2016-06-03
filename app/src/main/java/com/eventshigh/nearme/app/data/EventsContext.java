@@ -16,8 +16,10 @@ import java.util.Calendar;
 public class EventsContext implements Parcelable {
     private static final String DATE_FILTER_FORMAT = "%4d-%02d-%02d";
 
-    @Nullable public City city;
-    @Nullable public LatLng location;
+    @Nullable
+    public City city;
+    @Nullable
+    public LatLng location;
     public String query;
     public String dateFilter;
 
@@ -37,6 +39,10 @@ public class EventsContext implements Parcelable {
         City oldCity = city;
         city = City.getCity(location);
         return (oldCity == null && city == null) || (oldCity != null && oldCity.equals(city));
+    }
+
+    public void removeDateFilter() {
+        dateFilter = "";
     }
 
     public void setDateFilter(Calendar calendar) {
@@ -68,7 +74,7 @@ public class EventsContext implements Parcelable {
     @Override
     public boolean equals(Object another) {
         return another != null && another instanceof EventsContext &&
-            toString().equals(another.toString());
+                toString().equals(another.toString());
     }
 
     @Override
@@ -87,16 +93,16 @@ public class EventsContext implements Parcelable {
     // a CREATOR that implements these two methods
     public static final Parcelable.Creator<EventsContext> CREATOR =
             new Parcelable.Creator<EventsContext>() {
-        public EventsContext createFromParcel(Parcel in) {
-            LatLng location = in.readParcelable(LatLng.class.getClassLoader());
-            String query = in.readString();
-            EventsContext context =  new EventsContext(location, query);
-            context.dateFilter = in.readString();
-            return context;
-        }
+                public EventsContext createFromParcel(Parcel in) {
+                    LatLng location = in.readParcelable(LatLng.class.getClassLoader());
+                    String query = in.readString();
+                    EventsContext context = new EventsContext(location, query);
+                    context.dateFilter = in.readString();
+                    return context;
+                }
 
-        public EventsContext[] newArray(int size) {
-            return new EventsContext[size];
-        }
-    };
+                public EventsContext[] newArray(int size) {
+                    return new EventsContext[size];
+                }
+            };
 }
