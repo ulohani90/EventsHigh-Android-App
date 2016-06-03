@@ -52,4 +52,5 @@ public class VolleyHelper {
             activity.reportActionToAnalytics("failedRequest");
         }
     }
+
 }
