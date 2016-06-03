@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:color="#353535" android:state_selected="true" />
+    <!-- finger down -->
+    <item android:color="#353535" android:state_pressed="true" />
+
+    <!-- Default, "just hanging' out" state. -->
+    <item android:color="@android:color/white" />
+</selector>

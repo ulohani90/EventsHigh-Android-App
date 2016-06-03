@@ -17,7 +17,9 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.network.DateCategoryRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
@@ -27,16 +29,16 @@ import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
-import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.user.Preferences;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Fragment to show events.
@@ -62,8 +64,10 @@ public class EventsFragment extends BaseEventsFragment {
 
     SocialInvitationsRequest.SpecialCoupons special;
 
+    EventsCollection eventsCollection;
+
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
-                                             boolean showCategories, boolean showEhInviteForNotification,SocialInvitationsRequest.SpecialCoupons special) {
+                                             boolean showCategories, boolean showEhInviteForNotification, SocialInvitationsRequest.SpecialCoupons special) {
         EventsFragment fragment = new EventsFragment();
         Bundle args = getArgs(eventsContext, showFollowCard, showCategories);
         args.putBoolean(SHOW_EH_INVITE_NOTIFICATION_PARAM, showEhInviteForNotification);
@@ -113,17 +117,17 @@ public class EventsFragment extends BaseEventsFragment {
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
-
-        noEventHeaderText = (TextView)view.findViewById(R.id.no_my_event_heading);
-        callToActionButton = (TextView)view.findViewById(R.id.explore_events);
+        swipeRefreshLayout.setEnabled(false);
+        noEventHeaderText = (TextView) view.findViewById(R.id.no_my_event_heading);
+        callToActionButton = (TextView) view.findViewById(R.id.explore_events);
         // Actions Buttons.
         callToActionButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query)){
-                    Intent intent = new Intent(getActivity(),SelectInterestsActivity.class);
+                if (EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query)) {
+                    Intent intent = new Intent(getActivity(), SelectInterestsActivity.class);
                     startActivity(intent);
-                }else {
+                } else {
                     activity.showSearchView("today");
                 }
             }
@@ -142,20 +146,19 @@ public class EventsFragment extends BaseEventsFragment {
         noMyEventsView = view.findViewById(R.id.view_no_my_event);
         retryView = view.findViewById(R.id.view_retry);
 
-        if(getArguments()!=null && getArguments().getParcelable("special_obj")!=null)
-                special = getArguments().getParcelable("special_obj");
+        if (getArguments() != null && getArguments().getParcelable("special_obj") != null)
+            special = getArguments().getParcelable("special_obj");
 
     }
-
 
 
     @Override
     public void onStart() {
         super.onStart();
-        if(Preferences.getInstance(getActivity()).isInterestUpdated() && EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
+        if (Preferences.getInstance(getActivity()).isInterestUpdated() && EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
             fetchNewListing(Preferences.getInstance(getActivity()).isInterestUpdated());
             Preferences.getInstance(getActivity()).setIsInterestUpdated(false);
-        }else{
+        } else {
             fetchNewListing(false);
         }
 
@@ -164,8 +167,8 @@ public class EventsFragment extends BaseEventsFragment {
     @Override
     public void onStop() {
 
-        if(asyncRequest!=null)
-        asyncRequest.cancel(true);
+        if (asyncRequest != null)
+            asyncRequest.cancel(true);
         isLoading = false;
 /*
         if(eventsAdapter!=null){
@@ -174,17 +177,18 @@ public class EventsFragment extends BaseEventsFragment {
         super.onStop();
     }
 
-    public void setOnScrollListener (OnScrollListener onScrollListener) {
+    public void setOnScrollListener(OnScrollListener onScrollListener) {
         this.onScrollListener = onScrollListener;
     }
 
     boolean isLoading;
     MyEventsRequest asyncRequest;
+
     public void fetchNewListing(boolean shouldBypassCache) {
-        if(isLoading){
+        if (isLoading) {
             return;
         }
-        isLoading =true;
+        isLoading = true;
 
         topProgressBar.setVisibility(View.VISIBLE);
         noMyEventsView.setVisibility(View.GONE);
@@ -195,13 +199,14 @@ public class EventsFragment extends BaseEventsFragment {
             asyncRequest = new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mMyFavEventsMoviesFetcherCallBack, mErrorListener);
             asyncRequest.execute();
-        }else if(EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query)){
+        } else if (EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query)) {
             MobileUserEventsRequest.submit(activity, eventsContext,
                     Priority.IMMEDIATE, this, shouldBypassCache, true, mMyEventsFetcherCallBack, mErrorListener);
         } else if (eventsContext.query.isEmpty() && !eventsContext.dateFilter.isEmpty() && showCategories) {
             DateCategoryRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, mMyEventsFetcherCallBack, mErrorListener);
         } else {
+
             EventCollectionRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
         }
@@ -235,12 +240,14 @@ public class EventsFragment extends BaseEventsFragment {
         }
     }
 
-    boolean isFragmentDestroyed=false;
+    boolean isFragmentDestroyed = false;
+
     @Override
     public void onDestroy() {
         isFragmentDestroyed = true;
         super.onDestroy();
     }
+
 
     private Listener<List<TopicEvents>> mMyEventsFetcherCallBack = new Listener<List<TopicEvents>>() {
         @Override
@@ -257,11 +264,11 @@ public class EventsFragment extends BaseEventsFragment {
                         noMyEventsView.setVisibility(View.VISIBLE);
                         noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_event));
                         callToActionButton.setText("Explore Events");
-                    }else if(EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
+                    } else if (EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
                         noMyEventsView.setVisibility(View.VISIBLE);
                         noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_interest));
                         callToActionButton.setText("Personalize");
-                    }else {
+                    } else {
                         noMyEventsView.setVisibility(View.GONE);
                         retryView.setVisibility(View.VISIBLE);
                     }
@@ -269,13 +276,13 @@ public class EventsFragment extends BaseEventsFragment {
             }
 
             if (!isIntermediate || !myEvents.isEmpty()) {
-                if(getActivity()!=null && (getActivity()) instanceof EventsGridActivity){
-                    ((EventsGridActivity)getActivity()).setShareImageUrl(myEvents.get(0).events.get(0).imgUrl);
+                if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
+                    ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.get(0).events.get(0).imgUrl);
                 }
 
                 eventsAdapter.setTopicEvents(myEvents, eventsContext, eventGridView.getSpanCount() * 2);
 
-            //    eventGridView.scrollToPosition(scrollPosition);
+                //    eventGridView.scrollToPosition(scrollPosition);
             }
             isLoading = false;
         }
@@ -296,11 +303,11 @@ public class EventsFragment extends BaseEventsFragment {
                         noMyEventsView.setVisibility(View.VISIBLE);
                         noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_event));
                         callToActionButton.setText("Explore Events");
-                    }else if(EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
+                    } else if (EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
                         noMyEventsView.setVisibility(View.VISIBLE);
                         noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_interest));
                         callToActionButton.setText("Personalize");
-                    }else {
+                    } else {
                         noMyEventsView.setVisibility(View.GONE);
                         retryView.setVisibility(View.VISIBLE);
                     }
@@ -308,15 +315,15 @@ public class EventsFragment extends BaseEventsFragment {
             }
 
             if (!isIntermediate) {
-                if( !myEvents.topicEvents.isEmpty()) {
+                if (!myEvents.topicEvents.isEmpty()) {
                     if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
                         ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.topicEvents.get(0).events.get(0).imgUrl);
                     }
 
                     eventsAdapter.setTopicEvents(myEvents.topicEvents, eventsContext, eventGridView.getSpanCount() * 2);
                 }
-                if(!myEvents.movies.isEmpty()){
-                    eventsAdapter.setMoviesListData(myEvents.movies,eventsContext, true,myEvents.topicEvents.isEmpty()?true:false);
+                if (!myEvents.movies.isEmpty()) {
+                    eventsAdapter.setMoviesListData(myEvents.movies, eventsContext, true, myEvents.topicEvents.isEmpty() ? true : false);
                 }
                 //    eventGridView.scrollToPosition(scrollPosition);
             }
@@ -345,32 +352,37 @@ public class EventsFragment extends BaseEventsFragment {
             if (!isIntermediate || !eventsCollection.events.isEmpty()) {
                 String seeAllQuery = eventsContext.query.isEmpty() ||
                         eventsContext.dateFilter.isEmpty() ? null : eventsContext.query;
-                if(getActivity()!=null && (getActivity()) instanceof EventsGridActivity){
-                    if(eventsCollection.events.size()>0)
-                    ((EventsGridActivity)getActivity()).setShareImageUrl(eventsCollection.events.get(0).imgUrl);
+                if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
+                    if (eventsCollection.events.size() > 0)
+                        ((EventsGridActivity) getActivity()).setShareImageUrl(eventsCollection.events.get(0).imgUrl);
                 }
-                eventsAdapter.setEvents(eventsCollection.events, seeAllQuery, showEhInviteForNotification);
-                if (showFollowCard) {
+                EventsFragment.this.eventsCollection = eventsCollection;
+                List<Event> filteredEvents = eventsCollection.events;
+                filteredEvents = filterEventsWithCategory(null, filteredEvents);
+                filteredEvents = filterEventsWithDate(filteredEvents, -1);
+                filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
+                /*if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
-                            eventsCollection.numFollowers,special);
-                }
-           //     eventGridView.scrollToPosition(scrollPosition);
+                            eventsCollection.numFollowers, special);
+                }*/
+                //     eventGridView.scrollToPosition(scrollPosition);
             }
         }
     };
 
     private Listener<SocialInvitationsRequest.CommonInviteObject> mSocialInvitesCallback =
-        new Listener<SocialInvitationsRequest.CommonInviteObject>() {
-            @Override
-            public void onResponse(SocialInvitationsRequest.CommonInviteObject inviteObj, boolean isIntermediate) {
-                if (isDetached()) {
-                    return;
-                }
+            new Listener<SocialInvitationsRequest.CommonInviteObject>() {
+                @Override
+                public void onResponse(SocialInvitationsRequest.CommonInviteObject inviteObj, boolean isIntermediate) {
+                    if (isDetached()) {
+                        return;
+                    }
 
-                eventsAdapter.setSocialInvites(inviteObj.getInvites());
-                isLoading=false;
-            }
-        };
+                    eventsAdapter.setSocialInvites(inviteObj.getInvites());
+                    isLoading = false;
+                }
+            };
 
     private ErrorListener mErrorListener = new ErrorListener() {
         @Override
@@ -390,4 +402,188 @@ public class EventsFragment extends BaseEventsFragment {
             isLoading = false;
         }
     };
+
+
+    ArrayList<String> filterCategoryName;
+
+    public List<Event> filterEventsWithCategory(String category, List<Event> totalEvents) {
+        List<Event> allEvents;
+
+        if (totalEvents == null) {
+            allEvents = eventsCollection.events;
+        } else {
+            allEvents = totalEvents;
+        }
+
+        if (filterCategoryName == null)
+            filterCategoryName = new ArrayList<>();
+        if (category != null) {
+            if (filterCategoryName.contains(category)) {
+                filterCategoryName.remove(category);
+            } else {
+                filterCategoryName.add(category);
+            }
+        }
+        List<Event> filteredEvents = new ArrayList<>();
+        if (filterCategoryName.size() > 0) {
+            for (int i = 0; i < allEvents.size(); i++) {
+                for (int j = 0; j < filterCategoryName.size(); j++) {
+                    if (allEvents.get(i).tags.contains(filterCategoryName.get(j))) {
+                        filteredEvents.add(allEvents.get(i));
+                        break;
+                    }
+                }
+            }
+        } else {
+            filteredEvents = allEvents;
+        }
+
+        if (totalEvents == null) {
+            filteredEvents = filterEventsWithDate(filteredEvents, -1);
+            filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+            eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+            if (filteredEvents.isEmpty()) {
+                // Failed. Show toast and return empty list.
+                Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+
+            }
+        }
+        return filteredEvents;
+
+    }
+
+
+    ArrayList<Long> filterEventTimes;
+
+    public List<Event> filterEventsWithDate(List<Event> totalEvents, long... times) {
+        List<Event> allEvents;
+        if (totalEvents == null) {
+            allEvents = eventsCollection.events;
+        } else {
+            allEvents = totalEvents;
+        }
+        if (filterEventTimes == null) {
+            filterEventTimes = new ArrayList<>();
+        }
+        for (long time : times) {
+            if (time != -1) {
+                if (filterEventTimes.contains(time)) {
+                    filterEventTimes.remove(time);
+                } else {
+                    filterEventTimes.add(time);
+                }
+            }
+        }
+        List<Event> filteredEvents = new ArrayList<>();
+        if (filterEventTimes.size() > 0) {
+            for (int i = 0; i < allEvents.size(); i++) {
+                for (int j = 0; j < filterEventTimes.size(); j++) {
+                    for (int k = 0; k < allEvents.get(i).eventTimings.length; k++) {
+                        if (filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime()) {
+                            filteredEvents.add(allEvents.get(i));
+                            break;
+                        }
+                    }
+                }
+            }
+        } else {
+            filteredEvents = allEvents;
+        }
+
+        if (totalEvents == null) {
+            filteredEvents = filterEventsWithCategory(null, filteredEvents);
+            filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+            eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+            if (filteredEvents.isEmpty()) {
+                // Failed. Show toast and return empty list.
+                Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+
+            }
+        }
+        return filteredEvents;
+
+    }
+
+    List<Integer> filterEventPrices;
+
+    public List<Event> filterEventsWithPrice(List<Event> totalEvents, int priceValue) {
+        List<Event> allEvents;
+        if (totalEvents == null) {
+            allEvents = eventsCollection.events;
+        } else {
+            allEvents = totalEvents;
+        }
+        if (filterEventPrices == null) {
+            filterEventPrices = new ArrayList<>();
+        }
+
+        if (priceValue != -1) {
+            if (filterEventPrices.contains(priceValue)) {
+                filterEventPrices.remove((Integer) priceValue);
+            } else {
+                filterEventPrices.add((Integer) priceValue);
+            }
+        }
+
+
+        List<Event> filteredEvents = new ArrayList<>();
+        if (filterEventPrices.size() > 0) {
+            for (int i = 0; i < allEvents.size(); i++) {
+                Event event = allEvents.get(i);
+                secondLoop:
+                for (int j = 0; j < filterEventPrices.size(); j++) {
+                    int priceMin = -1;
+                    int priceMax = -1;
+                    if (filterEventPrices.get(j) == EventsGridActivity.FREE) {
+                        priceMax = 0;
+                        priceMin = 0;
+                    } else if (filterEventPrices.get(j) == EventsGridActivity.UPTO_250) {
+                        priceMin = 1;
+                        priceMax = 250;
+                    } else if (filterEventPrices.get(j) == EventsGridActivity.PRICE_250_TO_750) {
+                        priceMin = 250;
+                        priceMax = 750;
+                    } else {
+                        priceMin = 750;
+                        priceMax = 50000;
+                    }
+                    if (event.ehPrices.size() > 0) {
+                        for (EhPrices price : event.ehPrices) {
+                            if (price.discountValue > 0) {
+                                if (price.discountValue >= priceMin && price.discountValue <= priceMax) {
+                                    filteredEvents.add(event);
+                                    break secondLoop;
+                                }
+                            } else {
+                                if (price.value >= priceMin && price.value <= priceMax) {
+                                    filteredEvents.add(event);
+                                    break secondLoop;
+                                }
+                            }
+                        }
+                    } else {
+                        if (event.minPrice >= priceMin && event.maxPrice <= priceMax) {
+                            filteredEvents.add(event);
+                            break secondLoop;
+                        }
+                    }
+                }
+
+            }
+        } else {
+            filteredEvents = allEvents;
+        }
+
+        if (totalEvents == null) {
+            filteredEvents = filterEventsWithCategory(null, filteredEvents);
+            filteredEvents = filterEventsWithDate(filteredEvents, -1);
+            eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+            if (filteredEvents.isEmpty()) {
+                // Failed. Show toast and return empty list.
+                Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+
+            }
+        }
+        return filteredEvents;
+    }
 }

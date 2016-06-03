@@ -60,6 +60,6 @@
     <color name="movie_text_grey_color">#999999</color>
     <color name="movie_submit_green_color">#4caf50</color>
 
-
+<color name="transparent_white">#33FFFFFF</color>
 
 </resources>

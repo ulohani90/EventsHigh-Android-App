@@ -30,10 +30,11 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
 
 
     Account account;
+
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
-     * @param listener callback on success.
+     * @param listener      callback on success.
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, EventsContext eventsContext,
@@ -44,20 +45,19 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
         String url;
         try {
             url = EventsHighEndpoints.getApiEndpointEventsMobileUser(Utils.getAndroidId(context));
-            if(shouldBypassCache){
-                url = url+"&cmode=override";
+            if (shouldBypassCache) {
+                url = url + "&cmode=override";
             }
         } catch (IllegalArgumentException e) {
             errorListener.onErrorResponse(new VolleyError("Invalid Query", e));
             return;
         }
 
-        MobileUserEventsRequest request = new MobileUserEventsRequest(context,eventsContext, url, priority,
+        MobileUserEventsRequest request = new MobileUserEventsRequest(context, eventsContext, url, priority,
                 shouldBypassCache, includeWithoutLocation, listener, errorListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
-
 
 
     private final EventsContext eventsContext;
@@ -65,7 +65,7 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
     private final boolean includeWithoutLocation;
     private Context mContext;
 
-    public MobileUserEventsRequest(Context context,EventsContext eventsContext, String url, Priority priority,
+    public MobileUserEventsRequest(Context context, EventsContext eventsContext, String url, Priority priority,
                                    boolean shouldBypassCache, boolean includeWithoutLocation,
                                    Response.Listener<List<MyEventsRequest.TopicEvents>> listener, Response.ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
@@ -88,19 +88,22 @@ public class MobileUserEventsRequest extends JsonRequest<List<MyEventsRequest.To
     @Override
     protected Response<List<MyEventsRequest.TopicEvents>> parseNetworkResponse(NetworkResponse networkResponse) {
         try {
-        List<MyEventsRequest.TopicEvents> events = new ArrayList<>();
+            List<MyEventsRequest.TopicEvents> events = new ArrayList<>();
             String jsonString = new String(networkResponse.data, "UTF-8");
             JSONObject eventsJson = new JSONObject(jsonString);
-            JSONArray eventsJsonArray = eventsJson.getJSONArray("events");
+            if (eventsJson.has("events")) {
+                JSONArray eventsJsonArray = eventsJson.getJSONArray("events");
 
-            for(int i=0;i<eventsJsonArray.length();i++){
-                List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"),includeWithoutLocation);
-                account.setIsFollowing(eventsJsonArray.getJSONObject(i).getString("topic"),true);
-                MyEventsRequest.TopicEvents eventData = new MyEventsRequest.TopicEvents(eventsJsonArray.getJSONObject(i).getString("topic"),topicEvents,eventsJsonArray.getJSONObject(i).getInt("event_count"));
-                events.add(eventData);
+                for (int i = 0; i < eventsJsonArray.length(); i++) {
+                    List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"), includeWithoutLocation);
+                    account.setIsFollowing(eventsJsonArray.getJSONObject(i).getString("topic"), true);
+                    MyEventsRequest.TopicEvents eventData = new MyEventsRequest.TopicEvents(eventsJsonArray.getJSONObject(i).getString("topic"), topicEvents, eventsJsonArray.getJSONObject(i).getInt("event_count"));
+                    events.add(eventData);
+                }
             }
-            return  Response.success(events, HttpHeaderParser.parseCacheHeaders(networkResponse));
-        } catch (UnsupportedEncodingException |JSONException e) {
+            return Response.success(events, HttpHeaderParser.parseCacheHeaders(networkResponse));
+
+        } catch (UnsupportedEncodingException | JSONException e) {
             Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }

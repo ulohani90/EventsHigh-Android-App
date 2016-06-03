@@ -978,10 +978,11 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
                 for (EhPrices ehPrice : event.ehPrices) {
                     View view = LayoutInflater.from(EventDetailActivity.this).inflate(R.layout.event_detail_price_layout, ehPriceContainer, false);
                     if (ehPrice.discountValue > 0) {
-                        ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " + ehPrice.currency + " " + ehPrice.discountValue);
+                        ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " +(ehPrice.discountValue > 0 ? ( ehPrice.currency + " " + ehPrice.discountValue) : "Free"));
                     } else {
-                        ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " + ehPrice.currency + " " + ehPrice.value);
+                        ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " +(ehPrice.value > 0 ? (ehPrice.name + " - " + ehPrice.currency + " " + ehPrice.value) : "Free"));
                     }
+
 
                     if (ehPrice.note != null && ehPrice.note.length() > 0) {
                         TextView note = (TextView) view.findViewById(R.id.event_note);
@@ -1021,7 +1022,7 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
             if (event.locality != null) {
                 addTagView(tagsView, event.locality, "localityAsTag");
             }
-            if (event.tags.length > 0) {
+            if (event.tags.size() > 0) {
                 for (final String tag : event.tags) {
                     addTagView(tagsView, tag, "tagClick");
                 }

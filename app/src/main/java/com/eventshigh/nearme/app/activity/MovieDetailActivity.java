@@ -191,6 +191,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
                 Preferences.getInstance(MovieDetailActivity.this).setIsReviewAdded(false);
                 if (adapter != null)
                     adapter.notifyDataSetChanged();
+                fabWriteReviews.setVisibility(View.GONE);
 
             }
         }

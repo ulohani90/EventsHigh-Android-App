@@ -97,6 +97,8 @@ public class DateTimeUtils {
                 };
     }
 
+    public static final long MILLISECONDS_IN_A_DAY = 86400000;
+
     private static final SimpleDateFormat FULL_DATE_TIME_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.US);
 
@@ -137,6 +139,12 @@ public class DateTimeUtils {
         return toMidnight(cal, event.city.timeZone).getTime();
     }
 
+
+    public static Date getCurrentDate(long timeInMillis) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date(timeInMillis));
+        return toMidnight(calendar, null).getTime();
+    }
 
     public static Calendar toMidnight(Calendar cal, @Nullable String timeZone) {
         if (timeZone != null) {
@@ -311,5 +319,15 @@ public class DateTimeUtils {
         return date.getTime();
     }
 
+    public static long[] getWeekEndDates() {
+        long[] weekendDates = new long[2];
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+        weekendDates[0] = toMidnight(c, null).getTime().getTime();
 
+        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        weekendDates[1] = toMidnight(c, null).getTime().getTime();
+        return weekendDates;
+
+    }
 }

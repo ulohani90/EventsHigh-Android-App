@@ -90,12 +90,13 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
         setShouldAllowStaleResponse(true);
-
         this.context = context;
         this.eventsContext = eventsContext;
         this.priority = priority;
         this.includeWithoutLocation = includeWithoutLocation;
     }
+
+
 
     @Override
     public Priority getPriority() {

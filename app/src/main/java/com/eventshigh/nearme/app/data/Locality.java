@@ -116,6 +116,7 @@ public enum  Locality {
     }
 
 
+
     public String getImageUrl() {
         return "https://assets.eventshigh.com/localities/" + toString().toLowerCase() + ".jpg";
     }
