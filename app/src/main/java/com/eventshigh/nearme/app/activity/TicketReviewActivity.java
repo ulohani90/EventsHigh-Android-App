@@ -141,7 +141,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
         tvEventsName.setText(event.title);
         tvEventsLocation.setText(event.venue);
         tvNoOfTickets.setText(noOfTickets+" Ticket(s)");
-        tvNowTotal.setText("₹"+total+"");
+        tvNowTotal.setText("₹ "+total+"");
         tvDate.setText(eventTime.date);
         tvTime.setText(eventTime.time);
         for(EhPrices ehp:prices){

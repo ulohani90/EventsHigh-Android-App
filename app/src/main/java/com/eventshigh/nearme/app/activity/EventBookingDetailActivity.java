@@ -3,11 +3,14 @@ package com.eventshigh.nearme.app.activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +36,7 @@ import pl.snowdog.material.ui.ToolbarColorizeHelper;
 /**
  * Created by umesh on 19/05/16.
  */
-public class EventBookingDetailActivity extends BaseActivity implements View.OnClickListener{
+public class EventBookingDetailActivity extends BaseActivity implements View.OnClickListener {
 
     public static final String EVENT_TOTAL_TICKETS = "event_total_tickets";
     public static final String EVENT_DATE_SELECTED = "event_date_selected";
@@ -79,16 +82,16 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         addEventTickets(0, 0);
         updateTotalPrice();
 
-        tvNextEventBooking = (TextView)findViewById(R.id.tv_next_event_booking);
+        tvNextEventBooking = (TextView) findViewById(R.id.tv_next_event_booking);
         tvNextEventBooking.setOnClickListener(this);
 
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.tv_next_event_booking:
-                if(noOfTickets>0) {
+                if (noOfTickets > 0) {
                     Intent iNext = new Intent(this, GuestDetailActivity.class);
                     Bundle bundleNext = new Bundle();
                     bundleNext.putParcelable(EventDetailActivity.EVENT_OBJECT, event);
@@ -100,15 +103,15 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
 
                     iNext.putExtras(bundleNext);
                     startActivity(iNext);
-                }else{
-                    Toast.makeText(this,"Please select your ticket(s)",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Please select your ticket(s)", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         if (toolbar != null)
             setLightToolbarIcons();
@@ -139,7 +142,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
             final TextView dayText = (TextView) view.findViewById(R.id.event_day);
             dayText.setVisibility(View.VISIBLE);
 
-            if (i == 0){
+            if (i == 0) {
                 dayText.setSelected(true);
                 dateLayoutSelectedLast = dayText;
                 dateString = dates.get(0);
@@ -148,12 +151,13 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
             TextView timeLayout = (TextView) view.findViewById(R.id.time_textview);
             timeLayout.setVisibility(View.GONE);
             SpannableString date = new SpannableString(eventTimes.get(dates.get(i)).get(0).day + "\n" + eventTimes.get(dates.get(i)).get(0).date);
+            date.setSpan(new StyleSpan(Typeface.BOLD), 0, 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             date.setSpan(new RelativeSizeSpan(0.8f), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             dayText.setText(date);
             view.setTag(i);
             dateContainer.addView(view);
-            dateContainer.setTag(i+"");
+            dateContainer.setTag(i + "");
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -178,7 +182,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         LinearLayout timeContainer = (LinearLayout) findViewById(R.id.time_container);
         timings = eventTimes.get(dates.get(position));
         timeContainer.removeAllViews();
-        for (int i = 0; i < timings.size(); i++){
+        for (int i = 0; i < timings.size(); i++) {
 
             View view = LayoutInflater.from(this).inflate(R.layout.ticket_date_time_count_container, timeContainer, false);
             TextView dayText = (TextView) view.findViewById(R.id.event_day);
@@ -193,7 +197,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
             }
             view.setTag(i);
             timeContainer.addView(view);
-            timeContainer.setTag(i+"");
+            timeContainer.setTag(i + "");
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -219,9 +223,9 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         eventTimes = new HashMap<>();
         for (int i = 0; i < event.eventTimings.length; i++) {
             EventTime time = DateTimeUtils.getEventTime(event, i);
-            if (eventTimes.containsKey(time.date)){
+            if (eventTimes.containsKey(time.date)) {
                 eventTimes.get(time.date).add(time);
-            }else{
+            } else {
                 ArrayList<EventTime> timings = new ArrayList<>();
                 timings.add(time);
                 eventTimes.put(time.date, timings);
@@ -234,7 +238,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         prices = getEhPrices(dateIndex, timeIndex);
         LinearLayout ticketTypes = (LinearLayout) findViewById(R.id.options_container);
         ticketTypes.removeAllViews();
-        for (int i = 0; i < prices.size(); i++){
+        for (int i = 0; i < prices.size(); i++) {
             final EhPrices price = prices.get(i);
             View view = LayoutInflater.from(this).inflate(R.layout.eh_ticket_type_layout, ticketTypes, false);
             TextView ticketType = (TextView) view.findViewById(R.id.ticket_name);
@@ -253,7 +257,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
             }
             currency = price.currency;
             ticketCount.setText(0 + "");
-            ticketCount.setTag(i+"");
+            ticketCount.setTag(i + "");
             ticketCountIncrement.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -311,10 +315,10 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
     public ArrayList<EhPrices> getEhPrices(int dateIndex, int timeIndex) {
         ArrayList<EhPrices> results = new ArrayList<>();
         EventTime eventTime = eventTimes.get(dates.get(dateIndex)).get(timeIndex);
-        for (int i = 0; i < event.ehPrices.size(); i++){
+        for (int i = 0; i < event.ehPrices.size(); i++) {
             EhPrices ehPrices = event.ehPrices.get(i);
-            long eventTimeLong = System. currentTimeMillis();
-            if(ehPrices.validityStart<=eventTimeLong && ehPrices.validityStop>eventTimeLong){
+            long eventTimeLong = System.currentTimeMillis();
+            if (ehPrices.validityStart <= eventTimeLong && ehPrices.validityStop > eventTimeLong) {
                 for (int j = 0; j < event.ehPrices.get(i).occurences.size(); j++) {
                     EventTime time = DateTimeUtils.dateToEventTime(new Date(ehPrices.occurences.get(j)), TimeZone.getTimeZone(event.city.timeZone));
                     if (eventTime.equals(time)) {
@@ -326,7 +330,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         return results;
     }
 
-    public void updateTotalPrice(){
+    public void updateTotalPrice() {
         totalPrice.setText(currency + " " + Math.round(total));
         numberOfTickets.setText(Math.round(noOfTickets) + "");
     }

@@ -13,19 +13,26 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:weightSum="1"
-            android:padding="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
             android:background="@android:color/white"
             android:textSize="14sp"
             android:orientation="vertical">
         <TextView
             android:id="@+id/tv_guest_radio_name"
             android:layout_width="match_parent"
+            android:textSize="14sp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="10dp"
             android:layout_height="wrap_content"/>
         <RadioGroup
             android:id="@+id/rg_guest_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:paddingRight="16dp"
             android:imeOptions="actionNext"/>
         </LinearLayout>
     </LinearLayout>

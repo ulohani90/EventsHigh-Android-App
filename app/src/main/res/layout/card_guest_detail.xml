@@ -3,7 +3,8 @@
     android:orientation="vertical"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:paddingTop="12dp"
+    android:paddingTop="16dp"
+    android:background="#EAEAEA"
     android:paddingBottom="12dp">
 
     <TextView
@@ -12,6 +13,10 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:textSize="16sp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:textColor="#878787"
+
         android:fontFamily="sens-serif-medium"
         />
 
@@ -25,6 +30,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="14sp"
+        android:textColor="#353535"
+        android:textColorHint="#878787"
         android:padding="16dp"
         android:background="@android:color/white"
         android:inputType="textPersonName"
@@ -43,6 +50,8 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:padding="16dp"
+        android:textColor="#353535"
+        android:textColorHint="#878787"
         android:inputType="textEmailAddress"
         android:background="@android:color/white"
         android:imeOptions="actionNext"
@@ -62,6 +71,8 @@
         android:textSize="14sp"
         android:padding="16dp"
         android:inputType="phone"
+        android:textColor="#353535"
+        android:textColorHint="#878787"
         android:background="@android:color/white"
         android:imeOptions="actionNext"
         android:hint="Phone"
