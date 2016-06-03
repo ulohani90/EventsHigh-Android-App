@@ -41,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -167,11 +168,11 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
                 JSONObject jsonObject = arrayGuestDetails.getJSONObject(i);
 
                 ((TextView) llGuestLayout.findViewById(R.id.tv_guest_name))
-                        .setText(jsonObject.getString("name"));
+                        .setText(jsonObject.getString("firstName"));
                 ((TextView) llGuestLayout.findViewById(R.id.tv_guest_email))
                         .setText(jsonObject.getString("email"));
                 ((TextView) llGuestLayout.findViewById(R.id.tv_guest_phone))
-                        .setText(jsonObject.getString("phone"));
+                        .setText(jsonObject.getString("mobile"));
                 llTicketCardList.addView(llGuestLayout);
             }
         }catch (JSONException e){
@@ -354,13 +355,13 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
 
 
                 int noOfCards = arrayGuestDetails.length();
-                    for (int i = 0; i < noOfCards; i++)
-                        params.add(new BasicNameValuePair("firstName", arrayGuestDetails.getJSONObject(i).getString("name")));
-                    for (int i = 0; i < noOfCards; i++)
-                        params.add(new BasicNameValuePair("mobile", arrayGuestDetails.getJSONObject(i).getString("phone")));
-                    for (int i = 0; i < noOfCards; i++)
-                        params.add(new BasicNameValuePair("email", arrayGuestDetails.getJSONObject(i).getString("email")));
-
+                Iterator<String> iter = arrayGuestDetails.getJSONObject(0).keys();
+                while (iter.hasNext()){
+                    String key = iter.next();
+                    for (int i = 0; i < noOfCards; i++) {
+                        params.add(new BasicNameValuePair(key, arrayGuestDetails.getJSONObject(i).get(key).toString()));
+                    }
+                }
 
                 params.add(new BasicNameValuePair("paymode", "online"));
                 params.add(new BasicNameValuePair("isMobile", "true"));

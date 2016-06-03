@@ -38,8 +38,6 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
     List<LinearLayout> listAdditionalFieldsLayout;
 
     List<AdditionalTicketField> additionalTicketFieldList;
-    String[] tsize = {"S","M","L","XL","XXL"};
-    int [] noTSize;
     JSONArray jsonArrayGuestDetail;
     Event event;
     Bundle bundle;
@@ -84,36 +82,12 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
 
     //add user detail
     private void addGuestCradLayouts(){
-        noTSize = new int[noOfGuestDetails];
         listGuestDetailLayout = new ArrayList<>();
         listAdditionalFieldsLayout = new ArrayList<>();
 
         for(int i=0;i< noOfGuestDetails;i++){
             LinearLayout llGuestLayout = (LinearLayout)getLayoutInflater().inflate(R.layout.card_guest_detail,null);
             i++;((TextView)llGuestLayout.findViewById(R.id.tv_guest_no)).setText("Guest "+i);i--;
-            final TextView tvTsize = (TextView)llGuestLayout.findViewById(R.id.tv_tsize);
-            ImageButton ibLeftArrow = (ImageButton)llGuestLayout.findViewById(R.id.ib_left_arrow_tsize);
-            ImageButton ibRightArrow = (ImageButton)llGuestLayout.findViewById(R.id.ib_right_arrow_tsize);
-            tvTsize.setText(tsize[0]);
-            noTSize[i]=0;
-            ibLeftArrow.setTag(i + "");
-            ibLeftArrow.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int i = Integer.parseInt(v.getTag().toString());
-                    noTSize[i] = (noTSize[i]+4)%5;
-                    tvTsize.setText(tsize[noTSize[i]]);
-                }
-            });
-            ibRightArrow.setTag(i + "");
-            ibRightArrow.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int i = Integer.parseInt(v.getTag().toString());
-                    noTSize[i] = (noTSize[i]+1)%5;
-                    tvTsize.setText(tsize[noTSize[i]]);
-                }
-            });
             addAditionalFieldViews(llGuestLayout);
             llGuestDetailLayoutContainer.addView(llGuestLayout);
             listGuestDetailLayout.add(llGuestLayout);
@@ -126,18 +100,22 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
         for (AdditionalTicketField additionalTicketField : additionalTicketFieldList) {
             if (additionalTicketField.getType().equalsIgnoreCase("Text")){
                 LinearLayout textFieldLinearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.additional_ticket_text_field, null);
+                textFieldLinearLayout.setTag(additionalTicketField.getName());
                 TextView tvTextField  = (TextView)textFieldLinearLayout.findViewById(R.id.tv_guest_text);
                 tvTextField.setHint(additionalTicketField.getName());
                 llGuestDetailCard.addView(textFieldLinearLayout);
                 listAdditionalFieldsLayout.add(textFieldLinearLayout);
             }else if(additionalTicketField.getType().equalsIgnoreCase("One-of")){
                 LinearLayout radioLinearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.additional_ticket_radio_group, null);
+                radioLinearLayout.setTag(additionalTicketField.getName());
                 TextView tvRadioTitle = (TextView)radioLinearLayout.findViewById(R.id.tv_guest_radio_name);
                 tvRadioTitle.setText(additionalTicketField.getName());
-                RadioGroup rgOneOf  = (RadioGroup)radioLinearLayout.findViewById(R.id.tv_guest_radio_group);
-                for(String option: additionalTicketField.getOptions()){
+                RadioGroup rgOneOf  = (RadioGroup)radioLinearLayout.findViewById(R.id.rg_guest_radio_group);
+                for(int i=0;i<additionalTicketField.getOptions().size();i++){
+                    String option = additionalTicketField.getOptions().get(i);
                     RadioButton radioButton = new RadioButton(this);
                     radioButton.setText(option);
+                    radioButton.setId(i);
                     rgOneOf.addView(radioButton);
                 }
                 llGuestDetailCard.addView(radioLinearLayout);
@@ -150,16 +128,17 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
     private boolean checkAllEditTextFilled(){
         jsonArrayGuestDetail = new JSONArray();
         boolean is_details_complete = true;
-
+        boolean isLoopBreak = false;
         for(LinearLayout ll_guest_detail:listGuestDetailLayout){
+            if(isLoopBreak)break;
             JSONObject jsonObject = new JSONObject();
             try {
                 if(!Utils.checkIfStringEmpty(((TextView) ll_guest_detail.findViewById(R.id.et_guest_name)).getText().toString())){
-                    jsonObject.put("name", ((TextView) ll_guest_detail.findViewById(R.id.et_guest_name)).getText().toString());
+                    jsonObject.put("firstName", ((TextView) ll_guest_detail.findViewById(R.id.et_guest_name)).getText().toString());
                 }else{
                     is_details_complete = false;
                     focusOnView(ll_guest_detail.findViewById(R.id.et_guest_name));
-                    Toast.makeText(this,"All fields are mandatory",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this,"All fields are compulsory.",Toast.LENGTH_SHORT).show();
                     break;
                 }
                 if(!Utils.checkIfStringEmpty(((TextView) ll_guest_detail.findViewById(R.id.et_guest_email)).getText().toString())){
@@ -174,49 +153,56 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
                 }else{
                     is_details_complete = false;
                     focusOnView(ll_guest_detail.findViewById(R.id.et_guest_email));
-                    Toast.makeText(this,"All fields are mandatory",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this,"All fields are compulsory.",Toast.LENGTH_SHORT).show();
                     break;
                 }
                 if(!Utils.checkIfStringEmpty(((TextView) ll_guest_detail.findViewById(R.id.et_guest_phone)).getText().toString())){
                     if(Utils.isValidPhone(((TextView) ll_guest_detail.findViewById(R.id.et_guest_phone)).getText().toString())) {
-                        jsonObject.put("phone", ((TextView) ll_guest_detail.findViewById(R.id.et_guest_phone)).getText().toString());
+                        jsonObject.put("mobile", ((TextView) ll_guest_detail.findViewById(R.id.et_guest_phone)).getText().toString());
                     }else{
                         Toast.makeText(this,"10 digit Phone No is required",Toast.LENGTH_SHORT).show();
                         is_details_complete = false;
                         focusOnView(ll_guest_detail.findViewById(R.id.et_guest_phone));
                         break;
                     }
-                }else{
+                }
+                else{
                     is_details_complete = false;
                     focusOnView(ll_guest_detail.findViewById(R.id.et_guest_phone));
-                    Toast.makeText(this,"All fields are mandatory",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this,"All fields are compulsory.",Toast.LENGTH_SHORT).show();
                     break;
                 }
+
                 for(AdditionalTicketField additionalTicketField: additionalTicketFieldList){
                     if(additionalTicketField.getType().equalsIgnoreCase("Text")){
                         LinearLayout llTextField = (LinearLayout)ll_guest_detail.findViewWithTag(additionalTicketField.getName());
                         TextView tvTextField = (TextView)llTextField.findViewById(R.id.tv_guest_text);
                         if (!Utils.checkIfStringEmpty(tvTextField.getText().toString())){
-                            jsonObject.put(additionalTicketField.getName(), ((TextView) ll_guest_detail.findViewById(R.id.et_guest_phone)).getText().toString());
+                            jsonObject.put(additionalTicketField.getName(), tvTextField.getText().toString());
                         }else{
                             is_details_complete = false;
-                            focusOnView(tvTextField);
-                            Toast.makeText(this, "All fields are mandatory", Toast.LENGTH_SHORT).show();
+                            isLoopBreak = true;
+                            focusOnAdditionalView(llTextField);
+                            Toast.makeText(this, "All fields are compulsory.", Toast.LENGTH_SHORT).show();
                             break;
                         }
-                    }else if(additionalTicketField.getType().equalsIgnoreCase("one-off")){
-                        LinearLayout llTextField = (LinearLayout)ll_guest_detail.findViewWithTag(additionalTicketField.getName());
-                        TextView tvTextField = (TextView)llTextField.findViewById(R.id.tv_guest_text);
-                        if (!Utils.checkIfStringEmpty(tvTextField.getText().toString())){
-                            jsonObject.put(additionalTicketField.getName(), ((TextView) ll_guest_detail.findViewById(R.id.et_guest_phone)).getText().toString());
+                    }else if(additionalTicketField.getType().equalsIgnoreCase("One-of")){
+                        LinearLayout llOneOf = (LinearLayout)ll_guest_detail.findViewWithTag(additionalTicketField.getName());
+                        RadioGroup rgOneOf = (RadioGroup)llOneOf.findViewById(R.id.rg_guest_radio_group);
+                        int selectedId = rgOneOf.getCheckedRadioButtonId();
+                        if (selectedId != -1){
+                            RadioButton radioSexButton=(RadioButton)findViewById(selectedId);
+                            jsonObject.put(additionalTicketField.getName(), radioSexButton.getText().toString());
                         }else{
                             is_details_complete = false;
-                            focusOnView(tvTextField);
-                            Toast.makeText(this, "All fields are mandatory", Toast.LENGTH_SHORT).show();
+                            isLoopBreak = true;
+                            focusOnAdditionalView(llOneOf);
+                            Toast.makeText(this, "All fields are compulsory.", Toast.LENGTH_SHORT).show();
                             break;
                         }
                     }
                 }
+
             }catch (JSONException e){
                 is_details_complete = false;
             }
@@ -242,6 +228,18 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
             public void run(){
                 svDetailCards.smoothScrollTo(0,((View)((View)view.getParent()).getParent()).getTop()
                                                 +((View)view.getParent()).getTop());
+                view.setFocusableInTouchMode(true);
+                view.requestFocus();
+            }
+        });
+    }
+
+    private final void focusOnAdditionalView(final View view) {
+        new Handler().post(new Runnable() {
+            @Override
+            public void run(){
+                svDetailCards.smoothScrollTo(0, ((View) view.getParent()).getTop()
+                        +  view.getTop());
                 view.setFocusableInTouchMode(true);
                 view.requestFocus();
             }

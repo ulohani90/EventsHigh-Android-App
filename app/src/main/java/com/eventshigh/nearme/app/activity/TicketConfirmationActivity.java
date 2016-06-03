@@ -100,9 +100,9 @@ public class TicketConfirmationActivity extends AppCompatActivity implements Vie
         try {
             arrayGuestDetails = new JSONArray(arrayDetailCards);
             JSONObject jsonObject = arrayGuestDetails.getJSONObject(0);
-            tvEventGuestName.setText(jsonObject.getString("name"));
+            tvEventGuestName.setText(jsonObject.getString("firstName"));
             tvEventGuestEmailId.setText(jsonObject.getString("email"));
-            tvEventGuestPhone.setText(jsonObject.getString("phone"));
+            tvEventGuestPhone.setText(jsonObject.getString("mobile"));
         }catch (JSONException e){
         }
     }
