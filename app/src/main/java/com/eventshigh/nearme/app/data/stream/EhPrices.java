@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Created by umesh on 07/04/16.
  */
-public class EhPrices implements Parcelable {
+public class EhPrices implements Parcelable{
     public double min;
     public double max;
     public String name;
@@ -24,6 +24,7 @@ public class EhPrices implements Parcelable {
     public ArrayList<Long> occurences;
     public double value;
     public double discountValue;
+    public int count = 0;
 
     public EhPrices(Parcel in) {
         this.min = in.readDouble();
@@ -35,9 +36,10 @@ public class EhPrices implements Parcelable {
         this.discountValue = in.readDouble();
         this.occurences = new ArrayList<>();
         in.readList(occurences, Long.class.getClassLoader());
+        this.count = in.readInt();
     }
 
-    public EhPrices(double min, double max, String name, String note, String currency, double value, double discountValue, ArrayList<Long> occurences) {
+    public EhPrices(double min, double max, String name, String note, String currency, double value, double discountValue, ArrayList<Long> occurences,int count) {
         this.min = min;
         this.max = max;
         this.name = name;
@@ -46,10 +48,11 @@ public class EhPrices implements Parcelable {
         this.value = value;
         this.discountValue = discountValue;
         this.occurences = occurences;
+        this.count = count;
     }
 
-    public static EhPrices createObject(double min, double max, String name, String note, String currency, double value, double discountValue, ArrayList<Long> occurences) {
-        return new EhPrices(min, max, name, note, currency, value, discountValue, occurences);
+    public static EhPrices createObject(double min, double max, String name, String note, String currency, double value, double discountValue, ArrayList<Long> occurences, int count) {
+        return new EhPrices(min, max, name, note, currency, value, discountValue, occurences, count);
     }
 
     @Override
@@ -67,15 +70,14 @@ public class EhPrices implements Parcelable {
         dest.writeDouble(value);
         dest.writeDouble(discountValue);
         dest.writeList(occurences);
+        dest.writeInt(count);
     }
 
     public static final Parcelable.Creator<EhPrices> CREATOR =
             new Parcelable.Creator<EhPrices>() {
                 public EhPrices createFromParcel(Parcel in) {
                     return new EhPrices(in);
-
                 }
-
                 public EhPrices[] newArray(int size) {
                     return new EhPrices[size];
                 }

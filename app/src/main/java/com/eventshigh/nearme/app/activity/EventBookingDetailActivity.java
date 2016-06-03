@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
@@ -21,10 +23,8 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -33,7 +33,13 @@ import pl.snowdog.material.ui.ToolbarColorizeHelper;
 /**
  * Created by umesh on 19/05/16.
  */
-public class EventBookingDetailActivity extends BaseActivity {
+public class EventBookingDetailActivity extends BaseActivity implements View.OnClickListener{
+
+    public static final String EVENT_TOTAL_TICKETS = "event_total_tickets";
+    public static final String EVENT_DATE_SELECTED = "event_date_selected";
+    public static final String EVENT_TIME_SELECTED = "event_time_selected";
+    public static final String EVENT_TOTAL_PRICE = "total_price";
+    public static final String EVENT_TICKETS_DESCRIPTION = "tickets_description";
 
 
     Event event;
@@ -44,6 +50,12 @@ public class EventBookingDetailActivity extends BaseActivity {
     TextView totalPrice;
     TextView numberOfTickets;
     String currency;
+    TextView tvNextEventBooking;
+
+    String dateString;
+    EventTime eventTime;
+    ArrayList<EhPrices> prices;
+    ArrayList<EventTime> timings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +79,37 @@ public class EventBookingDetailActivity extends BaseActivity {
         addTimeContainerData(0);
         addEventTickets(0, 0);
         updateTotalPrice();
+
+        tvNextEventBooking = (TextView)findViewById(R.id.tv_next_event_booking);
+        tvNextEventBooking.setOnClickListener(this);
+
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.tv_next_event_booking:
+                if(noOfTickets>0) {
+                    Intent iNext = new Intent(this, GuestDetailActivity.class);
+                    Bundle bundleNext = new Bundle();
+                    bundleNext.putParcelable(EventDetailActivity.EVENT_OBJECT, event);
+                    bundleNext.putDouble(EVENT_TOTAL_TICKETS, noOfTickets);
+                    bundleNext.putDouble(EVENT_TOTAL_PRICE, total);
+                    bundleNext.putString(EVENT_DATE_SELECTED, dateString);
+                    bundleNext.putParcelable(EVENT_TIME_SELECTED, eventTime);
+                    bundleNext.putParcelableArrayList(EVENT_TICKETS_DESCRIPTION, prices);
+
+                    iNext.putExtras(bundleNext);
+                    startActivity(iNext);
+                }else{
+                    Toast.makeText(this,"Please select your ticket(s)",Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
 
     @Override
-    protected void onResume() {
+    protected void onResume(){
         super.onResume();
         if (toolbar != null)
             setLightToolbarIcons();
@@ -102,9 +140,10 @@ public class EventBookingDetailActivity extends BaseActivity {
             final TextView dayText = (TextView) view.findViewById(R.id.event_day);
             dayText.setVisibility(View.VISIBLE);
 
-            if (i == 0) {
+            if (i == 0){
                 dayText.setSelected(true);
                 dateLayoutSelectedLast = dayText;
+                dateString = dates.get(0);
             }
             TextView timeLayout = (TextView) view.findViewById(R.id.time_textview);
             timeLayout.setVisibility(View.GONE);
@@ -114,6 +153,7 @@ public class EventBookingDetailActivity extends BaseActivity {
             dayText.setText(date);
             view.setTag(i);
             dateContainer.addView(view);
+            dateContainer.setTag(i+"");
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -121,6 +161,7 @@ public class EventBookingDetailActivity extends BaseActivity {
                     if (dateLayoutSelectedLast != null) {
                         dateLayoutSelectedLast.setSelected(false);
                     }
+                    dateString = dates.get(Integer.parseInt(v.getTag().toString()));
                     dayText.setSelected(true);
                     dateLayoutSelectedLast = dayText;
                     addTimeContainerData(position);
@@ -133,9 +174,9 @@ public class EventBookingDetailActivity extends BaseActivity {
 
     public void addTimeContainerData(final int position) {
         LinearLayout timeContainer = (LinearLayout) findViewById(R.id.time_container);
-        ArrayList<EventTime> timings = eventTimes.get(dates.get(position));
+        timings = eventTimes.get(dates.get(position));
         timeContainer.removeAllViews();
-        for (int i = 0; i < timings.size(); i++) {
+        for (int i = 0; i < timings.size(); i++){
 
             View view = LayoutInflater.from(this).inflate(R.layout.ticket_date_time_count_container, timeContainer, false);
             TextView dayText = (TextView) view.findViewById(R.id.event_day);
@@ -146,9 +187,11 @@ public class EventBookingDetailActivity extends BaseActivity {
             if (i == 0) {
                 timeLayout.setSelected(true);
                 timeLayoutLastSelected = timeLayout;
+                eventTime = timings.get(0);
             }
             view.setTag(i);
             timeContainer.addView(view);
+            timeContainer.setTag(i+"");
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -156,6 +199,7 @@ public class EventBookingDetailActivity extends BaseActivity {
                     if (timeLayoutLastSelected != null) {
                         timeLayoutLastSelected.setSelected(false);
                     }
+                    eventTime = timings.get(Integer.parseInt(v.getTag().toString()));
                     timeLayout.setSelected(true);
                     timeLayoutLastSelected = timeLayout;
                     addEventTickets(position, timeIndex);
@@ -184,9 +228,10 @@ public class EventBookingDetailActivity extends BaseActivity {
     }
 
     public void addEventTickets(int dateIndex, int timeIndex) {
-        ArrayList<EhPrices> prices = getEhPrices(dateIndex, timeIndex);
+        prices = getEhPrices(dateIndex, timeIndex);
         LinearLayout ticketTypes = (LinearLayout) findViewById(R.id.options_container);
-        for (int i = 0; i < prices.size(); i++) {
+        ticketTypes.removeAllViews();
+        for (int i = 0; i < prices.size(); i++){
             final EhPrices price = prices.get(i);
             View view = LayoutInflater.from(this).inflate(R.layout.eh_ticket_type_layout, ticketTypes, false);
             TextView ticketType = (TextView) view.findViewById(R.id.ticket_name);
@@ -205,6 +250,7 @@ public class EventBookingDetailActivity extends BaseActivity {
             }
             currency = price.currency;
             ticketCount.setText(0 + "");
+            ticketCount.setTag(i+"");
             ticketCountIncrement.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -212,6 +258,7 @@ public class EventBookingDetailActivity extends BaseActivity {
                     int ticketNo = Integer.parseInt(ticketCount.getText().toString());
                     if (ticketNo < 50) {
                         ticketNo++;
+                        prices.get(Integer.parseInt(ticketCount.getTag().toString())).count = ticketNo;
                         ticketCount.setText(ticketNo + "");
                         noOfTickets += 1;
                         if (price.discountValue < 0.01) {
@@ -229,6 +276,7 @@ public class EventBookingDetailActivity extends BaseActivity {
                     int ticketNo = Integer.parseInt(ticketCount.getText().toString());
                     if (ticketNo != 0) {
                         ticketNo--;
+                        prices.get(Integer.parseInt(ticketCount.getTag().toString())).count = ticketNo;
                         ticketCount.setText(ticketNo + "");
                         noOfTickets -= 1;
                         if (price.discountValue < 0) {
@@ -272,7 +320,6 @@ public class EventBookingDetailActivity extends BaseActivity {
 
         }
         return results;
-
     }
 
     public void updateTotalPrice() {

@@ -69,4 +69,5 @@ public class EventDescriptionSection implements Parcelable {
         }
         return eventDescriptionSections;
     }
+
 }

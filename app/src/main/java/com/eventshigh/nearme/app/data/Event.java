@@ -431,6 +431,7 @@ public class Event implements Parcelable {
             }
         }
 
+
         // Event timings.
         List<Long> eventTimings = new ArrayList<>();
         Date eventTiming = DateTimeUtils.mergeDateTime(eventJson.optString("date"),
@@ -450,6 +451,7 @@ public class Event implements Parcelable {
                 }
             }
         }
+
 
         if (eventTimings.size() > 2) {
             Collections.sort(eventTimings.subList(1, eventTimings.size()));
@@ -523,8 +525,10 @@ public class Event implements Parcelable {
                 } else {
                     minPrice = 0;
                     maxPrice = 0;
+
                 }
-                ehPrices.add(EhPrices.createObject(minPrice, maxPrice, ehPriceName, ehPriceNote, currency, value, discountValue, ehOccurences));
+                ehPrices.add(EhPrices.createObject(minPrice, maxPrice, ehPriceName, ehPriceNote, currency, value, discountValue, ehOccurences,0));
+
             }
         }
 

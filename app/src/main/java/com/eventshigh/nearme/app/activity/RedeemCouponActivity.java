@@ -268,12 +268,11 @@ public class RedeemCouponActivity extends BaseActivity {
                     if (selectedVoucherPos != -1) {
                         coupon.setErrorEnabled(false);
                         return true;
-                    } else {
+                    } else{
                         coupon.setErrorEnabled(true);
                         coupon.setError("No coupon selected.");
                         return false;
                     }
-
 
                 } else {
                     emailAdd.setErrorEnabled(true);

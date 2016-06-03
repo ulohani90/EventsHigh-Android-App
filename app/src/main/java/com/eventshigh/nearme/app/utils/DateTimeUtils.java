@@ -1,5 +1,7 @@
 package com.eventshigh.nearme.app.utils;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.data.Event;
@@ -31,18 +33,27 @@ public class DateTimeUtils {
         return false;
     }
 
-    public static class EventTime {
+    public static class EventTime implements Parcelable{
         public final String day;
         public final String date;
         public final
         @Nullable
         String time;
+        public long longtime;
+
+        public EventTime(String day, String date, @Nullable String time, long longtime) {
+            this.day = day;
+            this.date = date;
+            this.time = time;
+            this.longtime = longtime;
+        }
 
         public EventTime(String day, String date, @Nullable String time) {
             this.day = day;
             this.date = date;
             this.time = time;
         }
+
 
         public String toString() {
             return day + ", " + date + (time == null ? "" : " at " + time);
@@ -58,6 +69,32 @@ public class DateTimeUtils {
                 return true;
             return false;
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(day);
+            dest.writeString(date);
+            dest.writeString(time);
+            dest.writeLong(longtime);
+        }
+
+        // This is used to regenerate your object. All Parcelables must have
+        // a CREATOR that implements these two methods
+        public static final Parcelable.Creator<EventTime> CREATOR =
+                new Parcelable.Creator<EventTime>() {
+                    public EventTime createFromParcel(Parcel in) {
+                        return new EventTime(in.readString(), in.readString(),in.readString(), in.readLong());
+                    }
+                    public EventTime[] newArray(int size) {
+                        return new EventTime[size];
+                    }
+
+                };
     }
 
     public static final long MILLISECONDS_IN_A_DAY = 86400000;
@@ -132,7 +169,7 @@ public class DateTimeUtils {
         }
 
         return dateToEventTime(new Date(event.eventTimings[index]),
-                TimeZone.getTimeZone(event.city.timeZone));
+                TimeZone.getTimeZone(event.city.timeZone),event.eventTimings[index]);
     }
 
 
@@ -143,6 +180,15 @@ public class DateTimeUtils {
             return new EventTime(SIMPLE_DAY_FORMAT.format(date),
                     SIMPLE_DATE_FORMAT.format(date),
                     getTimeString(date, timeZone));
+        }
+    }
+    public static EventTime dateToEventTime(Date date, TimeZone timeZone, long longtime) {
+        synchronized (SIMPLE_DATE_FORMAT) {
+            SIMPLE_DAY_FORMAT.setTimeZone(timeZone);
+            SIMPLE_DATE_FORMAT.setTimeZone(timeZone);
+            return new EventTime(SIMPLE_DAY_FORMAT.format(date),
+                    SIMPLE_DATE_FORMAT.format(date),
+                    getTimeString(date, timeZone),longtime);
         }
     }
 
