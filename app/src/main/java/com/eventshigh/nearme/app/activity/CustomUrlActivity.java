@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.net.UrlQuerySanitizer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,12 +25,16 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class CustomUrlActivity extends BaseActivity {
     public static final String BLOG_HOST = "blog.eventshigh.com";
     public static final String EXTRA_TITLE_KEY =  CustomUrlActivity.class.getName() + ".title";
 
     private WebView webView;
+    private static boolean isPayment;
+
 
     public static void launchCustomUrl(Context context, Uri webUri, @Nullable String title) {
         Intent intent = new Intent(context,
@@ -37,6 +43,7 @@ public class CustomUrlActivity extends BaseActivity {
         if (title != null) {
             intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);
         }
+
         context.startActivity(intent);
     }
 
@@ -45,6 +52,7 @@ public class CustomUrlActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_url);
         webView = (WebView) findViewById(R.id.web_view);
+        isPayment = getIntent().getBooleanExtra(TicketReviewActivity.IS_PAYMENT,false);
         setupWebView(webView, this, true);
 
         // Set title.
@@ -62,7 +70,6 @@ public class CustomUrlActivity extends BaseActivity {
                 actionBar.setTitle(title);
             }
         }
-
         // If its notification action, report it accordingly.
         String action = getIntent().getAction();
         if (action != null && action.startsWith(NOTIFICATION_ACTION)) {
@@ -150,7 +157,7 @@ public class CustomUrlActivity extends BaseActivity {
 
         // Setup a new web view client so we can listen in on events and also customize
         // web view behavior.
-        webView.setWebViewClient(new EHWebViewClient(activity,
+        webView.setWebViewClient(new EHWebViewClient(activity,isPayment,
                 useProgressBar ? activity.findViewById(R.id.top_progress_bar) : null));
         webView.setWebChromeClient(new WebChromeClient());
         webSettings.setPluginState(PluginState.ON);
@@ -159,10 +166,12 @@ public class CustomUrlActivity extends BaseActivity {
     public static class EHWebViewClient extends WebViewClient {
         private BaseActivity activity;
         @Nullable private View progressBar;
+        private boolean isPayment;
 
-        public EHWebViewClient(BaseActivity activity, @Nullable View progressBar) {
+        public EHWebViewClient(BaseActivity activity,boolean isPayment, @Nullable View progressBar) {
             this.activity = activity;
             this.progressBar = progressBar;
+            this.isPayment = isPayment;
         }
 
         @Override
@@ -170,6 +179,24 @@ public class CustomUrlActivity extends BaseActivity {
             if (progressBar != null) {
                 activity.reportActionToAnalytics("startLoading");
                 progressBar.setVisibility(View.VISIBLE);
+            }
+            if(isPayment){
+                if (isPayment){
+                        Log.e("custom URLs ",url);
+                        if(url.toLowerCase().contains(("ticket.jsp").toLowerCase())){
+                            UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(url);
+                            Intent intent = new Intent();
+                            intent.putExtra(TicketReviewActivity.BOOKING_ID, sanitizer.getValue("booking"));
+                            intent.putExtra(TicketReviewActivity.IS_PAYMENT_SUCCESS, true);
+                            activity.setResult(RESULT_OK, intent);
+                            activity.finish();
+                        }else if(url.toLowerCase().contains(("failed.html").toLowerCase())){
+                            Intent intent = new Intent();
+                            intent.putExtra(TicketReviewActivity.IS_PAYMENT_SUCCESS,false);
+                            activity.setResult(RESULT_OK, intent);
+                            activity.finish();
+                        }
+                }
             }
         }
 
@@ -185,7 +212,7 @@ public class CustomUrlActivity extends BaseActivity {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             // Returning true here means that when opening new links from this page will open
             // the default app that can handle the link.
-            if (url.contains("www.eventshigh.com")) {
+            if (url.contains("www.eventshigh.com")){
                 activity.reportActionToAnalytics("openEhLink", url);
                 Intent intent = new Intent(activity, LaunchActivity.class);
                 intent.setAction(Intent.ACTION_VIEW);

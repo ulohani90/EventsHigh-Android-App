@@ -34,7 +34,7 @@ public class EventsHighEndpoints {
     private static final String API_ENDPOINT_FEATURED_FORMAT =
             API_URI_BASE + "api/get_featured_events/%s?mobile=1";
     private static final String API_ENDPOINT_EVENT_UBER_FORMAT =
-            API_URI_BASE + "api/get_event_uber_info/%s?mobile=1";
+            API_URI_BASE + "api/get_event_uber_info/%s?mobile=1&cmode=override";
     private static final String API_ENDPOINT_MULTI_EVENT_UBER_FORMAT =
             API_URI_BASE + "api/get_event_uber_infos/%s?mobile=1";
 
@@ -231,7 +231,7 @@ public class EventsHighEndpoints {
         return query.equalsIgnoreCase(QUERY_MY_INTEREST_EVENTS);
     }
 
-    public static boolean isFeaturedEventQuery(String query) {
+    public static boolean isFeaturedEventQuery(String query){
         return query.equalsIgnoreCase(QUERY_FEATURED);
     }
 

@@ -40,11 +40,10 @@ import java.util.List;
  */
 
 
-public class MovieReviewSubmitRequest extends JsonObjectRequest {
+public class MovieReviewSubmitRequest extends JsonObjectRequest{
 
     public static void submit(Context context,JSONObject data,
                               Priority priority, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
-
 
         try {
             URL url = new URL(EventsHighEndpoints.API_URI_BASE +"reviews/add");

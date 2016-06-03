@@ -44,7 +44,6 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
 
     Event event;
     Toolbar toolbar;
-    boolean isPromoCodeApplied;
     double total = 0;
     double noOfTickets = 0;
     TextView totalPrice;
@@ -145,6 +144,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                 dateLayoutSelectedLast = dayText;
                 dateString = dates.get(0);
             }
+
             TextView timeLayout = (TextView) view.findViewById(R.id.time_textview);
             timeLayout.setVisibility(View.GONE);
             SpannableString date = new SpannableString(eventTimes.get(dates.get(i)).get(0).day + "\n" + eventTimes.get(dates.get(i)).get(0).date);
@@ -166,6 +166,8 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                     dateLayoutSelectedLast = dayText;
                     addTimeContainerData(position);
                     addEventTickets(position, 0);
+                    total = noOfTickets = 0;
+                    updateTotalPrice();
                 }
             });
         }
@@ -203,7 +205,8 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                     timeLayout.setSelected(true);
                     timeLayoutLastSelected = timeLayout;
                     addEventTickets(position, timeIndex);
-
+                    total = noOfTickets = 0;
+                    updateTotalPrice();
                 }
             });
         }
@@ -216,9 +219,9 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         eventTimes = new HashMap<>();
         for (int i = 0; i < event.eventTimings.length; i++) {
             EventTime time = DateTimeUtils.getEventTime(event, i);
-            if (eventTimes.containsKey(time.date)) {
+            if (eventTimes.containsKey(time.date)){
                 eventTimes.get(time.date).add(time);
-            } else {
+            }else{
                 ArrayList<EventTime> timings = new ArrayList<>();
                 timings.add(time);
                 eventTimes.put(time.date, timings);
@@ -279,7 +282,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                         prices.get(Integer.parseInt(ticketCount.getTag().toString())).count = ticketNo;
                         ticketCount.setText(ticketNo + "");
                         noOfTickets -= 1;
-                        if (price.discountValue < 0) {
+                        if (price.discountValue < 0.01) {
                             total -= price.value;
                         } else {
                             total -= price.discountValue;
@@ -308,22 +311,24 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
     public ArrayList<EhPrices> getEhPrices(int dateIndex, int timeIndex) {
         ArrayList<EhPrices> results = new ArrayList<>();
         EventTime eventTime = eventTimes.get(dates.get(dateIndex)).get(timeIndex);
-        for (int i = 0; i < event.ehPrices.size(); i++) {
+        for (int i = 0; i < event.ehPrices.size(); i++){
             EhPrices ehPrices = event.ehPrices.get(i);
-            for (int j = 0; j < event.ehPrices.get(i).occurences.size(); j++) {
-                EventTime time = DateTimeUtils.dateToEventTime(new Date(ehPrices.occurences.get(j)), TimeZone.getTimeZone(event.city.timeZone));
-                if (eventTime.equals(time)) {
-                    results.add(ehPrices);
+            long eventTimeLong = System. currentTimeMillis();
+            if(ehPrices.validityStart<=eventTimeLong && ehPrices.validityStop>eventTimeLong){
+                for (int j = 0; j < event.ehPrices.get(i).occurences.size(); j++) {
+                    EventTime time = DateTimeUtils.dateToEventTime(new Date(ehPrices.occurences.get(j)), TimeZone.getTimeZone(event.city.timeZone));
+                    if (eventTime.equals(time)) {
+                        results.add(ehPrices);
+                    }
                 }
-
             }
-
         }
         return results;
     }
 
-    public void updateTotalPrice() {
+    public void updateTotalPrice(){
         totalPrice.setText(currency + " " + Math.round(total));
         numberOfTickets.setText(Math.round(noOfTickets) + "");
     }
+
 }

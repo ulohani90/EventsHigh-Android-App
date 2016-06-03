@@ -40,7 +40,7 @@ public class GatewayUrlRequest extends StringRequest{
                               Priority priority, Response.Listener<String> listener, Response.ErrorListener errorListener) {
 
         try {
-            URL url = new URL(EventsHighEndpoints.GATEWAY_URI_BASE +"gateway");
+            URL url = new URL(EventsHighEndpoints.GATEWAY_URI_BASE);
             Uri uri = Uri.parse(url.toURI().toString());
 
             GatewayUrlRequest request =
@@ -75,13 +75,13 @@ public class GatewayUrlRequest extends StringRequest{
     @Override
     public Map<String, String> getHeaders() throws AuthFailureError {
         Map<String, String> mapHeader = new HashMap<String,String>();
-        mapHeader.put("Content-Type","multipart/form-data");
+        mapHeader.put("Content-Type","application/x-www-form-urlencoded");
         return mapHeader;
     }
 
     @Override
     public String getBodyContentType() {
-        return "multipart/form-data";
+        return "application/x-www-form-urlencoded";
     }
 
     @Override
@@ -90,9 +90,11 @@ public class GatewayUrlRequest extends StringRequest{
     }
 
     @Override
-    protected Response<String> parseNetworkResponse(NetworkResponse response) {
-        String urlLocation = response.headers.get("Location");
+    protected Response<String> parseNetworkResponse(NetworkResponse response){
+        String urlLocation = response.statusCode + "";
+        Log.e("Gateway Url",urlLocation);
             return Response.success(urlLocation,
                     HttpHeaderParser.parseCacheHeaders(response));
     }
+
 }

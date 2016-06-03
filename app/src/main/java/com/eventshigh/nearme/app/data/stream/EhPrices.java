@@ -25,8 +25,11 @@ public class EhPrices implements Parcelable{
     public double value;
     public double discountValue;
     public int count = 0;
+    public Long validityStart;
+    public Long validityStop;
 
-    public EhPrices(Parcel in) {
+
+    public EhPrices(Parcel in){
         this.min = in.readDouble();
         this.max = in.readDouble();
         this.name = in.readString();
@@ -34,12 +37,15 @@ public class EhPrices implements Parcelable{
         this.currency = in.readString();
         this.value = in.readDouble();
         this.discountValue = in.readDouble();
+        this.validityStart = in.readLong();
+        this.validityStop = in.readLong();
         this.occurences = new ArrayList<>();
         in.readList(occurences, Long.class.getClassLoader());
         this.count = in.readInt();
     }
 
-    public EhPrices(double min, double max, String name, String note, String currency, double value, double discountValue, ArrayList<Long> occurences,int count) {
+    public EhPrices(double min, double max, String name, String note, String currency, double value, double discountValue, ArrayList<Long> occurences,
+                    int count, long validityStart, long validityStop) {
         this.min = min;
         this.max = max;
         this.name = name;
@@ -47,12 +53,16 @@ public class EhPrices implements Parcelable{
         this.currency = currency;
         this.value = value;
         this.discountValue = discountValue;
+        this.validityStart = validityStart;
+        this.validityStop = validityStop;
         this.occurences = occurences;
         this.count = count;
     }
 
-    public static EhPrices createObject(double min, double max, String name, String note, String currency, double value, double discountValue, ArrayList<Long> occurences, int count) {
-        return new EhPrices(min, max, name, note, currency, value, discountValue, occurences, count);
+    public static EhPrices createObject(double min, double max, String name, String note, String currency,
+                                        double value, double discountValue, ArrayList<Long> occurences, int count,
+                                        long validityStart, long validityStop) {
+        return new EhPrices(min, max, name, note, currency, value, discountValue, occurences, count, validityStart, validityStop);
     }
 
     @Override
@@ -69,6 +79,8 @@ public class EhPrices implements Parcelable{
         dest.writeString(currency);
         dest.writeDouble(value);
         dest.writeDouble(discountValue);
+        dest.writeLong(validityStart);
+        dest.writeLong(validityStop);
         dest.writeList(occurences);
         dest.writeInt(count);
     }
@@ -82,6 +94,5 @@ public class EhPrices implements Parcelable{
                     return new EhPrices[size];
                 }
             };
-
 
 }

@@ -35,7 +35,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="80dp"
+                android:minHeight="60dp"
                 android:orientation="horizontal">
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -95,11 +95,15 @@
                         android:text="Booking ID"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
                         android:drawablePadding="4dp"/>
                     <TextView
                         android:id="@+id/tv_event_booking_id"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:background="@color/red_movie_text_color"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -117,7 +121,8 @@
                     <TextView
                         android:id="@+id/tv_event_guest_name"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:textSize="8sp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -131,11 +136,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:drawableTop="@drawable/email"
-                        android:drawablePadding="4dp"/>
+                        android:drawablePadding="8dp"/>
                     <TextView
                         android:id="@+id/tv_event_guest_email"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:textSize="8sp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -149,11 +155,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:drawableTop="@drawable/call_yellow"
-                        android:drawablePadding="4dp"/>
+                        android:drawablePadding="6dp"/>
                     <TextView
                         android:id="@+id/tv_event_guest_phone"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:textSize="8sp"/>
                 </LinearLayout>
 
             </LinearLayout>
@@ -164,29 +171,30 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/movie_text_grey_color"/>
+                android:background="#e5e5e5"/>
 
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:minHeight="80dp"
+                android:minHeight="60dp"
                 android:layout_marginTop="10dp">
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal">
+                    android:layout_weight="1">
                     <TextView
                         android:text="DATE"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:drawableLeft="@drawable/calc_yellow"
                         android:drawablePadding="4dp"
-                        android:textStyle="bold"/>
+                        android:gravity="center_vertical"
+                        android:textColor="#666666"
+                        android:fontFamily="sens-serif-medium"/>
                     <TextView
                         android:id="@+id/tv_event_date"
                         android:layout_width="wrap_content"
@@ -205,7 +213,9 @@
                         android:layout_height="wrap_content"
                         android:drawableLeft="@drawable/time_yellow"
                         android:drawablePadding="4dp"
-                        android:textStyle="bold"/>
+                        android:textColor="#666666"
+                        android:gravity="center_vertical"
+                        android:fontFamily="sens-serif-medium"/>
                     <TextView
                         android:id="@+id/tv_event_time"
                         android:layout_width="wrap_content"
@@ -217,14 +227,16 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_weight="1"
-                    android:gravity="center_horizontal">
+                    android:gravity="right">
                     <TextView
                         android:text="SEATS"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:drawableLeft="@drawable/seat"
                         android:drawablePadding="4dp"
-                        android:textStyle="bold"/>
+                        android:textColor="#666666"
+                        android:gravity="center_vertical"
+                        android:fontFamily="sens-serif-medium"/>
                     <TextView
                         android:id="@+id/tv_ticket_description"
                         android:layout_width="wrap_content"
@@ -237,13 +249,14 @@
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
-                android:background="@color/movie_text_grey_color"/>
+                android:background="#e5e5e5"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center">
                 <TextView
+                    android:id="@+id/tv_event_map_location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -270,6 +283,7 @@
             android:src="@drawable/paid"/>
 
         <LinearLayout
+            android:id="@+id/ll_share_ticket_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/yellow_rectamgle_bg"

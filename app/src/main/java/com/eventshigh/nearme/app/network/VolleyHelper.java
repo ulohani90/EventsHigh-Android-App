@@ -18,6 +18,7 @@ import com.squareup.okhttp.OkHttpClient;
 public class VolleyHelper {
 
     private static VolleyHelper instance;
+
     public static synchronized VolleyHelper getInstance(Context context) {
         if (instance == null) {
             instance = new VolleyHelper(context);
@@ -31,11 +32,11 @@ public class VolleyHelper {
         requestQueue = Volley.newRequestQueue(context.getApplicationContext(), new OkHttpStack(new OkHttpClient()));
     }
 
-    public static RequestQueue getRequestQueue(Context context) {
+    public static RequestQueue getRequestQueue(Context context){
         return getInstance(context).requestQueue;
     }
 
-    public static <T> void addToRequestQueue(Context context, Request<T> req) {
+    public static <T> void addToRequestQueue(Context context, Request<T> req){
         getRequestQueue(context).add(req);
     }
 
