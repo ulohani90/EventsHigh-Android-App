@@ -57,6 +57,7 @@
                             android:layout_height="wrap_content"
                             android:text="EVENTS NAME"
                             android:textSize="16sp"
+                            android:textColor="#666666"
                             android:fontFamily="sans-serif-medium"
                             android:layout_marginBottom="2dp"/>
                         <TextView
@@ -100,8 +101,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal">
+                        android:layout_weight="1">
                         <TextView
                             android:text="DATE"
                             android:layout_width="wrap_content"
@@ -139,7 +139,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:layout_weight="1"
-                        android:gravity="center_horizontal">
+                        android:gravity="right">
                         <TextView
                             android:text="SEATS"
                             android:layout_width="wrap_content"
@@ -159,7 +159,7 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
-                    android:background="@color/movie_text_grey_color"/>
+                    android:background="#e5e5e5"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -171,7 +171,8 @@
                         android:text="TOTAL AMOUNT"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textStyle="bold"
+                        android:fontFamily="sens-serif-medium"
+                        android:textColor="#666666"
                         android:textSize="16dp"/>
                     <TextView
                         android:id="@+id/tv_total_amt"
@@ -232,6 +233,7 @@
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
                         android:text="PERSONAL DETAILS"
+                        android:textColor="#666666"
                         android:fontFamily="sans-serif-medium"
                         android:layout_marginBottom="4dp"/>
                 </LinearLayout>

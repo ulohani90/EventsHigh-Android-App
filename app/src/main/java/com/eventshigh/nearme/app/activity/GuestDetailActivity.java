@@ -9,17 +9,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.stream.AdditionalTicketField;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,15 +32,18 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
 
     public static final String GUEST_DETAIL_ARRAY = "guest_detail_array";
 
-    private static int noOfGuest;
-    List<LinearLayout> listGuestDetailLayout;
+    private static int noOfGuestDetails;
 
+    List<LinearLayout> listGuestDetailLayout;
+    List<LinearLayout> listAdditionalFieldsLayout;
+
+    List<AdditionalTicketField> additionalTicketFieldList;
     String[] tsize = {"S","M","L","XL","XXL"};
     int [] noTSize;
     JSONArray jsonArrayGuestDetail;
     Event event;
     Bundle bundle;
-    LinearLayout ll_guest_detail_layout_container;
+    LinearLayout llGuestDetailLayoutContainer;
     Button btnNextGuestDetails;
     ScrollView svDetailCards;
 
@@ -48,7 +55,9 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
         mapViews();
         bundle = getIntent().getExtras();
         event = bundle.getParcelable(EventDetailActivity.EVENT_OBJECT);
-        noOfGuest = (int)bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_TICKETS);
+        additionalTicketFieldList = event.additionalTicketFieldList;
+        noOfGuestDetails = (event.isRequestPerAttendeeData())?
+                (int)bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_TICKETS):1;
         addGuestCradLayouts();
         btnNextGuestDetails.setOnClickListener(this);
     }
@@ -69,15 +78,17 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
 
     private void mapViews(){
         svDetailCards = (ScrollView)findViewById(R.id.sv_guest_detail_cards);
-        ll_guest_detail_layout_container = (LinearLayout)findViewById(R.id.ll_guest_detail_layout_container);
+        llGuestDetailLayoutContainer = (LinearLayout)findViewById(R.id.ll_guest_detail_layout_container);
         btnNextGuestDetails = (Button)findViewById(R.id.btn_guest_detail_next);
     }
 
+    //add user detail
     private void addGuestCradLayouts(){
-        noTSize = new int[noOfGuest];
-        listGuestDetailLayout = new ArrayList<LinearLayout>();
+        noTSize = new int[noOfGuestDetails];
+        listGuestDetailLayout = new ArrayList<>();
+        listAdditionalFieldsLayout = new ArrayList<>();
 
-        for(int i=0;i< noOfGuest;i++){
+        for(int i=0;i< noOfGuestDetails;i++){
             LinearLayout llGuestLayout = (LinearLayout)getLayoutInflater().inflate(R.layout.card_guest_detail,null);
             i++;((TextView)llGuestLayout.findViewById(R.id.tv_guest_no)).setText("Guest "+i);i--;
             final TextView tvTsize = (TextView)llGuestLayout.findViewById(R.id.tv_tsize);
@@ -103,11 +114,39 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
                     tvTsize.setText(tsize[noTSize[i]]);
                 }
             });
-            ll_guest_detail_layout_container.addView(llGuestLayout);
+            addAditionalFieldViews(llGuestLayout);
+            llGuestDetailLayoutContainer.addView(llGuestLayout);
             listGuestDetailLayout.add(llGuestLayout);
         }
     }
 
+
+    //mapping and creating additional field programmatically
+    private void addAditionalFieldViews(LinearLayout llGuestDetailCard) {
+        for (AdditionalTicketField additionalTicketField : additionalTicketFieldList) {
+            if (additionalTicketField.getType().equalsIgnoreCase("Text")){
+                LinearLayout textFieldLinearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.additional_ticket_text_field, null);
+                TextView tvTextField  = (TextView)textFieldLinearLayout.findViewById(R.id.tv_guest_text);
+                tvTextField.setHint(additionalTicketField.getName());
+                llGuestDetailCard.addView(textFieldLinearLayout);
+                listAdditionalFieldsLayout.add(textFieldLinearLayout);
+            }else if(additionalTicketField.getType().equalsIgnoreCase("One-of")){
+                LinearLayout radioLinearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.additional_ticket_radio_group, null);
+                TextView tvRadioTitle = (TextView)radioLinearLayout.findViewById(R.id.tv_guest_radio_name);
+                tvRadioTitle.setText(additionalTicketField.getName());
+                RadioGroup rgOneOf  = (RadioGroup)radioLinearLayout.findViewById(R.id.tv_guest_radio_group);
+                for(String option: additionalTicketField.getOptions()){
+                    RadioButton radioButton = new RadioButton(this);
+                    radioButton.setText(option);
+                    rgOneOf.addView(radioButton);
+                }
+                llGuestDetailCard.addView(radioLinearLayout);
+                listAdditionalFieldsLayout.add(radioLinearLayout);
+            }
+        }
+    }
+
+    //method to check if all field are filled while submitting guest details
     private boolean checkAllEditTextFilled(){
         jsonArrayGuestDetail = new JSONArray();
         boolean is_details_complete = true;
@@ -153,6 +192,31 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
                     Toast.makeText(this,"All fields are mandatory",Toast.LENGTH_SHORT).show();
                     break;
                 }
+                for(AdditionalTicketField additionalTicketField: additionalTicketFieldList){
+                    if(additionalTicketField.getType().equalsIgnoreCase("Text")){
+                        LinearLayout llTextField = (LinearLayout)ll_guest_detail.findViewWithTag(additionalTicketField.getName());
+                        TextView tvTextField = (TextView)llTextField.findViewById(R.id.tv_guest_text);
+                        if (!Utils.checkIfStringEmpty(tvTextField.getText().toString())){
+                            jsonObject.put(additionalTicketField.getName(), ((TextView) ll_guest_detail.findViewById(R.id.et_guest_phone)).getText().toString());
+                        }else{
+                            is_details_complete = false;
+                            focusOnView(tvTextField);
+                            Toast.makeText(this, "All fields are mandatory", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                    }else if(additionalTicketField.getType().equalsIgnoreCase("one-off")){
+                        LinearLayout llTextField = (LinearLayout)ll_guest_detail.findViewWithTag(additionalTicketField.getName());
+                        TextView tvTextField = (TextView)llTextField.findViewById(R.id.tv_guest_text);
+                        if (!Utils.checkIfStringEmpty(tvTextField.getText().toString())){
+                            jsonObject.put(additionalTicketField.getName(), ((TextView) ll_guest_detail.findViewById(R.id.et_guest_phone)).getText().toString());
+                        }else{
+                            is_details_complete = false;
+                            focusOnView(tvTextField);
+                            Toast.makeText(this, "All fields are mandatory", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                    }
+                }
             }catch (JSONException e){
                 is_details_complete = false;
             }
@@ -171,8 +235,8 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
         return super.onOptionsItemSelected(item);
     }
 
+    //to get scroll to not-filled view
     private final void focusOnView(final View view) {
-
         new Handler().post(new Runnable() {
             @Override
             public void run(){

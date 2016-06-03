@@ -259,7 +259,6 @@ public class DateTimeUtils {
         return date.getTime();
     }
 
-
     public static String getRemainingTime(long milliseconds) {
         StringBuilder builder = new StringBuilder();
         long timeDifference = milliseconds - System.currentTimeMillis();

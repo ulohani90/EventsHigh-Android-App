@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.data.stream.AdditionalTicketField;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -96,6 +97,11 @@ public class Event implements Parcelable {
 
     public final ArrayList<MovieUserReviewObject> reviewObjects;
 
+    @Nullable
+    public final String requestPerAttendeeData;
+    @Nullable
+    public final List<AdditionalTicketField> additionalTicketFieldList;
+
     public Event(String id, City city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, @Nullable String sourceUrl,
@@ -108,7 +114,8 @@ public class Event implements Parcelable {
                  String organizerName, String organizerPhone, String organizerWebsite,
                  String organizerEmail, String organizerLink, ArrayList<EhPrices> ehPrices,
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
-                 EventDescriptionSection[] descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects) {
+                 EventDescriptionSection[] descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
+                 @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -153,6 +160,9 @@ public class Event implements Parcelable {
 
         this.descriptionSections = descriptionSections;
         this.reviewObjects = reviewObjects;
+
+        this.requestPerAttendeeData = Utils.checkIfUnknown(requestPerAttendeeData);
+        this.additionalTicketFieldList = additionalTicketFieldList;
     }
 
 
@@ -203,6 +213,9 @@ public class Event implements Parcelable {
         this.descriptionSections = in.createTypedArray(EventDescriptionSection.CREATOR);
         reviewObjects = new ArrayList<>();
         in.readTypedList(reviewObjects, MovieUserReviewObject.CREATOR);
+        this.requestPerAttendeeData = in.readString();
+        additionalTicketFieldList = new ArrayList<>();
+        in.readTypedList(additionalTicketFieldList,AdditionalTicketField.CREATOR);
     }
 
     public Uri getEventDetailsURI() {
@@ -211,6 +224,11 @@ public class Event implements Parcelable {
 
     public Uri getEventShareURI() {
         return getEventShareURI(null);
+    }
+
+    public boolean isRequestPerAttendeeData(){
+        if(Utils.checkIfStringEmpty(requestPerAttendeeData))return true;
+        else return requestPerAttendeeData.equals("on");
     }
 
     public Uri getEventShareURI(@Nullable String src) {
@@ -326,15 +344,17 @@ public class Event implements Parcelable {
         dest.writeString(priceNote);
         dest.writeTypedArray(descriptionSections, flags);
         dest.writeTypedList(reviewObjects);
+
+        dest.writeString(requestPerAttendeeData);
+        dest.writeTypedList(additionalTicketFieldList);
     }
 
     // This is used to regenerate your object. All Parcelables must have
     // a CREATOR that implements these two methods
     public static final Parcelable.Creator<Event> CREATOR =
             new Parcelable.Creator<Event>() {
-                public Event createFromParcel(Parcel in) {
+                public Event createFromParcel(Parcel in){
                     return new Event(in);
-
                 }
 
                 public Event[] newArray(int size) {
@@ -366,7 +386,7 @@ public class Event implements Parcelable {
         String booking_text = eventJson.optString("booking_text");
         String img_url = eventJson.optString("img_url");
         if ((source_url != null && source_url.toLowerCase().contains("eventviva")) ||
-                (img_url != null && img_url.endsWith("missing.png"))) {
+                (img_url != null && img_url.endsWith("missing.png"))){
             img_url = null;
         }
 
@@ -436,17 +456,17 @@ public class Event implements Parcelable {
         List<Long> eventTimings = new ArrayList<>();
         Date eventTiming = DateTimeUtils.mergeDateTime(eventJson.optString("date"),
                 eventJson.optString("start_time"), city.timeZone);
-        if (eventTiming != null) {
+        if (eventTiming != null){
             eventTimings.add(eventTiming.getTime());
         }
 
         JSONArray upcoming_occurrences = eventJson.optJSONArray("upcoming_occurrences");
-        if (upcoming_occurrences != null) {
+        if (upcoming_occurrences != null){
             for (int i = 0; i < upcoming_occurrences.length(); i++) {
                 eventTiming = DateTimeUtils.mergeDateTime(
                         upcoming_occurrences.getJSONObject(i).optString("date"),
                         upcoming_occurrences.getJSONObject(i).optString("start_time"), city.timeZone);
-                if (eventTiming != null && !eventTimings.contains(eventTiming.getTime())) {
+                if (eventTiming != null && !eventTimings.contains(eventTiming.getTime())){
                     eventTimings.add(eventTiming.getTime());
                 }
             }
@@ -497,7 +517,7 @@ public class Event implements Parcelable {
                 maxPrice = -1;
                 JSONObject ehPrice = prices.getJSONObject(j);
                 currency = ehPrice.optString("currency", "\u20B9");
-                if (currency.equalsIgnoreCase("INR")) {
+                if (currency.equalsIgnoreCase("INR")){
                     currency = "\u20B9";
                 }
                 ArrayList<Long> ehOccurences = new ArrayList<>();
@@ -513,6 +533,12 @@ public class Event implements Parcelable {
                 ehPriceNote = ehPrice.optString("note", "");
                 double discountValue = ehPrice.optDouble("discount_value", -1);
                 double value = ehPrice.optDouble("value", -1);
+                String startVaild = ehPrice.getString("validity_start");
+                String endValid = ehPrice.getString("validity_end");
+                if(Utils.checkIfStringEmpty(startVaild))startVaild = "1907-01-01 00:00:00.0";
+                if(Utils.checkIfStringEmpty(endValid))endValid = "2099-01-01 00:00:00.0";
+                long validityStart = DateTimeUtils.parseOfferTime(startVaild);
+                long validityEnd = DateTimeUtils.parseOfferTime(endValid);
                 /*if (value < 0.01) {
                     value = ehPrice.optDouble("value", -1);
                 }*/
@@ -525,14 +551,17 @@ public class Event implements Parcelable {
                 } else {
                     minPrice = 0;
                     maxPrice = 0;
-
                 }
-                ehPrices.add(EhPrices.createObject(minPrice, maxPrice, ehPriceName, ehPriceNote, currency, value, discountValue, ehOccurences,0));
 
-            }
+                long timenow = System.currentTimeMillis();
+                if(validityStart <= timenow && validityEnd > timenow)
+                ehPrices.add(EhPrices.createObject(minPrice, maxPrice, ehPriceName, ehPriceNote, currency, value, discountValue, ehOccurences,0,
+                        validityStart,validityEnd));
+                }
+
         }
 
-        if (mashup != null && ehPrices.size() == 0) {
+        if (mashup != null && ehPrices.size() == 0){
             JSONObject priceInfo = mashup.optJSONObject("price_info");
             if (priceInfo != null) {
                 if (priceInfo.optString("type").equalsIgnoreCase("free")) {
@@ -594,6 +623,18 @@ public class Event implements Parcelable {
             }
         }
 
+
+        //Attributes
+        List<AdditionalTicketField> additionalTicketFieldList = new ArrayList<>();
+        String requestPerAttendeeData = eventJson.optString("request_per_attendee_data", "");
+        if(eventJson.has("additional_fields")) {
+            JSONArray additionalFieldsJsonArray = eventJson.getJSONArray("additional_fields");
+            for (int j = 0; j < additionalFieldsJsonArray.length(); j++) {
+                AdditionalTicketField additionalTicketField = AdditionalTicketField.fromJsonObject(additionalFieldsJsonArray.getJSONObject(j));
+                additionalTicketFieldList.add(additionalTicketField);
+            }
+        }
+
         return new Event(id,
                 city,
                 title,
@@ -635,7 +676,9 @@ public class Event implements Parcelable {
                 ehPriceName,
                 ehPriceNote,
                 descriptionSections.toArray(new EventDescriptionSection[descriptionSections.size()]),
-                reviews
+                reviews,
+                requestPerAttendeeData,
+                additionalTicketFieldList
         );
     }
 
@@ -685,7 +728,7 @@ public class Event implements Parcelable {
 
     public Intent getShowDirectionsOnMapIntent() {
         String query = getMapQuery();
-        if (query == null) {
+        if (query == null){
             return null;
         }
 
