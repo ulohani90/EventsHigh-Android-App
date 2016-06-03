@@ -82,6 +82,7 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
         btnNextGuestDetails = (Button)findViewById(R.id.btn_guest_detail_next);
     }
 
+    //add user detail
     private void addGuestCradLayouts(){
         noTSize = new int[noOfGuestDetails];
         listGuestDetailLayout = new ArrayList<>();
@@ -131,6 +132,8 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
                 listAdditionalFieldsLayout.add(textFieldLinearLayout);
             }else if(additionalTicketField.getType().equalsIgnoreCase("One-of")){
                 LinearLayout radioLinearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.additional_ticket_radio_group, null);
+                TextView tvRadioTitle = (TextView)radioLinearLayout.findViewById(R.id.tv_guest_radio_name);
+                tvRadioTitle.setText(additionalTicketField.getName());
                 RadioGroup rgOneOf  = (RadioGroup)radioLinearLayout.findViewById(R.id.tv_guest_radio_group);
                 for(String option: additionalTicketField.getOptions()){
                     RadioButton radioButton = new RadioButton(this);
