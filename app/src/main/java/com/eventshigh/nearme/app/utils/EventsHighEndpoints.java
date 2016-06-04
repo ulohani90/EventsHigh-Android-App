@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class EventsHighEndpoints {
     public static final String WEB_URI_BASE = "https://www.eventshigh.com/";
     public static final String API_URI_BASE = "https://api.eventshigh.com/";
-    public static final String GATEWAY_URI_BASE = "http://192.168.0.123:8000/";
+    public static final String GATEWAY_URI_BASE = "http://192.168.0.112:8000/";
 
     private static final String API_ENDPOINT_DATE_FORMAT =
             API_URI_BASE + "api/date/%s/%s?limit=100&mobile=1";
@@ -191,7 +191,7 @@ public class EventsHighEndpoints {
 
     }
 
-    public static String getApiEndpointEventsUber(List<String> eventIds) {
+    public static String getApiEndpointEventsUber(List<String> eventIds){
         Collections.sort(eventIds);
         return String.format(API_ENDPOINT_MULTI_EVENT_UBER_FORMAT, StringUtils.toCsvString(eventIds));
     }

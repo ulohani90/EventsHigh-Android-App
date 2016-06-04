@@ -326,7 +326,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
         */
 
         private void doPost(){
-            try {
+            try{
                 URL url = new URL(EventsHighEndpoints.GATEWAY_URI_BASE+"gateway?cmode=override");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
@@ -351,8 +351,6 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
                 for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketName", ehp.name + ""));
                 for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketValue", ehp.value + ""));
                 for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketNum", ehp.count + ""));
-
-
 
                 int noOfCards = arrayGuestDetails.length();
                 Iterator<String> iter = arrayGuestDetails.getJSONObject(0).keys();
