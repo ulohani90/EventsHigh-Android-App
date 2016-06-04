@@ -346,7 +346,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
                 ISO_8601_DATE_FORMAT.setTimeZone(ist);
                 String nowAsISO = ISO_8601_DATE_FORMAT.format(new Date(eventTime.longtime));
 
-                params.add(new BasicNameValuePair("datetime", nowAsISO));
+                params.add(new BasicNameValuePair("datetime", eventTime.longtime+""));
 
                 for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketName", ehp.name + ""));
                 for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketValue", ehp.value + ""));

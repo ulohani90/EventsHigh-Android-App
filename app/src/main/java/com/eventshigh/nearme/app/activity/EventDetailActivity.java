@@ -459,7 +459,7 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
         new UserActionHelper(this).recordAction(EventAction.BOOK, event.id);
 
         final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
-        if (event.bookingUrl.contains("ticketing.eventshigh.com")) {
+        if (event.bookingUrl.contains("https://ticketing.eventshigh.com/checkout3.jsp?eid="+event.id)) {
             /*
             bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
             bookingUriBuilder.appendQueryParameter("name", userInfo.name);
