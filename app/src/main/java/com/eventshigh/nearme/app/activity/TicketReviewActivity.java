@@ -183,10 +183,10 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if (resultCode == RESULT_OK && requestCode == PAYMENT_REQ_CODE) {
-            if (data.hasExtra(IS_PAYMENT_SUCCESS)){
-                Toast.makeText(this, "Payment successful",
-                        Toast.LENGTH_SHORT).show();
-                callConfirmationActivity(data.getStringExtra(BOOKING_ID));
+            if (data.hasExtra(IS_PAYMENT_SUCCESS) & data.getBooleanExtra(IS_PAYMENT_SUCCESS,false)){
+                    Toast.makeText(this, "Payment successful",
+                            Toast.LENGTH_SHORT).show();
+                    callConfirmationActivity(data.getStringExtra(BOOKING_ID));
             }else{
                 Toast.makeText(this, "You payment was unccessful. Please try again",
                         Toast.LENGTH_LONG).show();
