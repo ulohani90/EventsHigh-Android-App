@@ -5,11 +5,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.stream.AdditionalTicketField;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;
@@ -60,8 +62,19 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
                 (int) bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_TICKETS) : 1;
         addGuestCradLayouts();
         btnNextGuestDetails.setOnClickListener(this);
+        preFillDetails();
     }
 
+    private void preFillDetails(){
+        LinearLayout llFirstLayout = listGuestDetailLayout.get(0);
+        String firstGuestName = new Account(this).getUserInfo().name;
+        if(!Utils.checkIfStringEmpty(firstGuestName))
+        ((TextView)llFirstLayout.findViewById(R.id.et_guest_name)).setText(firstGuestName);
+
+        String firstGuestPhoneNo = new Account(this).getUserInfo().phoneNo;
+        if(!Utils.checkIfStringEmpty(firstGuestPhoneNo))
+        ((TextView)llFirstLayout.findViewById(R.id.et_guest_phone)).setText(firstGuestPhoneNo);
+    }
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -109,7 +122,15 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
                 tvTextField.setHint(additionalTicketField.getName());
                 llGuestDetailCard.addView(textFieldLinearLayout);
                 listAdditionalFieldsLayout.add(textFieldLinearLayout);
-            } else if (additionalTicketField.getType().equalsIgnoreCase("One-of")) {
+            }else if(additionalTicketField.getType().equalsIgnoreCase("Number")){
+                LinearLayout textFieldLinearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.additional_ticket_text_field, null);
+                textFieldLinearLayout.setTag(additionalTicketField.getName());
+                TextView tvTextField = (TextView) textFieldLinearLayout.findViewById(R.id.tv_guest_text);
+                tvTextField.setHint(additionalTicketField.getName());
+                tvTextField.setInputType(InputType.TYPE_CLASS_PHONE);
+                llGuestDetailCard.addView(textFieldLinearLayout);
+                listAdditionalFieldsLayout.add(textFieldLinearLayout);
+            }else if (additionalTicketField.getType().equalsIgnoreCase("One-of")){
                 LinearLayout radioLinearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.additional_ticket_radio_group, null);
                 radioLinearLayout.setTag(additionalTicketField.getName());
                 TextView tvRadioTitle = (TextView) radioLinearLayout.findViewById(R.id.tv_guest_radio_name);
@@ -118,6 +139,7 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
                 for (int i = 0; i < additionalTicketField.getOptions().size(); i++) {
                     String option = additionalTicketField.getOptions().get(i);
                     RadioButton radioButton = new RadioButton(this);
+                    radioButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                     radioButton.setText(option);
                     radioButton.setId(i);
                     radioButton.setTextColor(Color.parseColor("#353535"));
@@ -179,7 +201,7 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
                 }
 
                 for (AdditionalTicketField additionalTicketField : additionalTicketFieldList) {
-                    if (additionalTicketField.getType().equalsIgnoreCase("Text")) {
+                    if (additionalTicketField.getType().equalsIgnoreCase("Text") || additionalTicketField.getType().equalsIgnoreCase("Number")) {
                         LinearLayout llTextField = (LinearLayout) ll_guest_detail.findViewWithTag(additionalTicketField.getName());
                         TextView tvTextField = (TextView) llTextField.findViewById(R.id.tv_guest_text);
                         if (!Utils.checkIfStringEmpty(tvTextField.getText().toString())) {

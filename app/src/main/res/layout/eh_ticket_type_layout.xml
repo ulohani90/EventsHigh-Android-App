@@ -49,10 +49,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:text="Rs 400"
         android:textColor="#353535"
-        android:textSize="14sp"
-        android:visibility="invisible" />
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/ticket_count_decrement"

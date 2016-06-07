@@ -169,6 +169,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginBottom="36dp"
                     android:background="@drawable/card_item_bg"
                     android:orientation="horizontal">
 
@@ -235,5 +236,15 @@
             android:textAllCaps="true"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_sold_out"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:text="Sold Out"
+            android:gravity="center"
+            android:background="@android:color/white"/>
+
     </FrameLayout>
 </LinearLayout>

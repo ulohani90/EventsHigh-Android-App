@@ -145,16 +145,19 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
         tvDate.setText(eventTime.date);
         tvTime.setText(eventTime.time);
         for(EhPrices ehp:prices){
-            discount += (ehp.discountValue*ehp.count);
+            if(ehp.discountValue > 0.01)
+            discount += ((ehp.value - ehp.discountValue)*ehp.count);
             if(ehp.count>0)
             seatDetails.append(ehp.count+" "+ehp.name+"\n");
         }
         tvSeats.setText(seatDetails);
+
         if(discount == 0){
             llAmtSave.setVisibility(View.GONE);
         }else{
-            tvSavedAmt.setText(" ₹"+discount);
+            tvSavedAmt.setText("You saved"+" ₹ "+discount);
         }
+
         addCards(arrayDetailCards);
     }
 
@@ -183,10 +186,10 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if (resultCode == RESULT_OK && requestCode == PAYMENT_REQ_CODE) {
-            if (data.hasExtra(IS_PAYMENT_SUCCESS)){
-                Toast.makeText(this, "Payment successful",
-                        Toast.LENGTH_SHORT).show();
-                callConfirmationActivity(data.getStringExtra(BOOKING_ID));
+            if (data.hasExtra(IS_PAYMENT_SUCCESS) & data.getBooleanExtra(IS_PAYMENT_SUCCESS,false)){
+                    Toast.makeText(this, "Payment successful",
+                            Toast.LENGTH_SHORT).show();
+                    callConfirmationActivity(data.getStringExtra(BOOKING_ID));
             }else{
                 Toast.makeText(this, "You payment was unccessful. Please try again",
                         Toast.LENGTH_LONG).show();
@@ -326,7 +329,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
         */
 
         private void doPost(){
-            try {
+            try{
                 URL url = new URL(EventsHighEndpoints.GATEWAY_URI_BASE+"gateway?cmode=override");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
@@ -349,10 +352,13 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
                 params.add(new BasicNameValuePair("datetime", eventTime.longtime+""));
 
                 for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketName", ehp.name + ""));
-                for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketValue", ehp.value + ""));
+                for (EhPrices ehp : prices)
+                    if(ehp.discountValue > 0.01)
+                        params.add(new BasicNameValuePair("ticketValue", ehp.discountValue + ""));
+                    else
+                        params.add(new BasicNameValuePair("ticketValue", ehp.value + ""));
+
                 for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketNum", ehp.count + ""));
-
-
 
                 int noOfCards = arrayGuestDetails.length();
                 Iterator<String> iter = arrayGuestDetails.getJSONObject(0).keys();
