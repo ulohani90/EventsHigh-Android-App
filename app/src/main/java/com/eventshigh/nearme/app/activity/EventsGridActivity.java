@@ -64,9 +64,54 @@ public class EventsGridActivity extends BaseContextActivity {
     public static final int FREE = 1;
     public static final int UPTO_250 = 2;
     public static final int PRICE_250_TO_750 = 3;
-    public static final int MORE_THAN_750 = 4;
+    public static final int PRICE_750_TO_1500 = 4;
+    public static final int MORE_THAN_1500 = 5;
 
     LinearLayout filtersContainer;
+
+    public static final String[] EXPLORE_TAGS = {
+            EventsHighEndpoints.QUERY_FEATURED,
+            EventCategory.NIGHTLIFE.categoryName,
+            EventCategory.THEATRE.categoryName,
+            EventCategory.MUSIC.categoryName,
+            EventCategory.KIDS_ENTERTAINMENT.categoryName,
+            EventCategory.TECH.categoryName,
+            EventCategory.SPORTS.categoryName,
+            EventCategory.HEALTH_WELLNESS.categoryName,
+            EventCategory.DANCE.categoryName,
+            EventCategory.ART.categoryName,
+            EventCategory.FOOD.categoryName,
+            EventCategory.LITERATURE.categoryName,
+
+    };
+
+    public static final String[] EXPLORE_TAGS_CHENNAI = {
+            EventCategory.NIGHTLIFE.categoryName,
+            EventCategory.THEATRE.categoryName,
+            EventCategory.MUSIC.categoryName,
+            EventCategory.TECH.categoryName,
+            EventCategory.SPORTS.categoryName,
+            EventCategory.HEALTH_WELLNESS.categoryName,
+            EventCategory.DANCE.categoryName,
+            EventCategory.ART.categoryName,
+            EventCategory.FOOD.categoryName,
+            EventCategory.LITERATURE.categoryName,
+
+    };
+
+    public static final String[] EXPLORE_TAGS_BANGALORE = {
+            EventsHighEndpoints.QUERY_FEATURED,
+            EventCategory.NIGHTLIFE.categoryName,
+            EventCategory.THEATRE.categoryName,
+            EventCategory.MUSIC.categoryName,
+            EventCategory.KIDS_ENTERTAINMENT.categoryName,
+            EventCategory.TECH.categoryName,
+            EventCategory.SPORTS.categoryName,
+            EventCategory.DANCE.categoryName,
+            EventCategory.ART.categoryName,
+            EventCategory.FOOD.categoryName,
+            EventCategory.LITERATURE.categoryName,
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,11 +272,12 @@ public class EventsGridActivity extends BaseContextActivity {
     public void addFiltersData() {
         isFiltersShown = true;
         final LinearLayout horizontalCategories = (LinearLayout) findViewById(R.id.category_container);
-        final EventCategory[] categories = EventCategory.values();
+        final String[] categories = eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE :
+                (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS);
         for (int i = 0; i < categories.length; i++) {
             View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
             final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
-            filterText.setText(categories[i].categoryName);
+            filterText.setText(categories[i]);
             horizontalCategories.addView(view);
             filterText.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -242,13 +288,16 @@ public class EventsGridActivity extends BaseContextActivity {
                     } else {
                         filterText.setSelected(true);
                     }
-
-                    eventsFragment.filterEventsWithCategory(filterText.getText().toString(), null);
+                    if (filterText.getText().toString().equalsIgnoreCase(EventsHighEndpoints.QUERY_FEATURED)) {
+                        eventsFragment.filterEventsWithCategory("Featured", null);
+                    } else {
+                        eventsFragment.filterEventsWithCategory(filterText.getText().toString(), null);
+                    }
                 }
             });
         }
         LinearLayout horizontalprice = (LinearLayout) findViewById(R.id.price_container);
-        String[] priceRanges = {"Free", " \u20B9 ", "\u20B9 \u20B9", "\u20B9 \u20B9 \u20B9"};
+        String[] priceRanges = {"Free", " \u20B9 ", "\u20B9 \u20B9", "\u20B9 \u20B9 \u20B9", "\u20B9 \u20B9 \u20B9 \u20B9"};
         for (int i = 0; i < priceRanges.length; i++) {
             View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
             final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
@@ -265,8 +314,10 @@ public class EventsGridActivity extends BaseContextActivity {
                         eventsFragment.filterEventsWithPrice(null, UPTO_250);
                     } else if (position == 2) {
                         eventsFragment.filterEventsWithPrice(null, PRICE_250_TO_750);
+                    } else if (position == 3) {
+                        eventsFragment.filterEventsWithPrice(null, PRICE_750_TO_1500);
                     } else {
-                        eventsFragment.filterEventsWithPrice(null, MORE_THAN_750);
+                        eventsFragment.filterEventsWithPrice(null, MORE_THAN_1500);
                     }
 
                     if (filterText.isSelected()) {
@@ -322,8 +373,8 @@ public class EventsGridActivity extends BaseContextActivity {
                         nextYear.add(Calendar.DAY_OF_MONTH, 45);
 
                         if (selectedDates != null) {
-                            dialogView.init(currentYear.getTime(), nextYear.getTime()).withSelectedDates(selectedDates) //
-                                    .inMode(CalendarPickerView.SelectionMode.MULTIPLE);
+                            dialogView.init(currentYear.getTime(), nextYear.getTime()).inMode(CalendarPickerView.SelectionMode.MULTIPLE).withSelectedDates(selectedDates) //
+                            ;
                         } else {
                             dialogView.init(currentYear.getTime(), nextYear.getTime()) //
                                     .inMode(CalendarPickerView.SelectionMode.MULTIPLE);

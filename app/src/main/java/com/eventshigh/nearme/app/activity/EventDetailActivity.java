@@ -460,25 +460,23 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
 
         final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
         if (event.bookingUrl.contains("ticketing.eventshigh.com")) {
-            /*
             bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
             bookingUriBuilder.appendQueryParameter("name", userInfo.name);
             bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
             bookingUriBuilder.appendQueryParameter("src", "eh-android");
-            */
-           Intent intent = new Intent(this, EventBookingDetailActivity.class);
+           /*Intent intent = new Intent(this, EventBookingDetailActivity.class);
            intent.putExtra("event", event);
-           startActivity(intent);
+           startActivity(intent);*/
 
-        }else {
-            try {
-                CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
-                        getString(R.string.title_book));
-            } catch (Exception e) {
-                Crashlytics.getInstance().core.logException(e);
-                showMessage(R.string.retry);
-            }
         }
+        try {
+            CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
+                    getString(R.string.title_book));
+        } catch (Exception e) {
+            Crashlytics.getInstance().core.logException(e);
+            showMessage(R.string.retry);
+        }
+
 
     }
 
@@ -978,9 +976,9 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
                 for (EhPrices ehPrice : event.ehPrices) {
                     View view = LayoutInflater.from(EventDetailActivity.this).inflate(R.layout.event_detail_price_layout, ehPriceContainer, false);
                     if (ehPrice.discountValue > 0) {
-                        ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " +(ehPrice.discountValue > 0 ? ( ehPrice.currency + " " + ehPrice.discountValue) : "Free"));
+                        ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " + (ehPrice.discountValue > 0 ? (ehPrice.currency + " " + ehPrice.discountValue) : "Free"));
                     } else {
-                        ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " +(ehPrice.value > 0 ? (ehPrice.name + " - " + ehPrice.currency + " " + ehPrice.value) : "Free"));
+                        ((TextView) view.findViewById(R.id.event_price)).setText(ehPrice.name + " - " + (ehPrice.value > 0 ? (ehPrice.name + " - " + ehPrice.currency + " " + ehPrice.value) : "Free"));
                     }
 
 
@@ -1093,7 +1091,7 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
             if (event.reviewObjects.size() == 0) {
                 findViewById(R.id.btn_add_review).setVisibility(View.GONE);
                 ((LinearLayout) findViewById(R.id.no_review_layout)).setVisibility(View.VISIBLE);
-                TextView addReviewBtn1 = (TextView)findViewById(R.id.btn_add_review1);
+                TextView addReviewBtn1 = (TextView) findViewById(R.id.btn_add_review1);
                 SpannableString string = new SpannableString("Write a Review");
                 string.setSpan(new UnderlineSpan(), 0, string.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                 addReviewBtn1.setText(string);

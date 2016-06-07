@@ -59,6 +59,9 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
     ArrayList<EhPrices> prices;
     ArrayList<EventTime> timings;
 
+    TextView validOnExtraDays;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +79,8 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
 
         totalPrice = (TextView) findViewById(R.id.total_price);
         numberOfTickets = (TextView) findViewById(R.id.total_tickets);
+
+        validOnExtraDays = (TextView) findViewById(R.id.valid_on_extras_days);
         getTimingSlots();
         addDateContainerData();
         addTimeContainerData(0);

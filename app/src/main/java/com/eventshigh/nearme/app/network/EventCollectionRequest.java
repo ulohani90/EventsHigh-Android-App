@@ -51,9 +51,9 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
-     * @param context an application eventsContext to initiate the volley.
+     * @param context       an application eventsContext to initiate the volley.
      * @param eventsContext EventsContext representing the request.
-     * @param listener callback on success.
+     * @param listener      callback on success.
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, EventsContext eventsContext, Priority priority,
@@ -79,14 +79,37 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         VolleyHelper.addToRequestQueue(context, request);
     }
 
+    public static void submit(Context context, EventsContext eventsContext, Priority priority,
+                              Object tag, String dateString, boolean shouldBypassCache, boolean includeWithoutLocation,
+                              Listener<EventsCollection> listener, ErrorListener errorListener) {
+        if (eventsContext.city == null) {
+            errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
+            return;
+        }
+
+        String url;
+        try {
+            url = EventsHighEndpoints.getApiEndpointForDate(eventsContext, dateString);
+        } catch (IllegalArgumentException e) {
+            errorListener.onErrorResponse(new VolleyError("Invalid Query", e));
+            return;
+        }
+
+        EventCollectionRequest request = new EventCollectionRequest(
+                context, url, eventsContext, priority, shouldBypassCache, includeWithoutLocation,
+                listener, errorListener);
+        request.setTag(tag);
+        VolleyHelper.addToRequestQueue(context, request);
+    }
+
     private final Context context;
     private final EventsContext eventsContext;
     private final Priority priority;
     private final boolean includeWithoutLocation;
 
     public EventCollectionRequest(Context context, String url, EventsContext eventsContext,
-          Priority priority, boolean shouldBypassCache, boolean includeWithoutLocation,
-          Listener<EventsCollection> listener, ErrorListener errorListener) {
+                                  Priority priority, boolean shouldBypassCache, boolean includeWithoutLocation,
+                                  Listener<EventsCollection> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
         setShouldAllowStaleResponse(true);
@@ -95,7 +118,6 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         this.priority = priority;
         this.includeWithoutLocation = includeWithoutLocation;
     }
-
 
 
     @Override
@@ -124,7 +146,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         String jsonString = new String(response.data, "UTF-8");
         JSONObject eventsJson = new JSONObject(jsonString);
         List<Event> events = Event.parseUpcomingEvents(eventsJson, includeWithoutLocation);
-        filterOldEvents(context,events);
+        filterOldEvents(context, events);
 
         // Sort the event list to user.
         Collections.sort(events, new EventComparator(eventsContext.location));
@@ -133,11 +155,11 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     }
 
     // Filter out the events which has started more than three hours back.
-    public static void filterOldEvents(Context context , List<Event> events) {
+    public static void filterOldEvents(Context context, List<Event> events) {
         long threeHoursBack = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(3);
         long aDayBack = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1);
 
-        for (Iterator<Event> it =  events.iterator(); it.hasNext(); ) {
+        for (Iterator<Event> it = events.iterator(); it.hasNext(); ) {
             Event event = it.next();
 
             boolean isPastEvent = true;
@@ -156,10 +178,10 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
                 break;
             }
 
-            if (isPastEvent)  {
+            if (isPastEvent) {
                 it.remove();
                 EventsMarkerManager.Editor eventsMarkerEditor =
-                            EventsMarkerManager.getInstance(context).getEditor();
+                        EventsMarkerManager.getInstance(context).getEditor();
                 eventsMarkerEditor.recordEventMark(event, null);
                 eventsMarkerEditor.close();
 

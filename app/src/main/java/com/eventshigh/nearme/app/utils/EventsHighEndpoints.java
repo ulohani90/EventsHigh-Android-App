@@ -62,7 +62,7 @@ public class EventsHighEndpoints {
 
     public static final String QUERY_MY_EVENT = "my events";
     public static final String QUERY_MY_INTEREST_EVENTS = "my_interest_events";
-    public static final String QUERY_FEATURED = "editor's picks";
+    public static final String QUERY_FEATURED = "Editor's picks";
 
     public static Uri getEventDetailsURI(Event event) {
         StringBuilder sb = new StringBuilder(event.id);
@@ -170,6 +170,12 @@ public class EventsHighEndpoints {
         }
     }
 
+    public static String getApiEndpointForDate(EventsContext eventsContext, String dateString) {
+        return String.format(API_ENDPOINT_DATE_FORMAT,
+                eventsContext.city.toString().toLowerCase(),
+                dateString.toLowerCase());
+    }
+
     public static String getApiEndPointForOffers(String cityName) {
         return String.format(API_ENDPOINT_OFFERS_FORMAT, cityName);
     }
@@ -231,7 +237,7 @@ public class EventsHighEndpoints {
         return query.equalsIgnoreCase(QUERY_MY_INTEREST_EVENTS);
     }
 
-    public static boolean isFeaturedEventQuery(String query){
+    public static boolean isFeaturedEventQuery(String query) {
         return query.equalsIgnoreCase(QUERY_FEATURED);
     }
 

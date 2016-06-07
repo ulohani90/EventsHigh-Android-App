@@ -69,6 +69,7 @@ public class Event implements Parcelable {
     public final String address;
     public final boolean isCleanVenue;
 
+
     public final String[] performers;
 
     @Nullable
@@ -215,7 +216,7 @@ public class Event implements Parcelable {
         in.readTypedList(reviewObjects, MovieUserReviewObject.CREATOR);
         this.requestPerAttendeeData = in.readString();
         additionalTicketFieldList = new ArrayList<>();
-        in.readTypedList(additionalTicketFieldList,AdditionalTicketField.CREATOR);
+        in.readTypedList(additionalTicketFieldList, AdditionalTicketField.CREATOR);
     }
 
     public Uri getEventDetailsURI() {
@@ -226,8 +227,8 @@ public class Event implements Parcelable {
         return getEventShareURI(null);
     }
 
-    public boolean isRequestPerAttendeeData(){
-        if(Utils.checkIfStringEmpty(requestPerAttendeeData))return true;
+    public boolean isRequestPerAttendeeData() {
+        if (Utils.checkIfStringEmpty(requestPerAttendeeData)) return true;
         else return requestPerAttendeeData.equals("on");
     }
 
@@ -353,7 +354,7 @@ public class Event implements Parcelable {
     // a CREATOR that implements these two methods
     public static final Parcelable.Creator<Event> CREATOR =
             new Parcelable.Creator<Event>() {
-                public Event createFromParcel(Parcel in){
+                public Event createFromParcel(Parcel in) {
                     return new Event(in);
                 }
 
@@ -386,7 +387,7 @@ public class Event implements Parcelable {
         String booking_text = eventJson.optString("booking_text");
         String img_url = eventJson.optString("img_url");
         if ((source_url != null && source_url.toLowerCase().contains("eventviva")) ||
-                (img_url != null && img_url.endsWith("missing.png"))){
+                (img_url != null && img_url.endsWith("missing.png"))) {
             img_url = null;
         }
 
@@ -434,13 +435,12 @@ public class Event implements Parcelable {
         EventCategory category = EventCategory.OTHER;
         JSONArray tagsJsonArr = eventJson.getJSONArray("tags");
         ArrayList<String> tagsList = new ArrayList<>(tagsJsonArr.length());
+
         for (int j = 0; j < tagsJsonArr.length(); j++) {
             Object currentTag = tagsJsonArr.get(j);
             String tag = currentTag instanceof JSONObject ?
                     tagsJsonArr.getJSONObject(j).getString("tag") : String.valueOf(currentTag);
-            if (tag.equalsIgnoreCase("featured")) {
-                continue;
-            }
+
             tagsList.add(Utils.capitalize(tag));
 
             if (category == EventCategory.OTHER) {
@@ -450,23 +450,25 @@ public class Event implements Parcelable {
                 }
             }
         }
-
+        if (title.equalsIgnoreCase("Nritya Shakti Tour 2016-An intensive workshop by Shakti Mohan")) {
+            tagsList.hashCode();
+        }
 
         // Event timings.
         List<Long> eventTimings = new ArrayList<>();
         Date eventTiming = DateTimeUtils.mergeDateTime(eventJson.optString("date"),
                 eventJson.optString("start_time"), city.timeZone);
-        if (eventTiming != null){
+        if (eventTiming != null) {
             eventTimings.add(eventTiming.getTime());
         }
 
         JSONArray upcoming_occurrences = eventJson.optJSONArray("upcoming_occurrences");
-        if (upcoming_occurrences != null){
+        if (upcoming_occurrences != null) {
             for (int i = 0; i < upcoming_occurrences.length(); i++) {
                 eventTiming = DateTimeUtils.mergeDateTime(
                         upcoming_occurrences.getJSONObject(i).optString("date"),
                         upcoming_occurrences.getJSONObject(i).optString("start_time"), city.timeZone);
-                if (eventTiming != null && !eventTimings.contains(eventTiming.getTime())){
+                if (eventTiming != null && !eventTimings.contains(eventTiming.getTime())) {
                     eventTimings.add(eventTiming.getTime());
                 }
             }
@@ -517,7 +519,7 @@ public class Event implements Parcelable {
                 maxPrice = -1;
                 JSONObject ehPrice = prices.getJSONObject(j);
                 currency = ehPrice.optString("currency", "\u20B9");
-                if (currency.equalsIgnoreCase("INR")){
+                if (currency.equalsIgnoreCase("INR")) {
                     currency = "\u20B9";
                 }
                 ArrayList<Long> ehOccurences = new ArrayList<>();
@@ -535,8 +537,8 @@ public class Event implements Parcelable {
                 double value = ehPrice.optDouble("value", -1);
                 String startVaild = ehPrice.getString("validity_start");
                 String endValid = ehPrice.getString("validity_end");
-                if(Utils.checkIfStringEmpty(startVaild))startVaild = "1907-01-01 00:00:00.0";
-                if(Utils.checkIfStringEmpty(endValid))endValid = "2099-01-01 00:00:00.0";
+                if (Utils.checkIfStringEmpty(startVaild)) startVaild = "1907-01-01 00:00:00.0";
+                if (Utils.checkIfStringEmpty(endValid)) endValid = "2099-01-01 00:00:00.0";
                 long validityStart = DateTimeUtils.parseOfferTime(startVaild);
                 long validityEnd = DateTimeUtils.parseOfferTime(endValid);
                 /*if (value < 0.01) {
@@ -554,14 +556,15 @@ public class Event implements Parcelable {
                 }
 
                 long timenow = System.currentTimeMillis();
-                if(validityStart <= timenow && validityEnd > timenow)
-                ehPrices.add(EhPrices.createObject(minPrice, maxPrice, ehPriceName, ehPriceNote, currency, value, discountValue, ehOccurences,0,
-                        validityStart,validityEnd));
-                }
+                boolean isMulti = ehPrice.optInt("is_multi") == 0 ? false : true;
+                if (validityStart <= timenow && validityEnd > timenow)
+                    ehPrices.add(EhPrices.createObject(minPrice, maxPrice, ehPriceName, ehPriceNote, currency, value, discountValue, ehOccurences, 0,
+                            validityStart, validityEnd, isMulti));
+            }
 
         }
 
-        if (mashup != null && ehPrices.size() == 0){
+        if (mashup != null && ehPrices.size() == 0) {
             JSONObject priceInfo = mashup.optJSONObject("price_info");
             if (priceInfo != null) {
                 if (priceInfo.optString("type").equalsIgnoreCase("free")) {
@@ -627,7 +630,7 @@ public class Event implements Parcelable {
         //Attributes
         List<AdditionalTicketField> additionalTicketFieldList = new ArrayList<>();
         String requestPerAttendeeData = eventJson.optString("request_per_attendee_data", "");
-        if(eventJson.has("additional_fields")) {
+        if (eventJson.has("additional_fields")) {
             JSONArray additionalFieldsJsonArray = eventJson.getJSONArray("additional_fields");
             for (int j = 0; j < additionalFieldsJsonArray.length(); j++) {
                 AdditionalTicketField additionalTicketField = AdditionalTicketField.fromJsonObject(additionalFieldsJsonArray.getJSONObject(j));
@@ -728,7 +731,7 @@ public class Event implements Parcelable {
 
     public Intent getShowDirectionsOnMapIntent() {
         String query = getMapQuery();
-        if (query == null){
+        if (query == null) {
             return null;
         }
 

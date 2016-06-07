@@ -409,46 +409,48 @@ public class EventsFragment extends BaseEventsFragment {
     public List<Event> filterEventsWithCategory(String category, List<Event> totalEvents) {
         List<Event> allEvents;
 
-        if (totalEvents == null) {
+        if (totalEvents == null && eventsCollection != null) {
             allEvents = eventsCollection.events;
         } else {
             allEvents = totalEvents;
         }
-
-        if (filterCategoryName == null)
-            filterCategoryName = new ArrayList<>();
-        if (category != null) {
-            if (filterCategoryName.contains(category)) {
-                filterCategoryName.remove(category);
-            } else {
-                filterCategoryName.add(category);
-            }
-        }
-        List<Event> filteredEvents = new ArrayList<>();
-        if (filterCategoryName.size() > 0) {
-            for (int i = 0; i < allEvents.size(); i++) {
-                for (int j = 0; j < filterCategoryName.size(); j++) {
-                    if (allEvents.get(i).tags.contains(filterCategoryName.get(j))) {
-                        filteredEvents.add(allEvents.get(i));
-                        break;
-                    }
+        if (allEvents != null) {
+            if (filterCategoryName == null)
+                filterCategoryName = new ArrayList<>();
+            if (category != null) {
+                if (filterCategoryName.contains(category)) {
+                    filterCategoryName.remove(category);
+                } else {
+                    filterCategoryName.add(category);
                 }
             }
-        } else {
-            filteredEvents = allEvents;
-        }
-
-        if (totalEvents == null) {
-            filteredEvents = filterEventsWithDate(filteredEvents, -1);
-            filteredEvents = filterEventsWithPrice(filteredEvents, -1);
-            eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
-            if (filteredEvents.isEmpty()) {
-                // Failed. Show toast and return empty list.
-                Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
-
+            List<Event> filteredEvents = new ArrayList<>();
+            if (filterCategoryName.size() > 0) {
+                for (int i = 0; i < allEvents.size(); i++) {
+                    for (int j = 0; j < filterCategoryName.size(); j++) {
+                        if (allEvents.get(i).tags.contains(filterCategoryName.get(j))) {
+                            filteredEvents.add(allEvents.get(i));
+                            break;
+                        }
+                    }
+                }
+            } else {
+                filteredEvents = allEvents;
             }
+
+            if (totalEvents == null) {
+                filteredEvents = filterEventsWithDate(filteredEvents, -1);
+                filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                if (filteredEvents.isEmpty()) {
+                    // Failed. Show toast and return empty list.
+                    Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+
+                }
+            }
+            return filteredEvents;
         }
-        return filteredEvents;
+        return null;
 
     }
 
@@ -457,50 +459,55 @@ public class EventsFragment extends BaseEventsFragment {
 
     public List<Event> filterEventsWithDate(List<Event> totalEvents, long... times) {
         List<Event> allEvents;
-        if (totalEvents == null) {
+        if (totalEvents == null && eventsCollection != null) {
             allEvents = eventsCollection.events;
         } else {
             allEvents = totalEvents;
         }
-        if (filterEventTimes == null) {
-            filterEventTimes = new ArrayList<>();
-        }
-        for (long time : times) {
-            if (time != -1) {
-                if (filterEventTimes.contains(time)) {
-                    filterEventTimes.remove(time);
-                } else {
-                    filterEventTimes.add(time);
-                }
+
+        if (allEvents != null) {
+            if (filterEventTimes == null) {
+                filterEventTimes = new ArrayList<>();
             }
-        }
-        List<Event> filteredEvents = new ArrayList<>();
-        if (filterEventTimes.size() > 0) {
-            for (int i = 0; i < allEvents.size(); i++) {
-                for (int j = 0; j < filterEventTimes.size(); j++) {
-                    for (int k = 0; k < allEvents.get(i).eventTimings.length; k++) {
-                        if (filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime()) {
-                            filteredEvents.add(allEvents.get(i));
-                            break;
-                        }
+            for (long time : times) {
+                if (time != -1) {
+                    if (filterEventTimes.contains(time)) {
+                        filterEventTimes.remove(time);
+                    } else {
+                        filterEventTimes.add(time);
                     }
                 }
             }
-        } else {
-            filteredEvents = allEvents;
-        }
-
-        if (totalEvents == null) {
-            filteredEvents = filterEventsWithCategory(null, filteredEvents);
-            filteredEvents = filterEventsWithPrice(filteredEvents, -1);
-            eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
-            if (filteredEvents.isEmpty()) {
-                // Failed. Show toast and return empty list.
-                Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
-
+            List<Event> filteredEvents = new ArrayList<>();
+            if (filterEventTimes.size() > 0) {
+                for (int i = 0; i < allEvents.size(); i++) {
+                    secondLoop:
+                    for (int j = 0; j < filterEventTimes.size(); j++) {
+                        for (int k = 0; k < allEvents.get(i).eventTimings.length; k++) {
+                            if (filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime()) {
+                                filteredEvents.add(allEvents.get(i));
+                                break secondLoop;
+                            }
+                        }
+                    }
+                }
+            } else {
+                filteredEvents = allEvents;
             }
+
+            if (totalEvents == null) {
+                filteredEvents = filterEventsWithCategory(null, filteredEvents);
+                filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                if (filteredEvents.isEmpty()) {
+                    // Failed. Show toast and return empty list.
+                    Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+
+                }
+            }
+            return filteredEvents;
         }
-        return filteredEvents;
+        return null;
 
     }
 
@@ -508,82 +515,88 @@ public class EventsFragment extends BaseEventsFragment {
 
     public List<Event> filterEventsWithPrice(List<Event> totalEvents, int priceValue) {
         List<Event> allEvents;
-        if (totalEvents == null) {
+        if (totalEvents == null && eventsCollection != null) {
             allEvents = eventsCollection.events;
         } else {
             allEvents = totalEvents;
         }
-        if (filterEventPrices == null) {
-            filterEventPrices = new ArrayList<>();
-        }
-
-        if (priceValue != -1) {
-            if (filterEventPrices.contains(priceValue)) {
-                filterEventPrices.remove((Integer) priceValue);
-            } else {
-                filterEventPrices.add((Integer) priceValue);
+        if (allEvents != null) {
+            if (filterEventPrices == null) {
+                filterEventPrices = new ArrayList<>();
             }
-        }
+
+            if (priceValue != -1) {
+                if (filterEventPrices.contains(priceValue)) {
+                    filterEventPrices.remove((Integer) priceValue);
+                } else {
+                    filterEventPrices.add((Integer) priceValue);
+                }
+            }
 
 
-        List<Event> filteredEvents = new ArrayList<>();
-        if (filterEventPrices.size() > 0) {
-            for (int i = 0; i < allEvents.size(); i++) {
-                Event event = allEvents.get(i);
-                secondLoop:
-                for (int j = 0; j < filterEventPrices.size(); j++) {
-                    int priceMin = -1;
-                    int priceMax = -1;
-                    if (filterEventPrices.get(j) == EventsGridActivity.FREE) {
-                        priceMax = 0;
-                        priceMin = 0;
-                    } else if (filterEventPrices.get(j) == EventsGridActivity.UPTO_250) {
-                        priceMin = 1;
-                        priceMax = 250;
-                    } else if (filterEventPrices.get(j) == EventsGridActivity.PRICE_250_TO_750) {
-                        priceMin = 250;
-                        priceMax = 750;
-                    } else {
-                        priceMin = 750;
-                        priceMax = 50000;
-                    }
-                    if (event.ehPrices.size() > 0) {
-                        for (EhPrices price : event.ehPrices) {
-                            if (price.discountValue > 0) {
-                                if (price.discountValue >= priceMin && price.discountValue <= priceMax) {
-                                    filteredEvents.add(event);
-                                    break secondLoop;
-                                }
-                            } else {
-                                if (price.value >= priceMin && price.value <= priceMax) {
-                                    filteredEvents.add(event);
-                                    break secondLoop;
+            List<Event> filteredEvents = new ArrayList<>();
+            if (filterEventPrices.size() > 0) {
+                for (int i = 0; i < allEvents.size(); i++) {
+                    Event event = allEvents.get(i);
+                    secondLoop:
+                    for (int j = 0; j < filterEventPrices.size(); j++) {
+                        int priceMin = -1;
+                        int priceMax = -1;
+                        if (filterEventPrices.get(j) == EventsGridActivity.FREE) {
+                            priceMax = 0;
+                            priceMin = 0;
+                        } else if (filterEventPrices.get(j) == EventsGridActivity.UPTO_250) {
+                            priceMin = 1;
+                            priceMax = 250;
+                        } else if (filterEventPrices.get(j) == EventsGridActivity.PRICE_250_TO_750) {
+                            priceMin = 250;
+                            priceMax = 750;
+                        } else if(filterEventPrices.get(j) == EventsGridActivity.PRICE_750_TO_1500){
+                            priceMin = 750;
+                            priceMax = 1500;
+                        }else{
+                            priceMin = 1500;
+                            priceMax = 500000;
+                        }
+                        if (event.ehPrices.size() > 0) {
+                            for (EhPrices price : event.ehPrices) {
+                                if (price.discountValue > 0) {
+                                    if (price.discountValue >= priceMin && price.discountValue <= priceMax) {
+                                        filteredEvents.add(event);
+                                        break secondLoop;
+                                    }
+                                } else {
+                                    if (price.value >= priceMin && price.value <= priceMax) {
+                                        filteredEvents.add(event);
+                                        break secondLoop;
+                                    }
                                 }
                             }
-                        }
-                    } else {
-                        if (event.minPrice >= priceMin && event.maxPrice <= priceMax) {
-                            filteredEvents.add(event);
-                            break secondLoop;
+                        } else {
+                            if (event.minPrice >= priceMin && event.maxPrice <= priceMax) {
+                                filteredEvents.add(event);
+                                break secondLoop;
+                            }
                         }
                     }
+
                 }
-
+            } else {
+                filteredEvents = allEvents;
             }
-        } else {
-            filteredEvents = allEvents;
-        }
 
-        if (totalEvents == null) {
-            filteredEvents = filterEventsWithCategory(null, filteredEvents);
-            filteredEvents = filterEventsWithDate(filteredEvents, -1);
-            eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
-            if (filteredEvents.isEmpty()) {
-                // Failed. Show toast and return empty list.
-                Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+            if (totalEvents == null) {
+                filteredEvents = filterEventsWithCategory(null, filteredEvents);
+                filteredEvents = filterEventsWithDate(filteredEvents, -1);
+                eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                if (filteredEvents.isEmpty()) {
+                    // Failed. Show toast and return empty list.
+                    Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
 
+                }
             }
+            return filteredEvents;
         }
-        return filteredEvents;
+        return null;
     }
 }

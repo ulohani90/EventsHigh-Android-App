@@ -63,10 +63,8 @@
                         android:layout_height="56dp"
                         android:animateLayoutChanges="true"
                         android:clipChildren="false"
-                        android:gravity="center_vertical"
-                        android:scrollbarSize="1dp"
-                        android:scrollbarThumbHorizontal="@drawable/scrollbar_gradient_drawable"
-                        android:scrollbars="horizontal">
+                        android:scrollbars="none"
+                        android:gravity="center_vertical">
 
                         <LinearLayout
                             android:id="@+id/date_container"
@@ -92,10 +90,8 @@
                         android:layout_height="56dp"
                         android:animateLayoutChanges="true"
                         android:clipChildren="false"
-                        android:gravity="center_vertical"
-                        android:scrollbarSize="1dp"
-                        android:scrollbarThumbHorizontal="@drawable/scrollbar_gradient_drawable"
-                        android:scrollbars="horizontal">
+                        android:scrollbars="none"
+                        android:gravity="center_vertical">
 
                         <LinearLayout
                             android:id="@+id/category_container"
@@ -122,10 +118,8 @@
                         android:layout_height="56dp"
                         android:animateLayoutChanges="true"
                         android:clipChildren="false"
-                        android:gravity="center_vertical"
-                        android:scrollbarSize="1dp"
-                        android:scrollbarThumbHorizontal="@drawable/scrollbar_gradient_drawable"
-                        android:scrollbars="horizontal">
+                        android:scrollbars="none"
+                        android:gravity="center_vertical">
 
                         <LinearLayout
                             android:id="@+id/price_container"

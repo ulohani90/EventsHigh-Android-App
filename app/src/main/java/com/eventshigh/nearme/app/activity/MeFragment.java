@@ -115,9 +115,7 @@ public class MeFragment extends Fragment {
 
     public class MePagerAdapter extends FragmentStatePagerAdapter {
 
-        String []TABS = {"My Favourites","My Events","My Friends"};
-
-
+        String []TABS = {"Favourites","Events","Friends"};
 
         Fragment fragment;
 

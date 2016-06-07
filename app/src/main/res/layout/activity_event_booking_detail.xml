@@ -58,9 +58,9 @@
                             android:layout_gravity="center_vertical"
                             android:drawableBottom="@drawable/ic_cal_bigger"
                             android:drawablePadding="8dp"
+                            android:fontFamily="sans-serif-medium"
                             android:padding="10dp"
                             android:text="Date"
-                            android:fontFamily="sans-serif-medium"
                             android:textAllCaps="true"
                             android:textSize="12sp" />
 
@@ -81,6 +81,15 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/valid_on_extras_days"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    android:textColor="#353535"
+                    android:textSize="14sp" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -99,8 +108,8 @@
                             android:layout_gravity="center_vertical"
                             android:drawableBottom="@drawable/ic_time_red"
                             android:drawablePadding="8dp"
-                            android:padding="10dp"
                             android:fontFamily="sans-serif-medium"
+                            android:padding="10dp"
                             android:text="Time"
                             android:textAllCaps="true"
                             android:textSize="12sp" />
@@ -136,10 +145,10 @@
                         android:background="@android:color/white"
                         android:drawableLeft="@drawable/ic_ticket_red"
                         android:drawablePadding="5dp"
+                        android:fontFamily="sans-serif-medium"
                         android:gravity="center_vertical"
                         android:padding="8dp"
                         android:text="Tickets"
-                        android:fontFamily="sans-serif-medium"
                         android:textAllCaps="true"
                         android:textColor="#878787"
                         android:textSize="14sp" />
@@ -174,9 +183,9 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
                             android:drawablePadding="8dp"
+                            android:fontFamily="sans-serif-medium"
                             android:padding="8dp"
                             android:text="Total"
-                            android:fontFamily="sans-serif-medium"
                             android:textAllCaps="true"
                             android:textColor="@android:color/white"
                             android:textSize="16sp" />
@@ -188,11 +197,11 @@
                             android:layout_gravity="center_vertical"
                             android:layout_weight="1"
                             android:drawablePadding="8dp"
+                            android:fontFamily="sans-serif-medium"
                             android:gravity="center"
                             android:padding="8dp"
                             android:text="Tickets"
                             android:textAllCaps="true"
-                            android:fontFamily="sans-serif-medium"
                             android:textColor="@android:color/white"
                             android:textSize="16sp" />
 
