@@ -410,10 +410,12 @@ public class EventsFragment extends BaseEventsFragment {
         List<Event> allEvents;
 
         if (totalEvents == null && eventsCollection != null) {
+
             allEvents = eventsCollection.events;
         } else {
             allEvents = totalEvents;
         }
+
         if (allEvents != null) {
             if (filterCategoryName == null)
                 filterCategoryName = new ArrayList<>();
@@ -451,7 +453,6 @@ public class EventsFragment extends BaseEventsFragment {
             return filteredEvents;
         }
         return null;
-
     }
 
 
@@ -460,12 +461,14 @@ public class EventsFragment extends BaseEventsFragment {
     public List<Event> filterEventsWithDate(List<Event> totalEvents, long... times) {
         List<Event> allEvents;
         if (totalEvents == null && eventsCollection != null) {
+
             allEvents = eventsCollection.events;
         } else {
             allEvents = totalEvents;
         }
 
         if (allEvents != null) {
+
             if (filterEventTimes == null) {
                 filterEventTimes = new ArrayList<>();
             }
@@ -481,12 +484,14 @@ public class EventsFragment extends BaseEventsFragment {
             List<Event> filteredEvents = new ArrayList<>();
             if (filterEventTimes.size() > 0) {
                 for (int i = 0; i < allEvents.size(); i++) {
+
                     secondLoop:
                     for (int j = 0; j < filterEventTimes.size(); j++) {
                         for (int k = 0; k < allEvents.get(i).eventTimings.length; k++) {
                             if (filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime()) {
                                 filteredEvents.add(allEvents.get(i));
                                 break secondLoop;
+
                             }
                         }
                     }
@@ -516,6 +521,7 @@ public class EventsFragment extends BaseEventsFragment {
     public List<Event> filterEventsWithPrice(List<Event> totalEvents, int priceValue) {
         List<Event> allEvents;
         if (totalEvents == null && eventsCollection != null) {
+
             allEvents = eventsCollection.events;
         } else {
             allEvents = totalEvents;
@@ -524,6 +530,7 @@ public class EventsFragment extends BaseEventsFragment {
             if (filterEventPrices == null) {
                 filterEventPrices = new ArrayList<>();
             }
+
 
             if (priceValue != -1) {
                 if (filterEventPrices.contains(priceValue)) {
@@ -551,10 +558,10 @@ public class EventsFragment extends BaseEventsFragment {
                         } else if (filterEventPrices.get(j) == EventsGridActivity.PRICE_250_TO_750) {
                             priceMin = 250;
                             priceMax = 750;
-                        } else if(filterEventPrices.get(j) == EventsGridActivity.PRICE_750_TO_1500){
+                        } else if (filterEventPrices.get(j) == EventsGridActivity.PRICE_750_TO_1500) {
                             priceMin = 750;
                             priceMax = 1500;
-                        }else{
+                        } else {
                             priceMin = 1500;
                             priceMax = 500000;
                         }
@@ -597,6 +604,8 @@ public class EventsFragment extends BaseEventsFragment {
             }
             return filteredEvents;
         }
+
+
         return null;
     }
 }
