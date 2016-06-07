@@ -145,16 +145,19 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
         tvDate.setText(eventTime.date);
         tvTime.setText(eventTime.time);
         for(EhPrices ehp:prices){
-            discount += (ehp.discountValue*ehp.count);
+            if(ehp.discountValue > 0.01)
+            discount += ((ehp.value - ehp.discountValue)*ehp.count);
             if(ehp.count>0)
             seatDetails.append(ehp.count+" "+ehp.name+"\n");
         }
         tvSeats.setText(seatDetails);
+
         if(discount == 0){
             llAmtSave.setVisibility(View.GONE);
         }else{
-            tvSavedAmt.setText(" ₹"+discount);
+            tvSavedAmt.setText("You saved"+" ₹ "+discount);
         }
+
         addCards(arrayDetailCards);
     }
 
@@ -349,7 +352,12 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
                 params.add(new BasicNameValuePair("datetime", eventTime.longtime+""));
 
                 for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketName", ehp.name + ""));
-                for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketValue", ehp.value + ""));
+                for (EhPrices ehp : prices)
+                    if(ehp.discountValue > 0.01)
+                        params.add(new BasicNameValuePair("ticketValue", ehp.discountValue + ""));
+                    else
+                        params.add(new BasicNameValuePair("ticketValue", ehp.value + ""));
+
                 for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketNum", ehp.count + ""));
 
                 int noOfCards = arrayGuestDetails.length();

@@ -17,6 +17,7 @@
             android:imeOptions="actionNext"
             android:padding="16dp"
             android:textColor="#353535"
+            android:maxLines="1"
             android:textColorHint="#878787"
             android:textSize="14sp" />
     </LinearLayout>
