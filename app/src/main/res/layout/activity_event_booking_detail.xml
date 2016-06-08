@@ -135,8 +135,8 @@
                     android:id="@+id/ticket_container_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/card_item_bg"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/card_item_bg">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -172,15 +172,16 @@
                         android:id="@+id/ticket_disable_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:background="#22000000"
                         android:clickable="true"
                         android:visibility="gone"
-                        android:background="#33000000" />
+                        />
                 </FrameLayout>
 
                 <FrameLayout
+                    android:id="@+id/combo_ticket_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/combo_ticket_container"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/card_item_bg"
                     android:visibility="gone">
@@ -194,17 +195,13 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/combo_tickets_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:background="@android:color/white"
-                            android:drawableLeft="@drawable/ic_ticket_red"
-                            android:drawablePadding="5dp"
-                            android:fontFamily="sans-serif-medium"
                             android:gravity="center_vertical"
                             android:padding="8dp"
-                            android:text="Combo Tickets"
-                            android:textAllCaps="true"
                             android:textColor="#878787"
                             android:textSize="14sp" />
 
@@ -223,9 +220,9 @@
                         android:id="@+id/combo_disable_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:background="#22000000"
                         android:clickable="true"
-                        android:visibility="gone"
-                        android:background="#33000000" />
+                        android:visibility="gone" />
                 </FrameLayout>
 
                 <LinearLayout
@@ -304,37 +301,36 @@
             android:id="@+id/ll_sold_out_screen"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
             android:background="#eeeeee"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
             android:padding="24dp"
             android:visibility="gone">
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@drawable/soldout_ic"
                 android:layout_marginBottom="10dp"
-                android:layout_marginTop="50dp"/>
+                android:layout_marginTop="50dp"
+                android:src="@drawable/soldout_ic" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14dp"
-                android:textAllCaps="true"
+                android:layout_marginBottom="10dp"
                 android:fontFamily="sens-serif-medium"
                 android:text="Online tickets have been sold out"
-                android:layout_marginBottom="10dp"
+                android:textAllCaps="true"
                 android:textColor="#666666"
-                />
+                android:textSize="14dp" />
 
             <TextView
                 android:id="@+id/tv_sold_out_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="#999999"
-                android:text="They may be available at venue. Please check with organizers."/>
+                android:text="They may be available at venue. Please check with organizers."
+                android:textColor="#999999" />
 
         </LinearLayout>
 
