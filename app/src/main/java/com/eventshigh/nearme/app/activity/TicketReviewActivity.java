@@ -45,7 +45,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-public class TicketReviewActivity extends AppCompatActivity implements View.OnClickListener{
+import javax.net.ssl.HttpsURLConnection;
+
+public class TicketReviewActivity extends AppCompatActivity implements View.OnClickListener {
 
     TextView tvEventsName, tvEventsLocation, tvNoOfTickets;
     TextView tvDate, tvTime, tvSeats;
@@ -69,13 +71,13 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
 
     Bundle bundle;
 
-    public static final String IS_PAYMENT =  "is_payment";
-    public static final String BOOKING_ID =  "booking";
-    public static final String IS_PAYMENT_SUCCESS =  "is_success";
+    public static final String IS_PAYMENT = "is_payment";
+    public static final String BOOKING_ID = "booking";
+    public static final String IS_PAYMENT_SUCCESS = "is_success";
     public static final int PAYMENT_REQ_CODE = 100;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ticket_review);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -86,11 +88,11 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
     }
 
     @Override
-    public void onClick(View v){
-        switch (v.getId()){
+    public void onClick(View v) {
+        switch (v.getId()) {
             case R.id.ibtn_edit_ticket_details:
-            onBackPressed();
-            break;
+                onBackPressed();
+                break;
             case R.id.btn_ticket_review_next:
                 //callGatewayBrowser("https://www.reddit.com//");
                 //prepareGatewayReq();
@@ -101,8 +103,8 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch(item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 this.finish();
                 return true;
@@ -119,19 +121,19 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
         tvTime = (TextView) findViewById(R.id.tv_event_time);
         tvSeats = (TextView) findViewById(R.id.tv_ticket_description);
         tvNowTotal = (TextView) findViewById(R.id.tv_total_amt);
-        llAmtSave = (LinearLayout)findViewById(R.id.ll_amt_save);
+        llAmtSave = (LinearLayout) findViewById(R.id.ll_amt_save);
         tvSavedAmt = (TextView) findViewById(R.id.tv_amt_save);
         llTicketCardList = (LinearLayout) findViewById(R.id.ll_guest_ticket_list);
-        ibtnEdit = (ImageButton)findViewById(R.id.ibtn_edit_ticket_details);
+        ibtnEdit = (ImageButton) findViewById(R.id.ibtn_edit_ticket_details);
         ibtnEdit.setOnClickListener(this);
-        btnReviewNext = (Button)findViewById(R.id.btn_ticket_review_next);
+        btnReviewNext = (Button) findViewById(R.id.btn_ticket_review_next);
         btnReviewNext.setOnClickListener(this);
     }
 
-    private void mapIntentData(){
+    private void mapIntentData() {
 
         event = bundle.getParcelable(EventDetailActivity.EVENT_OBJECT);
-        noOfTickets = (int)bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_TICKETS);
+        noOfTickets = (int) bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_TICKETS);
         total = bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_PRICE);
         dateString = bundle.getString(EventBookingDetailActivity.EVENT_DATE_SELECTED);
         eventTime = bundle.getParcelable(EventBookingDetailActivity.EVENT_TIME_SELECTED);
@@ -139,22 +141,22 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
         arrayDetailCards = bundle.getString(GuestDetailActivity.GUEST_DETAIL_ARRAY);
         tvEventsName.setText(event.title);
         tvEventsLocation.setText(event.venue);
-        tvNoOfTickets.setText(noOfTickets+" Ticket(s)");
-        tvNowTotal.setText("₹ "+total+"");
+        tvNoOfTickets.setText(noOfTickets + " Ticket(s)");
+        tvNowTotal.setText("₹ " + total + "");
         tvDate.setText(eventTime.date);
         tvTime.setText(eventTime.time);
-        for(EhPrices ehp:prices){
-            if(ehp.discountValue > 0.01)
-            discount += ((ehp.value - ehp.discountValue)*ehp.count);
-            if(ehp.count>0)
-            seatDetails.append(ehp.count+" "+ehp.name+"\n");
+        for (EhPrices ehp : prices) {
+            if (ehp.discountValue > 0.01)
+                discount += ((ehp.value - ehp.discountValue) * ehp.count);
+            if (ehp.count > 0)
+                seatDetails.append(ehp.count + " " + ehp.name + "\n");
         }
         tvSeats.setText(seatDetails);
 
-        if(discount == 0){
+        if (discount == 0) {
             llAmtSave.setVisibility(View.GONE);
-        }else{
-            tvSavedAmt.setText("You saved"+" ₹ "+discount);
+        } else {
+            tvSavedAmt.setText("You saved" + " ₹ " + discount);
         }
 
         addCards(arrayDetailCards);
@@ -177,30 +179,30 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
                         .setText(jsonObject.getString("mobile"));
                 llTicketCardList.addView(llGuestLayout);
             }
-        }catch (JSONException e){
-     }
+        } catch (JSONException e) {
+        }
 
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == PAYMENT_REQ_CODE) {
-            if (data.hasExtra(IS_PAYMENT_SUCCESS) & data.getBooleanExtra(IS_PAYMENT_SUCCESS,false)){
-                    Toast.makeText(this, "Payment successful",
-                            Toast.LENGTH_SHORT).show();
-                    callConfirmationActivity(data.getStringExtra(BOOKING_ID));
-            }else{
+            if (data.hasExtra(IS_PAYMENT_SUCCESS) & data.getBooleanExtra(IS_PAYMENT_SUCCESS, false)) {
+                Toast.makeText(this, "Payment successful",
+                        Toast.LENGTH_SHORT).show();
+                callConfirmationActivity(data.getStringExtra(BOOKING_ID));
+            } else {
                 Toast.makeText(this, "You payment was unccessful. Please try again",
                         Toast.LENGTH_LONG).show();
             }
         }
     }
 
-    private void callConfirmationActivity(String bookingId){
-            Intent iNext = new Intent(this, TicketConfirmationActivity.class);
-            bundle.putString(BOOKING_ID, bookingId);
-            iNext.putExtras(bundle);
-            startActivity(iNext);
+    private void callConfirmationActivity(String bookingId) {
+        Intent iNext = new Intent(this, TicketConfirmationActivity.class);
+        bundle.putString(BOOKING_ID, bookingId);
+        iNext.putExtras(bundle);
+        startActivity(iNext);
     }
 
         /*
@@ -275,6 +277,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
         ProgressDialog pdLoading = new ProgressDialog(TicketReviewActivity.this);
         String location = "";
         boolean isSuccess = false;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -282,6 +285,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
             pdLoading.setMessage("\tLoading...");
             pdLoading.show();
         }
+
         @Override
         protected Void doInBackground(Void... params) {
             //doPostRequest();
@@ -290,17 +294,17 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
         }
 
         @Override
-        protected void onPostExecute(Void result){
+        protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             pdLoading.dismiss();
-                if(!Utils.checkIfStringEmpty(location)){
+            if (!Utils.checkIfStringEmpty(location)) {
                 Intent intent = new Intent(TicketReviewActivity.this, CustomUrlActivity.class);
-                Uri myUri = Uri.parse(EventsHighEndpoints.GATEWAY_URI_BASE+location);
-                intent.putExtra(TicketReviewActivity.IS_PAYMENT,true);
+                Uri myUri = Uri.parse(EventsHighEndpoints.GATEWAY_URI_BASE + location);
+                intent.putExtra(TicketReviewActivity.IS_PAYMENT, true);
                 intent.setData(myUri);
                 startActivityForResult(intent, PAYMENT_REQ_CODE);
-            }else{
-                Toast.makeText(getApplicationContext(),"Try Again",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Try Again", Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -327,10 +331,10 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
         }
         */
 
-        private void doPost(){
-            try{
-                URL url = new URL(EventsHighEndpoints.GATEWAY_URI_BASE+"gateway?cmode=override");
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        private void doPost() {
+            try {
+                URL url = new URL(EventsHighEndpoints.GATEWAY_URI_BASE + "gateway?cmode=override");
+                HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 connection.setInstanceFollowRedirects(false);
@@ -342,15 +346,8 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
 
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("eid", event.id));
-                /*
-                final SimpleDateFormat ISO_8601_DATE_FORMAT = new SimpleDateFormat(
-                        "yyyy-MM-dd'T'HH:mmZ");
-                TimeZone ist = TimeZone.getTimeZone("GMT+0530");
-                ISO_8601_DATE_FORMAT.setTimeZone(ist);
-                String nowAsISO = ISO_8601_DATE_FORMAT.format(new Date(eventTime.longtime));
-                */
 
-                params.add(new BasicNameValuePair("datetime", eventTime.longtime+""));
+                params.add(new BasicNameValuePair("datetime", eventTime.longtime + ""));
 
                 for (EhPrices ehp : prices) {
                     if(ehp.count>0){
@@ -359,14 +356,13 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
                             params.add(new BasicNameValuePair("ticketValue", ehp.discountValue + ""));
                         else
                             params.add(new BasicNameValuePair("ticketValue", ehp.value + ""));
-
                         params.add(new BasicNameValuePair("ticketNum", ehp.count + ""));
                     }
                 }
 
                 int noOfCards = arrayGuestDetails.length();
                 Iterator<String> iter = arrayGuestDetails.getJSONObject(0).keys();
-                while (iter.hasNext()){
+                while (iter.hasNext()) {
                     String key = iter.next();
                     for (int i = 0; i < noOfCards; i++) {
                         params.add(new BasicNameValuePair(key, arrayGuestDetails.getJSONObject(i).get(key).toString()));
@@ -385,9 +381,10 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
 
                 // Get Response
                 int status = connection.getResponseCode();
+                Log.i("Status Code", status + "");
                 location = connection.getHeaderField("location");
-                Log.e("location gateway",connection.getHeaderFields().toString());
-            }catch (Exception ioe){
+                Log.e("location gateway", connection.getHeaderFields().toString());
+            } catch (Exception ioe) {
                 Log.e("Server Respo", ioe.toString());
             }
 
@@ -420,13 +417,11 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
 
         }
 
-        private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException
-        {
+        private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException {
             StringBuilder result = new StringBuilder();
             boolean first = true;
 
-            for (NameValuePair pair : params)
-            {
+            for (NameValuePair pair : params) {
                 if (first)
                     first = false;
                 else
