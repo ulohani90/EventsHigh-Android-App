@@ -86,9 +86,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:visibility="gone"
                     android:textColor="#353535"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:visibility="gone" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -131,45 +131,108 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <LinearLayout
+                <FrameLayout
+                    android:id="@+id/ticket_container_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
                     android:background="@drawable/card_item_bg"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@android:color/white"
-                        android:drawableLeft="@drawable/ic_ticket_red"
-                        android:drawablePadding="5dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:gravity="center_vertical"
-                        android:padding="8dp"
-                        android:text="Tickets"
-                        android:textAllCaps="true"
-                        android:textColor="#878787"
-                        android:textSize="14sp" />
+                    android:layout_marginTop="8dp">
 
                     <LinearLayout
-                        android:id="@+id/options_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+
                         android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@android:color/white"
+                            android:drawableLeft="@drawable/ic_ticket_red"
+                            android:drawablePadding="5dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="Tickets"
+                            android:textAllCaps="true"
+                            android:textColor="#878787"
+                            android:textSize="14sp" />
+
+                        <LinearLayout
+                            android:id="@+id/options_container"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:id="@+id/ticket_disable_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clickable="true"
+                        android:visibility="gone"
+                        android:background="#33000000" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/combo_ticket_container"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/card_item_bg"
+                    android:visibility="gone">
+
+                    <LinearLayout
+
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@android:color/white"
+                            android:drawableLeft="@drawable/ic_ticket_red"
+                            android:drawablePadding="5dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="Combo Tickets"
+                            android:textAllCaps="true"
+                            android:textColor="#878787"
+                            android:textSize="14sp" />
+
+                        <LinearLayout
+                            android:id="@+id/combo_options_container"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                        </LinearLayout>
+
 
                     </LinearLayout>
 
-
-                </LinearLayout>
-
+                    <View
+                        android:id="@+id/combo_disable_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clickable="true"
+                        android:visibility="gone"
+                        android:background="#33000000" />
+                </FrameLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
-                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="36dp"
+                    android:layout_marginTop="8dp"
                     android:background="@drawable/card_item_bg"
                     android:orientation="horizontal">
 
@@ -241,10 +304,10 @@
             android:id="@+id/tv_sold_out"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"
-            android:text="Sold Out"
+            android:background="@android:color/white"
             android:gravity="center"
-            android:background="@android:color/white"/>
+            android:text="Sold Out"
+            android:visibility="gone" />
 
     </FrameLayout>
 </LinearLayout>

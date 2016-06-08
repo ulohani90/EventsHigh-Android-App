@@ -470,15 +470,15 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
             intent.putExtra("event", event);
             startActivity(intent);
 
+        } else {
+            try {
+                CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
+                        getString(R.string.title_book));
+            } catch (Exception e) {
+                Crashlytics.getInstance().core.logException(e);
+                showMessage(R.string.retry);
+            }
         }
-        try {
-            CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
-                    getString(R.string.title_book));
-        } catch (Exception e) {
-            Crashlytics.getInstance().core.logException(e);
-            showMessage(R.string.retry);
-        }
-
 
     }
 

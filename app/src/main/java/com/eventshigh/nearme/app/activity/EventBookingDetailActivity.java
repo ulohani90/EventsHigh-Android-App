@@ -14,6 +14,7 @@ import android.text.style.StyleSpan;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -60,6 +61,8 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
 
     TextView validOnExtraDays;
 
+    FrameLayout ticketContainerLayout, comboContainerLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,14 +83,17 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         numberOfTickets = (TextView) findViewById(R.id.total_tickets);
 
         validOnExtraDays = (TextView) findViewById(R.id.valid_on_extras_days);
+        ticketContainerLayout = (FrameLayout) findViewById(R.id.ticket_container_layout);
+        comboContainerLayout = (FrameLayout) findViewById(R.id.combo_ticket_container);
         getTimingSlots();
 
-        if(eventTimes.size() == 0) {
+        if (eventTimes.size() == 0) {
             findViewById(R.id.tv_sold_out).setVisibility(View.VISIBLE);
-        }else {
+        } else {
             addDateContainerData();
             addTimeContainerData(0);
             addEventTickets(0, 0);
+            addEventComboTickets(0, 0);
             updateTotalPrice();
 
             tvNextEventBooking = (TextView) findViewById(R.id.tv_next_event_booking);
@@ -177,8 +183,10 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                     dateString = dates.get(Integer.parseInt(v.getTag().toString()));
                     dayText.setSelected(true);
                     dateLayoutSelectedLast = dayText;
+
                     addTimeContainerData(position);
                     addEventTickets(position, 0);
+                    addEventComboTickets(position, 0);
                     total = noOfTickets = 0;
                     updateTotalPrice();
                 }
@@ -203,6 +211,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                 timeLayout.setSelected(true);
                 timeLayoutLastSelected = timeLayout;
                 eventTime = timings.get(0);
+
             }
             view.setTag(i);
             timeContainer.addView(view);
@@ -218,6 +227,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                     timeLayout.setSelected(true);
                     timeLayoutLastSelected = timeLayout;
                     addEventTickets(position, timeIndex);
+                    addEventComboTickets(position, timeIndex);
                     total = noOfTickets = 0;
                     updateTotalPrice();
                 }
@@ -231,9 +241,9 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         dates = new ArrayList<>();
         eventTimes = new HashMap<>();
 
-        for (int i = 0; i < event.eventTimings.length; i++){
+        for (int i = 0; i < event.eventTimings.length; i++) {
             EventTime time = DateTimeUtils.getEventTime(event, i);
-            if(getEhPricesSize(time)>0) {
+            if (getEhPricesSize(time) > 0) {
                 if (eventTimes.containsKey(time.date)) {
                     eventTimes.get(time.date).add(time);
                 } else {
@@ -252,82 +262,238 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         LinearLayout ticketTypes = (LinearLayout) findViewById(R.id.options_container);
         ticketTypes.removeAllViews();
         for (int i = 0; i < prices.size(); i++) {
-            final EhPrices price = prices.get(i);
-            View view = LayoutInflater.from(this).inflate(R.layout.eh_ticket_type_layout, ticketTypes, false);
-            TextView ticketType = (TextView) view.findViewById(R.id.ticket_name);
-            TextView ticketDesc = (TextView) view.findViewById(R.id.ticket_desc);
-            TextView ticketPrice = (TextView) view.findViewById(R.id.ticket_price);
-            TextView ticketDiscountedPrice = (TextView) view.findViewById(R.id.ticket_discounted_price);
-            final TextView ticketCount = (TextView) view.findViewById(R.id.ticket_count);
-            TextView ticketCountIncrement = (TextView) view.findViewById(R.id.ticket_count_increment);
-            TextView ticketCountDecrement = (TextView) view.findViewById(R.id.ticket_count_decrement);
-            ticketType.setText(price.name);
-            if (price.note != null && price.note.length() > 0) {
-                ticketDesc.setText(price.note);
-                ticketDesc.setVisibility(View.VISIBLE);
-            } else {
-                ticketDesc.setVisibility(View.GONE);
-            }
-            currency = price.currency;
-            ticketCount.setText(0 + "");
-            ticketCount.setTag(i + "");
-            ticketCountIncrement.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
 
-                    int ticketNo = Integer.parseInt(ticketCount.getText().toString());
-                    if (ticketNo < 10) {
-                        ticketNo++;
-                        prices.get(Integer.parseInt(ticketCount.getTag().toString())).count = ticketNo;
-                        ticketCount.setText(ticketNo + "");
-                        noOfTickets += 1;
-                        if (price.discountValue < 0.01) {
-                            total += price.value;
-                        } else {
-                            total += price.discountValue;
-                        }
-                        updateTotalPrice();
-                    }else{
-                        Toast.makeText(getApplicationContext(),"Maximum of 10 tickets can be booked. Please contact for cooperate bookings.",
-                                Toast.LENGTH_SHORT).show();
-                    }
+            final EhPrices price = prices.get(i);
+            if (!price.isMulti) {
+
+                View view = LayoutInflater.from(this).inflate(R.layout.eh_ticket_type_layout, ticketTypes, false);
+                TextView ticketType = (TextView) view.findViewById(R.id.ticket_name);
+                TextView ticketDesc = (TextView) view.findViewById(R.id.ticket_desc);
+                TextView ticketPrice = (TextView) view.findViewById(R.id.ticket_price);
+                TextView ticketDiscountedPrice = (TextView) view.findViewById(R.id.ticket_discounted_price);
+                final TextView ticketCount = (TextView) view.findViewById(R.id.ticket_count);
+                TextView ticketCountIncrement = (TextView) view.findViewById(R.id.ticket_count_increment);
+                TextView ticketCountDecrement = (TextView) view.findViewById(R.id.ticket_count_decrement);
+
+                ticketType.setText(price.name);
+
+                if (price.note != null && price.note.length() > 0) {
+                    ticketDesc.setText(price.note);
+                    ticketDesc.setVisibility(View.VISIBLE);
+                } else {
+                    ticketDesc.setVisibility(View.GONE);
                 }
-            });
-            ticketCountDecrement.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int ticketNo = Integer.parseInt(ticketCount.getText().toString());
-                    if (ticketNo != 0) {
-                        ticketNo--;
-                        prices.get(Integer.parseInt(ticketCount.getTag().toString())).count = ticketNo;
-                        ticketCount.setText(ticketNo + "");
-                        noOfTickets -= 1;
-                        if (price.discountValue < 0.01) {
-                            total -= price.value;
+                currency = price.currency;
+                ticketCount.setText(0 + "");
+                ticketCount.setTag(i + "");
+                ticketCountIncrement.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        int ticketNo = Integer.parseInt(ticketCount.getText().toString());
+                        if (ticketNo < 10) {
+
+                            ticketNo++;
+                            if (ticketNo > 0) {
+                                if (comboContainerLayout.isShown()) {
+                                    findViewById(R.id.combo_disable_view).setVisibility(View.VISIBLE);
+                                }
+                            }
+                            prices.get(Integer.parseInt(ticketCount.getTag().toString())).count = ticketNo;
+                            ticketCount.setText(ticketNo + "");
+                            noOfTickets += 1;
+                            if (price.discountValue < 0.01) {
+                                total += price.value;
+                            } else {
+                                total += price.discountValue;
+                            }
+                            updateTotalPrice();
                         } else {
-                            total -= price.discountValue;
+                            Toast.makeText(getApplicationContext(), "Maximum of 10 tickets can be booked. Please contact for cooperate bookings.",
+                                    Toast.LENGTH_SHORT).show();
                         }
-                        updateTotalPrice();
                     }
+                });
+                ticketCountDecrement.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int ticketNo = Integer.parseInt(ticketCount.getText().toString());
+                        if (ticketNo != 0) {
+                            ticketNo--;
+                            if (ticketNo == 0) {
+                                if (comboContainerLayout.isShown()) {
+                                    findViewById(R.id.combo_disable_view).setVisibility(View.GONE);
+                                }
+                            }
+                            prices.get(Integer.parseInt(ticketCount.getTag().toString())).count = ticketNo;
+                            ticketCount.setText(ticketNo + "");
+                            noOfTickets -= 1;
+                            if (price.discountValue < 0.01) {
+                                total -= price.value;
+                            } else {
+                                total -= price.discountValue;
+                            }
+                            updateTotalPrice();
+                        }
+                    }
+                });
+                if (price.discountValue > 0) {
+                    ticketPrice.setTextColor(Color.parseColor("#C0C0C0"));
+                    ticketPrice.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);
+                    ticketPrice.setText(price.currency + " " + price.value);
+                    ticketDiscountedPrice.setText(price.currency + " " + price.discountValue);
+                    ticketPrice.setPaintFlags(ticketPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                } else {
+                    ticketPrice.setTextColor(Color.parseColor("#353535"));
+                    ticketPrice.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+                    ticketPrice.setText(price.currency + " " + price.value);
+                    ticketPrice.setPaintFlags(ticketPrice.getPaintFlags());
                 }
-            });
-            if (price.discountValue > 0) {
-                ticketPrice.setTextColor(Color.parseColor("#C0C0C0"));
-                ticketPrice.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);
-                ticketPrice.setText(price.currency + " " + price.value);
-                ticketDiscountedPrice.setText(price.currency + " " + price.discountValue);
-                ticketPrice.setPaintFlags(ticketPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            } else{
-                ticketPrice.setTextColor(Color.parseColor("#353535"));
-                ticketPrice.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
-                ticketPrice.setText(price.currency + " " + price.value);
-                ticketPrice.setPaintFlags(ticketPrice.getPaintFlags());
+                ticketTypes.addView(view);
             }
-            ticketTypes.addView(view);
         }
 
     }
 
+    public void addEventComboTickets(int dateIndex, int timeIndex) {
+        prices = getEhPrices(dateIndex, timeIndex);
+
+        LinearLayout ticketTypes = (LinearLayout) findViewById(R.id.combo_options_container);
+        ticketTypes.removeAllViews();
+        boolean showView = false;
+        for (int i = 0; i < prices.size(); i++) {
+
+            final EhPrices price = prices.get(i);
+            if ((price.isMulti && isFirstOccurence(dateIndex, timeIndex, price))) {
+                showView = true;
+                View view = LayoutInflater.from(this).inflate(R.layout.eh_ticket_type_layout, ticketTypes, false);
+                TextView ticketType = (TextView) view.findViewById(R.id.ticket_name);
+                TextView ticketDesc = (TextView) view.findViewById(R.id.ticket_desc);
+                TextView ticketPrice = (TextView) view.findViewById(R.id.ticket_price);
+                TextView ticketDiscountedPrice = (TextView) view.findViewById(R.id.ticket_discounted_price);
+                final TextView ticketCount = (TextView) view.findViewById(R.id.ticket_count);
+                TextView ticketCountIncrement = (TextView) view.findViewById(R.id.ticket_count_increment);
+                TextView ticketCountDecrement = (TextView) view.findViewById(R.id.ticket_count_decrement);
+                if (price.isMulti) {
+                    ticketType.setText(getExtraString(price));
+                } else {
+                    ticketType.setText(price.name);
+                }
+
+                if (price.note != null && price.note.length() > 0) {
+                    ticketDesc.setText(price.note);
+                    ticketDesc.setVisibility(View.VISIBLE);
+                } else {
+                    ticketDesc.setVisibility(View.GONE);
+                }
+                currency = price.currency;
+                ticketCount.setText(0 + "");
+                ticketCount.setTag(i + "");
+                ticketCountIncrement.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        int ticketNo = Integer.parseInt(ticketCount.getText().toString());
+                        if (ticketNo < 10) {
+                            ticketNo++;
+                            if (ticketNo > 0) {
+                                findViewById(R.id.ticket_disable_view).setVisibility(View.VISIBLE);
+                            }
+                            prices.get(Integer.parseInt(ticketCount.getTag().toString())).count = ticketNo;
+                            ticketCount.setText(ticketNo + "");
+                            noOfTickets += 1;
+                            if (price.discountValue < 0.01) {
+                                total += price.value;
+                            } else {
+                                total += price.discountValue;
+                            }
+                            updateTotalPrice();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Maximum of 10 tickets can be booked. Please contact for cooperate bookings.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                ticketCountDecrement.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int ticketNo = Integer.parseInt(ticketCount.getText().toString());
+                        if (ticketNo != 0) {
+                            ticketNo--;
+                            if (ticketNo == 0) {
+                                findViewById(R.id.ticket_disable_view).setVisibility(View.GONE);
+                            }
+                            prices.get(Integer.parseInt(ticketCount.getTag().toString())).count = ticketNo;
+                            ticketCount.setText(ticketNo + "");
+                            noOfTickets -= 1;
+                            if (price.discountValue < 0.01) {
+                                total -= price.value;
+                            } else {
+                                total -= price.discountValue;
+                            }
+                            updateTotalPrice();
+                        }
+                    }
+                });
+                if (price.discountValue > 0) {
+                    ticketPrice.setTextColor(Color.parseColor("#C0C0C0"));
+                    ticketPrice.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);
+                    ticketPrice.setText(price.currency + " " + price.value);
+                    ticketDiscountedPrice.setText(price.currency + " " + price.discountValue);
+                    ticketPrice.setPaintFlags(ticketPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                } else {
+                    ticketPrice.setTextColor(Color.parseColor("#353535"));
+                    ticketPrice.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+                    ticketPrice.setText(price.currency + " " + price.value);
+                    ticketPrice.setPaintFlags(ticketPrice.getPaintFlags());
+                }
+                ticketTypes.addView(view);
+            }
+        }
+        if (showView) {
+            comboContainerLayout.setVisibility(View.VISIBLE);
+        } else {
+            comboContainerLayout.setVisibility(View.GONE);
+        }
+
+    }
+
+    public String getExtraString(EhPrices price) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(price.name);
+        if (price.occurences.size() >= 2) {
+            if (DateTimeUtils.dateToEventTime(new Date(price.occurences.get(0)), TimeZone.getTimeZone(event.city.timeZone)).date.equalsIgnoreCase(DateTimeUtils.dateToEventTime(new Date(price.occurences.get(1)), TimeZone.getTimeZone(event.city.timeZone)).date)) {
+
+                builder.append(" ( Also valid for ");
+                for (int i = 1; i < price.occurences.size(); i++) {
+                    if (i != 1) {
+                        builder.append(", ");
+                    }
+                    builder.append(DateTimeUtils.dateToEventTime(new Date(price.occurences.get(i)), TimeZone.getTimeZone(event.city.timeZone)).time);
+                }
+                builder.append(" )");
+            } else {
+                builder.append(" ( Also valid for ");
+                for (int i = 1; i < price.occurences.size(); i++) {
+                    if (i != 1) {
+                        builder.append(", ");
+                    }
+                    EventTime time = DateTimeUtils.dateToEventTime(new Date(price.occurences.get(i)), TimeZone.getTimeZone(event.city.timeZone));
+                    builder.append(time.day + " " + time.date + " " + time.time);
+                }
+                builder.append(" )");
+            }
+        }
+        return builder.toString();
+    }
+
+    public boolean isFirstOccurence(int dateIndex, int timeIndex, EhPrices price) {
+        EventTime time = eventTimes.get(dates.get(dateIndex)).get(timeIndex);
+        if (DateTimeUtils.dateToEventTime(new Date(price.occurences.get(0)), TimeZone.getTimeZone(event.city.timeZone)).equals(time)) {
+            return true;
+        }
+        return false;
+    }
 
 
     public ArrayList<EhPrices> getEhPrices(int dateIndex, int timeIndex) {
