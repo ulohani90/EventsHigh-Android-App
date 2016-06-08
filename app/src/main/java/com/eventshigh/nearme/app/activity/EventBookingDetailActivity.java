@@ -88,12 +88,12 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         comboContainerLayout = (FrameLayout) findViewById(R.id.combo_ticket_container);
         getTimingSlots();
 
-        if(eventTimes.size() == 0) {
+        if (eventTimes.size() == 0) {
             findViewById(R.id.ll_sold_out_screen).setVisibility(View.VISIBLE);
-            if(!Utils.checkIfStringEmpty(event.organizerPhone))
-                ((TextView)findViewById(R.id.tv_sold_out_text)).setText("They may be available at venue. Please check with organizers at this "+event.organizerPhone+" .");
-                getSupportActionBar().setTitle("Sold out");
-        }else {
+            if (!Utils.checkIfStringEmpty(event.organizerPhone))
+                ((TextView) findViewById(R.id.tv_sold_out_text)).setText("They may be available at venue. Please check with organizers at this " + event.organizerPhone + " .");
+            getSupportActionBar().setTitle("Sold out");
+        } else {
             addDateContainerData();
             addTimeContainerData(0);
             addEventTickets(0, 0);
@@ -361,7 +361,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
 
     public void addEventComboTickets(int dateIndex, int timeIndex) {
         prices = getEhPrices(dateIndex, timeIndex);
-
+        TextView comboTicketTitle = (TextView) findViewById(R.id.combo_tickets_title);
         LinearLayout ticketTypes = (LinearLayout) findViewById(R.id.combo_options_container);
         ticketTypes.removeAllViews();
         boolean showView = false;
@@ -378,11 +378,9 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                 final TextView ticketCount = (TextView) view.findViewById(R.id.ticket_count);
                 TextView ticketCountIncrement = (TextView) view.findViewById(R.id.ticket_count_increment);
                 TextView ticketCountDecrement = (TextView) view.findViewById(R.id.ticket_count_decrement);
-                if (price.isMulti) {
-                    ticketType.setText(getExtraString(price));
-                } else {
-                    ticketType.setText(price.name);
-                }
+                comboTicketTitle.setText(getExtraString(price));
+                ticketType.setText(price.name);
+
 
                 if (price.note != null && price.note.length() > 0) {
                     ticketDesc.setText(price.note);
@@ -464,31 +462,36 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
 
     public String getExtraString(EhPrices price) {
         StringBuilder builder = new StringBuilder();
-        builder.append(price.name);
+
         if (price.occurences.size() >= 2) {
             if (DateTimeUtils.dateToEventTime(new Date(price.occurences.get(0)), TimeZone.getTimeZone(event.city.timeZone)).date.equalsIgnoreCase(DateTimeUtils.dateToEventTime(new Date(price.occurences.get(1)), TimeZone.getTimeZone(event.city.timeZone)).date)) {
 
-                builder.append(" ( Also valid for ");
-                for (int i = 1; i < price.occurences.size(); i++) {
-                    if (i != 1) {
-                        builder.append(", ");
+                builder.append("For " + DateTimeUtils.dateToEventTime(new Date(price.occurences.get(0)), TimeZone.getTimeZone(event.city.timeZone)).date + ", ");
+                for (int i = 0; i < price.occurences.size(); i++) {
+                    if (i != 0) {
+                        builder.append(" & ");
                     }
                     builder.append(DateTimeUtils.dateToEventTime(new Date(price.occurences.get(i)), TimeZone.getTimeZone(event.city.timeZone)).time);
                 }
-                builder.append(" )");
+
             } else {
-                builder.append(" ( Also valid for ");
-                for (int i = 1; i < price.occurences.size(); i++) {
-                    if (i != 1) {
-                        builder.append(", ");
+                builder.append("For ");
+                EventTime time = null;
+                for (int i = 0; i < price.occurences.size(); i++) {
+                    if (i != 0) {
+                        builder.append(" - ");
                     }
-                    EventTime time = DateTimeUtils.dateToEventTime(new Date(price.occurences.get(i)), TimeZone.getTimeZone(event.city.timeZone));
-                    builder.append(time.day + " " + time.date + " " + time.time);
+                    time = DateTimeUtils.dateToEventTime(new Date(price.occurences.get(i)), TimeZone.getTimeZone(event.city.timeZone));
+                    builder.append(time.day + " " + time.date);
                 }
-                builder.append(" )");
+
+                builder.append(", " + time.time);
             }
         }
-        return builder.toString();
+        SpannableString string = new SpannableString(builder.toString());
+        string.setSpan(new StyleSpan(Typeface.BOLD), 0, 14, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        return string.toString();
     }
 
     public boolean isFirstOccurence(int dateIndex, int timeIndex, EhPrices price) {

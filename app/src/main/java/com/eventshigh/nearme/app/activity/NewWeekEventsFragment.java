@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
@@ -271,7 +273,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             if (totalEvents == null) {
                 filteredEvents = filterEventsWithDate(filteredEvents, -1);
                 filteredEvents = filterEventsWithPrice(filteredEvents, -1);
-                eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+               /* eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.size() > 0) {
 
                     noMyEventsView.setVisibility(View.GONE);
@@ -281,7 +283,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                     Toast.makeText(getActivity(), R.string.no_events, Toast.LENGTH_SHORT).show();
 
 
-                }
+                }*/
             }
             return filteredEvents;
         }
@@ -340,7 +342,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             if (totalEvents == null) {
                 filteredEvents = filterEventsWithCategory(null, filteredEvents);
                 filteredEvents = filterEventsWithPrice(filteredEvents, -1);
-                eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                /*eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.size() > 0) {
 
                     noMyEventsView.setVisibility(View.GONE);
@@ -349,7 +351,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                     // Failed. Show toast and return empty list.
                     Toast.makeText(getActivity(), R.string.no_events, Toast.LENGTH_SHORT).show();
 
-                }
+                }*/
             }
             return filteredEvents;
         }
@@ -437,7 +439,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             if (totalEvents == null) {
                 filteredEvents = filterEventsWithCategory(null, filteredEvents);
                 filteredEvents = filterEventsWithDate(filteredEvents, -1);
-                eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                /*eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.size() > 0) {
 
                     noMyEventsView.setVisibility(View.GONE);
@@ -446,7 +448,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                     // Failed. Show toast and return empty list.
                     Toast.makeText(getActivity(), R.string.no_events, Toast.LENGTH_SHORT).show();
 
-                }
+                }*/
             }
             return filteredEvents;
         }
@@ -479,9 +481,11 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                         filterText.setSelected(true);
                     }
                     if (filterText.getText().toString().equalsIgnoreCase(EventsHighEndpoints.QUERY_FEATURED)) {
-                        filterEventsWithCategory("Featured", null);
+                        startFilterAsyncTask(EventsGridActivity.CATEGORY_FILTER, null, "Featured", -1, null);
+                        //filterEventsWithCategory("Featured", null);
                     } else {
-                        filterEventsWithCategory(filterText.getText().toString(), null);
+                        startFilterAsyncTask(EventsGridActivity.CATEGORY_FILTER, null, filterText.getText().toString(), -1, null);
+                        //filterEventsWithCategory(filterText.getText().toString(), null);
                     }
                 }
             });
@@ -499,15 +503,20 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                 public void onClick(View v) {
                     int position = (Integer) filterText.getTag();
                     if (position == 0) {
-                        filterEventsWithPrice(null, EventsGridActivity.FREE);
+                        startFilterAsyncTask(EventsGridActivity.PRICE_FILTER, null, null, EventsGridActivity.FREE, null);
+                        // filterEventsWithPrice(null, EventsGridActivity.FREE);
                     } else if (position == 1) {
-                        filterEventsWithPrice(null, EventsGridActivity.UPTO_250);
+                        startFilterAsyncTask(EventsGridActivity.PRICE_FILTER, null, null, EventsGridActivity.UPTO_250, null);
+                        //filterEventsWithPrice(null, EventsGridActivity.UPTO_250);
                     } else if (position == 2) {
-                        filterEventsWithPrice(null, EventsGridActivity.PRICE_250_TO_750);
+                        startFilterAsyncTask(EventsGridActivity.PRICE_FILTER, null, null, EventsGridActivity.PRICE_250_TO_750, null);
+                        //filterEventsWithPrice(null, EventsGridActivity.PRICE_250_TO_750);
                     } else if (position == 3) {
-                        filterEventsWithPrice(null, EventsGridActivity.PRICE_750_TO_1500);
+                        startFilterAsyncTask(EventsGridActivity.PRICE_FILTER, null, null, EventsGridActivity.PRICE_750_TO_1500, null);
+                        //filterEventsWithPrice(null, EventsGridActivity.PRICE_750_TO_1500);
                     } else {
-                        filterEventsWithPrice(null, EventsGridActivity.MORE_THAN_1500);
+                        startFilterAsyncTask(EventsGridActivity.PRICE_FILTER, null, null, EventsGridActivity.MORE_THAN_1500, null);
+                        //filterEventsWithPrice(null, EventsGridActivity.MORE_THAN_1500);
                     }
                     if (filterText.isSelected()) {
                         filterText.setSelected(false);
@@ -549,13 +558,16 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                 public void onClick(View v) {
                     if (filterText.getText().toString().equalsIgnoreCase("Today")) {
                         checkIfCustomDateSelected();
-                        filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                        startFilterAsyncTask(EventsGridActivity.DATE_FILTER, null, null, -1, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                        //filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Tomorrow")) {
                         checkIfCustomDateSelected();
-                        filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
+                        startFilterAsyncTask(EventsGridActivity.DATE_FILTER, null, null, -1, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
+                        // filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
                     } else if (filterText.getText().toString().equalsIgnoreCase("Weekend")) {
                         checkIfCustomDateSelected();
-                        filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
+                        startFilterAsyncTask(EventsGridActivity.DATE_FILTER, null, null, -1, DateTimeUtils.getWeekEndDates());
+                        //filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Dates")) {
                         showDateDialog();
                         Calendar currentYear = Calendar.getInstance();
@@ -634,7 +646,8 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             for (int i = 0; i < selectedDates.size(); i++) {
                 dates[i] = selectedDates.get(i).getTime();
             }
-            filterEventsWithDate(null, dates);
+            startFilterAsyncTask(EventsGridActivity.DATE_FILTER, null, null, -1, dates);
+            //filterEventsWithDate(null, dates);
         }
     }
 
@@ -727,5 +740,68 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
         }
         showMoreFilterText.setCompoundDrawables(drawableLeft, null, null, null);
+    }
+
+    FilterAsyncTask filterAsyncTask;
+
+    public void startFilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, long... times) {
+        if (filterAsyncTask != null && !filterAsyncTask.isCancelled()) {
+            filterAsyncTask.cancel(true);
+
+        }
+        filterAsyncTask = new FilterAsyncTask(type, totalEvents, category, priceValue, times);
+        filterAsyncTask.execute();
+
+    }
+
+    public class FilterAsyncTask extends AsyncTask<Void, Void, List<Event>> {
+
+        List<Event> totalEvents;
+        String category;
+        int priceValue;
+        long[] times;
+        int type;
+
+        public FilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, long... times) {
+            this.type = type;
+            this.totalEvents = totalEvents;
+            this.category = category;
+            this.priceValue = priceValue;
+            this.times = times;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            topProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected List<Event> doInBackground(Void... params) {
+            switch (type) {
+                case EventsGridActivity.PRICE_FILTER:
+                    return filterEventsWithPrice(totalEvents, priceValue);
+                case EventsGridActivity.DATE_FILTER:
+                    return filterEventsWithDate(totalEvents, times);
+                case EventsGridActivity.CATEGORY_FILTER:
+                    return filterEventsWithCategory(category, totalEvents);
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<Event> events) {
+
+            if (!isCancelled() && events != null) {
+                topProgressBar.setVisibility(View.GONE);
+                eventsAdapter.setEvents(events, null, showEhInviteForNotification);
+                if (events.size() > 0) {
+                    noMyEventsView.setVisibility(View.GONE);
+                } else {
+                    noMyEventsView.setVisibility(View.VISIBLE);
+                    Toast.makeText(getActivity(), R.string.no_events, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -443,12 +444,12 @@ public class EventsFragment extends BaseEventsFragment {
             if (totalEvents == null) {
                 filteredEvents = filterEventsWithDate(filteredEvents, -1);
                 filteredEvents = filterEventsWithPrice(filteredEvents, -1);
-                eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                /*eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.isEmpty()) {
                     // Failed. Show toast and return empty list.
                     Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
 
-                }
+                }*/
             }
             return filteredEvents;
         }
@@ -503,12 +504,12 @@ public class EventsFragment extends BaseEventsFragment {
             if (totalEvents == null) {
                 filteredEvents = filterEventsWithCategory(null, filteredEvents);
                 filteredEvents = filterEventsWithPrice(filteredEvents, -1);
-                eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+               /* eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.isEmpty()) {
                     // Failed. Show toast and return empty list.
                     Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
 
-                }
+                }*/
             }
             return filteredEvents;
         }
@@ -595,17 +596,78 @@ public class EventsFragment extends BaseEventsFragment {
             if (totalEvents == null) {
                 filteredEvents = filterEventsWithCategory(null, filteredEvents);
                 filteredEvents = filterEventsWithDate(filteredEvents, -1);
-                eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                /*eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.isEmpty()) {
                     // Failed. Show toast and return empty list.
                     Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
 
-                }
+                }*/
             }
             return filteredEvents;
         }
 
 
         return null;
+    }
+
+    FilterAsyncTask filterAsyncTask;
+
+    public void startFilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, long... times) {
+        if (filterAsyncTask != null && !filterAsyncTask.isCancelled()) {
+            filterAsyncTask.cancel(true);
+
+        }
+        filterAsyncTask = new FilterAsyncTask(type, totalEvents, category, priceValue, times);
+        filterAsyncTask.execute();
+
+    }
+
+    public class FilterAsyncTask extends AsyncTask<Void, Void, List<Event>> {
+
+        List<Event> totalEvents;
+        String category;
+        int priceValue;
+        long[] times;
+        int type;
+
+        public FilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, long... times) {
+            this.type = type;
+            this.totalEvents = totalEvents;
+            this.category = category;
+            this.priceValue = priceValue;
+            this.times = times;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            topProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected List<Event> doInBackground(Void... params) {
+            switch (type) {
+                case EventsGridActivity.PRICE_FILTER:
+                    return filterEventsWithPrice(totalEvents, priceValue);
+                case EventsGridActivity.DATE_FILTER:
+                    return filterEventsWithDate(totalEvents, times);
+                case EventsGridActivity.CATEGORY_FILTER:
+                    return filterEventsWithCategory(category, totalEvents);
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<Event> events) {
+
+            if (!isCancelled()) {
+                topProgressBar.setVisibility(View.GONE);
+                eventsAdapter.setEvents(events, null, showEhInviteForNotification);
+                if (events.isEmpty()) {
+                    Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+
+                }
+            }
+        }
     }
 }

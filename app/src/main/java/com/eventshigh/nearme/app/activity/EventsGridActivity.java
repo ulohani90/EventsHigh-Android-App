@@ -60,6 +60,10 @@ public class EventsGridActivity extends BaseContextActivity {
     boolean isCategoryFilterVisible;
     Account account;
 
+    public static final int PRICE_FILTER = 3;
+    public static final int CATEGORY_FILTER = 1;
+    public static final int DATE_FILTER = 2;
+
 
     public static final int FREE = 1;
     public static final int UPTO_250 = 2;
@@ -289,9 +293,11 @@ public class EventsGridActivity extends BaseContextActivity {
                         filterText.setSelected(true);
                     }
                     if (filterText.getText().toString().equalsIgnoreCase(EventsHighEndpoints.QUERY_FEATURED)) {
-                        eventsFragment.filterEventsWithCategory("Featured", null);
+                        eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, "Featured", -1, null);
+                        //eventsFragment.filterEventsWithCategory("Featured", null);
                     } else {
-                        eventsFragment.filterEventsWithCategory(filterText.getText().toString(), null);
+                        eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, filterText.getText().toString(), -1, null);
+                        //eventsFragment.filterEventsWithCategory(filterText.getText().toString(), null);
                     }
                 }
             });
@@ -309,15 +315,20 @@ public class EventsGridActivity extends BaseContextActivity {
                 public void onClick(View v) {
                     int position = (Integer) filterText.getTag();
                     if (position == 0) {
-                        eventsFragment.filterEventsWithPrice(null, FREE);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, FREE, null);
+                        // eventsFragment.filterEventsWithPrice(null, FREE);
                     } else if (position == 1) {
-                        eventsFragment.filterEventsWithPrice(null, UPTO_250);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, UPTO_250, null);
+                        //eventsFragment.filterEventsWithPrice(null, UPTO_250);
                     } else if (position == 2) {
-                        eventsFragment.filterEventsWithPrice(null, PRICE_250_TO_750);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_250_TO_750, null);
+                        //eventsFragment.filterEventsWithPrice(null, PRICE_250_TO_750);
                     } else if (position == 3) {
-                        eventsFragment.filterEventsWithPrice(null, PRICE_750_TO_1500);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_750_TO_1500, null);
+                        //eventsFragment.filterEventsWithPrice(null, PRICE_750_TO_1500);
                     } else {
-                        eventsFragment.filterEventsWithPrice(null, MORE_THAN_1500);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, MORE_THAN_1500, null);
+                        //eventsFragment.filterEventsWithPrice(null, MORE_THAN_1500);
                     }
 
                     if (filterText.isSelected()) {
@@ -358,13 +369,16 @@ public class EventsGridActivity extends BaseContextActivity {
                 public void onClick(View v) {
                     if (filterText.getText().toString().equalsIgnoreCase("Today")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                        //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Tomorrow")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
+                        // eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
                     } else if (filterText.getText().toString().equalsIgnoreCase("Weekend")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, DateTimeUtils.getWeekEndDates());
+                        //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Dates")) {
 
                         showDateDialog();
@@ -464,7 +478,8 @@ public class EventsGridActivity extends BaseContextActivity {
             for (int i = 0; i < selectedDates.size(); i++) {
                 dates[i] = selectedDates.get(i).getTime();
             }
-            eventsFragment.filterEventsWithDate(null, dates);
+            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, dates);
+            //eventsFragment.filterEventsWithDate(null, dates);
         }
     }
 
