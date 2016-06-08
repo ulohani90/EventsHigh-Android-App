@@ -18,7 +18,6 @@ import android.widget.Toast;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
-import com.eventshigh.nearme.app.network.GatewayUrlRequest;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -334,7 +333,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                connection.setFollowRedirects(false);
+                connection.setInstanceFollowRedirects(false);
 
                 // Send request
                 OutputStream os = connection.getOutputStream();
@@ -353,15 +352,17 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
 
                 params.add(new BasicNameValuePair("datetime", eventTime.longtime+""));
 
-                for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketName", ehp.name + ""));
-                for (EhPrices ehp : prices)
-                    if(ehp.discountValue > 0.01)
-                        params.add(new BasicNameValuePair("ticketValue", ehp.discountValue + ""));
-                    else
-                        params.add(new BasicNameValuePair("ticketValue", ehp.value + ""));
+                for (EhPrices ehp : prices) {
+                    if(ehp.count>0){
+                        params.add(new BasicNameValuePair("ticketName", ehp.name + ""));
+                        if (ehp.discountValue > 0.01)
+                            params.add(new BasicNameValuePair("ticketValue", ehp.discountValue + ""));
+                        else
+                            params.add(new BasicNameValuePair("ticketValue", ehp.value + ""));
 
-                for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketNum", ehp.count + ""));
-
+                        params.add(new BasicNameValuePair("ticketNum", ehp.count + ""));
+                    }
+                }
 
                 int noOfCards = arrayGuestDetails.length();
                 Iterator<String> iter = arrayGuestDetails.getJSONObject(0).keys();
