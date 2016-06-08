@@ -228,14 +228,43 @@
             android:textColor="@android:color/white"
             android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/tv_sold_out"
+        <LinearLayout
+            android:id="@+id/ll_sold_out_screen"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"
-            android:text="Sold Out"
-            android:gravity="center"
-            android:background="@android:color/white"/>
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:background="#eeeeee"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/soldout_ic"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="50dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14dp"
+                android:textAllCaps="true"
+                android:fontFamily="sens-serif-medium"
+                android:text="Online tickets have been sold out"
+                android:layout_marginBottom="10dp"
+                android:textColor="#666666"
+                />
+
+            <TextView
+                android:id="@+id/tv_sold_out_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="#999999"
+                android:text="They may be available at venue. Please check with organizers."/>
+
+        </LinearLayout>
 
     </FrameLayout>
 </LinearLayout>

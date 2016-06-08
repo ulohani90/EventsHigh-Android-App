@@ -24,6 +24,7 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -78,7 +79,10 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         getTimingSlots();
 
         if(eventTimes.size() == 0) {
-            findViewById(R.id.tv_sold_out).setVisibility(View.VISIBLE);
+            findViewById(R.id.ll_sold_out_screen).setVisibility(View.VISIBLE);
+            if(!Utils.checkIfStringEmpty(event.organizerPhone))
+                ((TextView)findViewById(R.id.tv_sold_out_text)).setText("They may be available at venue. Please check with organizers at this "+event.organizerPhone+" .");
+                getSupportActionBar().setTitle("Sold out");
         }else {
             addDateContainerData();
             addTimeContainerData(0);
