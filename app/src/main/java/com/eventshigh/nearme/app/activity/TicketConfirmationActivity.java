@@ -46,6 +46,7 @@ public class TicketConfirmationActivity extends AppCompatActivity implements Vie
     double discount = 0;
     StringBuilder seatDetails = new StringBuilder("");
     JSONArray arrayGuestDetails;
+    String ticketLink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +84,9 @@ public class TicketConfirmationActivity extends AppCompatActivity implements Vie
         eventTime = bundle.getParcelable(EventBookingDetailActivity.EVENT_TIME_SELECTED);
         prices = bundle.getParcelableArrayList(EventBookingDetailActivity.EVENT_TICKETS_DESCRIPTION);
         arrayDetailCards = bundle.getString(GuestDetailActivity.GUEST_DETAIL_ARRAY);
+
         noOfTickets = (int) bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_TICKETS);
+        ticketLink = bundle.getString(TicketReviewActivity.TICKETING_LINK);
 
         tvEventName.setText(event.title);
         tvEventLocation.setText(event.venue);
@@ -165,7 +168,13 @@ public class TicketConfirmationActivity extends AppCompatActivity implements Vie
         }
     }
 
+
     void startTicketShareActivity() {
+        String shareText = "Hey, I just book " + noOfTickets + " tickets for " + event.title + " on EventsHigh. It'll be fun.\n" + ticketLink;
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
+        this.startActivity(shareIntent);
 
     }
 

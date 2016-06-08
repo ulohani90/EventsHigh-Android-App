@@ -187,6 +187,7 @@ public class CustomUrlActivity extends BaseActivity {
                             UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(url);
                             Intent intent = new Intent();
                             intent.putExtra(TicketReviewActivity.BOOKING_ID, sanitizer.getValue("booking"));
+                            intent.putExtra(TicketReviewActivity.TICKETING_LINK, url);
                             intent.putExtra(TicketReviewActivity.IS_PAYMENT_SUCCESS, true);
                             activity.setResult(RESULT_OK, intent);
                             activity.finish();

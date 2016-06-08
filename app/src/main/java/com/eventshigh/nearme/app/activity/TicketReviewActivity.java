@@ -73,6 +73,8 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
 
     public static final String IS_PAYMENT = "is_payment";
     public static final String BOOKING_ID = "booking";
+    public static final String TICKETING_LINK = "ticketing_link";
+
     public static final String IS_PAYMENT_SUCCESS = "is_success";
     public static final int PAYMENT_REQ_CODE = 100;
 
@@ -190,7 +192,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
             if (data.hasExtra(IS_PAYMENT_SUCCESS) & data.getBooleanExtra(IS_PAYMENT_SUCCESS, false)) {
                 Toast.makeText(this, "Payment successful",
                         Toast.LENGTH_SHORT).show();
-                callConfirmationActivity(data.getStringExtra(BOOKING_ID));
+                callConfirmationActivity(data.getStringExtra(BOOKING_ID),data.getStringExtra(TICKETING_LINK));
             } else {
                 Toast.makeText(this, "You payment was unccessful. Please try again",
                         Toast.LENGTH_LONG).show();
@@ -198,9 +200,10 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    private void callConfirmationActivity(String bookingId) {
+    private void callConfirmationActivity(String bookingId, String ticketingLink) {
         Intent iNext = new Intent(this, TicketConfirmationActivity.class);
         bundle.putString(BOOKING_ID, bookingId);
+        bundle.putString(TICKETING_LINK,ticketingLink);
         iNext.putExtras(bundle);
         iNext.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(iNext);
@@ -357,6 +360,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
                             params.add(new BasicNameValuePair("ticketValue", ehp.discountValue + ""));
                         else
                             params.add(new BasicNameValuePair("ticketValue", ehp.value + ""));
+
                         params.add(new BasicNameValuePair("ticketNum", ehp.count + ""));
                     }
                 }
