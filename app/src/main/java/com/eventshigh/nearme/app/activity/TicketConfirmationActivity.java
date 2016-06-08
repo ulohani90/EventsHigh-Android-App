@@ -14,8 +14,10 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;
@@ -25,9 +27,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class TicketConfirmationActivity extends AppCompatActivity implements View.OnClickListener{
+public class TicketConfirmationActivity extends AppCompatActivity implements View.OnClickListener {
 
-    TextView tvEventName, tvEventLocation,tvNoOfTickets;
+    TextView tvEventName, tvEventLocation, tvNoOfTickets;
     TextView tvEventBookingId, tvEventGuestName, tvEventGuestEmailId, tvEventGuestPhone;
     TextView tvEventDate, tvEventTime, tvEventSeatDescription;
     TextView tvEventMapLocation;
@@ -53,35 +55,35 @@ public class TicketConfirmationActivity extends AppCompatActivity implements Vie
         mapViews();
         bundle = getIntent().getExtras();
         mapIntentData();
-        noOfTickets = (int)bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_TICKETS);
+        noOfTickets = (int) bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_TICKETS);
 
     }
 
-    void mapViews(){
-        tvEventName = (TextView)findViewById(R.id.tv_event_name);
-        tvEventLocation = (TextView)findViewById(R.id.tv_event_location);
-        tvNoOfTickets = (TextView)findViewById(R.id.tv_no_of_tickets);
-        tvEventGuestPhone = (TextView)findViewById(R.id.tv_event_guest_phone);
-        tvEventGuestEmailId = (TextView)findViewById(R.id.tv_event_guest_email);
-        tvEventGuestName = (TextView)findViewById(R.id.tv_event_guest_name);
-        tvEventBookingId = (TextView)findViewById(R.id.tv_event_booking_id);
-        tvEventDate = (TextView)findViewById(R.id.tv_event_date);
-        tvEventTime = (TextView)findViewById(R.id.tv_event_time);
-        tvEventSeatDescription = (TextView)findViewById(R.id.tv_ticket_description);
-        llShareTicketBtn = (LinearLayout)findViewById(R.id.ll_share_ticket_btn);
+    void mapViews() {
+        tvEventName = (TextView) findViewById(R.id.tv_event_name);
+        tvEventLocation = (TextView) findViewById(R.id.tv_event_location);
+        tvNoOfTickets = (TextView) findViewById(R.id.tv_no_of_tickets);
+        tvEventGuestPhone = (TextView) findViewById(R.id.tv_event_guest_phone);
+        tvEventGuestEmailId = (TextView) findViewById(R.id.tv_event_guest_email);
+        tvEventGuestName = (TextView) findViewById(R.id.tv_event_guest_name);
+        tvEventBookingId = (TextView) findViewById(R.id.tv_event_booking_id);
+        tvEventDate = (TextView) findViewById(R.id.tv_event_date);
+        tvEventTime = (TextView) findViewById(R.id.tv_event_time);
+        tvEventSeatDescription = (TextView) findViewById(R.id.tv_ticket_description);
+        llShareTicketBtn = (LinearLayout) findViewById(R.id.ll_share_ticket_btn);
         llShareTicketBtn.setOnClickListener(this);
-        tvEventMapLocation = (TextView)findViewById(R.id.tv_event_map_location);
+        tvEventMapLocation = (TextView) findViewById(R.id.tv_event_map_location);
         tvEventMapLocation.setOnClickListener(this);
     }
 
-    private void mapIntentData(){
+    private void mapIntentData() {
         event = bundle.getParcelable(EventDetailActivity.EVENT_OBJECT);
         total = bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_PRICE);
         dateString = bundle.getString(EventBookingDetailActivity.EVENT_DATE_SELECTED);
         eventTime = bundle.getParcelable(EventBookingDetailActivity.EVENT_TIME_SELECTED);
         prices = bundle.getParcelableArrayList(EventBookingDetailActivity.EVENT_TICKETS_DESCRIPTION);
         arrayDetailCards = bundle.getString(GuestDetailActivity.GUEST_DETAIL_ARRAY);
-        noOfTickets = (int)bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_TICKETS);
+        noOfTickets = (int) bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_TICKETS);
 
         tvEventName.setText(event.title);
         tvEventLocation.setText(event.venue);
@@ -89,10 +91,10 @@ public class TicketConfirmationActivity extends AppCompatActivity implements Vie
 
         tvEventDate.setText(eventTime.date);
         tvEventTime.setText(eventTime.time);
-        for(EhPrices ehp:prices){
-            discount += (ehp.discountValue*ehp.count);
-            if(ehp.count>0)
-                seatDetails.append(ehp.count+" "+ehp.name+"\n");
+        for (EhPrices ehp : prices) {
+            discount += (ehp.discountValue * ehp.count);
+            if (ehp.count > 0)
+                seatDetails.append(ehp.count + " " + ehp.name + "\n");
         }
         tvEventSeatDescription.setText(seatDetails);
 
@@ -103,33 +105,47 @@ public class TicketConfirmationActivity extends AppCompatActivity implements Vie
             tvEventGuestName.setText(jsonObject.getString("firstName"));
             tvEventGuestEmailId.setText(jsonObject.getString("email"));
             tvEventGuestPhone.setText(jsonObject.getString("mobile"));
-        }catch (JSONException e){
+        } catch (JSONException e) {
         }
+
+        findViewById(R.id.tv_explore_more_booking).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventsContext param = new EventsContext(null, "eventshigh specials");
+                Intent intent = new Intent(TicketConfirmationActivity.this, EventsGridActivity.class)
+                        .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
+
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch(item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onBackPressed(){
-        NavUtils.navigateUpFromSameTask(this);
-        super.onBackPressed();
+    public void onBackPressed() {
+        Intent intent = new Intent(this, LaunchActivity.class);
+        startActivity(intent);
+        //NavUtils.navigateUpFromSameTask(this);
+        this.finish();
     }
 
     @Override
-    public void finish(){
-       super.finish();
+    public void finish() {
+        super.finish();
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.tv_event_map_location:
                 startMapActivity();
                 break;
@@ -140,17 +156,18 @@ public class TicketConfirmationActivity extends AppCompatActivity implements Vie
     }
 
 
-    void startMapActivity(){
-        if(event.location != null){
+    void startMapActivity() {
+        if (event.location != null) {
             Intent intent = event.getShowDirectionsOnMapIntent();
             startActivity(intent);
-        }else{
+        } else {
             Toast.makeText(TicketConfirmationActivity.this, "Map location not available", Toast.LENGTH_SHORT).show();
         }
     }
 
-    void startTicketShareActivity(){
+    void startTicketShareActivity() {
 
     }
+
 
 }

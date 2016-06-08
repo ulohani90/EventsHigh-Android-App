@@ -202,6 +202,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
         Intent iNext = new Intent(this, TicketConfirmationActivity.class);
         bundle.putString(BOOKING_ID, bookingId);
         iNext.putExtras(bundle);
+        iNext.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(iNext);
     }
 
@@ -350,7 +351,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
                 params.add(new BasicNameValuePair("datetime", eventTime.longtime + ""));
 
                 for (EhPrices ehp : prices) {
-                    if(ehp.count>0){
+                    if (ehp.count > 0) {
                         params.add(new BasicNameValuePair("ticketName", ehp.name + ""));
                         if (ehp.discountValue > 0.01)
                             params.add(new BasicNameValuePair("ticketValue", ehp.discountValue + ""));
