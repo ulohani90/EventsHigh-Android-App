@@ -23,8 +23,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
@@ -33,6 +33,7 @@ import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.ui.animation.ResizeAnimation;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.squareup.timessquare.CalendarPickerView;
 
@@ -143,14 +144,19 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         addFiltersData();
+        makeServerRequest(false);
+        if (filterCategoryName != null)
+            filterCategoryName.clear();
+        if (filterEventPrices != null)
+            filterEventPrices.clear();
+        if (filterEventTimes != null)
+            filterEventTimes.clear();
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-
-        makeServerRequest(false);
     }
 
     public void makeServerRequest(boolean shouldBypassCache) {
@@ -158,8 +164,8 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         endDate.setFirstDayOfWeek(Calendar.MONDAY);
         endDate.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         endDate.add(Calendar.DAY_OF_WEEK, 8);
-        eventsContext.dateFilter = EventsContext.formatDateFilter(Calendar.getInstance()) + "," + EventsContext.formatDateFilter(endDate);
-        EventCollectionRequest.submit(activity, eventsContext, Request.Priority.IMMEDIATE, this,
+        String dateString = EventsContext.formatDateFilter(Calendar.getInstance()) + "," + EventsContext.formatDateFilter(endDate);
+        EventCollectionRequest.submit(activity, eventsContext, Request.Priority.IMMEDIATE, this, dateString,
                 shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
     }
 
@@ -230,13 +236,15 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
     public List<Event> filterEventsWithCategory(String category, List<Event> totalEvents) {
         List<Event> allEvents;
 
-        if (totalEvents == null && eventsCollection!=null) {
+        if (totalEvents == null && eventsCollection != null) {
+
             allEvents = eventsCollection.events;
         } else {
             allEvents = totalEvents;
         }
 
-        if(allEvents!=null) {
+        if (allEvents != null) {
+
             if (filterCategoryName == null)
                 filterCategoryName = new ArrayList<>();
             if (category != null) {
@@ -278,6 +286,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             return filteredEvents;
         }
         return null;
+
     }
 
 
@@ -285,13 +294,16 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
     public List<Event> filterEventsWithDate(List<Event> totalEvents, long... times) {
         List<Event> allEvents;
-        if (totalEvents == null && eventsCollection!=null) {
+
+        if (totalEvents == null && eventsCollection != null) {
+
             allEvents = eventsCollection.events;
         } else {
             allEvents = totalEvents;
         }
 
-        if(allEvents!=null) {
+        if (allEvents != null) {
+
             if (filterEventTimes == null) {
                 filterEventTimes = new ArrayList<>();
             }
@@ -307,11 +319,16 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             List<Event> filteredEvents = new ArrayList<>();
             if (filterEventTimes.size() > 0) {
                 for (int i = 0; i < allEvents.size(); i++) {
+
+                    secondLoop:
+
                     for (int j = 0; j < filterEventTimes.size(); j++) {
                         for (int k = 0; k < allEvents.get(i).eventTimings.length; k++) {
                             if (filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime()) {
                                 filteredEvents.add(allEvents.get(i));
-                                break;
+                                break secondLoop;
+
+
                             }
                         }
                     }
@@ -337,20 +354,21 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             return filteredEvents;
         }
         return null;
+
     }
 
     List<Integer> filterEventPrices;
 
     public List<Event> filterEventsWithPrice(List<Event> totalEvents, int priceValue) {
         List<Event> allEvents;
-        if (totalEvents == null && eventsCollection!=null ) {
+        if (totalEvents == null && eventsCollection != null) {
+
             allEvents = eventsCollection.events;
         } else {
             allEvents = totalEvents;
         }
 
-
-        if(allEvents != null) {
+        if (allEvents != null) {
             if (filterEventPrices == null) {
                 filterEventPrices = new ArrayList<>();
             }
@@ -362,7 +380,6 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                     filterEventPrices.add((Integer) priceValue);
                 }
             }
-
 
             List<Event> filteredEvents = new ArrayList<>();
             if (filterEventPrices.size() > 0) {
@@ -378,12 +395,16 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                             priceMin = 0;
                         } else if (filterEventPrices.get(j) == EventsGridActivity.UPTO_250) {
                             priceMin = 1;
-                            priceMax = 100;
+                            priceMax = 250;
                         } else if (filterEventPrices.get(j) == EventsGridActivity.PRICE_250_TO_750) {
-                            priceMin = 100;
-                            priceMax = 200;
+                            priceMin = 250;
+                            priceMax = 750;
+                        } else if (filterEventPrices.get(j) == EventsGridActivity.PRICE_750_TO_1500) {
+                            priceMin = 750;
+                            priceMax = 1500;
                         } else {
-                            priceMin = 200;
+                            priceMin = 1500;
+
                             priceMax = 50000;
                         }
                         if (event.ehPrices.size() > 0) {
@@ -427,9 +448,9 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
                 }
             }
-
-        return filteredEvents;
+            return filteredEvents;
         }
+
         return null;
     }
 
@@ -441,11 +462,12 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
     public void addFiltersData() {
         final LinearLayout horizontalCategories = (LinearLayout) view.findViewById(R.id.category_container);
-        final EventCategory[] categories = EventCategory.values();
+        final String[] categories = eventsContext.city == City.BANGALORE ? EventsGridActivity.EXPLORE_TAGS_BANGALORE :
+                (eventsContext.city == City.CHENNAI ? EventsGridActivity.EXPLORE_TAGS_CHENNAI : EventsGridActivity.EXPLORE_TAGS);
         for (int i = 0; i < categories.length; i++) {
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
             final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
-            filterText.setText(categories[i].categoryName);
+            filterText.setText(categories[i]);
             horizontalCategories.addView(view);
             filterText.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -456,13 +478,16 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                     } else {
                         filterText.setSelected(true);
                     }
-
-                    filterEventsWithCategory(filterText.getText().toString(), null);
+                    if (filterText.getText().toString().equalsIgnoreCase(EventsHighEndpoints.QUERY_FEATURED)) {
+                        filterEventsWithCategory("Featured", null);
+                    } else {
+                        filterEventsWithCategory(filterText.getText().toString(), null);
+                    }
                 }
             });
         }
         LinearLayout horizontalprice = (LinearLayout) view.findViewById(R.id.price_container);
-        String[] priceRanges = {"Free", " \u20B9 ", "\u20B9 \u20B9", "\u20B9 \u20B9 \u20B9"};
+        String[] priceRanges = {"Free", " \u20B9 ", "\u20B9 \u20B9", "\u20B9 \u20B9 \u20B9", "\u20B9 \u20B9 \u20B9 \u20B9"};
         for (int i = 0; i < priceRanges.length; i++) {
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
             final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
@@ -479,8 +504,10 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                         filterEventsWithPrice(null, EventsGridActivity.UPTO_250);
                     } else if (position == 2) {
                         filterEventsWithPrice(null, EventsGridActivity.PRICE_250_TO_750);
+                    } else if (position == 3) {
+                        filterEventsWithPrice(null, EventsGridActivity.PRICE_750_TO_1500);
                     } else {
-                        filterEventsWithPrice(null, EventsGridActivity.MORE_THAN_750);
+                        filterEventsWithPrice(null, EventsGridActivity.MORE_THAN_1500);
                     }
                     if (filterText.isSelected()) {
                         filterText.setSelected(false);

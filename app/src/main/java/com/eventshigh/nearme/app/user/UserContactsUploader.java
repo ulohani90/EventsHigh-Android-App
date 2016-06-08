@@ -59,17 +59,17 @@ public class UserContactsUploader {
 
         // We do not have necessary permissions, request for it.
         // Should we show an explanation?
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.READ_CONTACTS)) {
+      /*  if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.READ_CONTACTS)) {
             // Show an expanation to the user *asynchronously* -- don't block
             // this thread waiting for the user's response! After the user
             // sees the explanation, try again to request the permission.
             Preferences preferences = Preferences.getInstance(activity);
             AskForContactsDialog.show(activity,preferences);
-        } else {
+        } else {*/
             // No explanation needed, we can request the permission.
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_CONTACTS},
                 BaseActivity.PERMISSIONS_REQUEST_READ_CONTACTS);
-        }
+        //}
     }
 
     private static class UserContactsUploadRunner implements Listener<JSONObject>, ErrorListener, Runnable {

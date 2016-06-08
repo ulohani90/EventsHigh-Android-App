@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Created by umesh on 07/04/16.
  */
-public class EhPrices implements Parcelable{
+public class EhPrices implements Parcelable {
     public double min;
     public double max;
     public String name;
@@ -27,9 +27,10 @@ public class EhPrices implements Parcelable{
     public int count = 0;
     public Long validityStart;
     public Long validityStop;
+    public boolean isMulti;
 
 
-    public EhPrices(Parcel in){
+    public EhPrices(Parcel in) {
         this.min = in.readDouble();
         this.max = in.readDouble();
         this.name = in.readString();
@@ -42,10 +43,11 @@ public class EhPrices implements Parcelable{
         this.occurences = new ArrayList<>();
         in.readList(occurences, Long.class.getClassLoader());
         this.count = in.readInt();
+        this.isMulti = in.createBooleanArray()[0];
     }
 
     public EhPrices(double min, double max, String name, String note, String currency, double value, double discountValue, ArrayList<Long> occurences,
-                    int count, long validityStart, long validityStop) {
+                    int count, long validityStart, long validityStop, boolean isMulti) {
         this.min = min;
         this.max = max;
         this.name = name;
@@ -57,12 +59,13 @@ public class EhPrices implements Parcelable{
         this.validityStop = validityStop;
         this.occurences = occurences;
         this.count = count;
+        this.isMulti = isMulti;
     }
 
     public static EhPrices createObject(double min, double max, String name, String note, String currency,
                                         double value, double discountValue, ArrayList<Long> occurences, int count,
-                                        long validityStart, long validityStop) {
-        return new EhPrices(min, max, name, note, currency, value, discountValue, occurences, count, validityStart, validityStop);
+                                        long validityStart, long validityStop, boolean isMulti) {
+        return new EhPrices(min, max, name, note, currency, value, discountValue, occurences, count, validityStart, validityStop, isMulti);
     }
 
     @Override
@@ -83,6 +86,7 @@ public class EhPrices implements Parcelable{
         dest.writeLong(validityStop);
         dest.writeList(occurences);
         dest.writeInt(count);
+        dest.writeBooleanArray(new boolean[]{isMulti});
     }
 
     public static final Parcelable.Creator<EhPrices> CREATOR =
@@ -90,6 +94,7 @@ public class EhPrices implements Parcelable{
                 public EhPrices createFromParcel(Parcel in) {
                     return new EhPrices(in);
                 }
+
                 public EhPrices[] newArray(int size) {
                     return new EhPrices[size];
                 }

@@ -26,6 +26,7 @@ import com.eventshigh.nearme.app.data.MovieInfoObject;
 import com.eventshigh.nearme.app.data.MovieMarkerManager;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -40,7 +41,7 @@ import com.google.android.gms.maps.model.LatLng;
  * Base activity for location aware events listing. This class implements common methods to fetch
  * fetch event listings when needed and asking the parent activity to show events as per user
  * interactions.
- *
+ * <p/>
  * This class also implements base user interactions like tabs, filters etc.
  */
 public abstract class BaseContextActivity extends BaseActivity {
@@ -101,9 +102,11 @@ public abstract class BaseContextActivity extends BaseActivity {
         super.onResume();
 
         // Upload contacts
+
+        //AskForContactsDialog.show(BaseContextActivity.this, Preferences.getInstance(this));
         Intent inIntent = getIntent();
         if (eventsContext.city != null && toolbar != null &&
-            (inIntent == null || !Intent.ACTION_VIEW.equals(inIntent.getAction()))) {
+                (inIntent == null || !Intent.ACTION_VIEW.equals(inIntent.getAction()))) {
             toolbar.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -133,7 +136,7 @@ public abstract class BaseContextActivity extends BaseActivity {
                     != PackageManager.PERMISSION_GRANTED) {
                 // Request missing location permission.
                 ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
             } else {
                 reportActionToAnalytics("switchToMaps");
                 switchTo(EventsMapsActivity.class);
@@ -166,7 +169,7 @@ public abstract class BaseContextActivity extends BaseActivity {
         if (actionBar != null) {
             String title = DateTimeUtils.queryToTitle(eventsContext.query);
             if (!eventsContext.dateFilter.isEmpty()) {
-                title += " on " +  DateTimeUtils.queryToTitle(eventsContext.dateFilter);
+                title += " on " + DateTimeUtils.queryToTitle(eventsContext.dateFilter);
             }
             actionBar.setTitle(title);
         }
@@ -199,7 +202,7 @@ public abstract class BaseContextActivity extends BaseActivity {
             protected void applyTransformation(float interpolatedTime, Transformation t) {
                 toolbar.getLayoutParams().height = interpolatedTime == 1
                         ? LayoutParams.WRAP_CONTENT
-                        : (int)(targetHeight * interpolatedTime);
+                        : (int) (targetHeight * interpolatedTime);
                 toolbar.requestLayout();
             }
 
@@ -222,10 +225,10 @@ public abstract class BaseContextActivity extends BaseActivity {
         Animation animation = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
-                if(interpolatedTime == 1){
+                if (interpolatedTime == 1) {
                     toolbar.setVisibility(View.GONE);
-                }else{
-                    toolbar.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
+                } else {
+                    toolbar.getLayoutParams().height = initialHeight - (int) (initialHeight * interpolatedTime);
                     toolbar.requestLayout();
                 }
             }
@@ -243,7 +246,7 @@ public abstract class BaseContextActivity extends BaseActivity {
     protected void showVerifyPhoneSnackbar() {
         boolean isVerificationPending = Account.isPhoneVerifyPending(this);
         final View view = findViewById(R.id.verify_phone_container);
-        view.setVisibility(isVerificationPending ? View.VISIBLE :View.GONE);
+        view.setVisibility(isVerificationPending ? View.VISIBLE : View.GONE);
         view.findViewById(R.id.verify_phone).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -264,7 +267,8 @@ public abstract class BaseContextActivity extends BaseActivity {
         return eventsMarkerManager.isFavourite(event.id);
     }
 
-    public @Nullable
+    public
+    @Nullable
     EventMark getEventMark(Event event) {
         return eventsMarkerManager.getEventMark(event.id);
     }
@@ -278,10 +282,11 @@ public abstract class BaseContextActivity extends BaseActivity {
     }
 
     public boolean isMovieFavourite(MovieInfoObject movie) {
-        return moviesMarkerManager.isFavourite(movie.getId()+"");
+        return moviesMarkerManager.isFavourite(movie.getId() + "");
     }
 
-    public @Nullable
+    public
+    @Nullable
     MovieMarkerManager.MovieMark getMovieMark(MovieInfoObject movie) {
         return moviesMarkerManager.getMovieMark(movie.getId() + "");
     }
@@ -337,7 +342,7 @@ public abstract class BaseContextActivity extends BaseActivity {
         startActivity(intent);
     }
 
-    public void showCustomUrlActivity(String contestUrl,String title){
+    public void showCustomUrlActivity(String contestUrl, String title) {
         Intent intent = new Intent(this,
                 contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
         intent.setData(Uri.parse(contestUrl));
