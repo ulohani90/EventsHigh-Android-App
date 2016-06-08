@@ -343,11 +343,13 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
 
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("eid", event.id));
+                /*
                 final SimpleDateFormat ISO_8601_DATE_FORMAT = new SimpleDateFormat(
                         "yyyy-MM-dd'T'HH:mmZ");
                 TimeZone ist = TimeZone.getTimeZone("GMT+0530");
                 ISO_8601_DATE_FORMAT.setTimeZone(ist);
                 String nowAsISO = ISO_8601_DATE_FORMAT.format(new Date(eventTime.longtime));
+                */
 
                 params.add(new BasicNameValuePair("datetime", eventTime.longtime+""));
 
@@ -359,6 +361,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
                         params.add(new BasicNameValuePair("ticketValue", ehp.value + ""));
 
                 for (EhPrices ehp : prices)params.add(new BasicNameValuePair("ticketNum", ehp.count + ""));
+
 
                 int noOfCards = arrayGuestDetails.length();
                 Iterator<String> iter = arrayGuestDetails.getJSONObject(0).keys();

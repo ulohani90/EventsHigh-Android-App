@@ -153,7 +153,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
 
     TextView timeLayoutLastSelected;
 
-    public void addDateContainerData() {
+    public void addDateContainerData(){
         LinearLayout dateContainer = (LinearLayout) findViewById(R.id.date_container);
         for (int i = 0; i < dates.size(); i++) {
             View view = LayoutInflater.from(this).inflate(R.layout.ticket_date_time_count_container, dateContainer, false);
@@ -359,6 +359,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
 
     }
 
+
     public void addEventComboTickets(int dateIndex, int timeIndex) {
         prices = getEhPrices(dateIndex, timeIndex);
 
@@ -368,7 +369,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         for (int i = 0; i < prices.size(); i++) {
 
             final EhPrices price = prices.get(i);
-            if ((price.isMulti && isFirstOccurence(dateIndex, timeIndex, price))) {
+            if ((price.isMulti && isFirstOccurence(dateIndex, timeIndex, price))){
                 showView = true;
                 View view = LayoutInflater.from(this).inflate(R.layout.eh_ticket_type_layout, ticketTypes, false);
                 TextView ticketType = (TextView) view.findViewById(R.id.ticket_name);
@@ -400,13 +401,13 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                         int ticketNo = Integer.parseInt(ticketCount.getText().toString());
                         if (ticketNo < 10) {
                             ticketNo++;
-                            if (ticketNo > 0) {
+                            if (ticketNo > 0){
                                 findViewById(R.id.ticket_disable_view).setVisibility(View.VISIBLE);
                             }
                             prices.get(Integer.parseInt(ticketCount.getTag().toString())).count = ticketNo;
                             ticketCount.setText(ticketNo + "");
                             noOfTickets += 1;
-                            if (price.discountValue < 0.01) {
+                            if (price.discountValue < 0.01){
                                 total += price.value;
                             } else {
                                 total += price.discountValue;
@@ -432,14 +433,15 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                             noOfTickets -= 1;
                             if (price.discountValue < 0.01) {
                                 total -= price.value;
-                            } else {
+                            }else{
                                 total -= price.discountValue;
                             }
                             updateTotalPrice();
                         }
                     }
                 });
-                if (price.discountValue > 0) {
+
+                if (price.discountValue > 0){
                     ticketPrice.setTextColor(Color.parseColor("#C0C0C0"));
                     ticketPrice.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);
                     ticketPrice.setText(price.currency + " " + price.value);
@@ -540,5 +542,6 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         totalPrice.setText(currency + " " + Math.round(total));
         numberOfTickets.setText(Math.round(noOfTickets) + "");
     }
+
 
 }

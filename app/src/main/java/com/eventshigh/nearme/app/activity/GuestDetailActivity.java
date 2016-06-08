@@ -50,7 +50,7 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
     ScrollView svDetailCards;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guest_detail);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -136,16 +136,16 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
                 TextView tvRadioTitle = (TextView) radioLinearLayout.findViewById(R.id.tv_guest_radio_name);
                 tvRadioTitle.setText(additionalTicketField.getName());
                 RadioGroup rgOneOf = (RadioGroup) radioLinearLayout.findViewById(R.id.rg_guest_radio_group);
-                for (int i = 0; i < additionalTicketField.getOptions().size(); i++) {
+                for (int i = 0; i < additionalTicketField.getOptions().size(); i++){
                     String option = additionalTicketField.getOptions().get(i);
                     RadioButton radioButton = new RadioButton(this);
                     radioButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                     radioButton.setText(option);
                     radioButton.setId(i);
                     radioButton.setTextColor(Color.parseColor("#353535"));
-
                     rgOneOf.addView(radioButton);
                 }
+
                 llGuestDetailCard.addView(radioLinearLayout);
                 listAdditionalFieldsLayout.add(radioLinearLayout);
             }
@@ -161,9 +161,9 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
             if (isLoopBreak) break;
             JSONObject jsonObject = new JSONObject();
             try {
-                if (!Utils.checkIfStringEmpty(((TextView) ll_guest_detail.findViewById(R.id.et_guest_name)).getText().toString())) {
+                if(!Utils.checkIfStringEmpty(((TextView) ll_guest_detail.findViewById(R.id.et_guest_name)).getText().toString())){
                     jsonObject.put("firstName", ((TextView) ll_guest_detail.findViewById(R.id.et_guest_name)).getText().toString());
-                } else {
+                } else{
                     is_details_complete = false;
                     focusOnView(ll_guest_detail.findViewById(R.id.et_guest_name));
                     Toast.makeText(this, "All fields are compulsory.", Toast.LENGTH_SHORT).show();
@@ -218,8 +218,8 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
                         RadioGroup rgOneOf = (RadioGroup) llOneOf.findViewById(R.id.rg_guest_radio_group);
                         int selectedId = rgOneOf.getCheckedRadioButtonId();
                         if (selectedId != -1) {
-                            RadioButton radioSexButton = (RadioButton) findViewById(selectedId);
-                            jsonObject.put(additionalTicketField.getName(), radioSexButton.getText().toString());
+                            RadioButton radioButton = (RadioButton)rgOneOf.findViewById(selectedId);
+                            jsonObject.put(additionalTicketField.getName(),radioButton.getText().toString());
                         } else {
                             is_details_complete = false;
                             isLoopBreak = true;
