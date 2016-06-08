@@ -265,11 +265,12 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         prices = getEhPrices(dateIndex, timeIndex);
         LinearLayout ticketTypes = (LinearLayout) findViewById(R.id.options_container);
         ticketTypes.removeAllViews();
+        boolean showView = false;
         for (int i = 0; i < prices.size(); i++) {
 
             final EhPrices price = prices.get(i);
             if (!price.isMulti) {
-
+                showView = true;
                 View view = LayoutInflater.from(this).inflate(R.layout.eh_ticket_type_layout, ticketTypes, false);
                 TextView ticketType = (TextView) view.findViewById(R.id.ticket_name);
                 TextView ticketDesc = (TextView) view.findViewById(R.id.ticket_desc);
@@ -355,6 +356,12 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                 }
                 ticketTypes.addView(view);
             }
+        }
+        if (showView) {
+            ticketContainerLayout.setVisibility(View.VISIBLE);
+            findViewById(R.id.ticket_disable_view).setVisibility(View.GONE);
+        } else {
+            ticketContainerLayout.setVisibility(View.GONE);
         }
 
     }
@@ -456,6 +463,8 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         }
         if (showView) {
             comboContainerLayout.setVisibility(View.VISIBLE);
+            findViewById(R.id.combo_disable_view).setVisibility(View.GONE);
+
         } else {
             comboContainerLayout.setVisibility(View.GONE);
         }
