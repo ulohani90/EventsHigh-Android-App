@@ -8,10 +8,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
-import android.graphics.Movie;
 import android.location.Location;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -21,7 +19,6 @@ import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.res.TypedArrayUtils;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -40,13 +37,13 @@ import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.broadcast.GeofenceStartService;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.CitySelectDialog;
-import com.eventshigh.nearme.app.ui.ReferEarnDialog;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter.OnCitySelectionListener;
 import com.eventshigh.nearme.app.user.Account;
@@ -77,7 +74,7 @@ import pl.snowdog.material.ui.ToolbarColorizeHelper;
 /**
  * Application Main or launch activity.
  */
-public class LaunchActivity extends BaseContextActivity {
+public class LaunchActivity extends BaseContextActivity{
     // Constants
     public static final String DEFAULT_TAB_PARAM = LaunchActivity.class.getName() + "_default_tab";
 
@@ -92,6 +89,7 @@ public class LaunchActivity extends BaseContextActivity {
     // its not passed in intent.
     private GoogleApiClient client;
 
+
     // GCM registration helper.
     private Account account;
 
@@ -104,6 +102,7 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String OFFERS_TAB = "Offers";
     public static final String MOVIES_TAB = "movies";
     public ArrayList<String> TABS = new ArrayList<>();
+
 
     //Calculate no of time user resumes on to Home
     int screenViewCount;
@@ -134,6 +133,8 @@ public class LaunchActivity extends BaseContextActivity {
             actionBar.setHomeButtonEnabled(true);
         }
 
+        startService(new Intent(this, GeofenceStartService.class));
+
         if (isFinishing()) {
             return;
         }
@@ -157,17 +158,16 @@ public class LaunchActivity extends BaseContextActivity {
 */
         getIntent().getAction();
 
+
     }
+
 
     @Override
     public View getViewForSnackbar() {
         return null;
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -181,10 +181,6 @@ public class LaunchActivity extends BaseContextActivity {
 
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
 
     @Override
     protected void onResume() {
@@ -219,7 +215,7 @@ public class LaunchActivity extends BaseContextActivity {
         //Show next screen.
         showNextScreen();
 
-        // Setup the Google+ Button.
+            // Setup the Google+ Button.
         PlusOneButton plusOneButton = (PlusOneButton) findViewById(R.id.plus_one_button);
         plusOneButton.initialize("https://play.google.com/store/apps/details?id=" + getPackageName(),
                 PLUS_ONE_REQUEST_CODE);
@@ -274,6 +270,8 @@ public class LaunchActivity extends BaseContextActivity {
     }
 
     @Override
+
+
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         drawerToggle.onConfigurationChanged(newConfig);
@@ -994,4 +992,6 @@ public class LaunchActivity extends BaseContextActivity {
                 }
             }, getIntent().getData(), LaunchActivity.this);
     }
+
+
 }
