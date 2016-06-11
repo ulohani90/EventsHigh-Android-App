@@ -187,26 +187,45 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (showReviewActivity) {
+            showReviewActivity = false;
+            callConfirmationActivity(bookingId, ticketingLink);
+
+        }
+    }
+
+    boolean showReviewActivity;
+
+    String bookingId;
+    String ticketingLink;
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == PAYMENT_REQ_CODE) {
             if (data.hasExtra(IS_PAYMENT_SUCCESS) & data.getBooleanExtra(IS_PAYMENT_SUCCESS, false)) {
                 Toast.makeText(this, "Payment successful",
                         Toast.LENGTH_SHORT).show();
-                callConfirmationActivity(data.getStringExtra(BOOKING_ID),data.getStringExtra(TICKETING_LINK));
+                showReviewActivity = true;
+                bookingId = data.getStringExtra(BOOKING_ID);
+                ticketingLink = data.getStringExtra(TICKETING_LINK);
+                //
             } else {
-                Toast.makeText(this, "You payment was unccessful. Please try again",
+                Toast.makeText(this, "You payment was unsuccessful. Please try again",
                         Toast.LENGTH_LONG).show();
             }
         }
     }
 
     private void callConfirmationActivity(String bookingId, String ticketingLink) {
+        sendBroadcast(new Intent(GuestDetailActivity.ACTION_FINISH));
         Intent iNext = new Intent(this, TicketConfirmationActivity.class);
         bundle.putString(BOOKING_ID, bookingId);
-        bundle.putString(TICKETING_LINK,ticketingLink);
+        bundle.putString(TICKETING_LINK, ticketingLink);
         iNext.putExtras(bundle);
-        iNext.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(iNext);
+        finish();
     }
 
         /*
@@ -286,7 +305,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
         protected void onPreExecute() {
             super.onPreExecute();
             //this method will be running on UI thread
-            pdLoading.setMessage("\tLoading...");
+            pdLoading.setMessage("\tReserving your ticket...");
             pdLoading.show();
         }
 

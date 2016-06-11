@@ -531,6 +531,7 @@ public class Event implements Parcelable {
                         ehOccurences.add(date.getTime());
                     }
                 }
+                Collections.sort(ehOccurences);
                 ehPriceName = ehPrice.optString("name", "");
                 ehPriceNote = ehPrice.optString("note", "");
                 double discountValue = ehPrice.optDouble("discount_value", -1);

@@ -206,8 +206,8 @@
 
     <string name="ui_add_follow">+Follow</string>
 
-    <string name="title_activity_review">Review</string>
-    <string name="title_activity_ticket_confirmation">Confirmation</string>
+    <string name="title_activity_review">Confirm your reservation</string>
+    <string name="title_activity_ticket_confirmation">Ticket Confirmation</string>
 
 
 </resources>

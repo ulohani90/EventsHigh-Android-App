@@ -1,40 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@android:color/white">
+
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:background="@drawable/card_item_bg">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:weightSum="1"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:background="@android:color/white"
-            android:textSize="14sp"
-            android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:paddingTop="16dp"
+        android:textSize="14sp"
+        android:weightSum="1">
+
         <TextView
             android:id="@+id/tv_guest_radio_name"
             android:layout_width="match_parent"
-            android:textSize="14sp"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:paddingBottom="10dp"
-            android:layout_height="wrap_content"/>
+            android:textSize="14sp" />
+
         <RadioGroup
             android:id="@+id/rg_guest_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
             android:orientation="vertical"
             android:paddingLeft="10dp"
-            android:paddingRight="16dp"
-            android:imeOptions="actionNext"/>
-        </LinearLayout>
+            android:paddingRight="16dp" />
     </LinearLayout>
+
 
 </LinearLayout>

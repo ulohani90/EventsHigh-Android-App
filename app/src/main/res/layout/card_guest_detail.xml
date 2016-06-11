@@ -1,85 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:paddingTop="16dp"
-    android:background="#EAEAEA"
-    android:paddingBottom="12dp">
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/tv_guest_no"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
+        android:text="Guest 1"
         android:textColor="#878787"
+        android:textSize="20sp" />
 
-        android:fontFamily="sens-serif-medium"
-        />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:background="@drawable/card_item_bg">
-    <EditText
+    <android.support.design.widget.TextInputLayout
         android:id="@+id/et_guest_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#353535"
-        android:textColorHint="#878787"
-        android:padding="16dp"
-        android:background="@android:color/white"
-        android:inputType="textPersonName"
-        android:maxLines="1"
-        android:imeOptions="actionNext"
-        android:hint="Full Name"/>
-    </LinearLayout>
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/phone_no_info_message"
+        android:layout_marginTop="8dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:background="@drawable/card_item_bg">
-    <EditText
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Full Name"
+            android:imeOptions="actionNext"
+            android:inputType="textPersonName"
+            android:maxLines="1"
+            android:paddingBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp"
+            android:textColor="#353535"
+            android:textColorHint="#878787"
+            android:textSize="14sp" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
         android:id="@+id/et_guest_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:padding="16dp"
-        android:textColor="#353535"
-        android:textColorHint="#878787"
-        android:inputType="textEmailAddress"
-        android:maxLines="1"
-        android:background="@android:color/white"
-        android:imeOptions="actionNext"
-        android:hint="Email"
-        />
-    </LinearLayout>
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/phone_no_info_message"
+        android:layout_marginTop="8dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:background="@drawable/card_item_bg">
-    <EditText
+        <EditText
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:imeOptions="actionNext"
+            android:inputType="textEmailAddress"
+            android:maxLines="1"
+            android:paddingBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="5dp"
+            android:textColor="#353535"
+            android:textColorHint="#878787"
+            android:textSize="14sp" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
         android:id="@+id/et_guest_phone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:padding="16dp"
-        android:inputType="phone"
-        android:textColor="#353535"
-        android:maxLength="10"
-        android:textColorHint="#878787"
-        android:background="@android:color/white"
-        android:imeOptions="actionNext"
-        android:hint="Phone"
-        />
-    </LinearLayout>
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/phone_no_info_message"
+        android:layout_marginTop="5dp">
+
+        <EditText
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Phone"
+            android:imeOptions="actionNext"
+            android:inputType="phone"
+            android:maxLength="10"
+            android:paddingBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:textColor="#353535"
+            android:textColorHint="#878787"
+            android:textSize="14sp" />
+    </android.support.design.widget.TextInputLayout>
+
 
 </LinearLayout>

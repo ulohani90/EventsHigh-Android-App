@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <!-- Notification services -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -495,9 +496,7 @@
 
         <activity
             android:name=".activity.TicketConfirmationActivity"
-
             android:label="@string/title_activity_ticket_confirmation"
-            android:launchMode="singleTask"
             android:parentActivityName=".activity.LaunchActivity"
             android:screenOrientation="portrait">
             <meta-data

@@ -52,31 +52,33 @@
                         <TextView
                             android:id="@+id/tv_event_name"
                             android:layout_width="0dp"
-                            android:layout_weight="1"
                             android:layout_height="wrap_content"
-
                             android:layout_marginRight="10dp"
+
+                            android:layout_weight="1"
                             android:fontFamily="sans-serif-medium"
                             android:text="EVENTS NAME"
                             android:textColor="#666666"
                             android:textSize="20sp" />
+
                         <TextView
                             android:id="@+id/tv_no_of_tickets"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawableLeft="@drawable/ticket_ic"
+                            android:drawablePadding="5dp"
                             android:gravity="center"
                             android:text="X Ticket(s)"
-                            android:drawablePadding="5dp"
                             android:textSize="14sp" />
 
                     </LinearLayout>
+
                     <TextView
                         android:id="@+id/tv_event_location"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="EVENTS LOCATION"
                         android:layout_marginTop="5dp"
+                        android:text="EVENTS LOCATION"
                         android:textColor="@color/movie_text_grey_color"
                         android:textSize="14sp" />
 
@@ -107,8 +109,8 @@
                         <TextView
                             android:id="@+id/tv_event_date"
                             android:layout_width="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -129,8 +131,8 @@
                         <TextView
                             android:id="@+id/tv_event_time"
                             android:layout_width="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -143,16 +145,17 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawableLeft="@drawable/seat"
+                            android:drawableLeft="@drawable/ticket_ic"
                             android:drawablePadding="4dp"
                             android:gravity="center_vertical"
-                            android:text="SEATS" />
+                            android:text="TICKETS" />
 
                         <TextView
                             android:id="@+id/tv_ticket_description"
                             android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_marginTop="5dp"
-                            android:layout_height="wrap_content" />
+                            android:gravity="center" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -183,9 +186,9 @@
                         android:id="@+id/tv_total_amt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="16sp"
+                        android:gravity="right|center_vertical"
                         android:textColor="#353535"
-                        android:gravity="right|center_vertical" />
+                        android:textSize="16sp" />
                 </LinearLayout>
 
 
@@ -232,27 +235,26 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:background="@android:color/white"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
                 android:orientation="horizontal"
-                >
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
 
                 <LinearLayout
                     android:id="@+id/ll_guest_ticket_list"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingBottom="8dp"
+                    android:paddingTop="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="4dp"
+                        android:fontFamily="sens-serif-medium"
                         android:text="PERSONAL DETAILS"
                         android:textColor="#666666"
-                        android:fontFamily="sens-serif-medium"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -260,9 +262,9 @@
                     android:id="@+id/ibtn_edit_ticket_details"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingTop="8dp"
                     android:layout_gravity="end"
                     android:background="@android:color/white"
+                    android:paddingTop="8dp"
                     android:src="@drawable/edit" />
             </LinearLayout>
 

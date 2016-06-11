@@ -16,6 +16,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
+import com.eventshigh.nearme.app.data.stream.TicketNotificationStreamItem;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -117,9 +118,9 @@ public class TicketConfirmationActivity extends AppCompatActivity implements Vie
                 EventsContext param = new EventsContext(null, "eventshigh specials");
                 Intent intent = new Intent(TicketConfirmationActivity.this, EventsGridActivity.class)
                         .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
-
                 startActivity(intent);
-                finish();
+                TicketConfirmationActivity.this.finish();
+
             }
         });
     }
@@ -135,16 +136,11 @@ public class TicketConfirmationActivity extends AppCompatActivity implements Vie
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, LaunchActivity.class);
-        startActivity(intent);
+        super.onBackPressed();
         //NavUtils.navigateUpFromSameTask(this);
-        this.finish();
+
     }
 
-    @Override
-    public void finish() {
-        super.finish();
-    }
 
     @Override
     public void onClick(View v) {
