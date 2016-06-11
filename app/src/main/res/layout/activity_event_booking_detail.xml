@@ -290,7 +290,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_gravity="bottom"
-            android:background="@drawable/eh_button_done"
+            android:background="@drawable/eh_button_cta"
             android:gravity="center"
             android:text="Next"
             android:textAllCaps="true"

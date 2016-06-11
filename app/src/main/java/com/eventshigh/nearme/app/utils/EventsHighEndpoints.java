@@ -48,6 +48,9 @@ public class EventsHighEndpoints {
     private static final String API_ENDPOINT_MULTI_MOVIE_UBER_FORMAT =
             API_URI_BASE + "api/get_movie_infos/%s/%s";
 
+    private static final String API_ENDPOINT_NEW_DATE_FORMAT =
+            API_URI_BASE + "api/date/%s/%s?limit=300&mobile=1";
+
 
     private static final String API_ENDPOINT_MOVIE_UBER_INFO_FORMAT = API_URI_BASE + "api/get_movie_uber_info/%s";
 
@@ -173,7 +176,7 @@ public class EventsHighEndpoints {
     }
 
     public static String getApiEndpointForDate(EventsContext eventsContext, String dateString) {
-        return String.format(API_ENDPOINT_DATE_FORMAT,
+        return String.format(API_ENDPOINT_NEW_DATE_FORMAT,
                 eventsContext.city.toString().toLowerCase(),
                 dateString.toLowerCase());
     }
@@ -199,7 +202,7 @@ public class EventsHighEndpoints {
 
     }
 
-    public static String getApiEndpointEventsUber(List<String> eventIds){
+    public static String getApiEndpointEventsUber(List<String> eventIds) {
         Collections.sort(eventIds);
         return String.format(API_ENDPOINT_MULTI_EVENT_UBER_FORMAT, StringUtils.toCsvString(eventIds));
     }

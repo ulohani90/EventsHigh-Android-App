@@ -31,7 +31,8 @@ public enum DataType {
     MOVIE_INFO(20),
     MOVIE_LIST_CARD(21),
     MOVIE_CATEGORY(22),
-    MOVIE_USER_REVIEW(23);
+    MOVIE_USER_REVIEW(23),
+    NEW_EXPLORE_CATEOGRY(24);
 
     public final int typeId;
 
@@ -131,6 +132,9 @@ public enum DataType {
         }
         if (typeId == MOVIE_CATEGORY.typeId) {
             return TrendingCategoryCard.newInstance(activity, parent);
+        }
+        if (typeId == NEW_EXPLORE_CATEOGRY.typeId) {
+            return ExploreCategoryCard.newInstance(activity, parent);
         }
         throw new IllegalArgumentException("invalid typeid");
     }

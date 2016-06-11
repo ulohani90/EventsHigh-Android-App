@@ -1,6 +1,9 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -72,7 +75,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
-
+        getSupportActionBar().setTitle("Choose your tickets");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ScrollView scrollView = (ScrollView) findViewById(R.id.booking_scrollview);
@@ -103,7 +106,11 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
             tvNextEventBooking = (TextView) findViewById(R.id.tv_next_event_booking);
             tvNextEventBooking.setOnClickListener(this);
         }
-
+        /**
+         * Add receiver for finishing this activity on ticket completion
+         */
+        finishReceiver = new FinishReceiver();
+        registerReceiver(finishReceiver, new IntentFilter(GuestDetailActivity.ACTION_FINISH));
     }
 
     @Override
@@ -555,5 +562,23 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         numberOfTickets.setText(Math.round(noOfTickets) + "");
     }
 
+    /**
+     * Finish on Complete Ticket Booking
+     */
+    private FinishReceiver finishReceiver;
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(finishReceiver);
+    }
+
+    private final class FinishReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(GuestDetailActivity.ACTION_FINISH))
+                finish();
+        }
+    }
 }
