@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
+import android.graphics.Movie;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,7 +33,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.crashlytics.android.Crashlytics;
@@ -40,7 +45,11 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.broadcast.GeofenceStartService;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.MovieDetailObject;
+import com.eventshigh.nearme.app.network.EventRequest;
+import com.eventshigh.nearme.app.network.MovieDetailRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.CitySelectDialog;
@@ -940,11 +949,11 @@ public class LaunchActivity extends BaseContextActivity{
                 public void onInitFinished(JSONObject referringParams, BranchError error) {
                     if (error == null) {
                         //showEventDetails();
-                        if (referringParams.length() == 0) {
+                        try {
+                            if (referringParams.length() == 0) {
                             // showNextScreen();
                             Log.i("Event_detail_missed", "refering params empty");
-                        } else {
-                            try {
+                        } else if(!referringParams.optBoolean("review",false)){
                                 if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
                                     //showNextScreen();
                                     Log.i("Event_detail_missed", referringParams.getBoolean("+is_first_session") ? "False" : "true");
@@ -979,11 +988,30 @@ public class LaunchActivity extends BaseContextActivity{
                                     }*/
                                     //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
                                 }
-                            } catch (JSONException e) {
-                                // showNextScreen();
-                                e.printStackTrace();
+
+                                System.out.println("JsonObject received" + referringParams);
+                        }else if(referringParams.optBoolean("review",false)) {
+
+                                if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
+                                    //showNextScreen();
+                                    Log.i("Event_detail_missed", referringParams.getBoolean("+is_first_session") ? "False" : "true");
+                                } else {
+                                    if (referringParams.has("event_id")) {
+                                        writeEventReview(
+                                                EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
+                                    }else if(referringParams.has("event_uri")) {
+                                        Uri uri = Uri.parse(referringParams.getString("event_uri"));
+                                        showSearchView(uri.getLastPathSegment());
+                                    } else if (referringParams.has("movie_id")) {
+                                        int id = referringParams.getInt("movie_id");
+                                        writeMovieReview(id,null);
+                                    }
+
+                                }
                             }
-                            System.out.println("JsonObject received" + referringParams);
+                        } catch (JSONException e) {
+                            // showNextScreen();
+                            e.printStackTrace();
                         }
                     } else {
                         //  showNextScreen();
@@ -991,6 +1019,59 @@ public class LaunchActivity extends BaseContextActivity{
                     }
                 }
             }, getIntent().getData(), LaunchActivity.this);
+    }
+
+    public void writeMovieReview(int movieId, @Nullable String label) {
+        //reportActionToAnalytics("showEventDetails", label);
+        if(movieId != -1)
+        MovieDetailRequest.submit(this, movieId, Request.Priority.IMMEDIATE,
+                new Response.Listener<MovieDetailObject>() {
+                    @Override
+                    public void onResponse(MovieDetailObject movieDetailObject, boolean b) {
+                        Intent detailIntent = new Intent(LaunchActivity.this, MovieDetailActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable(MovieDetailActivity.MOVIE_DETAIL_OBJECT, movieDetailObject);
+                        bundle.putString(MovieDetailActivity.OBJECT_TYPE, "movie");
+                        detailIntent.putExtras(bundle);
+                        startActivity(detailIntent);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Toast.makeText(LaunchActivity.this, R.string.failed_load,
+                                Toast.LENGTH_SHORT).show();
+                        VolleyHelper.log(LaunchActivity.this, volleyError);
+                        finish();
+                    }
+                });
+
+    }
+
+    public void writeEventReview(Uri eventDetailsURI, @Nullable String label) {
+
+        EventRequest.submit(this, eventDetailsURI, Request.Priority.IMMEDIATE, new Response.Listener<Event>() {
+                    @Override
+                    public void onResponse(Event event, boolean b) {
+                        //reportActionToAnalytics("showEventDetails", label);
+                        Intent detailIntent = new Intent(LaunchActivity.this, WriteReviewActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable(EventDetailActivity.EVENT_OBJECT, event);
+                        bundle.putString(MovieDetailActivity.OBJECT_TYPE, "event");
+                        detailIntent.putExtras(bundle);
+                        startActivity(detailIntent);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Toast.makeText(LaunchActivity.this, R.string.failed_load,
+                                Toast.LENGTH_SHORT).show();
+                        VolleyHelper.log(LaunchActivity.this, volleyError);
+                        finish();
+                    }
+                });
+
     }
 
 

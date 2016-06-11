@@ -334,6 +334,8 @@ public abstract class BaseContextActivity extends BaseActivity {
         startActivity(detailIntent, bundle);
     }
 
+
+
     public void seeAll() {
         reportActionToAnalytics("seeAll", eventsContext.getLabel());
         EventsContext param = new EventsContext(eventsContext.location, eventsContext.query);

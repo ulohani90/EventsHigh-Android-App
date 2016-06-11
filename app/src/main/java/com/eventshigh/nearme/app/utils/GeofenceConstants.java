@@ -97,4 +97,5 @@ public final class GeofenceConstants{
 //        BAY_AREA_LANDMARKS.put("aloft hotel", new LatLng(0,0));//there are two alof
 
     }
+
 }
