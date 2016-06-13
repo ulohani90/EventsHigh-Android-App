@@ -55,7 +55,7 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
             }else{
                 event = bundle.getParcelable(EventDetailActivity.EVENT_OBJECT);
             }
-        } else {
+        } else{
             //Do something here if data not received
         }
 

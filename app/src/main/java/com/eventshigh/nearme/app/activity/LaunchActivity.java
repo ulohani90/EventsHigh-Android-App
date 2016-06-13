@@ -11,7 +11,6 @@ import android.content.res.Configuration;
 import android.graphics.Movie;
 import android.location.Location;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -21,7 +20,6 @@ import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.res.TypedArrayUtils;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -35,18 +33,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.broadcast.GeofenceStartService;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.MovieDetailObject;
+import com.eventshigh.nearme.app.network.EventRequest;
+import com.eventshigh.nearme.app.network.MovieDetailRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.CitySelectDialog;
-import com.eventshigh.nearme.app.ui.ReferEarnDialog;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter;
 import com.eventshigh.nearme.app.ui.adapter.CityListAdapter.OnCitySelectionListener;
 import com.eventshigh.nearme.app.user.Account;
@@ -92,6 +98,7 @@ public class LaunchActivity extends BaseContextActivity {
     // its not passed in intent.
     private GoogleApiClient client;
 
+
     // GCM registration helper.
     private Account account;
 
@@ -104,6 +111,7 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String OFFERS_TAB = "Offers";
     public static final String MOVIES_TAB = "movies";
     public ArrayList<String> TABS = new ArrayList<>();
+
 
     //Calculate no of time user resumes on to Home
     int screenViewCount;
@@ -134,6 +142,8 @@ public class LaunchActivity extends BaseContextActivity {
             actionBar.setHomeButtonEnabled(true);
         }
 
+        startService(new Intent(this, GeofenceStartService.class));
+
         if (isFinishing()) {
             return;
         }
@@ -158,6 +168,7 @@ public class LaunchActivity extends BaseContextActivity {
         setUserCityHeader();
         getIntent().getAction();
 
+
     }
 
 
@@ -175,15 +186,12 @@ public class LaunchActivity extends BaseContextActivity {
         toolbar.addView(view);
     }
 
+
     @Override
     public View getViewForSnackbar() {
         return null;
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -197,10 +205,6 @@ public class LaunchActivity extends BaseContextActivity {
 
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
 
     @Override
     protected void onResume() {
@@ -291,6 +295,8 @@ public class LaunchActivity extends BaseContextActivity {
     }
 
     @Override
+
+
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         drawerToggle.onConfigurationChanged(newConfig);
@@ -960,11 +966,11 @@ public class LaunchActivity extends BaseContextActivity {
                 public void onInitFinished(JSONObject referringParams, BranchError error) {
                     if (error == null) {
                         //showEventDetails();
-                        if (referringParams.length() == 0) {
-                            // showNextScreen();
-                            Log.i("Event_detail_missed", "refering params empty");
-                        } else {
-                            try {
+                        try {
+                            if (referringParams.length() == 0) {
+                                // showNextScreen();
+                                Log.i("Event_detail_missed", "refering params empty");
+                            } else if (!referringParams.optBoolean("review", false)) {
                                 if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
                                     //showNextScreen();
                                     Log.i("Event_detail_missed", referringParams.getBoolean("+is_first_session") ? "False" : "true");
@@ -999,11 +1005,30 @@ public class LaunchActivity extends BaseContextActivity {
                                     }*/
                                     //showEventDetails((Event)( obj.get("event")), eventsContext.getLabel(), null);
                                 }
-                            } catch (JSONException e) {
-                                // showNextScreen();
-                                e.printStackTrace();
+
+                                System.out.println("JsonObject received" + referringParams);
+                            } else if (referringParams.optBoolean("review", false)) {
+
+                                if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
+                                    //showNextScreen();
+                                    Log.i("Event_detail_missed", referringParams.getBoolean("+is_first_session") ? "False" : "true");
+                                } else {
+                                    if (referringParams.has("event_id")) {
+                                        writeEventReview(
+                                                EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
+                                    } else if (referringParams.has("event_uri")) {
+                                        Uri uri = Uri.parse(referringParams.getString("event_uri"));
+                                        showSearchView(uri.getLastPathSegment());
+                                    } else if (referringParams.has("movie_id")) {
+                                        int id = referringParams.getInt("movie_id");
+                                        writeMovieReview(id, null);
+                                    }
+
+                                }
                             }
-                            System.out.println("JsonObject received" + referringParams);
+                        } catch (JSONException e) {
+                            // showNextScreen();
+                            e.printStackTrace();
                         }
                     } else {
                         //  showNextScreen();
@@ -1012,4 +1037,59 @@ public class LaunchActivity extends BaseContextActivity {
                 }
             }, getIntent().getData(), LaunchActivity.this);
     }
+
+    public void writeMovieReview(int movieId, @Nullable String label) {
+        //reportActionToAnalytics("showEventDetails", label);
+        if (movieId != -1)
+            MovieDetailRequest.submit(this, movieId, Request.Priority.IMMEDIATE,
+                    new Response.Listener<MovieDetailObject>() {
+                        @Override
+                        public void onResponse(MovieDetailObject movieDetailObject, boolean b) {
+                            Intent detailIntent = new Intent(LaunchActivity.this, MovieDetailActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putParcelable(MovieDetailActivity.MOVIE_DETAIL_OBJECT, movieDetailObject);
+                            bundle.putString(MovieDetailActivity.OBJECT_TYPE, "movie");
+                            detailIntent.putExtras(bundle);
+                            startActivity(detailIntent);
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            Toast.makeText(LaunchActivity.this, R.string.failed_load,
+                                    Toast.LENGTH_SHORT).show();
+                            VolleyHelper.log(LaunchActivity.this, volleyError);
+                            finish();
+                        }
+                    });
+
+    }
+
+    public void writeEventReview(Uri eventDetailsURI, @Nullable String label) {
+
+        EventRequest.submit(this, eventDetailsURI, Request.Priority.IMMEDIATE, new Response.Listener<Event>() {
+                    @Override
+                    public void onResponse(Event event, boolean b) {
+                        //reportActionToAnalytics("showEventDetails", label);
+                        Intent detailIntent = new Intent(LaunchActivity.this, WriteReviewActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable(EventDetailActivity.EVENT_OBJECT, event);
+                        bundle.putString(MovieDetailActivity.OBJECT_TYPE, "event");
+                        detailIntent.putExtras(bundle);
+                        startActivity(detailIntent);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Toast.makeText(LaunchActivity.this, R.string.failed_load,
+                                Toast.LENGTH_SHORT).show();
+                        VolleyHelper.log(LaunchActivity.this, volleyError);
+                        finish();
+                    }
+                });
+
+    }
+
+
 }
