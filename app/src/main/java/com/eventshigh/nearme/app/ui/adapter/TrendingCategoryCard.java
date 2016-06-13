@@ -125,7 +125,7 @@ public class TrendingCategoryCard extends ViewHolder {
             @Override
             public void run() {
                 LayoutParams lp = imageView.getLayoutParams();
-                lp.height = imageView.getWidth()/3;
+                lp.height = imageView.getWidth() / 3;
                 imageView.setLayoutParams(lp);
                 // parent.postInvalidate();
             }

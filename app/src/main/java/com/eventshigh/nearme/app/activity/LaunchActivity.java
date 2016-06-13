@@ -155,8 +155,24 @@ public class LaunchActivity extends BaseContextActivity {
             }
         }
 */
+        setUserCityHeader();
         getIntent().getAction();
 
+    }
+
+
+    TextView toolbarTitleText;
+
+    public void setUserCityHeader() {
+        View view = LayoutInflater.from(this).inflate(R.layout.home_toolbar_city_layout, toolbar, false);
+        toolbarTitleText = (TextView) view.findViewById(R.id.location_text);
+        view.findViewById(R.id.parent_layout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        toolbar.addView(view);
     }
 
     @Override
@@ -235,6 +251,7 @@ public class LaunchActivity extends BaseContextActivity {
 
         currentCity = (TextView) findViewById(R.id.current_city);
         if (account.getLastCity() != null) {
+            toolbarTitleText.setText(account.getLastCity().name());
             currentCity.setText(account.getLastCity().name());
             currentCity.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -474,6 +491,7 @@ public class LaunchActivity extends BaseContextActivity {
         City userCity = account.getLastCity();
         if (eventsContext.city != null && userCity != null &&
                 eventsContext.city != userCity) {
+            toolbarTitleText.setText(userCity.name() + "  \u22C0");
             cityChanged(userCity);
             return;
         }

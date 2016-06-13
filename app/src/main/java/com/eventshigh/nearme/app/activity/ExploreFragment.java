@@ -1,6 +1,9 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,22 +40,22 @@ import java.util.List;
  */
 public class ExploreFragment extends BaseEventsFragment {
     public static final String[] EXPLORE_TAGS = {
-            EventsHighEndpoints.QUERY_FEATURED,
+            EventCategory.TODAY.categoryName,
+            EventCategory.MOVIES.categoryName,
             EventCategory.NIGHTLIFE.categoryName,
-            EventCategory.THEATRE.categoryName,
-            EventCategory.MUSIC.categoryName,
-            EventCategory.KIDS_ENTERTAINMENT.categoryName,
-            EventCategory.TECH.categoryName,
-            EventCategory.SPORTS.categoryName,
+            EventCategory.LIVE_PERFORMANCES.categoryName,
+            EventCategory.OUTDOORS.categoryName,
             EventCategory.HEALTH_WELLNESS.categoryName,
-            EventCategory.DANCE.categoryName,
+            EventCategory.KIDS_ENTERTAINMENT.categoryName,
+            EventCategory.SPORTS.categoryName,
+            EventCategory.WORKSHOP.categoryName,
+            EventCategory.TECH.categoryName,
             EventCategory.ART.categoryName,
-            EventCategory.FOOD.categoryName,
-            EventCategory.LITERATURE.categoryName,
+            EventCategory.FOOD.categoryName
 
     };
 
-    public static final String[] EXPLORE_TAGS_CHENNAI = {
+  /*  public static final String[] EXPLORE_TAGS_CHENNAI = {
             EventCategory.NIGHTLIFE.categoryName,
             EventCategory.THEATRE.categoryName,
             EventCategory.MUSIC.categoryName,
@@ -79,7 +82,7 @@ public class ExploreFragment extends BaseEventsFragment {
             EventCategory.ART.categoryName,
             EventCategory.FOOD.categoryName,
             EventCategory.LITERATURE.categoryName,
-    };
+    };*/
 
     public static ExploreFragment getInstance(EventsContext eventsContext) {
         ExploreFragment fragment = new ExploreFragment();
@@ -109,7 +112,8 @@ public class ExploreFragment extends BaseEventsFragment {
         AutofitRecyclerView exploreGridView = (AutofitRecyclerView) view.findViewById(R.id.explore_grid);
         exploreGridView.setAdapter(eventsAdapter);
         exploreGridView.addOnScrollListener(new HideActionBarOnScroll(activity));
-
+        //exploreGridView.setHorizontalSpacing((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
+        exploreGridView.addItemDecoration(new SpaceItemDecorator((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics())));
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         topProgressBar.setVisibility(View.VISIBLE);
         chooseLocalityLayout = (LinearLayout) view.findViewById(R.id.choose_city_view);
@@ -232,9 +236,10 @@ public class ExploreFragment extends BaseEventsFragment {
         @Override
         public void onResponse(EventCollection eventCollection, boolean isIntermediate) {
 
-            eventsAdapter.setExploreCategories(eventCollection, selectedLocalities,
+            /*eventsAdapter.setExploreCategories(eventCollection, selectedLocalities,
                     eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE :
-                            (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS), "movies");
+                            (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS), "movies");*/
+            eventsAdapter.setNewExploreCategories(eventCollection, EXPLORE_TAGS);
 
             if (!isIntermediate) {
                 EventInvitationsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
@@ -261,10 +266,42 @@ public class ExploreFragment extends BaseEventsFragment {
             topProgressBar.setVisibility(View.GONE);
 
             if (eventsAdapter.getItemCount() == 0) {
-                eventsAdapter.setExploreCategories(null,
+                eventsAdapter.setNewExploreCategories(null, EXPLORE_TAGS);
+               /* eventsAdapter.setExploreCategories(null,
                         Locality.getLocalities(eventsContext.city, false),
-                        eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS, "movies");
+                        eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS, "movies");*/
             }
         }
     };
+
+    public class SpaceItemDecorator extends RecyclerView.ItemDecoration {
+        int space;
+
+        public SpaceItemDecorator(int space) {
+            this.space = space;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
+                                   RecyclerView.State state) {
+            if (parent.getChildAdapterPosition(view) == 0 || parent.getChildAdapterPosition(view) == 1) {
+                outRect.top = 0;
+                outRect.bottom = 0;
+                outRect.left = 0;
+                outRect.right = 0;
+            } else if (parent.getChildAdapterPosition(view) >= 2) {
+                outRect.top = space;
+                if (parent.getChildAdapterPosition(view) % 2 == 0) {
+                    outRect.left = space;
+                    outRect.right = space / 2;
+                } else {
+                    outRect.right = space;
+                    outRect.left = space / 2;
+                }
+            }
+
+        }
+
+
+    }
 }
