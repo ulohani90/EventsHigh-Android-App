@@ -61,10 +61,15 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.PlusOneButton;
 import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
@@ -83,9 +88,11 @@ import pl.snowdog.material.ui.ToolbarColorizeHelper;
 /**
  * Application Main or launch activity.
  */
-public class LaunchActivity extends BaseContextActivity{
+public class LaunchActivity extends BaseContextActivity {
     // Constants
     public static final String DEFAULT_TAB_PARAM = LaunchActivity.class.getName() + "_default_tab";
+    int PLACE_AUTOCOMPLETE_REQUEST_CODE = 0x001;
+
 
     // UI Elements for this activity.
     private DrawerLayout drawer;
@@ -165,9 +172,34 @@ public class LaunchActivity extends BaseContextActivity{
             }
         }
 */
+        setUserCityHeader();
         getIntent().getAction();
 
 
+    }
+
+
+    TextView toolbarTitleText;
+
+    public void setUserCityHeader() {
+        View view = LayoutInflater.from(this).inflate(R.layout.home_toolbar_city_layout, toolbar, false);
+        toolbarTitleText = (TextView) view.findViewById(R.id.location_text);
+        view.findViewById(R.id.parent_layout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent intent =
+                            new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                                    .build(LaunchActivity.this);
+                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                } catch (GooglePlayServicesRepairableException e){
+                    // TODO: Handle the error.
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    // TODO: Handle the error.
+                }
+            }
+        });
+        toolbar.addView(view);
     }
 
 
@@ -175,7 +207,6 @@ public class LaunchActivity extends BaseContextActivity{
     public View getViewForSnackbar() {
         return null;
     }
-
 
 
     @Override
@@ -224,7 +255,7 @@ public class LaunchActivity extends BaseContextActivity{
         //Show next screen.
         showNextScreen();
 
-            // Setup the Google+ Button.
+        // Setup the Google+ Button.
         PlusOneButton plusOneButton = (PlusOneButton) findViewById(R.id.plus_one_button);
         plusOneButton.initialize("https://play.google.com/store/apps/details?id=" + getPackageName(),
                 PLUS_ONE_REQUEST_CODE);
@@ -240,6 +271,7 @@ public class LaunchActivity extends BaseContextActivity{
 
         currentCity = (TextView) findViewById(R.id.current_city);
         if (account.getLastCity() != null) {
+            toolbarTitleText.setText(account.getLastCity().name());
             currentCity.setText(account.getLastCity().name());
             currentCity.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -481,6 +513,7 @@ public class LaunchActivity extends BaseContextActivity{
         City userCity = account.getLastCity();
         if (eventsContext.city != null && userCity != null &&
                 eventsContext.city != userCity) {
+            toolbarTitleText.setText(userCity.name() + "  \u22C0");
             cityChanged(userCity);
             return;
         }
@@ -717,7 +750,21 @@ public class LaunchActivity extends BaseContextActivity{
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        //Checking if the previous activity is launched on branch Auto deep link.
+            if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+                if (resultCode == RESULT_OK) {
+                    Place place = PlaceAutocomplete.getPlace(this, data);
+                    Log.i("TestActivity", "Place: " + place.getName());
+                } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                    Status status = PlaceAutocomplete.getStatus(this, data);
+                    // TODO: Handle the error.
+                    Log.i("TestActivity", status.getStatusMessage());
+
+                } else if (resultCode == RESULT_CANCELED){
+                    // The user canceled the operation.
+                }
+            }
+
+          //Checking if the previous activity is launched on branch Auto deep link.
         if (requestCode == getResources().getInteger(R.integer.EventsDetailDeepLink_code)) {
             //Decide here where  to navigate  when an auto deep linked activity finishes.
             //For e.g. Go to HomeActivity or a  SignUp Activity.
@@ -951,9 +998,9 @@ public class LaunchActivity extends BaseContextActivity{
                         //showEventDetails();
                         try {
                             if (referringParams.length() == 0) {
-                            // showNextScreen();
-                            Log.i("Event_detail_missed", "refering params empty");
-                        } else if(!referringParams.optBoolean("review",false)){
+                                // showNextScreen();
+                                Log.i("Event_detail_missed", "refering params empty");
+                            } else if (!referringParams.optBoolean("review", false)) {
                                 if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
                                     //showNextScreen();
                                     Log.i("Event_detail_missed", referringParams.getBoolean("+is_first_session") ? "False" : "true");
@@ -990,7 +1037,7 @@ public class LaunchActivity extends BaseContextActivity{
                                 }
 
                                 System.out.println("JsonObject received" + referringParams);
-                        }else if(referringParams.optBoolean("review",false)) {
+                            } else if (referringParams.optBoolean("review", false)) {
 
                                 if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
                                     //showNextScreen();
@@ -999,12 +1046,12 @@ public class LaunchActivity extends BaseContextActivity{
                                     if (referringParams.has("event_id")) {
                                         writeEventReview(
                                                 EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
-                                    }else if(referringParams.has("event_uri")) {
+                                    } else if (referringParams.has("event_uri")) {
                                         Uri uri = Uri.parse(referringParams.getString("event_uri"));
                                         showSearchView(uri.getLastPathSegment());
                                     } else if (referringParams.has("movie_id")) {
                                         int id = referringParams.getInt("movie_id");
-                                        writeMovieReview(id,null);
+                                        writeMovieReview(id, null);
                                     }
 
                                 }
@@ -1023,28 +1070,28 @@ public class LaunchActivity extends BaseContextActivity{
 
     public void writeMovieReview(int movieId, @Nullable String label) {
         //reportActionToAnalytics("showEventDetails", label);
-        if(movieId != -1)
-        MovieDetailRequest.submit(this, movieId, Request.Priority.IMMEDIATE,
-                new Response.Listener<MovieDetailObject>() {
-                    @Override
-                    public void onResponse(MovieDetailObject movieDetailObject, boolean b) {
-                        Intent detailIntent = new Intent(LaunchActivity.this, MovieDetailActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable(MovieDetailActivity.MOVIE_DETAIL_OBJECT, movieDetailObject);
-                        bundle.putString(MovieDetailActivity.OBJECT_TYPE, "movie");
-                        detailIntent.putExtras(bundle);
-                        startActivity(detailIntent);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(LaunchActivity.this, R.string.failed_load,
-                                Toast.LENGTH_SHORT).show();
-                        VolleyHelper.log(LaunchActivity.this, volleyError);
-                        finish();
-                    }
-                });
+        if (movieId != -1)
+            MovieDetailRequest.submit(this, movieId, Request.Priority.IMMEDIATE,
+                    new Response.Listener<MovieDetailObject>() {
+                        @Override
+                        public void onResponse(MovieDetailObject movieDetailObject, boolean b) {
+                            Intent detailIntent = new Intent(LaunchActivity.this, MovieDetailActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putParcelable(MovieDetailActivity.MOVIE_DETAIL_OBJECT, movieDetailObject);
+                            bundle.putString(MovieDetailActivity.OBJECT_TYPE, "movie");
+                            detailIntent.putExtras(bundle);
+                            startActivity(detailIntent);
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            Toast.makeText(LaunchActivity.this, R.string.failed_load,
+                                    Toast.LENGTH_SHORT).show();
+                            VolleyHelper.log(LaunchActivity.this, volleyError);
+                            finish();
+                        }
+                    });
 
     }
 

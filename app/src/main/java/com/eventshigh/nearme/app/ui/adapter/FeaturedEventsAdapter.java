@@ -5,17 +5,23 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.ReferralActivity;
+import com.eventshigh.nearme.app.user.Account;
 
 /**
-* A {@link android.support.v4.view.PagerAdapter} which can be used to show Featured Events.
-*/
+ * A {@link android.support.v4.view.PagerAdapter} which can be used to show Featured Events.
+ */
 public class FeaturedEventsAdapter extends PagerAdapter {
     private static final int MAX_EVENTS = 5;
 
     private final EventPagerData eventPagerData;
+
+    public static final String BANNER_IMAGE_URL = "https://assets.eventshigh.com/banner.png";
 
     public FeaturedEventsAdapter(EventPagerData eventPagerData) {
         this.eventPagerData = eventPagerData;
@@ -34,9 +40,20 @@ public class FeaturedEventsAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        if (eventPagerData.showReferralOffer && position == 0) {
+        if (position == 0) {
             // special app invite.
             View view = eventPagerData.activity.getLayoutInflater().inflate(R.layout.card_refer, container, false);
+            TextView helloUserText = (TextView) view.findViewById(R.id.hello_user_text);
+            Account account = new Account(eventPagerData.activity);
+            if (account.getUserInfo() != null && account.getUserInfo().name != null && account.getUserInfo().name.length() > 0) {
+                helloUserText.setText("Hello " + account.getUserInfo().name);
+            } else {
+                helloUserText.setText("Hello");
+            }
+            ImageView banner = (ImageView) view.findViewById(R.id.banner_img);
+            Glide.with(eventPagerData.activity).load(BANNER_IMAGE_URL).placeholder(R.drawable.eh_default_event)
+                    .crossFade().centerCrop()
+                    .into(banner);
             view.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -51,10 +68,10 @@ public class FeaturedEventsAdapter extends PagerAdapter {
 
         int eventIndex = position;
         if (eventIndex > 0 && eventPagerData.showReferralOffer) {
-            eventIndex --;
+            eventIndex--;
         }
         View view = EventCard.getEventCard(eventPagerData.events.get(eventIndex),
-                eventPagerData.activity, null, container,false);
+                eventPagerData.activity, null, container, false);
         container.addView(view);
         return view;
     }

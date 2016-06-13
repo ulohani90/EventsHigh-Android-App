@@ -24,7 +24,7 @@ public class NewExploreCategoryData implements AdapterData {
 
     @Override
     public DataType getType() {
-        return DataType.EXPLORE_CATEGORY;
+        return DataType.NEW_EXPLORE_CATEOGRY;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class NewExploreCategoryData implements AdapterData {
 
     public int getInfoGraphId() {
         try {
-            return R.drawable.class.getField("infograph_" +
+            return R.drawable.class.getField("explore_ic_" +
                     EventCategory.toCategoryParsableString(tag).toLowerCase()).getInt(null);
         } catch (IllegalAccessException e) {
             // Ignore

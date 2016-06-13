@@ -18,7 +18,19 @@ import java.util.Map;
  * This Icon is used in event marker on Map or on Event Info card.
  */
 public enum EventCategory {
+    TODAY,
+    MOVIES,
+    NIGHTLIFE("Parties"),
+    LIVE_PERFORMANCES("Live Shows"),
+    OUTDOORS,
+    HEALTH_WELLNESS("Health & Wellness"),
+    KIDS_ENTERTAINMENT("Kids"),
+    SPORTS,
+    WORKSHOP,
+    TECH("Technology"),
     ART("Arts & Culture"),
+    FOOD,
+
     COMEDY,
     DANCE,
     DJ,
@@ -26,26 +38,16 @@ public enum EventCategory {
     ENVIRONMENT,
     FASHION,
     FILM,
-    FOOD,
-    HEALTH_WELLNESS("Health & Wellness"),
-    KIDS_ENTERTAINMENT("Kids"),
     LITERATURE("TLS(Technology, Literature & Society)"),
     MUSIC,
-    OUTDOORS,
-    NIGHTLIFE("Parties & Nightlife"),
     PHOTOGRAPHY,
     SHOPPING,
     SOCIAL_CAUSES,
     SPIRITUAL,
-    SPORTS,
-    TECH,
     THEATRE,
-    WORKSHOP,
-    LIVE_PERFORMANCES("Live Performances & Shows"),
     EDITOR_PICKS("Editor's Picks"),
     FREE_EVENTS,
-    OTHER,
-    MOVIES;
+    OTHER;
 
     private static final String LOG_TAG = EventCategory.class.getSimpleName();
     public final String categoryName;
@@ -148,8 +150,8 @@ public enum EventCategory {
     }
 
     public static boolean isACategory(String categoryName) {
-        for(EventCategory category: EventCategory.values()){
-            if(category.categoryName.equalsIgnoreCase(categoryName))
+        for (EventCategory category : EventCategory.values()) {
+            if (category.categoryName.equalsIgnoreCase(categoryName))
                 return true;
         }
         return false;
