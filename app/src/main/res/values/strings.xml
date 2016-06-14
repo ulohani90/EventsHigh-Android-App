@@ -213,7 +213,6 @@
     <string name="explore_ten_category_text">Here are your 10 ways to think about your next events and movies</string>
 
 
-
     <!-- Error strings for Geofence-->
     <string name="not_connected">GoogleApiClient no yet connected. Try again.</string>
     <string name="geofence_not_available">Geofence service is not available now</string>
@@ -234,8 +233,6 @@
     <string name="unknown_geofence_transition">Unknown Transition</string>
     <string name="geofence_transition_notification_text">Click notification to return to app</string>
     <string name="title_activity_test">TestActivity</string>
-    <string name="title_activity_places_autocomplete_bounded">PlacesAutocompleteBoundedActivity
-    </string>
 
 
 </resources>

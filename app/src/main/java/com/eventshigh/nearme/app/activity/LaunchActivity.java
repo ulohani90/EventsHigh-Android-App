@@ -189,19 +189,18 @@ public class LaunchActivity extends BaseContextActivity {
         view.findViewById(R.id.parent_layout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    if (account.getLastCity() != null) {
-                        Intent intent =
+
+                if (account.getLastCity() != null) {
+                        /*Intent intent =
                                 new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).setBoundsBias(account.getLastCity().cityBounds)
                                         .build(LaunchActivity.this);
-                        startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-                    } else {
-                        Toast.makeText(LaunchActivity.this, "Please select the city first", Toast.LENGTH_LONG).show();
-                    }
-                } catch (GooglePlayServicesRepairableException e) {
-                    // TODO: Handle the error.
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    // TODO: Handle the error.
+                        startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);*/
+
+                    Intent intent = new Intent(LaunchActivity.this, PlacesAutocompleteBoundedActivity.class);
+                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+
+                } else {
+                    Toast.makeText(LaunchActivity.this, "Please select the city first", Toast.LENGTH_LONG).show();
                 }
             }
         });

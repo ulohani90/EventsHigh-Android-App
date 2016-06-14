@@ -8,34 +8,31 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ListView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.ui.adapter.GooglePlacesAutocompleteAdapter;
+import com.eventshigh.nearme.app.user.Account;
 
-public class PlacesAutocompleteBoundedActivity extends AppCompatActivity implements TextWatcher{
+public class PlacesAutocompleteBoundedActivity extends AppCompatActivity implements TextWatcher {
 
     private GooglePlacesAutocompleteAdapter dataAdapter;
     EditText etSearchBar;
     ListView listView;
 
     @Override
-    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_places_autocomplete_bounded);
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar_et);
         setSupportActionBar(tb);
-        final ActionBar ab = getSupportActionBar();
-        ab.setDisplayShowHomeEnabled(true); // show or hide the default home button
-        ab.setDisplayHomeAsUpEnabled(true);
-        ab.setDisplayShowCustomEnabled(true); // enable overriding the default toolbar layout
-        ab.setDisplayShowTitleEnabled(false); // disable the default title element here (for centered title)
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        etSearchBar = (EditText)findViewById(R.id.et_search_place);
-
-        dataAdapter = new  GooglePlacesAutocompleteAdapter(PlacesAutocompleteBoundedActivity.this,
-                R.id.lv_search_place_list);
+        etSearchBar = (EditText) findViewById(R.id.et_search_place);
+        Account account = new Account(this);
+        dataAdapter = new GooglePlacesAutocompleteAdapter(PlacesAutocompleteBoundedActivity.this, account.getLastCity().name(), account.getLastCity().cityBounds);
         listView = (ListView) findViewById(R.id.lv_search_place_list);
         listView.setAdapter(dataAdapter);
         listView.setTextFilterEnabled(true);
@@ -43,6 +40,13 @@ public class PlacesAutocompleteBoundedActivity extends AppCompatActivity impleme
     }
 
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            this.finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     public void afterTextChanged(Editable s) {
     }
