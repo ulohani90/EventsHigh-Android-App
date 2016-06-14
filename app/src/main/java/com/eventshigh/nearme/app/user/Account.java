@@ -11,6 +11,7 @@ import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.Locality;
+import com.eventshigh.nearme.app.data.LocalityLatLong;
 import com.eventshigh.nearme.app.user.UserActionHelper.FollowingAction;
 
 import java.util.ArrayList;
@@ -27,8 +28,10 @@ public class Account {
     }
 
     public static class UserInfo {
-        @Nullable public final String name;
-        @Nullable public final String phoneNo;
+        @Nullable
+        public final String name;
+        @Nullable
+        public final String phoneNo;
         public final Boolean isVerified;
 
         public UserInfo(@Nullable String name, @Nullable String phoneNo, Boolean isVerified) {
@@ -49,7 +52,9 @@ public class Account {
     // Last city selection by user.
     private static final String PREF_LAST_CITY = "last_city";
 
-    private static final String PREF_SAVED_LOCALITY="saved_locality";
+    private static final String PREF_LAST_LOCALITY = "last_locality";
+
+    private static final String PREF_SAVED_LOCALITY = "saved_locality";
 
     // The referrer for this user. this user installed the app via this referrer.
     private static final String PREF_REFERRER = "referrer";
@@ -70,6 +75,7 @@ public class Account {
     // shared and static accountInfo which usages shared preference to store records.
     private static SharedPreferences accountInfo;
     private static UserCityListener userCityListener = null;
+
     private static synchronized void setAccountInfo(Context context) {
         if (accountInfo == null) {
             accountInfo = context.getSharedPreferences(PREFS_FILE_NAME, 0);
@@ -142,17 +148,19 @@ public class Account {
         return userInfo.phoneNo != null && !userInfo.isVerified;
     }
 
-    public boolean recordReferrer(String referrer,boolean isReceivedReferrer2) {
+    public boolean recordReferrer(String referrer, boolean isReceivedReferrer2) {
         if (!accountInfo.contains(PREF_REFERRER) || isReceivedReferrer2) {
             accountInfo.edit().putString(PREF_REFERRER, referrer).apply();
-            UpdateAccountInfoService.run(context, true,isReceivedReferrer2);
+            UpdateAccountInfoService.run(context, true, isReceivedReferrer2);
             return true;
         }
 
         return false;
     }
 
-    public @Nullable String getReferrer() {
+    public
+    @Nullable
+    String getReferrer() {
         return accountInfo.getString(PREF_REFERRER, null);
     }
 
@@ -161,7 +169,9 @@ public class Account {
         accountInfo.edit().putString(PREF_REFERRER_ID, referrerLink).apply();
     }
 
-    public @Nullable String getReferrerId() {
+    public
+    @Nullable
+    String getReferrerId() {
         return accountInfo.getString(PREF_REFERRER_ID, null);
     }
 
@@ -169,10 +179,11 @@ public class Account {
         accountInfo.edit().putString(PREF_REFERRER_CODE, referrerLink).apply();
     }
 
-    public @Nullable String getReferrerCode() {
+    public
+    @Nullable
+    String getReferrerCode() {
         return accountInfo.getString(PREF_REFERRER_CODE, null);
     }
-
 
 
     public boolean isFollowing(String tag) {
@@ -207,11 +218,22 @@ public class Account {
 
         City currentLastCity = getLastCity();
         if (currentLastCity == null || !city.equals(currentLastCity)) {
-            accountInfo.edit().putString(PREF_LAST_CITY, city.toString())
+            accountInfo.edit().putString(PREF_LAST_CITY, city.toString()).putString(PREF_LAST_LOCALITY, "")
                     .putString(PREF_SAVED_LOCALITY, "").apply();
             UpdateAccountInfoService.refreshCity(context);
         }
         notifyCityChange();
+    }
+
+    public void setLastLocality(@Nullable LocalityLatLong locality) {
+        if (locality == null) {
+            return;
+        }
+        LocalityLatLong lastLocality = getLastLocality();
+        if (lastLocality == null || !lastLocality.equals(locality)) {
+            String localityString = locality.getName() + "," + locality.getLatLng().latitude + "," + locality.getLatLng().longitude;
+            accountInfo.edit().putString(PREF_LAST_LOCALITY, localityString).apply();
+        }
     }
 
     public void setSavedLocalities(List<Locality> localities) {
@@ -219,20 +241,20 @@ public class Account {
             return;
         }
 
-        StringBuilder localityName=new StringBuilder();
-        for(int i=0;i<localities.size();i++){
+        StringBuilder localityName = new StringBuilder();
+        for (int i = 0; i < localities.size(); i++) {
             localityName.append(localities.get(i).name);
-            if(i!=localities.size()-1){
+            if (i != localities.size() - 1) {
                 localityName.append(",");
             }
         }
-            accountInfo.edit().putString(PREF_SAVED_LOCALITY, localityName.toString()).apply();
+        accountInfo.edit().putString(PREF_SAVED_LOCALITY, localityName.toString()).apply();
 
     }
 
-    public List<Locality> getSavedLocalities(){
+    public List<Locality> getSavedLocalities() {
         List<Locality> locality = new ArrayList<Locality>();
-        if(accountInfo.getString(PREF_SAVED_LOCALITY, "").length()>0) {
+        if (accountInfo.getString(PREF_SAVED_LOCALITY, "").length() > 0) {
             String[] localityName = accountInfo.getString(PREF_SAVED_LOCALITY, "").split(",");
             for (int i = 0; i < localityName.length; i++) {
                 locality.add(Locality.getLocality(localityName[i]));
@@ -241,13 +263,22 @@ public class Account {
         return locality;
     }
 
-    public @Nullable City getLastCity() {
+    public
+    @Nullable
+    LocalityLatLong getLastLocality() {
+        return LocalityLatLong.getLocality(accountInfo.getString(PREF_LAST_LOCALITY, ""));
+    }
+
+    public
+    @Nullable
+    City getLastCity() {
         return City.getCity(accountInfo.getString(PREF_LAST_CITY, ""));
     }
 
-    public static synchronized void setUserCityListener (@Nullable UserCityListener newUserCityListener) {
+    public static synchronized void setUserCityListener(@Nullable UserCityListener newUserCityListener) {
         userCityListener = newUserCityListener;
     }
+
     private static synchronized void notifyCityChange() {
         if (userCityListener != null) {
             City lastCity = City.getCity(accountInfo.getString(PREF_LAST_CITY, ""));

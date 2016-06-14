@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,7 +9,11 @@ import android.widget.ImageView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
+import com.eventshigh.nearme.app.activity.EventsGridActivity;
+import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.IntentUtils;
 
 /**
  * Created by umesh on 11/06/16.
@@ -41,7 +46,19 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
         nearBy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                activity.reportActionToAnalytics("showSearchView", "nearme");
+                EventsContext param;
+                Account account = new Account(activity);
+                if (account.getLastLocality() != null) {
+                    param = new EventsContext(account.getLastLocality().getLatLng(), EventsHighEndpoints.QUERY_NEARME);
+                } else {
+                    param = new EventsContext(account.getLastCity().cityBounds.getCenter(), EventsHighEndpoints.QUERY_NEARME);
+                }
 
+                param.removeDateFilter();
+                Intent intent = new Intent(activity, EventsGridActivity.class)
+                        .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
+                activity.startActivity(intent);
             }
         });
     }

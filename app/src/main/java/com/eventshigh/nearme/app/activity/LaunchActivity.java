@@ -47,6 +47,7 @@ import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.LocalityLatLong;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.MovieDetailRequest;
@@ -68,6 +69,7 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.model.LatLng;
@@ -188,11 +190,15 @@ public class LaunchActivity extends BaseContextActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    Intent intent =
-                            new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
-                                    .build(LaunchActivity.this);
-                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-                } catch (GooglePlayServicesRepairableException e){
+                    if (account.getLastCity() != null) {
+                        Intent intent =
+                                new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).setBoundsBias(account.getLastCity().cityBounds)
+                                        .build(LaunchActivity.this);
+                        startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                    } else {
+                        Toast.makeText(LaunchActivity.this, "Please select the city first", Toast.LENGTH_LONG).show();
+                    }
+                } catch (GooglePlayServicesRepairableException e) {
                     // TODO: Handle the error.
                 } catch (GooglePlayServicesNotAvailableException e) {
                     // TODO: Handle the error.
@@ -271,7 +277,12 @@ public class LaunchActivity extends BaseContextActivity {
 
         currentCity = (TextView) findViewById(R.id.current_city);
         if (account.getLastCity() != null) {
-            toolbarTitleText.setText(account.getLastCity().name());
+            if (account.getLastLocality() != null && account.getLastLocality().getName().length() > 0) {
+                toolbarTitleText.setText(account.getLastLocality().getName());
+            } else {
+                toolbarTitleText.setText(account.getLastCity().name());
+            }
+
             currentCity.setText(account.getLastCity().name());
             currentCity.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -279,6 +290,7 @@ public class LaunchActivity extends BaseContextActivity {
                     CitySelectDialog.show(LaunchActivity.this, account, new CitySelectDialog.CitySelectionCallback() {
                         @Override
                         public void onCityChanged(City city) {
+                            toolbarTitleText.setText(city.name());
                             currentCity.setText(city.name());
                             cityChanged(city);
                         }
@@ -594,6 +606,16 @@ public class LaunchActivity extends BaseContextActivity {
         if (tab != null) {
             tab.select();
         }
+        if (account.getLastCity() != null) {
+            if (account.getLastLocality() != null && account.getLastLocality().getName().length() > 0) {
+                toolbarTitleText.setText(account.getLastLocality().getName());
+            } else {
+                toolbarTitleText.setText(account.getLastCity().name());
+            }
+
+            if (currentCity != null)
+                currentCity.setText(account.getLastCity().name());
+        }
     }
 
     private void setupTabIconsWithOffer() {
@@ -750,21 +772,28 @@ public class LaunchActivity extends BaseContextActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-            if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
-                if (resultCode == RESULT_OK) {
-                    Place place = PlaceAutocomplete.getPlace(this, data);
+        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                toolbarTitleText.setText(place.getName());
+                if (account.getLastCity().cityBounds.contains(place.getLatLng())) {
+                    LocalityLatLong locality = new LocalityLatLong(place.getName().toString(), place.getLatLng());
+                    account.setLastLocality(locality);
                     Log.i("TestActivity", "Place: " + place.getName());
-                } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
-                    Status status = PlaceAutocomplete.getStatus(this, data);
-                    // TODO: Handle the error.
-                    Log.i("TestActivity", status.getStatusMessage());
-
-                } else if (resultCode == RESULT_CANCELED){
-                    // The user canceled the operation.
+                } else {
+                    Toast.makeText(this, "Selected locality has to be in " + account.getLastCity().name(), Toast.LENGTH_LONG).show();
                 }
-            }
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                // TODO: Handle the error.
+                Log.i("TestActivity", status.getStatusMessage());
 
-          //Checking if the previous activity is launched on branch Auto deep link.
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+        }
+
+        //Checking if the previous activity is launched on branch Auto deep link.
         if (requestCode == getResources().getInteger(R.integer.EventsDetailDeepLink_code)) {
             //Decide here where  to navigate  when an auto deep linked activity finishes.
             //For e.g. Go to HomeActivity or a  SignUp Activity.

@@ -40,6 +40,7 @@ public class EventsHighEndpoints {
     private static final String API_ENDPOINT_MULTI_EVENT_UBER_FORMAT =
             API_URI_BASE + "api/get_event_uber_infos/%s?mobile=1";
 
+    private static final String API_ENDPOINT_EVENT_LAT_LONG_FORMAT = API_URI_BASE + "api/get_events_by_latlong/%s/%s/%s/%s";
     private static final String API_ENDPOINT_MULTI_EVENT_MOBILE_ID_FORMAT =
             API_URI_BASE + "api/get_events_for_mobile_user/%s?mobile=1";
     private static final String API_ENDPOINT_MOVIES_LIST_FORMAT =
@@ -68,6 +69,7 @@ public class EventsHighEndpoints {
     public static final String QUERY_MY_EVENT = "my events";
     public static final String QUERY_MY_INTEREST_EVENTS = "my_interest_events";
     public static final String QUERY_FEATURED = "Editor's picks";
+    public static final String QUERY_NEARME = "Near Me";
 
     public static Uri getEventDetailsURI(Event event) {
         StringBuilder sb = new StringBuilder(event.id);
@@ -159,10 +161,19 @@ public class EventsHighEndpoints {
                         URLEncoder.encode(eventsContext.query, "UTF-8"));
             }
 
+
             if (eventsContext.dateFilter.isEmpty()) {
-                return String.format(API_ENDPOINT_QUERY_FORMAT,
-                        eventsContext.city.toString().toLowerCase(),
-                        URLEncoder.encode(eventsContext.query, "UTF-8"));
+                if (isNearMeQuery(eventsContext.query)) {
+
+                    return String.format(API_ENDPOINT_EVENT_LAT_LONG_FORMAT,
+                            eventsContext.city.toString().toLowerCase(),
+                            eventsContext.location.latitude,
+                            eventsContext.location.longitude, 2);
+                } else {
+                    return String.format(API_ENDPOINT_QUERY_FORMAT,
+                            eventsContext.city.toString().toLowerCase(),
+                            URLEncoder.encode(eventsContext.query, "UTF-8"));
+                }
             }
 
             return String.format(API_ENDPOINT_QUERY_DATE_FORMAT,
@@ -173,6 +184,10 @@ public class EventsHighEndpoints {
             Crashlytics.getInstance().core.logException(e);
             throw new IllegalArgumentException(e);
         }
+    }
+
+    public static boolean isNearMeQuery(String query) {
+        return query.equalsIgnoreCase(QUERY_NEARME);
     }
 
     public static String getApiEndpointForDate(EventsContext eventsContext, String dateString) {
