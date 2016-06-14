@@ -311,6 +311,9 @@ public abstract class BaseContextActivity extends BaseActivity {
         startActivity(intent);
     }
 
+
+
+
     public void showCategorySearchView(String query) {
         reportActionToAnalytics("showSearchView", query);
         EventsContext param = new EventsContext(eventsContext.location, query);

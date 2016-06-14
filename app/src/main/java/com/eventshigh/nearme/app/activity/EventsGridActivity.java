@@ -36,6 +36,7 @@ import com.squareup.timessquare.CalendarPickerView;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
 
@@ -180,12 +181,12 @@ public class EventsGridActivity extends BaseContextActivity {
         Fragment eventFragment;
         if (!eventsContext.query.isEmpty()) {
 
-            if (Locality.getLocality(eventsContext.query) == null) {
-                isCategoryFilterVisible = false;
-                findViewById(R.id.category_filter).setVisibility(View.GONE);
-            } else {
+            if (EventsHighEndpoints.isDateQuery(eventsContext.query) || eventsContext.query.equalsIgnoreCase(EventsHighEndpoints.QUERY_NEARME)) {
                 isCategoryFilterVisible = true;
                 findViewById(R.id.category_filter).setVisibility(View.VISIBLE);
+            } else {
+                isCategoryFilterVisible = false;
+                findViewById(R.id.category_filter).setVisibility(View.GONE);
             }
 
             boolean showEhInviteForNotification = getIntent() != null &&
@@ -209,6 +210,7 @@ public class EventsGridActivity extends BaseContextActivity {
         addFiltersData();
 
     }
+
 
     TextView followBtn;
 

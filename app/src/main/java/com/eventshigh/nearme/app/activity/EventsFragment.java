@@ -206,19 +206,19 @@ public class EventsFragment extends BaseEventsFragment {
         } else if (eventsContext.query.isEmpty() && !eventsContext.dateFilter.isEmpty() && showCategories) {
             DateCategoryRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, mMyEventsFetcherCallBack, mErrorListener);
-        } else {
+        }  else {
 
             EventCollectionRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
         }
-        SocialInvitationsRequest.submit(activity, Priority.NORMAL, this, false, mSocialInvitesCallback,
+        /*SocialInvitationsRequest.submit(activity, Priority.NORMAL, this, false, mSocialInvitesCallback,
                 new ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         VolleyHelper.log(activity, volleyError);
                     }
                 }
-        );
+        );*/
 
         // Load social actions.
         if (showFollowCard) {
