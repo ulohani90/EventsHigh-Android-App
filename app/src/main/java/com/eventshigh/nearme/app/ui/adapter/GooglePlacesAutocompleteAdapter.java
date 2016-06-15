@@ -106,6 +106,7 @@ public class GooglePlacesAutocompleteAdapter
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         View row = super.getView(position, convertView, parent);
 
         // Sets the primary and secondary text for a row.

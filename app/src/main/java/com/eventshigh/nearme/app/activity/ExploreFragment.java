@@ -19,7 +19,6 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
@@ -30,7 +29,6 @@ import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.ui.adapter.LocalitiesAdapter;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 import java.util.List;
@@ -48,7 +46,7 @@ public class ExploreFragment extends BaseEventsFragment {
             EventCategory.HEALTH_WELLNESS.categoryName,
             EventCategory.KIDS_ENTERTAINMENT.categoryName,
             EventCategory.SPORTS.categoryName,
-            EventCategory.WORKSHOP.categoryName,
+            EventCategory.WORKSHOPS.categoryName,
             EventCategory.TECH.categoryName,
             EventCategory.ART.categoryName,
             EventCategory.FOOD.categoryName
@@ -240,10 +238,10 @@ public class ExploreFragment extends BaseEventsFragment {
                     eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE :
                             (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS), "movies");*/
             eventsAdapter.setNewExploreCategories(eventCollection, EXPLORE_TAGS);
-
+            topProgressBar.setVisibility(View.GONE);
             if (!isIntermediate) {
-                EventInvitationsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
-                        false, mEventInvitationsCallback, mErrorListener);
+               /* EventInvitationsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
+                        false, mEventInvitationsCallback, mErrorListener);*/
             }
         }
     };

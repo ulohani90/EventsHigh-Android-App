@@ -7,6 +7,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.EventCategory;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 /**
  * Created by umesh on 10/06/16.
@@ -38,6 +39,7 @@ public class NewExploreCategoryData implements AdapterData {
 
     public int getInfoGraphId() {
         try {
+
             return R.drawable.class.getField("explore_ic_" +
                     EventCategory.toCategoryParsableString(tag).toLowerCase()).getInt(null);
         } catch (IllegalAccessException e) {

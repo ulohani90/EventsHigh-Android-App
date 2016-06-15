@@ -33,7 +33,11 @@ public class ExploreCategoryCard extends RecyclerView.ViewHolder {
     }
 
     public void bindData(final NewExploreCategoryData data) {
-        categoryName.setText(data.tag);
+        if (data.tag.equalsIgnoreCase(EventCategory.NIGHTLIFE.categoryName)) {
+            categoryName.setText("Parties");
+        } else {
+            categoryName.setText(data.tag);
+        }
         Drawable drawable = data.activity.getResources().getDrawable(data.getInfoGraphId());
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         categoryName.setCompoundDrawables(drawable, null, null, null);

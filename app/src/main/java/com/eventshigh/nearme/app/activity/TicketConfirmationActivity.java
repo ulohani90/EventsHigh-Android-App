@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class TicketConfirmationActivity extends AppCompatActivity implements View.OnClickListener {
+public class TicketConfirmationActivity extends BaseActivity implements View.OnClickListener {
 
     TextView tvEventName, tvEventLocation, tvNoOfTickets;
     TextView tvEventBookingId, tvEventGuestName, tvEventGuestEmailId, tvEventGuestPhone;
@@ -115,6 +115,7 @@ public class TicketConfirmationActivity extends AppCompatActivity implements Vie
         findViewById(R.id.tv_explore_more_booking).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                reportActionToAnalytics("exploreMoreClick");
                 EventsContext param = new EventsContext(null, "eventshigh specials");
                 Intent intent = new Intent(TicketConfirmationActivity.this, EventsGridActivity.class)
                         .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
@@ -146,10 +147,11 @@ public class TicketConfirmationActivity extends AppCompatActivity implements Vie
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_event_map_location:
+                reportActionToAnalytics("showOnMap");
                 startMapActivity();
                 break;
             case R.id.ll_share_ticket_btn:
-                startTicketShareActivity();
+                startTicketShareActivity(noOfTickets, event, ticketLink);
                 break;
         }
     }
@@ -162,16 +164,6 @@ public class TicketConfirmationActivity extends AppCompatActivity implements Vie
         } else {
             Toast.makeText(TicketConfirmationActivity.this, "Map location not available", Toast.LENGTH_SHORT).show();
         }
-    }
-
-
-    void startTicketShareActivity() {
-        String shareText = "Hey, I just book " + noOfTickets + " tickets for " + event.title + " on EventsHigh. It'll be fun.\n" + ticketLink;
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
-        this.startActivity(shareIntent);
-
     }
 
 

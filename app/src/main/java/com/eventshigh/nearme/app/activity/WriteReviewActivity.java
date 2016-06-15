@@ -31,6 +31,7 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
     Event event;
     protected int movie_rated;
     String type = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,12 +51,12 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
         Bundle bundle = this.getIntent().getExtras();
         if (bundle != null) {
             type = bundle.getString(MovieDetailActivity.OBJECT_TYPE);
-            if(type.equals("movie")){
+            if (type.equals("movie")) {
                 movieDetailObject = bundle.getParcelable(MovieDetailActivity.MOVIE_DETAIL_OBJECT);
-            }else{
+            } else {
                 event = bundle.getParcelable(EventDetailActivity.EVENT_OBJECT);
             }
-        } else{
+        } else {
             //Do something here if data not received
         }
 
@@ -135,7 +136,7 @@ public class WriteReviewActivity extends AppCompatActivity implements View.OnTou
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-       // overridePendingTransition(R.anim.stay, R.anim.animate_slide_down);
+        // overridePendingTransition(R.anim.stay, R.anim.animate_slide_down);
     }
 }
 

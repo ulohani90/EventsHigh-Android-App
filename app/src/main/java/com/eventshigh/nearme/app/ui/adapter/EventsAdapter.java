@@ -207,6 +207,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         for (String tag : tags) {
             dataToShow.add(new NewExploreCategoryData(tag, activity, this));
         }
+
+        notifyDataSetChanged();
     }
 
     public void setExploreCategories(@Nullable EventCollection eventCollection,

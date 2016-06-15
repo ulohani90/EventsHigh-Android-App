@@ -30,9 +30,9 @@ public class EventRequest extends JsonRequest<Event> {
     /**
      * Helper method to submit a volley request to fetch Event information from its Uri.
      *
-     * @param context an application context to initiate the volley.
-     * @param eventUri Uri representing the event.
-     * @param listener callback on success.
+     * @param context       an application context to initiate the volley.
+     * @param eventUri      Uri representing the event.
+     * @param listener      callback on success.
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, Uri eventUri, Priority priority,
@@ -56,9 +56,10 @@ public class EventRequest extends JsonRequest<Event> {
 
     /**
      * Creates a new request.
-     * @param url URL to fetch the JSON from
-     * @param priority priority of request.
-     * @param listener Listener to receive the JSON response
+     *
+     * @param url           URL to fetch the JSON from
+     * @param priority      priority of request.
+     * @param listener      Listener to receive the JSON response
      * @param errorListener Error listener, or null to ignore errors.
      */
     public EventRequest(Context context, String url, Priority priority,

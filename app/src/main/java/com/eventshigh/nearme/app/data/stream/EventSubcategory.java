@@ -35,16 +35,16 @@ public enum EventSubcategory {
     OUTDOORS_ADVENTURE_ACTIVITIES(EventCategory.OUTDOORS, "Adventure Activities"),
     OUTDOORS_STAY_EXPERIENCE(EventCategory.OUTDOORS, "Stay Experience"),
 
-    WORKSHOP_SELECT_ALL(EventCategory.WORKSHOP, "Select All"),
-    WORKSHOP_ART_WORKSHOP(EventCategory.WORKSHOP, "Art workshops"),
-    WORKSHOP_PHOTOGRAPHY(EventCategory.WORKSHOP, "Photography"),
-    WORKSHOP_TECH_WORKSHOP(EventCategory.WORKSHOP, "Tech Workshops"),
-    WORKSHOP_FOOD_WORKSHOP(EventCategory.WORKSHOP, "Cooking & Food Workshops"),
-    WORKSHOP_DANCE_WORKSHOP(EventCategory.WORKSHOP, "Dance Workshops"),
-    WORKSHOP_THEATER_WORKSHOP(EventCategory.WORKSHOP, "Theatre Workshop"),
-    WORKSHOP_SELF_HELP_WORKSHOP(EventCategory.WORKSHOP, "Self Help Workshop"),
-    WORKSHOP_HEALTH_WELLNESS_WORKSHOP(EventCategory.WORKSHOP, "Health & Wellness Workshop"),
-    WORKSHOP_SPORTS_CLASSES(EventCategory.WORKSHOP, "Sports classes"),
+    WORKSHOP_SELECT_ALL(EventCategory.WORKSHOPS, "Select All"),
+    WORKSHOP_ART_WORKSHOP(EventCategory.WORKSHOPS, "Art workshops"),
+    WORKSHOP_PHOTOGRAPHY(EventCategory.WORKSHOPS, "Photography"),
+    WORKSHOP_TECH_WORKSHOP(EventCategory.WORKSHOPS, "Tech Workshops"),
+    WORKSHOP_FOOD_WORKSHOP(EventCategory.WORKSHOPS, "Cooking & Food Workshops"),
+    WORKSHOP_DANCE_WORKSHOP(EventCategory.WORKSHOPS, "Dance Workshops"),
+    WORKSHOP_THEATER_WORKSHOP(EventCategory.WORKSHOPS, "Theatre Workshop"),
+    WORKSHOP_SELF_HELP_WORKSHOP(EventCategory.WORKSHOPS, "Self Help Workshop"),
+    WORKSHOP_HEALTH_WELLNESS_WORKSHOP(EventCategory.WORKSHOPS, "Health & Wellness Workshop"),
+    WORKSHOP_SPORTS_CLASSES(EventCategory.WORKSHOPS, "Sports classes"),
 
 
 

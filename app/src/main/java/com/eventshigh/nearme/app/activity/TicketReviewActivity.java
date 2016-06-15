@@ -47,7 +47,7 @@ import java.util.TimeZone;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class TicketReviewActivity extends AppCompatActivity implements View.OnClickListener {
+public class TicketReviewActivity extends BaseActivity implements View.OnClickListener {
 
     TextView tvEventsName, tvEventsLocation, tvNoOfTickets;
     TextView tvDate, tvTime, tvSeats;
@@ -93,12 +93,14 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ibtn_edit_ticket_details:
+                reportActionToAnalytics("editBtnClick");
                 onBackPressed();
                 break;
             case R.id.btn_ticket_review_next:
                 //callGatewayBrowser("https://www.reddit.com//");
                 //prepareGatewayReq();
                 //makeGatewayReq();
+
                 (new AsyncCaller()).execute();
                 break;
         }
@@ -321,6 +323,7 @@ public class TicketReviewActivity extends AppCompatActivity implements View.OnCl
             super.onPostExecute(result);
             pdLoading.dismiss();
             if (!Utils.checkIfStringEmpty(location)) {
+                reportActionToAnalytics("proceed");
                 Intent intent = new Intent(TicketReviewActivity.this, CustomUrlActivity.class);
                 Uri myUri = Uri.parse(EventsHighEndpoints.GATEWAY_URI_BASE + location);
                 intent.putExtra(TicketReviewActivity.IS_PAYMENT, true);

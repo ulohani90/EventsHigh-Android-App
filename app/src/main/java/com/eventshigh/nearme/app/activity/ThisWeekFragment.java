@@ -27,8 +27,8 @@ import java.util.Locale;
 public class ThisWeekFragment extends BaseEventsFragment {
     public static final String NUM_DAYS_PARAM = ThisWeekFragment.class.getName() + "_num_days";
 
-    public static ThisWeekFragment getInstance(EventsContext eventsContext,  boolean showCategories,
-            int numDays) {
+    public static ThisWeekFragment getInstance(EventsContext eventsContext, boolean showCategories,
+                                               int numDays) {
         ThisWeekFragment fragment = new ThisWeekFragment();
 
         Bundle args = getArgs(eventsContext, false, showCategories);
@@ -77,7 +77,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
         viewPager.post(new Runnable() {
             @Override
             public void run() {
-                if(activity.isRunning()) {
+                if (activity.isRunning()) {
                     viewPager.setAdapter(adapter);
                     tabsView.removeAllTabs();
                     select(populateTabs());
@@ -126,7 +126,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
         public final TextView dayOfMonthView;
 
         public DateTabView(View root) {
-            this.root  = root;
+            this.root = root;
             weekDayView = (TextView) root.findViewById(R.id.weekday);
             dayOfMonthView = (TextView) root.findViewById(R.id.dayofmonth);
         }
@@ -141,7 +141,7 @@ public class ThisWeekFragment extends BaseEventsFragment {
         public Fragment getItem(int position) {
             EventsContext dateContext = new EventsContext(eventsContext.location, "");
             dateContext.setDateFilter(getDate(position));
-            return EventsFragment.getInstance(dateContext, false, showCategories, false,null);
+            return EventsFragment.getInstance(dateContext, false, showCategories, false, null, false);
         }
 
         @Override

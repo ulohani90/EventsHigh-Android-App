@@ -464,8 +464,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
     public void addFiltersData() {
         final LinearLayout horizontalCategories = (LinearLayout) view.findViewById(R.id.category_container);
-        final String[] categories = eventsContext.city == City.BANGALORE ? EventsGridActivity.EXPLORE_TAGS_BANGALORE :
-                (eventsContext.city == City.CHENNAI ? EventsGridActivity.EXPLORE_TAGS_CHENNAI : EventsGridActivity.EXPLORE_TAGS);
+        final String[] categories = EventsGridActivity.EXPLORE_TAGS;
         for (int i = 0; i < categories.length; i++) {
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
             final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
@@ -779,10 +778,13 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         protected List<Event> doInBackground(Void... params) {
             switch (type) {
                 case EventsGridActivity.PRICE_FILTER:
+                    ((BaseContextActivity) getActivity()).reportActionToAnalytics("filterClick", "priceFilter", 1, priceValue + "");
                     return filterEventsWithPrice(totalEvents, priceValue);
                 case EventsGridActivity.DATE_FILTER:
+                    ((BaseContextActivity) getActivity()).reportActionToAnalytics("filterClick", "dateFilter", 1, getTimesString(times));
                     return filterEventsWithDate(totalEvents, times);
                 case EventsGridActivity.CATEGORY_FILTER:
+                    ((BaseContextActivity) getActivity()).reportActionToAnalytics("filterClick", "categoryFilter", 1, category);
                     return filterEventsWithCategory(category, totalEvents);
 
             }
@@ -803,5 +805,16 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                 }
             }
         }
+    }
+
+    public String getTimesString(long... times) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < times.length; i++) {
+            if (i != 0) {
+                builder.append(",");
+            }
+            builder.append(times[i] + "");
+        }
+        return builder.toString();
     }
 }

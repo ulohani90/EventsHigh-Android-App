@@ -33,7 +33,7 @@ public class DateTimeUtils {
         return false;
     }
 
-    public static class EventTime implements Parcelable{
+    public static class EventTime implements Parcelable {
         public final String day;
         public final String date;
         public final
@@ -88,8 +88,9 @@ public class DateTimeUtils {
         public static final Parcelable.Creator<EventTime> CREATOR =
                 new Parcelable.Creator<EventTime>() {
                     public EventTime createFromParcel(Parcel in) {
-                        return new EventTime(in.readString(), in.readString(),in.readString(), in.readLong());
+                        return new EventTime(in.readString(), in.readString(), in.readString(), in.readLong());
                     }
+
                     public EventTime[] newArray(int size) {
                         return new EventTime[size];
                     }
@@ -169,7 +170,7 @@ public class DateTimeUtils {
         }
 
         return dateToEventTime(new Date(event.eventTimings[index]),
-                TimeZone.getTimeZone(event.city.timeZone),event.eventTimings[index]);
+                TimeZone.getTimeZone(event.city.timeZone), event.eventTimings[index]);
     }
 
 
@@ -182,13 +183,14 @@ public class DateTimeUtils {
                     getTimeString(date, timeZone));
         }
     }
+
     public static EventTime dateToEventTime(Date date, TimeZone timeZone, long longtime) {
         synchronized (SIMPLE_DATE_FORMAT) {
             SIMPLE_DAY_FORMAT.setTimeZone(timeZone);
             SIMPLE_DATE_FORMAT.setTimeZone(timeZone);
             return new EventTime(SIMPLE_DAY_FORMAT.format(date),
                     SIMPLE_DATE_FORMAT.format(date),
-                    getTimeString(date, timeZone),longtime);
+                    getTimeString(date, timeZone), longtime);
         }
     }
 
