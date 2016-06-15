@@ -773,14 +773,15 @@ public class LaunchActivity extends BaseContextActivity {
 
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                Place place = PlaceAutocomplete.getPlace(this, data);
-                toolbarTitleText.setText(place.getName());
-                if (account.getLastCity().cityBounds.contains(place.getLatLng())) {
-                    LocalityLatLong locality = new LocalityLatLong(place.getName().toString(), place.getLatLng());
+                String placeName = data.getStringExtra("place_name");
+                LatLng latLng = data.getParcelableExtra("place_lat_lng");
+                if (latLng != null && placeName != null) {
+                    toolbarTitleText.setText(placeName);
+                    LocalityLatLong locality = new LocalityLatLong(placeName, latLng);
                     account.setLastLocality(locality);
-                    Log.i("TestActivity", "Place: " + place.getName());
+                    Log.i("TestActivity", "Place: " + placeName);
                 } else {
-                    Toast.makeText(this, "Selected locality has to be in " + account.getLastCity().name(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Selected locality not found ", Toast.LENGTH_LONG).show();
                 }
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
