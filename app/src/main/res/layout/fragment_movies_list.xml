@@ -68,7 +68,7 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:verticalSpacing="5dp"
-        tools:listitem="@layout/card_event" />
+        tools:listitem="@layout/card_event"/>
     </LinearLayout>
 
 </FrameLayout>

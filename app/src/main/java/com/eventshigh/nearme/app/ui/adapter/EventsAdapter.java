@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
+import com.eventshigh.nearme.app.activity.MyTicketsFragment;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
@@ -16,6 +17,7 @@ import com.eventshigh.nearme.app.data.MovieInfoObject;
 import com.eventshigh.nearme.app.data.MovieReviewObject;
 import com.eventshigh.nearme.app.data.MovieShowTimeObject;
 import com.eventshigh.nearme.app.data.MovieUserReviewObject;
+import com.eventshigh.nearme.app.data.MyTicketObject;
 import com.eventshigh.nearme.app.data.ShowDates;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.TrendingTopic;
@@ -55,6 +57,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     OnEditClickListener mListener;
 
     OnItemClickedListener pListener;
+
+    OnMyTicketItemClickedListener myTicketListener;
 
     public EventsAdapter(BaseContextActivity activity) {
         this.activity = activity;
@@ -97,6 +101,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         }
         for (MovieDetailObject obj : objs) {
             dataToShow.add(new MovieListData(obj, activity));
+        }
+        notifyDataSetChanged();
+    }
+
+
+    public void setMyTicketsData(List<MyTicketObject> objs, MyTicketsFragment myTicketsFragment){
+        for (MyTicketObject obj : objs) {
+            dataToShow.add(new MyTicketData(obj, activity, myTicketsFragment));
         }
         notifyDataSetChanged();
     }
@@ -311,7 +323,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int type) {
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int type){
         return DataType.onCreateViewHolder(activity, viewGroup, type);
     }
 
@@ -325,7 +337,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
             ((MovieReviewData) dataToShow.get(position)).onBindViewHolder(card, position);
         } else if (card instanceof MovieUserReviewCard) {
             ((MovieUserReviewData) dataToShow.get(position)).onBindViewHolder(card, position);
-        } else {
+        }else if (card instanceof MyTicketCard){
+            ((MyTicketData) dataToShow.get(position)).onBindViewHolder(card, position,myTicketListener);
+        }else{
             dataToShow.get(position).onBindViewHolder(card, position);
         }
     }
@@ -364,6 +378,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     }
 
+    public void setOnMyTicketClickListener(OnMyTicketItemClickedListener listener) {
+        this.myTicketListener = listener;
+
+    }
+
     public void setOnItemClickedListener(OnItemClickedListener listener) {
         this.pListener = listener;
     }
@@ -377,4 +396,9 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     public interface OnItemClickedListener {
         void onItemClicked(int pos);
     }
+
+    public interface OnMyTicketItemClickedListener{
+        void onItemClicked(int pos);
+    }
+
 }

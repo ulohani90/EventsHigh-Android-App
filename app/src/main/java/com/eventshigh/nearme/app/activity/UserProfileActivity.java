@@ -1,15 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,9 +28,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.Arrays;
 
-public class UserProfileActivity extends AppCompatActivity implements View.OnClickListener{
+public class UserProfileActivity extends BaseContextActivity implements View.OnClickListener{
     LoginButton loginButton;
-
     CallbackManager callbackManager;
     TextView tv1;
     Button btnFbLogin;
@@ -47,20 +38,20 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_user_profile);
+        /*
         tv1 = (TextView)findViewById(R.id.tv1);
         btnFbLogin = (Button)findViewById(R.id.btn_fb_login);
         btnFbLogin.setOnClickListener(this);
         ivProfilePic = (ImageView)findViewById(R.id.iv_profile_pic);
+        */
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_fb_login:
-                fbLoginButtonPressed();
-                break;
         }
     }
 

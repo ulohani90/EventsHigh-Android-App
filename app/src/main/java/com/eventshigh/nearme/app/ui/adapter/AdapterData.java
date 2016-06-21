@@ -8,4 +8,5 @@ public interface AdapterData {
     void onBindViewHolder(ViewHolder card, int position);
 
     String getId();
+
 }

@@ -19,7 +19,9 @@ import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -49,8 +51,10 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.LocalityLatLong;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
+import com.eventshigh.nearme.app.data.MyTicketObject;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.MovieDetailRequest;
+import com.eventshigh.nearme.app.network.MyTicketsRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.CitySelectDialog;
@@ -79,9 +83,13 @@ import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import io.branch.referral.Branch;
 import io.branch.referral.BranchError;
@@ -90,10 +98,12 @@ import pl.snowdog.material.ui.ToolbarColorizeHelper;
 /**
  * Application Main or launch activity.
  */
+
 public class LaunchActivity extends BaseContextActivity {
     // Constants
     public static final String DEFAULT_TAB_PARAM = LaunchActivity.class.getName() + "_default_tab";
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 0x001;
+    public static final int SUBMIT_REVIEW_REQUEST_CODE = 900;
 
 
     // UI Elements for this activity.
@@ -153,6 +163,8 @@ public class LaunchActivity extends BaseContextActivity {
 
         startService(new Intent(this, GeofenceStartService.class));
 
+        fetchEventAttendedDetails();
+
         if (isFinishing()) {
             return;
         }
@@ -180,6 +192,58 @@ public class LaunchActivity extends BaseContextActivity {
 
     }
 
+    public void fetchEventAttendedDetails() {
+        MyTicketsRequest.submit(this, Request.Priority.IMMEDIATE, this, true,mTicketsListener, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.e("LaunchActivity", "Not able to fetch ticketed events attended");
+            }
+        }, true);
+    }
+
+    private Response.Listener<List<MyTicketObject>> mTicketsListener = new Response.Listener<List<MyTicketObject>>() {
+        @Override
+        public void onResponse(List<MyTicketObject> tickets, boolean isIntermediate) {
+            try {
+                if (tickets != null) {
+                    MyTicketObject reqMyTickets = null;
+                    for (MyTicketObject myTicketObject : tickets) {
+                        Date date = new SimpleDateFormat("EEE MMM dd, hh:mm aa", Locale.ENGLISH).parse(myTicketObject.getEventTime());
+                        long milliseconds = date.getTime();
+                        long millisecondsFromNow = milliseconds - date.getTime();
+                        if (millisecondsFromNow < 86400000){
+                            reqMyTickets = myTicketObject;
+                            break;
+                        }
+                    }
+                    if (reqMyTickets != null) {
+                        showDialog(reqMyTickets);
+                        reportActionToAnalytics("reviewModelShow");
+                    }
+                }
+            } catch (ParseException pe){
+                Log.e("Launch Activity", pe.toString());
+            }
+        }
+    };
+
+    public void showDialog(MyTicketObject myTicketObject) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        ReviewEventAttendedDialog newFragment = new ReviewEventAttendedDialog();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ReviewEventAttendedDialog.MY_TICKET, myTicketObject);
+        newFragment.setArguments(bundle);
+        boolean mIsLargeLayout = false;
+        if (mIsLargeLayout) {
+            newFragment.show(fragmentManager, "dialog");
+        } else {
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            transaction.add(android.R.id.content, newFragment)
+                    .addToBackStack(null).commit();
+        }
+    }
+
 
     TextView toolbarTitleText;
 
@@ -191,10 +255,6 @@ public class LaunchActivity extends BaseContextActivity {
             public void onClick(View v) {
 
                 if (account.getLastCity() != null) {
-                        /*Intent intent =
-                                new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).setBoundsBias(account.getLastCity().cityBounds)
-                                        .build(LaunchActivity.this);
-                        startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);*/
 
                     Intent intent = new Intent(LaunchActivity.this, PlacesAutocompleteBoundedActivity.class);
                     startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
@@ -367,6 +427,7 @@ public class LaunchActivity extends BaseContextActivity {
                 super.onBackPressed();
             }
         }
+
     }
 
     @Override
@@ -723,7 +784,7 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.getTabAt(3).setCustomView(tabFour);
     }
 
-    private void showNextScreen() {
+    private void showNextScreen(){
         // If we do not have user city, use GoogleLocation api to get user location.
         if (eventsContext.city == null) {
             client = new GoogleApiClient.Builder(this)
@@ -798,6 +859,11 @@ public class LaunchActivity extends BaseContextActivity {
             //Decide here where  to navigate  when an auto deep linked activity finishes.
             //For e.g. Go to HomeActivity or a  SignUp Activity.
             showNextScreen();
+        }
+
+        if(requestCode == SUBMIT_REVIEW_REQUEST_CODE){
+            if(resultCode == RESULT_OK)
+            super.onBackPressed();
         }
     }
 

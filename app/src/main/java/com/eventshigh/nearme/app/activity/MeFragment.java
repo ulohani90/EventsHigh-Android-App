@@ -92,7 +92,8 @@ public class MeFragment extends Fragment {
         });
         tabsView.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
         tabsView.setupWithViewPager(viewPager);
-
+        tabsView.setTabMode(TabLayout.MODE_SCROLLABLE);
+        tabsView.setTabGravity(TabLayout.GRAVITY_CENTER);
         account = new Account(getActivity());
 
         String tabParam = getArguments().getString(TAB_PARAM,"");
@@ -115,7 +116,7 @@ public class MeFragment extends Fragment {
 
     public class MePagerAdapter extends FragmentStatePagerAdapter {
 
-        String []TABS = {"Favourites","Events","Friends"};
+        String []TABS = {"Favourites","Events","Friends","My Tickets"};
 
         Fragment fragment;
 
@@ -124,7 +125,7 @@ public class MeFragment extends Fragment {
         }
 
         @Override
-        public Fragment getItem(int position) {
+        public Fragment getItem(int position){
             if(position == 0){
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_EVENT);
@@ -135,9 +136,12 @@ public class MeFragment extends Fragment {
                         EventsHighEndpoints.QUERY_MY_INTEREST_EVENTS);
                 myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null);
                 return myInterestEventsFragment;
-            }else{
+            }else if(position == 2){
                 ContactsFragment fragment = new ContactsFragment();
                 return fragment;
+            }else{
+                MyTicketsFragment myTicketsFragment = new MyTicketsFragment();
+                return myTicketsFragment;
             }
 
 
