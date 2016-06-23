@@ -37,7 +37,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
-
         <com.eventshigh.nearme.app.view.AutofitRecyclerView
             android:id="@+id/event_grid"
             android:layout_width="match_parent"

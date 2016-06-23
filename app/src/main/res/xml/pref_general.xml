@@ -18,7 +18,6 @@
     </Preference>
 -->
 
-
     <Preference
         android:icon="@drawable/ic_personalize_nav"
         android:layout="@layout/navigation_menu_white_items"

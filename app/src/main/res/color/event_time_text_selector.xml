@@ -4,6 +4,8 @@
 
     <item android:color="@android:color/white" android:state_selected="true" />
 
+    <item android:color="@android:color/white" android:state_pressed="true" />
+
     <!-- Default, "just hanging' out" state. -->
     <item android:color="#353535" />
 

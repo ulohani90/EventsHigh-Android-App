@@ -24,7 +24,7 @@ public class GAHelper {
 
     private final GoogleAnalytics googleAnalytics;
     private final Tracker tracker;
-    private static String referrerId;
+    //private static String referrerId;
     private final Account account;
 
 
@@ -33,10 +33,10 @@ public class GAHelper {
         tracker = googleAnalytics.newTracker(R.xml.analytics);
         tracker.enableAdvertisingIdCollection(true);
         account = new Account(context);
-        referrerId = account.getReferrerId();
+       /* referrerId = account.getReferrerId();
         if (referrerId != null) {
             tracker.setClientId(referrerId);
-        }
+        }*/
         // Disable GA reporting in debug build.
         if (Utils.isDebug(context)) {
             googleAnalytics.setAppOptOut(true);
@@ -68,12 +68,12 @@ public class GAHelper {
     }
 
     public void reportCampaignParams(String campaignData) {
-        if (referrerId == null) {
+       /* if (referrerId == null) {
             referrerId = account.getReferrerId();
             if (referrerId != null) {
                 tracker.setClientId(referrerId);
             }
-        }
+        }*/
         tracker.send(new HitBuilders.ScreenViewBuilder()
                         .setCampaignParamsFromUrl(campaignData)
                         .build()
@@ -91,12 +91,12 @@ public class GAHelper {
             for (int i = 0; i < customValues.length; i++) {
                 builder.setCustomDimension(i + 1, customValues[i]);
             }
-            if (referrerId == null) {
+           /* if (referrerId == null) {
                 referrerId = account.getReferrerId();
                 if (referrerId != null) {
                     tracker.setClientId(referrerId);
                 }
-            }
+            }*/
             tracker.send(builder.build());
         }
     }

@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize"
+            android:elevation="8dp"
+            android:minHeight="?android:attr/actionBarSize"
+            app:navigationContentDescription="@string/abc_action_bar_up_description"
+            app:subtitleTextAppearance="@style/EHActionBar"
+            app:theme="@style/EHActionBarDark"
+            tools:ignore="UnusedAttribute" />
+
+        <ProgressBar
+            android:id="@+id/top_progress_bar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="-4dp"
+            android:layout_marginTop="-4dp"
+            android:gravity="center"
+            android:indeterminate="true" />
+
+        <com.eventshigh.nearme.app.view.CustomScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp">
+
+                    <android.support.v4.view.ViewPager
+                        android:id="@+id/image_pager"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+
+                        tools:ignore="UnusedAttribute" />
+
+                    <LinearLayout
+                        android:id="@+id/dots_parent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal" />
+
+                    <TextView
+                        android:id="@+id/event_price"
+                        style="@style/EventCardText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginTop="20dp"
+                        android:background="@drawable/price_tag_drawable_bg"
+                        android:fontFamily="sans-serif-medium"
+                        android:padding="11dp"
+                        android:textColor="#CCFFFFFF"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp"
+                        android:visibility="gone"
+                        tools:text="₹ 200 - 500" />
+                </FrameLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/event_stats"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="18dp"
+                        android:drawablePadding="4dp"
+                        android:drawableStart="@drawable/ic_person_black_18dp"
+                        android:gravity="center"
+                        android:textIsSelectable="false"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:text="1049 views, 23 favourited" />
+
+                    <com.eventshigh.nearme.app.view.ContactListView
+                        android:id="@+id/followed_by"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:padding="18dp"
+                        android:visibility="gone"
+                        app:contactPhotoSize="24dp"
+                        app:contactPosition="start"
+                        app:text=" ♥ (like) this." />
+                </LinearLayout>
+
+                <!-- Invitations -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#1a4d4d4d" />
+
+                <com.eventshigh.nearme.app.view.ContactListView
+                    android:id="@+id/invited_by"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:visibility="gone"
+                    app:contactPhotoSize="24dp"
+                    app:contactPosition="start" />
+
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/abc_action_bar_default_height_material"
+                    android:background="#E3E4E5"
+                    android:elevation="0dp"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                    android:visibility="gone"
+                    app:tabIndicatorColor="@color/primary"
+                    app:tabIndicatorHeight="3dp"
+                    app:tabSelectedTextColor="@color/primary"
+                    app:tabTextColor="#656565"
+                    tools:ignore="UnusedAttribute" />
+
+
+                <com.eventshigh.nearme.app.view.SmartViewPager
+                    android:id="@+id/view_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:ignore="UnusedAttribute" />
+            </LinearLayout>
+        </com.eventshigh.nearme.app.view.CustomScrollView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@android:color/white"
+        android:divider="@drawable/shape_vertical_divider"
+        android:orientation="horizontal"
+        android:showDividers="middle">
+
+        <LinearLayout
+            android:id="@+id/share_whatsapp_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/share_btn_selector_bg"
+            android:clickable="true"
+            android:elevation="4dp"
+            android:gravity="center"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                android:id="@+id/share_whatsapp"
+                style="@style/EHButtonCTA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:clickable="false"
+                android:drawableLeft="@drawable/whatsapp_24dp"
+                android:drawablePadding="8dp"
+                android:gravity="center"
+                android:text="@string/action_lets_go"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/book_ticket"
+            style="@style/EHButtonCTA"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1.5"
+            android:background="@drawable/eh_button_book"
+            android:elevation="4dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:onClick="openBookingSite"
+            android:text="@string/action_book"
+            android:visibility="gone"
+            tools:ignore="UnusedAttribute"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/join_event"
+            style="@style/EHButtonCTA"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1.5"
+            android:background="@drawable/eh_button_book"
+            android:elevation="4dp"
+            android:gravity="center"
+            android:onClick="openSourceSite"
+            android:text="@string/action_join"
+            android:visibility="gone"
+            tools:ignore="UnusedAttribute"
+            tools:visibility="visible" />
+    </LinearLayout>
+
+    <include
+        android:id="@+id/verify_phone_container"
+        layout="@layout/view_phone_snack_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="64dp"
+        android:visibility="visible" />
+
+    <include
+        android:id="@+id/view_retry"
+        layout="@layout/view_retry"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+</FrameLayout>

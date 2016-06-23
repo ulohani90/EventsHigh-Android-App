@@ -1,10 +1,16 @@
 package com.eventshigh.nearme.app.view;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
+import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.user.Account;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * This Class Defines the FlowLayout Class for adding and removing the Compose
@@ -69,6 +75,7 @@ public class ZCustomFlowLayout extends ZFlowLayout {
         }
 
     }
+
     public void setReceipentsForMoVieCasts(
             final ArrayList<String> objects, boolean addBackground) {
 
@@ -97,6 +104,34 @@ public class ZCustomFlowLayout extends ZFlowLayout {
 
         }
 
+    }
+
+    public void setRecipientForEventCategories(BaseContextActivity activity, Account account, ArrayList<String> tags, Event event, String action) {
+
+        if (this.getChildCount() > 0)
+            this.removeAllViews();
+        viewsWidth = 0;
+        ComposeEventCategoryView adduserView;
+        for (int i = 0; i < tags.size(); i++) {
+            final String obj = tags.get(i);
+            adduserView = new ComposeEventCategoryView(getContext());
+
+            adduserView.setTag(obj);
+            adduserView.setContent(activity, account, obj, event, action);
+
+            adduserView.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        listener.selectedHashTag(obj);
+                    }
+                }
+            });
+
+            this.addView(adduserView);
+
+        }
     }
 
     public interface OnHashTagClickListener {

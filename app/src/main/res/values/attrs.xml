@@ -37,4 +37,8 @@
     <declare-styleable name="Theme">
         <attr name="circularImageViewStyle" format="reference"></attr>
     </declare-styleable>
+
+    <declare-styleable name="CustomScrollView">
+        <attr name="maxHeight" format="integer" />
+    </declare-styleable>
 </resources>

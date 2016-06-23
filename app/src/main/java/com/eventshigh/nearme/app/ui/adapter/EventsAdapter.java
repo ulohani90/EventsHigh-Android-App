@@ -162,6 +162,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
+    public void setEventInfoObject(Event event) {
+        dataToShow.clear();
+        dataToShow.add(new EventInfoData(event, activity));
+        notifyDataSetChanged();
+
+    }
 
     public void setInfoObject(MovieInfoObject obj) {
         dataToShow.clear();

@@ -21,7 +21,7 @@
     <color name="toolbar_big">#7E57C2</color>
     <color name="toolbar_big_status">#5E35B1</color>
 
-    <color name="book_button">#4698B8</color>
+    <color name="book_button">#E78E31</color>
     <color name="book_button_dark">#3688A8</color>
     <color name="invite_button">#57B39C</color>
     <color name="invite_button_dark">#47A38C</color>
@@ -62,4 +62,9 @@
 
 <color name="transparent_white">#33FFFFFF</color>
 
+    <color name="eh_button_color">#E78E31</color>
+    <color name="eh_button_dark_color">#cc7e2d</color>
+
+    <color name="eh_share_button_color">#76A930</color>
+    <color name="eh_share_button_dark_color">#6c9a2c</color>
 </resources>

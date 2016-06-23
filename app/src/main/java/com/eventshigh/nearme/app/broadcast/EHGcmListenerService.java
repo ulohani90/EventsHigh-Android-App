@@ -21,6 +21,7 @@ import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.activity.MeFragment;
 import com.eventshigh.nearme.app.activity.MovieBrowseActivity;
 import com.eventshigh.nearme.app.activity.MovieDetailActivity;
+import com.eventshigh.nearme.app.activity.NewEventDetailActivity;
 import com.eventshigh.nearme.app.activity.PointsBreakdownActivity;
 import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.activity.SelectInterestsActivity;
@@ -251,7 +252,7 @@ public class EHGcmListenerService extends GcmListenerService {
             city = City.BANGALORE;
         }
 
-        Intent intent = new Intent(context, EventDetailActivity.class);
+        Intent intent = new Intent(context, NewEventDetailActivity.class);
         intent.setAction(BaseActivity.NOTIFICATION_ACTION);
         intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
         return PendingIntent.getActivity(context, 0, intent, 0);
