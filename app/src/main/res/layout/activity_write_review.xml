@@ -16,7 +16,7 @@
         android:id="@+id/verify_phn_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#99000000"
+        android:background="#eeeeee"
         android:visibility="gone">
 
         <LinearLayout

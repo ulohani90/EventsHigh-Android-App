@@ -118,6 +118,8 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         switch (v.getId()) {
             case R.id.tv_next_event_booking:
                 if (noOfTickets > 0) {
+
+                    reportActionToAnalytics("proceed");
                     Intent iNext = new Intent(this, GuestDetailActivity.class);
                     Bundle bundleNext = new Bundle();
                     bundleNext.putParcelable(EventDetailActivity.EVENT_OBJECT, event);
@@ -187,6 +189,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    reportActionToAnalytics("dateSelected");
                     int position = (Integer) v.getTag();
                     if (dateLayoutSelectedLast != null) {
                         dateLayoutSelectedLast.setSelected(false);
@@ -230,6 +233,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    reportActionToAnalytics("timeSelected");
                     int timeIndex = (Integer) v.getTag();
                     if (timeLayoutLastSelected != null) {
                         timeLayoutLastSelected.setSelected(false);
@@ -301,7 +305,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                 ticketCountIncrement.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        reportActionToAnalytics("ticketCountIncrement");
                         int ticketNo = Integer.parseInt(ticketCount.getText().toString());
                         if (ticketNo < 10) {
 
@@ -329,6 +333,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                 ticketCountDecrement.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        reportActionToAnalytics("ticketCountDecrement");
                         int ticketNo = Integer.parseInt(ticketCount.getText().toString());
                         if (ticketNo != 0) {
                             ticketNo--;
@@ -409,7 +414,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                 ticketCountIncrement.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        reportActionToAnalytics("comboTicketCountIncrement");
                         int ticketNo = Integer.parseInt(ticketCount.getText().toString());
                         if (ticketNo < 10) {
                             ticketNo++;
@@ -434,6 +439,8 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                 ticketCountDecrement.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
+                        reportActionToAnalytics("comboTicketCountDecrement");
                         int ticketNo = Integer.parseInt(ticketCount.getText().toString());
                         if (ticketNo != 0) {
                             ticketNo--;

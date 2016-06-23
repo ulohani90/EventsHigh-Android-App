@@ -175,6 +175,7 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
                     PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
                     return;
                 }
+                reportActionToAnalytics("write_review_btn_click");
                 Intent i = new Intent(this, WriteReviewActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(EVENT_OBJECT, event);

@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Patterns;
 import android.util.TypedValue;
@@ -42,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class GuestDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class GuestDetailActivity extends BaseActivity implements View.OnClickListener {
 
     public static final String GUEST_DETAIL_ARRAY = "guest_detail_array";
 
@@ -58,11 +59,15 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
     LinearLayout llGuestDetailLayoutContainer;
     Button btnNextGuestDetails;
     ScrollView svDetailCards;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guest_detail);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Choose your tickets");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mapViews();
         bundle = getIntent().getExtras();
@@ -111,7 +116,7 @@ public class GuestDetailActivity extends AppCompatActivity implements View.OnCli
         switch (v.getId()) {
             case R.id.btn_guest_detail_next:
                 if (checkAllEditTextFilled()) {
-
+                    reportActionToAnalytics("proceed");
                     Intent iNext = new Intent(this, TicketReviewActivity.class);
                     bundle.putString(GUEST_DETAIL_ARRAY, jsonArrayGuestDetail.toString());
                     iNext.putExtras(bundle);

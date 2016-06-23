@@ -8,13 +8,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
-import android.graphics.Movie;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+                                                                                                                                                                                                                                                                                                                                                                            import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.app.ActivityCompat;
@@ -99,7 +98,7 @@ import pl.snowdog.material.ui.ToolbarColorizeHelper;
  * Application Main or launch activity.
  */
 
-public class LaunchActivity extends BaseContextActivity {
+public class LaunchActivity extends BaseContextActivity{
     // Constants
     public static final String DEFAULT_TAB_PARAM = LaunchActivity.class.getName() + "_default_tab";
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 0x001;
@@ -163,12 +162,13 @@ public class LaunchActivity extends BaseContextActivity {
 
         startService(new Intent(this, GeofenceStartService.class));
 
-        fetchEventAttendedDetails();
+        //fetchEventAttendedDetails();
 
         if (isFinishing()) {
             return;
         }
 
+        // Set defaults for preferences.
         // Set defaults for preferences.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
 
@@ -478,6 +478,7 @@ public class LaunchActivity extends BaseContextActivity {
                     ActivityCompat.checkSelfPermission(LaunchActivity.this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 Location location = LocationServices.FusedLocationApi.getLastLocation(client);
                 if (location != null) {
+                    
                     LatLng latLng = LocationUtils.locationToLatLng(location);
                     eventsContext.changeLocation(latLng);
                     if (eventsContext.city != null) {

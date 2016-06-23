@@ -38,8 +38,8 @@ public class MyTicketsRequest extends JsonRequest<List<MyTicketObject>>{
                               Object tag, boolean shouldBypassCache, Response.Listener<List<MyTicketObject>> listener,
                               Response.ErrorListener errorListener, boolean reviewEvent){
 
-        String url = EventsHighEndpoints.API_URI_BASE+"mobileapp/my_tickets?mobile_no=9535592445";
-        //url += (new Account(context)).getUserInfo().phoneNo;
+        String url = EventsHighEndpoints.API_URI_BASE+"mobileapp/my_tickets?mobile_no=";
+        url += (new Account(context)).getUserInfo().phoneNo;
         if (shouldBypassCache){
             url += "&cmode=bypass";
         }
@@ -83,8 +83,15 @@ public class MyTicketsRequest extends JsonRequest<List<MyTicketObject>>{
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject eventJson = new JSONObject(jsonString);
-            JSONArray itemsJson = eventJson.getJSONArray("items");
-            boolean hasSubmittedReview = eventJson.getBoolean("hasSubmittedReview");
+
+            JSONArray itemsJson = new JSONArray();
+            if(eventJson.has("items"))
+            itemsJson = eventJson.getJSONArray("items");
+
+            boolean hasSubmittedReview;
+
+            hasSubmittedReview= eventJson.getBoolean("hasSubmittedReview");
+
             if(reviewEvent && hasSubmittedReview){
                 return Response.success(null,HttpHeaderParser.parseCacheHeaders(response));
             }else{

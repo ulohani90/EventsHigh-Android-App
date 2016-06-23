@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.user.Account;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
@@ -62,7 +63,6 @@ public class GooglePlacesAutocompleteAdapter
      */
     private AutocompleteFilter mPlaceFilter;
 
-    private String cityName;
 
 
     /**
@@ -71,19 +71,11 @@ public class GooglePlacesAutocompleteAdapter
      * @see android.widget.ArrayAdapter#ArrayAdapter(android.content.Context, int)
      */
     public GooglePlacesAutocompleteAdapter(Context context, GoogleApiClient googleApiClient,
-                                           LatLngBounds bounds, AutocompleteFilter filter, String cityName) {
+                                           LatLngBounds bounds, AutocompleteFilter filter) {
         super(context, android.R.layout.simple_expandable_list_item_2, android.R.id.text1);
-        this.cityName = cityName;
         mGoogleApiClient = googleApiClient;
         mBounds = bounds;
         mPlaceFilter = filter;
-    }
-
-    /**
-     * Sets the bounds for all subsequent queries.
-     */
-    public void setBounds(LatLngBounds bounds) {
-        mBounds = bounds;
     }
 
     /**
@@ -106,6 +98,7 @@ public class GooglePlacesAutocompleteAdapter
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         View row = super.getView(position, convertView, parent);
 
         // Sets the primary and secondary text for a row.
@@ -141,21 +134,24 @@ public class GooglePlacesAutocompleteAdapter
                     // Retrieve the autocomplete results.
 
                     for (int i = 0; i < mResultList.size(); i++) {
-                        if (cityName.equalsIgnoreCase(City.BANGALORE.name())) {
-                            if (mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase()) ||
-                                    mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains("BENGALURU") ||
-                                    mResultList.get(i).getSecondaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase()) ||
-                                    mResultList.get(i).getSecondaryText(STYLE_BOLD).toString().toUpperCase().contains("BENGALURU")) {
-                                filteredResults.add(mResultList.get(i));
-                            }
-                        } else {
-                            if (mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase()) ||
-                                    mResultList.get(i).getSecondaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase())) {
-                                filteredResults.add(mResultList.get(i));
-                            }
+                        City[] cities = City.values();
+                        for (City city : cities) {
+                            String cityName = city.name();
+                            if (cityName.equalsIgnoreCase(City.BANGALORE.name())) {
+                                if (mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase()) ||
+                                        mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains("BENGALURU") ||
+                                        mResultList.get(i).getSecondaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase()) ||
+                                        mResultList.get(i).getSecondaryText(STYLE_BOLD).toString().toUpperCase().contains("BENGALURU")) {
+                                    filteredResults.add(mResultList.get(i));
+                                }
+                            } else {
+                                if (mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase()) ||
+                                        mResultList.get(i).getSecondaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase())) {
+                                    filteredResults.add(mResultList.get(i));
+                                }
 
+                            }
                         }
-
                     }
 
                     mResultList = filteredResults;

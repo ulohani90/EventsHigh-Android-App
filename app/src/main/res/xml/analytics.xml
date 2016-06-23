@@ -19,5 +19,11 @@
     <screenName name="com.eventshigh.nearme.app.activity.AboutUsActivity">AboutUs</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.SelectInterestsActivity">Personalize</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.ReferralActivity">ReferAndEarn</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.EventBookingDetailActivity">EventBookingPage</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.GuestDetailActivity">GuestDetailsActivity</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.TicketConfirmationActivity">TicketConfirmationActivity</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.TicketReviewActivity">TicketReviewActivity</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.PlacesAutocompleteBoundedActivity">SearchPlaceActivity</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.WriteReviewActivity">WriteReviewActivity</screenName>
 
 </resources>

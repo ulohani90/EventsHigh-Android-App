@@ -28,9 +28,9 @@
                 android:imeOptions="actionNext"
                 android:inputType="textPersonName"
                 android:maxLines="1"
+                android:paddingBottom="0dp"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
-                android:paddingBottom="0dp"
                 android:textColor="#ffffff"
                 android:textColorHint="#f0f0f0"
                 android:textCursorDrawable="@null"
@@ -50,10 +50,33 @@
 
     </android.support.v7.widget.Toolbar>
 
+    <TextView
+        android:id="@+id/select_current_location"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@id/toolbar_et"
+        android:drawableLeft="@drawable/ic_device_gps_fixed"
+        android:drawablePadding="5dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:padding="5dp"
+        android:paddingBottom="8dp"
+
+        android:text="Select Current Location"
+
+        android:textColor="#353535" />
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/select_current_location"
+        android:background="#f0f0f0" />
+
     <ListView
         android:id="@+id/lv_search_place_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar_et" />
+        android:layout_below="@id/separator" />
 
 </RelativeLayout>

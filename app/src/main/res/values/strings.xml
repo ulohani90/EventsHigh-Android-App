@@ -210,9 +210,8 @@
     <string name="title_activity_ticket_confirmation">Ticket Confirmation</string>
 
 
-    <string name="explore_ten_category_text">Here are your 10 ways to think about your next events and movies</string>
-
-
+    <string name="explore_ten_category_text">Here are 12 ways to think about your next outing!</string>
+    
     <!-- Error strings for Geofence-->
     <string name="not_connected">GoogleApiClient no yet connected. Try again.</string>
     <string name="geofence_not_available">Geofence service is not available now</string>

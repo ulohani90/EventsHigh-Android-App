@@ -83,8 +83,8 @@ public class IntentUtils {
 
         if (param.query.endsWith("day")) {
             if (param.query.equalsIgnoreCase("today")) {
-                param.query = QUERY_ALL;
-                param.setDateFilter(Calendar.getInstance());
+                /*param.query = QUERY_ALL;
+                param.setDateFilter(Calendar.getInstance());*/
             } else {
                 try {
                     Integer day = (Integer) Calendar.class.getField(param.query.toUpperCase()).get(null);

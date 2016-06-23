@@ -27,7 +27,7 @@ import com.eventshigh.nearme.app.view.CircularImageView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class WriteRecentEventReviewActivity extends AppCompatActivity{
+public class WriteRecentEventReviewActivity extends BaseContextActivity{
 
     private static String JSON_KEY_REVIEWER_ID = "reviewer_id";//mobi no
     private static String JSON_KEY_REVIEW_FOR = "review_for";
@@ -52,8 +52,7 @@ public class WriteRecentEventReviewActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_write_review_description);
-
+        setupLayout(R.layout.fragment_write_review_description);
 
         reviewHeader = (TextView)findViewById(R.id.tv_write_review_description_movie_name);
         btnWriteReview = (TextView)findViewById(R.id.btn_write_review);
@@ -75,6 +74,7 @@ public class WriteRecentEventReviewActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 placeReviewActionIfEvent();
+                reportActionToAnalytics("submitReview");
             }
         });
     }

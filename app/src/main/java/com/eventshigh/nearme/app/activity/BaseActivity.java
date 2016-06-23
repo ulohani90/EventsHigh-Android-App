@@ -90,6 +90,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected long shareEventsInitiatedTimestamp = 0;
     protected long shareOfferInitiatedTimestamp = 0;
     protected long shareMovieInitiatedTimestamp = 0;
+    protected long shareTicketInitiatedTimestamp = 0;
 
 
     // **********************************************
@@ -183,9 +184,16 @@ public abstract class BaseActivity extends AppCompatActivity {
                     Long.toString(secForShare));
         }
 
+        if (shareTicketInitiatedTimestamp > 0) {
+            long secForShare = (System.currentTimeMillis() - shareTicketInitiatedTimestamp) / 1000;
+            reportActionToAnalytics(secForShare > 5 ? "shareTickets" : "ticketShareDismissed",
+                    Long.toString(secForShare));
+        }
+
         shareEventInitiatedTimestamp = 0;
         shareMovieInitiatedTimestamp = 0;
         shareOfferInitiatedTimestamp = 0;
+        shareTicketInitiatedTimestamp = 0;
 
 
         if (Preferences.getInstance(this).getLastTimeReferShown() == 0) {
@@ -722,6 +730,18 @@ public abstract class BaseActivity extends AppCompatActivity {
                 }
             }
         });
+
+    }
+
+    void startTicketShareActivity(int noOfTickets, Event event, String ticketLink) {
+        shareMovieInitiatedTimestamp = System.currentTimeMillis();
+        reportActionToAnalytics("ticketShareInitiated", ticketLink);
+        String shareText = "Hey, I just book " + noOfTickets + " tickets for " + event.title + " on EventsHigh. It'll be fun.\n" + ticketLink;
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
+
+        this.startActivity(shareIntent);
 
     }
 }

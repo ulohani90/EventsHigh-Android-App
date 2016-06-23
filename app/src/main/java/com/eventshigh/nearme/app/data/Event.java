@@ -379,311 +379,319 @@ public class Event implements Parcelable {
                 .replaceAll("Â", "")
                 .replaceAll("\r\n", "<br/>")
                 .replaceAll("\n\n", "<br/><br/>");
-        City city = City.valueOf(eventJson.getString("city").toUpperCase());
+        City city = null;
+        try {
+            city = City.valueOf(eventJson.getString("city").toUpperCase());
 
-        JSONObject mashup = eventJson.optJSONObject("mashup");
-        String source_url = eventJson.optString("source_url");
-        String booking_url = mashup == null ? null : mashup.optString("booking_url");
-        String booking_text = eventJson.optString("booking_text");
-        String img_url = eventJson.optString("img_url");
-        if ((source_url != null && source_url.toLowerCase().contains("eventviva")) ||
-                (img_url != null && img_url.endsWith("missing.png"))) {
-            img_url = null;
-        }
 
-        JSONObject stats = eventJson.optJSONObject("stats");
-        int num_views = stats == null ? 0 : stats.optInt("view_event");
-        int num_saves = stats == null ? 0 : stats.optInt("add_favorite");
-        boolean eh_recommends = eventJson.optBoolean("eh_editor");
-        float uberScore = (float) eventJson.optDouble("uber_score", 1);
-
-        double lat = 0;
-        double lon = 0;
-        if (mashup != null) {
-            lat = mashup.optDouble("lat", 0);
-            lon = mashup.optDouble("lon", 0);
-        }
-
-        JSONObject localityJson = eventJson.optJSONObject("locality_info");
-        if (!city.cityBounds.contains(new LatLng(lat, lon)) && localityJson != null) {
-            // Invalid latitude and longitude. Try locality_info.
-            lat = localityJson.optDouble("lat", 0);
-            lon = localityJson.optDouble("lon", 0);
-        }
-
-        String venue = null;
-        String address = null;
-        boolean isCleanVenue = false;
-        JSONObject venueJson = eventJson.optJSONObject("venue_info");
-        if (venueJson != null) {
-            venue = Utils.capitalize(venueJson.optString("name"));
-            address = venueJson.optString("address");
-            isCleanVenue = venueJson.optBoolean("clean_venue", false);
-        }
-
-        String locality = null;
-        if (localityJson != null) {
-            locality = localityJson.optString("locality");
-        }
-
-        if (address != null && venue != null &&
-                address.toLowerCase().startsWith(venue.toLowerCase())) {
-            address = address.substring(venue.length()).trim();
-        }
-
-        // Tags.
-        EventCategory category = EventCategory.OTHER;
-        JSONArray tagsJsonArr = eventJson.getJSONArray("tags");
-        ArrayList<String> tagsList = new ArrayList<>(tagsJsonArr.length());
-
-        for (int j = 0; j < tagsJsonArr.length(); j++) {
-            Object currentTag = tagsJsonArr.get(j);
-            String tag = currentTag instanceof JSONObject ?
-                    tagsJsonArr.getJSONObject(j).getString("tag") : String.valueOf(currentTag);
-
-            tagsList.add(Utils.capitalize(tag));
-
-            if (category == EventCategory.OTHER) {
-                EventCategory tagCategory = EventCategory.parseCategory(tag);
-                if (tagCategory != null) {
-                    category = tagCategory;
-                }
+            JSONObject mashup = eventJson.optJSONObject("mashup");
+            String source_url = eventJson.optString("source_url");
+            String booking_url = mashup == null ? null : mashup.optString("booking_url");
+            String booking_text = eventJson.optString("booking_text");
+            String img_url = eventJson.optString("img_url");
+            if ((source_url != null && source_url.toLowerCase().contains("eventviva")) ||
+                    (img_url != null && img_url.endsWith("missing.png"))) {
+                img_url = null;
             }
-        }
-        if (title.equalsIgnoreCase("Nritya Shakti Tour 2016-An intensive workshop by Shakti Mohan")) {
-            tagsList.hashCode();
-        }
 
-        // Event timings.
-        List<Long> eventTimings = new ArrayList<>();
-        Date eventTiming = DateTimeUtils.mergeDateTime(eventJson.optString("date"),
-                eventJson.optString("start_time"), city.timeZone);
-        if (eventTiming != null) {
-            eventTimings.add(eventTiming.getTime());
-        }
+            JSONObject stats = eventJson.optJSONObject("stats");
+            int num_views = stats == null ? 0 : stats.optInt("view_event");
+            int num_saves = stats == null ? 0 : stats.optInt("add_favorite");
+            boolean eh_recommends = eventJson.optBoolean("eh_editor");
+            float uberScore = (float) eventJson.optDouble("uber_score", 1);
 
-        JSONArray upcoming_occurrences = eventJson.optJSONArray("upcoming_occurrences");
-        if (upcoming_occurrences != null) {
-            for (int i = 0; i < upcoming_occurrences.length(); i++) {
-                eventTiming = DateTimeUtils.mergeDateTime(
-                        upcoming_occurrences.getJSONObject(i).optString("date"),
-                        upcoming_occurrences.getJSONObject(i).optString("start_time"), city.timeZone);
-                if (eventTiming != null && !eventTimings.contains(eventTiming.getTime())) {
-                    eventTimings.add(eventTiming.getTime());
-                }
+            double lat = 0;
+            double lon = 0;
+            if (mashup != null) {
+                lat = mashup.optDouble("lat", 0);
+                lon = mashup.optDouble("lon", 0);
             }
-        }
 
-
-        if (eventTimings.size() > 2) {
-            Collections.sort(eventTimings.subList(1, eventTimings.size()));
-        }
-
-        long[] eventTimingsArr = new long[eventTimings.size()];
-        int i = 0;
-        for (Long eventTime : eventTimings) {
-            eventTimingsArr[i] = eventTime;
-            i++;
-        }
-
-        // Performers
-        JSONArray participantsInfo = eventJson.optJSONArray("participants");
-        List<String> performers = new ArrayList<>(participantsInfo == null ? 0 : participantsInfo.length());
-        if (participantsInfo != null) {
-            for (i = 0; i < participantsInfo.length(); i++) {
-                String performer = participantsInfo.getJSONObject(i).optString("name");
-                if (performer != null) {
-                    performers.add(performer);
-                }
+            JSONObject localityJson = eventJson.optJSONObject("locality_info");
+            if (city != null && !city.cityBounds.contains(new LatLng(lat, lon)) && localityJson != null) {
+                // Invalid latitude and longitude. Try locality_info.
+                lat = localityJson.optDouble("lat", 0);
+                lon = localityJson.optDouble("lon", 0);
             }
-        }
 
-        // Organizer Info.
-        String organizerName = mashup == null ? null : mashup.optString("organizer_name");
-        String organizerPhone = mashup == null ? null : mashup.optString("organizer_phone");
-        String organizerWebsite = mashup == null ? null : mashup.optString("organizer_website");
-        String organizerEmail = mashup == null ? null : mashup.optString("organizer_email");
-        String organizerLink = mashup == null ? null : mashup.optString("organizer_link");
+            String venue = null;
+            String address = null;
+            boolean isCleanVenue = false;
+            JSONObject venueJson = eventJson.optJSONObject("venue_info");
+            if (venueJson != null) {
+                venue = Utils.capitalize(venueJson.optString("name"));
+                address = venueJson.optString("address");
+                isCleanVenue = venueJson.optBoolean("clean_venue", false);
+            }
 
-        // Price.
-        double minPrice = -1, maxPrice = -1;
-        String ehPriceName = "";
-        String ehPriceNote = "";
-        String currency = "\u20B9";
-        JSONArray prices = eventJson.optJSONArray("eh_prices");
-        ArrayList<EhPrices> ehPrices = new ArrayList<>();
-        if (prices != null) {
+            String locality = null;
+            if (localityJson != null) {
+                locality = localityJson.optString("locality");
+            }
 
-            for (int j = 0; j < prices.length(); j++) {
-                minPrice = -1;
-                maxPrice = -1;
-                JSONObject ehPrice = prices.getJSONObject(j);
-                currency = ehPrice.optString("currency", "\u20B9");
-                if (currency.equalsIgnoreCase("INR")) {
-                    currency = "\u20B9";
-                }
-                ArrayList<Long> ehOccurences = new ArrayList<>();
-                JSONArray occurrences = ehPrice.getJSONArray("occurrences");
-                if (occurrences != null) {
-                    for (int k = 0; k < occurrences.length(); k++) {
-                        Date date = DateTimeUtils.mergeDateTime(occurrences.getJSONObject(k).optString("date"),
-                                occurrences.getJSONObject(k).optString("time"), city.timeZone);
-                        ehOccurences.add(date.getTime());
+            if (address != null && venue != null &&
+                    address.toLowerCase().startsWith(venue.toLowerCase())) {
+                address = address.substring(venue.length()).trim();
+            }
+
+            // Tags.
+            EventCategory category = EventCategory.OTHER;
+            JSONArray tagsJsonArr = eventJson.getJSONArray("tags");
+            ArrayList<String> tagsList = new ArrayList<>(tagsJsonArr.length());
+
+            for (int j = 0; j < tagsJsonArr.length(); j++) {
+                Object currentTag = tagsJsonArr.get(j);
+                String tag = currentTag instanceof JSONObject ?
+                        tagsJsonArr.getJSONObject(j).getString("tag") : String.valueOf(currentTag);
+
+                tagsList.add(Utils.capitalize(tag));
+
+                if (category == EventCategory.OTHER) {
+                    EventCategory tagCategory = EventCategory.parseCategory(tag);
+                    if (tagCategory != null) {
+                        category = tagCategory;
                     }
                 }
-                Collections.sort(ehOccurences);
-                ehPriceName = ehPrice.optString("name", "");
-                ehPriceNote = ehPrice.optString("note", "");
-                double discountValue = ehPrice.optDouble("discount_value", -1);
-                double value = ehPrice.optDouble("value", -1);
-                String startVaild = ehPrice.getString("validity_start");
-                String endValid = ehPrice.getString("validity_end");
-                if (Utils.checkIfStringEmpty(startVaild)) startVaild = "1907-01-01 00:00:00.0";
-                if (Utils.checkIfStringEmpty(endValid)) endValid = "2099-01-01 00:00:00.0";
-                long validityStart = DateTimeUtils.parseOfferTime(startVaild);
-                long validityEnd = DateTimeUtils.parseOfferTime(endValid);
-                /*if (value < 0.01) {
-                    value = ehPrice.optDouble("value", -1);
-                }*/
-                if (discountValue > 0) {
-                    minPrice = minPrice < 0 ? value : Math.min(minPrice, value);
-                    maxPrice = maxPrice < 0 ? value : Math.max(maxPrice, value);
-                } else if (value > 0) {
-                    minPrice = minPrice < 0 ? value : Math.min(minPrice, value);
-                    maxPrice = maxPrice < 0 ? value : Math.max(maxPrice, value);
-                } else {
-                    minPrice = 0;
-                    maxPrice = 0;
-                }
-
-                long timenow = System.currentTimeMillis();
-                boolean isMulti = ehPrice.optInt("is_multi") == 0 ? false : true;
-                if (validityStart <= timenow && validityEnd > timenow)
-                    ehPrices.add(EhPrices.createObject(minPrice, maxPrice, ehPriceName, ehPriceNote, currency, value, discountValue, ehOccurences, 0,
-                            validityStart, validityEnd, isMulti));
+            }
+            if (title.equalsIgnoreCase("Nritya Shakti Tour 2016-An intensive workshop by Shakti Mohan")) {
+                tagsList.hashCode();
             }
 
-        }
+            // Event timings.
+            List<Long> eventTimings = new ArrayList<>();
+            Date eventTiming = DateTimeUtils.mergeDateTime(eventJson.optString("date"),
+                    eventJson.optString("start_time"), city.timeZone);
+            if (eventTiming != null) {
+                eventTimings.add(eventTiming.getTime());
+            }
 
-        if (mashup != null && ehPrices.size() == 0) {
-            JSONObject priceInfo = mashup.optJSONObject("price_info");
-            if (priceInfo != null) {
-                if (priceInfo.optString("type").equalsIgnoreCase("free")) {
-                    minPrice = 0;
-                    maxPrice = 0;
-                } else {
-                    currency = priceInfo.optString("currency", "\u20B9");
+            JSONArray upcoming_occurrences = eventJson.optJSONArray("upcoming_occurrences");
+            if (upcoming_occurrences != null) {
+                for (int i = 0; i < upcoming_occurrences.length(); i++) {
+                    eventTiming = DateTimeUtils.mergeDateTime(
+                            upcoming_occurrences.getJSONObject(i).optString("date"),
+                            upcoming_occurrences.getJSONObject(i).optString("start_time"), city.timeZone);
+                    if (eventTiming != null && !eventTimings.contains(eventTiming.getTime())) {
+                        eventTimings.add(eventTiming.getTime());
+                    }
+                }
+            }
+
+
+            if (eventTimings.size() > 2) {
+                Collections.sort(eventTimings.subList(1, eventTimings.size()));
+            }
+
+            long[] eventTimingsArr = new long[eventTimings.size()];
+            int i = 0;
+            for (Long eventTime : eventTimings) {
+                eventTimingsArr[i] = eventTime;
+                i++;
+            }
+
+            // Performers
+            JSONArray participantsInfo = eventJson.optJSONArray("participants");
+            List<String> performers = new ArrayList<>(participantsInfo == null ? 0 : participantsInfo.length());
+            if (participantsInfo != null) {
+                for (i = 0; i < participantsInfo.length(); i++) {
+                    String performer = participantsInfo.getJSONObject(i).optString("name");
+                    if (performer != null) {
+                        performers.add(performer);
+                    }
+                }
+            }
+
+            // Organizer Info.
+            String organizerName = mashup == null ? null : mashup.optString("organizer_name");
+            String organizerPhone = mashup == null ? null : mashup.optString("organizer_phone");
+            String organizerWebsite = mashup == null ? null : mashup.optString("organizer_website");
+            String organizerEmail = mashup == null ? null : mashup.optString("organizer_email");
+            String organizerLink = mashup == null ? null : mashup.optString("organizer_link");
+
+            // Price.
+            double minPrice = -1, maxPrice = -1;
+            String ehPriceName = "";
+            String ehPriceNote = "";
+            String currency = "\u20B9";
+            JSONArray prices = eventJson.optJSONArray("eh_prices");
+            ArrayList<EhPrices> ehPrices = new ArrayList<>();
+            if (prices != null) {
+
+                for (int j = 0; j < prices.length(); j++) {
+                    minPrice = -1;
+                    maxPrice = -1;
+                    JSONObject ehPrice = prices.getJSONObject(j);
+                    currency = ehPrice.optString("currency", "\u20B9");
                     if (currency.equalsIgnoreCase("INR")) {
                         currency = "\u20B9";
                     }
-                    minPrice = priceInfo.optDouble("min", -1);
-                    maxPrice = priceInfo.optDouble("max", -1);
-                    if (minPrice < 0 || maxPrice < 0) {
-                        double value = priceInfo.optDouble("value", -1);
-                        if (value > 0) {
-                            minPrice = value;
-                            maxPrice = value;
+                    ArrayList<Long> ehOccurences = new ArrayList<>();
+                    JSONArray occurrences = ehPrice.getJSONArray("occurrences");
+                    if (occurrences != null) {
+                        for (int k = 0; k < occurrences.length(); k++) {
+                            Date date = DateTimeUtils.mergeDateTime(occurrences.getJSONObject(k).optString("date"),
+                                    occurrences.getJSONObject(k).optString("time"), city.timeZone);
+                            ehOccurences.add(date.getTime());
                         }
                     }
+                    Collections.sort(ehOccurences);
+                    ehPriceName = ehPrice.optString("name", "");
+                    ehPriceNote = ehPrice.optString("note", "");
+                    double discountValue = ehPrice.optDouble("discount_value", -1);
+                    double value = ehPrice.optDouble("value", -1);
+                    String startVaild = ehPrice.getString("validity_start");
+                    String endValid = ehPrice.getString("validity_end");
+                    if (Utils.checkIfStringEmpty(startVaild)) startVaild = "1907-01-01 00:00:00.0";
+                    if (Utils.checkIfStringEmpty(endValid)) endValid = "2099-01-01 00:00:00.0";
+                    long validityStart = DateTimeUtils.parseOfferTime(startVaild);
+                    long validityEnd = DateTimeUtils.parseOfferTime(endValid);
+                /*if (value < 0.01) {
+                    value = ehPrice.optDouble("value", -1);
+                }*/
+                    if (discountValue > 0) {
+                        minPrice = minPrice < 0 ? value : Math.min(minPrice, value);
+                        maxPrice = maxPrice < 0 ? value : Math.max(maxPrice, value);
+                    } else if (value > 0) {
+                        minPrice = minPrice < 0 ? value : Math.min(minPrice, value);
+                        maxPrice = maxPrice < 0 ? value : Math.max(maxPrice, value);
+                    } else {
+                        minPrice = 0;
+                        maxPrice = 0;
+                    }
+
+                    long timenow = System.currentTimeMillis();
+                    boolean isMulti = ehPrice.optInt("is_multi") == 0 ? false : true;
+                    if (validityStart <= timenow && validityEnd > timenow)
+                        ehPrices.add(EhPrices.createObject(minPrice, maxPrice, ehPriceName, ehPriceNote, currency, value, discountValue, ehOccurences, 0,
+                                validityStart, validityEnd, isMulti));
                 }
-                ehPriceName = priceInfo.optString("name", "");
 
             }
-        }
 
-        //User Reviews
+            if (mashup != null && ehPrices.size() == 0) {
+                JSONObject priceInfo = mashup.optJSONObject("price_info");
+                if (priceInfo != null) {
+                    if (priceInfo.optString("type").equalsIgnoreCase("free")) {
+                        minPrice = 0;
+                        maxPrice = 0;
+                    } else {
+                        currency = priceInfo.optString("currency", "\u20B9");
+                        if (currency.equalsIgnoreCase("INR")) {
+                            currency = "\u20B9";
+                        }
+                        minPrice = priceInfo.optDouble("min", -1);
+                        maxPrice = priceInfo.optDouble("max", -1);
+                        if (minPrice < 0 || maxPrice < 0) {
+                            double value = priceInfo.optDouble("value", -1);
+                            if (value > 0) {
+                                minPrice = value;
+                                maxPrice = value;
+                            }
+                        }
+                    }
+                    ehPriceName = priceInfo.optString("name", "");
 
-        ArrayList<MovieUserReviewObject> reviews = new ArrayList<>();
-        JSONArray reviewsArray = eventJson.getJSONArray("reviews");
-        if (reviewsArray != null) {
-            for (int l = 0; l < reviewsArray.length(); l++) {
-                MovieUserReviewObject obj = new MovieUserReviewObject(reviewsArray.getJSONObject(l));
-                if (obj.getReviewState() == null || obj.getReviewState().equalsIgnoreCase("published")) {
-                    reviews.add(obj);
                 }
             }
-        }
 
-        // Event Description Sections.
-        List<EventDescriptionSection> descriptionSections = new ArrayList<>();
-        JSONArray descriptionSectionsJson = eventJson.optJSONArray("description_sections");
-        if (descriptionSectionsJson != null) {
-            descriptionSections = EventDescriptionSection.fromJSON(descriptionSectionsJson);
-        }
+            //User Reviews
 
-        // Find youtube id if any.
-        String youtubeId = null;
-        Matcher youtubeMatcher = YOUTUBE_FINDER.matcher(description);
-        if (youtubeMatcher.find()) {
-            youtubeId = youtubeMatcher.group(1);
-        }
-        if (youtubeId == null) {
-            for (EventDescriptionSection descriptionSection : descriptionSections) {
-                youtubeMatcher = YOUTUBE_FINDER.matcher(descriptionSection.description);
-                if (youtubeMatcher.find()) {
-                    youtubeId = youtubeMatcher.group(1);
-                    break;
+            ArrayList<MovieUserReviewObject> reviews = new ArrayList<>();
+            JSONArray reviewsArray = eventJson.getJSONArray("reviews");
+            if (reviewsArray != null) {
+                for (int l = 0; l < reviewsArray.length(); l++) {
+                    MovieUserReviewObject obj = new MovieUserReviewObject(reviewsArray.getJSONObject(l));
+                    if (obj.getReviewState() == null || obj.getReviewState().equalsIgnoreCase("published")) {
+                        reviews.add(obj);
+                    }
                 }
             }
-        }
 
-
-        //Attributes
-        List<AdditionalTicketField> additionalTicketFieldList = new ArrayList<>();
-        String requestPerAttendeeData = eventJson.optString("request_per_attendee_data", "");
-        if (eventJson.has("additional_fields")) {
-            JSONArray additionalFieldsJsonArray = eventJson.getJSONArray("additional_fields");
-            for (int j = 0; j < additionalFieldsJsonArray.length(); j++) {
-                AdditionalTicketField additionalTicketField = AdditionalTicketField.fromJsonObject(additionalFieldsJsonArray.getJSONObject(j));
-                additionalTicketFieldList.add(additionalTicketField);
+            // Event Description Sections.
+            List<EventDescriptionSection> descriptionSections = new ArrayList<>();
+            JSONArray descriptionSectionsJson = eventJson.optJSONArray("description_sections");
+            if (descriptionSectionsJson != null) {
+                descriptionSections = EventDescriptionSection.fromJSON(descriptionSectionsJson);
             }
+
+            // Find youtube id if any.
+            String youtubeId = null;
+            Matcher youtubeMatcher = YOUTUBE_FINDER.matcher(description);
+            if (youtubeMatcher.find()) {
+                youtubeId = youtubeMatcher.group(1);
+            }
+            if (youtubeId == null) {
+                for (EventDescriptionSection descriptionSection : descriptionSections) {
+                    youtubeMatcher = YOUTUBE_FINDER.matcher(descriptionSection.description);
+                    if (youtubeMatcher.find()) {
+                        youtubeId = youtubeMatcher.group(1);
+                        break;
+                    }
+                }
+            }
+
+
+            //Attributes
+            List<AdditionalTicketField> additionalTicketFieldList = new ArrayList<>();
+            String requestPerAttendeeData = eventJson.optString("request_per_attendee_data", "");
+            if (eventJson.has("additional_fields")) {
+                JSONArray additionalFieldsJsonArray = eventJson.getJSONArray("additional_fields");
+                for (int j = 0; j < additionalFieldsJsonArray.length(); j++) {
+                    AdditionalTicketField additionalTicketField = AdditionalTicketField.fromJsonObject(additionalFieldsJsonArray.getJSONObject(j));
+                    additionalTicketFieldList.add(additionalTicketField);
+                }
+            }
+
+
+            return new Event(id,
+                    city,
+                    title,
+                    category,
+
+                    description,
+                    tagsList,
+                    youtubeId,
+
+                    img_url,
+                    source_url,
+                    booking_url,
+                    booking_text,
+
+                    num_views,
+                    num_saves,
+                    eh_recommends,
+                    uberScore,
+
+                    eventTimingsArr,
+
+                    new LatLng(lat, lon),
+                    venue,
+                    locality,
+                    address,
+                    isCleanVenue,
+
+                    performers.toArray(new String[performers.size()]),
+
+                    organizerName,
+                    organizerPhone,
+                    organizerWebsite,
+                    organizerEmail,
+                    organizerLink,
+                    ehPrices,
+                    minPrice,
+                    maxPrice,
+                    currency,
+                    ehPriceName,
+                    ehPriceNote,
+                    descriptionSections.toArray(new EventDescriptionSection[descriptionSections.size()]),
+                    reviews,
+                    requestPerAttendeeData,
+                    additionalTicketFieldList
+            );
+        } catch (IllegalArgumentException e) {
+            Crashlytics.logException(e);
+            return null;
         }
-
-        return new Event(id,
-                city,
-                title,
-                category,
-
-                description,
-                tagsList,
-                youtubeId,
-
-                img_url,
-                source_url,
-                booking_url,
-                booking_text,
-
-                num_views,
-                num_saves,
-                eh_recommends,
-                uberScore,
-
-                eventTimingsArr,
-
-                new LatLng(lat, lon),
-                venue,
-                locality,
-                address,
-                isCleanVenue,
-
-                performers.toArray(new String[performers.size()]),
-
-                organizerName,
-                organizerPhone,
-                organizerWebsite,
-                organizerEmail,
-                organizerLink,
-                ehPrices,
-                minPrice,
-                maxPrice,
-                currency,
-                ehPriceName,
-                ehPriceNote,
-                descriptionSections.toArray(new EventDescriptionSection[descriptionSections.size()]),
-                reviews,
-                requestPerAttendeeData,
-                additionalTicketFieldList
-        );
     }
 
     public static List<Event> fromJSON(JSONArray jsonArray, boolean includeWithoutLocation) {
@@ -691,7 +699,7 @@ public class Event implements Parcelable {
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 Event event = fromJSON(jsonArray.getJSONObject(i));
-                if (includeWithoutLocation || event.location != null) {
+                if (event != null && (includeWithoutLocation || event.location != null)) {
                     events.add(event);
                 }
             } catch (JSONException | ParseException e) {

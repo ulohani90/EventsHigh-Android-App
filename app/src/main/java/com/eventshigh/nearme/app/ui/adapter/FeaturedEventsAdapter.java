@@ -21,7 +21,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
 
     private final EventPagerData eventPagerData;
 
-    public static final String BANNER_IMAGE_URL = "https://assets.eventshigh.com/banner.png";
+    public static final String BANNER_IMAGE_URL = "https://assets.eventshigh.com/banner.jpg";
 
     public FeaturedEventsAdapter(EventPagerData eventPagerData) {
         this.eventPagerData = eventPagerData;

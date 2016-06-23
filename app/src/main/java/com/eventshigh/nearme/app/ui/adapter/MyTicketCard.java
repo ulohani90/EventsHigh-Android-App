@@ -30,6 +30,9 @@ public class MyTicketCard extends RecyclerView.ViewHolder{
     TextView tvShowMoreLess;
     LinearLayout llHidingMask;
 
+    LinearLayout maskingRowView;
+    TextView rowDate, rowBookingId;
+
     EventsAdapter.OnMyTicketItemClickedListener myTicketItemClickedListener;
 
     public static MyTicketCard newInstance(final BaseActivity activity, ViewGroup parent) {
@@ -55,6 +58,9 @@ public class MyTicketCard extends RecyclerView.ViewHolder{
         llHidingMask = (LinearLayout)itemView.findViewById(R.id.ll_hiding_mask);
         tvShowMoreLess = (TextView) itemView.findViewById(R.id.tv_show_more_less);
 
+        maskingRowView = (LinearLayout)itemView.findViewById(R.id.row_view_ticket);
+        rowDate = (TextView)itemView.findViewById(R.id.row_date);
+        rowBookingId = (TextView)itemView.findViewById(R.id.row_booking_id);
     }
 
 
@@ -80,9 +86,20 @@ public class MyTicketCard extends RecyclerView.ViewHolder{
         tvDate.setText(timeList.get(0));
         tvSeat.setText(myTicketObject.getTicketType());
 
+        rowDate.setText(myTicketObject.getEventTime());
+        rowBookingId.setText(myTicketObject.getBookingId());
 
-        if(myTicketsFragment.clickPosition == position)llHidingMask.setVisibility(View.VISIBLE);
-        else llHidingMask.setVisibility(View.GONE);
+        if(myTicketsFragment.clickPosition == position){
+            llHidingMask.setVisibility(View.VISIBLE);
+            maskingRowView.setVisibility(View.GONE);
+            tvNoTickets.setVisibility(View.VISIBLE);
+            tvShowMoreLess.setText("Show Less");
+        }else{
+            llHidingMask.setVisibility(View.GONE);
+            maskingRowView.setVisibility(View.VISIBLE);
+            tvNoTickets.setVisibility(View.GONE);
+            tvShowMoreLess.setText("Show More");
+        }
 
     }
 

@@ -1,10 +1,20 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,7 +23,10 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.MovieReviewSubmitRequest;
+import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -22,41 +35,78 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class UserProfileActivity extends BaseContextActivity implements View.OnClickListener{
-    LoginButton loginButton;
     CallbackManager callbackManager;
-    TextView tv1;
-    Button btnFbLogin;
-    ImageView ivProfilePic;
+
+    public ArrayList<String> TABS;
+
+
+    ImageView userImage;
+    TextView userName;
+    TextView userCity;
+    TextView userInterestCount, userFollowerCount, userFavouriteCount;
+    TabLayout tabsView;
+    ViewPager pager;
+    UserProfilePagerAdapter userProfilePagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        setupLayout(R.layout.activity_user_profile);
+        TABS = new ArrayList<>();
+        TABS.add("Favourites");
+        TABS.add("Events");
+        TABS.add("Friends");
+        TABS.add("My Tickets");
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        addToolbarView();
+
+        pager = (ViewPager) findViewById(R.id.view_pager);
+        userProfilePagerAdapter = new UserProfilePagerAdapter(getSupportFragmentManager(),this);
+        pager.setAdapter(userProfilePagerAdapter);
+
+        tabsView = (TabLayout) findViewById(R.id.tabs);
+        tabsView.setupWithViewPager(pager);
+        tabsView.setVisibility(View.VISIBLE);
+        pager.setVisibility(View.VISIBLE);
+        //tabsView.setScrollPosition(0, 0, true);
+
 
         FacebookSdk.sdkInitialize(getApplicationContext());
-        setContentView(R.layout.activity_user_profile);
-        /*
-        tv1 = (TextView)findViewById(R.id.tv1);
-        btnFbLogin = (Button)findViewById(R.id.btn_fb_login);
-        btnFbLogin.setOnClickListener(this);
-        ivProfilePic = (ImageView)findViewById(R.id.iv_profile_pic);
-        */
+        fbLoginButtonPressed();
     }
 
+    public void addToolbarView() {
+        View view = LayoutInflater.from(this).inflate(R.layout.card_user_profile, toolbar, false);
+        userImage = (ImageView) view.findViewById(R.id.profile_image);
+        userName = (TextView) view.findViewById(R.id.profile_user_name);
+        userCity = (TextView) view.findViewById(R.id.profile_user_city);
+        userInterestCount = (TextView)view.findViewById(R.id.user_interest_count);
+        userFavouriteCount = (TextView)view.findViewById(R.id.user_favourite_count);
+        userFollowerCount = (TextView)view.findViewById(R.id.user_follower_count);
+        toolbar.addView(view);
+        toolbar.setBackgroundColor(Color.TRANSPARENT);
+    }
+
+
     @Override
-    public void onClick(View v) {
+    public void onClick(View v){
         switch (v.getId()) {
         }
     }
 
+
     void fbLoginButtonPressed(){
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
+        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends"));
         callbackManager = CallbackManager.Factory.create();
 
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -95,7 +145,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                         }catch (JSONException e){
                             Log.e("User Profile","JSON Exception");
                         }
-                        tv1.setText(object.toString());
+                        //tv1.setText(object.toString());
                         Log.e("obj ",object.toString());
                      }
             });
@@ -127,6 +177,48 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    EventsFragment myFavouritesFragment;
+    EventsFragment myInterestEventsFragment;
+
+    public class UserProfilePagerAdapter extends FragmentStatePagerAdapter{
+        private Context context;
+        public UserProfilePagerAdapter(FragmentManager fragmentManager, Context context){
+            super(fragmentManager);
+            this.context = context;
+        }
+
+        @Override
+        public Fragment getItem(int position){
+            if(position == 0){
+                LatLng latLng = (new Account(context)).getLastCity().cityBounds.getCenter();
+                EventsContext myEventsContext = new EventsContext(latLng,EventsHighEndpoints.QUERY_MY_EVENT);
+                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null,false);
+                return myFavouritesFragment;
+            }else  if(position == 1){
+                EventsContext myEventsContext = new EventsContext(eventsContext.location,
+                        EventsHighEndpoints.QUERY_MY_INTEREST_EVENTS);
+                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null,false);
+                return myInterestEventsFragment;
+            }else if(position == 2){
+                ContactsFragment fragment = new ContactsFragment();
+                return fragment;
+            }else{
+                MyTicketsFragment myTicketsFragment = new MyTicketsFragment();
+                return myTicketsFragment;
+            }
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return TABS.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return TABS.size();
+        }
     }
 
 

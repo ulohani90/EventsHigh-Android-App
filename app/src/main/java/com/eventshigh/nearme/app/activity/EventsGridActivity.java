@@ -31,6 +31,7 @@ import com.eventshigh.nearme.app.ui.animation.ResizeAnimation;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.squareup.timessquare.CalendarPickerView;
 
 import java.util.Calendar;
@@ -59,6 +60,8 @@ public class EventsGridActivity extends BaseContextActivity {
     HorizontalScrollView categoryFilter, priceFilter, dateFilter;
 
     boolean isCategoryFilterVisible;
+
+    boolean isTodaySelected;
     Account account;
 
     public static final int PRICE_FILTER = 3;
@@ -75,47 +78,17 @@ public class EventsGridActivity extends BaseContextActivity {
     LinearLayout filtersContainer;
 
     public static final String[] EXPLORE_TAGS = {
-            EventsHighEndpoints.QUERY_FEATURED,
             EventCategory.NIGHTLIFE.categoryName,
-            EventCategory.THEATRE.categoryName,
-            EventCategory.MUSIC.categoryName,
-            EventCategory.KIDS_ENTERTAINMENT.categoryName,
-            EventCategory.TECH.categoryName,
-            EventCategory.SPORTS.categoryName,
+            EventCategory.LIVE_PERFORMANCES.categoryName,
+            EventCategory.OUTDOORS.categoryName,
             EventCategory.HEALTH_WELLNESS.categoryName,
-            EventCategory.DANCE.categoryName,
-            EventCategory.ART.categoryName,
-            EventCategory.FOOD.categoryName,
-            EventCategory.LITERATURE.categoryName,
-
-    };
-
-    public static final String[] EXPLORE_TAGS_CHENNAI = {
-            EventCategory.NIGHTLIFE.categoryName,
-            EventCategory.THEATRE.categoryName,
-            EventCategory.MUSIC.categoryName,
-            EventCategory.TECH.categoryName,
-            EventCategory.SPORTS.categoryName,
-            EventCategory.HEALTH_WELLNESS.categoryName,
-            EventCategory.DANCE.categoryName,
-            EventCategory.ART.categoryName,
-            EventCategory.FOOD.categoryName,
-            EventCategory.LITERATURE.categoryName,
-
-    };
-
-    public static final String[] EXPLORE_TAGS_BANGALORE = {
-            EventsHighEndpoints.QUERY_FEATURED,
-            EventCategory.NIGHTLIFE.categoryName,
-            EventCategory.THEATRE.categoryName,
-            EventCategory.MUSIC.categoryName,
             EventCategory.KIDS_ENTERTAINMENT.categoryName,
-            EventCategory.TECH.categoryName,
             EventCategory.SPORTS.categoryName,
-            EventCategory.DANCE.categoryName,
+            EventCategory.WORKSHOPS.categoryName,
+            EventCategory.TECH.categoryName,
             EventCategory.ART.categoryName,
-            EventCategory.FOOD.categoryName,
-            EventCategory.LITERATURE.categoryName,
+            EventCategory.FOOD.categoryName
+
     };
 
     @Override
@@ -181,7 +154,9 @@ public class EventsGridActivity extends BaseContextActivity {
         Fragment eventFragment;
         if (!eventsContext.query.isEmpty()) {
 
-            if (EventsHighEndpoints.isDateQuery(eventsContext.query) || eventsContext.query.equalsIgnoreCase(EventsHighEndpoints.QUERY_NEARME)) {
+            if (eventsContext.query.equalsIgnoreCase("today") || eventsContext.query.contains(EventsHighEndpoints.QUERY_NEARME)) {
+                if (eventsContext.query.equalsIgnoreCase("today"))
+                    isTodaySelected = true;
                 isCategoryFilterVisible = true;
                 findViewById(R.id.category_filter).setVisibility(View.VISIBLE);
             } else {
@@ -192,7 +167,7 @@ public class EventsGridActivity extends BaseContextActivity {
             boolean showEhInviteForNotification = getIntent() != null &&
                     getIntent().getAction() != null && getIntent().getAction().startsWith(NOTIFICATION_ACTION);
             EventsFragment eventFragment1 = EventsFragment.getInstance(
-                    eventsContext, showFollowCard, false, showEhInviteForNotification, (SocialInvitationsRequest.SpecialCoupons) getIntent().getParcelableExtra("special_obj"));
+                    eventsContext, showFollowCard, false, showEhInviteForNotification, (SocialInvitationsRequest.SpecialCoupons) getIntent().getParcelableExtra("special_obj"), isTodaySelected);
             eventFragment1.setOnScrollListener(
                     false ? followCardScrollListener : doNothingScrollListener);
 
@@ -218,22 +193,29 @@ public class EventsGridActivity extends BaseContextActivity {
         if (toolbar != null) {
             View view = LayoutInflater.from(this).inflate(R.layout.event_grid_toolbar_layout, toolbar, false);
             TextView title = (TextView) view.findViewById(R.id.title);
-            title.setText(eventsContext.query);
+            title.setText(Utils.capitalize(eventsContext.query));
             followBtn = (TextView) view.findViewById(R.id.follow_btn);
-            followBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (followBtn.isSelected()) {
-                        unSelectFollowBtn();
-                    } else {
-                        selectFollowBtn();
-                    }
-                }
-            });
-            if (account.isFollowing(eventsContext.query)) {
-                changeFollowBtnState(true);
+            if (eventsContext.query.equalsIgnoreCase("today")) {
+                followBtn.setVisibility(View.GONE);
             } else {
-                changeFollowBtnState(false);
+                followBtn.setVisibility(View.VISIBLE);
+
+                followBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (followBtn.isSelected()) {
+                            unSelectFollowBtn();
+                        } else {
+                            selectFollowBtn();
+                        }
+                    }
+                });
+
+                if (account.isFollowing(eventsContext.query)) {
+                    changeFollowBtnState(true);
+                } else {
+                    changeFollowBtnState(false);
+                }
             }
             toolbar.addView(view);
         }
@@ -278,8 +260,7 @@ public class EventsGridActivity extends BaseContextActivity {
     public void addFiltersData() {
         isFiltersShown = true;
         final LinearLayout horizontalCategories = (LinearLayout) findViewById(R.id.category_container);
-        final String[] categories = eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE :
-                (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS);
+        final String[] categories = EXPLORE_TAGS;
         for (int i = 0; i < categories.length; i++) {
             View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
             final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
@@ -362,6 +343,11 @@ public class EventsGridActivity extends BaseContextActivity {
                 tomorrow = filterText;
             } else {
                 today = filterText;
+                if (isTodaySelected) {
+                    today.setSelected(true);
+                } else {
+                    today.setSelected(false);
+                }
             }
 
 

@@ -54,6 +54,7 @@ public class MyPointsListFragment  extends Fragment {
         exploreGridView.setVerticalSpacing(0);
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         topProgressBar.setVisibility(View.VISIBLE);
+
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override

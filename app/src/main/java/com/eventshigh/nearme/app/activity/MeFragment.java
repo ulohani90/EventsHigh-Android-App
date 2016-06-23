@@ -50,7 +50,7 @@ public class MeFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(Activity activity){
         super.onAttach(activity);
         eventsContext = getArguments().getParcelable(BaseEventsFragment.EVENT_CONTEXT_PARAM);
         this.activity = (BaseContextActivity) activity;
@@ -125,25 +125,24 @@ public class MeFragment extends Fragment {
         }
 
         @Override
-        public Fragment getItem(int position){
-            if(position == 0){
+        public Fragment getItem(int position) {
+            if (position == 0) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_EVENT);
-                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null);
+                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null, false);
                 return myFavouritesFragment;
-            }else  if(position == 1){
+            } else if (position == 1) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_INTEREST_EVENTS);
-                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null);
+                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false);
                 return myInterestEventsFragment;
-            }else if(position == 2){
+            } else if (position == 2) {
                 ContactsFragment fragment = new ContactsFragment();
                 return fragment;
-            }else{
+            } else {
                 MyTicketsFragment myTicketsFragment = new MyTicketsFragment();
                 return myTicketsFragment;
             }
-
 
         }
 

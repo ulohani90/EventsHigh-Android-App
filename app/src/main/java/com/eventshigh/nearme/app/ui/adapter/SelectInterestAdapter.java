@@ -162,7 +162,7 @@ public class SelectInterestAdapter extends BaseExpandableListAdapter{
             return R.drawable.green_circle_bg;
         }else if(category == EventCategory.OUTDOORS){
             return R.drawable.golden_circle_bg;
-        }else if(category == EventCategory.WORKSHOP){
+        }else if(category == EventCategory.WORKSHOPS){
             return R.drawable.violet_circle_bg;
         }else if(category == EventCategory.LIVE_PERFORMANCES){
             return R.drawable.pink_circle_bg;

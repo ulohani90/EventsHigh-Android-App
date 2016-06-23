@@ -50,7 +50,7 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
                 EventsContext param;
                 Account account = new Account(activity);
                 if (account.getLastLocality() != null) {
-                    param = new EventsContext(account.getLastLocality().getLatLng(), EventsHighEndpoints.QUERY_NEARME);
+                    param = new EventsContext(account.getLastLocality().getLatLng(), EventsHighEndpoints.QUERY_NEARME + " (" + account.getLastLocality().getName() + ")");
                 } else {
                     param = new EventsContext(account.getLastCity().cityBounds.getCenter(), EventsHighEndpoints.QUERY_NEARME);
                 }

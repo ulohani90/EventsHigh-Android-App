@@ -50,7 +50,7 @@ public class EventsHighEndpoints {
             API_URI_BASE + "api/get_movie_infos/%s/%s";
 
     private static final String API_ENDPOINT_NEW_DATE_FORMAT =
-            API_URI_BASE + "api/date/%s/%s?limit=300&mobile=1";
+            API_URI_BASE + "api/date/%s/%s?mobile=1";
 
 
     private static final String API_ENDPOINT_MOVIE_UBER_INFO_FORMAT = API_URI_BASE + "api/get_movie_uber_info/%s";
@@ -187,7 +187,7 @@ public class EventsHighEndpoints {
     }
 
     public static boolean isNearMeQuery(String query) {
-        return query.equalsIgnoreCase(QUERY_NEARME);
+        return query.startsWith(QUERY_NEARME);
     }
 
     public static String getApiEndpointForDate(EventsContext eventsContext, String dateString) {

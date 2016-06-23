@@ -171,9 +171,10 @@ public abstract class BaseContextActivity extends BaseActivity {
             if (!eventsContext.dateFilter.isEmpty()) {
                 title += " on " + DateTimeUtils.queryToTitle(eventsContext.dateFilter);
             }
-            actionBar.setTitle(title);
+            actionBar.setTitle(Utils.capitalize(title));
         }
     }
+
 
     protected void switchTo(Class<?> cls) {
         reportActionToAnalytics("switchView");
@@ -312,8 +313,6 @@ public abstract class BaseContextActivity extends BaseActivity {
     }
 
 
-
-
     public void showCategorySearchView(String query) {
         reportActionToAnalytics("showSearchView", query);
         EventsContext param = new EventsContext(eventsContext.location, query);
@@ -336,7 +335,6 @@ public abstract class BaseContextActivity extends BaseActivity {
         detailIntent.putExtra(EventDetailActivity.EXTRA_EVENT_PARAM, event);
         startActivity(detailIntent, bundle);
     }
-
 
 
     public void seeAll() {

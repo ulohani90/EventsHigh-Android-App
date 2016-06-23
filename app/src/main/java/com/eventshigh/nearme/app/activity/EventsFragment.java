@@ -13,6 +13,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.android.volley.Request;
 import com.android.volley.Request.Priority;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
@@ -36,9 +37,11 @@ import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -67,11 +70,17 @@ public class EventsFragment extends BaseEventsFragment {
 
     EventsCollection eventsCollection;
 
+    boolean isTodaySelected;
+
+
+    public static final String IS_TODAY_SELECTED = "is_today_selected";
+
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
-                                             boolean showCategories, boolean showEhInviteForNotification, SocialInvitationsRequest.SpecialCoupons special) {
+                                             boolean showCategories, boolean showEhInviteForNotification, SocialInvitationsRequest.SpecialCoupons special, boolean isTodaySelected) {
         EventsFragment fragment = new EventsFragment();
         Bundle args = getArgs(eventsContext, showFollowCard, showCategories);
         args.putBoolean(SHOW_EH_INVITE_NOTIFICATION_PARAM, showEhInviteForNotification);
+        args.putBoolean(IS_TODAY_SELECTED, isTodaySelected);
         args.putParcelable("special_obj", special);
         fragment.setArguments(args);
         return fragment;
@@ -81,6 +90,7 @@ public class EventsFragment extends BaseEventsFragment {
         super.onAttach(context);
 
         showEhInviteForNotification = getArguments().getBoolean(SHOW_EH_INVITE_NOTIFICATION_PARAM);
+        isTodaySelected = getArguments().getBoolean(IS_TODAY_SELECTED);
         if (onScrollListener == null) {
             onScrollListener = new HideActionBarOnScroll(this.activity);
         }
@@ -114,7 +124,7 @@ public class EventsFragment extends BaseEventsFragment {
             public void onRefresh() {
                 activity.reportActionToAnalytics("swipeRefresh", eventsContext.toString());
                 swipeRefreshLayout.setRefreshing(false);
-                fetchNewListing(true /* bypass cache*/);
+                fetchNewListing(true );// bypass cache
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
@@ -165,6 +175,7 @@ public class EventsFragment extends BaseEventsFragment {
 
     }
 
+
     @Override
     public void onStop() {
 
@@ -206,7 +217,16 @@ public class EventsFragment extends BaseEventsFragment {
         } else if (eventsContext.query.isEmpty() && !eventsContext.dateFilter.isEmpty() && showCategories) {
             DateCategoryRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, mMyEventsFetcherCallBack, mErrorListener);
-        }  else {
+        } else if (!eventsContext.query.isEmpty() && eventsContext.query.equalsIgnoreCase("today")) {
+            Calendar endDate = Calendar.getInstance();
+            endDate.setFirstDayOfWeek(Calendar.MONDAY);
+            endDate.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+            endDate.add(Calendar.DAY_OF_WEEK, 8);
+            String dateString = EventsContext.formatDateFilter(Calendar.getInstance()) + "," + EventsContext.formatDateFilter(endDate);
+            EventCollectionRequest.submit(activity, eventsContext, Request.Priority.IMMEDIATE, this, dateString,
+                    shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
+
+        } else {
 
             EventCollectionRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
@@ -360,7 +380,12 @@ public class EventsFragment extends BaseEventsFragment {
                 EventsFragment.this.eventsCollection = eventsCollection;
                 List<Event> filteredEvents = eventsCollection.events;
                 filteredEvents = filterEventsWithCategory(null, filteredEvents);
-                filteredEvents = filterEventsWithDate(filteredEvents, -1);
+                if (isTodaySelected) {
+                    filteredEvents = filterEventsWithDate(filteredEvents, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                } else {
+                    filteredEvents = filterEventsWithDate(filteredEvents, -1);
+                }
+
                 filteredEvents = filterEventsWithPrice(filteredEvents, -1);
                 eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
                 /*if (showFollowCard) {
@@ -431,6 +456,7 @@ public class EventsFragment extends BaseEventsFragment {
             if (filterCategoryName.size() > 0) {
                 for (int i = 0; i < allEvents.size(); i++) {
                     for (int j = 0; j < filterCategoryName.size(); j++) {
+
                         if (allEvents.get(i).tags.contains(filterCategoryName.get(j))) {
                             filteredEvents.add(allEvents.get(i));
                             break;
@@ -458,6 +484,7 @@ public class EventsFragment extends BaseEventsFragment {
 
 
     ArrayList<Long> filterEventTimes;
+
 
     public List<Event> filterEventsWithDate(List<Event> totalEvents, long... times) {
         List<Event> allEvents;

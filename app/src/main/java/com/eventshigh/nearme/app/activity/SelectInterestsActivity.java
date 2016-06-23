@@ -39,7 +39,7 @@ public class SelectInterestsActivity extends BaseActivity{
             EventCategory.LIVE_PERFORMANCES,
             EventCategory.FOOD,
             EventCategory.SPORTS,
-            EventCategory.WORKSHOP,
+            EventCategory.WORKSHOPS,
             EventCategory.HEALTH_WELLNESS,
             EventCategory.LITERATURE,
             EventCategory.KIDS_ENTERTAINMENT,
