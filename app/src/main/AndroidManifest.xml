@@ -269,6 +269,32 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar">
+
+            <!--<intent-filter
+                android:autoVerify="true"
+                tools:ignore="UnusedAttribute">
+                <data
+                    android:host="www.eventshigh.com"
+                    android:pathPrefix="/detail"
+                    android:scheme="https" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>-->
+
+            <meta-data
+                android:name="io.branch.sdk.auto_link_request_code"
+                android:value="@integer/EventsDetailDeepLink_code" />
+        </activity>
+        <activity
+            android:name=".activity.NewEventDetailActivity"
+            android:exported="true"
+            android:hardwareAccelerated="true"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar">
             <intent-filter
                 android:autoVerify="true"
                 tools:ignore="UnusedAttribute">

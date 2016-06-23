@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/event_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:padding="10dp"
+        android:text="Jashn-e-Mohit"
+        android:textColor="#262626"
+        android:textSize="20sp" />
+
+
+    <TextView
+        android:id="@+id/event_organizer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_orgnizer"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="Jashn-e-Mohit"
+        android:textColor="#575757"
+        android:textSize="14sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1a4d4d4d" />
+
+    <LinearLayout
+        android:id="@+id/event_time_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:background="@color/button_gray"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/event_time_first"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/event_time_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_gravity="center"
+                android:src="@drawable/calc_yellow"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/event_time"
+                style="@style/EHText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/event_time_icon"
+                android:textColor="#A3000000"
+                android:textIsSelectable="false"
+                android:transitionName="event_time"
+                tools:ignore="UnusedAttribute"
+                tools:text="Wed, 14 Jan at 9:30 AM" />
+
+            <TextView
+                android:id="@+id/event_time_details"
+                style="@style/EHText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/event_time"
+                android:layout_toEndOf="@+id/event_time_icon"
+                android:textColor="#999197A3"
+                android:textIsSelectable="false"
+                tools:text="2 days from now" />
+
+            <TextView
+                android:id="@+id/event_venue"
+                style="@style/EHText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/event_time_details"
+                android:layout_marginTop="4dp"
+                android:layout_toEndOf="@+id/event_time_icon"
+                android:drawableLeft="@drawable/ic_map_nav"
+                android:drawablePadding="4dp"
+                android:textColor="#999197A3"
+                android:textIsSelectable="false"
+                tools:text="2 days from now" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/also_on"
+            style="@style/EHButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:text="@string/ui_also_on"
+            android:textAllCaps="false"
+            android:textColor="#262626" />
+
+        <HorizontalScrollView
+            android:id="@+id/event_future_times_hs"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scrollbars="none"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/event_future_times"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:divider="@drawable/shape_vertical_divider"
+                android:orientation="horizontal"
+                android:showDividers="middle" />
+        </HorizontalScrollView>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1a4d4d4d" />
+
+    <WebView
+        android:id="@+id/event_description"
+        style="@style/EHText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:hardwareAccelerated="true"
+        android:textColor="#CC383F3F"
+        android:textIsSelectable="true" />
+
+    <LinearLayout
+        android:id="@+id/youtube_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" />
+
+    <LinearLayout
+        android:id="@+id/action_button_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/button_gray"
+        android:orientation="horizontal">
+
+
+        <TextView
+            android:id="@+id/btn_add_calender"
+            style="@style/EHDetailActionButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:drawableTop="@drawable/ic_add_cal"
+
+            android:text="@string/action_add_to_calender" />
+
+
+        <TextView
+            style="@style/EHDetailActionButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:drawableTop="@drawable/ic_queries"
+            android:text="@string/action_ama" />
+
+        <TextView
+            style="@style/EHDetailActionButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:drawableTop="@drawable/ic_call"
+            android:text="@string/action_call" />
+    </LinearLayout>
+
+    <com.eventshigh.nearme.app.view.ZCustomFlowLayout
+        android:id="@+id/category_flowlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:orientation="horizontal"
+        app:verticalSpacing="8dp"/>
+    <LinearLayout
+        android:id="@+id/ll_event_write_review"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/reviews_header"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/ui_reviews_text"
+            android:textAllCaps="true"
+            android:textColor="#CC383F3F"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/btn_add_review"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="Write A Review"
+            android:textColor="@color/twitter"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/review_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <include
+                android:id="@+id/review_card"
+                layout="@layout/card_user_movie_review"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/show_more_text"
+                style="@style/EHText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Show More"
+                android:textAllCaps="true"
+                android:textColor="#CC383F3F" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/no_review_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/no_review_text"
+                style="@style/EHText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Be the first one to write a review. Share your experience"
+                android:textColor="#CC383F3F"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/btn_add_review1"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:text="Write A Review"
+                android:textColor="@color/twitter"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+
+</LinearLayout>

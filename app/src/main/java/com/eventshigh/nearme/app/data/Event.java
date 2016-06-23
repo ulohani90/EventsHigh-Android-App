@@ -45,6 +45,8 @@ public class Event implements Parcelable {
 
     @Nullable
     public final String imgUrl;
+
+    public final ArrayList<String> allImages;
     @Nullable
     public final String sourceUrl;
     @Nullable
@@ -105,7 +107,7 @@ public class Event implements Parcelable {
 
     public Event(String id, City city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
-                 @Nullable String imgUrl, @Nullable String sourceUrl,
+                 @Nullable String imgUrl, ArrayList<String> allImages, @Nullable String sourceUrl,
                  @Nullable String bookingUrl, @Nullable String bookingText,
                  int numViews, int numSaves, boolean ehRecommended,
                  float uberScore, long[] eventTimings,
@@ -127,6 +129,7 @@ public class Event implements Parcelable {
         this.youtubeVideoId = Utils.checkIfUnknown(youtubeVideoId);
 
         this.imgUrl = Utils.checkIfUnknown(imgUrl);
+        this.allImages = allImages;
         this.sourceUrl = Utils.checkIfUnknown(sourceUrl);
         this.bookingUrl = Utils.checkIfUnknown(bookingUrl);
         this.bookingText = Utils.checkIfUnknown(bookingText);
@@ -179,6 +182,8 @@ public class Event implements Parcelable {
         this.youtubeVideoId = Utils.checkIfUnknown(in.readString());
 
         this.imgUrl = Utils.checkIfUnknown(in.readString());
+        allImages = new ArrayList<>();
+        in.readStringList(allImages);
         this.sourceUrl = Utils.checkIfUnknown(in.readString());
         this.bookingUrl = Utils.checkIfUnknown(in.readString());
         this.bookingText = Utils.checkIfUnknown(in.readString());
@@ -312,6 +317,7 @@ public class Event implements Parcelable {
         dest.writeString(emptyIfNull(youtubeVideoId));
 
         dest.writeString(emptyIfNull(imgUrl));
+        dest.writeStringList(allImages);
         dest.writeString(emptyIfNull(sourceUrl));
         dest.writeString(emptyIfNull(bookingUrl));
         dest.writeString(emptyIfNull(bookingText));
@@ -392,6 +398,14 @@ public class Event implements Parcelable {
             if ((source_url != null && source_url.toLowerCase().contains("eventviva")) ||
                     (img_url != null && img_url.endsWith("missing.png"))) {
                 img_url = null;
+            }
+
+            ArrayList<String> allImages = new ArrayList<>();
+            String allImageUrls = eventJson.optString("all_images");
+            if (allImageUrls != null && allImageUrls.length() > 0) {
+                for (String url : allImageUrls.split(",")) {
+                    allImages.add(url);
+                }
             }
 
             JSONObject stats = eventJson.optJSONObject("stats");
@@ -653,6 +667,7 @@ public class Event implements Parcelable {
                     youtubeId,
 
                     img_url,
+                    allImages,
                     source_url,
                     booking_url,
                     booking_text,

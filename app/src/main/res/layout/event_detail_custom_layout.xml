@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="64dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingTop="8dp">
+
+    <WebView
+        android:id="@+id/event_description"
+        style="@style/EHText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hardwareAccelerated="true"
+        android:textColor="#CC383F3F"
+        android:textIsSelectable="true" />
+</LinearLayout>

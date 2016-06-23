@@ -23,6 +23,7 @@
     <string name="action_direction">Directions</string>
     <string name="action_calendar">Calendar</string>
     <string name="action_ama">Enquiries</string>
+
     <string name="action_show_map">Show on map</string>
     <string name="action_check_out">Check out</string>
     <string name="action_settings">Settings</string>
@@ -33,6 +34,7 @@
     <string name="action_signup">Sign Up</string>
     <string name="action_submit">Submit</string>
     <string name="action_cancel">Cancel</string>
+    <string name="action_add_to_calender">Add to Calender</string>
 
     <!-- Menu items -->
     <string name="menu_edit_location">Change Location</string>
@@ -58,7 +60,7 @@
     <string name="ui_email">Email - </string>
     <string name="ui_phone">Phone - </string>
     <string name="ui_website">Website - </string>
-    <string name="ui_also_on">also on …</string>
+    <string name="ui_also_on">Also on …</string>
     <string name="ui_read_more">Read More …</string>
     <string name="ui_referrer_default">Like this app? Tell your friends!</string>
     <string name="ui_enter_phone_number_hint">Your Phone Number</string>
@@ -108,6 +110,7 @@
     <!-- Sharing -->
     <string name="action_share">Share</string>
     <string name="action_invite">Share App</string>
+    <string name="action_lets_go">Let\'s go</string>
     <string name="action_add_friend">Add Friends</string>
     <string name="share_event_text">Hey! Found a nice event on EventsHigh, check it out. Shall we go to this? Come on it’ll be fun!\n\n%1$s\n\n%2$s\n\n Use my referral code %3$s</string>
     <string name="share_event_twitter_text">[via @eventshighapp]\n%1$s\n\n%2$s\n\n Use my referral code %3$s</string>
@@ -211,7 +214,7 @@
 
 
     <string name="explore_ten_category_text">Here are 12 ways to think about your next outing!</string>
-    
+
     <!-- Error strings for Geofence-->
     <string name="not_connected">GoogleApiClient no yet connected. Try again.</string>
     <string name="geofence_not_available">Geofence service is not available now</string>
