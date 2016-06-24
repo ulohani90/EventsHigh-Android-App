@@ -25,6 +25,7 @@ import com.eventshigh.nearme.app.activity.NewEventDetailActivity;
 import com.eventshigh.nearme.app.activity.PointsBreakdownActivity;
 import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.activity.SelectInterestsActivity;
+import com.eventshigh.nearme.app.activity.WriteReviewActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.FriendsStore;
@@ -90,6 +91,10 @@ public class EHGcmListenerService extends GcmListenerService {
         String browseMovies = Utils.checkIfUnknown(msg.getString("browse_movies"));
         String movieId = Utils.checkIfUnknown(msg.getString("movie_id"));
 
+        String reviewFor = Utils.checkIfUnknown(msg.getString("review_for"));
+        String reviewEntityId = Utils.checkIfUnknown(msg.getString("review_entity_id"));
+        String reviewEntityImage = Utils.checkIfUnknown(msg.getString("review_entity_image"));
+        String reviewedEntity = Utils.checkIfUnknown(msg.getString("reviewed_entity"));
 
         UserContact contact = null;
         if (mobileNo != null) {
@@ -115,7 +120,7 @@ public class EHGcmListenerService extends GcmListenerService {
             message = message.replace("Your friend", contact.name);
         }
 
-        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null && referEarn == null && special == null && pointsBreakdown == null && browseMovies == null && movieId == null) {
+        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null && referEarn == null && special == null && pointsBreakdown == null && browseMovies == null && movieId == null && reviewFor == null) {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
             return null;
         }
@@ -217,7 +222,17 @@ public class EHGcmListenerService extends GcmListenerService {
             intent.putExtra(MovieDetailActivity.FROM_NOTIFICATION_PARAM, true);
             intent.putExtra(MovieDetailActivity.MOVIE_ID, Integer.parseInt(movieId));
             contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        } else {
+        }else if(reviewFor != null){
+            Intent intent = new Intent(this,WriteReviewActivity.class);
+            intent.setAction(BaseActivity.NOTIFICATION_ACTION + title);
+            intent.putExtra(WriteReviewActivity.FROM_NOTIFICATION_PARAM, true);
+            intent.putExtra(MovieDetailActivity.OBJECT_TYPE, reviewFor);
+            intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_ID,reviewEntityId);
+            intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_IMAGE,reviewEntityImage);
+            intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_NAME,reviewedEntity);
+            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+            imageUrl = reviewEntityImage;
+        }else{
             Intent intent = new Intent(this,
                     contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + title);

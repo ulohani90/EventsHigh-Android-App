@@ -158,7 +158,6 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
         account = new Account(this);
 
         //my_review
-
         btnAddReview = (TextView) findViewById(R.id.btn_add_review);
         llEventContainer = (LinearLayout) findViewById(R.id.event_container);
         btnAddReview.setOnClickListener(this);

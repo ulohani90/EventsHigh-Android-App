@@ -27,12 +27,14 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.MovieReviewSubmitRequest;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.maps.model.LatLng;
@@ -43,12 +45,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class UserProfileActivity extends BaseContextActivity implements View.OnClickListener{
+public class UserProfileActivity extends BaseContextActivity implements View.OnClickListener {
     CallbackManager callbackManager;
 
     public ArrayList<String> TABS;
-
-
     ImageView userImage;
     TextView userName;
     TextView userCity;
@@ -58,7 +58,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     UserProfilePagerAdapter userProfilePagerAdapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupLayout(R.layout.activity_user_profile);
         TABS = new ArrayList<>();
@@ -71,7 +71,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         addToolbarView();
 
         pager = (ViewPager) findViewById(R.id.view_pager);
-        userProfilePagerAdapter = new UserProfilePagerAdapter(getSupportFragmentManager(),this);
+        userProfilePagerAdapter = new UserProfilePagerAdapter(getSupportFragmentManager(), this);
         pager.setAdapter(userProfilePagerAdapter);
 
         tabsView = (TabLayout) findViewById(R.id.tabs);
@@ -90,73 +90,94 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         userImage = (ImageView) view.findViewById(R.id.profile_image);
         userName = (TextView) view.findViewById(R.id.profile_user_name);
         userCity = (TextView) view.findViewById(R.id.profile_user_city);
-        userInterestCount = (TextView)view.findViewById(R.id.user_interest_count);
-        userFavouriteCount = (TextView)view.findViewById(R.id.user_favourite_count);
-        userFollowerCount = (TextView)view.findViewById(R.id.user_follower_count);
+        userInterestCount = (TextView) view.findViewById(R.id.user_interest_count);
+        userFavouriteCount = (TextView) view.findViewById(R.id.user_favourite_count);
+        userFollowerCount = (TextView) view.findViewById(R.id.user_follower_count);
         toolbar.addView(view);
         toolbar.setBackgroundColor(Color.TRANSPARENT);
     }
 
 
     @Override
-    public void onClick(View v){
+    public void onClick(View v) {
         switch (v.getId()) {
         }
     }
 
+    LoginResult loginResult;
 
-    void fbLoginButtonPressed(){
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends"));
+    void fbLoginButtonPressed() {
+        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends", "read_custom_friendlists"));
         callbackManager = CallbackManager.Factory.create();
 
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
-            public void onSuccess(LoginResult loginResult) {
-                requestUserProfile(loginResult);
+            public void onSuccess(LoginResult loginRes) {
+                loginResult = loginRes;
+                requestUserProfile();
             }
+
             @Override
             public void onCancel() {
                 Toast.makeText(getBaseContext(), "Login Cancelled", Toast.LENGTH_SHORT).show();
             }
+
             @Override
-            public void onError(FacebookException e){
-                Log.e("Problem conn fb",e.toString());
-                Toast.makeText(getBaseContext(), "Problem connecting to Facebook" , Toast.LENGTH_SHORT).show();
+            public void onError(FacebookException e) {
+                Log.e("Problem conn fb", e.toString());
+                Toast.makeText(getBaseContext(), "Problem connecting to Facebook", Toast.LENGTH_SHORT).show();
             }
         });
 
     }
+    void requestUserProfile() {
+        System.out.println("onSuccess");
+        String accessToken = loginResult.getAccessToken().getToken();
+        Log.i("accessToken", accessToken);
 
-    void requestUserProfile(LoginResult loginResult){
-                System.out.println("onSuccess");
-                String accessToken = loginResult.getAccessToken().getToken();
-                Log.i("accessToken", accessToken);
+        GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
 
-                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+            @Override
+            public void onCompleted(JSONObject object, GraphResponse response) {
+                Log.i("LoginActivity", response.toString());
+                // Get facebook data from login
+                try {
+                    String userID = object.getString("id");
+                    fetchFriends(userID);
+                    object.remove("id");
+                    object.put("profile_pic", "https://graph.facebook.com/" + userID + "/picture?type=large");
 
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        Log.i("LoginActivity", response.toString());
-                        // Get facebook data from login
-                        try {
-                            String userID = object.getString("id");
-                            object.remove("id");
-                            object.put("profile_pic","https://graph.facebook.com/" + userID + "/picture?type=large");
-                        }catch (JSONException e){
-                            Log.e("User Profile","JSON Exception");
-                        }
-                        //tv1.setText(object.toString());
-                        Log.e("obj ",object.toString());
-                     }
-            });
-            Bundle parameters = new Bundle();
-            parameters.putString("fields", "name, email"); // Parámetros que pedimos a facebook
-            request.setParameters(parameters);
-            request.executeAsync();
+                } catch (JSONException e) {
+                    Log.e("User Profile", "JSON Exception");
+                }
+                //tv1.setText(object.toString());
+                Log.e("obj ", object.toString());
+            }
+        });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "name, email"); // Parámetros que pedimos a facebook
+        request.setParameters(parameters);
+        request.executeAsync();
 
     }
 
-    public void placeReviewAction(final JSONObject data){
+    void fetchFriends(String userId){
+        Bundle param = new Bundle();
+        param.putString("fields", "id");
+        param.putInt("limit", 100);
+
+        /* make the API call */
+        GraphRequest req = new GraphRequest(loginResult.getAccessToken(), "/"+userId+"/friendlists", null
+                ,HttpMethod.GET,new GraphRequest.Callback(){
+            public void onCompleted(GraphResponse response) {
+                    /* handle the result */
+            }
+        }
+        );
+        req.executeAsync();
+    }
+
+    public void placeReviewAction(final JSONObject data) {
         MovieReviewSubmitRequest.submit(this,
                 data, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
                     @Override
@@ -182,29 +203,30 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     EventsFragment myFavouritesFragment;
     EventsFragment myInterestEventsFragment;
 
-    public class UserProfilePagerAdapter extends FragmentStatePagerAdapter{
+    public class UserProfilePagerAdapter extends FragmentStatePagerAdapter {
         private Context context;
-        public UserProfilePagerAdapter(FragmentManager fragmentManager, Context context){
+
+        public UserProfilePagerAdapter(FragmentManager fragmentManager, Context context) {
             super(fragmentManager);
             this.context = context;
         }
 
         @Override
-        public Fragment getItem(int position){
-            if(position == 0){
+        public Fragment getItem(int position) {
+            if (position == 0) {
                 LatLng latLng = (new Account(context)).getLastCity().cityBounds.getCenter();
-                EventsContext myEventsContext = new EventsContext(latLng,EventsHighEndpoints.QUERY_MY_EVENT);
-                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null,false);
+                EventsContext myEventsContext = new EventsContext(latLng, EventsHighEndpoints.QUERY_MY_EVENT);
+                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null, false);
                 return myFavouritesFragment;
-            }else  if(position == 1){
+            } else if (position == 1) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_INTEREST_EVENTS);
-                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null,false);
+                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false);
                 return myInterestEventsFragment;
-            }else if(position == 2){
+            } else if (position == 2) {
                 ContactsFragment fragment = new ContactsFragment();
                 return fragment;
-            }else{
+            } else {
                 MyTicketsFragment myTicketsFragment = new MyTicketsFragment();
                 return myTicketsFragment;
             }

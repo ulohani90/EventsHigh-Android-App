@@ -58,7 +58,6 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
     private static String JSON_KEY_REVIEW_RATINGS = "ratings";
     private static String JSON_KEY_CITY = "reviewed_entity_city";
 
-    AppCompatActivity mAppCompatActivity;
     EditText etWriteReviewDescription;
     TextView btnReviewSubmit;
     CircularImageView ivMoviePicture;
@@ -108,6 +107,13 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
             tvMovieName.setText(writeReviewActivity.event.title);
         }
 
+        if (writeReviewActivity.isFromNotification){
+            Glide.with(writeReviewActivity).load(writeReviewActivity.reviewEntityImage)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                    .into(ivMoviePicture);
+            tvMovieName.setText(writeReviewActivity.reviewEntityName);
+        }
 
         writeReviewActivity.movie_rated =
                 (int) writeReviewActivity.writeReviewRatingFragment.rbMovieRating.getRating();
@@ -122,11 +128,7 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
         switch (v.getId()) {
             case R.id.btn_write_review:
                 if (etWriteReviewDescription != null && etWriteReviewDescription.getText() != null && etWriteReviewDescription.getText().toString().length() > 0) {
-                    if (writeReviewActivity.type.equals("movie")) {
-                        placeReviewActionIfMovie();
-                    } else {
-                        placeReviewActionIfEvent();
-                    }
+                    placeReviewAction();
                 } else {
                     showNoDescDialog();
                 }
@@ -147,11 +149,7 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
                     @Override
 
                     public void onClick(DialogInterface dialog, int which) {
-                        if (writeReviewActivity.type.equals("movie")) {
-                            placeReviewActionIfMovie();
-                        } else {
-                            placeReviewActionIfEvent();
-                        }
+                        placeReviewAction();
                     }
                 })
                 .setCancelable(true)
@@ -165,13 +163,19 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
     }
 
 
-    public void placeReviewActionIfMovie() {
+    public void placeReviewAction() {
         try {
             final JSONObject jsonObject = new JSONObject();
-            jsonObject.put(JSON_KEY_REVIEWER_ID, (new Account(writeReviewActivity)).getUserInfo().phoneNo);
-            jsonObject.put(JSON_KEY_REVIEW_FOR, "movie");
-            jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.movieDetailObject.getMovieInfo().getId() + "");
+            if (writeReviewActivity.isFromNotification) {
+                jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.reviewEntityId);
+            } else if (writeReviewActivity.type.equals("movie")) {
+                jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.movieDetailObject.getMovieInfo().getId());
+            } else if (writeReviewActivity.type.equals("event")) {
+                jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.event.id);
+            }
+            jsonObject.put(JSON_KEY_REVIEW_FOR, writeReviewActivity.type);
             jsonObject.put(JSON_KEY_REVIEW_ENTITY, tvMovieName.getText().toString());
+            jsonObject.put(JSON_KEY_REVIEWER_ID, (new Account(writeReviewActivity)).getUserInfo().phoneNo);
             jsonObject.put(JSON_KEY_REVIEW_RATINGS, (int) rbMovieRating.getRating());
             jsonObject.put(JSON_KEY_REVIEW_TEXT, etWriteReviewDescription.getText().toString());
             jsonObject.put(JSON_KEY_REVIEW_BY, (new Account(writeReviewActivity)).getUserInfo().name);
@@ -180,7 +184,7 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
             jsonObject.put(JSON_KEY_REVIEW_DEVICE_ID, Settings.Secure.getString
                     (getContext().getContentResolver(), Settings.Secure.ANDROID_ID));
 
-            progress = ProgressDialog.show(getActivity(), null, "Submitting Review.Please Wait...");
+            progress = ProgressDialog.show(getActivity(), null, "Submitting Review. Please Wait...");
             MovieReviewSubmitRequest.submit(writeReviewActivity,
                     jsonObject, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
                         @Override
@@ -202,49 +206,7 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
                             Log.i("Message failure", "true" + jsonObject.toString());
                         }
                     });
-        } catch (JSONException e) {
-            Crashlytics.getInstance().core.logException(e);
-        }
-    }
-
-    public void placeReviewActionIfEvent() {
-        try {
-            final JSONObject jsonObject = new JSONObject();
-            jsonObject.put(JSON_KEY_REVIEWER_ID, (new Account(writeReviewActivity)).getUserInfo().phoneNo);
-            jsonObject.put(JSON_KEY_REVIEW_FOR, "event");
-            jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.event.id + "");
-            jsonObject.put(JSON_KEY_REVIEW_ENTITY, tvMovieName.getText().toString());
-            jsonObject.put(JSON_KEY_REVIEW_RATINGS, (int) rbMovieRating.getRating());
-            jsonObject.put(JSON_KEY_REVIEW_TEXT, etWriteReviewDescription.getText().toString());
-            jsonObject.put(JSON_KEY_REVIEW_BY, (new Account(writeReviewActivity)).getUserInfo().name);
-            jsonObject.put(JSON_KEY_CITY, (new Account(writeReviewActivity)).getLastCity().name());
-            jsonObject.put(JSON_KEY_REVIEW_PLATFORM, "android");
-            jsonObject.put(JSON_KEY_REVIEW_DEVICE_ID, Settings.Secure.getString
-                    (getContext().getContentResolver(), Settings.Secure.ANDROID_ID));
-
-            progress = ProgressDialog.show(getActivity(), null, "Submitting Review.Please Wait...");
-            MovieReviewSubmitRequest.submit(writeReviewActivity,
-                    jsonObject, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject jsonObject, boolean b) {
-                            if (getActivity() != null) {
-                                if (progress != null)
-                                    progress.dismiss();
-                                Preferences.getInstance(getActivity()).setIsReviewAdded(true);
-                                Log.i("Message Success", "true");
-                                Toast.makeText(getActivity(), "Your review has been added successfully", Toast.LENGTH_SHORT).show();
-                                closeParentActivity();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            if (progress != null)
-                                progress.dismiss();
-                            Log.i("Message failure", "true" + jsonObject.toString());
-                        }
-                    });
-        } catch (JSONException e) {
+        } catch (JSONException e){
             Crashlytics.getInstance().core.logException(e);
         }
     }

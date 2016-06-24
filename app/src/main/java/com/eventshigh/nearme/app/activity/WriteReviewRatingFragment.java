@@ -49,23 +49,33 @@ public class WriteReviewRatingFragment extends Fragment {
         rbMovieRating.setOnTouchListener(writeReviewActivity);
         ivMoviePicture = (ImageView) rootView.findViewById(R.id.iv_write_review_movie_pic);
         ratingHeaderText = (TextView) rootView.findViewById(R.id.rate_header);
-        if (writeReviewActivity.type.equals("movie")) {
 
-            if (writeReviewActivity.movieDetailObject != null) {
-                tvMovieName.setText(writeReviewActivity.movieDetailObject.getMovieInfo().getName());
-                Glide.with(this).load(writeReviewActivity.movieDetailObject.getMovieInfo().getImg_url())
+        if (writeReviewActivity.isFromNotification){
+                tvMovieName.setText(writeReviewActivity.reviewEntityName);
+                Glide.with(this).load(writeReviewActivity.reviewEntityImage)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                            .into(ivMoviePicture);
+                ratingHeaderText.setText("Please rate the Movie!");
+        }else{
+            if (writeReviewActivity.type.equals("movie")) {
+
+                if (writeReviewActivity.movieDetailObject != null) {
+                    tvMovieName.setText(writeReviewActivity.movieDetailObject.getMovieInfo().getName());
+                    Glide.with(this).load(writeReviewActivity.movieDetailObject.getMovieInfo().getImg_url())
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                            .into(ivMoviePicture);
+                }
+                ratingHeaderText.setText("Please rate the Movie!");
+            } else {
+                tvMovieName.setText(writeReviewActivity.event.title);
+                Glide.with(this).load(writeReviewActivity.event.imgUrl)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                         .into(ivMoviePicture);
+                ratingHeaderText.setText("Please rate the Event!");
             }
-            ratingHeaderText.setText("Please rate the Movie!");
-        } else {
-            tvMovieName.setText(writeReviewActivity.event.title);
-            Glide.with(this).load(writeReviewActivity.event.imgUrl)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
-                    .into(ivMoviePicture);
-            ratingHeaderText.setText("Please rate the Event!");
         }
 
         return rootView;

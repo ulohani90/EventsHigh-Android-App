@@ -114,7 +114,7 @@ public class EHNotification {
                         null, imageBitmapFuture);
                 VolleyHelper.addToRequestQueue(context, request);
                 bitmap = imageBitmapFuture.get();
-            } catch (Exception e) {
+            } catch (Exception e){
                 Crashlytics.getInstance().core.logException(e);
             }
         }
