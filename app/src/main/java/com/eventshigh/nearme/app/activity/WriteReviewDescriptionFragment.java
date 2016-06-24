@@ -83,7 +83,7 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_write_review_description, container, false);
-
+        rootView.findViewById(R.id.toolbar).setVisibility(View.GONE);
         ivMoviePicture = (CircularImageView) rootView.findViewById(R.id.civ_movie_pic);
         tvMovieName = (TextView) rootView.findViewById(R.id.tv_write_review_description_movie_name);
         rbMovieRating = (RatingBar) rootView.findViewById(R.id.rb_write_rating_description);

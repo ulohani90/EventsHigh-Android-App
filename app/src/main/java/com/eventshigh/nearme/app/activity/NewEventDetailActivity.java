@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -55,6 +56,7 @@ import com.eventshigh.nearme.app.view.SmartViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
@@ -339,16 +341,21 @@ public class NewEventDetailActivity extends BaseContextActivity {
         });
 
         statsView = (TextView) findViewById(R.id.event_stats);
-        if (event.numViews > 5) {
+       /* if (event.numViews > 5) {
+            int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics());
+            ((ImageView) findViewById(R.id.img1)).setImageDrawable(UserContact.getDrawableForName(String.valueOf(getRandomCharacter()), size));
+            ((ImageView) findViewById(R.id.img2)).setImageDrawable(UserContact.getDrawableForName(String.valueOf(getRandomCharacter()), size));
             ((View) statsView.getParent()).setVisibility(View.VISIBLE);
             statsView.setVisibility(View.VISIBLE);
         } else {
+            ((ImageView) findViewById(R.id.img1)).setVisibility(View.GONE);
+            ((ImageView) findViewById(R.id.img2)).setVisibility(View.GONE);
             ((View) statsView.getParent()).setVisibility(View.GONE);
             statsView.setVisibility(View.GONE);
         }
 
-        statsView.setText("" + event.numViews + " views");
-
+        statsView.setText(" and " + event.numViews + " more viewed this");
+*/
         bookView.setVisibility(event.bookingUrl != null && event.bookingUrl.length() > 0 ? View.VISIBLE : View.GONE);
         if (event.bookingText != null) {
             bookView.setText(event.bookingText);
@@ -404,11 +411,15 @@ public class NewEventDetailActivity extends BaseContextActivity {
         viewPager.setAdapter(adapter);
 
         TabLayout tabsView = (TabLayout) findViewById(R.id.tabs);
-        tabsView.setVisibility(View.VISIBLE);
-        tabsView.setTabGravity(TabLayout.GRAVITY_FILL);
-        tabsView.setTabMode(TabLayout.MODE_SCROLLABLE);
-        tabsView.setupWithViewPager(viewPager);
-        tabsView.setScrollPosition(0, 0, true);
+        if (TABS.size() > 1) {
+            tabsView.setVisibility(View.VISIBLE);
+            tabsView.setTabGravity(TabLayout.GRAVITY_FILL);
+            tabsView.setTabMode(TabLayout.MODE_SCROLLABLE);
+            tabsView.setupWithViewPager(viewPager);
+            tabsView.setScrollPosition(0, 0, true);
+        } else {
+            tabsView.setVisibility(View.GONE);
+        }
 // Show social data.
         SocialActionsRequest.submit(this, Request.Priority.LOW, this, false,
                 new Response.Listener<SocialActionsRequest.SocialActions>() {
@@ -417,9 +428,38 @@ public class NewEventDetailActivity extends BaseContextActivity {
                         Set<SocialFriend> likedBy = socialActions.eventFavourites.get(event.id);
                         reportActionToAnalytics("showSocialInfo", "likes",
                                 likedBy == null ? 0 : likedBy.size());
-                        ((ContactListView) findViewById(R.id.followed_by)).setVisibility(View.VISIBLE);
-                        ((ContactListView) findViewById(R.id.followed_by)).setFollowers(
-                                NewEventDetailActivity.this, likedBy);
+                        if (likedBy != null && likedBy.size() > 0) {
+                            ((ImageView) findViewById(R.id.img1)).setVisibility(View.GONE);
+                            ((ImageView) findViewById(R.id.img2)).setVisibility(View.GONE);
+                            ((ContactListView) findViewById(R.id.followed_by)).setVisibility(View.VISIBLE);
+                            ((ContactListView) findViewById(R.id.followed_by)).setFollowers(
+                                    NewEventDetailActivity.this, likedBy);
+                            StringBuilder builder = new StringBuilder();
+                            int pos = 0;
+                            for (SocialFriend socialFriend : likedBy) {
+                                if (pos > 0) {
+                                    break;
+                                }
+                                builder.append(socialFriend.getName());
+                                pos++;
+                            }
+                            if (builder.length() > 0) {
+                                builder.append(" and ");
+                            }
+                            builder.append(event.numViews + "+ people interested");
+                            statsView.setText(builder.toString());
+                        } else {
+                            ((ImageView) findViewById(R.id.img1)).setVisibility(View.VISIBLE);
+                            ((ImageView) findViewById(R.id.img2)).setVisibility(View.VISIBLE);
+                            ((ImageView) findViewById(R.id.img1)).setImageResource(getDummyImageResource());
+                            ((ImageView) findViewById(R.id.img2)).setImageResource(getDummyImageResource());
+                            StringBuilder builder = new StringBuilder();
+                            builder.append(event.numViews + "+ people interested");
+                            statsView.setText(builder.toString());
+                        }
+
+                        ((View) statsView.getParent()).setVisibility(View.VISIBLE);
+                        statsView.setVisibility(View.VISIBLE);
                     }
                 },
                 new Response.ErrorListener() {
@@ -429,7 +469,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                     }
                 }
         );
-        SocialInvitationsRequest.submit(this, Request.Priority.LOW, this, false,
+        /*SocialInvitationsRequest.submit(this, Request.Priority.LOW, this, false,
                 new Response.Listener<SocialInvitationsRequest.CommonInviteObject>() {
                     @Override
                     public void onResponse(SocialInvitationsRequest.CommonInviteObject commonInviteObject, boolean isIntermediate) {
@@ -460,9 +500,21 @@ public class NewEventDetailActivity extends BaseContextActivity {
                         VolleyHelper.log(NewEventDetailActivity.this, volleyError);
                     }
                 }
-        );
+        );*/
 
     }
+
+
+    public char getRandomCharacter() {
+        final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        final int N = alphabet.length();
+        Random r = new Random();
+        for (int i = 0; i < 50; i++) {
+            return alphabet.charAt(r.nextInt(N));
+        }
+        return 'P';
+    }
+
 
     public void openBookingSite(View view) {
         Account account = new Account(this);
@@ -658,5 +710,55 @@ public class NewEventDetailActivity extends BaseContextActivity {
         eventsMarkerEditor.close();
     }
 
+    public int getDummyImageResource() {
+        Random random = new Random();
+        int num = random.nextInt(20 - 1 + 1) + 1;
+        switch (num) {
+            case 1:
+                return R.drawable.ic_dummy_1;
+            case 2:
+                return R.drawable.ic_dummy_2;
+            case 3:
+                return R.drawable.ic_dummy_3;
+            case 4:
+                return R.drawable.ic_dummy_4;
+            case 5:
+                return R.drawable.ic_dummy_5;
+            case 6:
+                return R.drawable.ic_dummy_6;
+            case 7:
+                return R.drawable.ic_dummy_7;
+            case 8:
+                return R.drawable.ic_dummy_8;
+            case 9:
+                return R.drawable.ic_dummy_9;
+            case 10:
+                return R.drawable.ic_dummy_10;
+            case 11:
+                return R.drawable.ic_dummy_11;
+            case 12:
+                return R.drawable.ic_dummy_12;
+            case 13:
+                return R.drawable.ic_dummy_13;
+            case 14:
+                return R.drawable.ic_dummy_14;
+            case 15:
+                return R.drawable.ic_dummy_15;
+            case 16:
+                return R.drawable.ic_dummy_16;
+            case 17:
+                return R.drawable.ic_dummy_17;
+            case 18:
+                return R.drawable.ic_dummy_18;
+            case 19:
+                return R.drawable.ic_dummy_19;
+            case 20:
+                return R.drawable.ic_dummy_20;
+            default:
+                return R.drawable.ic_dummy_5;
+
+
+        }
+    }
 
 }

@@ -15,7 +15,7 @@
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
         android:text="Jashn-e-Mohit"
-        android:textColor="#262626"
+        android:textColor="#333333"
         android:textSize="20sp" />
 
 
@@ -74,31 +74,15 @@
                 android:textIsSelectable="false"
                 tools:text="2 days from now" />
 
-            <TextView
-                android:id="@+id/event_venue"
-                style="@style/EHText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/event_time_details"
-                android:layout_marginTop="4dp"
-                android:layout_toEndOf="@+id/event_time_icon"
-                android:drawableLeft="@drawable/ic_map_nav"
-                android:drawablePadding="4dp"
-                android:textColor="#999197A3"
-                android:textIsSelectable="false"
-                tools:text="2 days from now" />
         </RelativeLayout>
 
         <TextView
             android:id="@+id/also_on"
-
-            android:layout_width="wrap_content"
+            android:layout_width="76dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:background="@drawable/eh_button"
             android:gravity="center"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
             android:text="@string/ui_also_on"
             android:textAllCaps="false"
             android:textColor="#262626" />
@@ -106,14 +90,11 @@
         <TextView
             android:id="@+id/btn_add_calender"
             style="@style/EHDetailActionButton"
-            android:layout_width="wrap_content"
+            android:layout_width="96dp"
             android:layout_height="wrap_content"
             android:clickable="true"
             android:drawableTop="@drawable/ic_add_cal"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
             android:text="@string/action_add_to_calender"
-
             android:textSize="12sp" />
 
         <HorizontalScrollView
@@ -151,7 +132,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="3"
             android:orientation="vertical"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
@@ -190,29 +171,27 @@
                 android:layout_marginTop="5dp"
                 android:background="#f0f0f0" />
 
-            <TextView
-                android:id="@+id/event_travel_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="36dp"
-                android:layout_marginTop="5dp"
-                android:drawableLeft="@drawable/ic_route"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="10 min"
-                android:textColor="#353535"
-                android:textSize="12sp" />
+
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/event_travel_time"
+            android:layout_width="76dp"
+            android:layout_height="wrap_content"
+            android:drawablePadding="5dp"
+            android:drawableTop="@drawable/ic_route"
+            android:gravity="center"
+            android:text="10 min"
+            android:textColor="#353535"
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/btn_direction"
             style="@style/EHDetailActionButton"
-            android:layout_width="wrap_content"
+            android:layout_width="96dp"
             android:layout_height="wrap_content"
             android:clickable="true"
             android:drawableTop="@drawable/ic_nav"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
             android:text="@string/action_direction"
             android:textSize="12sp" />
 
@@ -234,7 +213,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_weight="1"
+            android:layout_weight="4.3"
             android:drawableLeft="@drawable/ic_orgnizer"
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
@@ -243,27 +222,28 @@
             android:textColor="#575757"
             android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/btn_enquiry"
-            style="@style/EHDetailActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:drawableTop="@drawable/ic_queries"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="@string/action_ama" />
+        <FrameLayout
+            android:layout_width="96dp"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/btn_call_organizer"
-            style="@style/EHDetailActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:drawableTop="@drawable/ic_call"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="@string/action_call" />
+            <TextView
+                android:id="@+id/btn_enquiry"
+                style="@style/EHDetailActionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:drawableTop="@drawable/ic_queries"
+                android:text="@string/action_ama" />
+
+            <TextView
+                android:id="@+id/btn_call_organizer"
+                style="@style/EHDetailActionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:drawableTop="@drawable/ic_call"
+                android:text="@string/action_call" />
+        </FrameLayout>
     </LinearLayout>
 
     <WebView
@@ -338,31 +318,6 @@
         app:verticalSpacing="8dp" />
 
     <TextView
-        android:id="@+id/locality_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:clickable="true"
-        android:fontFamily="sans-serif-medium"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingTop="8dp"
-        android:text="Locality"
-        android:textAllCaps="true"
-        android:textColor="#CC383F3F"
-        android:textSize="14sp" />
-
-
-    <com.eventshigh.nearme.app.view.ZCustomFlowLayout
-        android:id="@+id/locality_flowlayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        app:horizontalSpacing="8dp"
-        app:orientation="horizontal"
-        app:verticalSpacing="8dp" />
-
-    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -404,8 +359,8 @@
             android:layout_marginRight="8dp"
             android:fontFamily="sans-serif-medium"
             android:text="@string/ui_reviews_text"
-            android:textColor="#CC383F3F"
             android:textAllCaps="true"
+            android:textColor="#CC383F3F"
             android:textSize="14sp" />
 
         <TextView

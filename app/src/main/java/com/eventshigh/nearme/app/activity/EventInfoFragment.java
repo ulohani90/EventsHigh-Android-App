@@ -51,6 +51,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * Created by umesh on 17/06/16.
@@ -64,12 +65,12 @@ public class EventInfoFragment extends Fragment {
     }
 
     TextView eventName;
-    TextView eventOrganizer, eventTime, timeDetails, venueView, addressView, travelTimeView, alsoOnView, addToCalender;
+    TextView eventOrganizer, eventTime, timeDetails, addressView, travelTimeView, alsoOnView, addToCalender;
     HorizontalScrollView futureTimesViewGroup;
     LinearLayout futureTimesView, youtubeFragment;
     WebView descriptionView;
     View timeGroupView, eventTimeFirstView;
-    ZCustomFlowLayout performersFlowLayout, venueFlowLayout, categoriesFlowLayout, localityFlowLayout;
+    ZCustomFlowLayout performersFlowLayout, venueFlowLayout, categoriesFlowLayout;
     View view;
     View enquiryBtn, callOrganizer, directionLayout, mapDirection;
 
@@ -80,7 +81,7 @@ public class EventInfoFragment extends Fragment {
 
     Account account;
 
-    View venueHeader, localityHeader, performersHeader;
+    View venueHeader, performersHeader;
 
     TextView ratingHeader, reviewsCount;
 
@@ -93,7 +94,7 @@ public class EventInfoFragment extends Fragment {
         eventOrganizer = (TextView) view.findViewById(R.id.event_organizer);
         eventTime = (TextView) view.findViewById(R.id.event_time);
         timeDetails = (TextView) view.findViewById(R.id.event_time_details);
-        venueView = (TextView) view.findViewById(R.id.event_venue);
+
         alsoOnView = (TextView) view.findViewById(R.id.also_on);
         futureTimesViewGroup = (HorizontalScrollView) view.findViewById(R.id.event_future_times_hs);
         futureTimesView = (LinearLayout) view.findViewById(R.id.event_future_times);
@@ -107,9 +108,7 @@ public class EventInfoFragment extends Fragment {
         categoriesFlowLayout = (ZCustomFlowLayout) view.findViewById(R.id.category_flowlayout);
         performersFlowLayout = (ZCustomFlowLayout) view.findViewById(R.id.performer_flowlayout);
         venueFlowLayout = (ZCustomFlowLayout) view.findViewById(R.id.venue_flowlayout);
-        localityFlowLayout = (ZCustomFlowLayout) view.findViewById(R.id.locality_flowlayout);
         venueHeader = view.findViewById(R.id.venue_header);
-        localityHeader = view.findViewById(R.id.locality_header);
         performersHeader = view.findViewById(R.id.performers_header);
 
         enquiryBtn = view.findViewById(R.id.btn_enquiry);
@@ -215,10 +214,9 @@ public class EventInfoFragment extends Fragment {
                     }
                 });
             } else {
-                alsoOnView.setVisibility(View.GONE);
+                alsoOnView.setVisibility(View.INVISIBLE);
             }
         }
-        venueView.setText(event.venue);
         eventTimeFirstView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -257,20 +255,12 @@ public class EventInfoFragment extends Fragment {
             venueHeader.setVisibility(View.VISIBLE);
             ArrayList<String> venueList = new ArrayList<>();
             venueList.add(event.venue);
+            if (event.locality != null)
+                venueList.add(event.locality);
             venueFlowLayout.setRecipientForEventCategories((BaseContextActivity) getActivity(), new Account(getActivity()), venueList, event, "venueAsTag");
         } else {
             venueFlowLayout.setVisibility(View.GONE);
             venueHeader.setVisibility(View.GONE);
-        }
-        if (event.locality != null) {
-            localityFlowLayout.setVisibility(View.VISIBLE);
-            localityHeader.setVisibility(View.VISIBLE);
-            ArrayList<String> localityList = new ArrayList<>();
-            localityList.add(event.locality);
-            localityFlowLayout.setRecipientForEventCategories((BaseContextActivity) getActivity(), new Account(getActivity()), localityList, event, "localityAsTag");
-        } else {
-            localityFlowLayout.setVisibility(View.GONE);
-            localityHeader.setVisibility(View.GONE);
         }
 
         categoriesFlowLayout.setRecipientForEventCategories((BaseContextActivity) getActivity(), new Account(getActivity()), event.tags, event, "tagClick");
@@ -284,6 +274,7 @@ public class EventInfoFragment extends Fragment {
         if (event.organizerPhone != null) {
             enquiryBtn.setVisibility(View.GONE);
             callOrganizer.setVisibility(View.VISIBLE);
+
             callOrganizer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

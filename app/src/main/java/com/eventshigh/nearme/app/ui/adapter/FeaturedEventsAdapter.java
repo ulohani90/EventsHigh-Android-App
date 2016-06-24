@@ -21,7 +21,7 @@ public class FeaturedEventsAdapter extends PagerAdapter {
 
     private final EventPagerData eventPagerData;
 
-    public static final String BANNER_IMAGE_URL = "https://assets.eventshigh.com/banner.jpg";
+    public static final String BANNER_IMAGE_URL = "https://assets.eventshigh.com/banner_new.jpg";
 
     public FeaturedEventsAdapter(EventPagerData eventPagerData) {
         this.eventPagerData = eventPagerData;
@@ -54,14 +54,14 @@ public class FeaturedEventsAdapter extends PagerAdapter {
             Glide.with(eventPagerData.activity).load(BANNER_IMAGE_URL).placeholder(R.drawable.eh_default_event)
                     .crossFade().centerCrop()
                     .into(banner);
-            view.setOnClickListener(new OnClickListener() {
+           /* view.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     eventPagerData.activity.reportActionToAnalytics("headerreferralclick");
                     Intent intent = new Intent(eventPagerData.activity, ReferralActivity.class);
                     eventPagerData.activity.startActivity(intent);
                 }
-            });
+            });*/
             container.addView(view);
             return view;
         }

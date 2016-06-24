@@ -88,31 +88,59 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
+                    <com.eventshigh.nearme.app.view.ContactListView
+                        android:id="@+id/followed_by"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:paddingBottom="18dp"
+                        android:paddingLeft="18dp"
+                        android:paddingRight="8dp"
+                        android:clipChildren="false"
+                        android:paddingTop="18dp"
+                        android:visibility="gone"
+                        app:contactPhotoSize="28dp"
+                        app:contactPosition="start" />
+
+                    <com.eventshigh.nearme.app.view.CircularImageView
+                        android:id="@+id/img1"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="10dp"
+                        android:scaleType="centerInside"
+                        app:border="true"
+                        app:border_color="@android:color/white"
+                        app:border_width="1dp" />
+
+                    <com.eventshigh.nearme.app.view.CircularImageView
+                        android:id="@+id/img2"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="-10dp"
+                        android:scaleType="centerInside"
+                        app:border="true"
+                        app:border_color="@android:color/white"
+                        app:border_width="1dp" />
+
                     <TextView
                         android:id="@+id/event_stats"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_margin="18dp"
+                        android:layout_marginBottom="18dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="18dp"
+                        android:layout_marginTop="18dp"
                         android:drawablePadding="4dp"
-                        android:drawableStart="@drawable/ic_person_black_18dp"
+                        android:fontFamily="sans-serif-medium"
                         android:gravity="center"
                         android:textIsSelectable="false"
-                        android:textStyle="bold"
                         android:visibility="gone"
                         tools:text="1049 views, 23 favourited" />
 
-                    <com.eventshigh.nearme.app.view.ContactListView
-                        android:id="@+id/followed_by"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:padding="18dp"
-                        android:visibility="gone"
-                        app:contactPhotoSize="24dp"
-                        app:contactPosition="start"
-                        app:text=" ♥ (like) this." />
+
                 </LinearLayout>
 
                 <!-- Invitations -->
@@ -134,7 +162,7 @@
                     android:id="@+id/tabs"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/abc_action_bar_default_height_material"
-                    android:background="#E3E4E5"
+                    android:background="#eceef0"
                     android:elevation="0dp"
                     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     android:visibility="gone"

@@ -135,7 +135,7 @@ public class ContactListView extends HorizontalScrollView {
                     TextView tv = new TextView(parentView.getContext());
                     LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                             LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER);
-                    lp.leftMargin = Utils.dpToPx(parentView.getContext(), 4);
+                    lp.leftMargin = Utils.dpToPx(parentView.getContext(),4);
                     lp.gravity = Gravity.CENTER;
                     tv.setLayoutParams(lp);
                     tv.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
@@ -145,12 +145,16 @@ public class ContactListView extends HorizontalScrollView {
 
                 ImageView imageView = new ImageView(parentView.getContext());
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(size, size);
-                lp.leftMargin = Utils.dpToPx(parentView.getContext(), 2);
-                lp.rightMargin = Utils.dpToPx(parentView.getContext(), 2);
+                if(parentView.getChildCount()!=0) {
+                    lp.leftMargin = Utils.dpToPx(parentView.getContext(), -8);
+                }else{
+                    lp.leftMargin = Utils.dpToPx(parentView.getContext(), 2);
+                }
+
                 lp.gravity = Gravity.CENTER;
                 imageView.setLayoutParams(lp);
                 imageView.setImageDrawable(drawable);
-                parentView.addView(imageView, 0);
+                parentView.addView(imageView);
             }
         }
     }

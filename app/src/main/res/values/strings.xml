@@ -34,7 +34,7 @@
     <string name="action_signup">Sign Up</string>
     <string name="action_submit">Submit</string>
     <string name="action_cancel">Cancel</string>
-    <string name="action_add_to_calender">Add to Calender</string>
+    <string name="action_add_to_calender">Add to Calendar</string>
 
     <!-- Menu items -->
     <string name="menu_edit_location">Change Location</string>
@@ -213,7 +213,7 @@
     <string name="title_activity_ticket_confirmation">Ticket Confirmation</string>
 
 
-    <string name="explore_ten_category_text">Here are 12 ways to think about your next outing!</string>
+    <string name="explore_ten_category_text">Here are 12 ways to think about\nyour next outing!</string>
 
     <!-- Error strings for Geofence-->
     <string name="not_connected">GoogleApiClient no yet connected. Try again.</string>
