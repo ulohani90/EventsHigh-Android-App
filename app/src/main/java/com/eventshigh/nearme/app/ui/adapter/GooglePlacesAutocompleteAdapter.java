@@ -10,6 +10,7 @@ import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import android.content.Context;
@@ -70,12 +71,15 @@ public class GooglePlacesAutocompleteAdapter
      *
      * @see android.widget.ArrayAdapter#ArrayAdapter(android.content.Context, int)
      */
+    String cityName;
+
     public GooglePlacesAutocompleteAdapter(Context context, GoogleApiClient googleApiClient,
-                                           LatLngBounds bounds, AutocompleteFilter filter) {
+                                           LatLngBounds bounds, AutocompleteFilter filter, String cityName) {
         super(context, android.R.layout.simple_expandable_list_item_2, android.R.id.text1);
         mGoogleApiClient = googleApiClient;
         mBounds = bounds;
         mPlaceFilter = filter;
+        this.cityName = cityName;
     }
 
     /**
@@ -115,6 +119,10 @@ public class GooglePlacesAutocompleteAdapter
         return row;
     }
 
+    public void changeCity(String cityName, LatLngBounds latLngBounds){
+        this.cityName = cityName;
+        this.mBounds = latLngBounds;
+    }
     /**
      * Returns the filter for the current set of autocomplete results.
      */
@@ -134,9 +142,6 @@ public class GooglePlacesAutocompleteAdapter
                     // Retrieve the autocomplete results.
 
                     for (int i = 0; i < mResultList.size(); i++) {
-                        City[] cities = City.values();
-                        for (City city : cities) {
-                            String cityName = city.name();
                             if (cityName.equalsIgnoreCase(City.BANGALORE.name())) {
                                 if (mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase()) ||
                                         mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains("BENGALURU") ||
@@ -150,7 +155,6 @@ public class GooglePlacesAutocompleteAdapter
                                     filteredResults.add(mResultList.get(i));
                                 }
 
-                            }
                         }
                     }
 
@@ -174,6 +178,7 @@ public class GooglePlacesAutocompleteAdapter
                     notifyDataSetInvalidated();
                 }
             }
+
 
             @Override
             public CharSequence convertResultToString(Object resultValue) {

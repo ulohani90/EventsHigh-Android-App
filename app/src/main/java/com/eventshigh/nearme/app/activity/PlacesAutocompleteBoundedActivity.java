@@ -15,19 +15,26 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.ui.CitySelectDialog;
 import com.eventshigh.nearme.app.ui.adapter.GooglePlacesAutocompleteAdapter;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.LocationUtils;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -52,13 +59,15 @@ import java.util.Locale;
 
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
 
-public class PlacesAutocompleteBoundedActivity extends AppCompatActivity implements TextWatcher, GoogleApiClient.OnConnectionFailedListener {
+public class PlacesAutocompleteBoundedActivity extends BaseActivity implements TextWatcher, GoogleApiClient.OnConnectionFailedListener {
 
     private GooglePlacesAutocompleteAdapter dataAdapter;
     EditText etSearchBar;
     ListView listView;
 
     GoogleApiClient mGoogleApiClient;
+    LinearLayout llChangeCity;
+    TextView currentCity, changeCityText;
     Toolbar toolbar;
 
     @Override
@@ -70,7 +79,7 @@ public class PlacesAutocompleteBoundedActivity extends AppCompatActivity impleme
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         etSearchBar = (EditText) findViewById(R.id.et_search_place);
-        Account account = new Account(this);
+        final Account account = new Account(this);
 
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -79,7 +88,7 @@ public class PlacesAutocompleteBoundedActivity extends AppCompatActivity impleme
                 .build();
         if (mGoogleApiClient != null)
             mGoogleApiClient.connect();
-        dataAdapter = new GooglePlacesAutocompleteAdapter(PlacesAutocompleteBoundedActivity.this, mGoogleApiClient, account.getLastCity().cityBounds, null);
+        dataAdapter = new GooglePlacesAutocompleteAdapter(PlacesAutocompleteBoundedActivity.this, mGoogleApiClient, account.getLastCity().cityBounds, null,account.getLastCity().name());
         listView = (ListView) findViewById(R.id.lv_search_place_list);
         listView.setAdapter(dataAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -125,6 +134,28 @@ public class PlacesAutocompleteBoundedActivity extends AppCompatActivity impleme
                 }*/
 
                 //noinspection ConstantConditions
+            }
+        });
+
+        llChangeCity = (LinearLayout)findViewById(R.id.btn_change_city);
+        currentCity = (TextView)findViewById(R.id.tv_current_city);
+        currentCity.setText(account.getLastCity().name());
+        changeCityText = (TextView)findViewById(R.id.tv_change_city_text);
+        SpannableString content = new SpannableString("Change City");
+        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+        changeCityText.setText(content);
+        etSearchBar.setHint("Search Locality in " + Utils.capitalize(account.getLastCity().name()));
+        llChangeCity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                CitySelectDialog.show(PlacesAutocompleteBoundedActivity.this, account, new CitySelectDialog.CitySelectionCallback() {
+                    @Override
+                    public void onCityChanged(City city) {
+                        currentCity.setText(city.name());
+                        etSearchBar.setHint("Search Locality in "+Utils.capitalize(city.name()));
+                        dataAdapter.changeCity(city.name(),city.cityBounds);
+                    }
+                });
             }
         });
     }
