@@ -16,7 +16,6 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-
             <EditText
                 android:id="@+id/et_search_place"
                 android:layout_width="0dp"
@@ -50,20 +49,57 @@
 
     </android.support.v7.widget.Toolbar>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/btn_change_city"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:layout_below="@+id/toolbar_et">
+        <TextView
+            android:id="@+id/tv_current_city"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:drawablePadding="5dp"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:paddingBottom="8dp"
+            android:text="Your City"
+            android:textColor="#353535" />
+        <TextView
+            android:id="@+id/tv_change_city_text"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:paddingBottom="8dp"
+            android:text="Change City"
+            android:textColor="#353535"/>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/seperation_view"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="#dddddd"
+        android:layout_below="@+id/btn_change_city"/>
+
     <TextView
         android:id="@+id/select_current_location"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_below="@id/toolbar_et"
+        android:layout_below="@id/seperation_view"
         android:drawableLeft="@drawable/ic_device_gps_fixed"
         android:drawablePadding="5dp"
         android:foreground="?android:attr/selectableItemBackground"
         android:gravity="center_vertical"
         android:padding="5dp"
         android:paddingBottom="8dp"
-
         android:text="Select Current Location"
-
         android:textColor="#353535" />
 
     <View
