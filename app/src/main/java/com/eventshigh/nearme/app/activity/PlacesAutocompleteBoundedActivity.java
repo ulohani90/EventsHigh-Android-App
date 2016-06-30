@@ -10,6 +10,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.app.Activity;
 import android.os.PersistableBundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -102,40 +103,16 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
         });
         listView.setTextFilterEnabled(true);
         etSearchBar.addTextChangedListener(this);
-        (findViewById(R.id.select_current_location)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                onSelectLocationClick();
-
-                /*if (ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                        ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-                    Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                    if (location != null) {
-
-                        LatLng latLng = LocationUtils.locationToLatLng(location);
-                        Geocoder gcd = new Geocoder(PlacesAutocompleteBoundedActivity.this, Locale.getDefault());
-                        List<Address> addresses = null;
-                        try {
-                            addresses = gcd.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                            if (addresses.size() > 0) {
-                                System.out.println(addresses.get(0).getLocality());
-                                Intent intent = new Intent();
-                                intent.putExtra("place_lat_lng", latLng);
-                                intent.putExtra("place_name", addresses.get(0).getLocality());
-                                setResult(Activity.RESULT_OK, intent);
-                                finish();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }*/
-
-                //noinspection ConstantConditions
-            }
-        });
+        View locView = findViewById(R.id.select_current_location);
+        if (locView != null) {
+            locView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onSelectLocationClick();
+                }
+            });
+        }
 
         llChangeCity = (LinearLayout)findViewById(R.id.btn_change_city);
         currentCity = (TextView)findViewById(R.id.tv_current_city);
@@ -331,7 +308,7 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
     private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback
             = new ResultCallback<PlaceBuffer>() {
         @Override
-        public void onResult(PlaceBuffer places) {
+        public void onResult(@NonNull PlaceBuffer places) {
             if (!places.getStatus().isSuccess()) {
                 // Request did not complete successfully
                 Log.e("TAG", "Place query did not complete. Error: " + places.getStatus().toString());
@@ -347,9 +324,6 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
             places.release();
             setResult(Activity.RESULT_OK, intent);
             finish();
-            // Format details of the place for display and show it in a TextView.
-
-
         }
     };
 

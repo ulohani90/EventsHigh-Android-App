@@ -684,6 +684,7 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
                     }
                 }
         );
+        /*
         SocialInvitationsRequest.submit(this, Priority.LOW, this, false,
                 new Listener<SocialInvitationsRequest.CommonInviteObject>() {
                     @Override
@@ -716,6 +717,7 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
                     }
                 }
         );
+        */
     }
 
     private Listener<Event> mEventListener = new Listener<Event>() {

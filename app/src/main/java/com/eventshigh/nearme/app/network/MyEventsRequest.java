@@ -114,9 +114,11 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
 
         List<MovieDetailObject> movies = new ArrayList<>();
         List<TopicEvents> events = new ArrayList<>();
+        /*
         RequestFuture<SocialInvitationsRequest.CommonInviteObject> socialInvites = RequestFuture.newFuture();
         SocialInvitationsRequest.submit(context, priority, tag, shouldBypassCache,
                 socialInvites, socialInvites);
+                */
 
 
         MovieMarkerManager movieMarkerManager = MovieMarkerManager.getInstance(context);
@@ -145,6 +147,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
                 priority, tag, shouldBypassCache, includeWithoutLocation, favEvents, favEvents);
 
         // Look at invites and send the request for sent invitations.
+        /*
         List<String> eventIds = new ArrayList<>();
         try {
             eventIds.addAll(socialInvites.get().getInvites().keySet());
@@ -155,10 +158,11 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
         RequestFuture<List<Event>> invitedEvents = RequestFuture.newFuture();
         MultiEventsRequest.submit(context, eventsContext, eventIds, priority, tag,
                 shouldBypassCache, true, invitedEvents, invitedEvents);
+                */
 
         // Build Result.
         try {
-            addEventsToResults(events, INVITATIONS_NAME, invitedEvents);
+            // addEventsToResults(events, INVITATIONS_NAME, invitedEvents);
             addEventsToResults(events, FAVOURITES_NAME, favEvents);
             addMoviesToResults(movies, moviesList);
 
