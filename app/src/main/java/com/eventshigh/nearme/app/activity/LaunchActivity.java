@@ -360,8 +360,6 @@ public class LaunchActivity extends BaseContextActivity{
 
         // new InitiateBranchAsyncTask(getIntent().getData()).execute();
         loadBranchInstance();
-        // ReferEarnDialog.showDialog(this);
-
     }
 
     private void setLightToolbarIcons() {
@@ -478,7 +476,7 @@ public class LaunchActivity extends BaseContextActivity{
                     ActivityCompat.checkSelfPermission(LaunchActivity.this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 Location location = LocationServices.FusedLocationApi.getLastLocation(client);
                 if (location != null) {
-                    
+
                     LatLng latLng = LocationUtils.locationToLatLng(location);
                     eventsContext.changeLocation(latLng);
                     if (eventsContext.city != null) {
