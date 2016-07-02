@@ -115,12 +115,15 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
             tvMovieName.setText(writeReviewActivity.reviewEntityName);
         }
 
-        writeReviewActivity.movie_rated =
-                (int) writeReviewActivity.writeReviewRatingFragment.rbMovieRating.getRating();
-        rbMovieRating.setRating(writeReviewActivity.movie_rated);
         llReviewDescriptionHeader.setOnClickListener(this);
         btnReviewSubmit.setOnClickListener(this);
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        rbMovieRating.setRating(getArguments().getFloat("rating_count"));
     }
 
     @Override

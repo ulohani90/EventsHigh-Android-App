@@ -26,7 +26,7 @@ import com.eventshigh.nearme.app.network.MovieDetailRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 
-public class WriteReviewActivity extends BaseActivity implements View.OnTouchListener {
+public class WriteReviewActivity extends BaseActivity implements RatingBar.OnRatingBarChangeListener {
 
     private LinearLayout verifyPhnLayout;
     Account account;
@@ -41,7 +41,6 @@ public class WriteReviewActivity extends BaseActivity implements View.OnTouchLis
     WriteReviewDescriptionFragment writeReviewDescriptionFragment;
     MovieDetailObject movieDetailObject;
     Event event;
-    protected int movie_rated;
 
     String type = "";
     boolean isFromNotification;
@@ -108,26 +107,19 @@ public class WriteReviewActivity extends BaseActivity implements View.OnTouchLis
     //on ratingbar touch inside rating review fragment
     float xDown;
 
+
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            // save down X coordinate
-            xDown = event.getX();
-        } else if (event.getAction() == MotionEvent.ACTION_UP) {
-            // if user moves do not move the finger, update RatingBar value
-            if (Math.abs(xDown - event.getX()) < 5) {
-                onMovieRated();
-                return false;
-            }
-        }
-        return true;
+    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+        if(fromUser)
+        onMovieRated(rating);
     }
 
     //util method
-    public void onMovieRated() {
+    public void onMovieRated(float rating) {
         writeReviewDescriptionFragment =
                 WriteReviewDescriptionFragment.newInstance(this);
         Bundle args = new Bundle();
+        args.putFloat("rating_count",rating);
         writeReviewDescriptionFragment.setArguments(args);
         // Commit the transaction
         Handler handler = new Handler();

@@ -47,7 +47,8 @@ public class WriteReviewRatingFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_write_review_rating, container, false);
         tvMovieName = (TextView) rootView.findViewById(R.id.tv_write_review_movie_name);
         rbMovieRating = (RatingBar) rootView.findViewById(R.id.rb_write_rating);
-        rbMovieRating.setOnTouchListener(writeReviewActivity);
+        rbMovieRating.setOnRatingBarChangeListener(writeReviewActivity);
+
         ivMoviePicture = (ImageView) rootView.findViewById(R.id.iv_write_review_movie_pic);
         ratingHeaderText = (TextView) rootView.findViewById(R.id.rate_header);
 
