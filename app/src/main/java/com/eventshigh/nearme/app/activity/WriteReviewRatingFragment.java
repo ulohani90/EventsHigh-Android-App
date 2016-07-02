@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.utils.Utils;
 
 
 public class WriteReviewRatingFragment extends Fragment {
@@ -56,7 +57,7 @@ public class WriteReviewRatingFragment extends Fragment {
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                             .into(ivMoviePicture);
-                ratingHeaderText.setText("Please rate the Movie!");
+                ratingHeaderText.setText("Please rate the "+ Utils.capitalize(writeReviewActivity.type)+"!");
         }else{
             if (writeReviewActivity.type.equals("movie")) {
 

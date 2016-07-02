@@ -215,7 +215,7 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                writeReviewActivity.finish();
+                writeReviewActivity.onBackPressed();
                 // writeReviewActivity.overridePendingTransition(R.anim.animate_slide_down, R.anim.animate_slide_up);
             }
         }, 1000);

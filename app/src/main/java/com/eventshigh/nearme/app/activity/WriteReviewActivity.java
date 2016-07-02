@@ -75,7 +75,7 @@ public class WriteReviewActivity extends BaseActivity implements View.OnTouchLis
             reviewEntityId = getIntent().getStringExtra(REVIEW_ENTITY_ID);
             reviewEntityImage = getIntent().getStringExtra(REVIEW_ENTITY_IMAGE);
             reviewEntityName = getIntent().getStringExtra(REVIEW_ENTITY_NAME);
-        } else{
+        } else {
             if (type.equals("movie")) {
                 movieDetailObject = bundle.getParcelable(MovieDetailActivity.MOVIE_DETAIL_OBJECT);
             } else {
@@ -161,7 +161,13 @@ public class WriteReviewActivity extends BaseActivity implements View.OnTouchLis
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (isFromNotification) {
+            Intent intent = new Intent(this, LaunchActivity.class);
+            startActivity(intent);
+            this.finish();
+        } else {
+            super.onBackPressed();
+        }
     }
 }
 

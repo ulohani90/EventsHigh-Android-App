@@ -230,7 +230,7 @@ public class EHGcmListenerService extends GcmListenerService {
             intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_ID,reviewEntityId);
             intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_IMAGE,reviewEntityImage);
             intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_NAME,reviewedEntity);
-            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+            contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             imageUrl = reviewEntityImage;
         }else{
             Intent intent = new Intent(this,
