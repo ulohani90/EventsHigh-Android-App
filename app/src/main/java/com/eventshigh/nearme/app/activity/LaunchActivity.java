@@ -159,7 +159,6 @@ public class LaunchActivity extends BaseContextActivity{
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
         }
-
         startService(new Intent(this, GeofenceStartService.class));
 
         //fetchEventAttendedDetails();
@@ -1094,7 +1093,12 @@ public class LaunchActivity extends BaseContextActivity{
                             if (referringParams.length() == 0) {
                                 // showNextScreen();
                                 Log.i("Event_detail_missed", "refering params empty");
-                            } else if (!referringParams.optBoolean("review", false)) {
+                            }else if(referringParams.has("profile_id")){
+                                String profileId = referringParams.getString("profile_id");
+                                Intent intent = new Intent(LaunchActivity.this, UserProfileActivity.class);
+                                intent.putExtra(UserProfileActivity.PROFILE_ID,profileId);
+                                startActivity(intent);
+                            }else if (!referringParams.optBoolean("review", false)) {
                                 if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
                                     //showNextScreen();
                                     Log.i("Event_detail_missed", referringParams.getBoolean("+is_first_session") ? "False" : "true");

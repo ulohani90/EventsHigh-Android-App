@@ -149,11 +149,11 @@
     <string name="contacts_upload_promise">We will not share your contacts to any third party, that\'s a promise!</string>
 
     <!-- FB -->
-<!--
-    <string name="facebook_app_id">1728186420799822</string>
--->
+    <string name="facebook_app_id">196111897251952</string>
 
+<!--
     <string name="facebook_app_id">1632192933768110</string>
+-->
 
 
     <!-- Rating -->

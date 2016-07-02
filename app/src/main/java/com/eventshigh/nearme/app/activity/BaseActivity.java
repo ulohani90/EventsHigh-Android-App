@@ -31,6 +31,7 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.MovieInfoObject;
 import com.eventshigh.nearme.app.data.MovieMarkerManager;
+import com.eventshigh.nearme.app.data.ProfileInfo;
 import com.eventshigh.nearme.app.data.stream.OfferObject;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -329,6 +330,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
 
     }
+
 
     /**
      * Helper method to share an Event.
@@ -726,4 +728,77 @@ public abstract class BaseActivity extends AppCompatActivity {
         this.startActivity(shareIntent);
 
     }
+
+    //share profile
+    public void shareProfileWithBranch(final ProfileInfo profileInfo, String mobileNo, @Nullable final String packageName, @Nullable final String label) {
+
+        BranchUniversalObject branchObject = new BranchUniversalObject();
+
+
+       /* if (referralLink == null) {
+            referralLink = "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + Utils.getAndroidId(this);
+        }
+        */
+        branchObject.setCanonicalIdentifier(mobileNo)
+                .setTitle("Shubham Goyal")//event.title.replaceAll("\"", " &quot "))
+                .addContentMetadata("profile_id", mobileNo)
+                .setContentDescription("Check users EH Profile")//event.description.replaceAll("\"", " &quot "))
+                .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
+        branchObject.registerView();
+        String src = null;
+        if (packageName != null) {
+            src = packageName.split("\\.")[1];
+        }
+        LinkProperties linkProperties = new LinkProperties()
+                .setChannel(packageName)
+                .setFeature("sharing")
+                .addControlParameter("$always_deeplink", "true")
+                .addControlParameter("$desktop_url","http://www.eventshigh.com");//profileInfo.getProfileShareURI(src).toString());
+        //.addControlParameter("$android_url", referralLink)
+        //.addControlParameter("$ios_url", "http://www.eventshigh.com");
+        final ProgressDialog dialog = OneSecDialog.show(this);
+        branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
+            @Override
+            public void onLinkCreate(String url, BranchError error) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+                if (error == null) {
+                    shareProfile(profileInfo, url, packageName, label);
+                } else {
+                    //   if (error.getErrorCode() == -113) {
+                    showMessage(error.getMessage());
+                    // }
+                }
+            }
+        });
+
+    }
+
+    public void shareProfile(ProfileInfo profileInfo, String profileUri,
+                             @Nullable String packageName, @Nullable String label) {
+        String referralCode = new Account(this).getReferrerCode();
+        //reportEventAction(profileInfo, "eventShareInitiated", label == null ? packageName : label);
+        long shareProfileInitiatedTimestamp = System.currentTimeMillis();
+        //new UserActionHelper(this).recordShareAction(event.id, event.title, packageName, profileUri);
+
+        try {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT,
+                    String.format("Check out " + "'s profile on Events High! - " + profileUri)
+            );
+
+            sendIntent.setType("text/plain");
+            if (packageName != null) {
+                sendIntent.setPackage(packageName);
+            }
+            startActivity(sendIntent);
+        } catch (ActivityNotFoundException e) {
+            Crashlytics.getInstance().core.logException(e);
+            showMessage(R.string.failed_share);
+            Log.w(LOG_TAG, "failed sharing", e);
+        }
+    }
+
 }

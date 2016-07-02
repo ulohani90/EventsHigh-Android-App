@@ -105,6 +105,7 @@ public class Event implements Parcelable {
     @Nullable
     public final List<AdditionalTicketField> additionalTicketFieldList;
 
+
     public Event(String id, City city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, ArrayList<String> allImages, @Nullable String sourceUrl,
@@ -168,7 +169,6 @@ public class Event implements Parcelable {
         this.requestPerAttendeeData = Utils.checkIfUnknown(requestPerAttendeeData);
         this.additionalTicketFieldList = additionalTicketFieldList;
     }
-
 
     public Event(Parcel in) {
         this.id = in.readString();

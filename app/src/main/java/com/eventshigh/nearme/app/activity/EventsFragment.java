@@ -211,7 +211,7 @@ public class EventsFragment extends BaseEventsFragment {
             asyncRequest = new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mMyFavEventsMoviesFetcherCallBack, mErrorListener);
             asyncRequest.execute();
-        } else if (EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query)) {
+        } else if (EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query)){
             MobileUserEventsRequest.submit(activity, eventsContext,
                     Priority.IMMEDIATE, this, shouldBypassCache, true, mMyEventsFetcherCallBack, mErrorListener);
         } else if (eventsContext.query.isEmpty() && !eventsContext.dateFilter.isEmpty() && showCategories) {

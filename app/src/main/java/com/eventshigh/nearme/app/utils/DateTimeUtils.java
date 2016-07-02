@@ -282,6 +282,27 @@ public class DateTimeUtils {
         return builder.toString();
     }
 
+    public static String getPastTime(long milliseconds) {
+        StringBuilder builder = new StringBuilder();
+        long timeDifference = System.currentTimeMillis() - milliseconds;
+        long days = timeDifference / 86400000;
+        if (days > 0) {
+            builder.append(days + ((days > 1) ? " Days " : " Day "));
+            return builder.toString();
+        }
+        long hours = timeDifference / 3600000;
+        if (hours > 0) {
+            builder.append(hours + ((hours > 1) ? " Hours " : " Hour "));
+            return builder.toString();
+        }
+        long minutes = timeDifference / 60000;
+        if (minutes > 0) {
+            builder.append(minutes + ((minutes > 0) ? " Mins " : " Min "));
+            return builder.toString();
+        }
+
+        return builder.toString();
+    }
 
     public static String getPointAddedOnString(long time) {
         Calendar cal = Calendar.getInstance();

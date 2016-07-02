@@ -25,6 +25,9 @@ public class MovieUserReviewObject implements Parcelable {
 
     private String reviewEntity;
     private String reviewedEntityId;
+    private String reviewedEntityImage;
+    private String reviewedEntityLocation;
+
     private int reviewRating;
     private String reviewText;
 
@@ -32,8 +35,11 @@ public class MovieUserReviewObject implements Parcelable {
     private String reviewDeviceId;
     private String reviewState;
 
-    public MovieUserReviewObject() {
-    }
+    private long createdAt;
+
+    private Event event;
+    private MovieDetailObject movieDetailObject;
+
 
     public MovieUserReviewObject(Parcel in) {
         this.reviewId = in.readString();
@@ -47,6 +53,14 @@ public class MovieUserReviewObject implements Parcelable {
         this.reviewDeviceId = in.readString();
         this.reviewedEntityId = in.readString();
         this.reviewState = in.readString();
+        this.reviewedEntityImage = in.readString();
+        this.reviewedEntityLocation = in.readString();
+        this.createdAt = in.readLong();
+        if(reviewFor.equalsIgnoreCase("event")) {
+            this.event = in.readParcelable(Event.class.getClassLoader());
+        }else if(reviewFor.equalsIgnoreCase("movie")){
+            this.movieDetailObject = in.readParcelable(MovieUserReviewObject.class.getClassLoader());
+        }
     }
 
 
@@ -67,13 +81,54 @@ public class MovieUserReviewObject implements Parcelable {
                 reviewedEntityId = Utils.checkIfUnknown(obj.getString("reviewed_entity_id"));
             }
             reviewState = Utils.checkIfUnknown(obj.getString("state"));
-        } catch (Exception e) {
-
+            createdAt = obj.getLong("created_at");
+        } catch (Exception e){
         }
 
     }
 
     //setters and getters
+    public MovieDetailObject getMovieDetailObject() {
+        return movieDetailObject;
+    }
+
+    public void setMovieDetailObject(MovieDetailObject movieDetailObject) {
+        this.movieDetailObject = movieDetailObject;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getReviewedEntityLocation() {
+        return reviewedEntityLocation;
+    }
+
+    public void setReviewedEntityLocation(String reviewedEntityLocation) {
+        this.reviewedEntityLocation = reviewedEntityLocation;
+    }
+
+    public String getReviewedEntityImage() {
+        return reviewedEntityImage;
+    }
+
+    public void setReviewedEntityImage(String reviewedEntityImage) {
+        this.reviewedEntityImage = reviewedEntityImage;
+    }
+
+
     public String getReviewText() {
         return reviewText;
     }
@@ -182,8 +237,15 @@ public class MovieUserReviewObject implements Parcelable {
         dest.writeString(reviewDeviceId);
         dest.writeString(reviewedEntityId);
         dest.writeString(reviewState);
-
-    }
+        dest.writeString(reviewedEntityImage);
+        dest.writeString(reviewedEntityLocation);
+        dest.writeLong(createdAt);
+        if(reviewFor.equalsIgnoreCase("event")) {
+            dest.writeParcelable( event, flags);
+        }else if(reviewFor.equalsIgnoreCase("movie")){
+            dest.writeParcelable( movieDetailObject, flags);
+        }
+        }
 
     public static final Parcelable.Creator<MovieUserReviewObject> CREATOR =
             new Parcelable.Creator<MovieUserReviewObject>() {

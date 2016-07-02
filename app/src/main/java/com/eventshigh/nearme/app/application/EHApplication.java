@@ -4,6 +4,8 @@ import android.app.Application;
 import android.os.AsyncTask;
 
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
+import com.eventshigh.nearme.app.BuildConfig;
 
 import io.branch.referral.Branch;
 import io.fabric.sdk.android.Fabric;
@@ -24,9 +26,9 @@ public class EHApplication extends Application{
     public class InitailizeSdks extends AsyncTask<Void,Void,Void>{
 
         @Override
-        protected Void doInBackground(Void... params) {
-            Fabric.with(EHApplication.this, new Crashlytics());
-
+        protected Void doInBackground(Void... params){
+            CrashlyticsCore core = new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build();
+            Fabric.with(EHApplication.this, new Crashlytics.Builder().core(core).build());
             return null;
         }
     }

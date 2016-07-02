@@ -7,6 +7,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.ProfileInfo;
 import com.zendesk.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -88,6 +89,12 @@ public class EventsHighEndpoints {
                 .build();
     }
 
+    public static Uri getProfileShareURI(ProfileInfo profileInfo, @Nullable String src) {
+        return getProfileDetailsURI(profileInfo.getProfileId()).buildUpon()
+                .appendQueryParameter("src", "ehm" + (src == null ? "" : "_" + src))
+                .build();
+    }
+
     public static String getEventSuggestURI(City city) {
         return String.format(API_EVENTS_SUGGEST_FORMAT, city.toString().toLowerCase());
     }
@@ -101,6 +108,13 @@ public class EventsHighEndpoints {
                 .appendPath("detail")
                 .appendPath(Utils.capitalize(city.toString()))
                 .appendPath(eventId)
+                .build();
+    }
+
+    public static Uri getProfileDetailsURI(String profileId){
+        return Uri.parse(WEB_URI_BASE).buildUpon()
+                .appendPath("profile")
+                .appendPath(profileId)
                 .build();
     }
 

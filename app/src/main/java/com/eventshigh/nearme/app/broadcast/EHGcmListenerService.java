@@ -95,6 +95,7 @@ public class EHGcmListenerService extends GcmListenerService {
         String reviewEntityId = Utils.checkIfUnknown(msg.getString("review_entity_id"));
         String reviewEntityImage = Utils.checkIfUnknown(msg.getString("review_entity_image"));
         String reviewedEntity = Utils.checkIfUnknown(msg.getString("reviewed_entity"));
+        int notificationId = -1;
 
         UserContact contact = null;
         if (mobileNo != null) {
@@ -230,8 +231,9 @@ public class EHGcmListenerService extends GcmListenerService {
             intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_ID,reviewEntityId);
             intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_IMAGE,reviewEntityImage);
             intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_NAME,reviewedEntity);
-            contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            imageUrl = reviewEntityImage;
+            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+            //imageUrl = reviewEntityImage;
+            notificationId = 2;
         }else{
             Intent intent = new Intent(this,
                     contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
@@ -243,7 +245,7 @@ public class EHGcmListenerService extends GcmListenerService {
 
         return new EHNotification(this, title, message,
                 imageUrl, contentIntent,
-                priority == null ? Notification.PRIORITY_LOW : Notification.PRIORITY_HIGH,
+                priority == null ? Notification.PRIORITY_LOW : Notification.PRIORITY_HIGH, notificationId,
                 contact
         );
     }

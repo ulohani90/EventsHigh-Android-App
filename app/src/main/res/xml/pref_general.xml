@@ -7,7 +7,6 @@
           android:title="@string/pref_title_change_location"
       />-->
 
-<!--
     <Preference
         android:icon="@drawable/ic_personalize_nav"
         android:layout="@layout/navigation_menu_white_items"
@@ -16,7 +15,6 @@
             android:targetClass="com.eventshigh.nearme.app.activity.UserProfileActivity"
             android:targetPackage="com.eventshigh.nearme.app" />
     </Preference>
--->
 
     <Preference
         android:icon="@drawable/ic_personalize_nav"
@@ -26,6 +24,7 @@
             android:targetClass="com.eventshigh.nearme.app.activity.SelectInterestsActivity"
             android:targetPackage="com.eventshigh.nearme.app" />
     </Preference>
+
     <Preference
         android:icon="@drawable/ic_refer_earn_nav"
         android:layout="@layout/navigation_menu_white_items"

@@ -40,7 +40,7 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, EventsContext eventsContext, List<String> eventIds,
-            Priority priority, Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,
+            Priority priority, Object tag, boolean shouldBypassCache, boolean includeWithoutLocation,boolean isFilterOldEvents,
             Listener<List<Event>> listener, ErrorListener errorListener) {
 
 
@@ -58,18 +58,19 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
         }
 
         MultiEventsRequest request = new MultiEventsRequest(context,eventsContext, url, priority,
-                shouldBypassCache, includeWithoutLocation, listener, errorListener);
+                shouldBypassCache, includeWithoutLocation,isFilterOldEvents, listener, errorListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
 
     private final EventsContext eventsContext;
     private final Priority priority;
+    private final boolean isFilterOldEvents;
     private final boolean includeWithoutLocation;
     private Context mContext;
 
     public MultiEventsRequest(Context context,EventsContext eventsContext, String url, Priority priority,
-                              boolean shouldBypassCache, boolean includeWithoutLocation,
+                              boolean shouldBypassCache, boolean includeWithoutLocation,boolean isFilterOldEvents,
                               Listener<List<Event>> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
@@ -79,6 +80,7 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
         this.priority = priority;
         this.includeWithoutLocation = includeWithoutLocation;
         this.mContext = context;
+        this.isFilterOldEvents = isFilterOldEvents;
     }
 
     @Override
@@ -104,7 +106,10 @@ public class MultiEventsRequest extends JsonRequest<List<Event>> {
                     Crashlytics.getInstance().core.logException(e);
                 }
             }
-            EventCollectionRequest.filterOldEvents(mContext,events);
+
+            //events are not required to be filter always.
+            if(isFilterOldEvents)
+                EventCollectionRequest.filterOldEvents(mContext,events);
 
             // Sort the event list to user.
             Collections.sort(events, new EventComparator(eventsContext.location));

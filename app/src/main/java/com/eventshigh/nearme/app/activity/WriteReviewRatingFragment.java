@@ -81,4 +81,5 @@ public class WriteReviewRatingFragment extends Fragment {
 
         return rootView;
     }
+
 }

@@ -17,15 +17,9 @@ import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.MovieMarkerManager;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
-import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
-import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
-import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -34,6 +28,7 @@ import java.util.concurrent.TimeoutException;
  * Supports fetching of MyEvents for user -- it includes upcoming events which are marked as
  * favourite and few events for all follow.
  */
+
 public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEventFavouriteObject> {
     private static final String LOG_TAG = MyEventsRequest.class.getSimpleName();
 
@@ -144,7 +139,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
         markerManager.waitForLoading();
         RequestFuture<List<Event>> favEvents = RequestFuture.newFuture();
         MultiEventsRequest.submit(context, eventsContext, markerManager.getFavouritedEvents(),
-                priority, tag, shouldBypassCache, includeWithoutLocation, favEvents, favEvents);
+                priority, tag, shouldBypassCache, includeWithoutLocation,true,favEvents, favEvents);
 
         // Look at invites and send the request for sent invitations.
         /*

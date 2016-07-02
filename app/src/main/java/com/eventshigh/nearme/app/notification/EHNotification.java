@@ -86,9 +86,13 @@ public class EHNotification {
 
 
     public EHNotification(Context context, String title, String message, String imageUrl,
-                          PendingIntent launchIntent, int priority, @Nullable UserContact contact) {
+                          PendingIntent launchIntent, int priority,@Nullable int notificationId, @Nullable UserContact contact) {
         this.context = context;
-        this.notificationId = contact == null ? GCM_NOTIFICATION_ID : contact.mobileNo.hashCode();
+        if(notificationId>0){
+            this.notificationId = notificationId;
+        }else{
+            this.notificationId = contact == null ? GCM_NOTIFICATION_ID : contact.mobileNo.hashCode();
+        }
         this.priority = priority;
 
         this.title = title;
@@ -131,7 +135,7 @@ public class EHNotification {
     }
 
     @SuppressLint("InlinedApi")
-    private Notification createNotification(@Nullable Bitmap bitmap) {
+    private Notification createNotification(@Nullable Bitmap bitmap){
         Bitmap largeIcon = null;
         if (contact != null) {
             largeIcon = UserContact.getPhotoForContactId(context, contact.contactId);

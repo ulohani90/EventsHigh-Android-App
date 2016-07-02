@@ -35,7 +35,8 @@ public enum DataType {
     NEW_EXPLORE_CATEOGRY(24),
     EXPLORE_CATEGORY_HEADER(25),
     MY_TICKETS_CARD(26),
-    EVENT_INFO_CARD(27);
+    EVENT_INFO_CARD(27),
+    MY_REVIEW_CARD(28);
 
     public final int typeId;
 
@@ -50,7 +51,7 @@ public enum DataType {
                 || typeId == POINTS.typeId || typeId == TOTAL_POINT_HEADER.typeId
                 || typeId == POINT_BREAKDWON.typeId || typeId == MOVIE_CATEGORY.typeId
                 || typeId == EXPLORE_CATEGORY_HEADER.typeId || typeId == MY_TICKETS_CARD.typeId
-                || typeId == EVENT_INFO_CARD.typeId;
+                || typeId == EVENT_INFO_CARD.typeId || typeId == MY_REVIEW_CARD.typeId;
     }
 
     public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
@@ -151,6 +152,11 @@ public enum DataType {
         if (typeId == EVENT_INFO_CARD.typeId) {
             return EventInfoCard.newInstance(activity, parent);
         }
+
+        if (typeId == MY_REVIEW_CARD.typeId) {
+            return MyReviewCard.newInstance(activity, parent);
+        }
+
         throw new IllegalArgumentException("invalid typeid");
     }
 }

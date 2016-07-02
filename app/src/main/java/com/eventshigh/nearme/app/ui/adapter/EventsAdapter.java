@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
-import android.graphics.Movie;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -18,7 +17,6 @@ import com.eventshigh.nearme.app.data.MovieReviewObject;
 import com.eventshigh.nearme.app.data.MovieShowTimeObject;
 import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.data.MyTicketObject;
-import com.eventshigh.nearme.app.data.ShowDates;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.data.stream.OfferObject;
@@ -34,7 +32,6 @@ import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView.SpanAllColumnLookup;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -109,6 +106,13 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     public void setMyTicketsData(List<MyTicketObject> objs, MyTicketsFragment myTicketsFragment){
         for (MyTicketObject obj : objs) {
             dataToShow.add(new MyTicketData(obj, activity, myTicketsFragment));
+        }
+        notifyDataSetChanged();
+    }
+
+    public void setMyReviewsData(List<MovieUserReviewObject> objs){
+        for (MovieUserReviewObject obj : objs) {
+            dataToShow.add(new MyReviewData(obj,activity));
         }
         notifyDataSetChanged();
     }
@@ -347,6 +351,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
             ((MovieUserReviewData) dataToShow.get(position)).onBindViewHolder(card, position);
         }else if (card instanceof MyTicketCard){
             ((MyTicketData) dataToShow.get(position)).onBindViewHolder(card, position,myTicketListener);
+        }else if(card instanceof MyReviewCard) {
+            ((MyReviewData) dataToShow.get(position)).onBindViewHolder(card, position);
         }else{
             dataToShow.get(position).onBindViewHolder(card, position);
         }

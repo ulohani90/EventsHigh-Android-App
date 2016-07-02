@@ -5,28 +5,39 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.ProfileInfo;
+import com.eventshigh.nearme.app.network.AddFacebookUserInfoRequest;
+import com.eventshigh.nearme.app.network.FetchProfileRequest;
 import com.eventshigh.nearme.app.network.MovieReviewSubmitRequest;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.view.CircularImageView;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -48,14 +59,32 @@ import java.util.Arrays;
 public class UserProfileActivity extends BaseContextActivity implements View.OnClickListener {
     CallbackManager callbackManager;
 
+    public static final String PROFILE_ID = "profile_id";
+
     public ArrayList<String> TABS;
-    ImageView userImage;
-    TextView userName;
-    TextView userCity;
+    CircularImageView userImage;
+    ImageView shareButton;
+    TextView userName,userCity;
+    TextView btnFollow;
     TextView userInterestCount, userFollowerCount, userFavouriteCount;
+
     TabLayout tabsView;
     ViewPager pager;
     UserProfilePagerAdapter userProfilePagerAdapter;
+
+    private View topProgressBar;
+    private View retryView;
+
+
+    TextView tvFacebookInfo;
+    LinearLayout llFacebookInfoMask, llAboutUserMask;
+    JSONObject facebookJsonObject;
+
+    private String mobileNoProfileUser;
+    private boolean isUserSelf;
+
+    private LinearLayout verifyPhnLayout;
+    private Account account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,56 +92,107 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         setupLayout(R.layout.activity_user_profile);
         TABS = new ArrayList<>();
         TABS.add("Favourites");
-        TABS.add("Events");
-        TABS.add("Friends");
-        TABS.add("My Tickets");
+        TABS.add("Interests");
+        TABS.add("My Reviews");
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        retryView = findViewById(R.id.view_retry);
+        findViewById(R.id.retry).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fetchProfileInfo(false);
+            }
+        });
+
         addToolbarView();
-
         pager = (ViewPager) findViewById(R.id.view_pager);
-        userProfilePagerAdapter = new UserProfilePagerAdapter(getSupportFragmentManager(), this);
-        pager.setAdapter(userProfilePagerAdapter);
-
         tabsView = (TabLayout) findViewById(R.id.tabs);
-        tabsView.setupWithViewPager(pager);
         tabsView.setVisibility(View.VISIBLE);
         pager.setVisibility(View.VISIBLE);
-        //tabsView.setScrollPosition(0, 0, true);
+        userProfilePagerAdapter = new UserProfilePagerAdapter(getSupportFragmentManager(), this);
+        tabsView.setScrollPosition(0, 0, true);
 
+        //phone verify
+        account = new Account(this);
+        verifyPhnLayout = (LinearLayout)findViewById(R.id.verify_phn_layout);
+        (findViewById(R.id.verify_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                verifyClicked();
+            }
+
+        });
+
+
+        topProgressBar = findViewById(R.id.top_progress_bar);
+
+        mobileNoProfileUser = getIntent().getStringExtra(PROFILE_ID);
+        if (mobileNoProfileUser != null){
+            isUserSelf = false;
+        }else{
+            isUserSelf = true;
+            TABS.add("My Tickets");
+            TABS.add("My Friends");
+            llFacebookInfoMask.setVisibility(View.VISIBLE);
+            toolbar.setVisibility(View.VISIBLE);
+            pager.setVisibility(View.VISIBLE);
+        }
 
         FacebookSdk.sdkInitialize(getApplicationContext());
-        fbLoginButtonPressed();
     }
 
-    public void addToolbarView() {
+    @Override
+    protected void onResume(){
+        super.onResume();
+        fetchProfileInfo(false);
+    }
+
+    public void addToolbarView(){
         View view = LayoutInflater.from(this).inflate(R.layout.card_user_profile, toolbar, false);
-        userImage = (ImageView) view.findViewById(R.id.profile_image);
+        userImage = (CircularImageView) view.findViewById(R.id.profile_image);
+        shareButton = (ImageView)view.findViewById(R.id.profile_share);
         userName = (TextView) view.findViewById(R.id.profile_user_name);
         userCity = (TextView) view.findViewById(R.id.profile_user_city);
+        btnFollow = (TextView)view.findViewById(R.id.btn_follow);
+        btnFollow.setOnClickListener(this);
         userInterestCount = (TextView) view.findViewById(R.id.user_interest_count);
         userFavouriteCount = (TextView) view.findViewById(R.id.user_favourite_count);
         userFollowerCount = (TextView) view.findViewById(R.id.user_follower_count);
+        tvFacebookInfo = (TextView) view.findViewById(R.id.facebook_fetch_info);
+        llFacebookInfoMask = (LinearLayout) view.findViewById(R.id.ll_facebook_info_mask);
+        llAboutUserMask = (LinearLayout) view.findViewById(R.id.ll_about_user_mask);
+        tvFacebookInfo.setOnClickListener(this);
+        shareButton.setOnClickListener(this);
         toolbar.addView(view);
         toolbar.setBackgroundColor(Color.TRANSPARENT);
     }
 
 
+
+    public void verifyClicked(){
+        startActivity(new Intent(this, PhoneLoginActivity.class));
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.facebook_fetch_info:
+                fbLoginButtonPressed();
+                break;
+            case R.id.profile_share:
+                shareProfileWithBranch(userProfilePagerAdapter.getProfileInfo(),mobileNoProfileUser,null,"Profile");
+                break;
         }
     }
 
     LoginResult loginResult;
-
     void fbLoginButtonPressed() {
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends", "read_custom_friendlists"));
+        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends", "read_custom_friendlists", "user_likes", "user_about_me"));
         callbackManager = CallbackManager.Factory.create();
 
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
-            public void onSuccess(LoginResult loginRes) {
+            public void onSuccess(LoginResult loginRes){
                 loginResult = loginRes;
                 requestUserProfile();
             }
@@ -130,9 +210,10 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         });
 
     }
+
     void requestUserProfile() {
         System.out.println("onSuccess");
-        String accessToken = loginResult.getAccessToken().getToken();
+        final String accessToken = loginResult.getAccessToken().getToken();
         Log.i("accessToken", accessToken);
 
         GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
@@ -141,58 +222,97 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             public void onCompleted(JSONObject object, GraphResponse response) {
                 Log.i("LoginActivity", response.toString());
                 // Get facebook data from login
-                try {
-                    String userID = object.getString("id");
-                    fetchFriends(userID);
-                    object.remove("id");
-                    object.put("profile_pic", "https://graph.facebook.com/" + userID + "/picture?type=large");
-
-                } catch (JSONException e) {
-                    Log.e("User Profile", "JSON Exception");
+                if(object != null){
+                    try {
+                        String userId = object.getString("id");
+                        object.remove("id");
+                        object.put("fb_id", userId);
+                        object.put("fb_profile_pic", "https://graph.facebook.com/" + userId + "/picture?type=large");
+                        String temp = object.getString("email");
+                        object.remove("email");
+                        object.put("fb_email",temp);
+                        temp = object.getString("name");
+                        object.remove("name");
+                        object.put("fb_name",temp);
+                        object.put("fb_token", accessToken);
+                        object.put("android_id", Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
+                        addFacebookUserInfo(object);
+                        facebookJsonObject = object;
+                        llAboutUserMask.setVisibility(View.VISIBLE);
+                        llFacebookInfoMask.setVisibility(View.GONE);
+                        updateProfile();
+                    }catch (JSONException e) {
+                        Log.i("User Profile", "JSON Exception");
+                    }
+                    Log.e("obj ", object.toString());
                 }
-                //tv1.setText(object.toString());
-                Log.e("obj ", object.toString());
             }
         });
+
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "name, email"); // Parámetros que pedimos a facebook
+        parameters.putString("fields", "name, email");//add fields to fetch in graph response
         request.setParameters(parameters);
         request.executeAsync();
 
     }
 
-    void fetchFriends(String userId){
-        Bundle param = new Bundle();
-        param.putString("fields", "id");
-        param.putInt("limit", 100);
 
-        /* make the API call */
-        GraphRequest req = new GraphRequest(loginResult.getAccessToken(), "/"+userId+"/friendlists", null
-                ,HttpMethod.GET,new GraphRequest.Callback(){
-            public void onCompleted(GraphResponse response) {
-                    /* handle the result */
-            }
+    private void fetchProfileInfo(boolean shouldByPassChange){
+        if(isUserSelf)mobileNoProfileUser = account.getUserInfo().phoneNo;
+
+        if(Utils.checkIfStringEmpty(mobileNoProfileUser)){
+            verifyPhnLayout.setVisibility(View.VISIBLE);
+        }else{
+            topProgressBar.setVisibility(View.VISIBLE);
+            retryView.setVisibility(View.GONE);
+            FetchProfileRequest.submit(this, mobileNoProfileUser, Request.Priority.HIGH,
+                    new Response.Listener<ProfileInfo>() {
+                        @Override
+                        public void onResponse(ProfileInfo profileInfo, boolean b) {
+                            userProfilePagerAdapter.setProfileInfo(profileInfo);
+                            pager.setAdapter(userProfilePagerAdapter);
+                            tabsView.setupWithViewPager(pager);
+                            topProgressBar.setVisibility(View.GONE);
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
+                            topProgressBar.setVisibility(View.GONE);
+                            retryView.setVisibility(View.VISIBLE);
+                        }
+                    });
         }
-        );
-        req.executeAsync();
     }
 
-    public void placeReviewAction(final JSONObject data) {
-        MovieReviewSubmitRequest.submit(this,
-                data, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
+    private void addFacebookUserInfo(JSONObject object) {
+        AddFacebookUserInfoRequest.submit(this, object, Request.Priority.HIGH,
+                new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject, boolean b) {
-                        Log.i("Message Success", "true");
-                        Toast.makeText(getApplicationContext(), "Your profile created successfully", Toast.LENGTH_SHORT);
+                        Toast.makeText(UserProfileActivity.this,"Your profile has been updated successfully.",Toast.LENGTH_SHORT).show();;
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        Log.i("Message failure", "true" + data.toString());
+
                     }
                 });
     }
 
+    private void updateProfile() {
+        llAboutUserMask.setVisibility(View.VISIBLE);
+        try {
+            if (facebookJsonObject.has("fb_profile_pic"))
+                Glide.with(this).load(facebookJsonObject.getString("fb_profile_pic"))
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                        .into(userImage);
+            if (facebookJsonObject.has("fb_name"))
+                userName.setText(facebookJsonObject.getString("fb_name"));
+        } catch (JSONException jse) {
+            Log.e("User Profile", jse.toString());
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -200,11 +320,23 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
+
+    //Viewpager Fragments
     EventsFragment myFavouritesFragment;
     EventsFragment myInterestEventsFragment;
 
     public class UserProfilePagerAdapter extends FragmentStatePagerAdapter {
         private Context context;
+        private ProfileInfo profileInfo;
+
+        public ProfileInfo getProfileInfo() {
+            return profileInfo;
+        }
+
+        public void setProfileInfo(ProfileInfo profileInfo) {
+            this.profileInfo = profileInfo;
+        }
+
 
         public UserProfilePagerAdapter(FragmentManager fragmentManager, Context context) {
             super(fragmentManager);
@@ -224,11 +356,14 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false);
                 return myInterestEventsFragment;
             } else if (position == 2) {
-                ContactsFragment fragment = new ContactsFragment();
-                return fragment;
-            } else {
+                MyReviewsFragment myReviewsFragment = MyReviewsFragment.newInstance(eventsContext,profileInfo.getMovieUserReviewObjectArrayList());
+                return myReviewsFragment;
+            } else if(position == 3){
                 MyTicketsFragment myTicketsFragment = new MyTicketsFragment();
                 return myTicketsFragment;
+            }else{
+                ContactsFragment fragment = new ContactsFragment();
+                return fragment;
             }
         }
 

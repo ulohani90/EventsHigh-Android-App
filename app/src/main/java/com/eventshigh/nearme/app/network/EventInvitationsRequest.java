@@ -91,7 +91,7 @@ public class EventInvitationsRequest extends AsyncTask<Void, Void, EventInvitati
 
             RequestFuture<List<Event>> future2 = RequestFuture.newFuture();
             MultiEventsRequest.submit(context, eventsContext, eventIds, priority, tag,
-                    shouldBypassCache, true, future2, future2);
+                    shouldBypassCache, true,true,future2, future2);
             Map<String, Event> eventsMap = Utils.getMap();
             for (Event event: future2.get()) {
                 eventsMap.put(event.id, event);

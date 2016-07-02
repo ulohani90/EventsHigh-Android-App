@@ -14,6 +14,7 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.MovieMarkerManager;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONException;
@@ -52,7 +53,7 @@ public class MultiMovieRequest extends JsonRequest<List<MovieDetailObject>> {
 
         String url;
         try {
-            url = EventsHighEndpoints.getApiEndpointMoviesUber(movieIds, eventsContext.city.name());
+            url = EventsHighEndpoints.getApiEndpointMoviesUber(movieIds, (new Account(context)).getLastCity().name());
         } catch (IllegalArgumentException e) {
             errorListener.onErrorResponse(new VolleyError("Invalid Query", e));
             return;
