@@ -21,6 +21,7 @@ public class UserActionHelper {
     public static final String JSON_KEY_ACTION = "action";
     public static final String JSON_KEY_DATA = "data";
     private static final String JSON_KEY_EVENT_ID = "event_id";
+    private static final String JSON_KEY_USER_MOBILE_NO = "user_mobile_no";
     private static final String JSON_KEY_MOVIE_ID = "movie_id";
     private static final String JSON_KEY_INTEREST = "interest";
 
@@ -44,13 +45,18 @@ public class UserActionHelper {
         UN_FOLLOW,
     }
 
+    public enum UserFollowingAction{
+        USER_FOLLOW,
+        USER_UNFOLLOW,
+    }
+
     private final Context context;
 
     public UserActionHelper(Context context) {
         this.context = context;
     }
 
-    public void recordShareAction(String eventId,String eventTitle, @Nullable String appName, @Nullable String link) {
+    public void recordShareAction(String eventId, String eventTitle, @Nullable String appName, @Nullable String link) {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(JSON_KEY_EVENT_ID, eventId);
@@ -60,10 +66,10 @@ public class UserActionHelper {
             if (link != null) {
                 jsonObject.put("link", link);
             }
-            if(eventTitle!=null){
-                jsonObject.put("event_title",eventTitle);
+            if (eventTitle != null) {
+                jsonObject.put("event_title", eventTitle);
             }
-            recordServerUserAction(EventAction.SHARE.name().toLowerCase(),jsonObject);
+            recordServerUserAction(EventAction.SHARE.name().toLowerCase(), jsonObject);
             recordAction(EventAction.SHARE.name().toLowerCase(), jsonObject.toString());
         } catch (JSONException e) {
             Crashlytics.getInstance().core.logException(e);
@@ -74,7 +80,20 @@ public class UserActionHelper {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(JSON_KEY_EVENT_ID, eventId);
-            recordServerUserAction(action.name().toString(),jsonObject);
+            recordServerUserAction(action.name().toString(), jsonObject);
+            recordAction(action.name().toLowerCase(), jsonObject.toString());
+        } catch (JSONException e) {
+            Crashlytics.getInstance().core.logException(e);
+        }
+    }
+
+
+    public void recordUserFollowAction(UserFollowingAction action, String userMobileNo) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(JSON_KEY_USER_MOBILE_NO, userMobileNo);
+
+            recordServerUserAction(action.name().toString(), jsonObject);
             recordAction(action.name().toLowerCase(), jsonObject.toString());
         } catch (JSONException e) {
             Crashlytics.getInstance().core.logException(e);
@@ -85,7 +104,7 @@ public class UserActionHelper {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(JSON_KEY_MOVIE_ID, movieId);
-            recordServerUserAction(action.name().toString(),jsonObject);
+            recordServerUserAction(action.name().toString(), jsonObject);
             recordAction(action.name().toLowerCase(), jsonObject.toString());
         } catch (JSONException e) {
             Crashlytics.getInstance().core.logException(e);
@@ -96,7 +115,7 @@ public class UserActionHelper {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(JSON_KEY_INTEREST, interest);
-            recordServerUserAction(action.name().toString(),jsonObject);
+            recordServerUserAction(action.name().toString(), jsonObject);
             recordAction(action.name().toLowerCase(), jsonObject.toString());
         } catch (JSONException e) {
             Crashlytics.getInstance().core.logException(e);
@@ -108,16 +127,16 @@ public class UserActionHelper {
 
     }
 
-    public void recordServerUserAction(String action,JSONObject data){
+    public void recordServerUserAction(String action, JSONObject data) {
         RecordUserAction.submit(context, action, data, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject jsonObject, boolean b) {
-                Log.i("Message Success","true");
+                Log.i("Message Success", "true");
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Log.i("Message failure","true");
+                Log.i("Message failure", "true");
             }
         });
     }
