@@ -215,10 +215,14 @@ public class EventsFragment extends BaseEventsFragment {
 
         // Stop all requests associated with this fragment and then submit new request.
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-            asyncRequest = new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
-                    shouldBypassCache, true, mMyFavEventsMoviesFetcherCallBack, mErrorListener);
-            asyncRequest.execute();
-            //bindDataFavourite(null);
+            if (profileInfo == null) {
+                asyncRequest = new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
+                        shouldBypassCache, true, mMyFavEventsMoviesFetcherCallBack, mErrorListener);
+                asyncRequest.execute();
+            } else {
+                bindDataFavourite(profileInfo.getMeEventFavouriteObject());
+            }
+
         } else if (EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query)) {
             if (profileInfo == null) {
                 MobileUserEventsRequest.submit(activity, eventsContext,

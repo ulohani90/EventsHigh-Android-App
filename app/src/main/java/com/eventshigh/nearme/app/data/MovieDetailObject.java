@@ -6,6 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.TimeUtils;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -15,7 +16,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -150,5 +153,17 @@ public class MovieDetailObject implements Parcelable {
         dest.writeTypedList(userReviews);
     }
 
+    public static List<MovieDetailObject> fromJSON(Context context, JSONArray jsonArray) {
+        List<MovieDetailObject> movieDetailObjects = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                MovieDetailObject movieDetailObject = new MovieDetailObject(context,jsonArray.getJSONObject(i));
+                    movieDetailObjects.add(movieDetailObject);
+            } catch (JSONException e) {
+                Crashlytics.getInstance().core.logException(e);
+            }
+        }
+        return movieDetailObjects;
+    }
 
 }

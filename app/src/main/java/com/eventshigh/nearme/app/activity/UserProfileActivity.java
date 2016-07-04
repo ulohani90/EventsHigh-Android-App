@@ -64,7 +64,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     public ArrayList<String> TABS;
     CircularImageView userImage;
     ImageView shareButton;
-    TextView userName,userCity;
+    TextView userName, userCity;
     TextView btnFollow;
     TextView userInterestCount, userFollowerCount, userFavouriteCount;
 
@@ -74,7 +74,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
     private View topProgressBar;
     private View retryView;
-
+    private View profileView;
 
     TextView tvFacebookInfo;
     LinearLayout llFacebookInfoMask, llAboutUserMask;
@@ -91,9 +91,6 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setupLayout(R.layout.activity_user_profile);
         TABS = new ArrayList<>();
-        TABS.add("Favourites");
-        TABS.add("Interests");
-        TABS.add("My Reviews");
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         retryView = findViewById(R.id.view_retry);
@@ -103,7 +100,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 fetchProfileInfo(false);
             }
         });
-
+        profileView = findViewById(R.id.profile_view);
         addToolbarView();
         pager = (ViewPager) findViewById(R.id.view_pager);
         tabsView = (TabLayout) findViewById(R.id.tabs);
@@ -114,7 +111,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
         //phone verify
         account = new Account(this);
-        verifyPhnLayout = (LinearLayout)findViewById(R.id.verify_phn_layout);
+        verifyPhnLayout = (LinearLayout) findViewById(R.id.verify_phn_layout);
         (findViewById(R.id.verify_btn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,35 +122,24 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
 
         topProgressBar = findViewById(R.id.top_progress_bar);
-
         mobileNoProfileUser = getIntent().getStringExtra(PROFILE_ID);
-        if (mobileNoProfileUser != null){
-            isUserSelf = false;
-        }else{
-            isUserSelf = true;
-            TABS.add("My Tickets");
-            TABS.add("My Friends");
-            llFacebookInfoMask.setVisibility(View.VISIBLE);
-            toolbar.setVisibility(View.VISIBLE);
-            pager.setVisibility(View.VISIBLE);
-        }
 
         FacebookSdk.sdkInitialize(getApplicationContext());
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         fetchProfileInfo(false);
     }
 
-    public void addToolbarView(){
+    public void addToolbarView() {
         View view = LayoutInflater.from(this).inflate(R.layout.card_user_profile, toolbar, false);
         userImage = (CircularImageView) view.findViewById(R.id.profile_image);
-        shareButton = (ImageView)view.findViewById(R.id.profile_share);
+        shareButton = (ImageView) view.findViewById(R.id.profile_share);
         userName = (TextView) view.findViewById(R.id.profile_user_name);
         userCity = (TextView) view.findViewById(R.id.profile_user_city);
-        btnFollow = (TextView)view.findViewById(R.id.btn_follow);
+        btnFollow = (TextView) view.findViewById(R.id.btn_follow);
         btnFollow.setOnClickListener(this);
         userInterestCount = (TextView) view.findViewById(R.id.user_interest_count);
         userFavouriteCount = (TextView) view.findViewById(R.id.user_favourite_count);
@@ -168,8 +154,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     }
 
 
-
-    public void verifyClicked(){
+    public void verifyClicked() {
         startActivity(new Intent(this, PhoneLoginActivity.class));
     }
 
@@ -180,12 +165,13 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 fbLoginButtonPressed();
                 break;
             case R.id.profile_share:
-                shareProfileWithBranch(userProfilePagerAdapter.getProfileInfo(),mobileNoProfileUser,null,"Profile");
+                shareProfileWithBranch(userProfilePagerAdapter.getProfileInfo(), mobileNoProfileUser, null, "Profile");
                 break;
         }
     }
 
     LoginResult loginResult;
+
     void fbLoginButtonPressed() {
         LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends", "read_custom_friendlists", "user_likes", "user_about_me"));
         callbackManager = CallbackManager.Factory.create();
@@ -208,7 +194,6 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 Toast.makeText(getBaseContext(), "Problem connecting to Facebook", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     void requestUserProfile() {
@@ -222,7 +207,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             public void onCompleted(JSONObject object, GraphResponse response) {
                 Log.i("LoginActivity", response.toString());
                 // Get facebook data from login
-                if(object != null){
+                if (object != null) {
                     try {
                         String userId = object.getString("id");
                         object.remove("id");
@@ -230,10 +215,10 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                         object.put("fb_profile_pic", "https://graph.facebook.com/" + userId + "/picture?type=large");
                         String temp = object.getString("email");
                         object.remove("email");
-                        object.put("fb_email",temp);
+                        object.put("fb_email", temp);
                         temp = object.getString("name");
                         object.remove("name");
-                        object.put("fb_name",temp);
+                        object.put("fb_name", temp);
                         object.put("fb_token", accessToken);
                         object.put("android_id", Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
                         addFacebookUserInfo(object);
@@ -241,7 +226,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                         llAboutUserMask.setVisibility(View.VISIBLE);
                         llFacebookInfoMask.setVisibility(View.GONE);
                         updateProfile();
-                    }catch (JSONException e) {
+                    } catch (JSONException e) {
                         Log.i("User Profile", "JSON Exception");
                     }
                     Log.e("obj ", object.toString());
@@ -258,21 +243,66 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
 
     private void fetchProfileInfo(boolean shouldByPassChange){
-        if(isUserSelf)mobileNoProfileUser = account.getUserInfo().phoneNo;
+        if (mobileNoProfileUser != null) {
+            if (mobileNoProfileUser.equalsIgnoreCase(account.getUserInfo().phoneNo)) {
+                isUserSelf = true;
+            } else {
+                isUserSelf = false;
+            }
+        } else{
+            isUserSelf = true;
+        }
 
-        if(Utils.checkIfStringEmpty(mobileNoProfileUser)){
-            verifyPhnLayout.setVisibility(View.VISIBLE);
+        if(isUserSelf){
+            TABS.add("My Favourites");
+            TABS.add("My Interests");
+            TABS.add("My Reviews");
+            TABS.add("My Tickets");
+            TABS.add("My Friends");
+            if (isUserSelf) mobileNoProfileUser = account.getUserInfo().phoneNo;
         }else{
+            TABS.add("Favourites");
+            TABS.add("Interests");
+            TABS.add("Reviews");
+        }
+
+
+        if (Utils.checkIfStringEmpty(mobileNoProfileUser)) {
+            verifyPhnLayout.setVisibility(View.VISIBLE);
+        } else {
             topProgressBar.setVisibility(View.VISIBLE);
             retryView.setVisibility(View.GONE);
             FetchProfileRequest.submit(this, mobileNoProfileUser, Request.Priority.HIGH,
                     new Response.Listener<ProfileInfo>() {
                         @Override
                         public void onResponse(ProfileInfo profileInfo, boolean b) {
+                            profileView.setVisibility(View.VISIBLE);
                             userProfilePagerAdapter.setProfileInfo(profileInfo);
                             pager.setAdapter(userProfilePagerAdapter);
                             tabsView.setupWithViewPager(pager);
                             topProgressBar.setVisibility(View.GONE);
+                            //attech user data
+                            if (!Utils.checkIfStringEmpty(profileInfo.getName())) {
+                                userName.setText(profileInfo.getName());
+                                userCity.setText(profileInfo.getLastCity());
+                                Glide.with(UserProfileActivity.this).load(profileInfo.getProfilePic())
+                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                        .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                                        .into(userImage);
+                                llAboutUserMask.setVisibility(View.VISIBLE);
+                            } else if (isUserSelf) {
+                                llFacebookInfoMask.setVisibility(View.VISIBLE);
+                                userName.setText(new Account(UserProfileActivity.this).getUserInfo().name);
+                                userCity.setText(new Account(UserProfileActivity.this).getLastCity().name());
+                            }else{
+                                llAboutUserMask.setVisibility(View.VISIBLE);
+                            }
+                            //attech counts
+                            userFollowerCount.setText(profileInfo.getUserContactList().size()+"");
+                            userInterestCount.setText(profileInfo.getMyInterestEvents().size()+"");
+                            int favCount = profileInfo.getMeEventFavouriteObject().topicEvents.get(0).events.size() +
+                                    profileInfo.getMeEventFavouriteObject().movies.size();
+                            userFavouriteCount.setText(favCount+"");
                         }
                     }, new Response.ErrorListener() {
                         @Override
@@ -289,7 +319,8 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject, boolean b) {
-                        Toast.makeText(UserProfileActivity.this,"Your profile has been updated successfully.",Toast.LENGTH_SHORT).show();;
+                        Toast.makeText(UserProfileActivity.this, "Your profile has been updated successfully.", Toast.LENGTH_SHORT).show();
+                        ;
                     }
                 }, new Response.ErrorListener() {
                     @Override
@@ -348,21 +379,21 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             if (position == 0) {
                 LatLng latLng = (new Account(context)).getLastCity().cityBounds.getCenter();
                 EventsContext myEventsContext = new EventsContext(latLng, EventsHighEndpoints.QUERY_MY_EVENT);
-                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null, false,profileInfo);
+                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null, false, profileInfo);
                 return myFavouritesFragment;
             } else if (position == 1) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_INTEREST_EVENTS);
-                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false,profileInfo);
+                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false, profileInfo);
                 return myInterestEventsFragment;
             } else if (position == 2) {
-                MyReviewsFragment myReviewsFragment = MyReviewsFragment.newInstance(eventsContext,profileInfo.getMovieUserReviewObjectArrayList());
+                MyReviewsFragment myReviewsFragment = MyReviewsFragment.newInstance(eventsContext, profileInfo.getMovieUserReviewObjectArrayList());
                 return myReviewsFragment;
-            } else if(position == 3){
+            } else if (position == 3) {
                 MyTicketsFragment myTicketsFragment = new MyTicketsFragment();
                 return myTicketsFragment;
-            }else{
-                ContactsFragment fragment = new ContactsFragment();
+            } else {
+                ContactsFragment fragment = ContactsFragment.newInstance(profileInfo);
                 return fragment;
             }
         }

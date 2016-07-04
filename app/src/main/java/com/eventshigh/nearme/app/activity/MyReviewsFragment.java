@@ -110,6 +110,8 @@ public class MyReviewsFragment extends Fragment{
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
+        swipeRefreshLayout.setEnabled(false);
+
         eventsContext = getArguments().getParcelable(EVENT_CONTEXT);
         movieUserReviewObjects = getArguments().getParcelableArrayList("reviews");
     }

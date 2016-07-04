@@ -51,7 +51,7 @@ public class ContactsAdapter extends Adapter<ViewHolder> {
     public void setMyContacts(Collection<UserContact> contacts, FriendCardType cardType) {
         dataToShow.clear();
 
-        for (UserContact contact : contacts) {
+        for (UserContact contact : contacts){
             SocialFriend friend = new SocialFriend(contact);
             dataToShow.add(new SocialFriendData(activity, friendsStore, friend, cardType));
         }

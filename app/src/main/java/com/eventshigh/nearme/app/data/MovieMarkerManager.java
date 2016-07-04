@@ -85,8 +85,6 @@ public class MovieMarkerManager {
             if (mark == null) {
                 removeMovieMark(movie);
             } else {
-                new UserActionHelper(context).recordMovieAction(
-                        UserActionHelper.MovieAction.ADD_FAVORITE, movie.getId() + "");
                 movieMarkMap.put(movie.getId() + "", mark);
                 new UserActionHelper(context).recordMovieAction(
                         UserActionHelper.MovieAction.ADD_FAVORITE_MOVIE, movie.getId() + "");

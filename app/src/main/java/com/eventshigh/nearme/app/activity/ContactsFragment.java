@@ -15,6 +15,9 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.MovieUserReviewObject;
+import com.eventshigh.nearme.app.data.ProfileInfo;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.MyContactsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -26,6 +29,7 @@ import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.user.UserContactsUploader;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,18 +45,29 @@ public class ContactsFragment extends Fragment {
     private AutofitRecyclerView gridView;
 
     private ContactsAdapter contactsAdapter;
+    private ProfileInfo profileInfo;
 
     private boolean hasAskForContactsDialogShown = false;
-
     private View uploadContact;
-
     private TextView uploadContactsBtn;
+
+    public static final String PROFILE_INFO = "profile_info";
+
+    public static ContactsFragment newInstance(ProfileInfo profileInfo) {
+        Bundle args = new Bundle();
+        args.putParcelable(PROFILE_INFO, profileInfo);
+        ContactsFragment contactsFragment = new ContactsFragment();
+        contactsFragment.setArguments(args);
+        return contactsFragment;
+    }
+
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
         this.activity = (BaseActivity) context;
+        if (getArguments() != null && getArguments().getParcelable("profile_info") != null)
+            profileInfo = getArguments().getParcelable("profile_info");
     }
 
     @Override
@@ -127,14 +142,24 @@ public class ContactsFragment extends Fragment {
         VolleyHelper.getRequestQueue(activity).cancelAll(this);
 
         Preferences preferences = Preferences.getInstance(activity);
-        if (preferences.canUploadContacts()) {
+        if(profileInfo != null){
+            retryView.setVisibility(View.GONE);
+            noFriendsOnEhView.setVisibility(View.INVISIBLE);
+            uploadContact.setVisibility(View.GONE);
+            if (profileInfo.getUserContactList().isEmpty()) {
+                noFriendsOnEhView.setVisibility(View.VISIBLE);
+            }
+            contactsAdapter.setMyContacts(profileInfo.getUserContactList(), FriendCardType.FOLLOW);
+            topProgressBar.setVisibility(View.GONE);
+        }else if(preferences.canUploadContacts()) {
+
             topProgressBar.setVisibility(View.VISIBLE);
             retryView.setVisibility(View.GONE);
             noFriendsOnEhView.setVisibility(View.INVISIBLE);
             uploadContact.setVisibility(View.GONE);
             MyContactsRequest.submit(activity, Priority.IMMEDIATE, this, shouldBypassCache,
                 myContactsListener, errorListener);
-        } else {
+        } else{
             topProgressBar.setVisibility(View.GONE);
             retryView.setVisibility(View.GONE);
             noFriendsOnEhView.setVisibility(View.INVISIBLE);
