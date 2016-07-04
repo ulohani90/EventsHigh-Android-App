@@ -68,8 +68,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
     public void setSocialActions(@Nullable SocialActions socialActions) {
-        this.socialActions = socialActions;
-        notifyDataSetChanged();
+        if(socialActions!=null) {
+            this.socialActions = socialActions;
+            notifyDataSetChanged();
+        }
     }
 
     public void setSocialInvites(@Nullable Map<String, SocialInvite> socialInvites) {

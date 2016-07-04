@@ -85,9 +85,18 @@ public class EventInfoFragment extends Fragment {
 
     TextView ratingHeader, reviewsCount;
 
+    BaseContextActivity activity;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        activity = (BaseContextActivity)getActivity();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         view = inflater.inflate(R.layout.fragment_event_info_layout, container, false);
 
         eventName = (TextView) view.findViewById(R.id.event_name);
@@ -154,6 +163,7 @@ public class EventInfoFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         account = new Account(getActivity());
+
         final Event event = getArguments().getParcelable("event");
         eventName.setText(event.title);
         if (event.organizerName != null) {
@@ -416,19 +426,21 @@ public class EventInfoFragment extends Fragment {
     }
 
     private void populateEventTravelTime(Event event) {
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Location location = LocationServices.FusedLocationApi.getLastLocation(client);
-            if (location != null) {
-                userLocation = LocationUtils.locationToLatLng(location);
-            }
+        if(activity!=null) {
+            if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                Location location = LocationServices.FusedLocationApi.getLastLocation(client);
+                if (location != null) {
+                    userLocation = LocationUtils.locationToLatLng(location);
+                }
 
-            String eventTravelTime = LocationUtils.getTravelTime(getActivity(),
-                    userLocation, event.location);
-            travelTimeView.setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
-            view.findViewById(R.id.direction_separator).setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
-            if (eventTravelTime != null) {
-                travelTimeView.setText(eventTravelTime);
+                String eventTravelTime = LocationUtils.getTravelTime(getActivity(),
+                        userLocation, event.location);
+                travelTimeView.setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
+                view.findViewById(R.id.direction_separator).setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
+                if (eventTravelTime != null) {
+                    travelTimeView.setText(eventTravelTime);
+                }
             }
         }
     }

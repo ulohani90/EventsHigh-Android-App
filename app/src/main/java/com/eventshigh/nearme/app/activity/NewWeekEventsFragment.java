@@ -666,9 +666,10 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
     }
 
     public void checkIfCustomDateSelected() {
-        if (selectCustomDates.isSelected()) {
+        if (selectCustomDates != null && selectCustomDates.isSelected()) {
             selectCustomDates.setSelected(false);
-            filterEventTimes.clear();
+            if (filterEventTimes != null)
+                filterEventTimes.clear();
         }
     }
 

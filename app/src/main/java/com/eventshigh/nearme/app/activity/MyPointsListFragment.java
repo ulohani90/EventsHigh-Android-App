@@ -78,7 +78,9 @@ public class MyPointsListFragment  extends Fragment {
 
     public void makeServerRequest(boolean shouldByPassCache){
         City city = new Account(getActivity()).getLastCity();
-        OffersRequest.submit(getActivity(), city, Request.Priority.IMMEDIATE, this, shouldByPassCache, mListener, mErrorListener);
+        if(city!=null) {
+            OffersRequest.submit(getActivity(), city, Request.Priority.IMMEDIATE, this, shouldByPassCache, mListener, mErrorListener);
+        }
 
     }
 

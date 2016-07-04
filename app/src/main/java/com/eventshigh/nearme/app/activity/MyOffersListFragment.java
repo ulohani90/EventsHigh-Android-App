@@ -85,7 +85,7 @@ public class MyOffersListFragment extends Fragment {
         contactus = (TextView) view.findViewById(R.id.contact_us_text);
 
         SpannableString string = new SpannableString("For any queries, Contact us");
-        string.setSpan(new UnderlineSpan(),17,string.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        string.setSpan(new UnderlineSpan(), 17, string.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         contactus.setText(string);
         contactus.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,7 +164,9 @@ public class MyOffersListFragment extends Fragment {
 
     public void makeServerRequest(boolean shouldByPassCache) {
         City city = new Account(getActivity()).getLastCity();
-        OffersRequest.submit(getActivity(), city, Request.Priority.IMMEDIATE, this, shouldByPassCache, mListener, mErrorListener);
+        if (city != null) {
+            OffersRequest.submit(getActivity(), city, Request.Priority.IMMEDIATE, this, shouldByPassCache, mListener, mErrorListener);
+        }
 
     }
 

@@ -97,7 +97,10 @@ public class GooglePlacesAutocompleteAdapter
      */
     @Override
     public AutocompletePrediction getItem(int position) {
-        return mResultList.get(position);
+        if(mResultList!=null) {
+            return mResultList.get(position);
+        }
+        return null;
     }
 
     @Override
