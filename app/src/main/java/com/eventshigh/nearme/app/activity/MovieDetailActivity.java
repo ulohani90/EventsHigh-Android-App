@@ -128,7 +128,8 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     protected void onResume() {
         super.onResume();
         if (Preferences.getInstance(this).isReviewAdded()) {
-            makeMyReviewsServerRequest(true);
+            if (movieDetailOject != null)
+                makeMyReviewsServerRequest(true);
         }
     }
 
@@ -149,7 +150,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     }
 
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
     }
 
@@ -290,7 +291,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
         }
 
         @Override
-        public Fragment getItem(int position){
+        public Fragment getItem(int position) {
             Bundle bundle = new Bundle();
             if (TABS.get(position).equalsIgnoreCase(INFO)) {
 
@@ -357,9 +358,9 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
         Log.e("", state + " state changed");
     }
 
-    protected void animateFab(int position){
+    protected void animateFab(int position) {
         if (!TABS.get(position).equalsIgnoreCase(USER_REVIEWS)) {
-            if (fabWriteReviews.getVisibility() == View.VISIBLE){
+            if (fabWriteReviews.getVisibility() == View.VISIBLE) {
                 fabWriteReviews.setVisibility(View.GONE);
                 TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, 250);
                 translateAnimation.setDuration(300);

@@ -253,11 +253,12 @@ public class EventsFragment extends BaseEventsFragment {
         );*/
 
         // Load social actions.
-        if (showFollowCard) {
+        /*if (showFollowCard) {
             SocialActionsRequest.submit(activity, Priority.LOW, this, shouldBypassCache,
                     new Listener<SocialActions>() {
                         @Override
                         public void onResponse(SocialActions socialActions, boolean isIntermediate) {
+
                             activity.reportActionToAnalytics("showSocialInfo", "followers",
                                     socialActions.getNumFollowers(eventsContext.query));
                             eventsAdapter.setSocialActions(socialActions);
@@ -270,7 +271,7 @@ public class EventsFragment extends BaseEventsFragment {
                         }
                     }
             );
-        }
+        }*/
     }
 
     boolean isFragmentDestroyed = false;
@@ -770,7 +771,7 @@ public class EventsFragment extends BaseEventsFragment {
                 topProgressBar.setVisibility(View.GONE);
                 eventsAdapter.setEvents(events, null, showEhInviteForNotification);
                 if (events.isEmpty()) {
-                    Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), R.string.no_events, Snackbar.LENGTH_SHORT).show();
 
                 }
             }

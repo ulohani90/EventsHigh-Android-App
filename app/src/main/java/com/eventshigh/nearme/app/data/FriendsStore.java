@@ -16,6 +16,7 @@ public class FriendsStore {
     }
 
     public void setFollowing(String contactId, boolean following) {
+        
         preferences.edit().putBoolean(contactId, following).apply();
     }
 }

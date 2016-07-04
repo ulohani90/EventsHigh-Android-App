@@ -214,8 +214,8 @@ public abstract class BaseActivity extends AppCompatActivity {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-
-            onBackPressed();
+            if (isRunning())
+                onBackPressed();
             return true;
         }
 

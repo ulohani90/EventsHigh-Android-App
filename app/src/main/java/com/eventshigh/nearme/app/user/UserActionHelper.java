@@ -35,8 +35,8 @@ public class UserActionHelper {
     }
 
     public enum MovieAction {
-        ADD_FAVORITE,
-        REMOVE_FAVORITE,
+        ADD_FAVORITE_MOVIE,
+        REMOVE_FAVORITE_MOVIE,
     }
 
     public enum FollowingAction {

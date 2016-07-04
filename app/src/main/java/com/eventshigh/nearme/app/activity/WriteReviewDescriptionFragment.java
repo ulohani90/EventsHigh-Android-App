@@ -107,13 +107,14 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
             tvMovieName.setText(writeReviewActivity.event.title);
         }
 
-        if (writeReviewActivity.isFromNotification){
+        if (writeReviewActivity.isFromNotification) {
             Glide.with(writeReviewActivity).load(writeReviewActivity.reviewEntityImage)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                     .into(ivMoviePicture);
             tvMovieName.setText(writeReviewActivity.reviewEntityName);
         }
+
 
         llReviewDescriptionHeader.setOnClickListener(this);
         btnReviewSubmit.setOnClickListener(this);
@@ -209,7 +210,7 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
                             Log.i("Message failure", "true" + jsonObject.toString());
                         }
                     });
-        } catch (JSONException e){
+        } catch (JSONException e) {
             Crashlytics.getInstance().core.logException(e);
         }
     }

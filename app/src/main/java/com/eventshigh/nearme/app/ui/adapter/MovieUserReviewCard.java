@@ -50,7 +50,8 @@ public class MovieUserReviewCard extends RecyclerView.ViewHolder {
     }
 
     public void bindData(final BaseContextActivity activity, final MovieUserReviewObject review, String reviewForId) {
-        tvReviewText.setText(review.getReviewText().trim());
+        if(review.getReviewText()!=null)
+            tvReviewText.setText(review.getReviewText().trim());
         tvReviewBy.setText(review.getReviewBy());
         int size = ivReviewerImage.getLayoutParams().height;
         ivReviewerImage.setImageDrawable(UserContact.getDrawableForName(review.getReviewBy(), size));

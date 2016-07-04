@@ -81,16 +81,18 @@ public class EventsMarkerManager {
         }
 
         public Editor recordEventMark(Event event, @Nullable EventMark mark) {
-            if (mark == null) {
-                removeEventMark(event);
-            } else {
-                eventMarkMap.put(event.id, mark);
-                if (EventMark.isFavourite(mark)) {
-                    AlarmUtils.setEventAlarm(context, event);
-                    new UserActionHelper(context).recordAction(
-                            UserActionHelper.EventAction.ADD_FAVORITE, event.id);
+            if(event!=null) {
+                if (mark == null) {
+                    removeEventMark(event);
+                } else {
+                    eventMarkMap.put(event.id, mark);
+                    if (EventMark.isFavourite(mark)) {
+                        AlarmUtils.setEventAlarm(context, event);
+                        new UserActionHelper(context).recordAction(
+                                UserActionHelper.EventAction.ADD_FAVORITE, event.id);
+                    }
+                    threads.add(EventMarkDbHelper.addEntry(database, event.id, mark));
                 }
-                threads.add(EventMarkDbHelper.addEntry(database, event.id, mark));
             }
             return this;
         }

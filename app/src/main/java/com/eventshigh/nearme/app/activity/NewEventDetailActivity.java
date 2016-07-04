@@ -568,6 +568,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
             Bundle bundle = new Bundle();
             if (position == 0) {
                 bundle.putParcelable("event", event);
+
                 fragment = EventInfoFragment.newInstance(bundle);
                 return fragment;
             }
