@@ -63,7 +63,7 @@ public class SocialFriendCard extends ViewHolder {
             @Override
             public void onClick(View v) {
                 if (friendData.friend.contact != null) {
-                    friendsStore.setFollowing(friendData.friend.contact.contactId, !followButton.isSelected());
+                    friendsStore.setFollowing(friendData.friend.contact.mobileNo,friendData.friend.contact.contactId, !followButton.isSelected());
                     updateActionButton(friendsStore, friendData.friend);
                 }
             }
