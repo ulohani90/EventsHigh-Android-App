@@ -1,5 +1,7 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -17,8 +19,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
+import com.eventshigh.nearme.app.activity.UserProfileActivity;
 import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.data.UserContact;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.CircularImageView;
 
 /**
@@ -56,6 +60,19 @@ public class MovieUserReviewCard extends RecyclerView.ViewHolder {
             tvReviewFor.setText("This review was for " + review.getReviewEntity());
         } else {
             tvReviewFor.setVisibility(View.GONE);
+        }
+        tvReviewBy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(Utils.isValidPhone(review.getReviewerId())){
+                    Intent intent = new Intent(activity, UserProfileActivity.class);
+                    intent.putExtra(UserProfileActivity.PROFILE_ID,review.getReviewerId());
+                    activity.startActivity(intent);
+                }
+            }
+        });
+        if(Utils.isValidPhone(review.getReviewerId())){
+            tvReviewBy.setTextColor(Color.parseColor("#33aaee"));
         }
     }
 

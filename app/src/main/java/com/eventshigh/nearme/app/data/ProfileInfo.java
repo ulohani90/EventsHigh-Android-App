@@ -2,6 +2,8 @@ package com.eventshigh.nearme.app.data;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
@@ -19,7 +21,7 @@ import java.util.List;
  * @since 1/7/16.
  */
 
-public class ProfileInfo {
+public class ProfileInfo implements Parcelable{
 
     private String profileId;
     private ArrayList<MovieUserReviewObject> movieUserReviewObjectArrayList;
@@ -61,17 +63,26 @@ public class ProfileInfo {
         this.myInterestEvents = myInterestObjectList;
     }
 
+    public ProfileInfo(Parcel in){
+        profileId = in.readString();
+        movieUserReviewObjectArrayList = new ArrayList<>();
+        in.readTypedList(movieUserReviewObjectArrayList, MovieUserReviewObject.CREATOR);
+        myInterestEvents = new ArrayList<>();
+        in.readTypedList(myInterestEvents, MyEventsRequest.TopicEvents.CREATOR);
+    }
+
+
     public static ProfileInfo fromJson(JSONObject jsonObject, Context context) {
         ArrayList<MyEventsRequest.TopicEvents> events = new ArrayList<>();
         ArrayList<MovieUserReviewObject> movieUserReviewObjects = new ArrayList<>();
 
         try {
-            if (false && jsonObject.has("interest_events")) {
+            if (jsonObject.has("interest_events")) {
                 JSONArray eventsJsonArray = jsonObject.getJSONArray("interest_events");
 
                 for (int i = 0; i < eventsJsonArray.length(); i++) {
 
-                    if (eventsJsonArray.getJSONObject(i).has("topic_events")) {
+                    if (eventsJsonArray.getJSONObject(i).getInt("event_count") > 0.1) {
                     List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"), true);
                     new Account(context).setIsFollowing(eventsJsonArray.getJSONObject(i).getString("topic"), true);
                     MyEventsRequest.TopicEvents eventData = new MyEventsRequest.TopicEvents(eventsJsonArray.getJSONObject(i).getString("topic"), topicEvents, eventsJsonArray.getJSONObject(i).getInt("event_count"));
@@ -93,4 +104,28 @@ public class ProfileInfo {
         return null;
 
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(profileId);
+        dest.writeTypedList(movieUserReviewObjectArrayList);
+        dest.writeTypedList(myInterestEvents);
+    }
+
+    public static final Parcelable.Creator<ProfileInfo> CREATOR =
+            new Parcelable.Creator<ProfileInfo>() {
+                public ProfileInfo createFromParcel(Parcel in) {
+                    return new ProfileInfo(in);
+                }
+
+                public ProfileInfo[] newArray(int size) {
+                    return new ProfileInfo[size];
+                }
+            };
+
 }

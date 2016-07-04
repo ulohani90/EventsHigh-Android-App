@@ -21,6 +21,7 @@ import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.ProfileInfo;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.network.DateCategoryRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
@@ -67,6 +68,7 @@ public class EventsFragment extends BaseEventsFragment {
     int scrollPosition = 0;
 
     SocialInvitationsRequest.SpecialCoupons special;
+    private ProfileInfo profileInfo;
 
     EventsCollection eventsCollection;
 
@@ -76,12 +78,13 @@ public class EventsFragment extends BaseEventsFragment {
     public static final String IS_TODAY_SELECTED = "is_today_selected";
 
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
-                                             boolean showCategories, boolean showEhInviteForNotification, SocialInvitationsRequest.SpecialCoupons special, boolean isTodaySelected) {
+                                             boolean showCategories, boolean showEhInviteForNotification, SocialInvitationsRequest.SpecialCoupons special, boolean isTodaySelected, ProfileInfo profileInfo) {
         EventsFragment fragment = new EventsFragment();
         Bundle args = getArgs(eventsContext, showFollowCard, showCategories);
         args.putBoolean(SHOW_EH_INVITE_NOTIFICATION_PARAM, showEhInviteForNotification);
         args.putBoolean(IS_TODAY_SELECTED, isTodaySelected);
         args.putParcelable("special_obj", special);
+        args.putParcelable("profile_info", profileInfo);
         fragment.setArguments(args);
         return fragment;
     }
@@ -94,6 +97,10 @@ public class EventsFragment extends BaseEventsFragment {
         if (onScrollListener == null) {
             onScrollListener = new HideActionBarOnScroll(this.activity);
         }
+
+        if (getArguments() != null && getArguments().getParcelable("profile_info") != null)
+            profileInfo = getArguments().getParcelable("profile_info");
+
     }
 
     @Override
@@ -124,7 +131,7 @@ public class EventsFragment extends BaseEventsFragment {
             public void onRefresh() {
                 activity.reportActionToAnalytics("swipeRefresh", eventsContext.toString());
                 swipeRefreshLayout.setRefreshing(false);
-                fetchNewListing(true );// bypass cache
+                fetchNewListing(true);// bypass cache
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
@@ -211,9 +218,14 @@ public class EventsFragment extends BaseEventsFragment {
             asyncRequest = new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mMyFavEventsMoviesFetcherCallBack, mErrorListener);
             asyncRequest.execute();
-        } else if (EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query)){
-            MobileUserEventsRequest.submit(activity, eventsContext,
-                    Priority.IMMEDIATE, this, shouldBypassCache, true, mMyEventsFetcherCallBack, mErrorListener);
+            //bindDataFavourite(null);
+        } else if (EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query)) {
+            if (profileInfo == null) {
+                MobileUserEventsRequest.submit(activity, eventsContext,
+                        Priority.IMMEDIATE, this, shouldBypassCache, true, mMyEventsFetcherCallBack, mErrorListener);
+            } else {
+                bindDataInterestEvents(profileInfo.getMyInterestEvents());
+            }
         } else if (eventsContext.query.isEmpty() && !eventsContext.dateFilter.isEmpty() && showCategories) {
             DateCategoryRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, mMyEventsFetcherCallBack, mErrorListener);
@@ -269,6 +281,73 @@ public class EventsFragment extends BaseEventsFragment {
         super.onDestroy();
     }
 
+    private void bindDataInterestEvents(List<TopicEvents> myEvents) {
+        if (isFragmentDestroyed) {
+            return;
+        }
+
+        topProgressBar.setVisibility(View.GONE);
+
+        if (myEvents.isEmpty()) {
+            if (EventsHighEndpoints.isMyEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
+                noMyEventsView.setVisibility(View.VISIBLE);
+                noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_event));
+                callToActionButton.setText("Explore Events");
+            } else if (EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
+                noMyEventsView.setVisibility(View.VISIBLE);
+                noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_interest));
+                callToActionButton.setText("Personalize");
+            } else {
+                noMyEventsView.setVisibility(View.GONE);
+                retryView.setVisibility(View.VISIBLE);
+            }
+        }
+
+        if (!myEvents.isEmpty()) {
+            if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
+                ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.get(0).events.get(0).imgUrl);
+            }
+
+            eventsAdapter.setTopicEvents(myEvents, eventsContext, eventGridView.getSpanCount() * 2);
+        }
+        isLoading = false;
+    }
+
+    private void bindDataFavourite(MyEventsRequest.MeEventFavouriteObject myEvents) {
+        if (isFragmentDestroyed) {
+            return;
+        }
+
+        topProgressBar.setVisibility(View.GONE);
+
+        if (myEvents.topicEvents.isEmpty() && myEvents.movies.isEmpty()) {
+            if (EventsHighEndpoints.isMyEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
+                noMyEventsView.setVisibility(View.VISIBLE);
+                noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_event));
+                callToActionButton.setText("Explore Events");
+            } else if (EventsHighEndpoints.isMyInterestEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
+                noMyEventsView.setVisibility(View.VISIBLE);
+                noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_interest));
+                callToActionButton.setText("Personalize");
+            } else {
+                noMyEventsView.setVisibility(View.GONE);
+                retryView.setVisibility(View.VISIBLE);
+            }
+        }
+
+        if (!myEvents.topicEvents.isEmpty()) {
+            if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
+                ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.topicEvents.get(0).events.get(0).imgUrl);
+            }
+
+            eventsAdapter.setTopicEvents(myEvents.topicEvents, eventsContext, eventGridView.getSpanCount() * 2);
+        }
+        if (!myEvents.movies.isEmpty()) {
+            eventsAdapter.setMoviesListData(myEvents.movies, eventsContext, true, myEvents.topicEvents.isEmpty() ? true : false);
+        }
+        //    eventGridView.scrollToPosition(scrollPosition);
+        isLoading = false;
+    }
 
     private Listener<List<TopicEvents>> mMyEventsFetcherCallBack = new Listener<List<TopicEvents>>() {
         @Override

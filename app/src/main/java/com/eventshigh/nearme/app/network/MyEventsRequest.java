@@ -2,6 +2,8 @@ package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -16,6 +18,7 @@ import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.MovieMarkerManager;
+import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
 
 import java.util.ArrayList;
@@ -37,7 +40,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
     public static String MOVIES_NAME = "my movies";
 
 
-    public static class MeEventFavouriteObject {
+    public static class MeEventFavouriteObject implements Parcelable{
         public final List<TopicEvents> topicEvents;
 
         public final List<MovieDetailObject> movies;
@@ -47,9 +50,38 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
             this.movies = movies;
         }
 
+        public MeEventFavouriteObject(Parcel in){
+            this.topicEvents = new ArrayList<>();
+            in.readTypedList(this.topicEvents, TopicEvents.CREATOR);
+            this.movies = new ArrayList<>();
+            in.readTypedList(this.movies, MovieDetailObject.CREATOR);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeTypedList(topicEvents);
+            dest.writeTypedList(movies);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        public static final Parcelable.Creator<MeEventFavouriteObject> CREATOR =
+                new Parcelable.Creator<MeEventFavouriteObject>() {
+                    public MeEventFavouriteObject createFromParcel(Parcel in) {
+                        return new MeEventFavouriteObject(in);
+                    }
+                    public MeEventFavouriteObject[] newArray(int size) {
+                        return new MeEventFavouriteObject[size];
+                    }
+                };
+
+
     }
 
-    public static class TopicEvents {
+    public static class TopicEvents implements Parcelable{
         public final String topicName;
         public final List<Event> events;
         public final int numEvents;
@@ -63,6 +95,37 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
             this.events = events;
             this.numEvents = numEvents;
         }
+
+        public TopicEvents(Parcel in){
+            this.topicName = in.readString();
+            events = new ArrayList<>();
+            in.readTypedList(events, Event.CREATOR);
+            numEvents = in.readInt();
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(topicName);
+            dest.writeTypedList(events);
+            dest.writeFloat(numEvents);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        public static final Parcelable.Creator<TopicEvents> CREATOR =
+                new Parcelable.Creator<TopicEvents>() {
+                    public TopicEvents createFromParcel(Parcel in) {
+                        return new TopicEvents(in);
+                    }
+
+                    public TopicEvents[] newArray(int size) {
+                        return new TopicEvents[size];
+                    }
+                };
+
     }
 
     public static boolean isSpecialTag(String name) {

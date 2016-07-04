@@ -129,12 +129,12 @@ public class MeFragment extends Fragment {
             if (position == 0) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_EVENT);
-                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null, false);
+                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null, false,null);
                 return myFavouritesFragment;
             } else if (position == 1) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_INTEREST_EVENTS);
-                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false);
+                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false,null);
                 return myInterestEventsFragment;
             } else if (position == 2) {
                 ContactsFragment fragment = new ContactsFragment();

@@ -348,12 +348,12 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             if (position == 0) {
                 LatLng latLng = (new Account(context)).getLastCity().cityBounds.getCenter();
                 EventsContext myEventsContext = new EventsContext(latLng, EventsHighEndpoints.QUERY_MY_EVENT);
-                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null, false);
+                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null, false,profileInfo);
                 return myFavouritesFragment;
             } else if (position == 1) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_INTEREST_EVENTS);
-                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false);
+                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false,profileInfo);
                 return myInterestEventsFragment;
             } else if (position == 2) {
                 MyReviewsFragment myReviewsFragment = MyReviewsFragment.newInstance(eventsContext,profileInfo.getMovieUserReviewObjectArrayList());

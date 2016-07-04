@@ -167,7 +167,7 @@ public class EventsGridActivity extends BaseContextActivity {
             boolean showEhInviteForNotification = getIntent() != null &&
                     getIntent().getAction() != null && getIntent().getAction().startsWith(NOTIFICATION_ACTION);
             EventsFragment eventFragment1 = EventsFragment.getInstance(
-                    eventsContext, showFollowCard, false, showEhInviteForNotification, (SocialInvitationsRequest.SpecialCoupons) getIntent().getParcelableExtra("special_obj"), isTodaySelected);
+                    eventsContext, showFollowCard, false, showEhInviteForNotification, (SocialInvitationsRequest.SpecialCoupons) getIntent().getParcelableExtra("special_obj"), isTodaySelected,null);
             eventFragment1.setOnScrollListener(
                     false ? followCardScrollListener : doNothingScrollListener);
 
