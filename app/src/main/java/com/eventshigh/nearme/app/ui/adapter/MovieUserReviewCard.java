@@ -50,7 +50,7 @@ public class MovieUserReviewCard extends RecyclerView.ViewHolder {
     }
 
     public void bindData(final BaseContextActivity activity, final MovieUserReviewObject review, String reviewForId) {
-        if(review.getReviewText()!=null)
+        if (review.getReviewText() != null)
             tvReviewText.setText(review.getReviewText().trim());
         tvReviewBy.setText(review.getReviewBy());
         int size = ivReviewerImage.getLayoutParams().height;
@@ -62,19 +62,27 @@ public class MovieUserReviewCard extends RecyclerView.ViewHolder {
         } else {
             tvReviewFor.setVisibility(View.GONE);
         }
-        tvReviewBy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(Utils.isValidPhone(review.getReviewerId())){
-                    Intent intent = new Intent(activity, UserProfileActivity.class);
-                    intent.putExtra(UserProfileActivity.PROFILE_ID,review.getReviewerId());
-                    activity.startActivity(intent);
+
+        if (review.getReviewerId() != null) {
+            tvReviewBy.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (Utils.isValidPhone(review.getReviewerId())) {
+                        Intent intent = new Intent(activity, UserProfileActivity.class);
+                        intent.putExtra(UserProfileActivity.PROFILE_ID, review.getReviewerId());
+                        activity.startActivity(intent);
+                    }
                 }
+            });
+            if (Utils.isValidPhone(review.getReviewerId())) {
+                tvReviewBy.setTextColor(Color.parseColor("#33aaee"));
+            }else{
+                tvReviewBy.setTextColor(Color.parseColor("#666666"));
             }
-        });
-        if(Utils.isValidPhone(review.getReviewerId())){
-            tvReviewBy.setTextColor(Color.parseColor("#33aaee"));
+        }else{
+            tvReviewBy.setTextColor(Color.parseColor("#666666"));
         }
+
     }
 
 }

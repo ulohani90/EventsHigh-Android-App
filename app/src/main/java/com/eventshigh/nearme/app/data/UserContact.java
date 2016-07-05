@@ -8,6 +8,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,7 +32,7 @@ import java.util.Set;
 /**
  * Represents the user contact.
  */
-public class UserContact implements Comparable<UserContact>, Serializable {
+public class UserContact implements Comparable<UserContact>, Serializable, Parcelable{
     public final String contactId;
     public final String mobileNo;
     public final String name;
@@ -195,4 +197,40 @@ public class UserContact implements Comparable<UserContact>, Serializable {
         }
         return emails;
     }
+
+    public UserContact(Parcel in){
+        this.contactId = in.readString();
+        this.mobileNo = in.readString();
+        this.name = in.readString();
+        emails = in.createStringArray();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(contactId);
+        dest.writeString(mobileNo);
+        dest.writeString(name);
+        dest.writeStringArray(emails);
+    }
+
+    private static String emptyIfNull(@Nullable String string) {
+        return (string == null ? "" : string);
+    }
+
+    public static final Parcelable.Creator<UserContact> CREATOR =
+            new Parcelable.Creator<UserContact>() {
+                public UserContact createFromParcel(Parcel in) {
+                    return new UserContact(in);
+                }
+
+                public UserContact[] newArray(int size) {
+                    return new UserContact[size];
+                }
+            };
+
 }
