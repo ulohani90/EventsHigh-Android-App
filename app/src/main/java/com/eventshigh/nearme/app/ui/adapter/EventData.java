@@ -29,12 +29,12 @@ public class EventData implements AdapterData {
     @Override
     public void onBindViewHolder(ViewHolder card, int position) {
         ((EventCard) card).bindEventView(event, isFirstEvent, position, activity,
-                socialDataProvider.getSocialInvite(event.id));
+                socialDataProvider.getSocialActions(event.id));
     }
 
     public void onBindViewHolder(ViewHolder card, int position,EventsAdapter.OnItemClickedListener listener) {
         ((EventCard) card).bindEventView(event, isFirstEvent, position, activity,
-                socialDataProvider.getSocialInvite(event.id),listener);
+                socialDataProvider.getSocialActions(event.id),listener);
     }
 
 

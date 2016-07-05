@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_gravity="center"
-                android:src="@drawable/calc_yellow"
+                android:src="@drawable/cal_grey"
                 tools:ignore="ContentDescription" />
 
             <TextView
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@+id/event_time_icon"
-                android:textColor="#A3000000"
+                android:textColor="#353535"
                 android:textIsSelectable="false"
                 android:transitionName="event_time"
                 tools:ignore="UnusedAttribute"
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/event_time"
                 android:layout_toEndOf="@+id/event_time_icon"
-                android:textColor="#999197A3"
+                android:textColor="#9197A3"
                 android:textIsSelectable="false"
                 tools:text="2 days from now" />
 
@@ -159,7 +159,7 @@
                     android:lineSpacingExtra="1dp"
                     android:paddingLeft="10dp"
                     android:textColor="#575757"
-                    android:textSize="11sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
 
@@ -204,6 +204,7 @@
         android:background="#1a4d4d4d" />
 
     <LinearLayout
+        android:id="@+id/event_info_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/button_gray">
@@ -218,8 +219,8 @@
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
             android:padding="10dp"
-            android:text="Jashn-e-Mohit"
-            android:textColor="#575757"
+
+            android:textColor="#353535"
             android:textSize="14sp" />
 
         <FrameLayout

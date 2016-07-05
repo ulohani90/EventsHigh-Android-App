@@ -13,10 +13,12 @@ import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.BuildConfig;
+import com.eventshigh.nearme.app.R;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -32,18 +34,19 @@ public class Utils {
     public static final String YOUTUBE_API_KEY = "AIzaSyACL1eHX6pkvIAsFk1VqN-TDAgzS14Pwek";
 
     private static final int TITLE_MAX_LENGHT = 32;
+
     public static String shortenIfNeeded(String title) {
         return title.length() < TITLE_MAX_LENGHT ? title :
                 title.substring(0, TITLE_MAX_LENGHT - 3) + "...";
     }
 
     public static String capitalize(String original) {
-        if(original == null || original.length() == 0) {
+        if (original == null || original.length() == 0) {
             return original;
         }
 
         StringBuilder sb = new StringBuilder();
-        for(String part : original.split(" ")) {
+        for (String part : original.split(" ")) {
             if (part.isEmpty()) {
                 continue;
             }
@@ -126,12 +129,13 @@ public class Utils {
             mdEnc.update(input.getBytes(), 0, input.length());
             return new BigInteger(1, mdEnc.digest()).toString(16);
         } catch (NoSuchAlgorithmException e) {
-            throw  new RuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 
 
     private static final Set<String> DEBUG_ANDROID_ID = new HashSet<>();
+
     static {
         DEBUG_ANDROID_ID.add("5151a4342221f321");  // Parag
         DEBUG_ANDROID_ID.add("5f0f51994cb15c85");  // Arvind
@@ -147,11 +151,12 @@ public class Utils {
     }
 
     private static Pattern phoneNoPattern = Pattern.compile("[^\\d\\+]");
+
     public static String simplifyPhoneNo(String phoneNo) {
         return phoneNoPattern.matcher(phoneNo).replaceAll("");
     }
 
-    public static <K,V> Map<K,V> getMap() {
+    public static <K, V> Map<K, V> getMap() {
         if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
             return new ArrayMap<>();
         } else {
@@ -159,26 +164,82 @@ public class Utils {
         }
     }
 
-    public static int getRandomNumber(int low, int high){
+    public static int getRandomNumber(int low, int high) {
         Random r = new Random();
-        return r.nextInt(high-low) + low;
+        return r.nextInt(high - low) + low;
     }
 
     public static boolean isValidEmail(CharSequence target) {
-        if (TextUtils.isEmpty(target)){
+        if (TextUtils.isEmpty(target)) {
             return false;
         } else {
             return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
         }
     }
 
-    public static boolean isValidPhone(String phoneNo){
+    public static boolean isValidPhone(String phoneNo) {
         String Regex = "[^\\d] ";
         String PhoneDigits = phoneNo.replaceAll(Regex, "");
-        if (PhoneDigits.length()!=10){
+        if (PhoneDigits.length() != 10) {
             return false;
-        }else{
+        } else {
             return true;
+        }
+    }
+
+    public static Double roundToTwoDecimalPlaces(Double value) {
+        DecimalFormat format = new DecimalFormat("#.##");
+        return Double.valueOf(format.format(value));
+    }
+
+    public static int getDummyImageResource() {
+        Random random = new Random();
+        int num = random.nextInt(20 - 1 + 1) + 1;
+        switch (num) {
+            case 1:
+                return R.drawable.ic_dummy_1;
+            case 2:
+                return R.drawable.ic_dummy_2;
+            case 3:
+                return R.drawable.ic_dummy_3;
+            case 4:
+                return R.drawable.ic_dummy_4;
+            case 5:
+                return R.drawable.ic_dummy_5;
+            case 6:
+                return R.drawable.ic_dummy_6;
+            case 7:
+                return R.drawable.ic_dummy_7;
+            case 8:
+                return R.drawable.ic_dummy_8;
+            case 9:
+                return R.drawable.ic_dummy_9;
+            case 10:
+                return R.drawable.ic_dummy_10;
+            case 11:
+                return R.drawable.ic_dummy_11;
+            case 12:
+                return R.drawable.ic_dummy_12;
+            case 13:
+                return R.drawable.ic_dummy_13;
+            case 14:
+                return R.drawable.ic_dummy_14;
+            case 15:
+                return R.drawable.ic_dummy_15;
+            case 16:
+                return R.drawable.ic_dummy_16;
+            case 17:
+                return R.drawable.ic_dummy_17;
+            case 18:
+                return R.drawable.ic_dummy_18;
+            case 19:
+                return R.drawable.ic_dummy_19;
+            case 20:
+                return R.drawable.ic_dummy_20;
+            default:
+                return R.drawable.ic_dummy_5;
+
+
         }
     }
 

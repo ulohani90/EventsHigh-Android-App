@@ -82,6 +82,17 @@ public class ComposeEventCategoryView extends FrameLayout implements ZRuntimeVie
         categoryTagParent.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                activity.reportEventAction(event, action, obj);
+                Intent searchIntent = new Intent(activity, LaunchActivity.class);
+                searchIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT,
+                        new EventsContext(account.getLastCity().cityBounds.getCenter(), obj.toLowerCase()));
+                activity.startActivity(searchIntent);
+            }
+        });
+        followImg.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
                 if (categoryTagParent.isSelected()) {
                     activity.reportActionToAnalytics("removeFollowing", obj);
                     account.setIsFollowing(obj, true);
@@ -97,16 +108,7 @@ public class ComposeEventCategoryView extends FrameLayout implements ZRuntimeVie
                     setMarkedViews(true);
                     Toast.makeText(context, "You are now following " + obj, Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
-        followImg.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.reportEventAction(event, action, obj);
-                Intent searchIntent = new Intent(activity, LaunchActivity.class);
-                searchIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT,
-                        new EventsContext(account.getLastCity().cityBounds.getCenter(), obj.toLowerCase()));
-                activity.startActivity(searchIntent);
+
             }
         });
     }

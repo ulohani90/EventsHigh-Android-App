@@ -67,4 +67,5 @@
 
     <color name="eh_share_button_color">#76A930</color>
     <color name="eh_share_button_dark_color">#6c9a2c</color>
+    <color name="category_tag_separator_color">#BABABA</color>
 </resources>
