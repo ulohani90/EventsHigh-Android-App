@@ -359,7 +359,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     }
 
     protected void animateFab(int position) {
-        if (!TABS.get(position).equalsIgnoreCase(USER_REVIEWS)) {
+        if (!TABS.get(position).equalsIgnoreCase(USER_REVIEWS)){
             if (fabWriteReviews.getVisibility() == View.VISIBLE) {
                 fabWriteReviews.setVisibility(View.GONE);
                 TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, 250);

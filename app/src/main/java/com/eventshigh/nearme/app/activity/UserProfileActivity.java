@@ -86,11 +86,57 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     private LinearLayout verifyPhnLayout;
     private Account account;
 
+    //TABS
+    private final String FAVOURITES_TAB = "Favourites";
+    private final String INTERESTS_TAB = "Interest";
+    private final String REVIEWS_TAB = "Reviews";
+    private final String TICKETS_TAB = "Tickets";
+    private final String FRIENDS_TAB = "Friends";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupLayout(R.layout.activity_user_profile);
         TABS = new ArrayList<>();
+
+        //phone verify
+        account = new Account(this);
+        verifyPhnLayout = (LinearLayout) findViewById(R.id.verify_phn_layout);
+        (findViewById(R.id.verify_btn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                verifyClicked();
+            }
+
+        });
+
+        //check if user's self profile
+        mobileNoProfileUser = getIntent().getStringExtra(PROFILE_ID);
+
+        if (mobileNoProfileUser != null) {
+            if (mobileNoProfileUser.equalsIgnoreCase(account.getUserInfo().phoneNo)) {
+                isUserSelf = true;
+            } else {
+                isUserSelf = false;
+            }
+        } else {
+            isUserSelf = true;
+        }
+
+        if (isUserSelf) {
+            TABS.add(FAVOURITES_TAB);
+            TABS.add(INTERESTS_TAB);
+            TABS.add(REVIEWS_TAB);
+            TABS.add(TICKETS_TAB);
+            TABS.add(FRIENDS_TAB);
+            if (isUserSelf) mobileNoProfileUser = account.getUserInfo().phoneNo;
+        } else {
+            TABS.add(FAVOURITES_TAB);
+            TABS.add(INTERESTS_TAB);
+            TABS.add(REVIEWS_TAB);
+        }
+
+
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         retryView = findViewById(R.id.view_retry);
@@ -108,28 +154,14 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         pager.setVisibility(View.VISIBLE);
         userProfilePagerAdapter = new UserProfilePagerAdapter(getSupportFragmentManager(), this);
         tabsView.setScrollPosition(0, 0, true);
-
-        //phone verify
-        account = new Account(this);
-        verifyPhnLayout = (LinearLayout) findViewById(R.id.verify_phn_layout);
-        (findViewById(R.id.verify_btn)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                verifyClicked();
-            }
-
-        });
-
-
         topProgressBar = findViewById(R.id.top_progress_bar);
-        mobileNoProfileUser = getIntent().getStringExtra(PROFILE_ID);
-
         FacebookSdk.sdkInitialize(getApplicationContext());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if(userProfilePagerAdapter.profileInfo == null)
         fetchProfileInfo(false);
     }
 
@@ -178,7 +210,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
-            public void onSuccess(LoginResult loginRes){
+            public void onSuccess(LoginResult loginRes) {
                 loginResult = loginRes;
                 requestUserProfile();
             }
@@ -242,30 +274,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     }
 
 
-    private void fetchProfileInfo(boolean shouldByPassChange){
-        if (mobileNoProfileUser != null) {
-            if (mobileNoProfileUser.equalsIgnoreCase(account.getUserInfo().phoneNo)) {
-                isUserSelf = true;
-            } else {
-                isUserSelf = false;
-            }
-        } else{
-            isUserSelf = true;
-        }
-
-        if(isUserSelf){
-            TABS.add("My Favourites");
-            TABS.add("My Interests");
-            TABS.add("My Reviews");
-            TABS.add("My Tickets");
-            TABS.add("My Friends");
-            if (isUserSelf) mobileNoProfileUser = account.getUserInfo().phoneNo;
-        }else{
-            TABS.add("Favourites");
-            TABS.add("Interests");
-            TABS.add("Reviews");
-        }
-
+    private void fetchProfileInfo(boolean shouldByPassChange) {
 
         if (Utils.checkIfStringEmpty(mobileNoProfileUser)) {
             verifyPhnLayout.setVisibility(View.VISIBLE);
@@ -273,36 +282,47 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             topProgressBar.setVisibility(View.VISIBLE);
             retryView.setVisibility(View.GONE);
             FetchProfileRequest.submit(this, mobileNoProfileUser, Request.Priority.HIGH,
-                    new Response.Listener<ProfileInfo>() {
+                    new Response.Listener<ProfileInfo>(){
+
                         @Override
                         public void onResponse(ProfileInfo profileInfo, boolean b) {
-                            profileView.setVisibility(View.VISIBLE);
-                            userProfilePagerAdapter.setProfileInfo(profileInfo);
-                            pager.setAdapter(userProfilePagerAdapter);
-                            tabsView.setupWithViewPager(pager);
-                            topProgressBar.setVisibility(View.GONE);
-                            //attech user data
-                            if (!Utils.checkIfStringEmpty(profileInfo.getName())) {
-                                userName.setText(profileInfo.getName());
-                                userCity.setText(profileInfo.getLastCity());
-                                Glide.with(UserProfileActivity.this).load(profileInfo.getProfilePic())
-                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                        .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
-                                        .into(userImage);
-                                llAboutUserMask.setVisibility(View.VISIBLE);
-                            } else if (isUserSelf) {
-                                llFacebookInfoMask.setVisibility(View.VISIBLE);
-                                userName.setText(new Account(UserProfileActivity.this).getUserInfo().name);
-                                userCity.setText(new Account(UserProfileActivity.this).getLastCity().name());
-                            }else{
-                                llAboutUserMask.setVisibility(View.VISIBLE);
+                            if (isRunning()){
+                                userProfilePagerAdapter.setProfileInfo(profileInfo);
+                                pager.setAdapter(userProfilePagerAdapter);
+                                tabsView.setupWithViewPager(pager);
+                                profileView.setVisibility(View.VISIBLE);
+                                topProgressBar.setVisibility(View.GONE);
+
+                                int favCount = profileInfo.getMeEventFavouriteObject().topicEvents.get(0).events.size() +
+                                        profileInfo.getMeEventFavouriteObject().movies.size();
+                                if(!isUserSelf){
+                                    if(profileInfo.getMyInterestEvents().size() == 0)
+                                        TABS.remove(INTERESTS_TAB);
+                                    if(favCount == 0)
+                                        TABS.remove(FAVOURITES_TAB);
+                                    userProfilePagerAdapter.notifyDataSetChanged();
+                                }
+                                //attech user data
+                                if (!Utils.checkIfStringEmpty(profileInfo.getName())) {
+                                    userName.setText(profileInfo.getName());
+                                    userCity.setText(profileInfo.getLastCity());
+                                    Glide.with(UserProfileActivity.this).load(profileInfo.getProfilePic())
+                                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                            .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                                            .into(userImage);
+                                    llAboutUserMask.setVisibility(View.VISIBLE);
+                                } else if (isUserSelf) {
+                                    llFacebookInfoMask.setVisibility(View.VISIBLE);
+                                    userName.setText(new Account(UserProfileActivity.this).getUserInfo().name);
+                                    userCity.setText(new Account(UserProfileActivity.this).getLastCity().name());
+                                } else {
+                                    llAboutUserMask.setVisibility(View.VISIBLE);
+                                }
+                                //attech counts
+                                userFollowerCount.setText(profileInfo.getUserContactList().size() + "");
+                                userInterestCount.setText(profileInfo.getMyInterestEvents().size() + "");
+                                userFavouriteCount.setText(favCount + "");
                             }
-                            //attech counts
-                            userFollowerCount.setText(profileInfo.getUserContactList().size()+"");
-                            userInterestCount.setText(profileInfo.getMyInterestEvents().size()+"");
-                            int favCount = profileInfo.getMeEventFavouriteObject().topicEvents.get(0).events.size() +
-                                    profileInfo.getMeEventFavouriteObject().movies.size();
-                            userFavouriteCount.setText(favCount+"");
                         }
                     }, new Response.ErrorListener() {
                         @Override
@@ -359,7 +379,6 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     public class UserProfilePagerAdapter extends FragmentStatePagerAdapter {
         private Context context;
         private ProfileInfo profileInfo;
-
         public ProfileInfo getProfileInfo() {
             return profileInfo;
         }
@@ -374,27 +393,30 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             this.context = context;
         }
 
+
         @Override
         public Fragment getItem(int position) {
-            if (position == 0) {
+            if (TABS.get(position).equalsIgnoreCase(FAVOURITES_TAB)) {
                 LatLng latLng = (new Account(context)).getLastCity().cityBounds.getCenter();
                 EventsContext myEventsContext = new EventsContext(latLng, EventsHighEndpoints.QUERY_MY_EVENT);
                 myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null, false, profileInfo);
                 return myFavouritesFragment;
-            } else if (position == 1) {
+            } else if (TABS.get(position).equalsIgnoreCase(INTERESTS_TAB)) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_INTEREST_EVENTS);
                 myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false, profileInfo);
                 return myInterestEventsFragment;
-            } else if (position == 2) {
+            } else if (TABS.get(position).equalsIgnoreCase(REVIEWS_TAB)) {
                 MyReviewsFragment myReviewsFragment = MyReviewsFragment.newInstance(eventsContext, profileInfo.getMovieUserReviewObjectArrayList());
                 return myReviewsFragment;
-            } else if (position == 3) {
+            } else if (TABS.get(position).equalsIgnoreCase(TICKETS_TAB)) {
                 MyTicketsFragment myTicketsFragment = new MyTicketsFragment();
                 return myTicketsFragment;
-            } else {
+            } else if(TABS.get(position).equalsIgnoreCase(FRIENDS_TAB)){
                 ContactsFragment fragment = ContactsFragment.newInstance(profileInfo);
                 return fragment;
+            }else{
+                return null;
             }
         }
 
@@ -404,7 +426,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         }
 
         @Override
-        public int getCount() {
+        public int getCount(){
             return TABS.size();
         }
     }

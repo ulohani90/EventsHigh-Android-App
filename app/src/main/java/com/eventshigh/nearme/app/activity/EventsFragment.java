@@ -344,7 +344,6 @@ public class EventsFragment extends BaseEventsFragment {
             if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
                 ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.topicEvents.get(0).events.get(0).imgUrl);
             }
-
             eventsAdapter.setTopicEvents(myEvents.topicEvents, eventsContext, eventGridView.getSpanCount() * 2);
         }
         if (!myEvents.movies.isEmpty()) {

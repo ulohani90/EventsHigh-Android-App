@@ -102,6 +102,7 @@ public class ContactsFragment extends Fragment {
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
+        if(profileInfo != null)swipeRefreshLayout.setEnabled(false);
 
         view.findViewById(R.id.retry).setOnClickListener(new OnClickListener() {
             @Override
