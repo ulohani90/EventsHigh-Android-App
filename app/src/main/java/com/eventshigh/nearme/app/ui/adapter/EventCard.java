@@ -25,12 +25,15 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
+import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.ContactListView;
+
+import java.util.Set;
 
 public class EventCard extends ViewHolder {
     private final boolean shouldAdjustImageHeight;
@@ -44,12 +47,17 @@ public class EventCard extends ViewHolder {
     private final TextView travelTimeView;
     private final View arrowView;
     private final TextView eventStatsView;
-    private final ContactListView invitedByView;
+
     private final View infoArrowView;
     private final ImageView share;
     private final LinearLayout cardParent;
     private final LinearLayout eventInfo;
     private final boolean addShadow;
+    private final TextView eventLocation;
+    private final ImageView img1, img2;
+    private final ContactListView contactListView;
+    private final LinearLayout statsLayout;
+
 
     public static EventCard newInstance(Activity activity, ViewGroup parent,
                                         boolean shouldAdjustImageHeight, boolean isAddShadow) {
@@ -72,6 +80,7 @@ public class EventCard extends ViewHolder {
         this.shouldAdjustImageHeight = shouldAdjustImageHeight;
         bgView = (ImageView) cardView.findViewById(R.id.event_bg);
         recommendedView = (ImageView) cardView.findViewById(R.id.event_recommended);
+        eventLocation = (TextView) cardView.findViewById(R.id.event_location);
         titleView = (TextView) cardView.findViewById(R.id.event_title);
         favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
         eventTimeView = (TextView) cardView.findViewById(R.id.event_time);
@@ -80,11 +89,14 @@ public class EventCard extends ViewHolder {
         travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
         arrowView = cardView.findViewById(R.id.arrow);
         eventStatsView = (TextView) cardView.findViewById(R.id.event_stats);
-        invitedByView = (ContactListView) cardView.findViewById(R.id.invited_by);
         infoArrowView = cardView.findViewById(R.id.info_arrow);
         share = (ImageView) cardView.findViewById(R.id.share);
         cardParent = (LinearLayout) cardView.findViewById(R.id.card_parent);
         eventInfo = (LinearLayout) cardView.findViewById(R.id.event_info);
+        img1 = (ImageView) cardView.findViewById(R.id.img1);
+        img2 = (ImageView) cardView.findViewById(R.id.img2);
+        contactListView = (ContactListView) cardView.findViewById(R.id.followed_by);
+        statsLayout = (LinearLayout) cardView.findViewById(R.id.stats_parent);
         addShadow = isAddShadow;
     }
 
@@ -99,7 +111,7 @@ public class EventCard extends ViewHolder {
     @SuppressLint("SetTextI18n")
     public void bindEventView(final Event event, boolean isFirstEvent, final int position,
                               final BaseContextActivity activity,
-                              @Nullable SocialInvite invite) {
+                              Set<SocialFriend> likedBy) {
         bindEventView(event, activity, position, null);
         eventInfo.setVisibility(View.VISIBLE);
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
@@ -112,6 +124,7 @@ public class EventCard extends ViewHolder {
         } else {
             travelTimeView.setVisibility(View.GONE);
         }
+
 
         // Set actions handlers.
         favouriteView.setVisibility(View.VISIBLE);
@@ -136,19 +149,48 @@ public class EventCard extends ViewHolder {
         });
 
         // Is user invited to this event ?
-        if (invite != null && invite.getInvitedBy() != null) {
-            invitedByView.setVisibility(View.VISIBLE);
-            invitedByView.setFollowers(activity, invite.getAllInvitedBy());
-            infoArrowView.setVisibility(View.GONE);
-        } else if (event.numViews > 5) {
-            eventStatsView.setVisibility(View.VISIBLE);
-            eventStatsView.setText("" + event.numViews + " views");
-            infoArrowView.setVisibility(View.GONE);
+
+
+        if (likedBy != null && likedBy.size() > 0) {
+
+            statsLayout.setVisibility(View.VISIBLE);
+            img1.setVisibility(View.GONE);
+            img2.setVisibility(View.GONE);
+            contactListView.setVisibility(View.VISIBLE);
+            contactListView.setFollowers(
+                    activity, likedBy);
+            StringBuilder builder = new StringBuilder();
+            int pos = 0;
+            for (SocialFriend socialFriend : likedBy) {
+                if (pos > 0) {
+                    break;
+                }
+                builder.append(socialFriend.getName());
+                pos++;
+            }
+            if (builder.length() > 0 && event.numViews > 0) {
+                builder.append(" and ");
+            }
+            builder.append(event.numViews > 0 ? (event.numViews + "+ people interested") : "interested");
+            eventStatsView.setText(builder.toString());
         } else {
-            eventStatsView.setVisibility(View.VISIBLE);
-            eventStatsView.setText("" + Utils.getRandomNumber(10, 50) + " views");
-            infoArrowView.setVisibility(View.GONE);
+            if (event.numViews > 0) {
+                statsLayout.setVisibility(View.VISIBLE);
+                img1.setVisibility(View.VISIBLE);
+                img2.setVisibility(View.VISIBLE);
+                img1.setImageResource(Utils.getDummyImageResource());
+                img2.setImageResource(Utils.getDummyImageResource());
+                StringBuilder builder = new StringBuilder();
+                builder.append(event.numViews + "+ people interested");
+                eventStatsView.setText(builder.toString());
+            } else {
+                statsLayout.setVisibility(View.GONE);
+            }
         }
+
+        // ((View) eventStatsView.getParent()).setVisibility(View.VISIBLE);
+        eventStatsView.setVisibility(View.VISIBLE);
+
 
         //Share event
         share.setVisibility(View.VISIBLE);
@@ -214,6 +256,14 @@ public class EventCard extends ViewHolder {
 
         }
 
+        if (event.venue != null) {
+            eventLocation.setVisibility(View.VISIBLE);
+            eventLocation.setText(event.venue);
+        } else {
+            eventLocation.setVisibility(View.GONE);
+        }
+
+
         // Set the price.
 
         String priceString = event.getPriceString();
@@ -246,16 +296,16 @@ public class EventCard extends ViewHolder {
         arrowView.setVisibility(View.GONE);
         favouriteView.setVisibility(View.GONE);
         travelTimeView.setVisibility(View.GONE);
-        eventStatsView.setVisibility(View.GONE);
+
         share.setVisibility(View.GONE);
-        invitedByView.setVisibility(View.GONE);
+
         infoArrowView.setVisibility(View.GONE);
     }
 
     @SuppressLint("SetTextI18n")
     public void bindEventView(final Event event, boolean isFirstEvent, final int position,
                               final BaseContextActivity activity,
-                              @Nullable SocialInvite invite, EventsAdapter.OnItemClickedListener listener) {
+                              @Nullable Set<SocialFriend> likedBy, EventsAdapter.OnItemClickedListener listener) {
         bindEventView(event, activity, position, listener);
         eventInfo.setVisibility(View.VISIBLE);
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
@@ -292,7 +342,7 @@ public class EventCard extends ViewHolder {
         });
 
         // Is user invited to this event ?
-        if (invite != null && invite.getInvitedBy() != null) {
+        /*if (invite != null && invite.getInvitedBy() != null) {
             invitedByView.setVisibility(View.VISIBLE);
             invitedByView.setFollowers(activity, invite.getAllInvitedBy());
             infoArrowView.setVisibility(View.GONE);
@@ -304,8 +354,47 @@ public class EventCard extends ViewHolder {
             eventStatsView.setVisibility(View.VISIBLE);
             eventStatsView.setText("" + Utils.getRandomNumber(10, 50) + " views");
             infoArrowView.setVisibility(View.GONE);
+        }*/
+        if (likedBy != null && likedBy.size() > 0) {
+            statsLayout.setVisibility(View.VISIBLE);
+            img1.setVisibility(View.GONE);
+            img2.setVisibility(View.GONE);
+            contactListView.setVisibility(View.VISIBLE);
+            contactListView.setFollowers(
+                    activity, likedBy);
+            StringBuilder builder = new StringBuilder();
+            int pos = 0;
+            for (SocialFriend socialFriend : likedBy) {
+                if (pos > 0) {
+                    break;
+                }
+                builder.append(socialFriend.getName());
+                pos++;
+            }
+            if (builder.length() > 0 && event.numViews > 0) {
+                builder.append(" and ");
+            }
+            builder.append(event.numViews > 0 ? (event.numViews + "+ people interested") : " interested");
+            eventStatsView.setText(builder.toString());
+        } else {
+            if (event.numViews > 0) {
+                statsLayout.setVisibility(View.VISIBLE);
+                contactListView.setVisibility(View.GONE);
+                img1.setVisibility(View.VISIBLE);
+                img2.setVisibility(View.VISIBLE);
+                img1.setImageResource(Utils.getDummyImageResource());
+                img2.setImageResource(Utils.getDummyImageResource());
+                StringBuilder builder = new StringBuilder();
+                builder.append(event.numViews + "+ people interested");
+                eventStatsView.setText(builder.toString());
+            } else {
+                contactListView.setVisibility(View.GONE);
+                statsLayout.setVisibility(View.GONE);
+            }
         }
 
+        // ((View) eventStatsView.getParent()).setVisibility(View.VISIBLE);
+        eventStatsView.setVisibility(View.VISIBLE);
         //Share event
         share.setVisibility(View.VISIBLE);
         share.setOnClickListener(new OnClickListener() {

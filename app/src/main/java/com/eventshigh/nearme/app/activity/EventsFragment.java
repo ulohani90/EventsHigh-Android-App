@@ -11,10 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Request.Priority;
+import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
@@ -22,6 +24,7 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.ProfileInfo;
+import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.network.DateCategoryRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
@@ -40,10 +43,12 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
+import com.eventshigh.nearme.app.view.ContactListView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Fragment to show events.
@@ -276,7 +281,27 @@ public class EventsFragment extends BaseEventsFragment {
                     }
             );
         }*/
+
+
     }
+
+    public void addSocialInvitationRequests() {
+        SocialActionsRequest.submit(getActivity(), Request.Priority.LOW, this, false,
+                new Response.Listener<SocialActionsRequest.SocialActions>() {
+                    @Override
+                    public void onResponse(SocialActionsRequest.SocialActions socialActions, boolean isIntermediate) {
+                        eventsAdapter.setSocialActions(socialActions);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        VolleyHelper.log(((BaseActivity) getActivity()), volleyError);
+                    }
+                }
+        );
+    }
+
 
     boolean isFragmentDestroyed = false;
 
@@ -471,6 +496,8 @@ public class EventsFragment extends BaseEventsFragment {
 
                 filteredEvents = filterEventsWithPrice(filteredEvents, -1);
                 eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
+
+                addSocialInvitationRequests();
                 /*if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                             eventsCollection.numFollowers, special);

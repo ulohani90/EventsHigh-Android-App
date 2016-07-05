@@ -51,6 +51,7 @@ import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.user.UserActionHelper;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.ContactListView;
 import com.eventshigh.nearme.app.view.SmartViewPager;
 
@@ -80,6 +81,8 @@ public class NewEventDetailActivity extends BaseContextActivity {
     public static final String INFO_TAB = "Info";
 
     String planId;
+
+    LinearLayout statsLayout;
 
     @Override
     public View getViewForSnackbar() {
@@ -111,7 +114,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
         topProgressBar = findViewById(R.id.top_progress_bar);
         bookView = (TextView) findViewById(R.id.book_ticket);
         joinView = findViewById(R.id.join_event);
-
+        statsLayout = (LinearLayout) findViewById(R.id.stats_layout);
 
     }
 
@@ -133,6 +136,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 }
             }
         });
+
         favAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -309,7 +313,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
         isDataAttached = true;
         title.setText(event.title);
 
-        TextView eventPrice = (TextView) findViewById(R.id.event_price);
+        final TextView eventPrice = (TextView) findViewById(R.id.event_price);
         String priceString = event.getPriceString();
         if (priceString == null) {
             eventPrice.setVisibility(View.GONE);
@@ -429,6 +433,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                         reportActionToAnalytics("showSocialInfo", "likes",
                                 likedBy == null ? 0 : likedBy.size());
                         if (likedBy != null && likedBy.size() > 0) {
+                            statsLayout.setVisibility(View.VISIBLE);
                             ((ImageView) findViewById(R.id.img1)).setVisibility(View.GONE);
                             ((ImageView) findViewById(R.id.img2)).setVisibility(View.GONE);
                             ((ContactListView) findViewById(R.id.followed_by)).setVisibility(View.VISIBLE);
@@ -443,23 +448,31 @@ public class NewEventDetailActivity extends BaseContextActivity {
                                 builder.append(socialFriend.getName());
                                 pos++;
                             }
-                            if (builder.length() > 0) {
+                            if (builder.length() > 0 && event.numViews > 0) {
                                 builder.append(" and ");
                             }
-                            builder.append(event.numViews + "+ people interested");
+                            builder.append(event.numViews > 0 ? (event.numViews + "+ people interested") : " interested");
                             statsView.setText(builder.toString());
+                            ((View) statsView.getParent()).setVisibility(View.VISIBLE);
+                            statsView.setVisibility(View.VISIBLE);
                         } else {
-                            ((ImageView) findViewById(R.id.img1)).setVisibility(View.VISIBLE);
-                            ((ImageView) findViewById(R.id.img2)).setVisibility(View.VISIBLE);
-                            ((ImageView) findViewById(R.id.img1)).setImageResource(getDummyImageResource());
-                            ((ImageView) findViewById(R.id.img2)).setImageResource(getDummyImageResource());
-                            StringBuilder builder = new StringBuilder();
-                            builder.append(event.numViews + "+ people interested");
-                            statsView.setText(builder.toString());
+                            if (event.numViews > 0) {
+                                statsLayout.setVisibility(View.VISIBLE);
+                                ((ImageView) findViewById(R.id.img1)).setVisibility(View.VISIBLE);
+                                ((ImageView) findViewById(R.id.img2)).setVisibility(View.VISIBLE);
+                                ((ImageView) findViewById(R.id.img1)).setImageResource(Utils.getDummyImageResource());
+                                ((ImageView) findViewById(R.id.img2)).setImageResource(Utils.getDummyImageResource());
+                                StringBuilder builder = new StringBuilder();
+                                builder.append(event.numViews + "+ people interested");
+                                statsView.setText(builder.toString());
+                                ((View) statsView.getParent()).setVisibility(View.VISIBLE);
+                                statsView.setVisibility(View.VISIBLE);
+                            } else {
+                                statsLayout.setVisibility(View.GONE);
+                            }
                         }
 
-                        ((View) statsView.getParent()).setVisibility(View.VISIBLE);
-                        statsView.setVisibility(View.VISIBLE);
+
                     }
                 },
                 new Response.ErrorListener() {
@@ -711,55 +724,5 @@ public class NewEventDetailActivity extends BaseContextActivity {
         eventsMarkerEditor.close();
     }
 
-    public int getDummyImageResource() {
-        Random random = new Random();
-        int num = random.nextInt(20 - 1 + 1) + 1;
-        switch (num) {
-            case 1:
-                return R.drawable.ic_dummy_1;
-            case 2:
-                return R.drawable.ic_dummy_2;
-            case 3:
-                return R.drawable.ic_dummy_3;
-            case 4:
-                return R.drawable.ic_dummy_4;
-            case 5:
-                return R.drawable.ic_dummy_5;
-            case 6:
-                return R.drawable.ic_dummy_6;
-            case 7:
-                return R.drawable.ic_dummy_7;
-            case 8:
-                return R.drawable.ic_dummy_8;
-            case 9:
-                return R.drawable.ic_dummy_9;
-            case 10:
-                return R.drawable.ic_dummy_10;
-            case 11:
-                return R.drawable.ic_dummy_11;
-            case 12:
-                return R.drawable.ic_dummy_12;
-            case 13:
-                return R.drawable.ic_dummy_13;
-            case 14:
-                return R.drawable.ic_dummy_14;
-            case 15:
-                return R.drawable.ic_dummy_15;
-            case 16:
-                return R.drawable.ic_dummy_16;
-            case 17:
-                return R.drawable.ic_dummy_17;
-            case 18:
-                return R.drawable.ic_dummy_18;
-            case 19:
-                return R.drawable.ic_dummy_19;
-            case 20:
-                return R.drawable.ic_dummy_20;
-            default:
-                return R.drawable.ic_dummy_5;
-
-
-        }
-    }
 
 }

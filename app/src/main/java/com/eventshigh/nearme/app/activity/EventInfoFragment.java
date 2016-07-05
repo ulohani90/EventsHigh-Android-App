@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
@@ -87,10 +88,12 @@ public class EventInfoFragment extends Fragment {
 
     BaseContextActivity activity;
 
+    LinearLayout eventInfoLayout;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activity = (BaseContextActivity)getActivity();
+        activity = (BaseContextActivity) getActivity();
     }
 
     @Nullable
@@ -127,6 +130,8 @@ public class EventInfoFragment extends Fragment {
         mapDirection = view.findViewById(R.id.btn_direction);
         ratingHeader = (TextView) view.findViewById(R.id.rating_header);
         reviewsCount = (TextView) view.findViewById(R.id.reviews_count);
+
+        eventInfoLayout = (LinearLayout)view.findViewById(R.id.event_info_layout);
         return view;
     }
 
@@ -281,17 +286,7 @@ public class EventInfoFragment extends Fragment {
             }
         });
 
-        if (event.organizerPhone != null) {
-            enquiryBtn.setVisibility(View.GONE);
-            callOrganizer.setVisibility(View.VISIBLE);
-
-            callOrganizer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    call(event);
-                }
-            });
-        } else {
+        if(account.getLastCity().equals(City.BANGALORE)) {
             enquiryBtn.setVisibility(View.VISIBLE);
             callOrganizer.setVisibility(View.GONE);
             enquiryBtn.setOnClickListener(new View.OnClickListener() {
@@ -300,6 +295,26 @@ public class EventInfoFragment extends Fragment {
                     ama(event);
                 }
             });
+        }else{
+            if (event.organizerPhone != null) {
+                enquiryBtn.setVisibility(View.GONE);
+                callOrganizer.setVisibility(View.VISIBLE);
+                callOrganizer.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        call(event);
+                    }
+                });
+                eventInfoLayout.setVisibility(View.VISIBLE);
+            }else{
+                if(event.organizerName != null){
+                    eventInfoLayout.setVisibility(View.VISIBLE);
+                }else{
+                    eventInfoLayout.setVisibility(View.GONE);
+                }
+                enquiryBtn.setVisibility(View.GONE);
+                callOrganizer.setVisibility(View.GONE);
+            }
         }
 
 
@@ -422,11 +437,11 @@ public class EventInfoFragment extends Fragment {
             count++;
         }
 
-        return ((sum / count)) + "/5.0";
+        return Utils.roundToTwoDecimalPlaces(((sum / count))) + "/5.0";
     }
 
     private void populateEventTravelTime(Event event) {
-        if(activity!=null) {
+        if (activity != null) {
             if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 Location location = LocationServices.FusedLocationApi.getLastLocation(client);

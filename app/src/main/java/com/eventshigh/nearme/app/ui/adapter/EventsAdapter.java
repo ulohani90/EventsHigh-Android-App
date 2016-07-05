@@ -26,6 +26,7 @@ import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.MyPointsBreakdownRequest;
+import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
@@ -324,6 +325,12 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     @Nullable
     SocialInvite getSocialInvite(String eventId) {
         return socialInvites == null ? null : socialInvites.get(eventId);
+    }
+
+    @Nullable
+    @Override
+    public Set<SocialFriend> getSocialActions(String eventId) {
+        return socialActions == null? null: socialActions.eventFavourites.get(eventId);
     }
 
     @Override
