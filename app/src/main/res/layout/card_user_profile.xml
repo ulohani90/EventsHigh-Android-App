@@ -52,9 +52,10 @@
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/pointer"
         android:drawablePadding="2dp"
-        android:text="Bangalore"
+        android:text="Unknown"
         android:textColor="#999999"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:gravity="center_vertical"/>
 
     <FrameLayout
         android:layout_width="match_parent"
