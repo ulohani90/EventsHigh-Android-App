@@ -36,7 +36,7 @@ import java.util.List;
  * @author shubham
  * @since 27/6/16.
  */
-public class MyReviewsFragment extends Fragment{
+public class MyReviewsFragment extends Fragment {
 
     private View topProgressBar;
     private View retryView;
@@ -81,17 +81,17 @@ public class MyReviewsFragment extends Fragment{
         });
         //phone verify
         account = new Account(context);
-        verifyPhnLayout = (LinearLayout)view.findViewById(R.id.verify_phn_layout);
+        verifyPhnLayout = (LinearLayout) view.findViewById(R.id.verify_phn_layout);
         (view.findViewById(R.id.verify_btn)).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 verifyClicked();
             }
         });
         return view;
     }
 
-    public void verifyClicked(){
+    public void verifyClicked() {
         startActivity(new Intent(context, PhoneLoginActivity.class));
     }
 
@@ -153,14 +153,17 @@ public class MyReviewsFragment extends Fragment{
         */
         //setAdapterData(movieUserReviewObjects);
 
-        if (movieUserReviewObjects != null){
+        if (movieUserReviewObjects != null) {
             fetchDetailedInfo(shouldByPassCache, movieUserReviewObjects);
         }
-        if(movieUserReviewObjects == null || movieUserReviewObjects.size() == 0)noMyEventsView.setVisibility(View.VISIBLE);
-        topProgressBar.setVisibility(View.GONE);
+        if (movieUserReviewObjects == null || movieUserReviewObjects.size() == 0) {
+            noMyEventsView.setVisibility(View.VISIBLE);
+            topProgressBar.setVisibility(View.VISIBLE);
+        }
+
     }
 
-    private void fetchDetailedInfo(boolean shouldBypassCache, List<MovieUserReviewObject> movieUserReviewObjectList){
+    private void fetchDetailedInfo(boolean shouldBypassCache, List<MovieUserReviewObject> movieUserReviewObjectList) {
         movieUserReviewObjects = movieUserReviewObjectList;
         isRespoRecieved = false;
         topProgressBar.setVisibility(View.VISIBLE);
@@ -170,9 +173,9 @@ public class MyReviewsFragment extends Fragment{
                     @Override
                     public void onResponse(List<MovieDetailObject> movieDetailObjects, boolean b) {
                         updateMovies(movieDetailObjects);
-                        if(isRespoRecieved){
+                        if (isRespoRecieved) {
                             setAdapterData(movieUserReviewObjects);
-                        }else{
+                        } else {
                             isRespoRecieved = true;
                         }
                     }
@@ -180,42 +183,42 @@ public class MyReviewsFragment extends Fragment{
 
         RequestFuture<List<Event>> favEvents = RequestFuture.newFuture();
         MultiEventsRequest.submit(context, eventsContext, getEvents(movieUserReviewObjectList),
-                Request.Priority.HIGH, null, shouldBypassCache,true,false,new Response.Listener<List<Event>>() {
+                Request.Priority.HIGH, null, shouldBypassCache, true, false, new Response.Listener<List<Event>>() {
                     @Override
                     public void onResponse(List<Event> events, boolean b) {
                         updateEvents(events);
-                        if(isRespoRecieved){
+                        if (isRespoRecieved) {
                             setAdapterData(movieUserReviewObjects);
-                        }else{
+                        } else {
                             isRespoRecieved = true;
                         }
                     }
                 }, favEvents);
     }
 
-    private List<String> getMovies(List<MovieUserReviewObject> movieUserReviewObjectList){
+    private List<String> getMovies(List<MovieUserReviewObject> movieUserReviewObjectList) {
         List<String> movieList = new ArrayList<>();
-        for(MovieUserReviewObject movieUserReviewObject:movieUserReviewObjectList){
-            if(movieUserReviewObject.getReviewFor().equals("movie")){
+        for (MovieUserReviewObject movieUserReviewObject : movieUserReviewObjectList) {
+            if (movieUserReviewObject.getReviewFor().equals("movie")) {
                 movieList.add(movieUserReviewObject.getReviewedEntityId());
             }
         }
         return movieList;
     }
 
-    private List<String> getEvents(List<MovieUserReviewObject> movieUserReviewObjectList){
+    private List<String> getEvents(List<MovieUserReviewObject> movieUserReviewObjectList) {
         List<String> eventList = new ArrayList<>();
-        for(MovieUserReviewObject movieUserReviewObject: movieUserReviewObjectList){
-            if(movieUserReviewObject.getReviewFor().equals("event"))
+        for (MovieUserReviewObject movieUserReviewObject : movieUserReviewObjectList) {
+            if (movieUserReviewObject.getReviewFor().equals("event"))
                 eventList.add(movieUserReviewObject.getReviewedEntityId());
         }
         return eventList;
     }
 
-    private void updateMovies(List<MovieDetailObject> movieDetailObjects){
-        for(MovieDetailObject movieDetailObject: movieDetailObjects){
-            for(MovieUserReviewObject movieUserReviewObject: movieUserReviewObjects){
-                if(movieUserReviewObject.getReviewedEntityId().equalsIgnoreCase(movieDetailObject.getMovieInfo().getId()+"")){
+    private void updateMovies(List<MovieDetailObject> movieDetailObjects) {
+        for (MovieDetailObject movieDetailObject : movieDetailObjects) {
+            for (MovieUserReviewObject movieUserReviewObject : movieUserReviewObjects) {
+                if (movieUserReviewObject.getReviewedEntityId().equalsIgnoreCase(movieDetailObject.getMovieInfo().getId() + "")) {
                     movieUserReviewObject.setReviewedEntityImage(movieDetailObject.getMovieInfo().getImg_url());
                     movieUserReviewObject.setMovieDetailObject(movieDetailObject);
                 }
@@ -223,10 +226,10 @@ public class MyReviewsFragment extends Fragment{
         }
     }
 
-    private void updateEvents(List<Event> events){
-        for(Event event: events){
-            for(MovieUserReviewObject movieUserReviewObject: movieUserReviewObjects){
-                if(movieUserReviewObject.getReviewedEntityId().equalsIgnoreCase(event.id)){
+    private void updateEvents(List<Event> events) {
+        for (Event event : events) {
+            for (MovieUserReviewObject movieUserReviewObject : movieUserReviewObjects) {
+                if (movieUserReviewObject.getReviewedEntityId().equalsIgnoreCase(event.id)) {
                     movieUserReviewObject.setReviewedEntityImage(event.imgUrl);
                     movieUserReviewObject.setReviewedEntityLocation(event.locality);
                     movieUserReviewObject.setEvent(event);
@@ -236,6 +239,7 @@ public class MyReviewsFragment extends Fragment{
     }
 
     EventsAdapter adapter;
+
     public void setAdapterData(List<MovieUserReviewObject> objs) {
         topProgressBar.setVisibility(View.GONE);
         adapter = new EventsAdapter((BaseContextActivity) getActivity());
