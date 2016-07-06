@@ -147,7 +147,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     }
 
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
         verifyPhnLayout.setVisibility(View.GONE);
         if (Utils.checkIfStringEmpty(mobileNoProfileUser))
