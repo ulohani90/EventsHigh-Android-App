@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.opengl.Visibility;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -35,6 +37,7 @@ import com.eventshigh.nearme.app.data.ProfileInfo;
 import com.eventshigh.nearme.app.network.AddFacebookUserInfoRequest;
 import com.eventshigh.nearme.app.network.FetchProfileRequest;
 import com.eventshigh.nearme.app.network.MovieReviewSubmitRequest;
+import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -57,7 +60,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class UserProfileActivity extends BaseContextActivity implements View.OnClickListener {
+public class UserProfileActivity extends BaseContextActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
     CallbackManager callbackManager;
 
     public static final String PROFILE_ID = "profile_id";
@@ -71,11 +74,14 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
     TabLayout tabsView;
     ViewPager pager;
+
     UserProfilePagerAdapter userProfilePagerAdapter;
 
     private View topProgressBar;
     private View retryView;
     private View profileView;
+    private FloatingActionButton fabWriteReviews;
+
 
     TextView tvFacebookInfo;
     LinearLayout llFacebookInfoMask, llAboutUserMask;
@@ -143,6 +149,13 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
         //follow functionality
         friendsStore = new FriendsStore(this);
+
+        //write review
+        fabWriteReviews = (FloatingActionButton) findViewById(R.id.fab_write_review);
+        pager.addOnPageChangeListener(this);
+        fabWriteReviews.setOnClickListener(this);
+        fabWriteReviews.setVisibility(View.GONE);
+
 
     }
 
@@ -277,7 +290,11 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 shareProfileWithBranch(userProfilePagerAdapter.getProfileInfo(), mobileNoProfileUser, null, "Profile");
                 break;
             case R.id.btn_follow:
-                    //friendsStore.setFollowing(mobileNoProfileUser,mobileNoProfileUser,true);
+                //friendsStore.setFollowing(mobileNoProfileUser,mobileNoProfileUser,true);
+                break;
+            case R.id.fab_write_review:
+                Intent i = new Intent(this, SelectInterestsActivity.class);
+                startActivity(i);
                 break;
         }
     }
@@ -449,6 +466,42 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         @Override
         public int getCount() {
             return TABS.size();
+        }
+    }
+
+    //OnPageListerner Methods
+    @Override
+    public void onPageSelected(int position) {
+        reportActionToAnalytics("profile_tab_change", TABS.get(position));
+        animateFab(position);
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        Log.e("", state + " state changed");
+    }
+
+
+    protected void animateFab(int position) {
+        if (!TABS.get(position).equalsIgnoreCase(INTERESTS_TAB)) {
+            if (fabWriteReviews.getVisibility() == View.VISIBLE) {
+                fabWriteReviews.setVisibility(View.GONE);
+                TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, 250);
+                translateAnimation.setDuration(300);
+                fabWriteReviews.startAnimation(translateAnimation);
+            }
+        } else {
+            //Set First Reviewer Text Visible
+            fabWriteReviews.clearAnimation();
+            fabWriteReviews.setVisibility(View.VISIBLE);
+            TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 250, 0);
+            translateAnimation.setDuration(300);
+            fabWriteReviews.startAnimation(translateAnimation);
         }
     }
 

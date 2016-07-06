@@ -38,7 +38,7 @@ public class MyReviewCard extends RecyclerView.ViewHolder {
     public static MyReviewCard newInstance(final BaseActivity activity, ViewGroup parent) {
         baseActivity = activity;
         View view = activity.getLayoutInflater().inflate(R.layout.card_my_review, parent, false);
-        return new MyReviewCard(view); 
+        return new MyReviewCard(view);
     }
 
     public MyReviewCard(View view) {

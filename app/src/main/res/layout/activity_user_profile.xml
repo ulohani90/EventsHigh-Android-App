@@ -89,6 +89,14 @@
 
     </LinearLayout>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_write_review"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp"
+        android:src="@drawable/ic_edit" />
+
     <include
         android:id="@+id/verify_phone_container"
         layout="@layout/view_phone_snack_bar"
