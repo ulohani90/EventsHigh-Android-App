@@ -68,7 +68,7 @@ public class FetchProfileRequest extends JsonRequest<ProfileInfo>{
         try {
             String jsonString = new String(networkResponse.data, "UTF-8");
             JSONObject eventsJson = new JSONObject(jsonString);
-            ProfileInfo profileInfo = ProfileInfo.fromJson(eventsJson,context);
+            ProfileInfo profileInfo = ProfileInfo.fromJson(eventsJson,context,profileId);
             profileInfo.setProfileId(profileId);
             return Response.success(profileInfo,HttpHeaderParser.parseCacheHeaders(networkResponse));
         }catch (UnsupportedEncodingException uee){

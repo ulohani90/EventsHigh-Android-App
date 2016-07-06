@@ -153,7 +153,6 @@ public class ContactsFragment extends Fragment {
             contactsAdapter.setMyContacts(profileInfo.getUserContactList(), FriendCardType.FOLLOW);
             topProgressBar.setVisibility(View.GONE);
         }else if(preferences.canUploadContacts()) {
-
             topProgressBar.setVisibility(View.VISIBLE);
             retryView.setVisibility(View.GONE);
             noFriendsOnEhView.setVisibility(View.INVISIBLE);
