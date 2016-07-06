@@ -14,6 +14,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
@@ -149,7 +150,7 @@ public class ProfileInfo implements Parcelable {
     }
 
 
-    public static ProfileInfo fromJson(JSONObject jsonObject, Context context) {
+    public static ProfileInfo fromJson(JSONObject jsonObject, Context context, String profileMobileNo) {
         ArrayList<MyEventsRequest.TopicEvents> events = new ArrayList<>();
         ArrayList<MovieUserReviewObject> movieUserReviewObjects = new ArrayList<>();
 
@@ -201,12 +202,15 @@ public class ProfileInfo implements Parcelable {
                 JSONArray friends = jsonObject.getJSONArray("friends");
                 String myMobileNo = new Account(context).getUserInfo().phoneNo;
                 Set<UserContact> contactOnEh = new HashSet<>();
+                FriendsStore friendsStore = new FriendsStore(context);
                 for (int i = 0; i < friends.length(); i++) {
                     String mobileNo = friends.getJSONObject(i).getString("mobile_no");
                     if (!mobileNo.equals(myMobileNo)) {
                         UserContact contact = ContactUtils.getContactForServerPhone(context, mobileNo);
                         if (contact != null) {
                             contactOnEh.add(contact);
+                            if (profileMobileNo.equalsIgnoreCase(new Account(context).getUserInfo().phoneNo) && !friendsStore.isKeyExists(mobileNo))
+                                friendsStore.setFollowing(contact.mobileNo, contact.contactId, true);
                         }
                     }
                 }

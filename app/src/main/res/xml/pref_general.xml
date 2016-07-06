@@ -7,14 +7,14 @@
           android:title="@string/pref_title_change_location"
       />-->
 
-    <Preference
+    <!--<Preference
         android:icon="@drawable/profile"
         android:layout="@layout/navigation_menu_white_items"
         android:title="@string/profile_text">
         <intent
             android:targetClass="com.eventshigh.nearme.app.activity.UserProfileActivity"
             android:targetPackage="com.eventshigh.nearme.app" />
-    </Preference>
+    </Preference>-->
 
     <Preference
         android:icon="@drawable/ic_personalize_nav"

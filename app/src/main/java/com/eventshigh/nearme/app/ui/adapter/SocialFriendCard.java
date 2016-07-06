@@ -33,7 +33,7 @@ public class SocialFriendCard extends ViewHolder {
     }
 
     private void updateActionButton(FriendsStore friendsStore, SocialFriend friend) {
-        if (friend.contact != null && friendsStore.isFollowing(friend.contact.contactId)) {
+        if (friend.contact != null && friendsStore.isFollowing(friend.contact.mobileNo)) {
             followButton.setText(R.string.ui_following);
             followButton.setSelected(true);
         } else {

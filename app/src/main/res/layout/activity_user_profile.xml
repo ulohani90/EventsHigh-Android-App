@@ -8,18 +8,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
         android:orientation="vertical"
         tools:ignore="UnusedAttribute">
 
-        <ProgressBar
-            android:id="@+id/top_progress_bar"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="-4dp"
-            android:layout_marginTop="-4dp"
-            android:indeterminate="true" />
 
         <include
             android:id="@+id/view_retry"
@@ -30,11 +21,9 @@
             android:visibility="gone" />
 
         <android.support.design.widget.CoordinatorLayout
-            android:id="@+id/profile_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#eeeeee"
-            android:visibility="gone">
+            android:background="#eeeeee">
 
             <android.support.design.widget.AppBarLayout
                 android:id="@+id/app_bar_layout"
@@ -57,7 +46,7 @@
                     app:subtitleTextAppearance="@style/EHActionBarSubtitle"
                     app:theme="@style/EHActionBarTransparent"
                     app:layout_scrollFlags="scroll|enterAlways"
-                    tools:ignore="UnusedAttribute" />
+                    tools:ignore="UnusedAttribute"/>
 
                 <android.support.design.widget.TabLayout
                     android:id="@+id/tabs"
@@ -73,7 +62,8 @@
                     app:tabMode="scrollable"
                     app:tabSelectedTextColor="@color/primary"
                     app:tabTextColor="#333333"
-                    tools:ignore="UnusedAttribute" />
+                    tools:ignore="UnusedAttribute"
+                    android:visibility="invisible"/>
             </android.support.design.widget.AppBarLayout>
 
 
@@ -83,7 +73,8 @@
                 android:layout_height="wrap_content"
                 android:clipChildren="false"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                tools:ignore="UnusedAttribute" />
+                tools:ignore="UnusedAttribute"
+                android:visibility="invisible"/>
 
         </android.support.design.widget.CoordinatorLayout>
 

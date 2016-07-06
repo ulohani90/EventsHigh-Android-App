@@ -13,6 +13,7 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:id="@+id/back_arrow"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="match_parent"
             android:foreground="?android:attr/selectableItemBackground"
@@ -22,9 +23,9 @@
         <TextView
             android:id="@+id/user_name"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:text="Profile"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
@@ -39,22 +40,32 @@
 
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/top_progress_bar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="-4dp"
+        android:layout_marginTop="-4dp"
+        android:indeterminate="true" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:background="#ffffff"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:id="@+id/profile_view"
+        android:visibility="gone">
 
 
-            <com.eventshigh.nearme.app.view.CircularImageView
-                android:id="@+id/profile_image"
-                android:layout_gravity="center_horizontal"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_margin="8dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/com_facebook_profile_picture_blank_portrait" />
+        <com.eventshigh.nearme.app.view.CircularImageView
+            android:id="@+id/profile_image"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="8dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait" />
 
 
         <TextView
@@ -73,11 +84,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="8dp"
             android:drawableLeft="@drawable/pointer"
             android:drawablePadding="5dp"
             android:gravity="center_vertical"
             android:text="Unknown"
-            android:layout_marginBottom="8dp"
             android:textColor="#999999"
             android:textSize="14sp" />
 
@@ -101,12 +112,12 @@
                     android:layout_marginRight="16dp"
                     android:layout_marginTop="8dp"
                     android:gravity="center_horizontal"
-                    android:visibility="gone"
                     android:text="Events High is a local event and activity discovery platform that brings all the activities at one place and help user to find relevent one based on  their interests."
                     android:textColor="#999999"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:visibility="gone" />
 
-                <TextView
+                <!--<TextView
                     android:id="@+id/btn_follow"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -121,8 +132,24 @@
                     android:paddingRight="8dp"
                     android:paddingTop="4dp"
                     android:text="Follow"
-                    android:textColor="#F9A825"
-                    android:visibility="gone"/>
+                    android:textColor="#F9A825" />-->
+
+                <TextView
+                    android:id="@+id/btn_follow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="16dp"
+                    android:background="@drawable/eh_oval"
+                    android:paddingBottom="4dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="4dp"
+                    android:text="@string/ui_following"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
                 <View
                     android:layout_width="match_parent"

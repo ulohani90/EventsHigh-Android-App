@@ -13,6 +13,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
+import com.eventshigh.nearme.app.data.FriendsStore;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.ContactUtils;
@@ -32,7 +33,7 @@ import java.util.Set;
 
 public class MyContactsRequest extends JsonRequest<List<UserContact>> {
     public static void submit(Context context, Priority priority, Object tag, boolean shouldBypassCache,
-            Listener<List<UserContact>> listener, ErrorListener errorListener) {
+                              Listener<List<UserContact>> listener, ErrorListener errorListener) {
         try {
             Uri socialFriendsUri =
                     UpdateAccountInfoService.getBaseUri(context, "get_social_friends").build();
@@ -50,7 +51,7 @@ public class MyContactsRequest extends JsonRequest<List<UserContact>> {
     private final Uri socialFriendsUri;
 
     public MyContactsRequest(Context context, Uri socialFriendsUri, Priority priority,
-            boolean shouldBypassCache, Listener<List<UserContact>> listener, ErrorListener errorListener)
+                             boolean shouldBypassCache, Listener<List<UserContact>> listener, ErrorListener errorListener)
             throws GeneralSecurityException, UnsupportedEncodingException {
         super(Method.GET, Signer.sign(socialFriendsUri).toString(), null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
@@ -79,12 +80,16 @@ public class MyContactsRequest extends JsonRequest<List<UserContact>> {
 
             String myMobileNo = new Account(context).getUserInfo().phoneNo;
             Set<UserContact> contactOnEh = new HashSet<>();
+            FriendsStore friendsStore = new FriendsStore(context);
             for (int i = 0; i < friends.length(); i++) {
                 String mobileNo = friends.getJSONObject(i).getString("mobile_no");
                 if (!mobileNo.equals(myMobileNo)) {
+
                     UserContact contact = ContactUtils.getContactForServerPhone(context, mobileNo);
                     if (contact != null) {
                         contactOnEh.add(contact);
+                        if (!friendsStore.isKeyExists(mobileNo))
+                            friendsStore.setFollowing(contact.mobileNo, contact.contactId, true);
                     }
                 }
             }

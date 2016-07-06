@@ -18,6 +18,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
@@ -137,12 +138,11 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 fetchProfileInfo(false);
             }
         });
-        profileView = findViewById(R.id.profile_view);
         addToolbarView();
         pager = (ViewPager) findViewById(R.id.view_pager);
         tabsView = (TabLayout) findViewById(R.id.tabs);
-        userProfilePagerAdapter = new UserProfilePagerAdapter(getSupportFragmentManager(), this);
-        tabsView.setScrollPosition(0, 0, true);
+
+
         topProgressBar = findViewById(R.id.top_progress_bar);
 
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -159,6 +159,15 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
     }
 
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -166,12 +175,16 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         if (Utils.checkIfStringEmpty(mobileNoProfileUser))
             mobileNoProfileUser = account.getUserInfo().phoneNo;
 
-        if (userProfilePagerAdapter.profileInfo == null) {
+        if (userProfilePagerAdapter == null) {
             fetchProfileInfo(false);
         }
     }
 
     private void setViews(ProfileInfo profileInfo) {
+
+
+        int favCount = profileInfo.getMeEventFavouriteObject().topicEvents.get(0).events.size() +
+                profileInfo.getMeEventFavouriteObject().movies.size();
         TABS = new ArrayList<>();
         if (isUserSelf) {
             TABS.add(INTERESTS_TAB);
@@ -181,33 +194,35 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             TABS.add(TICKETS_TAB);
             mobileNoProfileUser = account.getUserInfo().phoneNo;
         } else {
-            TABS.add(INTERESTS_TAB);
-            TABS.add(FAVOURITES_TAB);
+            if (profileInfo.getMyInterestEvents().size() != 0)
+                TABS.add(INTERESTS_TAB);
+            if (favCount != 0)
+                TABS.add(FAVOURITES_TAB);
             TABS.add(REVIEWS_TAB);
             btnFollow.setVisibility(View.VISIBLE);
+
+            if (friendsStore.isFollowing(mobileNoProfileUser)) {
+                btnFollow.setSelected(true);
+                btnFollow.setText(R.string.ui_following);
+
+            } else {
+                btnFollow.setSelected(false);
+                btnFollow.setText(R.string.ui_follow);
+            }
         }
-
-        int favCount = profileInfo.getMeEventFavouriteObject().topicEvents.get(0).events.size() +
-                profileInfo.getMeEventFavouriteObject().movies.size();
-
-        if (!isUserSelf) {
-            if (profileInfo.getMyInterestEvents().size() == 0)
-                TABS.remove(INTERESTS_TAB);
-            if (favCount == 0)
-                TABS.remove(FAVOURITES_TAB);
-        }
-
+        userProfilePagerAdapter = new UserProfilePagerAdapter(getSupportFragmentManager(), this);
         userProfilePagerAdapter.setProfileInfo(profileInfo);
         pager.setAdapter(userProfilePagerAdapter);
         tabsView.setupWithViewPager(pager);
+        tabsView.setScrollPosition(0, 0, true);
         animateFab(0);
 
         topProgressBar.setVisibility(View.GONE);
 
-        if(profileInfo.getName()!=null)
-        userName.setText(profileInfo.getName());
+        if (profileInfo.getName() != null)
+            userName.setText(profileInfo.getName());
 
-        if(profileInfo.getLastCity() != null)
+        if (profileInfo.getLastCity() != null)
             userCity.setText(profileInfo.getLastCity());
 
         //attech user data
@@ -230,7 +245,11 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         userInterestCount.setText(profileInfo.getMyInterestEvents().size() + "");
         userFavouriteCount.setText(favCount + "");
         pager.setCurrentItem(0);
+        TabLayout.Tab tab = tabsView.getTabAt(0);
+        tab.select();
         profileView.setVisibility(View.VISIBLE);
+        tabsView.setVisibility(View.VISIBLE);
+        pager.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -264,6 +283,12 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
     public void addToolbarView() {
         View view = LayoutInflater.from(this).inflate(R.layout.card_user_profile, toolbar, false);
+        (view.findViewById(R.id.back_arrow)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         userImage = (CircularImageView) view.findViewById(R.id.profile_image);
         shareButton = (ImageView) view.findViewById(R.id.profile_share);
         userName = (TextView) view.findViewById(R.id.profile_user_name);
@@ -280,6 +305,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         shareButton.setOnClickListener(this);
         toolbar.addView(view);
         toolbar.setBackgroundColor(Color.TRANSPARENT);
+        profileView = view.findViewById(R.id.profile_view);
     }
 
 
@@ -297,6 +323,16 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 shareProfileWithBranch(userProfilePagerAdapter.getProfileInfo(), mobileNoProfileUser, null, "Profile");
                 break;
             case R.id.btn_follow:
+                if (btnFollow.isSelected()) {
+                    friendsStore.setFollowing(mobileNoProfileUser, mobileNoProfileUser, false);
+                    btnFollow.setText(R.string.ui_follow);
+                    btnFollow.setSelected(false);
+                } else {
+                    friendsStore.setFollowing(mobileNoProfileUser, mobileNoProfileUser, true);
+                    btnFollow.setText(R.string.ui_following);
+                    btnFollow.setSelected(true);
+                }
+
                 //friendsStore.setFollowing(mobileNoProfileUser,mobileNoProfileUser,true);
                 break;
             case R.id.fab_write_review:

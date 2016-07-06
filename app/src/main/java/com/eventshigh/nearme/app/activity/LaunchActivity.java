@@ -13,7 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-                                                                                                                                                                                                                                                                                                                                                                            import android.support.annotation.Nullable;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.app.ActivityCompat;
@@ -78,6 +78,7 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.PlusOneButton;
 import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
+import com.zendesk.sdk.model.helpcenter.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,7 +99,7 @@ import pl.snowdog.material.ui.ToolbarColorizeHelper;
  * Application Main or launch activity.
  */
 
-public class LaunchActivity extends BaseContextActivity{
+public class LaunchActivity extends BaseContextActivity {
     // Constants
     public static final String DEFAULT_TAB_PARAM = LaunchActivity.class.getName() + "_default_tab";
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 0x001;
@@ -192,7 +193,7 @@ public class LaunchActivity extends BaseContextActivity{
     }
 
     public void fetchEventAttendedDetails() {
-        MyTicketsRequest.submit(this, Request.Priority.IMMEDIATE, this, true,mTicketsListener, new Response.ErrorListener() {
+        MyTicketsRequest.submit(this, Request.Priority.IMMEDIATE, this, true, mTicketsListener, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 Log.e("LaunchActivity", "Not able to fetch ticketed events attended");
@@ -210,7 +211,7 @@ public class LaunchActivity extends BaseContextActivity{
                         Date date = new SimpleDateFormat("EEE MMM dd, hh:mm aa", Locale.ENGLISH).parse(myTicketObject.getEventTime());
                         long milliseconds = date.getTime();
                         long millisecondsFromNow = milliseconds - date.getTime();
-                        if (millisecondsFromNow < 86400000){
+                        if (millisecondsFromNow < 86400000) {
                             reqMyTickets = myTicketObject;
                             break;
                         }
@@ -220,7 +221,7 @@ public class LaunchActivity extends BaseContextActivity{
                         reportActionToAnalytics("reviewModelShow");
                     }
                 }
-            } catch (ParseException pe){
+            } catch (ParseException pe) {
                 Log.e("Launch Activity", pe.toString());
             }
         }
@@ -647,7 +648,12 @@ public class LaunchActivity extends BaseContextActivity{
         tabsView.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
+                int position = tab.getPosition();
+                if (position == 0) {
+
+                } else {
+                    viewPager.setCurrentItem(tab.getPosition());
+                }
             }
 
             @Override
@@ -684,7 +690,8 @@ public class LaunchActivity extends BaseContextActivity{
         tabOne.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewPager.setCurrentItem(0);
+                Intent intent = new Intent(LaunchActivity.this, UserProfileActivity.class);
+                startActivity(intent);
             }
         });
         tabsView.getTabAt(0).setCustomView(tabOne);
@@ -782,7 +789,7 @@ public class LaunchActivity extends BaseContextActivity{
         tabsView.getTabAt(3).setCustomView(tabFour);
     }
 
-    private void showNextScreen(){
+    private void showNextScreen() {
         // If we do not have user city, use GoogleLocation api to get user location.
         if (eventsContext.city == null) {
             client = new GoogleApiClient.Builder(this)
@@ -859,9 +866,9 @@ public class LaunchActivity extends BaseContextActivity{
             showNextScreen();
         }
 
-        if(requestCode == SUBMIT_REVIEW_REQUEST_CODE){
-            if(resultCode == RESULT_OK)
-            super.onBackPressed();
+        if (requestCode == SUBMIT_REVIEW_REQUEST_CODE) {
+            if (resultCode == RESULT_OK)
+                super.onBackPressed();
         }
     }
 
@@ -976,7 +983,12 @@ public class LaunchActivity extends BaseContextActivity{
             showActionBar();
 
             int position = tab.getPosition();
-            viewPager.setCurrentItem(position);
+            if (position == 0) {
+                Intent intent = new Intent(LaunchActivity.this, UserProfileActivity.class);
+                startActivity(intent);
+            } else {
+                viewPager.setCurrentItem(position);
+            }
 
         }
 
@@ -1093,12 +1105,12 @@ public class LaunchActivity extends BaseContextActivity{
                             if (referringParams.length() == 0) {
                                 // showNextScreen();
                                 Log.i("Event_detail_missed", "refering params empty");
-                            }else if(referringParams.has("profile_id")){
+                            } else if (referringParams.has("profile_id")) {
                                 String profileId = referringParams.getString("profile_id");
                                 Intent intent = new Intent(LaunchActivity.this, UserProfileActivity.class);
-                                intent.putExtra(UserProfileActivity.PROFILE_ID,profileId);
+                                intent.putExtra(UserProfileActivity.PROFILE_ID, profileId);
                                 startActivity(intent);
-                            }else if (!referringParams.optBoolean("review", false)) {
+                            } else if (!referringParams.optBoolean("review", false)) {
                                 if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
                                     //showNextScreen();
                                     Log.i("Event_detail_missed", referringParams.getBoolean("+is_first_session") ? "False" : "true");
