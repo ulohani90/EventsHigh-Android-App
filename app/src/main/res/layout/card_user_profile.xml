@@ -54,7 +54,7 @@
                 android:id="@+id/profile_image"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:layout_margin="10dp"
+                android:layout_margin="8dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/com_facebook_profile_picture_blank_portrait" />
 
@@ -70,7 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="sens-serif-medium"
             android:text="username"
             android:textColor="#333333"
@@ -85,6 +85,7 @@
             android:drawablePadding="5dp"
             android:gravity="center_vertical"
             android:text="Unknown"
+            android:layout_marginBottom="8dp"
             android:textColor="#999999"
             android:textSize="14sp" />
 
