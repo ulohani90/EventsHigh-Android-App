@@ -96,7 +96,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
     //TABS
     private final String FAVOURITES_TAB = "Favourites";
-    private final String INTERESTS_TAB = "Interest";
+    private final String INTERESTS_TAB = "Interests";
     private final String REVIEWS_TAB = "Reviews";
     private final String TICKETS_TAB = "Tickets";
     private final String FRIENDS_TAB = "Friends";
@@ -174,16 +174,17 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     private void setViews(ProfileInfo profileInfo) {
         TABS = new ArrayList<>();
         if (isUserSelf) {
-            TABS.add(FAVOURITES_TAB);
             TABS.add(INTERESTS_TAB);
+            TABS.add(FAVOURITES_TAB);
+            TABS.add(FRIENDS_TAB);
             TABS.add(REVIEWS_TAB);
             TABS.add(TICKETS_TAB);
-            TABS.add(FRIENDS_TAB);
-            if (isUserSelf) mobileNoProfileUser = account.getUserInfo().phoneNo;
+            mobileNoProfileUser = account.getUserInfo().phoneNo;
         } else {
-            TABS.add(FAVOURITES_TAB);
             TABS.add(INTERESTS_TAB);
+            TABS.add(FAVOURITES_TAB);
             TABS.add(REVIEWS_TAB);
+            btnFollow.setVisibility(View.VISIBLE);
         }
         int favCount = profileInfo.getMeEventFavouriteObject().topicEvents.get(0).events.size() +
                 profileInfo.getMeEventFavouriteObject().movies.size();
@@ -201,10 +202,14 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
         topProgressBar.setVisibility(View.GONE);
 
+        if(profileInfo.getName()!=null)
+        userName.setText(profileInfo.getName());
+
+        if(profileInfo.getLastCity() != null)
+            userCity.setText(profileInfo.getLastCity());
+
         //attech user data
         if (!Utils.checkIfStringEmpty(profileInfo.getProfilePic())) {
-            userName.setText(profileInfo.getName());
-            userCity.setText(profileInfo.getLastCity());
             Glide.with(UserProfileActivity.this).load(profileInfo.getProfilePic())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()

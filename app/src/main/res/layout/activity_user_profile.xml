@@ -140,7 +140,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="Please verify your phone number to view and manage own profile."
+                android:text="Please verify your phone number to view and manage your own profile."
                 android:textColor="#555555"
                 android:textIsSelectable="false"
                 android:textSize="13sp" />
