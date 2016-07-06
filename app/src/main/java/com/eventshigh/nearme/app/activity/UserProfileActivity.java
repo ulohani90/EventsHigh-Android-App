@@ -155,8 +155,8 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     private void setViews(ProfileInfo profileInfo) {
         TABS = new ArrayList<>();
         if (isUserSelf) {
-            TABS.add(FAVOURITES_TAB);
             TABS.add(INTERESTS_TAB);
+            TABS.add(FAVOURITES_TAB);
             TABS.add(REVIEWS_TAB);
             TABS.add(TICKETS_TAB);
             TABS.add(FRIENDS_TAB);
