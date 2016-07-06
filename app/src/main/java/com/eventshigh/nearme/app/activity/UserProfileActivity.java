@@ -30,6 +30,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.data.FriendsStore;
 import com.eventshigh.nearme.app.data.ProfileInfo;
 import com.eventshigh.nearme.app.network.AddFacebookUserInfoRequest;
 import com.eventshigh.nearme.app.network.FetchProfileRequest;
@@ -85,6 +86,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
     private LinearLayout verifyPhnLayout;
     private Account account;
+    private FriendsStore friendsStore;
 
     //TABS
     private final String FAVOURITES_TAB = "Favourites";
@@ -138,6 +140,10 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         topProgressBar = findViewById(R.id.top_progress_bar);
 
         FacebookSdk.sdkInitialize(getApplicationContext());
+
+        //follow functionality
+        friendsStore = new FriendsStore(this);
+
     }
 
     @Override
@@ -180,7 +186,6 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         pager.setAdapter(userProfilePagerAdapter);
         tabsView.setupWithViewPager(pager);
 
-        profileView.setVisibility(View.VISIBLE);
         topProgressBar.setVisibility(View.GONE);
 
         //attech user data
@@ -204,6 +209,8 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         userFollowerCount.setText(profileInfo.getUserContactList().size() + "");
         userInterestCount.setText(profileInfo.getMyInterestEvents().size() + "");
         userFavouriteCount.setText(favCount + "");
+        pager.setCurrentItem(0);
+        profileView.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -268,6 +275,9 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 break;
             case R.id.profile_share:
                 shareProfileWithBranch(userProfilePagerAdapter.getProfileInfo(), mobileNoProfileUser, null, "Profile");
+                break;
+            case R.id.btn_follow:
+                    //friendsStore.setFollowing(mobileNoProfileUser,mobileNoProfileUser,true);
                 break;
         }
     }

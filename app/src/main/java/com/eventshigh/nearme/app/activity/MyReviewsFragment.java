@@ -149,20 +149,21 @@ public class MyReviewsFragment extends Fragment{
                 }
             });
         }
-*/
+
+        */
+        //setAdapterData(movieUserReviewObjects);
+
         if (movieUserReviewObjects != null){
-            //setAdapterData(movieUserReviewObjects);
             fetchDetailedInfo(shouldByPassCache, movieUserReviewObjects);
         }
         if(movieUserReviewObjects == null || movieUserReviewObjects.size() == 0)noMyEventsView.setVisibility(View.VISIBLE);
         topProgressBar.setVisibility(View.GONE);
-
-
     }
 
     private void fetchDetailedInfo(boolean shouldBypassCache, List<MovieUserReviewObject> movieUserReviewObjectList){
         movieUserReviewObjects = movieUserReviewObjectList;
         isRespoRecieved = false;
+        topProgressBar.setVisibility(View.VISIBLE);
         RequestFuture<List<MovieDetailObject>> moviesList = RequestFuture.newFuture();
         MultiMovieRequest.submit(context, eventsContext, getMovies(movieUserReviewObjectList),
                 Request.Priority.HIGH, null, shouldBypassCache, true, new Response.Listener<List<MovieDetailObject>>() {
@@ -236,6 +237,7 @@ public class MyReviewsFragment extends Fragment{
 
     EventsAdapter adapter;
     public void setAdapterData(List<MovieUserReviewObject> objs) {
+        topProgressBar.setVisibility(View.GONE);
         adapter = new EventsAdapter((BaseContextActivity) getActivity());
         myReviewsList.setAdapter(adapter);
         adapter.setMyReviewsData(objs);
