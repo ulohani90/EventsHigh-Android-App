@@ -186,6 +186,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             TABS.add(REVIEWS_TAB);
             btnFollow.setVisibility(View.VISIBLE);
         }
+
         int favCount = profileInfo.getMeEventFavouriteObject().topicEvents.get(0).events.size() +
                 profileInfo.getMeEventFavouriteObject().movies.size();
 
@@ -199,6 +200,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         userProfilePagerAdapter.setProfileInfo(profileInfo);
         pager.setAdapter(userProfilePagerAdapter);
         tabsView.setupWithViewPager(pager);
+        animateFab(0);
 
         topProgressBar.setVisibility(View.GONE);
 

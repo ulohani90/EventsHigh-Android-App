@@ -96,7 +96,7 @@ public class MyTicketsFragment extends Fragment {
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
-
+        swipeRefreshLayout.setEnabled(false);
     }
 
     @Override

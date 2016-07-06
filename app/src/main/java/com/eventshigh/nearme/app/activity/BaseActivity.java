@@ -740,9 +740,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
         */
         branchObject.setCanonicalIdentifier(mobileNo)
-                .setTitle("Shubham Goyal")//event.title.replaceAll("\"", " &quot "))
+                .setTitle(profileInfo.getName())//event.title.replaceAll("\"", " &quot "))
                 .addContentMetadata("profile_id", mobileNo)
-                .setContentDescription("Check users EH Profile")//event.description.replaceAll("\"", " &quot "))
+                .setContentDescription("Check Events High Profile")//event.description.replaceAll("\"", " &quot "))
                 .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
         branchObject.registerView();
         String src = null;
@@ -786,7 +786,8 @@ public abstract class BaseActivity extends AppCompatActivity {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT,
-                    String.format("Check out " + "'s profile on Events High! - " + profileUri)
+                    String.format("Check out "+profileInfo.getName() + "'s profile on Events High! - "
+                            + profileUri)
             );
 
             sendIntent.setType("text/plain");
