@@ -40,6 +40,8 @@
                     android:fontFamily="sens-serif-medium"
                     android:text="Lahe Lahe"
                     android:textColor="#343434"
+                    android:maxLines="3"
+                    android:ellipsize="end"
                     android:textSize="16sp" />
 
                 <TextView
@@ -124,15 +126,15 @@
                 android:text="Rating: "
                 android:textAllCaps="true"
                 android:textColor="#999999"
-                android:textSize="14dp" />
+                android:textSize="14sp" />
 
             <RatingBar
                 android:id="@+id/entity_rating"
                 android:layout_width="wrap_content"
-                android:layout_height="24dp"
+                android:layout_height="18dp"
                 android:isIndicator="true"
                 android:progressDrawable="@drawable/movie_rating_bar_draw"
-                android:stepSize="0.2" />
+                android:stepSize="1" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

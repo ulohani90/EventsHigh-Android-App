@@ -41,7 +41,7 @@
                 <RatingBar
                     android:id="@+id/movie_rating_bar_card"
                     android:layout_width="wrap_content"
-                    android:layout_height="24dp"
+                    android:layout_height="18dp"
                     android:progressDrawable="@drawable/movie_rating_bar_draw"
                     android:stepSize="0.2"
                     android:isIndicator="true"

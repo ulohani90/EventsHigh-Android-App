@@ -20,7 +20,7 @@ public class FriendsStore {
         return preferences.getBoolean(contactId, true);
     }
 
-    public void setFollowing(String mobileNo,String contactId, boolean following) {
+    public void setFollowing(String mobileNo,String contactId, boolean following){
 
         new UserActionHelper(context).recordUserFollowAction(following? UserActionHelper.UserFollowingAction.USER_FOLLOW:UserActionHelper.UserFollowingAction.USER_UNFOLLOW,mobileNo);
         preferences.edit().putBoolean(contactId, following).apply();
