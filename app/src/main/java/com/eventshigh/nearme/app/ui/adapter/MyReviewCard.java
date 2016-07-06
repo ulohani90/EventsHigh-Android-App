@@ -55,7 +55,7 @@ public class MyReviewCard extends RecyclerView.ViewHolder {
     }
 
     public void bindData(final MovieUserReviewObject movieUserReviewObject) {
-        entityName.setText(movieUserReviewObject.getReviewEntity());
+        entityName.setText(Utils.capitalize(movieUserReviewObject.getReviewEntity()));
         reviewText.setText(movieUserReviewObject.getReviewText());
         entityRating.setRating(movieUserReviewObject.getReviewRating());
         Glide.with(baseActivity).load(movieUserReviewObject.getReviewedEntityImage())

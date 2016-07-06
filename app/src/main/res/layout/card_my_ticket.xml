@@ -4,30 +4,29 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="4dp">
+
+    >
 
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/ticket_header" />
+        android:background="@drawable/ticket_header" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
-        android:layout_marginTop="-1dp"
         android:background="@android:color/white"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
-            android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -41,10 +40,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="2dp"
+                    android:ellipsize="end"
                     android:fontFamily="sens-serif-medium"
+                    android:maxLines="2"
                     android:text="EVENTS NAME"
-                    android:textAllCaps="true"
-                    android:textSize="20sp" />
+                    android:textColor="#343434"
+                    android:textSize="16sp" />
+
 
                 <TextView
                     android:id="@+id/tv_event_location"
@@ -75,10 +77,10 @@
 
                 <LinearLayout
                     android:id="@+id/row_view_ticket"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:gravity="right"
+                    android:layout_marginTop="4dp"
+                    android:gravity="right|end"
                     android:orientation="vertical">
 
                     <TextView
@@ -90,14 +92,14 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:layout_marginTop="4dp"
-                        android:gravity="center_vertical">
+                        android:gravity="center"
+                        android:orientation="horizontal">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Booking ID "/>
+                            android:text="Booking ID " />
 
                         <TextView
                             android:id="@+id/row_booking_id"
@@ -109,7 +111,6 @@
                             android:textColor="@android:color/white" />
                     </LinearLayout>
                 </LinearLayout>
-
             </FrameLayout>
 
         </LinearLayout>
@@ -406,6 +407,6 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/ticket_footer" />
+        android:background="@drawable/ticket_footer" />
 
 </LinearLayout>

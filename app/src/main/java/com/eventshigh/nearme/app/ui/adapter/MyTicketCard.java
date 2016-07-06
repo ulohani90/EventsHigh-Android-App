@@ -11,6 +11,7 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.MyTicketsFragment;
 import com.eventshigh.nearme.app.data.MyTicketObject;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -74,7 +75,7 @@ public class MyTicketCard extends RecyclerView.ViewHolder{
         });
         this.myTicketItemClickedListener = myTicketItemClickedListener;
         tvNoTickets.setText(myTicketObject.getNoTicket() + " Ticket(s)");
-        tvEventName.setText(myTicketObject.getEventName());
+        tvEventName.setText(Utils.capitalize(myTicketObject.getEventName()));
         tvEventLocation.setVisibility(View.GONE);
         tvBookingId.setText(myTicketObject.getBookingId());
         tvGuestName.setText(myTicketObject.getUserName());
