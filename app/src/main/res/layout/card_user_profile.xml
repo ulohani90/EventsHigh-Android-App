@@ -36,6 +36,7 @@
             android:layout_height="match_parent"
             android:foreground="?android:attr/selectableItemBackground"
             android:scaleType="centerInside"
+            android:visibility="gone"
             android:src="@drawable/ic_share" />
 
     </LinearLayout>
@@ -272,7 +273,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
                     android:gravity="center_horizontal"
-                    android:text="Feeling lazy?\nImport your profile from Facebook."
+                    android:text="Import your profile from Facebook."
                     android:textColor="#999999"
                     android:textSize="14sp" />
 
@@ -285,11 +286,12 @@
                     android:id="@+id/facebook_fetch_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="8dp"
                     android:drawableLeft="@drawable/facebook"
                     android:drawablePadding="4dp"
                     android:gravity="center_vertical"
-                    android:text="Use Your Facebook info"
+                    android:text="Use your Facebook info"
+                    android:layout_marginBottom="8dp"
                     android:textColor="#333333" />
             </LinearLayout>
 

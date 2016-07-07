@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.data;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Parcel;
@@ -7,6 +8,7 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.stream.AdditionalTicketField;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
@@ -723,6 +725,26 @@ public class Event implements Parcelable {
         }
         return events;
     }
+
+
+    public static List<Event> fromJSON(Context context, JSONArray jsonArray, boolean includeWithoutLocation, boolean isForSavingAction) {
+        List<Event> events = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                Event event = fromJSON(jsonArray.getJSONObject(i));
+                if (event != null && (includeWithoutLocation || event.location != null)) {
+                    if (isForSavingAction)
+                        ((BaseContextActivity) context).recordEventMark(event, EventsMarkerManager.EventMark.FAVOURITE);
+                    events.add(event);
+
+                }
+            } catch (JSONException | ParseException e) {
+                Crashlytics.getInstance().core.logException(e);
+            }
+        }
+        return events;
+    }
+
 
     public static List<Event> parseUpcomingEvents(JSONObject eventsJSON,
                                                   boolean includeWithoutLocation) throws JSONException {

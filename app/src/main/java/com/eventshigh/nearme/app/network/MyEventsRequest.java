@@ -35,7 +35,7 @@ import java.util.concurrent.TimeoutException;
 public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEventFavouriteObject> {
     private static final String LOG_TAG = MyEventsRequest.class.getSimpleName();
 
-    private static String FAVOURITES_NAME = "my events";
+    public static String FAVOURITES_NAME = "my events";
     private static String INVITATIONS_NAME = "invitations";
     public static String MOVIES_NAME = "my movies";
 

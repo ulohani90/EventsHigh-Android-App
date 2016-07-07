@@ -12,6 +12,7 @@ import com.android.volley.ParseError;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -159,8 +160,12 @@ public class ProfileInfo implements Parcelable {
                 JSONArray eventsJsonArray = jsonObject.getJSONArray("interest_events");
 
                 for (int i = 0; i < eventsJsonArray.length(); i++) {
+
+
                     List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"), true);
-                    new Account(context).setIsFollowing(eventsJsonArray.getJSONObject(i).getString("topic"), true);
+
+                    if (profileMobileNo.equalsIgnoreCase(new Account(context).getUserInfo().phoneNo))
+                        new Account(context).setIsFollowing(eventsJsonArray.getJSONObject(i).getString("topic"), true);
                     MyEventsRequest.TopicEvents eventData = new MyEventsRequest.TopicEvents(eventsJsonArray.getJSONObject(i).getString("topic"), topicEvents, eventsJsonArray.getJSONObject(i).getInt("event_count"));
                     events.add(eventData);
                 }
@@ -190,11 +195,11 @@ public class ProfileInfo implements Parcelable {
             List<MovieDetailObject> favouriteMovie = new ArrayList<>();
 
             if (jsonObject.has("fav_events")) {
-                List<Event> topicEvents = Event.fromJSON(jsonObject.getJSONArray("fav_events"), true);
-                favouriteTopicEvents.add(new MyEventsRequest.TopicEvents("Events", topicEvents));
+                List<Event> topicEvents = Event.fromJSON(context, jsonObject.getJSONArray("fav_events"), true, profileMobileNo.equalsIgnoreCase(new Account(context).getUserInfo().phoneNo));
+                favouriteTopicEvents.add(new MyEventsRequest.TopicEvents(MyEventsRequest.FAVOURITES_NAME, topicEvents));
             }
             if (jsonObject.has("fav_movies")) {
-                favouriteMovie = MovieDetailObject.fromJSON(context, jsonObject.getJSONArray("fav_movies"));
+                favouriteMovie = MovieDetailObject.fromJSON(context, jsonObject.getJSONArray("fav_movies"), profileMobileNo.equalsIgnoreCase(new Account(context).getUserInfo().phoneNo));
             }
 
             List<UserContact> userContactList;
