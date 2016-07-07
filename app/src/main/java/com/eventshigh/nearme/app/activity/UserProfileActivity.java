@@ -331,6 +331,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                     friendsStore.setFollowing(mobileNoProfileUser, mobileNoProfileUser, true);
                     btnFollow.setText(R.string.ui_following);
                     btnFollow.setSelected(true);
+                    btnFollow.setSelected(true);
                 }
 
                 //friendsStore.setFollowing(mobileNoProfileUser,mobileNoProfileUser,true);

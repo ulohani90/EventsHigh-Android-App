@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.location.Location;
 import android.net.Uri;
@@ -226,6 +227,24 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
         if (event.reviewObjects.size() > 0) {
             findViewById(R.id.review_card).setVisibility(View.VISIBLE);
             ((TextView) findViewById(R.id.tv_user_review_by)).setText(event.reviewObjects.get(0).getReviewBy());
+
+            if (Utils.isValidPhone(event.reviewObjects.get(0).getReviewerId())) {
+                (findViewById(R.id.tv_user_review_by)).setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(EventDetailActivity.this, UserProfileActivity.class);
+                        intent.putExtra(UserProfileActivity.PROFILE_ID, event.reviewObjects.get(0).getReviewerId());
+                        startActivity(intent);
+                    }
+                });
+            }
+
+            if (Utils.isValidPhone(event.reviewObjects.get(0).getReviewerId())) {
+                ((TextView) findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#33aaee"));
+            }else{
+                ((TextView) findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#33aaee"));
+            }
+
             ((RatingBar) findViewById(R.id.rb_user_review_rating)).setRating(event.reviewObjects.get(0).getReviewRating());
             ((TextView) findViewById(R.id.tv_user_review_text)).setText(event.reviewObjects.get(0).getReviewText());
             if ((event.reviewObjects.get(0).getReviewedEntityId() == null || !event.reviewObjects.get(0).getReviewedEntityId().equalsIgnoreCase(event.id)) && event.reviewObjects.get(0).getReviewEntity() != null) {
@@ -1266,4 +1285,5 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
     private static String toHtmlNoFrame(String html) {
         return "<body>" + html.replaceAll("<iframe.*/iframe>", "") + "</body>";
     }
+
 }
