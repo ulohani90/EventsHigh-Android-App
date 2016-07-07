@@ -18,7 +18,7 @@ public class AskForContactsDialog {
     public static void doNeedful(BaseActivity activity) {
         Preferences preferences = Preferences.getInstance(activity);
         if (preferences.canUploadContacts()) {
-            new UserContactsUploader(activity).uploadContacts();
+            new UserContactsUploader(activity).uploadContacts(null);
         } else if (preferences.getLastUploadContactsAsked() < System.currentTimeMillis() - DateUtils.WEEK_IN_MILLIS) {
             AskForContactsDialog.show(activity, preferences);
         }
@@ -44,7 +44,7 @@ public class AskForContactsDialog {
                     public void onClick(DialogInterface dialog, int which) {
                         activity.reportActionToAnalytics("uploadContactsAccepted");
                         preferences.setCanUploadContacts(true);
-                        new UserContactsUploader(activity).uploadContacts();
+                        new UserContactsUploader(activity).uploadContacts(null);
                         callback.onContactsUploadAccepted();
                     }
                 })

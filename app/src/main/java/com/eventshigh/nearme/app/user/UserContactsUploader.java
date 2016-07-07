@@ -41,8 +41,9 @@ public class UserContactsUploader {
         preferences = PreferenceManager.getDefaultSharedPreferences(activity);
     }
 
-    public void uploadContacts() {
+    public void uploadContacts(OnUploadContactsSuccess listener) {
         // Don't do anything if we have tried in the last 1 day.
+
         final long lastTry = preferences.getLong(PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP, 0);
         long currentTimeMillis = System.currentTimeMillis();
         if (currentTimeMillis - lastTry < DateUtils.DAY_IN_MILLIS) {
@@ -52,7 +53,10 @@ public class UserContactsUploader {
         // Check if we have necessary permissions.
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_CONTACTS)
                 == PackageManager.PERMISSION_GRANTED) {
-            new Thread(new UserContactsUploadRunner(preferences, activity)).start();
+            if (listener != null) {
+                listener.onUploadSuccess();
+            }
+            new Thread(new UserContactsUploadRunner(preferences, activity, listener)).start();
             preferences.edit().putLong(PARAM_LAST_CONTACTS_SYNC_TRY_TIMESTAMP, currentTimeMillis).apply();
             return;
         }
@@ -66,8 +70,8 @@ public class UserContactsUploader {
             Preferences preferences = Preferences.getInstance(activity);
             AskForContactsDialog.show(activity,preferences);
         } else {*/
-            // No explanation needed, we can request the permission.
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_CONTACTS},
+        // No explanation needed, we can request the permission.
+        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_CONTACTS},
                 BaseActivity.PERMISSIONS_REQUEST_READ_CONTACTS);
         //}
     }
@@ -75,18 +79,20 @@ public class UserContactsUploader {
     private static class UserContactsUploadRunner implements Listener<JSONObject>, ErrorListener, Runnable {
         private final SharedPreferences preferences;
         private final Context context;
+        private final OnUploadContactsSuccess listener;
 
-        private UserContactsUploadRunner(SharedPreferences preferences, Context context) {
+        private UserContactsUploadRunner(SharedPreferences preferences, Context context, OnUploadContactsSuccess listener) {
             this.preferences = preferences;
             this.context = context.getApplicationContext();
+            this.listener = listener;
         }
 
         @Override
         @SuppressWarnings("TryFinallyCanBeTryWithResources")
         public void run() {
             String selectionExtras = " and "
-                + ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP
-                + " >= " + preferences.getLong(PARAM_LAST_CONTACTS_SYNC_TIMESTAMP, 0);
+                    + ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP
+                    + " >= " + preferences.getLong(PARAM_LAST_CONTACTS_SYNC_TIMESTAMP, 0);
             String order = ContactsContract.CommonDataKinds.Phone.CONTACT_LAST_UPDATED_TIMESTAMP +
                     " LIMIT " + MAX_CONTACTS_TO_UPLOAD;
 
@@ -107,6 +113,8 @@ public class UserContactsUploader {
         @Override
         public void onResponse(JSONObject jsonObject, boolean isIntermediate) {
             // TODO: replace currentTimeMillis with last contact timestamp.
+          /*  if (listener != null)
+                listener.onUploadSuccess();*/
             Log.i(LOG_TAG, "Successfully uploaded the contacts");
             preferences.edit().putLong(PARAM_LAST_CONTACTS_SYNC_TIMESTAMP, System.currentTimeMillis()).apply();
         }
@@ -117,4 +125,9 @@ public class UserContactsUploader {
             Crashlytics.getInstance().core.logException(volleyError.getCause());
         }
     }
+
+    public interface OnUploadContactsSuccess {
+        public void onUploadSuccess();
+    }
+
 }

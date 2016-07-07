@@ -6,15 +6,6 @@
 >
 
 
-    <ProgressBar
-        android:id="@+id/top_progress_bar"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="-4dp"
-        android:layout_marginTop="-4dp"
-        android:indeterminate="true"
-    />
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
@@ -96,5 +87,14 @@
             android:textSize="16sp"
             />
     </LinearLayout>
+    <ProgressBar
+        android:id="@+id/top_progress_bar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="-4dp"
+        android:layout_marginTop="-4dp"
+        android:indeterminate="true"
+        />
 
 </FrameLayout>
