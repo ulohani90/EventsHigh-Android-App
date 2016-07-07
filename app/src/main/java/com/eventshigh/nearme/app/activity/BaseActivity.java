@@ -426,8 +426,10 @@ public abstract class BaseActivity extends AppCompatActivity {
             sendIntent.setType("text/plain");
             if (packageName != null) {
                 sendIntent.setPackage(packageName);
+                startActivity(sendIntent);
+            } else {
+                startActivity(Intent.createChooser(sendIntent, "Share"));
             }
-            startActivity(sendIntent);
         } catch (ActivityNotFoundException e) {
             Crashlytics.getInstance().core.logException(e);
             showMessage(R.string.failed_share);
@@ -492,7 +494,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                         sendIntent.setAction(Intent.ACTION_SEND);
                         sendIntent.putExtra(Intent.EXTRA_TEXT, eventsContext.toString() + "\n\n" + url + "\n\nUse my referral code " + referralCode);
                         sendIntent.setType("text/plain");
-                        startActivity(sendIntent);
+                        startActivity(Intent.createChooser(sendIntent, "Share"));
                     } catch (ActivityNotFoundException e) {
                         Crashlytics.getInstance().core.logException(e);
                         showMessage(R.string.failed_share);
@@ -574,7 +576,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                     );
 
                     sendIntent.setType("text/plain");
-                    startActivity(sendIntent);
+                    startActivity(Intent.createChooser(sendIntent, "Share"));
                 } else {
                     //   if (error.getErrorCode() == -113) {
                     showMessage(error.getMessage());
@@ -707,7 +709,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                     );
 
                     sendIntent.setType("text/plain");
-                    startActivity(sendIntent);
+                    startActivity(Intent.createChooser(sendIntent, "Share"));
                 } else {
                     //   if (error.getErrorCode() == -113) {
                     showMessage(error.getMessage());
@@ -726,7 +728,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
 
-        this.startActivity(shareIntent);
+        this.startActivity(Intent.createChooser(shareIntent, "Share"));
 
     }
 
@@ -797,8 +799,10 @@ public abstract class BaseActivity extends AppCompatActivity {
             sendIntent.setType("text/plain");
             if (packageName != null) {
                 sendIntent.setPackage(packageName);
+                startActivity(sendIntent);
+            } else {
+                startActivity(Intent.createChooser(sendIntent, "Share"));
             }
-            startActivity(sendIntent);
         } catch (ActivityNotFoundException e) {
             Crashlytics.getInstance().core.logException(e);
             showMessage(R.string.failed_share);

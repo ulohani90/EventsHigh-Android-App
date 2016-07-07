@@ -153,6 +153,8 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+
+
         </activity>
         <activity
             android:name=".activity.EventsMapsActivity"
@@ -210,6 +212,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
+
         </activity>
         <activity
             android:name=".activity.BlogFeedActivity"
@@ -311,6 +314,7 @@
             <meta-data
                 android:name="io.branch.sdk.auto_link_request_code"
                 android:value="@integer/EventsDetailDeepLink_code" />
+
         </activity>
         <activity
             android:name=".activity.MyFriendsActivity"
@@ -341,7 +345,9 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:hardwareAccelerated="true"
             android:label="@string/app_name"
-            android:theme="@style/NoActionBar" />
+            android:theme="@style/NoActionBar">
+
+        </activity>
         <activity
             android:name=".activity.PointsBreakdownActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -352,7 +358,9 @@
             android:name=".activity.MovieBrowseActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:hardwareAccelerated="true"
-            android:theme="@style/NoActionBar" />
+            android:theme="@style/NoActionBar">
+
+        </activity>
         <activity
             android:name=".activity.RedeemCouponActivity"
             android:screenOrientation="portrait"
@@ -501,11 +509,9 @@
 
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
+
         </activity>
 
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id" />
 
         <activity
             android:name="com.facebook.FacebookActivity"
@@ -545,6 +551,8 @@
         <activity
             android:name=".activity.WriteRecentEventReviewActivity"
             android:theme="@style/NoActionBar" />
+
+
 
     </application>
 
