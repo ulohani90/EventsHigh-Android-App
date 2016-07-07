@@ -240,9 +240,9 @@ public class EventDetailActivity extends BaseActivity implements OnClickListener
             }
 
             if (Utils.isValidPhone(event.reviewObjects.get(0).getReviewerId())) {
-                ((TextView) findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#33aaee"));
+                ((TextView) findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("09a0f6"));
             }else{
-                ((TextView) findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#33aaee"));
+                ((TextView) findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#666666"));
             }
 
             ((RatingBar) findViewById(R.id.rb_user_review_rating)).setRating(event.reviewObjects.get(0).getReviewRating());

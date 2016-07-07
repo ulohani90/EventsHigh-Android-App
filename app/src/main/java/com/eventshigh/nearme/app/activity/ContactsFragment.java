@@ -143,7 +143,7 @@ public class ContactsFragment extends Fragment {
         VolleyHelper.getRequestQueue(activity).cancelAll(this);
 
         Preferences preferences = Preferences.getInstance(activity);
-        if(profileInfo != null){
+        if(profileInfo != null && preferences.canUploadContacts()){
             retryView.setVisibility(View.GONE);
             noFriendsOnEhView.setVisibility(View.INVISIBLE);
             uploadContact.setVisibility(View.GONE);
@@ -152,7 +152,7 @@ public class ContactsFragment extends Fragment {
             }
             contactsAdapter.setMyContacts(profileInfo.getUserContactList(), FriendCardType.FOLLOW);
             topProgressBar.setVisibility(View.GONE);
-        }else if(preferences.canUploadContacts()) {
+        }else if(preferences.canUploadContacts()){
             topProgressBar.setVisibility(View.VISIBLE);
             retryView.setVisibility(View.GONE);
             noFriendsOnEhView.setVisibility(View.INVISIBLE);

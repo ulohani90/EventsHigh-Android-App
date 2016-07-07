@@ -229,7 +229,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         if (!Utils.checkIfStringEmpty(profileInfo.getProfilePic())) {
             Glide.with(UserProfileActivity.this).load(profileInfo.getProfilePic())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                    .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait).crossFade().centerCrop()
                     .into(userImage);
             llAboutUserMask.setVisibility(View.VISIBLE);
         } else if (isUserSelf) {

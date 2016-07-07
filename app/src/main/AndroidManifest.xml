@@ -492,13 +492,12 @@
         <!-- Facebook-log for user profile activity -->
         <activity
             android:name=".activity.UserProfileActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
@@ -540,10 +539,12 @@
 
         <activity
             android:name=".activity.PlacesAutocompleteBoundedActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/NoActionBar" />
 
         <activity
             android:name=".activity.WriteRecentEventReviewActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/NoActionBar" />
 
     </application>

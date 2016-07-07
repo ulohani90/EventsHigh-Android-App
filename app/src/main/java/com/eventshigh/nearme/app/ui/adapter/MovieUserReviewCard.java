@@ -75,7 +75,7 @@ public class MovieUserReviewCard extends RecyclerView.ViewHolder {
                 }
             });
             if (Utils.isValidPhone(review.getReviewerId())) {
-                tvReviewBy.setTextColor(Color.parseColor("#33aaee"));
+                tvReviewBy.setTextColor(Color.parseColor("#09a0f6"));
             }else{
                 tvReviewBy.setTextColor(Color.parseColor("#666666"));
             }

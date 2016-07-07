@@ -135,10 +135,29 @@ public class EventInfoFragment extends Fragment {
         return view;
     }
 
-    public void updateReview(Event event) {
+    public void updateReview(final Event event) {
         if (event.reviewObjects.size() > 0) {
             view.findViewById(R.id.review_card).setVisibility(View.VISIBLE);
             ((TextView) view.findViewById(R.id.tv_user_review_by)).setText(event.reviewObjects.get(0).getReviewBy());
+            //Changing reviewers name clickable if profile_id available
+            if (Utils.isValidPhone(event.reviewObjects.get(0).getReviewerId())) {
+                (view.findViewById(R.id.tv_user_review_by)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(activity, UserProfileActivity.class);
+                        intent.putExtra(UserProfileActivity.PROFILE_ID, event.reviewObjects.get(0).getReviewerId());
+                        startActivity(intent);
+                    }
+                });
+            }
+
+            if (Utils.isValidPhone(event.reviewObjects.get(0).getReviewerId())) {
+                ((TextView) view.findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#09a0f6"));
+            }else{
+                ((TextView) view.findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#666666"));
+            }
+
+
             ((RatingBar) view.findViewById(R.id.rb_user_review_rating)).setRating(event.reviewObjects.get(0).getReviewRating());
             ((TextView) view.findViewById(R.id.tv_user_review_text)).setText(event.reviewObjects.get(0).getReviewText());
             if ((event.reviewObjects.get(0).getReviewedEntityId() == null || !event.reviewObjects.get(0).getReviewedEntityId().equalsIgnoreCase(event.id)) && event.reviewObjects.get(0).getReviewEntity() != null) {
