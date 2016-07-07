@@ -89,7 +89,7 @@ public class ContactsFragment extends Fragment {
         View inviteButtonView = view.findViewById(R.id.invite_button);
 
         uploadContact = view.findViewById(R.id.view_upload_contacts);
-        uploadContactsBtn = (TextView)view.findViewById(R.id.upload_contacts_btn);
+        uploadContactsBtn = (TextView) view.findViewById(R.id.upload_contacts_btn);
 
         // Setup the refresh on swipe down.
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
@@ -102,7 +102,7 @@ public class ContactsFragment extends Fragment {
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.primary);
-        if(profileInfo != null)swipeRefreshLayout.setEnabled(false);
+        if (profileInfo != null) swipeRefreshLayout.setEnabled(false);
 
         view.findViewById(R.id.retry).setOnClickListener(new OnClickListener() {
             @Override
@@ -118,6 +118,8 @@ public class ContactsFragment extends Fragment {
                 activity.shareApp();
             }
         });
+
+
     }
 
     @Override
@@ -135,47 +137,67 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-       // refresh(false);
+        // refresh(false);
     }
+
+    boolean hasUploadedContacts = false;
 
     private void refresh(boolean shouldBypassCache) {
 
         VolleyHelper.getRequestQueue(activity).cancelAll(this);
 
         Preferences preferences = Preferences.getInstance(activity);
-        if(profileInfo != null && preferences.canUploadContacts()){
+        if (profileInfo != null) {
             retryView.setVisibility(View.GONE);
             noFriendsOnEhView.setVisibility(View.INVISIBLE);
-            uploadContact.setVisibility(View.GONE);
-            if (profileInfo.getUserContactList().isEmpty()) {
-                noFriendsOnEhView.setVisibility(View.VISIBLE);
+            // uploadContact.setVisibility(View.GONE);
+            topProgressBar.setVisibility(View.GONE);
+            if (hasUploadedContacts) {
+                requestMyContactsFromServer(shouldBypassCache);
+                hasUploadedContacts = false;
+            } else if (profileInfo.getUserContactList().isEmpty()) {
+                uploadContacts(shouldBypassCache);
             }
             contactsAdapter.setMyContacts(profileInfo.getUserContactList(), FriendCardType.FOLLOW);
-            topProgressBar.setVisibility(View.GONE);
-        }else if(preferences.canUploadContacts()){
-            topProgressBar.setVisibility(View.VISIBLE);
-            retryView.setVisibility(View.GONE);
-            noFriendsOnEhView.setVisibility(View.INVISIBLE);
-            uploadContact.setVisibility(View.GONE);
-            MyContactsRequest.submit(activity, Priority.IMMEDIATE, this, shouldBypassCache,
-                myContactsListener, errorListener);
-        } else{
-            topProgressBar.setVisibility(View.GONE);
-            retryView.setVisibility(View.GONE);
-            noFriendsOnEhView.setVisibility(View.INVISIBLE);
-            hasAskForContactsDialogShown = true;
-            uploadContact.setVisibility(View.VISIBLE);
-            uploadContactsBtn.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.reportActionToAnalytics("uploadContactsAccepted");
-                    Preferences.getInstance(getActivity()).setCanUploadContacts(true);
-                    new UserContactsUploader(activity).uploadContacts();
-
-                }
-            });
-           // AskForContactsDialog.show(activity, preferences, contactsRequestCallback);
+        } else if (preferences.canUploadContacts()) {
+            requestMyContactsFromServer(shouldBypassCache);
+        } else {
+            uploadContacts(shouldBypassCache);
+            // AskForContactsDialog.show(activity, preferences, contactsRequestCallback);
         }
+    }
+
+    public void uploadContacts(final boolean shouldBypassCache) {
+        hasUploadedContacts = true;
+        topProgressBar.setVisibility(View.GONE);
+        retryView.setVisibility(View.GONE);
+        noFriendsOnEhView.setVisibility(View.INVISIBLE);
+        hasAskForContactsDialogShown = true;
+        uploadContact.setVisibility(View.VISIBLE);
+        uploadContactsBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.reportActionToAnalytics("uploadContactsAccepted");
+                Preferences.getInstance(getActivity()).setCanUploadContacts(true);
+                new UserContactsUploader(activity).uploadContacts(new UserContactsUploader.OnUploadContactsSuccess() {
+                    @Override
+                    public void onUploadSuccess() {
+
+                        //requestMyContactsFromServer(shouldBypassCache);
+                    }
+                });
+
+            }
+        });
+    }
+
+    public void requestMyContactsFromServer(boolean shouldBypassCache) {
+        topProgressBar.setVisibility(View.VISIBLE);
+        retryView.setVisibility(View.GONE);
+        noFriendsOnEhView.setVisibility(View.INVISIBLE);
+        uploadContact.setVisibility(View.GONE);
+        MyContactsRequest.submit(activity, Priority.IMMEDIATE, this, shouldBypassCache,
+                myContactsListener, errorListener);
     }
 
     private Listener<List<UserContact>> myContactsListener = new Listener<List<UserContact>>() {
@@ -185,6 +207,7 @@ public class ContactsFragment extends Fragment {
             if (contacts.isEmpty()) {
                 noFriendsOnEhView.setVisibility(View.VISIBLE);
             }
+            profileInfo.setUserContactList(contacts);
             contactsAdapter.setMyContacts(contacts, FriendCardType.FOLLOW);
         }
     };
@@ -202,7 +225,7 @@ public class ContactsFragment extends Fragment {
         }
     };
 
-    private ContactsRequestCallback contactsRequestCallback  = new ContactsRequestCallback() {
+    private ContactsRequestCallback contactsRequestCallback = new ContactsRequestCallback() {
         @Override
         public void onContactsUploadAccepted() {
             MyContactsRequest.submit(activity, Priority.IMMEDIATE, this, false,
@@ -214,4 +237,5 @@ public class ContactsFragment extends Fragment {
             activity.finish();
         }
     };
+
 }
