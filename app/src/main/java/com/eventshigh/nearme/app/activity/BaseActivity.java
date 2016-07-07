@@ -43,6 +43,7 @@ import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.GAHelper;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
@@ -744,6 +745,9 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .addContentMetadata("profile_id", mobileNo)
                 .setContentDescription("Check Events High Profile")//event.description.replaceAll("\"", " &quot "))
                 .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
+        if (!Utils.checkIfStringEmpty(profileInfo.getProfilePic())) {
+            branchObject.setContentImageUrl(profileInfo.getProfilePic());
+        }
         branchObject.registerView();
         String src = null;
         if (packageName != null) {
@@ -753,7 +757,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .setChannel(packageName)
                 .setFeature("sharing")
                 .addControlParameter("$always_deeplink", "true")
-                .addControlParameter("$desktop_url","http://www.eventshigh.com");//profileInfo.getProfileShareURI(src).toString());
+                .addControlParameter("$desktop_url", "http://www.eventshigh.com");//profileInfo.getProfileShareURI(src).toString());
         //.addControlParameter("$android_url", referralLink)
         //.addControlParameter("$ios_url", "http://www.eventshigh.com");
         final ProgressDialog dialog = OneSecDialog.show(this);
@@ -786,7 +790,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT,
-                    String.format("Check out "+profileInfo.getName() + "'s profile on Events High! - "
+                    String.format("Check out " + profileInfo.getName() + "'s profile on Events High! - "
                             + profileUri)
             );
 

@@ -248,6 +248,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         TabLayout.Tab tab = tabsView.getTabAt(0);
         tab.select();
         profileView.setVisibility(View.VISIBLE);
+        shareButton.setVisibility(View.VISIBLE);
         tabsView.setVisibility(View.VISIBLE);
         pager.setVisibility(View.VISIBLE);
     }

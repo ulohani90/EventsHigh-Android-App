@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import android.util.TimeUtils;
 
 import com.crashlytics.android.Crashlytics;
+import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -153,12 +154,39 @@ public class MovieDetailObject implements Parcelable {
         dest.writeTypedList(userReviews);
     }
 
+
     public static List<MovieDetailObject> fromJSON(Context context, JSONArray jsonArray) {
         List<MovieDetailObject> movieDetailObjects = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
-                MovieDetailObject movieDetailObject = new MovieDetailObject(context,jsonArray.getJSONObject(i));
-                    movieDetailObjects.add(movieDetailObject);
+                MovieDetailObject movieDetailObject = new MovieDetailObject(context, jsonArray.getJSONObject(i));
+                movieDetailObjects.add(movieDetailObject);
+            } catch (JSONException e) {
+                Crashlytics.getInstance().core.logException(e);
+            }
+        }
+        return movieDetailObjects;
+    }
+
+    /**
+     * Used to parse fav movies and store them correspondingly in the local db.
+     *
+     * @param context
+     * @param jsonArray
+     * @param isAddedForUser
+     * @return
+     */
+    public static List<MovieDetailObject> fromJSON(Context context, JSONArray jsonArray, boolean isAddedForUser) {
+        List<MovieDetailObject> movieDetailObjects = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+
+                MovieDetailObject movieDetailObject = new MovieDetailObject(context, jsonArray.getJSONObject(i));
+
+                if (isAddedForUser) {
+                    ((BaseContextActivity) context).recordMovieMark(movieDetailObject.getMovieInfo(), MovieMarkerManager.MovieMark.FAVOURITE);
+                }
+                movieDetailObjects.add(movieDetailObject);
             } catch (JSONException e) {
                 Crashlytics.getInstance().core.logException(e);
             }
