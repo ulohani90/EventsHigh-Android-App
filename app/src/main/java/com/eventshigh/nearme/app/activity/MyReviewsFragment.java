@@ -124,7 +124,9 @@ public class MyReviewsFragment extends Fragment {
 
 
     //util methods to fetch details of reviewed entity
-    private boolean isRespoRecieved = false;
+    private boolean isMovieRespoRecieved = false;
+    private boolean isEventRespoRecieved = false;
+
     List<MovieUserReviewObject> movieUserReviewObjects;
 
     private void fetchData(final boolean shouldByPassCache) {
@@ -149,51 +151,64 @@ public class MyReviewsFragment extends Fragment {
                 }
             });
         }
-
         */
         //setAdapterData(movieUserReviewObjects);
 
-        if (movieUserReviewObjects != null) {
+        if (movieUserReviewObjects != null && movieUserReviewObjects.size() != 0){
             fetchDetailedInfo(shouldByPassCache, movieUserReviewObjects);
         }
+
         if (movieUserReviewObjects == null || movieUserReviewObjects.size() == 0) {
             noMyEventsView.setVisibility(View.VISIBLE);
-            topProgressBar.setVisibility(View.VISIBLE);
+                topProgressBar.setVisibility(View.GONE);
         }
-
     }
 
     private void fetchDetailedInfo(boolean shouldBypassCache, List<MovieUserReviewObject> movieUserReviewObjectList) {
         movieUserReviewObjects = movieUserReviewObjectList;
-        isRespoRecieved = false;
+        isMovieRespoRecieved = false;
+        isEventRespoRecieved = false;
         topProgressBar.setVisibility(View.VISIBLE);
-        RequestFuture<List<MovieDetailObject>> moviesList = RequestFuture.newFuture();
+
         MultiMovieRequest.submit(context, eventsContext, getMovies(movieUserReviewObjectList),
                 Request.Priority.HIGH, null, shouldBypassCache, true, new Response.Listener<List<MovieDetailObject>>() {
                     @Override
                     public void onResponse(List<MovieDetailObject> movieDetailObjects, boolean b) {
                         updateMovies(movieDetailObjects);
-                        if (isRespoRecieved) {
+                        isMovieRespoRecieved = true;
+                        if (isEventRespoRecieved) {
                             setAdapterData(movieUserReviewObjects);
-                        } else {
-                            isRespoRecieved = true;
                         }
                     }
-                }, moviesList);
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        isMovieRespoRecieved = true;
+                        if(isEventRespoRecieved){
+                            topProgressBar.setVisibility(View.GONE);
+                        }
+                    }
+                });
 
-        RequestFuture<List<Event>> favEvents = RequestFuture.newFuture();
         MultiEventsRequest.submit(context, eventsContext, getEvents(movieUserReviewObjectList),
                 Request.Priority.HIGH, null, shouldBypassCache, true, false, new Response.Listener<List<Event>>() {
                     @Override
                     public void onResponse(List<Event> events, boolean b) {
                         updateEvents(events);
-                        if (isRespoRecieved) {
+                        isEventRespoRecieved = true;
+                        if (isMovieRespoRecieved) {
                             setAdapterData(movieUserReviewObjects);
-                        } else {
-                            isRespoRecieved = true;
                         }
                     }
-                }, favEvents);
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        isEventRespoRecieved = true;
+                        if (isMovieRespoRecieved) {
+                            topProgressBar.setVisibility(View.GONE);
+                        }
+                    }
+                });
     }
 
     private List<String> getMovies(List<MovieUserReviewObject> movieUserReviewObjectList) {
