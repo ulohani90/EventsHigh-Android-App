@@ -140,7 +140,7 @@ public class EventInfoFragment extends Fragment {
             view.findViewById(R.id.review_card).setVisibility(View.VISIBLE);
             ((TextView) view.findViewById(R.id.tv_user_review_by)).setText(event.reviewObjects.get(0).getReviewBy());
             //Changing reviewers name clickable if profile_id available
-            if (Utils.isValidPhone(event.reviewObjects.get(0).getReviewerId())) {
+            if (event.reviewObjects.get(0).getReviewerId() != null && Utils.isValidPhone(event.reviewObjects.get(0).getReviewerId())) {
                 (view.findViewById(R.id.tv_user_review_by)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -149,9 +149,6 @@ public class EventInfoFragment extends Fragment {
                         startActivity(intent);
                     }
                 });
-            }
-
-            if (Utils.isValidPhone(event.reviewObjects.get(0).getReviewerId())) {
                 ((TextView) view.findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#09a0f6"));
             }else{
                 ((TextView) view.findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#666666"));

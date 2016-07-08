@@ -347,7 +347,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     LoginResult loginResult;
 
     void fbLoginButtonPressed() {
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends", "read_custom_friendlists", "user_likes", "user_about_me"));
+        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends", "user_interests"));
         callbackManager = CallbackManager.Factory.create();
 
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
