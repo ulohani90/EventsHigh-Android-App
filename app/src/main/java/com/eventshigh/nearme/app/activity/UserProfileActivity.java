@@ -117,8 +117,8 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             }
 
         });
-        mobileNoProfileUser = getIntent().getStringExtra(PROFILE_ID);
 
+        mobileNoProfileUser = getIntent().getStringExtra(PROFILE_ID);
         //check if user's self profile
         if (mobileNoProfileUser != null) {
             if (mobileNoProfileUser.equalsIgnoreCase(account.getUserInfo().phoneNo)) {
@@ -155,8 +155,6 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         pager.addOnPageChangeListener(this);
         fabWriteReviews.setOnClickListener(this);
         fabWriteReviews.setVisibility(View.GONE);
-
-
     }
 
 
@@ -172,8 +170,9 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     protected void onStart() {
         super.onStart();
         verifyPhnLayout.setVisibility(View.GONE);
-        if (Utils.checkIfStringEmpty(mobileNoProfileUser))
+        if (Utils.checkIfStringEmpty(mobileNoProfileUser) && account.getUserInfo().isVerified){
             mobileNoProfileUser = account.getUserInfo().phoneNo;
+        }
 
         if (userProfilePagerAdapter == null){
             fetchProfileInfo(true);
