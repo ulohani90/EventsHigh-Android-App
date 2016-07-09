@@ -153,17 +153,18 @@ public class MyReviewsFragment extends Fragment {
         }
         */
         //setAdapterData(movieUserReviewObjects);
-
+        retryView.setVisibility(View.GONE);
+        isMovieRespoRecieved = false;
+        isEventRespoRecieved = false;
         if (movieUserReviewObjects != null && movieUserReviewObjects.size() != 0) {
             fetchDetailedInfo(shouldByPassCache, movieUserReviewObjects);
         }
 
         if (movieUserReviewObjects == null || movieUserReviewObjects.size() == 0) {
             noMyEventsView.setVisibility(View.VISIBLE);
-
             topProgressBar.setVisibility(View.GONE);
-
         }
+
     }
 
     private void fetchDetailedInfo(boolean shouldBypassCache, List<MovieUserReviewObject> movieUserReviewObjectList) {
@@ -188,6 +189,7 @@ public class MyReviewsFragment extends Fragment {
                         isMovieRespoRecieved = true;
                         if (isEventRespoRecieved) {
                             topProgressBar.setVisibility(View.GONE);
+                            retryView.setVisibility(View.VISIBLE);
                         }
                     }
                 });
@@ -208,6 +210,7 @@ public class MyReviewsFragment extends Fragment {
                         isEventRespoRecieved = true;
                         if (isMovieRespoRecieved) {
                             topProgressBar.setVisibility(View.GONE);
+                            retryView.setVisibility(View.VISIBLE);
                         }
                     }
                 });
