@@ -135,7 +135,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         findViewById(R.id.retry).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fetchProfileInfo(false);
+                fetchProfileInfo(true);
             }
         });
         addToolbarView();
@@ -175,14 +175,12 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         if (Utils.checkIfStringEmpty(mobileNoProfileUser))
             mobileNoProfileUser = account.getUserInfo().phoneNo;
 
-        if (userProfilePagerAdapter == null) {
-            fetchProfileInfo(false);
+        if (userProfilePagerAdapter == null){
+            fetchProfileInfo(true);
         }
     }
 
     private void setViews(ProfileInfo profileInfo) {
-
-
         int favCount = profileInfo.getMeEventFavouriteObject().topicEvents.get(0).events.size() +
                 profileInfo.getMeEventFavouriteObject().movies.size();
         TABS = new ArrayList<>();
@@ -268,8 +266,13 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                     new Response.Listener<ProfileInfo>() {
                         @Override
                         public void onResponse(ProfileInfo profileInfo, boolean b) {
-                            if (isRunning()) {
-                                setViews(profileInfo);
+                            if (isRunning()){
+                                if(profileInfo != null){
+                                    setViews(profileInfo);
+                                }else{
+                                    topProgressBar.setVisibility(View.GONE);
+                                    retryView.setVisibility(View.VISIBLE);
+                                }
                             }
                         }
                     }, new Response.ErrorListener() {
@@ -278,7 +281,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                             topProgressBar.setVisibility(View.GONE);
                             retryView.setVisibility(View.VISIBLE);
                         }
-                    });
+                    }, shouldByPassChange);
         }
     }
 
@@ -345,9 +348,9 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     }
 
     LoginResult loginResult;
-
     void fbLoginButtonPressed() {
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends", "read_custom_friendlists", "user_likes", "user_about_me"));
+        LoginManager.getInstance().logOut();
+        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends", "user_interests"));
         callbackManager = CallbackManager.Factory.create();
 
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -358,7 +361,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             }
 
             @Override
-            public void onCancel() {
+            public void onCancel(){
                 Toast.makeText(getBaseContext(), "Login Cancelled", Toast.LENGTH_SHORT).show();
             }
 
@@ -399,7 +402,6 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                         facebookJsonObject = object;
                         llAboutUserMask.setVisibility(View.VISIBLE);
                         llFacebookInfoMask.setVisibility(View.GONE);
-                        updateProfile();
                     } catch (JSONException e) {
                         Log.i("User Profile", "JSON Exception");
                     }
@@ -412,7 +414,6 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         parameters.putString("fields", "name, email");//add fields to fetch in graph response
         request.setParameters(parameters);
         request.executeAsync();
-
     }
 
 
@@ -421,6 +422,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject, boolean b) {
+                        updateProfile();
                         Toast.makeText(UserProfileActivity.this, "Your profile has been updated successfully.", Toast.LENGTH_SHORT).show();
                         ;
                     }
@@ -434,14 +436,22 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
     private void updateProfile() {
         llAboutUserMask.setVisibility(View.VISIBLE);
-        try {
-            if (facebookJsonObject.has("fb_profile_pic"))
+        try{
+            if (facebookJsonObject.has("fb_profile_pic")){
                 Glide.with(this).load(facebookJsonObject.getString("fb_profile_pic"))
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                         .into(userImage);
-            if (facebookJsonObject.has("fb_name"))
+                userProfilePagerAdapter.profileInfo.setProfilePic(facebookJsonObject.getString("fb_profile_pic"));
+            }
+            if (facebookJsonObject.has("fb_name")){
                 userName.setText(facebookJsonObject.getString("fb_name"));
+                userProfilePagerAdapter.profileInfo.setName(facebookJsonObject.getString("fb_name"));
+            }
+            if (facebookJsonObject.has("fb_email")){
+                userProfilePagerAdapter.profileInfo.setEmail(facebookJsonObject.getString("fb_email"));
+            }
+
         } catch (JSONException jse) {
             Log.e("User Profile", jse.toString());
         }

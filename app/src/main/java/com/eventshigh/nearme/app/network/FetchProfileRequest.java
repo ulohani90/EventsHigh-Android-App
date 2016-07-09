@@ -25,20 +25,20 @@ import java.security.GeneralSecurityException;
 public class FetchProfileRequest extends JsonRequest<ProfileInfo>{
 
     public static void submit(Context context,String mobileNo,
-                              Priority priority, Response.Listener<ProfileInfo> listener, Response.ErrorListener errorListener) {
+                              Priority priority, Response.Listener<ProfileInfo> listener, Response.ErrorListener errorListener, boolean shouldByPassCache) {
 
         try {
-            URL url = new URL(EventsHighEndpoints.API_URI_BASE +"api/user_info_for_mobile_no/"+mobileNo);
-            Uri uri = Uri.parse(url.toURI().toString());
+            String url = EventsHighEndpoints.API_URI_BASE +"api/user_info_for_mobile_no/"+mobileNo;
+            Uri uri = Uri.parse(url);
+            url = Signer.sign(uri).toString();
+            if (shouldByPassCache){
+                //url += "&cmode=bypass";
+            }
             FetchProfileRequest request = new FetchProfileRequest(mobileNo,
-                    Signer.sign(uri).toString(),priority,context, listener, errorListener);
+                    url,priority,context, listener, errorListener, shouldByPassCache);
             request.setRetryPolicy(new DefaultRetryPolicy(60_000,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             VolleyHelper.addToRequestQueue(context, request);
-        }catch(MalformedURLException e){
-            Log.e("Fetch fbInfo Error", e.toString());
-        }catch (URISyntaxException e){
-            Log.e("Fetch fbInfo Error",e.toString());
         }catch (UnsupportedEncodingException usee){
             Log.e("Add FbUser Info Error",usee.toString());
         }catch (GeneralSecurityException gse){
@@ -51,15 +51,16 @@ public class FetchProfileRequest extends JsonRequest<ProfileInfo>{
     private final String profileId;
 
     public FetchProfileRequest(String profileId, String url, Priority priority,Context context,
-                                      Response.Listener<ProfileInfo> listener, Response.ErrorListener errorListener) {
+                                      Response.Listener<ProfileInfo> listener, Response.ErrorListener errorListener,boolean shouldBypassCache) {
         super(Method.GET, url,null,listener, errorListener);
+        setShouldBypassCache(shouldBypassCache);
         this.priority = priority;
         this.context = context;
         this.profileId = profileId;
     }
 
     @Override
-    public Priority getPriority() {
+    public Priority getPriority(){
         return priority;
     }
 
@@ -69,6 +70,7 @@ public class FetchProfileRequest extends JsonRequest<ProfileInfo>{
             String jsonString = new String(networkResponse.data, "UTF-8");
             JSONObject eventsJson = new JSONObject(jsonString);
             ProfileInfo profileInfo = ProfileInfo.fromJson(eventsJson,context,profileId);
+            if(profileInfo != null)
             profileInfo.setProfileId(profileId);
             return Response.success(profileInfo,HttpHeaderParser.parseCacheHeaders(networkResponse));
         }catch (UnsupportedEncodingException uee){

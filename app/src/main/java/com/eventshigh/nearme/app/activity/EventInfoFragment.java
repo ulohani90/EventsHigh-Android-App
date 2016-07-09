@@ -149,9 +149,7 @@ public class EventInfoFragment extends Fragment {
                         startActivity(intent);
                     }
                 });
-                // ((TextView) view.findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#09a0f6"));
-            } else {
-                // ((TextView) view.findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#666666"));
+
             }
 
 
