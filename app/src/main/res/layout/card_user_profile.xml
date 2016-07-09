@@ -163,6 +163,7 @@
                     android:orientation="horizontal">
 
                     <LinearLayout
+                        android:id="@+id/btn_user_interest_count"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -196,6 +197,7 @@
                         android:background="#eeeeee" />
 
                     <LinearLayout
+                        android:id="@+id/btn_user_favourite_count"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -228,6 +230,7 @@
                         android:background="#eeeeee" />
 
                     <LinearLayout
+                        android:id="@+id/btn_user_follower_count"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"

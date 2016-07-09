@@ -307,6 +307,29 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         toolbar.addView(view);
         toolbar.setBackgroundColor(Color.TRANSPARENT);
         profileView = view.findViewById(R.id.profile_view);
+        findViewById(R.id.btn_user_favourite_count).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            if(TABS.contains(FAVOURITES_TAB)){
+                pager.setCurrentItem(TABS.indexOf(FAVOURITES_TAB));
+            }
+            }
+        });
+        findViewById(R.id.btn_user_follower_count).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                if(TABS.contains(FRIENDS_TAB)){
+                    pager.setCurrentItem(TABS.indexOf(FRIENDS_TAB));
+                }
+            }
+        });findViewById(R.id.btn_user_interest_count).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(TABS.contains(INTERESTS_TAB)){
+                    pager.setCurrentItem(TABS.indexOf(INTERESTS_TAB));
+                }
+            }
+        });
     }
 
 
