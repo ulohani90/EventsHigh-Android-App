@@ -131,7 +131,7 @@ public class EventInfoFragment extends Fragment {
         ratingHeader = (TextView) view.findViewById(R.id.rating_header);
         reviewsCount = (TextView) view.findViewById(R.id.reviews_count);
 
-        eventInfoLayout = (LinearLayout)view.findViewById(R.id.event_info_layout);
+        eventInfoLayout = (LinearLayout) view.findViewById(R.id.event_info_layout);
         return view;
     }
 
@@ -140,7 +140,7 @@ public class EventInfoFragment extends Fragment {
             view.findViewById(R.id.review_card).setVisibility(View.VISIBLE);
             ((TextView) view.findViewById(R.id.tv_user_review_by)).setText(event.reviewObjects.get(0).getReviewBy());
             //Changing reviewers name clickable if profile_id available
-            if (Utils.isValidPhone(event.reviewObjects.get(0).getReviewerId())) {
+            if (event.reviewObjects.get(0).getReviewerId() != null && Utils.isValidPhone(event.reviewObjects.get(0).getReviewerId())) {
                 (view.findViewById(R.id.tv_user_review_by)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -149,12 +149,9 @@ public class EventInfoFragment extends Fragment {
                         startActivity(intent);
                     }
                 });
-            }
-
-            if (Utils.isValidPhone(event.reviewObjects.get(0).getReviewerId())) {
-                ((TextView) view.findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#09a0f6"));
-            }else{
-                ((TextView) view.findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#666666"));
+                // ((TextView) view.findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#09a0f6"));
+            } else {
+                // ((TextView) view.findViewById(R.id.tv_user_review_by)).setTextColor(Color.parseColor("#666666"));
             }
 
 
@@ -305,7 +302,7 @@ public class EventInfoFragment extends Fragment {
             }
         });
 
-        if(account.getLastCity().equals(City.BANGALORE)) {
+        if (account.getLastCity().equals(City.BANGALORE)) {
             enquiryBtn.setVisibility(View.VISIBLE);
             callOrganizer.setVisibility(View.GONE);
             enquiryBtn.setOnClickListener(new View.OnClickListener() {
@@ -314,7 +311,7 @@ public class EventInfoFragment extends Fragment {
                     ama(event);
                 }
             });
-        }else{
+        } else {
             if (event.organizerPhone != null) {
                 enquiryBtn.setVisibility(View.GONE);
                 callOrganizer.setVisibility(View.VISIBLE);
@@ -325,10 +322,10 @@ public class EventInfoFragment extends Fragment {
                     }
                 });
                 eventInfoLayout.setVisibility(View.VISIBLE);
-            }else{
-                if(event.organizerName != null){
+            } else {
+                if (event.organizerName != null) {
                     eventInfoLayout.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     eventInfoLayout.setVisibility(View.GONE);
                 }
                 enquiryBtn.setVisibility(View.GONE);

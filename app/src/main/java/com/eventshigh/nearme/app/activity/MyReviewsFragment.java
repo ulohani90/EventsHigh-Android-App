@@ -158,7 +158,7 @@ public class MyReviewsFragment extends Fragment {
         }
         if (movieUserReviewObjects == null || movieUserReviewObjects.size() == 0) {
             noMyEventsView.setVisibility(View.VISIBLE);
-            topProgressBar.setVisibility(View.VISIBLE);
+            topProgressBar.setVisibility(View.GONE);
         }
 
     }

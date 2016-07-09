@@ -74,13 +74,13 @@ public class MovieUserReviewCard extends RecyclerView.ViewHolder {
                     }
                 }
             });
-            if (Utils.isValidPhone(review.getReviewerId())) {
+            /*if (Utils.isValidPhone(review.getReviewerId())) {
                 tvReviewBy.setTextColor(Color.parseColor("#09a0f6"));
-            }else{
+            } else {
                 tvReviewBy.setTextColor(Color.parseColor("#666666"));
-            }
+            }*/
         }else{
-            tvReviewBy.setTextColor(Color.parseColor("#666666"));
+            //tvReviewBy.setTextColor(Color.parseColor("#666666"));
         }
 
     }
