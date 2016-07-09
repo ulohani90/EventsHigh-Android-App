@@ -30,40 +30,40 @@ public class MeFragment extends Fragment {
 
     private TabLayout tabsView;
 
-    MePagerAdapter adapter;
+    // MePagerAdapter adapter;
 
     public static String TAB_PARAM = "tab_param";
 
-    public static final String MY_FAV_EVENTS="my favourite events";
+    public static final String MY_FAV_EVENTS = "my favourite events";
 
     public static final String MY_INTEREST_EVENTS = "my interest events";
 
     public static final String MY_FRIENDS = "my friends";
 
-    public static MeFragment getInstance(EventsContext eventsContext,String tabParam){
+    public static MeFragment getInstance(EventsContext eventsContext, String tabParam) {
         MeFragment fragment = new MeFragment();
         Bundle args = new Bundle();
         args.putParcelable(BaseEventsFragment.EVENT_CONTEXT_PARAM, eventsContext);
-        args.putString(TAB_PARAM,tabParam);
+        args.putString(TAB_PARAM, tabParam);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
-    public void onAttach(Activity activity){
+    public void onAttach(Activity activity) {
         super.onAttach(activity);
-        eventsContext = getArguments().getParcelable(BaseEventsFragment.EVENT_CONTEXT_PARAM);
-        this.activity = (BaseContextActivity) activity;
+        //  eventsContext = getArguments().getParcelable(BaseEventsFragment.EVENT_CONTEXT_PARAM);
+        // this.activity = (BaseContextActivity) activity;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_this_week, container, false);
+        View view = inflater.inflate(R.layout.empty_layout, container, false);
         return view;
     }
 
-    @Override
+    /*@Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -155,5 +155,5 @@ public class MeFragment extends Fragment {
         public CharSequence getPageTitle(int position) {
             return TABS[position];
         }
-    }
+    }*/
 }

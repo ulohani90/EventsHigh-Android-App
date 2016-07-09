@@ -77,6 +77,6 @@ public class SocialFriendCard extends ViewHolder {
                 activity.startActivity(intent);
             }
         });
-        contactName.setTextColor(Color.parseColor("#09a0f6"));
+        //contactName.setTextColor(Color.parseColor("#09a0f6"));
     }
 }

@@ -154,13 +154,15 @@ public class MyReviewsFragment extends Fragment {
         */
         //setAdapterData(movieUserReviewObjects);
 
-        if (movieUserReviewObjects != null && movieUserReviewObjects.size() != 0){
+        if (movieUserReviewObjects != null && movieUserReviewObjects.size() != 0) {
             fetchDetailedInfo(shouldByPassCache, movieUserReviewObjects);
         }
 
         if (movieUserReviewObjects == null || movieUserReviewObjects.size() == 0) {
             noMyEventsView.setVisibility(View.VISIBLE);
-                topProgressBar.setVisibility(View.GONE);
+
+            topProgressBar.setVisibility(View.GONE);
+
         }
     }
 
@@ -184,7 +186,7 @@ public class MyReviewsFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         isMovieRespoRecieved = true;
-                        if(isEventRespoRecieved){
+                        if (isEventRespoRecieved) {
                             topProgressBar.setVisibility(View.GONE);
                         }
                     }
