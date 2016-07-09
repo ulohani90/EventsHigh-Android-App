@@ -29,7 +29,7 @@
             android:padding="20dp"
             android:textSize="16sp"
             android:visibility="gone"
-            android:text="No reviews yet.\nWrite a review and share your experience with others."
+            android:text="@string/no_review_text"
             android:layout_weight="1000"
             />
 

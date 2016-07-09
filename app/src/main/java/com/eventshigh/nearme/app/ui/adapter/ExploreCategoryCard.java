@@ -47,7 +47,9 @@ public class ExploreCategoryCard extends RecyclerView.ViewHolder {
                 if (data.tag.equalsIgnoreCase(EventCategory.MOVIES.categoryName)) {
                     Intent intent = new Intent(data.activity, MovieBrowseActivity.class);
                     data.activity.startActivity(intent);
-                } else {
+                } else if(data.tag.equalsIgnoreCase(EventCategory.TECH.categoryName)){
+                    data.activity.showSearchView("Tech");
+                }else{
                     data.activity.showSearchView(data.tag);
                 }
             }

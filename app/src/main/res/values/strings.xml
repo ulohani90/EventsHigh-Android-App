@@ -151,9 +151,9 @@
     <!-- FB -->
     <string name="facebook_app_id">196111897251952</string>
 
-<!--
-    <string name="facebook_app_id">1632192933768110</string>
--->
+    <!--
+        <string name="facebook_app_id">1632192933768110</string>
+    -->
 
 
     <!-- Rating -->
@@ -241,5 +241,5 @@
     <string name="geofence_transition_notification_text">Click notification to return to app</string>
     <string name="title_activity_test">TestActivity</string>
 
-
+    <string name="no_review_text">No reviews yet.\nWrite a review and share your experience with others.</string>
 </resources>

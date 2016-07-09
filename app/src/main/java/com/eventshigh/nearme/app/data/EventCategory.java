@@ -38,7 +38,7 @@ public enum EventCategory {
     ENVIRONMENT,
     FASHION,
     FILM,
-    LITERATURE("TLS(Technology, Literature & Society)"),
+    LITERATURE,
     MUSIC,
     PHOTOGRAPHY,
     SHOPPING,
@@ -46,6 +46,7 @@ public enum EventCategory {
     SPIRITUAL,
     THEATRE,
     EDITOR_PICKS("Editor's Picks"),
+
     FREE_EVENTS,
     OTHER;
 

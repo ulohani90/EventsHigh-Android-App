@@ -16,9 +16,14 @@ public enum EventSubcategory {
     ART_PHOTOGRAPHY(EventCategory.ART, "Photography"),
     ART_ART_WORKSHOPS(EventCategory.ART, "Art Workshops"),
     ART_COLLEGE_FESTS(EventCategory.ART, "College Fests"),
+    ART_LITERATURE(EventCategory.ART,"Literature"),
+    ART_TALKS(EventCategory.ART,"Talks"),
+    ART_POETRY(EventCategory.ART,"Poetry"),
+    ART_STORY_TELLING(EventCategory.ART,"Storytelling"),
+    ART_SOCIAL_CAUSES(EventCategory.ART,"Social Causes"),
 
     PARTIES_SELECT_ALL(EventCategory.NIGHTLIFE, "Select All"),
-    PARTIES_LIVE_MUSIC(EventCategory.NIGHTLIFE, "Live Music"),
+
     PARTIES_LADIES_NIGHT(EventCategory.NIGHTLIFE, "Ladies Night"),
     PARTIES_KARAOKE(EventCategory.NIGHTLIFE, "Karaoke"),
     PARTIES_BOLLYWOOD(EventCategory.NIGHTLIFE, "Bollywood"),
@@ -55,6 +60,7 @@ public enum EventSubcategory {
     LIVE_PERFORMANCES_THEATRE(EventCategory.LIVE_PERFORMANCES,"Theatre"),
     LIVE_PERFORMANCES_FILMS(EventCategory.LIVE_PERFORMANCES,"Films"),
     LIVE_PERFORMANCES_FASHION_SHOW(EventCategory.LIVE_PERFORMANCES,"Fashion Show"),
+    LIVE_PERFORMANCES_LIVE_MUSIC(EventCategory.LIVE_PERFORMANCES, "Live Music"),
 
 
     FOOD_SELECT_ALL(EventCategory.FOOD,"Select All"),
@@ -83,14 +89,6 @@ public enum EventSubcategory {
     HEALTH_SPRITUAL(EventCategory.HEALTH_WELLNESS,"Spritual"),
     HEALTH_MEDITATION(EventCategory.HEALTH_WELLNESS,"Meditation"),
 
-
-    LITERATURE_SELECT_ALL(EventCategory.LITERATURE,"Select All"),
-    LITERATURE_TECHNOLOGY(EventCategory.LITERATURE,"Technology"),
-    LITERATURE_LITERATURE(EventCategory.LITERATURE,"Literature"),
-    LITERATURE_TALKS(EventCategory.LITERATURE,"Talks"),
-    LITERATURE_POETRY(EventCategory.LITERATURE,"Poetry"),
-    LITERATURE_STORY_TELLING(EventCategory.LITERATURE,"Storytelling"),
-    LITERATURE_SOCIAL_CAUSES(EventCategory.LITERATURE,"Social Causes"),
 
 
     KIDS_SELECT_ALL(EventCategory.KIDS_ENTERTAINMENT,"Select All"),

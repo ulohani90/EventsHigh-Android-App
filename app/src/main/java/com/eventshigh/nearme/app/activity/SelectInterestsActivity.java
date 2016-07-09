@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Created by umesh on 14/03/16.
  */
-public class SelectInterestsActivity extends BaseActivity{
+public class SelectInterestsActivity extends BaseActivity {
 
 
     public static final String FROM_NOTIFICATION_PARAM = "is_from_notification";
@@ -41,8 +41,8 @@ public class SelectInterestsActivity extends BaseActivity{
             EventCategory.SPORTS,
             EventCategory.WORKSHOPS,
             EventCategory.HEALTH_WELLNESS,
-            EventCategory.LITERATURE,
             EventCategory.KIDS_ENTERTAINMENT,
+            EventCategory.TECH,
             EventCategory.ART,
 
     };
@@ -53,14 +53,14 @@ public class SelectInterestsActivity extends BaseActivity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_interest_layout);
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setBackgroundColor(Color.TRANSPARENT);
         addToolbarView(toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        categoriesList = (ExpandableListView)findViewById(R.id.categories_list);
-        topProgressBar = (ProgressBar)findViewById(R.id.top_progress_bar);
+        categoriesList = (ExpandableListView) findViewById(R.id.categories_list);
+        topProgressBar = (ProgressBar) findViewById(R.id.top_progress_bar);
         /*findViewById(R.id.done_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,7 +74,7 @@ public class SelectInterestsActivity extends BaseActivity{
     @Override
     protected void onStart() {
         super.onStart();
-        if (getIntent()!=null && getIntent().getAction()!=null && getIntent().getAction().equals(BaseActivity.NOTIFICATION_ACTION)) {
+        if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equals(BaseActivity.NOTIFICATION_ACTION)) {
             reportActionToAnalytics("openNotification");
         }
     }
@@ -84,10 +84,10 @@ public class SelectInterestsActivity extends BaseActivity{
         return toolbar;
     }
 
-    public void addToolbarView(Toolbar toolbar){
-        View view = LayoutInflater.from(this).inflate(R.layout.skip_btn_layout,toolbar,false);
+    public void addToolbarView(Toolbar toolbar) {
+        View view = LayoutInflater.from(this).inflate(R.layout.skip_btn_layout, toolbar, false);
 
-        if(getIntent().getBooleanExtra(ONBOARDING_FLOW,false)){
+        if (getIntent().getBooleanExtra(ONBOARDING_FLOW, false)) {
             view.findViewById(R.id.skip_btn).setVisibility(View.VISIBLE);
             view.findViewById(R.id.skip_btn).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -96,14 +96,14 @@ public class SelectInterestsActivity extends BaseActivity{
                     skipClicked(v);
                 }
             });
-        }else if(getIntent().getBooleanExtra(FROM_NOTIFICATION_PARAM,false)){
+        } else if (getIntent().getBooleanExtra(FROM_NOTIFICATION_PARAM, false)) {
             isFromNotification = true;
         }
 
         toolbar.addView(view);
     }
 
-    public class LoadEventsSubCategories extends AsyncTask<Void ,Void,HashMap<EventCategory,List<EventSubcategory>>>{
+    public class LoadEventsSubCategories extends AsyncTask<Void, Void, HashMap<EventCategory, List<EventSubcategory>>> {
 
         @Override
         protected void onPreExecute() {
@@ -112,18 +112,20 @@ public class SelectInterestsActivity extends BaseActivity{
         }
 
         @Override
-        protected HashMap<EventCategory,List<EventSubcategory>> doInBackground(Void... params) {
+        protected HashMap<EventCategory, List<EventSubcategory>> doInBackground(Void... params) {
 
-            HashMap<EventCategory ,List<EventSubcategory>> subCategories = new HashMap<>();
-            for(EventCategory eventCategory: categories){
-                subCategories.put(eventCategory , EventSubcategory.getEventCategories(eventCategory,true));
+            HashMap<EventCategory, List<EventSubcategory>> subCategories = new HashMap<>();
+            for (EventCategory eventCategory : categories) {
+                subCategories.put(eventCategory, EventSubcategory.getEventCategories(eventCategory, true));
             }
             return subCategories;
         }
+
         int previousGroup = -1;
+
         @Override
         protected void onPostExecute(HashMap<EventCategory, List<EventSubcategory>> eventCategoryListHashMap) {
-            final SelectInterestAdapter adapter = new SelectInterestAdapter(SelectInterestsActivity.this,categories,eventCategoryListHashMap);
+            final SelectInterestAdapter adapter = new SelectInterestAdapter(SelectInterestsActivity.this, categories, eventCategoryListHashMap);
             categoriesList.setGroupIndicator(null);
             categoriesList.setAdapter(adapter);
             categoriesList.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
@@ -155,20 +157,20 @@ public class SelectInterestsActivity extends BaseActivity{
     }
 
     public void doneClicked(View view) {
-        if(isFromNotification) {
+        if (isFromNotification) {
             reportActionToAnalytics("donePClickedNotif");
-        }else{
+        } else {
             reportActionToAnalytics("donePClicked");
         }
         closeActivity(isFromNotification);
     }
 
-    public void skipClicked(View view){
+    public void skipClicked(View view) {
         closeActivity(isFromNotification);
     }
 
-    public void closeActivity(boolean shouldStartHome){
-        if(isFromNotification) {
+    public void closeActivity(boolean shouldStartHome) {
+        if (isFromNotification) {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);

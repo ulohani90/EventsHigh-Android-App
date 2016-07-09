@@ -170,13 +170,10 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     protected void onStart() {
         super.onStart();
         verifyPhnLayout.setVisibility(View.GONE);
-        if (Utils.checkIfStringEmpty(mobileNoProfileUser) && account.getUserInfo().isVerified){
+        if (Utils.checkIfStringEmpty(mobileNoProfileUser) && account.getUserInfo().isVerified) {
             mobileNoProfileUser = account.getUserInfo().phoneNo;
         }
-
-        if (userProfilePagerAdapter == null){
-            fetchProfileInfo(true);
-        }
+        fetchProfileInfo(true);
     }
 
     private void setViews(ProfileInfo profileInfo) {
@@ -259,16 +256,17 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         if (Utils.checkIfStringEmpty(mobileNoProfileUser)) {
             verifyPhnLayout.setVisibility(View.VISIBLE);
         } else {
+
             topProgressBar.setVisibility(View.VISIBLE);
             retryView.setVisibility(View.GONE);
             FetchProfileRequest.submit(this, mobileNoProfileUser, Request.Priority.HIGH,
                     new Response.Listener<ProfileInfo>() {
                         @Override
                         public void onResponse(ProfileInfo profileInfo, boolean b) {
-                            if (isRunning()){
-                                if(profileInfo != null){
+                            if (isRunning()) {
+                                if (profileInfo != null) {
                                     setViews(profileInfo);
-                                }else{
+                                } else {
                                     topProgressBar.setVisibility(View.GONE);
                                     retryView.setVisibility(View.VISIBLE);
                                 }
@@ -347,6 +345,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     }
 
     LoginResult loginResult;
+
     void fbLoginButtonPressed() {
         LoginManager.getInstance().logOut();
         LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends", "user_interests"));
@@ -360,7 +359,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             }
 
             @Override
-            public void onCancel(){
+            public void onCancel() {
                 Toast.makeText(getBaseContext(), "Login Cancelled", Toast.LENGTH_SHORT).show();
             }
 
@@ -435,19 +434,19 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
     private void updateProfile() {
         llAboutUserMask.setVisibility(View.VISIBLE);
-        try{
-            if (facebookJsonObject.has("fb_profile_pic")){
+        try {
+            if (facebookJsonObject.has("fb_profile_pic")) {
                 Glide.with(this).load(facebookJsonObject.getString("fb_profile_pic"))
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
                         .into(userImage);
                 userProfilePagerAdapter.profileInfo.setProfilePic(facebookJsonObject.getString("fb_profile_pic"));
             }
-            if (facebookJsonObject.has("fb_name")){
+            if (facebookJsonObject.has("fb_name")) {
                 userName.setText(facebookJsonObject.getString("fb_name"));
                 userProfilePagerAdapter.profileInfo.setName(facebookJsonObject.getString("fb_name"));
             }
-            if (facebookJsonObject.has("fb_email")){
+            if (facebookJsonObject.has("fb_email")) {
                 userProfilePagerAdapter.profileInfo.setEmail(facebookJsonObject.getString("fb_email"));
             }
 
@@ -499,7 +498,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false, profileInfo);
                 return myInterestEventsFragment;
             } else if (TABS.get(position).equalsIgnoreCase(REVIEWS_TAB)) {
-                MyReviewsFragment myReviewsFragment = MyReviewsFragment.newInstance(eventsContext, profileInfo.getMovieUserReviewObjectArrayList());
+                MyReviewsFragment myReviewsFragment = MyReviewsFragment.newInstance(eventsContext, profileInfo.getMovieUserReviewObjectArrayList(),mobileNoProfileUser);
                 return myReviewsFragment;
             } else if (TABS.get(position).equalsIgnoreCase(TICKETS_TAB)) {
                 MyTicketsFragment myTicketsFragment = new MyTicketsFragment();

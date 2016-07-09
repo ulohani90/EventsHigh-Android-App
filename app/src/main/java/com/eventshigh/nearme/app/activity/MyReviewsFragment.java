@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -40,18 +41,22 @@ public class MyReviewsFragment extends Fragment {
 
     private View topProgressBar;
     private View retryView;
-    private View noMyEventsView;
+    private TextView noMyEventsView;
     private AutofitRecyclerView myReviewsList;
     Context context;
     private EventsContext eventsContext;
 
     Account account;
     LinearLayout verifyPhnLayout;
-    public static final String EVENT_CONTEXT = "event_context";
 
-    public static MyReviewsFragment newInstance(EventsContext eventsContext, ArrayList<MovieUserReviewObject> movieUserReviewObjectList) {
+    String userMobileNo;
+    public static final String EVENT_CONTEXT = "event_context";
+    public static final String USER_MOBILE_NO = "mobile_no";
+
+    public static MyReviewsFragment newInstance(EventsContext eventsContext, ArrayList<MovieUserReviewObject> movieUserReviewObjectList, String userMobileNo) {
         Bundle args = new Bundle();
         args.putParcelable(EVENT_CONTEXT, eventsContext);
+        args.putString(USER_MOBILE_NO, userMobileNo);
         args.putParcelableArrayList("reviews", movieUserReviewObjectList);
         MyReviewsFragment fragment = new MyReviewsFragment();
         fragment.setArguments(args);
@@ -62,6 +67,7 @@ public class MyReviewsFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+        this.userMobileNo = getArguments().getString(USER_MOBILE_NO);
     }
 
     @Nullable
@@ -70,7 +76,7 @@ public class MyReviewsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_my_reviews, container, false);
         myReviewsList = (AutofitRecyclerView) view.findViewById(R.id.my_reviews_grid);
         // More views.
-        noMyEventsView = view.findViewById(R.id.view_no_my_event);
+        noMyEventsView = (TextView) view.findViewById(R.id.view_no_my_event);
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         retryView = view.findViewById(R.id.view_retry);
         view.findViewById(R.id.retry).setOnClickListener(new View.OnClickListener() {
@@ -162,6 +168,12 @@ public class MyReviewsFragment extends Fragment {
 
         if (movieUserReviewObjects == null || movieUserReviewObjects.size() == 0) {
             noMyEventsView.setVisibility(View.VISIBLE);
+            if (userMobileNo.equalsIgnoreCase(new Account(context).getUserInfo().phoneNo)) {
+                noMyEventsView.setText(getString(R.string.no_review_text));
+            } else {
+                noMyEventsView.setText("No Reviews");
+            }
+
             topProgressBar.setVisibility(View.GONE);
         }
 
