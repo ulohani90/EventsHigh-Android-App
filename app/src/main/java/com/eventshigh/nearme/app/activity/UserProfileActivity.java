@@ -310,22 +310,23 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         findViewById(R.id.btn_user_favourite_count).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            if(TABS.contains(FAVOURITES_TAB)){
-                pager.setCurrentItem(TABS.indexOf(FAVOURITES_TAB));
-            }
+                if (TABS.contains(FAVOURITES_TAB)) {
+                    pager.setCurrentItem(TABS.indexOf(FAVOURITES_TAB));
+                }
             }
         });
         findViewById(R.id.btn_user_follower_count).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                if(TABS.contains(FRIENDS_TAB)){
+            public void onClick(View v) {
+                if (TABS.contains(FRIENDS_TAB)) {
                     pager.setCurrentItem(TABS.indexOf(FRIENDS_TAB));
                 }
             }
-        });findViewById(R.id.btn_user_interest_count).setOnClickListener(new View.OnClickListener() {
+        });
+        findViewById(R.id.btn_user_interest_count).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(TABS.contains(INTERESTS_TAB)){
+                if (TABS.contains(INTERESTS_TAB)) {
                     pager.setCurrentItem(TABS.indexOf(INTERESTS_TAB));
                 }
             }
@@ -341,6 +342,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.facebook_fetch_info:
+                reportActionToAnalytics("fetchFBInfo");
                 fbLoginButtonPressed();
                 break;
             case R.id.profile_share:
@@ -348,10 +350,13 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 break;
             case R.id.btn_follow:
                 if (btnFollow.isSelected()) {
+
+                    reportActionToAnalytics("userFollowBtnClick");
                     friendsStore.setFollowing(mobileNoProfileUser, mobileNoProfileUser, false);
                     btnFollow.setText(R.string.ui_follow);
                     btnFollow.setSelected(false);
                 } else {
+                    reportActionToAnalytics("userUnFollowBtnClick");
                     friendsStore.setFollowing(mobileNoProfileUser, mobileNoProfileUser, true);
                     btnFollow.setText(R.string.ui_following);
                     btnFollow.setSelected(true);
@@ -361,6 +366,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 //friendsStore.setFollowing(mobileNoProfileUser,mobileNoProfileUser,true);
                 break;
             case R.id.fab_write_review:
+                reportActionToAnalytics("profileInterestFabClick");
                 Intent i = new Intent(this, SelectInterestsActivity.class);
                 startActivity(i);
                 break;
@@ -521,7 +527,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false, profileInfo);
                 return myInterestEventsFragment;
             } else if (TABS.get(position).equalsIgnoreCase(REVIEWS_TAB)) {
-                MyReviewsFragment myReviewsFragment = MyReviewsFragment.newInstance(eventsContext, profileInfo.getMovieUserReviewObjectArrayList(),mobileNoProfileUser);
+                MyReviewsFragment myReviewsFragment = MyReviewsFragment.newInstance(eventsContext, profileInfo.getMovieUserReviewObjectArrayList(), mobileNoProfileUser);
                 return myReviewsFragment;
             } else if (TABS.get(position).equalsIgnoreCase(TICKETS_TAB)) {
                 MyTicketsFragment myTicketsFragment = new MyTicketsFragment();

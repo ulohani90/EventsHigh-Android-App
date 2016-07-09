@@ -90,6 +90,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected long shareOfferInitiatedTimestamp = 0;
     protected long shareMovieInitiatedTimestamp = 0;
     protected long shareTicketInitiatedTimestamp = 0;
+    protected long shareProfileInitiatedTimestamp = 0;
 
 
     // **********************************************
@@ -188,7 +189,14 @@ public abstract class BaseActivity extends AppCompatActivity {
             reportActionToAnalytics(secForShare > 5 ? "shareTickets" : "ticketShareDismissed",
                     Long.toString(secForShare));
         }
+        if (shareProfileInitiatedTimestamp > 0) {
+            long secForShare = (System.currentTimeMillis() - shareProfileInitiatedTimestamp) / 1000;
+            reportActionToAnalytics(secForShare > 5 ? "shareProfile" : "shareProfileDismissed",
+                    Long.toString(secForShare));
+        }
 
+
+        shareProfileInitiatedTimestamp = 0;
         shareEventInitiatedTimestamp = 0;
         shareMovieInitiatedTimestamp = 0;
         shareOfferInitiatedTimestamp = 0;
@@ -783,10 +791,13 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public void shareProfile(ProfileInfo profileInfo, String profileUri,
                              @Nullable String packageName, @Nullable String label) {
+
+        shareProfileInitiatedTimestamp = System.currentTimeMillis();
+        reportActionToAnalytics("profileShareInitiated", profileUri);
         String referralCode = new Account(this).getReferrerCode();
-        //reportEventAction(profileInfo, "eventShareInitiated", label == null ? packageName : label);
+
         long shareProfileInitiatedTimestamp = System.currentTimeMillis();
-        //new UserActionHelper(this).recordShareAction(event.id, event.title, packageName, profileUri);
+
 
         try {
             Intent sendIntent = new Intent();
