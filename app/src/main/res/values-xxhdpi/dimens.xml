@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--OnBoarding assets-->
+    <dimen name="onboarding_img_height">280dp</dimen>
+    <dimen name="dots_margin_top">240dp</dimen>
+    <dimen name="container_margin_top">214dp</dimen>
+    <dimen name="curve_view_height">64dp</dimen>
+</resources>

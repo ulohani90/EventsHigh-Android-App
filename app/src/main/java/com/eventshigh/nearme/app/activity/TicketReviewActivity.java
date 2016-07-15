@@ -359,7 +359,7 @@ public class TicketReviewActivity extends BaseActivity implements View.OnClickLi
 
         private void doPost() {
             try {
-                URL url = new URL(EventsHighEndpoints.GATEWAY_URI_BASE + "gateway?cmode=override");
+                URL url = new URL(EventsHighEndpoints.GATEWAY_URI_BASE + "gateway");
                 HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");

@@ -11,6 +11,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.stream.AdditionalTicketField;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
+import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -250,6 +251,18 @@ public class Event implements Parcelable {
     public String getShortAddress() {
         String shortAddress = (venue == null ? "" : venue + " ") + (locality == null ? "" : "(" + locality + ")").trim();
         return shortAddress.isEmpty() ? Utils.capitalize(city.name()) : shortAddress;
+    }
+
+    public double getMinPrice() {
+        if (!ehPrices.isEmpty()) {
+            return ehPrices.get(0).value;
+        }
+
+        if (minPrice > -0.1) {
+            return minPrice;
+        }
+
+        return Integer.MAX_VALUE;
     }
 
     public
@@ -584,6 +597,8 @@ public class Event implements Parcelable {
 
             }
 
+            Collections.sort(ehPrices);
+
             if (mashup != null && ehPrices.size() == 0) {
                 JSONObject priceInfo = mashup.optJSONObject("price_info");
                 if (priceInfo != null) {
@@ -608,6 +623,9 @@ public class Event implements Parcelable {
                     ehPriceName = priceInfo.optString("name", "");
 
                 }
+            } else {
+                minPrice = ehPrices.get(0).min;
+                maxPrice = ehPrices.get(ehPrices.size() - 1).max;
             }
 
             //User Reviews
@@ -711,13 +729,21 @@ public class Event implements Parcelable {
         }
     }
 
-    public static List<Event> fromJSON(JSONArray jsonArray, boolean includeWithoutLocation) {
+    public static List<Event> fromJSON(JSONArray jsonArray, boolean includeWithoutLocation, OnPartialDataLoadingComplete listener) {
         List<Event> events = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 Event event = fromJSON(jsonArray.getJSONObject(i));
                 if (event != null && (includeWithoutLocation || event.location != null)) {
                     events.add(event);
+                }
+                if (listener != null) {
+                    if (i == 19) {
+                        listener.onPartialLoadingComplete(events);
+                        events = new ArrayList<>();
+                    } else if (i == jsonArray.length() - 1) {
+                        listener.onFullDataLoadingComplete(events.subList(20, events.size()));
+                    }
                 }
             } catch (JSONException | ParseException e) {
                 Crashlytics.getInstance().core.logException(e);
@@ -747,9 +773,11 @@ public class Event implements Parcelable {
 
 
     public static List<Event> parseUpcomingEvents(JSONObject eventsJSON,
-                                                  boolean includeWithoutLocation) throws JSONException {
+                                                  boolean includeWithoutLocation, OnPartialDataLoadingComplete listener) throws JSONException {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
-        return fromJSON(upcomingEvents, includeWithoutLocation);
+
+
+        return fromJSON(upcomingEvents, includeWithoutLocation, listener);
     }
 
 
@@ -786,6 +814,13 @@ public class Event implements Parcelable {
         Intent mapIntent = new Intent(android.content.Intent.ACTION_VIEW, locationUri);
         mapIntent.setPackage("com.google.android.apps.maps");
         return mapIntent;
+    }
+
+
+    public interface OnPartialDataLoadingComplete {
+        void onPartialLoadingComplete(List<Event> events);
+
+        void onFullDataLoadingComplete(List<Event> events);
     }
 
 }

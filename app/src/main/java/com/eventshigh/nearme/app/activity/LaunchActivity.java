@@ -304,7 +304,7 @@ public class LaunchActivity extends BaseContextActivity {
         if (eventsContext.location == null && eventsContext.query.isEmpty() &&
                 eventsContext.dateFilter.isEmpty()) {
             if (Preferences.getInstance(this).shouldShowOnBoarding()) {
-                startActivity(new Intent(this, OnBoardingActivity.class));
+                startActivity(new Intent(this, NewOnboardingActivity.class));
                 return;
             }
 

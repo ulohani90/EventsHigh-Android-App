@@ -48,14 +48,14 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
-     * @param context an application context to initiate the volley.
+     * @param context       an application context to initiate the volley.
      * @param eventsContext EventsContext representing the request.
-     * @param listener callback on success.
+     * @param listener      callback on success.
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, EventsContext eventsContext, Priority priority,
-            Object tag, boolean shouldBypassCache, Listener<EventCollection> listener,
-            ErrorListener errorListener) {
+                              Object tag, boolean shouldBypassCache, Listener<EventCollection> listener,
+                              ErrorListener errorListener) {
         if (eventsContext.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
             return;
@@ -96,7 +96,7 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
         try {
             // Parse the response.
             List<Event> events = EventCollectionRequest.parseEventsFromNetworkResponse(response,
-                    context, eventsContext, true).events;
+                    context, eventsContext, true, null).events;
             List<Event> filteredEvents = new ArrayList<>(MAX_FEATURED_EVENTS);
             for (Event event : events) {
                 if (event.imgUrl != null) {
@@ -127,7 +127,7 @@ public class FeaturedEventsRequest extends JsonRequest<EventCollection> {
             Preferences.getInstance(context).setShowReferral(showReferrer);
 
             return Response.success(new EventCollection(filteredEvents, showReferrer, trendingTopics),
-                HttpHeaderParser.parseCacheHeaders(response));
+                    HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
             Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));

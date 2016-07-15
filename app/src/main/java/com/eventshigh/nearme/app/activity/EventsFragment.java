@@ -22,6 +22,10 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventComparator;
+import com.eventshigh.nearme.app.data.EventDistanceComparator;
+import com.eventshigh.nearme.app.data.EventPriceComparator;
+import com.eventshigh.nearme.app.data.EventScoreComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.ProfileInfo;
 import com.eventshigh.nearme.app.data.SocialFriend;
@@ -38,6 +42,7 @@ import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -47,6 +52,7 @@ import com.eventshigh.nearme.app.view.ContactListView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -81,6 +87,12 @@ public class EventsFragment extends BaseEventsFragment {
 
 
     public static final String IS_TODAY_SELECTED = "is_today_selected";
+
+
+    int sortState = EventsGridActivity.SORT_STATE_TRENDING;
+
+    public List<Event> filteredEvents;
+
 
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
                                              boolean showCategories, boolean showEhInviteForNotification, SocialInvitationsRequest.SpecialCoupons special, boolean isTodaySelected, ProfileInfo profileInfo) {
@@ -246,7 +258,61 @@ public class EventsFragment extends BaseEventsFragment {
             endDate.add(Calendar.DAY_OF_WEEK, 8);
             String dateString = EventsContext.formatDateFilter(Calendar.getInstance()) + "," + EventsContext.formatDateFilter(endDate);
             EventCollectionRequest.submit(activity, eventsContext, Request.Priority.IMMEDIATE, this, dateString,
-                    shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
+                    shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener, new EventCollectionRequest.OnDataProcessComplete() {
+                        @Override
+                        public void onDataProcessComplete(final EventsCollection eventsCollection, final boolean isLoadingFinished) {
+                            if (isDetached()) {
+                                return;
+                            }
+
+                            if (!(eventsCollection.events.isEmpty())) {
+                                final String seeAllQuery = eventsContext.query.isEmpty() ||
+                                        eventsContext.dateFilter.isEmpty() ? null : eventsContext.query;
+                                if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
+                                    if (eventsCollection.events.size() > 0)
+                                        ((EventsGridActivity) getActivity()).setShareImageUrl(eventsCollection.events.get(0).imgUrl);
+                                }
+                                if (isLoadingFinished) {
+                                    EventsFragment.this.eventsCollection.events.addAll(eventsCollection.events);
+                                } else {
+                                    EventsFragment.this.eventsCollection = eventsCollection;
+                                }
+
+
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (isLoadingFinished) {
+
+                                            topProgressBar.setVisibility(View.GONE);
+
+                                            if (eventsCollection.events.isEmpty()) {
+                                                // Failed. Show toast and return empty list.
+                                                Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                        List<Event> filteredEvents = EventsFragment.this.eventsCollection.events;
+                                        filteredEvents = filterEventsWithCategory(null, filteredEvents);
+                                        if (isTodaySelected) {
+                                            if (filterEventTimes != null)
+                                                filterEventTimes.clear();
+                                            filteredEvents = filterEventsWithDate(filteredEvents, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                                        } else {
+                                            filteredEvents = filterEventsWithDate(filteredEvents, -1);
+                                        }
+
+                                        filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                                        EventsFragment.this.filteredEvents = filteredEvents;
+                                        sortData();
+                                        eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
+
+
+                                    }
+                                });
+
+                            }
+                        }
+                    });
 
         } else {
 
@@ -466,45 +532,51 @@ public class EventsFragment extends BaseEventsFragment {
     private Listener<EventsCollection> mEventsFetcherCallBack = new Listener<EventsCollection>() {
         @Override
         public void onResponse(EventsCollection eventsCollection, boolean isIntermediate) {
-            if (isDetached()) {
-                return;
-            }
-
-            if (!isIntermediate) {
-                topProgressBar.setVisibility(View.GONE);
-
-                if (eventsCollection.events.isEmpty()) {
-                    // Failed. Show toast and return empty list.
-                    Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
-                }
-            }
-
-            if (!isIntermediate || !eventsCollection.events.isEmpty()) {
-                String seeAllQuery = eventsContext.query.isEmpty() ||
-                        eventsContext.dateFilter.isEmpty() ? null : eventsContext.query;
-                if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
-                    if (eventsCollection.events.size() > 0)
-                        ((EventsGridActivity) getActivity()).setShareImageUrl(eventsCollection.events.get(0).imgUrl);
-                }
-                EventsFragment.this.eventsCollection = eventsCollection;
-                List<Event> filteredEvents = eventsCollection.events;
-                filteredEvents = filterEventsWithCategory(null, filteredEvents);
-                if (isTodaySelected) {
-                    filteredEvents = filterEventsWithDate(filteredEvents, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
-                } else {
-                    filteredEvents = filterEventsWithDate(filteredEvents, -1);
+            if (eventsCollection != null) {
+                if (isDetached()) {
+                    return;
                 }
 
-                filteredEvents = filterEventsWithPrice(filteredEvents, -1);
-                eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
+                if (!isIntermediate) {
+                    topProgressBar.setVisibility(View.GONE);
 
-                addSocialInvitationRequests();
+                    if (eventsCollection.events.isEmpty()) {
+                        // Failed. Show toast and return empty list.
+                        Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+
+                if (!isIntermediate || !eventsCollection.events.isEmpty()) {
+                    String seeAllQuery = eventsContext.query.isEmpty() ||
+                            eventsContext.dateFilter.isEmpty() ? null : eventsContext.query;
+                    if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
+                        if (eventsCollection.events.size() > 0)
+                            ((EventsGridActivity) getActivity()).setShareImageUrl(eventsCollection.events.get(0).imgUrl);
+                    }
+                    EventsFragment.this.eventsCollection = eventsCollection;
+                    List<Event> filteredEvents = eventsCollection.events;
+                    filteredEvents = filterEventsWithCategory(null, filteredEvents);
+                    if (isTodaySelected) {
+                        filteredEvents = filterEventsWithDate(filteredEvents, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                    } else {
+                        filteredEvents = filterEventsWithDate(filteredEvents, -1);
+                    }
+
+                    filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                    EventsFragment.this.filteredEvents = filteredEvents;
+                    sortData();
+                    eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
+
+                    addSocialInvitationRequests();
                 /*if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                             eventsCollection.numFollowers, special);
                 }*/
-                //     eventGridView.scrollToPosition(scrollPosition);
+                    //     eventGridView.scrollToPosition(scrollPosition);
+                }
             }
+
+            addSocialInvitationRequests();
         }
     };
 
@@ -750,6 +822,27 @@ public class EventsFragment extends BaseEventsFragment {
 
     FilterAsyncTask filterAsyncTask;
 
+    public void sortAccToSortState(int sortState) {
+        this.sortState = sortState;
+        sortData();
+        eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+    }
+
+    public void sortData() {
+        if (sortState == EventsGridActivity.SORT_STATE_TRENDING) {
+            Collections.sort(filteredEvents, new EventScoreComparator());
+        } else if (sortState == EventsGridActivity.SORT_STATE_PRICE) {
+            Collections.sort(filteredEvents, new EventPriceComparator());
+        } else if (sortState == EventsGridActivity.SORT_STATE_DISTANCE) {
+            if (new Account(activity).getLastLocality() != null)
+                Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastLocality().getLatLng()));
+            else
+                Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastCity().cityBounds.getCenter()));
+        }
+
+
+    }
+
     public void startFilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, long... times) {
         if (filterAsyncTask != null && !filterAsyncTask.isCancelled()) {
             filterAsyncTask.cancel(true);
@@ -800,7 +893,9 @@ public class EventsFragment extends BaseEventsFragment {
 
             if (!isCancelled()) {
                 topProgressBar.setVisibility(View.GONE);
-                eventsAdapter.setEvents(events, null, showEhInviteForNotification);
+                EventsFragment.this.filteredEvents = events;
+                sortData();
+                eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (events.isEmpty()) {
                     Snackbar.make(getView(), R.string.no_events, Snackbar.LENGTH_SHORT).show();
 

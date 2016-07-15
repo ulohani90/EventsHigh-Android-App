@@ -27,210 +27,228 @@ import com.eventshigh.nearme.app.R;
  */
 public class ZFlowLayout extends ViewGroup {
 
-	public static final int HORIZONTAL = 0;
-	public static final int VERTICAL = 1;
+    public static final int HORIZONTAL = 0;
+    public static final int VERTICAL = 1;
 
-	private int horizontalSpacing = 0;
-	private int verticalSpacing = 0;
-	@SuppressWarnings("unused")
-	private int orientation = 0;
+    private int horizontalSpacing = 0;
+    private int verticalSpacing = 0;
+    @SuppressWarnings("unused")
+    private int orientation = 0;
 
-	private int line_height;
+    private int line_height;
 
-	public ZFlowLayout(Context context) {
-		super(context);
-		this.readStyleParameters(context, null);
-	}
 
-	public ZFlowLayout(Context context, AttributeSet attributeSet) {
-		super(context, attributeSet);
-		this.readStyleParameters(context, attributeSet);
-	}
+    public ZFlowLayout(Context context) {
+        super(context);
+        this.readStyleParameters(context, null);
+    }
 
-	public ZFlowLayout(Context context, AttributeSet attributeSet, int defStyle) {
-		super(context, attributeSet, defStyle);
-		this.readStyleParameters(context, attributeSet);
-	}
+    public ZFlowLayout(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
+        this.readStyleParameters(context, attributeSet);
+    }
 
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		assert (MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.UNSPECIFIED);
+    public ZFlowLayout(Context context, AttributeSet attributeSet, int defStyle) {
+        super(context, attributeSet, defStyle);
+        this.readStyleParameters(context, attributeSet);
+    }
 
-		final int width = MeasureSpec.getSize(widthMeasureSpec)
-				- getPaddingLeft() - getPaddingRight();
-		int height = MeasureSpec.getSize(heightMeasureSpec) - getPaddingTop()
-				- getPaddingBottom();
-		final int count = getChildCount();
-		int line_height = 0;
 
-		int xpos = getPaddingLeft();
-		int ypos = getPaddingTop();
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        assert (MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.UNSPECIFIED);
 
-		int childHeightMeasureSpec;
-		if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.AT_MOST) {
-			childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(height,
-					MeasureSpec.AT_MOST);
-		} else {
-			childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(0,
-					MeasureSpec.UNSPECIFIED);
-		}
+        final int width = MeasureSpec.getSize(widthMeasureSpec)
+                - getPaddingLeft() - getPaddingRight();
+        int height = MeasureSpec.getSize(heightMeasureSpec) - getPaddingTop()
+                - getPaddingBottom();
+        final int count = getChildCount();
+        int line_height = 0;
 
-		for (int i = 0; i < count; i++) {
+        int xpos = getPaddingLeft();
+        int ypos = getPaddingTop();
 
-			final View child = getChildAt(i);
+        int childHeightMeasureSpec;
+        if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.AT_MOST) {
+            childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(height,
+                    MeasureSpec.AT_MOST);
+        } else {
+            childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(0,
+                    MeasureSpec.UNSPECIFIED);
+        }
 
-			if (child.getVisibility() != GONE) {
+        for (int i = 0; i < count; i++) {
 
-				// final LayoutParam lp = (LayoutParam)child.getLayoutParams();
-				child.measure(
-						MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST),
-						childHeightMeasureSpec);
+            final View child = getChildAt(i);
 
-				final int childw = child.getMeasuredWidth();
-				line_height = Math.max(line_height, child.getMeasuredHeight()
-						+ verticalSpacing);
+            if (child.getVisibility() != GONE) {
 
-				if (xpos + childw > width) {
-					xpos = getPaddingLeft();
-					ypos += line_height;
-				}
+                // final LayoutParam lp = (LayoutParam)child.getLayoutParams();
+                child.measure(
+                        MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST),
+                        childHeightMeasureSpec);
 
-				xpos += childw + horizontalSpacing;
+                final int childw = child.getMeasuredWidth();
+                line_height = Math.max(line_height, child.getMeasuredHeight()
+                        + verticalSpacing);
 
-			}
+                if (xpos + childw > width) {
+                    xpos = getPaddingLeft();
+                    ypos += line_height;
+                }
 
-		}
-		this.line_height = line_height;
+                xpos += childw + horizontalSpacing;
 
-		if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.UNSPECIFIED) {
-			height = ypos + line_height;
-		} else if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.AT_MOST) {
+            }
 
-			if (ypos + line_height < height) {
-				height = ypos + line_height;
-			}
+        }
+        this.line_height = line_height;
 
-		}
-		setMeasuredDimension(width, height);
+        if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.UNSPECIFIED) {
+            height = ypos + line_height;
+        } else if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.AT_MOST) {
 
-	}
+            if (ypos + line_height < height) {
+                height = ypos + line_height;
+            }
 
-	@Override
-	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        }
 
-		final int count = getChildCount();
-		final int width = r - l;
-		int xpos = getPaddingLeft();
-		int ypos = getPaddingTop();
+        if (measureActualHeight)
+            actualHeight = height;
+        setMeasuredDimension(width, height);
 
-		for (int i = 0; i < count; i++) {
 
-			final View child = getChildAt(i);
-			if (child.getVisibility() != GONE) {
+    }
 
-				final int childw = child.getMeasuredWidth();
-				final int childh = child.getMeasuredHeight();
-				if (xpos + childw > width) {
-					xpos = getPaddingLeft();
-					ypos += line_height;
-				}
-				child.layout(xpos, ypos, xpos + childw, ypos + childh);
-				xpos += childw + horizontalSpacing;
+    int actualHeight;
 
-			}
+    boolean measureActualHeight;
 
-		}
+    public void setMeasureActualHeight(boolean measureActualHeight) {
+        this.measureActualHeight = measureActualHeight;
+    }
 
-	}
+    public int getActualHeight() {
+        return actualHeight;
+    }
 
-	@Override
-	public LayoutParam generateLayoutParams(AttributeSet attributeSet) {
-		return new LayoutParam(getContext(), attributeSet);
-	}
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
 
-	@Override
-	protected LayoutParam generateLayoutParams(ViewGroup.LayoutParams p) {
-		return new LayoutParam(p);
-	}
+        final int count = getChildCount();
+        final int width = r - l;
+        int xpos = getPaddingLeft();
+        int ypos = getPaddingTop();
 
-	private void readStyleParameters(Context context, AttributeSet attributeSet) {
+        for (int i = 0; i < count; i++) {
 
-		TypedArray a = context.obtainStyledAttributes(attributeSet,
-				R.styleable.ZFlowLayout);
-		try {
-			horizontalSpacing = a.getDimensionPixelSize(
-					R.styleable.ZFlowLayout_horizontalSpacing, 0);
-			verticalSpacing = a.getDimensionPixelSize(
-					R.styleable.ZFlowLayout_verticalSpacing, 0);
-			orientation = a.getInteger(R.styleable.ZFlowLayout_orientation,
-					HORIZONTAL);
-		} finally {
-			a.recycle();
-		}
+            final View child = getChildAt(i);
+            if (child.getVisibility() != GONE) {
 
-	}
+                final int childw = child.getMeasuredWidth();
+                final int childh = child.getMeasuredHeight();
+                if (xpos + childw > width) {
+                    xpos = getPaddingLeft();
+                    ypos += line_height;
+                }
+                child.layout(xpos, ypos, xpos + childw, ypos + childh);
+                xpos += childw + horizontalSpacing;
 
-	public static class LayoutParam extends ViewGroup.LayoutParams {
-		private static int NO_SPACING = -1;
+            }
 
-		@SuppressWarnings("unused")
-		private int x;
-		@SuppressWarnings("unused")
-		private int y;
-		private int horizontalSpacing = NO_SPACING;
-		private int verticalSpacing = NO_SPACING;
-		@SuppressWarnings("unused")
-		private boolean newLine = false;
+        }
 
-		public LayoutParam(Context context, AttributeSet attributeSet) {
-			super(context, attributeSet);
-			this.readStyleParameters(context, attributeSet);
-		}
+    }
 
-		public LayoutParam(int width, int height) {
-			super(width, height);
-		}
+    @Override
+    public LayoutParam generateLayoutParams(AttributeSet attributeSet) {
+        return new LayoutParam(getContext(), attributeSet);
+    }
 
-		public LayoutParam(ViewGroup.LayoutParams layoutParams) {
-			super(layoutParams);
-		}
+    @Override
+    protected LayoutParam generateLayoutParams(ViewGroup.LayoutParams p) {
+        return new LayoutParam(p);
+    }
 
-		public boolean horizontalSpacingSpecified() {
-			return horizontalSpacing != NO_SPACING;
-		}
+    private void readStyleParameters(Context context, AttributeSet attributeSet) {
 
-		public boolean verticalSpacingSpecified() {
-			return verticalSpacing != NO_SPACING;
-		}
+        TypedArray a = context.obtainStyledAttributes(attributeSet,
+                R.styleable.ZFlowLayout);
+        try {
+            horizontalSpacing = a.getDimensionPixelSize(
+                    R.styleable.ZFlowLayout_horizontalSpacing, 0);
+            verticalSpacing = a.getDimensionPixelSize(
+                    R.styleable.ZFlowLayout_verticalSpacing, 0);
+            orientation = a.getInteger(R.styleable.ZFlowLayout_orientation,
+                    HORIZONTAL);
+        } finally {
+            a.recycle();
+        }
 
-		public void setPosition(int x, int y) {
-			this.x = x;
-			this.y = y;
-		}
+    }
 
-		private void readStyleParameters(Context context,
-				AttributeSet attributeSet) {
+    public static class LayoutParam extends ViewGroup.LayoutParams {
+        private static int NO_SPACING = -1;
 
-			TypedArray a = context.obtainStyledAttributes(attributeSet,
-					R.styleable.FlowLayout_LayoutParams);
-			try {
-				horizontalSpacing = a
-						.getDimensionPixelSize(
-								R.styleable.FlowLayout_LayoutParams_layout_horizontalSpacing,
-								NO_SPACING);
-				verticalSpacing = a
-						.getDimensionPixelSize(
-								R.styleable.FlowLayout_LayoutParams_layout_verticalSpacing,
-								NO_SPACING);
-				newLine = a.getBoolean(
-						R.styleable.FlowLayout_LayoutParams_layout_newLine,
-						false);
-			} finally {
-				a.recycle();
-			}
+        @SuppressWarnings("unused")
+        private int x;
+        @SuppressWarnings("unused")
+        private int y;
+        private int horizontalSpacing = NO_SPACING;
+        private int verticalSpacing = NO_SPACING;
+        @SuppressWarnings("unused")
+        private boolean newLine = false;
 
-		}
+        public LayoutParam(Context context, AttributeSet attributeSet) {
+            super(context, attributeSet);
+            this.readStyleParameters(context, attributeSet);
+        }
 
-	}
+        public LayoutParam(int width, int height) {
+            super(width, height);
+        }
+
+        public LayoutParam(ViewGroup.LayoutParams layoutParams) {
+            super(layoutParams);
+        }
+
+        public boolean horizontalSpacingSpecified() {
+            return horizontalSpacing != NO_SPACING;
+        }
+
+        public boolean verticalSpacingSpecified() {
+            return verticalSpacing != NO_SPACING;
+        }
+
+        public void setPosition(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        private void readStyleParameters(Context context,
+                                         AttributeSet attributeSet) {
+
+            TypedArray a = context.obtainStyledAttributes(attributeSet,
+                    R.styleable.FlowLayout_LayoutParams);
+            try {
+                horizontalSpacing = a
+                        .getDimensionPixelSize(
+                                R.styleable.FlowLayout_LayoutParams_layout_horizontalSpacing,
+                                NO_SPACING);
+                verticalSpacing = a
+                        .getDimensionPixelSize(
+                                R.styleable.FlowLayout_LayoutParams_layout_verticalSpacing,
+                                NO_SPACING);
+                newLine = a.getBoolean(
+                        R.styleable.FlowLayout_LayoutParams_layout_newLine,
+                        false);
+            } finally {
+                a.recycle();
+            }
+
+        }
+
+    }
 
 }

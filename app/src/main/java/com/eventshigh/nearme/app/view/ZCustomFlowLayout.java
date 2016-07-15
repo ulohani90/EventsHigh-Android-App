@@ -134,11 +134,38 @@ public class ZCustomFlowLayout extends ZFlowLayout {
         }
     }
 
+    public void setRecipientForSelectedInterest(final ArrayList<String> tags) {
+        if (this.getChildCount() > 0)
+            this.removeAllViews();
+        viewsWidth = 0;
+        ComposeInterestView adduserView;
+        for (int i = 0; i < tags.size(); i++) {
+            final String obj = tags.get(i);
+            adduserView = new ComposeInterestView(getContext());
+
+            //adduserView.setTag(obj);
+            adduserView.setContent(obj);
+            adduserView.getFollowImg().setTag(obj);
+            adduserView.getFollowImg().setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    tags.remove((String) v.getTag());
+                    mListener.refreshRecipientNames((String) v.getTag());
+                    setRecipientForSelectedInterest(tags);
+                }
+            });
+
+            this.addView(adduserView);
+
+        }
+    }
+
     public interface OnHashTagClickListener {
         void selectedHashTag(String obj);
+
     }
 
     public interface OnRecipientRemoveListener {
-        public void refreshRecipientNames();
+        void refreshRecipientNames(String tag);
     }
 }

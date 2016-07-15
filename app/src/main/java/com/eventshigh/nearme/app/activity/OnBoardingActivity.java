@@ -48,7 +48,7 @@ public class OnBoardingActivity extends BaseActivity {
             this.titleId = titleId;
             this.captionResId = captionResId;
             this.imageBitmap = ImageUtils.decodeSampledBitmapFromResource(getResources(),
-                imageResId, imageWidth, imageHeight);
+                    imageResId, imageWidth, imageHeight);
         }
     }
 
@@ -72,12 +72,12 @@ public class OnBoardingActivity extends BaseActivity {
         imageView = (ImageView) findViewById(R.id.screenshot);
 
         onBoardingStepResources = new OnBoardingStepResource[]{
-            new OnBoardingStepResource(R.string.onboarding_title_details,
-                R.string.onboarding_details, R.drawable.onboarding_details),
-            new OnBoardingStepResource(R.string.onboarding_title_favorites,
-                R.string.onboarding_favorites, R.drawable.onboarding_favorites),
-            new OnBoardingStepResource(R.string.onboarding_title_notification,
-                R.string.onboarding_notification, R.drawable.onboarding_notification),
+                new OnBoardingStepResource(R.string.onboarding_title_details,
+                        R.string.onboarding_details, R.drawable.onboarding_details),
+                new OnBoardingStepResource(R.string.onboarding_title_favorites,
+                        R.string.onboarding_favorites, R.drawable.onboarding_favorites),
+                new OnBoardingStepResource(R.string.onboarding_title_notification,
+                        R.string.onboarding_notification, R.drawable.onboarding_notification),
         };
 
         // Initialize the dotsView. Add dots to indicate the number of pages in view pager.
@@ -116,7 +116,7 @@ public class OnBoardingActivity extends BaseActivity {
                     launchNextActivity();
                 } else {
                     Animation animation = new FakeDragAnimation(viewPager,
-                        -viewPager.getMeasuredWidth());
+                            -viewPager.getMeasuredWidth());
                     animation.setDuration(500);
                     viewPager.startAnimation(animation);
                 }
@@ -129,7 +129,7 @@ public class OnBoardingActivity extends BaseActivity {
 
     private void launchNextActivity() {
         Intent phoneLoginIntent = new Intent(OnBoardingActivity.this, PhoneLoginActivity.class);
-        phoneLoginIntent.putExtra("is_onboarding",true);
+        phoneLoginIntent.putExtra("is_onboarding", true);
         startActivity(phoneLoginIntent);
         finish();
     }
@@ -166,7 +166,7 @@ public class OnBoardingActivity extends BaseActivity {
 
         @Override
         public void onPageSelected(int position) {
-            for (int i = 0 ; i < dotsView.getChildCount(); i++) {
+            for (int i = 0; i < dotsView.getChildCount(); i++) {
                 dotsView.getChildAt(i).setSelected(i == position);
             }
         }
@@ -177,11 +177,13 @@ public class OnBoardingActivity extends BaseActivity {
         }
     };
 
-    /** The view pager adapter that creates the views for each onboarding step. */
+    /**
+     * The view pager adapter that creates the views for each onboarding step.
+     */
     private PagerAdapter mOnBoardingStepsAdapter = new PagerAdapter() {
         @Override
         public int getCount() {
-            return  onBoardingStepResources.length;
+            return onBoardingStepResources.length;
         }
 
         @Override

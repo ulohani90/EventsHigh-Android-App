@@ -108,18 +108,6 @@ public enum EventSubcategory {
         this.name = name;
     }
 
-    public static List<EventSubcategory> getEventCategories(EventCategory category,boolean addisAll) {
-        List<EventSubcategory> subCategories = new ArrayList<>();
 
-
-        for (EventSubcategory subcategory : EventSubcategory.values()) {
-            if (subcategory.category== category) {
-                subCategories.add(subcategory);
-
-            }
-        }
-
-        return subCategories;
-    }
 
 }

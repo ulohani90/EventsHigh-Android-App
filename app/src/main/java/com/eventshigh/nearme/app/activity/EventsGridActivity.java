@@ -62,6 +62,12 @@ public class EventsGridActivity extends BaseContextActivity {
     boolean isCategoryFilterVisible;
 
     boolean isTodaySelected;
+
+    public static final int SORT_STATE_TRENDING = 1;
+    public static final int SORT_STATE_PRICE = 2;
+    public static final int SORT_STATE_DISTANCE = 3;
+
+
     Account account;
 
     public static final int PRICE_FILTER = 3;
@@ -76,6 +82,8 @@ public class EventsGridActivity extends BaseContextActivity {
     public static final int MORE_THAN_1500 = 5;
 
     LinearLayout filtersContainer;
+
+    LinearLayout sortFilter;
 
     public static final String[] EXPLORE_TAGS = {
             EventCategory.NIGHTLIFE.categoryName,
@@ -105,7 +113,8 @@ public class EventsGridActivity extends BaseContextActivity {
         }
         filtersContainer = (LinearLayout) findViewById(R.id.filters_container);
         categoryFilter = (HorizontalScrollView) findViewById(R.id.category_filter);
-        priceFilter = (HorizontalScrollView) findViewById(R.id.price_filter);
+        // priceFilter = (HorizontalScrollView) findViewById(R.id.price_filter);
+        sortFilter = (LinearLayout) findViewById(R.id.sort_container);
         dateFilter = (HorizontalScrollView) findViewById(R.id.date_filter);
 
         // Show query as title.
@@ -167,7 +176,7 @@ public class EventsGridActivity extends BaseContextActivity {
             boolean showEhInviteForNotification = getIntent() != null &&
                     getIntent().getAction() != null && getIntent().getAction().startsWith(NOTIFICATION_ACTION);
             EventsFragment eventFragment1 = EventsFragment.getInstance(
-                    eventsContext, showFollowCard, false, showEhInviteForNotification, (SocialInvitationsRequest.SpecialCoupons) getIntent().getParcelableExtra("special_obj"), isTodaySelected,null);
+                    eventsContext, showFollowCard, false, showEhInviteForNotification, (SocialInvitationsRequest.SpecialCoupons) getIntent().getParcelableExtra("special_obj"), isTodaySelected, null);
             eventFragment1.setOnScrollListener(
                     false ? followCardScrollListener : doNothingScrollListener);
 
@@ -285,7 +294,7 @@ public class EventsGridActivity extends BaseContextActivity {
                 }
             });
         }
-        LinearLayout horizontalprice = (LinearLayout) findViewById(R.id.price_container);
+        /*LinearLayout horizontalprice = (LinearLayout) findViewById(R.id.price_container);
         String[] priceRanges = {"Free", " \u20B9 ", "\u20B9 \u20B9", "\u20B9 \u20B9 \u20B9", "\u20B9 \u20B9 \u20B9 \u20B9"};
         for (int i = 0; i < priceRanges.length; i++) {
             View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
@@ -321,7 +330,7 @@ public class EventsGridActivity extends BaseContextActivity {
                     }
                 }
             });
-        }
+        }*/
         collapseAnimation();
         LinearLayout horizontalDate = (LinearLayout) findViewById(R.id.date_container);
         String[] dateRanges = {"Today", "Tomorrow", "Weekend", "Dates", "\u2022 • •"};
@@ -399,8 +408,48 @@ public class EventsGridActivity extends BaseContextActivity {
             });
         }
 
+        final TextView trending = (TextView) findViewById(R.id.sort_trending);
+        final TextView price = (TextView) findViewById(R.id.sort_price);
+        final TextView distance = (TextView) findViewById(R.id.sort_distance);
+        trending.setSelected(true);
+        trending.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!(eventsFragment.sortState == SORT_STATE_TRENDING)) {
+                    trending.setSelected(true);
+                    price.setSelected(false);
+                    distance.setSelected(false);
+                    eventsFragment.sortAccToSortState(SORT_STATE_TRENDING);
+                }
+            }
+        });
 
+        price.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!(eventsFragment.sortState == SORT_STATE_PRICE)) {
+                    trending.setSelected(false);
+                    price.setSelected(true);
+                    distance.setSelected(false);
+                    eventsFragment.sortAccToSortState(SORT_STATE_PRICE);
+                }
+            }
+        });
+
+        distance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!(eventsFragment.sortState == SORT_STATE_DISTANCE)) {
+                    trending.setSelected(false);
+                    price.setSelected(false);
+                    distance.setSelected(true);
+                    eventsFragment.sortAccToSortState(SORT_STATE_DISTANCE);
+                }
+
+            }
+        });
     }
+
 
     public void removeAllSelectedDateFilters() {
         if (today.isSelected()) {

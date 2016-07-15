@@ -150,6 +150,7 @@ public class EventInfoFragment extends Fragment {
                     }
                 });
 
+
             }
 
 

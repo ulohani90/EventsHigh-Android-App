@@ -30,13 +30,13 @@ import java.util.List;
 /**
  * Calls the api to get events for a day by categories.
  */
-public class DateCategoryRequest extends JsonRequest<List<TopicEvents>>  {
+public class DateCategoryRequest extends JsonRequest<List<TopicEvents>> {
     /**
      * Helper method to submit a volley request to fetch Events information.
      *
-     * @param context an application context to initiate the volley.
+     * @param context       an application context to initiate the volley.
      * @param eventsContext EventsContext representing the request.
-     * @param listener callback on success.
+     * @param listener      callback on success.
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, EventsContext eventsContext,
@@ -89,7 +89,7 @@ public class DateCategoryRequest extends JsonRequest<List<TopicEvents>>  {
                 JSONObject categoryEvents = dateEventsJson.getJSONObject(category);
                 int numEvents = categoryEvents.getInt("num_events");
                 JSONArray upcomingEvents = categoryEvents.getJSONArray("events");
-                List<Event> events = Event.fromJSON(upcomingEvents, true);
+                List<Event> events = Event.fromJSON(upcomingEvents, true, null);
 
                 category = category.equals("upcoming") ? IntentUtils.QUERY_ALL : category;
                 if (!events.isEmpty()) {

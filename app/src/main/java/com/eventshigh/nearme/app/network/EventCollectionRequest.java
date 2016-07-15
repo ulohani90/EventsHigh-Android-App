@@ -74,14 +74,14 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
         EventCollectionRequest request = new EventCollectionRequest(
                 context, url, eventsContext, priority, shouldBypassCache, includeWithoutLocation,
-                listener, errorListener);
+                listener, errorListener, null);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
 
     public static void submit(Context context, EventsContext eventsContext, Priority priority,
                               Object tag, String dateString, boolean shouldBypassCache, boolean includeWithoutLocation,
-                              Listener<EventsCollection> listener, ErrorListener errorListener) {
+                              Listener<EventsCollection> listener, ErrorListener errorListener, OnDataProcessComplete pListener) {
         if (eventsContext.city == null) {
             errorListener.onErrorResponse(new VolleyError("No City for: " + eventsContext.toString()));
             return;
@@ -97,7 +97,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
         EventCollectionRequest request = new EventCollectionRequest(
                 context, url, eventsContext, priority, shouldBypassCache, includeWithoutLocation,
-                listener, errorListener);
+                listener, errorListener, pListener);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
@@ -107,9 +107,11 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     private final Priority priority;
     private final boolean includeWithoutLocation;
 
+    OnDataProcessComplete mListener;
+
     public EventCollectionRequest(Context context, String url, EventsContext eventsContext,
                                   Priority priority, boolean shouldBypassCache, boolean includeWithoutLocation,
-                                  Listener<EventsCollection> listener, ErrorListener errorListener) {
+                                  Listener<EventsCollection> listener, ErrorListener errorListener, OnDataProcessComplete pListener) {
         super(Method.GET, url, null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
         setShouldAllowStaleResponse(true);
@@ -117,6 +119,8 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         this.eventsContext = eventsContext;
         this.priority = priority;
         this.includeWithoutLocation = includeWithoutLocation;
+        this.mListener = pListener;
+
     }
 
 
@@ -130,7 +134,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         try {
             // Parse the response.
             EventsCollection eventsCollection = parseEventsFromNetworkResponse(response, context,
-                    eventsContext, includeWithoutLocation);
+                    eventsContext, includeWithoutLocation, mListener);
             return Response.success(eventsCollection, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
             Crashlytics.getInstance().core.logException(e);
@@ -139,20 +143,47 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
     }
 
     public static EventsCollection parseEventsFromNetworkResponse(
-            NetworkResponse response, Context context, EventsContext eventsContext,
-            boolean includeWithoutLocation) throws UnsupportedEncodingException, JSONException {
+            NetworkResponse response, final Context context, final EventsContext eventsContext,
+            boolean includeWithoutLocation, final OnDataProcessComplete listener) throws UnsupportedEncodingException, JSONException {
         ReportTimingTask.report(context, "events", response.networkTimeMs);
 
         String jsonString = new String(response.data, "UTF-8");
-        JSONObject eventsJson = new JSONObject(jsonString);
-        List<Event> events = Event.parseUpcomingEvents(eventsJson, includeWithoutLocation);
-        filterOldEvents(context, events);
+        final JSONObject eventsJson = new JSONObject(jsonString);
 
-        // Sort the event list to user.
-        Collections.sort(events, new EventComparator(eventsContext.location));
+        if (listener != null) {
+            Event.parseUpcomingEvents(eventsJson, includeWithoutLocation, new Event.OnPartialDataLoadingComplete() {
+                @Override
+                public void onPartialLoadingComplete(List<Event> events) {
+                    filterOldEvents(context, events);
+                    // Sort the event list to user.
+                    Collections.sort(events, new EventComparator(eventsContext.location));
+                    listener.onDataProcessComplete(new EventsCollection(events, eventsJson.optInt("num_followers")), false);
 
-        return new EventsCollection(events, eventsJson.optInt("num_followers"));
+
+                }
+
+                @Override
+                public void onFullDataLoadingComplete(List<Event> events) {
+                    filterOldEvents(context, events);
+                    // Sort the event list to user.
+                    Collections.sort(events, new EventComparator(eventsContext.location));
+                    listener.onDataProcessComplete(new EventsCollection(events, eventsJson.optInt("num_followers")), true);
+                }
+            });
+        } else {
+            List<Event> events = Event.parseUpcomingEvents(eventsJson, includeWithoutLocation, null);
+            filterOldEvents(context, events);
+
+            // Sort the event list to user.
+            Collections.sort(events, new EventComparator(eventsContext.location));
+
+            return new EventsCollection(events, eventsJson.optInt("num_followers"));
+
+        }
+        return null;
+
     }
+
 
     // Filter out the events which has started more than three hours back.
     public static void filterOldEvents(Context context, List<Event> events) {
@@ -188,4 +219,11 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
             }
         }
     }
+
+
+    public interface OnDataProcessComplete {
+        void onDataProcessComplete(EventsCollection collection, boolean isLoadingFinished);
+    }
+
+
 }

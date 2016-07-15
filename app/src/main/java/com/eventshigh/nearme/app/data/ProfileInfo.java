@@ -162,7 +162,7 @@ public class ProfileInfo implements Parcelable {
                 for (int i = 0; i < eventsJsonArray.length(); i++) {
 
 
-                    List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"), true);
+                    List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"), true, null);
 
                     if (profileMobileNo.equalsIgnoreCase(new Account(context).getUserInfo().phoneNo))
                         new Account(context).setIsFollowing(eventsJsonArray.getJSONObject(i).getString("topic"), true);

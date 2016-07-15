@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Created by umesh on 07/04/16.
  */
-public class EhPrices implements Parcelable {
+public class EhPrices implements Parcelable, Comparable<EhPrices> {
     public double min;
     public double max;
     public String name;
@@ -100,4 +100,14 @@ public class EhPrices implements Parcelable {
                 }
             };
 
+    @Override
+    public int compareTo(EhPrices another) {
+        if (value > another.value) {
+            return 1;
+        } else if (value < another.value) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
 }

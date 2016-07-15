@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:elevation="8dp">
+
+        <AutoCompleteTextView
+            android:id="@+id/search_interest_actv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="@drawable/darktheme_edit_text_holo_light"
+            android:hint="Search interests and follow them"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/selected_category_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#f0f0f0"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="18dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
+                android:text="My Interests" />
+
+            <ImageView
+                android:id="@+id/expand_selected_interests"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="end"
+                android:scaleType="centerInside"
+                android:src="@drawable/arrow_up_down_selector_bg" />
+        </LinearLayout>
+
+        <com.eventshigh.nearme.app.view.ZCustomFlowLayout
+            android:id="@+id/selected_category_flowlayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="28dp"
+            android:paddingLeft="8dp"
+            android:paddingTop="8dp"
+            app:horizontalSpacing="8dp"
+            app:orientation="horizontal"
+            app:paddingEnd="8dp"
+            app:paddingStart="8dp"
+            app:verticalSpacing="8dp" />
+
+
+    </LinearLayout>
+</LinearLayout>

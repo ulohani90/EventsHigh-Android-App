@@ -27,6 +27,9 @@ import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventDistanceComparator;
+import com.eventshigh.nearme.app.data.EventPriceComparator;
+import com.eventshigh.nearme.app.data.EventScoreComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
@@ -34,6 +37,7 @@ import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.ui.animation.ResizeAnimation;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
@@ -41,6 +45,7 @@ import com.squareup.timessquare.CalendarPickerView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -75,6 +80,15 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
     LinearLayout filtersContainer;
     HorizontalScrollView dateFilter;
+
+    public static final int SORT_STATE_TRENDING = 1;
+    public static final int SORT_STATE_PRICE = 2;
+    public static final int SORT_STATE_DISTANCE = 3;
+
+
+    int sortState = SORT_STATE_TRENDING;
+
+    List<Event> filteredEvents;
 
     @Nullable
     @Override
@@ -168,47 +182,103 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         endDate.add(Calendar.DAY_OF_WEEK, 8);
         String dateString = EventsContext.formatDateFilter(Calendar.getInstance()) + "," + EventsContext.formatDateFilter(endDate);
         EventCollectionRequest.submit(activity, eventsContext, Request.Priority.IMMEDIATE, this, dateString,
-                shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
+                shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener, new EventCollectionRequest.OnDataProcessComplete() {
+                    @Override
+                    public void onDataProcessComplete(EventCollectionRequest.EventsCollection eventsCollection, final boolean isLoadingFinished) {
+                        if (isDetached()) {
+                            return;
+                        }
+
+
+                        if (!eventsCollection.events.isEmpty()) {
+                            noMyEventsView.setVisibility(View.GONE);
+                            final String seeAllQuery = eventsContext.query.isEmpty() ||
+                                    eventsContext.dateFilter.isEmpty() ? null : eventsContext.query;
+                            if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
+                                if (eventsCollection.events.size() > 0)
+                                    ((EventsGridActivity) getActivity()).setShareImageUrl(eventsCollection.events.get(0).imgUrl);
+                            }
+                            if (isLoadingFinished) {
+                                NewWeekEventsFragment.this.eventsCollection.events.addAll(eventsCollection.events);
+                            } else {
+                                NewWeekEventsFragment.this.eventsCollection = eventsCollection;
+                            }
+
+
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (isLoadingFinished) {
+                                        topProgressBar.setVisibility(View.GONE);
+
+                                        if (NewWeekEventsFragment.this.eventsCollection.events.isEmpty()) {
+                                            // Failed. Show toast and return empty list.
+                                            noMyEventsView.setVisibility(View.VISIBLE);
+                                            Toast.makeText(getActivity(), R.string.no_events, Toast.LENGTH_SHORT).show();
+
+                                        }
+                                    }
+                                    List<Event> filteredEvents = NewWeekEventsFragment.this.eventsCollection.events;
+                                    filteredEvents = filterEventsWithCategory(null, filteredEvents);
+                                    if (filterEventTimes != null) {
+                                        filterEventTimes.clear();
+                                    }
+                                    filteredEvents = filterEventsWithDate(filteredEvents, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                                    filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                                    NewWeekEventsFragment.this.filteredEvents = filteredEvents;
+                                    sortData();
+                                    eventsAdapter.setEvents(NewWeekEventsFragment.this.filteredEvents, seeAllQuery, false);
+                                    eventsContext.removeDateFilter();
+
+                                }
+                            });
+                            //addSocialInvitationRequests();
+
+                        }
+                    }
+                });
     }
 
     private Response.Listener<EventCollectionRequest.EventsCollection> mEventsFetcherCallBack = new Response.Listener<EventCollectionRequest.EventsCollection>() {
         @Override
         public void onResponse(EventCollectionRequest.EventsCollection eventsCollection, boolean isIntermediate) {
-            if (isDetached()) {
-                return;
-            }
-
-            if (!isIntermediate) {
-                topProgressBar.setVisibility(View.GONE);
-
-                if (eventsCollection.events.isEmpty()) {
-                    // Failed. Show toast and return empty list.
-                    noMyEventsView.setVisibility(View.VISIBLE);
-                    Toast.makeText(getActivity(), R.string.no_events, Toast.LENGTH_SHORT).show();
-
+            if (eventsCollection != null) {
+                if (isDetached()) {
+                    return;
                 }
-            }
 
-            if (!isIntermediate || !eventsCollection.events.isEmpty()) {
-                noMyEventsView.setVisibility(View.GONE);
-                String seeAllQuery = eventsContext.query.isEmpty() ||
-                        eventsContext.dateFilter.isEmpty() ? null : eventsContext.query;
-                if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
-                    if (eventsCollection.events.size() > 0)
-                        ((EventsGridActivity) getActivity()).setShareImageUrl(eventsCollection.events.get(0).imgUrl);
+                if (!isIntermediate) {
+                    topProgressBar.setVisibility(View.GONE);
+
+                    if (eventsCollection.events.isEmpty()) {
+                        // Failed. Show toast and return empty list.
+                        noMyEventsView.setVisibility(View.VISIBLE);
+                        Toast.makeText(getActivity(), R.string.no_events, Toast.LENGTH_SHORT).show();
+
+                    }
                 }
-                NewWeekEventsFragment.this.eventsCollection = eventsCollection;
-                List<Event> filteredEvents = eventsCollection.events;
-                filteredEvents = filterEventsWithCategory(null, filteredEvents);
-                filteredEvents = filterEventsWithDate(filteredEvents, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
-                filteredEvents = filterEventsWithPrice(filteredEvents, -1);
-                eventsAdapter.setEvents(filteredEvents, seeAllQuery, false);
-                eventsContext.removeDateFilter();
+
+                if (!isIntermediate || !eventsCollection.events.isEmpty()) {
+                    noMyEventsView.setVisibility(View.GONE);
+                    String seeAllQuery = eventsContext.query.isEmpty() ||
+                            eventsContext.dateFilter.isEmpty() ? null : eventsContext.query;
+                    if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
+                        if (eventsCollection.events.size() > 0)
+                            ((EventsGridActivity) getActivity()).setShareImageUrl(eventsCollection.events.get(0).imgUrl);
+                    }
+                    NewWeekEventsFragment.this.eventsCollection = eventsCollection;
+                    List<Event> filteredEvents = eventsCollection.events;
+                    filteredEvents = filterEventsWithCategory(null, filteredEvents);
+                    filteredEvents = filterEventsWithDate(filteredEvents, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                    filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                    eventsAdapter.setEvents(filteredEvents, seeAllQuery, false);
+                    eventsContext.removeDateFilter();
                 /*if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                             eventsCollection.numFollowers, special);
                 }*/
-                //     eventGridView.scrollToPosition(scrollPosition);
+                    //     eventGridView.scrollToPosition(scrollPosition);
+                }
             }
         }
     };
@@ -489,7 +559,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                 }
             });
         }
-        LinearLayout horizontalprice = (LinearLayout) view.findViewById(R.id.price_container);
+        /*LinearLayout horizontalprice = (LinearLayout) view.findViewById(R.id.price_container);
         String[] priceRanges = {"Free", " \u20B9 ", "\u20B9 \u20B9", "\u20B9 \u20B9 \u20B9", "\u20B9 \u20B9 \u20B9 \u20B9"};
         for (int i = 0; i < priceRanges.length; i++) {
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
@@ -524,7 +594,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                     }
                 }
             });
-        }
+        }*/
 
         LinearLayout horizontalDate = (LinearLayout) view.findViewById(R.id.date_container);
         String[] dateRanges = {"Today", "Tomorrow", "Weekend", "Dates", "• • •"};
@@ -601,6 +671,68 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         }
 
         collapseAnimation();
+
+        final TextView trending = (TextView) view.findViewById(R.id.sort_trending);
+        final TextView price = (TextView) view.findViewById(R.id.sort_price);
+        final TextView distance = (TextView) view.findViewById(R.id.sort_distance);
+        trending.setSelected(true);
+        trending.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!(sortState == SORT_STATE_TRENDING)) {
+                    trending.setSelected(true);
+                    price.setSelected(false);
+                    distance.setSelected(false);
+                    sortAccToSortState(SORT_STATE_TRENDING);
+                }
+            }
+        });
+
+        price.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!(sortState == SORT_STATE_PRICE)) {
+                    trending.setSelected(false);
+                    price.setSelected(true);
+                    distance.setSelected(false);
+                    sortAccToSortState(SORT_STATE_PRICE);
+                }
+            }
+        });
+
+        distance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!(sortState == SORT_STATE_DISTANCE)) {
+                    trending.setSelected(false);
+                    price.setSelected(false);
+                    distance.setSelected(true);
+                    sortAccToSortState(SORT_STATE_DISTANCE);
+                }
+
+            }
+        });
+    }
+
+    public void sortAccToSortState(int sortState) {
+        this.sortState = sortState;
+        sortData();
+        eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+    }
+
+    public void sortData() {
+        if (sortState == EventsGridActivity.SORT_STATE_TRENDING) {
+            Collections.sort(filteredEvents, new EventScoreComparator());
+        } else if (sortState == EventsGridActivity.SORT_STATE_PRICE) {
+            Collections.sort(filteredEvents, new EventPriceComparator());
+        } else if (sortState == EventsGridActivity.SORT_STATE_DISTANCE) {
+            if (new Account(activity).getLastLocality() != null)
+                Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastLocality().getLatLng()));
+            else
+                Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastCity().cityBounds.getCenter()));
+        }
+
+
     }
 
     CalendarPickerView dialogView;
@@ -797,7 +929,9 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
             if (!isCancelled() && events != null) {
                 topProgressBar.setVisibility(View.GONE);
-                eventsAdapter.setEvents(events, null, showEhInviteForNotification);
+                NewWeekEventsFragment.this.filteredEvents = events;
+                sortData();
+                eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (events.size() > 0) {
                     noMyEventsView.setVisibility(View.GONE);
                 } else {

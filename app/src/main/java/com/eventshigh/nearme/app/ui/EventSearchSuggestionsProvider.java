@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * This class provides the search suggestions from recent queries and static event tags.
- *
+ * <p/>
  * See http://developer.android.com/guide/topics/search/adding-recent-query-suggestions.html.
  */
 public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvider {
@@ -53,17 +53,18 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
         loadTags();
         loadEvents();
 
-        if (selectionArgs.length <=0 || selectionArgs[0].isEmpty()) {
+        if (selectionArgs.length <= 0 || selectionArgs[0].isEmpty()) {
             return super.query(uri, projection, selection, selectionArgs, sortOrder);
         }
 
-        MatrixCursor suggestionsCursor = new MatrixCursor(new String[] {
+        MatrixCursor suggestionsCursor = new MatrixCursor(new String[]{
                 BaseColumns._ID,
                 SearchManager.SUGGEST_COLUMN_TEXT_1,
                 SearchManager.SUGGEST_COLUMN_QUERY,
                 SearchManager.SUGGEST_COLUMN_ICON_1,
                 SearchManager.SUGGEST_COLUMN_INTENT_ACTION,
                 SearchManager.SUGGEST_COLUMN_INTENT_DATA,
+
         });
 
         int idIndex = suggestionsCursor.getColumnIndex(BaseColumns._ID);
@@ -119,6 +120,7 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
         suggestions.clearHistory();
     }
 
+
     private synchronized void loadTags() {
         // If tags are already loaded or if request is in flight then return
         if (allTags != null || requestTags != null) {
@@ -141,7 +143,7 @@ public class EventSearchSuggestionsProvider extends SearchRecentSuggestionsProvi
         }
 
         requestEvents = new EventSuggestRequest(lastCity, mEventSuggestListener,
-            mEventErrorListener);
+                mEventErrorListener);
         VolleyHelper.addToRequestQueue(getContext(), requestEvents);
     }
 

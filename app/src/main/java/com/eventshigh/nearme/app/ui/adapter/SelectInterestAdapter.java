@@ -23,12 +23,12 @@ import java.util.List;
 /**
  * Created by umesh on 15/03/16.
  */
-public class SelectInterestAdapter extends BaseExpandableListAdapter{
+public class SelectInterestAdapter extends BaseExpandableListAdapter {
 
 
     EventCategory[] categories;
 
-    HashMap<EventCategory , List<EventSubcategory> > subcategories;
+    HashMap<EventCategory, List<EventSubcategory>> subcategories;
 
     Context mContext;
 
@@ -36,12 +36,14 @@ public class SelectInterestAdapter extends BaseExpandableListAdapter{
 
     Account account;
 
+    OnFollowUnfollowOptionClick mListener;
 
-    public SelectInterestAdapter(Context context , EventCategory[] categories,HashMap<EventCategory , List<EventSubcategory> > subcategories){
-            this.mContext  =context;
-            this.account = new Account(context);
-            this.categories = categories;
-            this.subcategories = subcategories;
+    public SelectInterestAdapter(Context context, EventCategory[] categories, HashMap<EventCategory, List<EventSubcategory>> subcategories, OnFollowUnfollowOptionClick listener) {
+        this.mContext = context;
+        this.account = new Account(context);
+        this.categories = categories;
+        this.subcategories = subcategories;
+        this.mListener = listener;
     }
 
     @Override
@@ -87,8 +89,8 @@ public class SelectInterestAdapter extends BaseExpandableListAdapter{
 
     @Override
     public View getGroupView(final int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        if(convertView == null){
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.select_interest_item_layout,parent,false);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.select_interest_item_layout, parent, false);
             ViewHolder holder = new ViewHolder(convertView);
             convertView.setTag(holder);
 
@@ -100,28 +102,31 @@ public class SelectInterestAdapter extends BaseExpandableListAdapter{
                 .into(holder.categoryImage);
         holder.categoryImage.setBackgroundResource(getBackgroundResource(categories[groupPosition]));
         holder.expandArrow.setVisibility(View.VISIBLE);
-        if(subcategories.get(categories[groupPosition]).size()>0) {
+        if (subcategories.get(categories[groupPosition]).size() > 0) {
             holder.expandArrow.setVisibility(View.VISIBLE);
             if (selectedGroup == groupPosition) {
                 holder.expandArrow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
             } else {
                 holder.expandArrow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
             }
-        }else{
+        } else {
             holder.expandArrow.setVisibility(View.GONE);
         }
         holder.subcategoryName.setVisibility(View.GONE);
         holder.categoryName.setVisibility(View.VISIBLE);
         holder.categoryName.setText(categories[groupPosition].categoryName);
         holder.categoryName.setTypeface(null, Typeface.BOLD);
-        if(account.isFollowing(categories[groupPosition].categoryName)){
+        if (account.isFollowing(categories[groupPosition].categoryName)) {
             holder.followView.setVisibility(View.VISIBLE);
             holder.followView.setImageResource(R.drawable.ic_check_circle_green_24dp);
-        }else{
-            if(subcategories.get(categories[groupPosition]).size()==0){
+           /* if (mListener != null) {
+                mListener.onInterestClick(categories[groupPosition].categoryName, true);
+            }*/
+        } else {
+            if (subcategories.get(categories[groupPosition]).size() == 0) {
                 holder.followView.setVisibility(View.VISIBLE);
                 holder.followView.setImageResource(R.drawable.ic_add_circle_outline_gray_24dp);
-            }else{
+            } else {
                 holder.followView.setVisibility(View.GONE);
             }
 
@@ -133,81 +138,93 @@ public class SelectInterestAdapter extends BaseExpandableListAdapter{
                 if (account.isFollowing(categories[groupPosition].categoryName) && subcategories.get(categories[groupPosition]).size() == 0) {
                     account.setIsFollowing(categories[groupPosition].categoryName, false);
                     holder.followView.setImageResource(R.drawable.ic_add_circle_outline_black_24dp);
-                    if(((SelectInterestsActivity)mContext).isFromNotification()){
+                    if (((SelectInterestsActivity) mContext).isFromNotification()) {
                         ((SelectInterestsActivity) mContext).reportActionToAnalytics("removeFollowingPNotif", categories[groupPosition].categoryName);
-                    }else {
+                    } else {
                         ((SelectInterestsActivity) mContext).reportActionToAnalytics("removeFollowingP", categories[groupPosition].categoryName);
                     }
-                    ((SelectInterestsActivity)mContext).showMessage(categories[groupPosition].categoryName+" Unfollowed");
-
+                    ((SelectInterestsActivity) mContext).showMessage(categories[groupPosition].categoryName + " Unfollowed");
+                    if (mListener != null) {
+                        mListener.onInterestClick(categories[groupPosition].categoryName,
+                                false);
+                    }
                 } else {
                     account.setIsFollowing(categories[groupPosition].categoryName, true);
                     holder.followView.setImageResource(R.drawable.ic_check_circle_green_24dp);
-                    if(((SelectInterestsActivity)mContext).isFromNotification()){
+                    if (((SelectInterestsActivity) mContext).isFromNotification()) {
                         ((SelectInterestsActivity) mContext).reportActionToAnalytics("addFollowingPNotif", categories[groupPosition].categoryName);
-                    }else {
+                    } else {
                         ((SelectInterestsActivity) mContext).reportActionToAnalytics("addFollowingP", categories[groupPosition].categoryName);
                     }
-                    ((SelectInterestsActivity)mContext).showMessage("You are now following " + categories[groupPosition].categoryName);
+                    ((SelectInterestsActivity) mContext).showMessage("You are now following " + categories[groupPosition].categoryName);
+                    if (mListener != null) {
+                        mListener.onInterestClick(categories[groupPosition].categoryName,
+                                true);
+                    }
                 }
+
                 notifyDataSetChanged();
             }
         });
-       // holder.followView.setImageResource((account.isFollowing(categories[groupPosition].categoryName) || checkWhetherAllSelected(categories[groupPosition])) ? R.drawable.ic_check_circle_green_24dp : R.drawable.ic_add_circle_outline_black_24dp);
+        // holder.followView.setImageResource((account.isFollowing(categories[groupPosition].categoryName) || checkWhetherAllSelected(categories[groupPosition])) ? R.drawable.ic_check_circle_green_24dp : R.drawable.ic_add_circle_outline_black_24dp);
         return convertView;
     }
 
     public int getBackgroundResource(EventCategory category) {
-        if (category == EventCategory.NIGHTLIFE){
+        if (category == EventCategory.NIGHTLIFE) {
             return R.drawable.green_circle_bg;
-        }else if(category == EventCategory.OUTDOORS){
+        } else if (category == EventCategory.OUTDOORS) {
             return R.drawable.golden_circle_bg;
-        }else if(category == EventCategory.WORKSHOPS){
+        } else if (category == EventCategory.WORKSHOPS) {
             return R.drawable.violet_circle_bg;
-        }else if(category == EventCategory.LIVE_PERFORMANCES){
+        } else if (category == EventCategory.LIVE_PERFORMANCES) {
             return R.drawable.pink_circle_bg;
-        }else if(category == EventCategory.SPORTS){
+        } else if (category == EventCategory.SPORTS) {
             return R.drawable.blue_circle_bg;
-        }else if(category == EventCategory.FOOD){
+        } else if (category == EventCategory.FOOD) {
             return R.drawable.orange_cirlce_bg;
-        }else if(category == EventCategory.HEALTH_WELLNESS){
+        } else if (category == EventCategory.HEALTH_WELLNESS) {
             return R.drawable.yellow_circle_bg;
-        }else if(category == EventCategory.LITERATURE){
+        } else if (category == EventCategory.LITERATURE) {
             return R.drawable.purple_circle_bg;
-        }else if(category == EventCategory.KIDS_ENTERTAINMENT){
+        } else if (category == EventCategory.KIDS_ENTERTAINMENT) {
             return R.drawable.red_circle_bg;
-        }else if(category == EventCategory.EDITOR_PICKS){
+        } else if (category == EventCategory.EDITOR_PICKS) {
             return R.drawable.grey_circle_bg;
-        }else if(category == EventCategory.FREE_EVENTS){
+        } else if (category == EventCategory.FREE_EVENTS) {
             return R.drawable.slate_circle_bg;
-        }else{
+        } else {
             return R.drawable.light_blue_circle_bg;
         }
 
     }
 
     @Override
-    public View getChildView(final int groupPosition,final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        if(convertView == null){
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.select_interest_child_layout,parent,false);
+    public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.select_interest_child_layout, parent, false);
             ViewHolder holder = new ViewHolder(convertView);
             convertView.setTag(holder);
 
         }
-       final ViewHolder holder = new ViewHolder(convertView);
+        final ViewHolder holder = new ViewHolder(convertView);
         holder.expandArrow.setVisibility(View.GONE);
         holder.categoryImage.setVisibility(View.GONE);
-        if((childPosition == 0 && account.isFollowing(categories[groupPosition].categoryName) )||
-                account.isFollowing(subcategories.get(categories[groupPosition]).get(childPosition).name)){
+        if ((childPosition == 0 && account.isFollowing(categories[groupPosition].categoryName)) ||
+                account.isFollowing(subcategories.get(categories[groupPosition]).get(childPosition).name)) {
             holder.followView.setImageResource(R.drawable.ic_check_circle_green_24dp);
-        }else {
+           /* if (childPosition != 0 && mListener != null) {
+                mListener.onInterestClick(subcategories.get(categories[groupPosition]).get(childPosition).name,
+                        true);
+            }*/
+        } else {
             holder.followView.setImageResource(R.drawable.ic_add_circle_outline_gray_24dp);
         }
         holder.categoryName.setVisibility(View.GONE);
-        if(childPosition == 0){
-            holder.subcategoryName.setTypeface(null,Typeface.BOLD);
-        }else{
-            holder.subcategoryName.setTypeface(null,Typeface.NORMAL);
+        if (childPosition == 0) {
+            holder.subcategoryName.setTypeface(null, Typeface.BOLD);
+        } else {
+            holder.subcategoryName.setTypeface(null, Typeface.NORMAL);
         }
         holder.subcategoryName.setVisibility(View.VISIBLE);
         holder.subcategoryName.setText(subcategories.get(categories[groupPosition]).get(childPosition).name);
@@ -222,43 +239,55 @@ public class SelectInterestAdapter extends BaseExpandableListAdapter{
                     if (account.isFollowing(categories[groupPosition].categoryName)) {
                         account.setIsFollowing(categories[groupPosition].categoryName, false);
                         holder.followView.setImageResource(R.drawable.ic_add_circle_outline_gray_24dp);
-                        if(((SelectInterestsActivity)mContext).isFromNotification()){
+                        if (((SelectInterestsActivity) mContext).isFromNotification()) {
                             ((SelectInterestsActivity) mContext).reportActionToAnalytics("removeFollowingPNotif", categories[groupPosition].categoryName);
-                        }else {
+                        } else {
                             ((SelectInterestsActivity) mContext).reportActionToAnalytics("removeFollowingP", categories[groupPosition].categoryName);
                         }
-                        ((SelectInterestsActivity)mContext).showMessage(categories[groupPosition].categoryName+" Unfollowed");
+                        ((SelectInterestsActivity) mContext).showMessage(categories[groupPosition].categoryName + " Unfollowed");
+
+                        if (mListener != null) {
+                            mListener.onInterestClick(categories[groupPosition].categoryName, false);
+                        }
                     } else {
-                        if(((SelectInterestsActivity)mContext).isFromNotification()){
+                        if (((SelectInterestsActivity) mContext).isFromNotification()) {
                             ((SelectInterestsActivity) mContext).reportActionToAnalytics("addFollowingPNotif", categories[groupPosition].categoryName);
-                        }else {
+                        } else {
 
                             ((SelectInterestsActivity) mContext).reportActionToAnalytics("addFollowingP", categories[groupPosition].categoryName);
                         }
                         account.setIsFollowing(categories[groupPosition].categoryName, true);
+                        if (mListener != null) {
+                            mListener.onInterestClick(categories[groupPosition].categoryName, true);
+                        }
                         holder.followView.setImageResource(R.drawable.ic_check_circle_green_24dp);
-                        ((SelectInterestsActivity)mContext).showMessage("You are now following " + categories[groupPosition].categoryName);
+                        ((SelectInterestsActivity) mContext).showMessage("You are now following " + categories[groupPosition].categoryName);
                     }
                 } else if (account.isFollowing(subcategories.get(categories[groupPosition]).get(childPosition).name)) {
                     account.setIsFollowing(subcategories.get(categories[groupPosition]).get(childPosition).name, false);
                     holder.followView.setImageResource(R.drawable.ic_add_circle_outline_gray_24dp);
-                    if(((SelectInterestsActivity)mContext).isFromNotification()){
+                    if (((SelectInterestsActivity) mContext).isFromNotification()) {
                         ((SelectInterestsActivity) mContext).reportActionToAnalytics("removeFollowingNotif", subcategories.get(categories[groupPosition]).get(childPosition).name);
-                    }else {
+                    } else {
                         ((SelectInterestsActivity) mContext).reportActionToAnalytics("removeFollowingP", subcategories.get(categories[groupPosition]).get(childPosition).name);
                     }
-
-                    ((SelectInterestsActivity)mContext).showMessage(subcategories.get(categories[groupPosition]).get(childPosition).name + " Unfollowed");
+                    if (mListener != null) {
+                        mListener.onInterestClick(subcategories.get(categories[groupPosition]).get(childPosition).name, false);
+                    }
+                    ((SelectInterestsActivity) mContext).showMessage(subcategories.get(categories[groupPosition]).get(childPosition).name + " Unfollowed");
                 } else {
-                    if(((SelectInterestsActivity)mContext).isFromNotification()){
+                    if (((SelectInterestsActivity) mContext).isFromNotification()) {
                         ((SelectInterestsActivity) mContext).reportActionToAnalytics("addFollowingPNotif", subcategories.get(categories[groupPosition]).get(childPosition).name);
-                    }else {
+                    } else {
                         ((SelectInterestsActivity) mContext).reportActionToAnalytics("addFollowingP", subcategories.get(categories[groupPosition]).get(childPosition).name);
                     }
 
                     account.setIsFollowing(subcategories.get(categories[groupPosition]).get(childPosition).name, true);
                     holder.followView.setImageResource(R.drawable.ic_check_circle_green_24dp);
-                    ((SelectInterestsActivity)mContext).showMessage("You are now following " + subcategories.get(categories[groupPosition]).get(childPosition).name);
+                    if (mListener != null) {
+                        mListener.onInterestClick(subcategories.get(categories[groupPosition]).get(childPosition).name, true);
+                    }
+                    ((SelectInterestsActivity) mContext).showMessage("You are now following " + subcategories.get(categories[groupPosition]).get(childPosition).name);
                 }
                 // account.setIsFollowing(categories[groupPosition].categoryName, checkWhetherAllSelected(categories[groupPosition]));
                 notifyDataSetChanged();
@@ -269,15 +298,15 @@ public class SelectInterestAdapter extends BaseExpandableListAdapter{
         return convertView;
     }
 
-    public boolean checkWhetherAllSelected(EventCategory categoryName){
+    public boolean checkWhetherAllSelected(EventCategory categoryName) {
         List<EventSubcategory> subCategories = subcategories.get(categoryName);
-        for(int i=1;i<subCategories.size();i++){
-            if(!account.isFollowing(subCategories.get(i).name))
+        for (int i = 1; i < subCategories.size(); i++) {
+            if (!account.isFollowing(subCategories.get(i).name))
                 return false;
         }
-        if(subCategories.size() == 0){
+        if (subCategories.size() == 0) {
             return false;
-        }else {
+        } else {
             return true;
         }
     }
@@ -287,21 +316,26 @@ public class SelectInterestAdapter extends BaseExpandableListAdapter{
         return true;
     }
 
-    public class ViewHolder{
+    public class ViewHolder {
         private TextView categoryName;
-        private ImageView followView,expandArrow,categoryImage;
+        private ImageView followView, expandArrow, categoryImage;
         private LinearLayout parent;
         private TextView subcategoryName;
 
-        public ViewHolder(View view){
-            categoryName = (TextView)view.findViewById(R.id.category_name);
-            followView = (ImageView)view.findViewById(R.id.follow_icon);
-            parent = (LinearLayout)view.findViewById(R.id.parent);
-            subcategoryName = (TextView)view.findViewById(R.id.subcategory_name);
-            expandArrow = (ImageView)view.findViewById(R.id.expand_arrow);
-            categoryImage = (ImageView)view.findViewById(R.id.cat_image);
+        public ViewHolder(View view) {
+            categoryName = (TextView) view.findViewById(R.id.category_name);
+            followView = (ImageView) view.findViewById(R.id.follow_icon);
+            parent = (LinearLayout) view.findViewById(R.id.parent);
+            subcategoryName = (TextView) view.findViewById(R.id.subcategory_name);
+            expandArrow = (ImageView) view.findViewById(R.id.expand_arrow);
+            categoryImage = (ImageView) view.findViewById(R.id.cat_image);
         }
 
+    }
+
+
+    public interface OnFollowUnfollowOptionClick {
+        void onInterestClick(String tag, boolean isAdding);
     }
 
 

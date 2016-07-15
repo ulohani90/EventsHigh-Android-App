@@ -75,7 +75,7 @@ public class PhoneLoginActivity extends BaseActivity {
         nameEditText = nameView.getEditText();
         phoneNoEditText = phoneNoView.getEditText();
         codeEditText = codeView.getEditText();
-        isOnboarding = getIntent().getBooleanExtra("is_onboarding",false);
+        isOnboarding = getIntent().getBooleanExtra("is_onboarding", false);
         account = new Account(this);
         updateView();
     }
@@ -95,7 +95,7 @@ public class PhoneLoginActivity extends BaseActivity {
 
         final String phoneNo = Utils.simplifyPhoneNo(phoneNoEditText.getText().toString());
         phoneNoEditText.setText(phoneNo);
-        if (phoneNo.length() < 10 ) {
+        if (phoneNo.length() < 10) {
             phoneNoEditText.requestFocus();
             phoneNoView.setError("Entered phone number is not correct");
             return;
@@ -125,16 +125,16 @@ public class PhoneLoginActivity extends BaseActivity {
 
                                         reportActionToAnalytics("sendCodeVerified");
                                         account.recordVerifiedPhoneNumber();
-                                        if(isOnboarding) {
+                                        if (isOnboarding) {
                                             startInterestActivity();
-                                        }else {
+                                        } else {
                                             finish();
                                         }
                                     } else if (status == VerificationStatus.CODE_SENT) {
                                         reportActionToAnalytics("sendCodeSuccess");
-                                        if(isOnboarding) {
+                                        if (isOnboarding) {
                                             startInterestActivity();
-                                        }else {
+                                        } else {
                                             finish();
                                         }
                                     }
@@ -159,10 +159,10 @@ public class PhoneLoginActivity extends BaseActivity {
         }
     }
 
-    public void startInterestActivity(){
-        Intent intent = new Intent(this,SelectInterestsActivity.class);
+    public void startInterestActivity() {
+        /*Intent intent = new Intent(this,SelectInterestsActivity.class);
         intent.putExtra(SelectInterestsActivity.ONBOARDING_FLOW,true);
-        startActivity(intent);
+        startActivity(intent);*/
         finish();
     }
 
@@ -231,7 +231,7 @@ public class PhoneLoginActivity extends BaseActivity {
 
     private void setPhoneNumberInStringResource(int viewId, int stringResourceId) {
         String codeLabelString = String.format(
-            getResources().getString(stringResourceId), nameEditText.getText(), phoneNoEditText.getText());
+                getResources().getString(stringResourceId), nameEditText.getText(), phoneNoEditText.getText());
         TextView codeLabelView = (TextView) findViewById(viewId);
         codeLabelView.setText(codeLabelString);
         Linkify.addLinks(codeLabelView, Linkify.PHONE_NUMBERS);
