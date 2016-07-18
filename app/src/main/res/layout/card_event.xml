@@ -11,8 +11,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:ignore="UselessParent">
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/event_bg"
@@ -31,17 +30,25 @@
             android:layout_centerHorizontal="true"
             android:background="@drawable/shape_triangle" />
 
-        <ImageView
-            android:id="@+id/event_recommended"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/event_price"
-            android:layout_alignParentStart="true"
-            android:layout_marginBottom="5dp"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/eh_recommend"
-            tools:ignore="ContentDescription" />
 
+        <TextView
+            android:id="@+id/event_venue"
+            style="@style/EventCardText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/event_bg"
+            android:background="@drawable/gradient_bg"
+            android:drawableStart="@drawable/ic_location_on_white_12dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="9dp"
+            android:paddingRight="5dp"
+            android:paddingTop="20dp"
+            android:textColor="#CCFFFFFF"
+            android:textIsSelectable="false"
+            android:textSize="13sp"
+
+            android:visibility="invisible"
+            tools:text="Jagriti theatre, Whitefield" />
 
         <TextView
             android:id="@+id/event_price"
@@ -59,23 +66,16 @@
             android:textSize="15sp"
             tools:text="₹ 200 - 500" />
 
-        <TextView
-            android:id="@+id/event_venue"
-            style="@style/EventCardText"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/event_recommended"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/event_bg"
-            android:background="@drawable/gradient_bg"
-            android:drawableStart="@drawable/ic_location_on_white_12dp"
-            android:paddingBottom="5dp"
-            android:paddingLeft="9dp"
-            android:paddingRight="5dp"
-            android:paddingTop="20dp"
-            android:textColor="#CCFFFFFF"
-            android:textIsSelectable="false"
-
-            android:textSize="13sp"
-            tools:text="Jagriti theatre, Whitefield" />
+            android:layout_above="@id/event_price"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/eh_recommend"
+            tools:ignore="ContentDescription" />
     </RelativeLayout>
 
     <View
@@ -100,7 +100,6 @@
             style="?android:attr/textAppearanceMedium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@id/event_time"
             android:layout_marginBottom="8dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="3dp"
@@ -140,7 +139,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:drawablePadding="5dp"
-
                 android:drawableStart="@drawable/ic_local_taxi_grey_12dp"
                 android:textColor="#666666"
                 android:textIsSelectable="false"
@@ -233,8 +231,8 @@
                         android:drawablePadding="4dp"
                         android:fontFamily="sans-serif-medium"
                         android:textIsSelectable="false"
-                        android:visibility="gone"
                         android:textSize="11sp"
+                        android:visibility="gone"
                         tools:text="1049 views, 23 favourited" />
 
 

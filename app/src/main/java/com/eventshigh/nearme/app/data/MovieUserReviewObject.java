@@ -56,10 +56,12 @@ public class MovieUserReviewObject implements Parcelable {
         this.reviewedEntityImage = in.readString();
         this.reviewedEntityLocation = in.readString();
         this.createdAt = in.readLong();
-        if(reviewFor.equalsIgnoreCase("event")) {
-            this.event = in.readParcelable(Event.class.getClassLoader());
-        }else if(reviewFor.equalsIgnoreCase("movie")){
-            this.movieDetailObject = in.readParcelable(MovieUserReviewObject.class.getClassLoader());
+        if (reviewFor != null) {
+            if (reviewFor.equalsIgnoreCase("event")) {
+                this.event = in.readParcelable(Event.class.getClassLoader());
+            } else if (reviewFor.equalsIgnoreCase("movie")) {
+                this.movieDetailObject = in.readParcelable(MovieUserReviewObject.class.getClassLoader());
+            }
         }
     }
 
@@ -82,7 +84,7 @@ public class MovieUserReviewObject implements Parcelable {
             }
             reviewState = Utils.checkIfUnknown(obj.getString("state"));
             createdAt = obj.getLong("created_at");
-        } catch (Exception e){
+        } catch (Exception e) {
         }
 
     }
@@ -240,12 +242,12 @@ public class MovieUserReviewObject implements Parcelable {
         dest.writeString(reviewedEntityImage);
         dest.writeString(reviewedEntityLocation);
         dest.writeLong(createdAt);
-        if(reviewFor.equalsIgnoreCase("event")) {
-            dest.writeParcelable( event, flags);
-        }else if(reviewFor.equalsIgnoreCase("movie")){
-            dest.writeParcelable( movieDetailObject, flags);
+        if (reviewFor.equalsIgnoreCase("event")) {
+            dest.writeParcelable(event, flags);
+        } else if (reviewFor.equalsIgnoreCase("movie")) {
+            dest.writeParcelable(movieDetailObject, flags);
         }
-        }
+    }
 
     public static final Parcelable.Creator<MovieUserReviewObject> CREATOR =
             new Parcelable.Creator<MovieUserReviewObject>() {

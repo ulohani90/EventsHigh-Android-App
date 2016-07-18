@@ -209,6 +209,7 @@ public class ContactsFragment extends Fragment {
             }
             profileInfo.setUserContactList(contacts);
             contactsAdapter.setMyContacts(contacts, FriendCardType.FOLLOW);
+            ((UserProfileActivity)getActivity()).setFriendsCount(contacts.size());
         }
     };
 

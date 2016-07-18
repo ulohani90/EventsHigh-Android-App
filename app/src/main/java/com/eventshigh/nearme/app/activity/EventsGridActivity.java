@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,11 +21,13 @@ import android.view.animation.Animation;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventCategory;
 import com.eventshigh.nearme.app.data.Locality;
+import com.eventshigh.nearme.app.data.LocalityLatLong;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.ui.animation.ResizeAnimation;
@@ -32,6 +35,7 @@ import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.google.android.gms.maps.model.LatLng;
 import com.squareup.timessquare.CalendarPickerView;
 
 import java.util.Calendar;
@@ -55,9 +59,10 @@ public class EventsGridActivity extends BaseContextActivity {
 
     EventsFragment eventsFragment;
 
-    ThisWeekFragment thisWeekFragment;
 
-    HorizontalScrollView categoryFilter, priceFilter, dateFilter;
+    HorizontalScrollView categoryFilter, priceFilter, dateFilter, sortFilter;
+
+    int PLACE_AUTOCOMPLETE_REQUEST_CODE = 0x002;
 
     boolean isCategoryFilterVisible;
 
@@ -83,7 +88,6 @@ public class EventsGridActivity extends BaseContextActivity {
 
     LinearLayout filtersContainer;
 
-    LinearLayout sortFilter;
 
     public static final String[] EXPLORE_TAGS = {
             EventCategory.NIGHTLIFE.categoryName,
@@ -114,7 +118,7 @@ public class EventsGridActivity extends BaseContextActivity {
         filtersContainer = (LinearLayout) findViewById(R.id.filters_container);
         categoryFilter = (HorizontalScrollView) findViewById(R.id.category_filter);
         // priceFilter = (HorizontalScrollView) findViewById(R.id.price_filter);
-        sortFilter = (LinearLayout) findViewById(R.id.sort_container);
+        sortFilter = (HorizontalScrollView) findViewById(R.id.sort_container);
         dateFilter = (HorizontalScrollView) findViewById(R.id.date_filter);
 
         // Show query as title.
@@ -185,12 +189,11 @@ public class EventsGridActivity extends BaseContextActivity {
             tr.replace(R.id.event_container, eventsFragment);
             tr.commit();
         } else {
-            thisWeekFragment = ThisWeekFragment.getInstance(eventsContext, false, 14);
+            NewWeekEventsFragment thisWeekFragment = NewWeekEventsFragment.getInstance(eventsContext, false);
             FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
             tr.replace(R.id.event_container, thisWeekFragment);
             tr.commit();
         }
-
         addFiltersData();
 
     }
@@ -333,7 +336,7 @@ public class EventsGridActivity extends BaseContextActivity {
         }*/
         collapseAnimation();
         LinearLayout horizontalDate = (LinearLayout) findViewById(R.id.date_container);
-        String[] dateRanges = {"Today", "Tomorrow", "Weekend", "Dates", "\u2022 • •"};
+        String[] dateRanges = {"Today", "Tomorrow", "Weekend", "Custom Dates", "\u2022 • •"};
         for (int i = 0; i < dateRanges.length; i++) {
             View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
             final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
@@ -376,7 +379,7 @@ public class EventsGridActivity extends BaseContextActivity {
                         checkIfCustomDateSelected();
                         eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, DateTimeUtils.getWeekEndDates());
                         //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
-                    } else if (filterText.getText().toString().equalsIgnoreCase("Dates")) {
+                    } else if (filterText.getText().toString().equalsIgnoreCase("Custom Dates")) {
 
                         showDateDialog();
                         Calendar currentYear = Calendar.getInstance();
@@ -397,7 +400,7 @@ public class EventsGridActivity extends BaseContextActivity {
                         collapseAnimation();
                         return;
                     }
-                    if (!(filterText.getText().toString().equalsIgnoreCase("Dates"))) {
+                    if (!(filterText.getText().toString().equalsIgnoreCase("Custom Dates"))) {
                         if (filterText.isSelected()) {
                             filterText.setSelected(false);
                         } else {
@@ -408,9 +411,9 @@ public class EventsGridActivity extends BaseContextActivity {
             });
         }
 
-        final TextView trending = (TextView) findViewById(R.id.sort_trending);
-        final TextView price = (TextView) findViewById(R.id.sort_price);
-        final TextView distance = (TextView) findViewById(R.id.sort_distance);
+        trending = (TextView) findViewById(R.id.sort_trending);
+        price = (TextView) findViewById(R.id.sort_price);
+        distance = (TextView) findViewById(R.id.sort_distance);
         trending.setSelected(true);
         trending.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -436,20 +439,29 @@ public class EventsGridActivity extends BaseContextActivity {
             }
         });
 
+        if (account.getLastLocality() != null) {
+            distance.setText("Distance from " + Utils.capitalize(account.getLastLocality().getName()));
+        }
         distance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!(eventsFragment.sortState == SORT_STATE_DISTANCE)) {
-                    trending.setSelected(false);
-                    price.setSelected(false);
-                    distance.setSelected(true);
-                    eventsFragment.sortAccToSortState(SORT_STATE_DISTANCE);
+                if (account.getLastLocality() != null) {
+                    if (!(eventsFragment.sortState == SORT_STATE_DISTANCE)) {
+                        trending.setSelected(false);
+                        price.setSelected(false);
+                        distance.setSelected(true);
+                        eventsFragment.sortAccToSortState(SORT_STATE_DISTANCE);
+                    }
+                } else {
+                    Intent intent = new Intent(EventsGridActivity.this, PlacesAutocompleteBoundedActivity.class);
+                    intent.putExtra("show_special_text", true);
+                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
                 }
-
             }
         });
     }
 
+    TextView trending, price, distance;
 
     public void removeAllSelectedDateFilters() {
         if (today.isSelected()) {
@@ -724,5 +736,37 @@ public class EventsGridActivity extends BaseContextActivity {
 
         }
         showMoreFilterText.setCompoundDrawables(drawableLeft, null, null, null);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            String placeName = data.getStringExtra("place_name");
+            LatLng latLng = data.getParcelableExtra("place_lat_lng");
+            if (latLng != null && placeName != null) {
+                distance.setText("Distance from " + Utils.capitalize(placeName));
+                makeDistanceSortTrue();
+                LocalityLatLong locality = new LocalityLatLong(placeName, latLng);
+                account.setLastLocality(locality);
+                Log.i("TestActivity", "Place: " + placeName);
+            } else {
+                Toast.makeText(this, "Selected locality not found ", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    public void makeDistanceSortTrue() {
+        distance.setSelected(true);
+        price.setSelected(false);
+        trending.setSelected(false);
+        eventsFragment.sortAccToSortState(SORT_STATE_DISTANCE);
+        sortFilter.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                sortFilter.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
+            }
+        }, 100L);
+
     }
 }

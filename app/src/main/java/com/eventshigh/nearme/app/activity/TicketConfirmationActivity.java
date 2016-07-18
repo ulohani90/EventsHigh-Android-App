@@ -79,7 +79,7 @@ public class TicketConfirmationActivity extends BaseActivity implements View.OnC
     }
 
     private void mapIntentData() {
-        event = bundle.getParcelable(EventDetailActivity.EVENT_OBJECT);
+        event = bundle.getParcelable(NewEventDetailActivity.EVENT_OBJECT);
         total = bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_PRICE);
         dateString = bundle.getString(EventBookingDetailActivity.EVENT_DATE_SELECTED);
         eventTime = bundle.getParcelable(EventBookingDetailActivity.EVENT_TIME_SELECTED);

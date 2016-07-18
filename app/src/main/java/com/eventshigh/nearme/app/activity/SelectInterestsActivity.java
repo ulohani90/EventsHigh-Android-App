@@ -79,6 +79,8 @@ public class SelectInterestsActivity extends BaseActivity {
 
     Account account;
 
+    boolean isOnboarding;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -86,16 +88,22 @@ public class SelectInterestsActivity extends BaseActivity {
         setContentView(R.layout.activity_select_interest_layout);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         account = new Account(this);
+        isOnboarding = getIntent().getBooleanExtra(ONBOARDING_FLOW, false);
+
         addToolbarView(toolbar);
+
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Personalize");
+        if (!isOnboarding) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } else {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        }
+
         categoriesList = (ExpandableListView) findViewById(R.id.categories_list);
         topProgressBar = (ProgressBar) findViewById(R.id.top_progress_bar);
         minFlowLayoutHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 54, getResources().getDisplayMetrics());
 
         loadTags();
-
 
     }
 
@@ -138,7 +146,9 @@ public class SelectInterestsActivity extends BaseActivity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     textView.clearFocus();
+                    textView.setText("");
                     ((InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(textView.getWindowToken(), 0);
+
                 }
 
                 return false;
@@ -149,6 +159,7 @@ public class SelectInterestsActivity extends BaseActivity {
             public void onTagFollowed(String tag) {
                 if (!tags.contains(tag)) {
                     tags.add(tag);
+                    reportActionToAnalytics("remove_tag", tag);
                     selectedCategoryFlowLayout.setRecipientForSelectedInterest(tags);
                     checkTagsCount();
                 }
@@ -162,12 +173,13 @@ public class SelectInterestsActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (expandSelectedInterest.isSelected()) {
-
+                    reportActionToAnalytics("collapse_categories");
                     selectedCategoryFlowLayout.setMeasureActualHeight(false);
                     collapse(selectedCategoryFlowLayout);
                     expandSelectedInterest.setSelected(false);
 
                 } else {
+                    reportActionToAnalytics("expand_categories");
                     selectedCategoryFlowLayout.setMeasureActualHeight(true);
                     expand(selectedCategoryFlowLayout);
                     expandSelectedInterest.setSelected(true);
@@ -218,16 +230,7 @@ public class SelectInterestsActivity extends BaseActivity {
     public void addToolbarView(Toolbar toolbar) {
         View view = LayoutInflater.from(this).inflate(R.layout.skip_btn_layout, toolbar, false);
 
-        if (getIntent().getBooleanExtra(ONBOARDING_FLOW, false)) {
-            view.findViewById(R.id.skip_btn).setVisibility(View.VISIBLE);
-            view.findViewById(R.id.skip_btn).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    reportActionToAnalytics("followPSkip");
-                    skipClicked(v);
-                }
-            });
-        } else if (getIntent().getBooleanExtra(FROM_NOTIFICATION_PARAM, false)) {
+        if (getIntent().getBooleanExtra(FROM_NOTIFICATION_PARAM, false)) {
             isFromNotification = true;
         }
 
@@ -382,9 +385,11 @@ public class SelectInterestsActivity extends BaseActivity {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-        } else {
+        } else if (isOnboarding) {
             launchNextActivity();
 
+        } else {
+            finish();
         }
 
     }

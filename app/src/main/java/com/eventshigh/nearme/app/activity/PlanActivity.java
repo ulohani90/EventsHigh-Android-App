@@ -62,13 +62,13 @@ public class PlanActivity extends BaseActivity {
         // Parse the incoming intent params.
         userInfo = new Account(this).getUserInfo();
 
-        event = getIntent().getParcelableExtra(EventDetailActivity.EXTRA_EVENT_PARAM);
+        event = getIntent().getParcelableExtra(NewEventDetailActivity.EXTRA_EVENT_PARAM);
         if (event == null) {
             finish();
             return;
         }
 
-        planId = getIntent().getParcelableExtra(EventDetailActivity.EXTRA_PLAN_ID_PARAM);
+        planId = getIntent().getParcelableExtra(NewEventDetailActivity.EXTRA_PLAN_ID_PARAM);
         if (planId == null) {
             planId = Utils.md5(userInfo.phoneNo + event.id);
             isPlanPublished = false;

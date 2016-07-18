@@ -71,7 +71,7 @@ public class GuestDetailActivity extends BaseActivity implements View.OnClickLis
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mapViews();
         bundle = getIntent().getExtras();
-        event = bundle.getParcelable(EventDetailActivity.EVENT_OBJECT);
+        event = bundle.getParcelable(NewEventDetailActivity.EVENT_OBJECT);
         additionalTicketFieldList = event.additionalTicketFieldList;
         noOfGuestDetails = (event.isRequestPerAttendeeData()) ?
                 (int) bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_TICKETS) : 1;

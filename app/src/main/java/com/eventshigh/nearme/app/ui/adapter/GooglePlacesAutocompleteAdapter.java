@@ -65,7 +65,6 @@ public class GooglePlacesAutocompleteAdapter
     private AutocompleteFilter mPlaceFilter;
 
 
-
     /**
      * Initializes with a resource for text rows and autocomplete query bounds.
      *
@@ -97,7 +96,7 @@ public class GooglePlacesAutocompleteAdapter
      */
     @Override
     public AutocompletePrediction getItem(int position) {
-        if(mResultList!=null) {
+        if (mResultList != null) {
             return mResultList.get(position);
         }
         return null;
@@ -122,10 +121,11 @@ public class GooglePlacesAutocompleteAdapter
         return row;
     }
 
-    public void changeCity(String cityName, LatLngBounds latLngBounds){
+    public void changeCity(String cityName, LatLngBounds latLngBounds) {
         this.cityName = cityName;
         this.mBounds = latLngBounds;
     }
+
     /**
      * Returns the filter for the current set of autocomplete results.
      */
@@ -140,23 +140,23 @@ public class GooglePlacesAutocompleteAdapter
                 // Skip the autocomplete query if no constraints are given.
                 if (constraint != null) {
                     // Query the autocomplete API for the (constraint) search string.
-                    mResultList = getAutocomplete(constraint);
+                    ArrayList<AutocompletePrediction> mResultList = getAutocomplete(constraint);
 
                     // Retrieve the autocomplete results.
 
                     for (int i = 0; i < mResultList.size(); i++) {
-                            if (cityName.equalsIgnoreCase(City.BANGALORE.name())) {
-                                if (mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase()) ||
-                                        mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains("BENGALURU") ||
-                                        mResultList.get(i).getSecondaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase()) ||
-                                        mResultList.get(i).getSecondaryText(STYLE_BOLD).toString().toUpperCase().contains("BENGALURU")) {
-                                    filteredResults.add(mResultList.get(i));
-                                }
-                            } else {
-                                if (mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase()) ||
-                                        mResultList.get(i).getSecondaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase())) {
-                                    filteredResults.add(mResultList.get(i));
-                                }
+                        if (cityName.equalsIgnoreCase(City.BANGALORE.name())) {
+                            if (mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase()) ||
+                                    mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains("BENGALURU") ||
+                                    mResultList.get(i).getSecondaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase()) ||
+                                    mResultList.get(i).getSecondaryText(STYLE_BOLD).toString().toUpperCase().contains("BENGALURU")) {
+                                filteredResults.add(mResultList.get(i));
+                            }
+                        } else {
+                            if (mResultList.get(i).getPrimaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase()) ||
+                                    mResultList.get(i).getSecondaryText(STYLE_BOLD).toString().toUpperCase().contains(cityName.toUpperCase())) {
+                                filteredResults.add(mResultList.get(i));
+                            }
 
                         }
                     }
@@ -174,6 +174,7 @@ public class GooglePlacesAutocompleteAdapter
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 if (results != null && results.count > 0) {
+                    mResultList = (ArrayList<AutocompletePrediction>) results.values;
                     // The API returned at least one result, update the data.
                     notifyDataSetChanged();
                 } else {

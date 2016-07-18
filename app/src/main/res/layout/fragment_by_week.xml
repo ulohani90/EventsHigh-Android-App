@@ -105,7 +105,7 @@
                 </LinearLayout>
             </HorizontalScrollView>-->
             <HorizontalScrollView
-
+                android:id="@+id/sort_container"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:animateLayoutChanges="true"
@@ -114,7 +114,7 @@
                 android:scrollbars="none">
 
                 <LinearLayout
-                    android:id="@+id/sort_container"
+
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:clipToPadding="false"

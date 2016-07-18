@@ -53,35 +53,6 @@ public class ExploreFragment extends BaseEventsFragment {
 
     };
 
-  /*  public static final String[] EXPLORE_TAGS_CHENNAI = {
-            EventCategory.NIGHTLIFE.categoryName,
-            EventCategory.THEATRE.categoryName,
-            EventCategory.MUSIC.categoryName,
-            EventCategory.TECH.categoryName,
-            EventCategory.SPORTS.categoryName,
-            EventCategory.HEALTH_WELLNESS.categoryName,
-            EventCategory.DANCE.categoryName,
-            EventCategory.ART.categoryName,
-            EventCategory.FOOD.categoryName,
-            EventCategory.LITERATURE.categoryName,
-
-    };
-
-    public static final String[] EXPLORE_TAGS_BANGALORE = {
-            EventsHighEndpoints.QUERY_FEATURED,
-            EventCategory.NIGHTLIFE.categoryName,
-            "Free",
-            EventCategory.THEATRE.categoryName,
-            EventCategory.MUSIC.categoryName,
-            EventCategory.KIDS_ENTERTAINMENT.categoryName,
-            EventCategory.TECH.categoryName,
-            EventCategory.SPORTS.categoryName,
-            EventCategory.DANCE.categoryName,
-            EventCategory.ART.categoryName,
-            EventCategory.FOOD.categoryName,
-            EventCategory.LITERATURE.categoryName,
-    };*/
-
     public static ExploreFragment getInstance(EventsContext eventsContext) {
         ExploreFragment fragment = new ExploreFragment();
         fragment.setArguments(getArgs(eventsContext, false, false));

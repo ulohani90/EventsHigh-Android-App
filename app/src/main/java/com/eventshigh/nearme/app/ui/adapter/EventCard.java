@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.SpannableString;
@@ -171,17 +172,36 @@ public class EventCard extends ViewHolder {
             if (builder.length() > 0 && event.numViews > 0) {
                 builder.append(" and ");
             }
-            builder.append(event.numViews > 0 ? (event.numViews + "+ people interested") : "interested");
+            builder.append(event.numViews > 0 ? (event.numViews + " people interested") : "interested");
             eventStatsView.setText(builder.toString());
         } else {
             if (event.numViews > 0) {
                 statsLayout.setVisibility(View.VISIBLE);
                 img1.setVisibility(View.VISIBLE);
                 img2.setVisibility(View.VISIBLE);
-                img1.setImageResource(Utils.getDummyImageResource());
-                img2.setImageResource(Utils.getDummyImageResource());
+                int imgResource1;
+                if (img1.getTag() != null) {
+                    imgResource1 = (int) img1.getTag();
+                    img1.setImageResource(imgResource1);
+                } else {
+                    imgResource1 = Utils.getDummyImageResource();
+                    img1.setTag(imgResource1);
+                    img1.setImageResource(imgResource1);
+                }
+
+                int imgResource2;
+                if (img2.getTag() != null) {
+                    imgResource2 = (int) img2.getTag();
+                    img2.setImageResource(imgResource2);
+                } else {
+                    imgResource2 = getRandomImageResource(imgResource1);
+                    img2.setTag(imgResource2);
+                    img2.setImageResource(imgResource2);
+                }
+
+
                 StringBuilder builder = new StringBuilder();
-                builder.append(event.numViews + "+ people interested");
+                builder.append(event.numViews + " people interested");
                 eventStatsView.setText(builder.toString());
             } else {
                 statsLayout.setVisibility(View.GONE);
@@ -209,7 +229,14 @@ public class EventCard extends ViewHolder {
             public void onClick(View v) {
                 if (listener != null)
                     listener.onItemClicked(position);
-                activity.showEventDetails(event, "", null);
+                Bundle bundle = new Bundle();
+                if (img1.getTag() != null) {
+                    bundle.putInt("resource_1", (int) img1.getTag());
+                }
+                if (img2.getTag() != null) {
+                    bundle.putInt("resource_2", (int) img2.getTag());
+                }
+                activity.showEventDetailsWithUserImages(event, "", null, bundle);
             }
         });
 
@@ -306,6 +333,7 @@ public class EventCard extends ViewHolder {
     public void bindEventView(final Event event, boolean isFirstEvent, final int position,
                               final BaseContextActivity activity,
                               @Nullable Set<SocialFriend> likedBy, EventsAdapter.OnItemClickedListener listener) {
+
         bindEventView(event, activity, position, listener);
         eventInfo.setVisibility(View.VISIBLE);
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
@@ -374,7 +402,7 @@ public class EventCard extends ViewHolder {
             if (builder.length() > 0 && event.numViews > 0) {
                 builder.append(" and ");
             }
-            builder.append(event.numViews > 0 ? (event.numViews + "+ people interested") : " interested");
+            builder.append(event.numViews > 0 ? (event.numViews + " people interested") : " interested");
             eventStatsView.setText(builder.toString());
         } else {
             if (event.numViews > 0) {
@@ -382,10 +410,28 @@ public class EventCard extends ViewHolder {
                 contactListView.setVisibility(View.GONE);
                 img1.setVisibility(View.VISIBLE);
                 img2.setVisibility(View.VISIBLE);
-                img1.setImageResource(Utils.getDummyImageResource());
-                img2.setImageResource(Utils.getDummyImageResource());
+
+                int imgResource1;
+                if (img1.getTag() != null) {
+                    imgResource1 = (int) img1.getTag();
+                    img1.setImageResource(imgResource1);
+                } else {
+                    imgResource1 = Utils.getDummyImageResource();
+                    img1.setTag(imgResource1);
+                    img1.setImageResource(imgResource1);
+                }
+
+                int imgResource2;
+                if (img2.getTag() != null) {
+                    imgResource2 = (int) img2.getTag();
+                    img2.setImageResource(imgResource2);
+                } else {
+                    imgResource2 = getRandomImageResource(imgResource1);
+                    img2.setTag(imgResource2);
+                    img2.setImageResource(imgResource2);
+                }
                 StringBuilder builder = new StringBuilder();
-                builder.append(event.numViews + "+ people interested");
+                builder.append(event.numViews + " people interested");
                 eventStatsView.setText(builder.toString());
             } else {
                 contactListView.setVisibility(View.GONE);
@@ -404,5 +450,15 @@ public class EventCard extends ViewHolder {
             }
         });
     }
+
+
+    public int getRandomImageResource(int num) {
+        int newNum = Utils.getDummyImageResource();
+        if (newNum == num) {
+            newNum = Utils.getDummyImageResource();
+        }
+        return newNum;
+    }
+
 
 }

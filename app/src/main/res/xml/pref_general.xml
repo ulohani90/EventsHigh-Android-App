@@ -85,15 +85,7 @@
             android:targetPackage="com.eventshigh.nearme.app" />
     </Preference>
 
-    <!-- <Preference android:title="@string/title_my_friends"
-         android:layout="@layout/navigation_menu_white_items"
-         android:icon="@drawable/ic_my_friend_nav">
-         <intent
-             android:targetPackage="com.eventshigh.nearme.app"
-             android:targetClass="com.eventshigh.nearme.app.activity.MyFriendsActivity"
-         />
-     </Preference>
- -->
+
     <!--android:summary="listings@eventshigh.com"-->
     <Preference
         android:icon="@drawable/ic_create_events_nav"

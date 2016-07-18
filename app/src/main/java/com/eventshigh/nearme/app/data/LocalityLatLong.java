@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.data;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -25,9 +26,13 @@ public class LocalityLatLong {
     }
 
     public static LocalityLatLong getLocality(String locality) {
-        if (locality.length() > 0) {
-            String[] localityArray = locality.split(",");
-            return new LocalityLatLong(localityArray[0], new LatLng(Double.parseDouble(localityArray[1]), Double.parseDouble(localityArray[2])));
+        try {
+            if (locality.length() > 0) {
+                String[] localityArray = locality.split(",");
+                return new LocalityLatLong(localityArray[0], new LatLng(Double.parseDouble(localityArray[1]), Double.parseDouble(localityArray[2])));
+            }
+        } catch (NumberFormatException e) {
+            Crashlytics.logException(e);
         }
         return null;
     }

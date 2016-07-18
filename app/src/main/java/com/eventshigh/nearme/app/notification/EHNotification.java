@@ -22,7 +22,7 @@ import com.android.volley.toolbox.RequestFuture;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.activity.EventDetailActivity;
+import com.eventshigh.nearme.app.activity.NewEventDetailActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.UserContact;
@@ -183,7 +183,7 @@ public class EHNotification {
             // placeholder for city.
             city = City.BANGALORE;
         }
-        Intent intent = new Intent(context, EventDetailActivity.class);
+        Intent intent = new Intent(context, NewEventDetailActivity.class);
         intent.setAction(BaseActivity.NOTIFICATION_ACTION);
         intent.setData(EventsHighEndpoints.getEventDetailsURI(city, eventId));
         return PendingIntent.getActivity(context, 0, intent, 0);

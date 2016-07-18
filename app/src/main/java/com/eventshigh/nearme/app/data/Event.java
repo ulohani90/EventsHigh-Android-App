@@ -236,8 +236,10 @@ public class Event implements Parcelable {
     }
 
     public boolean isRequestPerAttendeeData() {
-        if (Utils.checkIfStringEmpty(requestPerAttendeeData)) return true;
-        else return requestPerAttendeeData.equals("on");
+        if (Utils.checkIfStringEmpty(requestPerAttendeeData))
+            return true;
+        else
+            return requestPerAttendeeData.equals("on");
     }
 
     public Uri getEventShareURI(@Nullable String src) {

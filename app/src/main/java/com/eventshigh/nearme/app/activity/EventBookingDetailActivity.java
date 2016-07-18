@@ -122,7 +122,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                     reportActionToAnalytics("proceed");
                     Intent iNext = new Intent(this, GuestDetailActivity.class);
                     Bundle bundleNext = new Bundle();
-                    bundleNext.putParcelable(EventDetailActivity.EVENT_OBJECT, event);
+                    bundleNext.putParcelable(NewEventDetailActivity.EVENT_OBJECT, event);
                     bundleNext.putDouble(EVENT_TOTAL_TICKETS, noOfTickets);
                     bundleNext.putDouble(EVENT_TOTAL_PRICE, total);
                     bundleNext.putString(EVENT_DATE_SELECTED, dateString);
@@ -165,6 +165,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
     public void addDateContainerData() {
         LinearLayout dateContainer = (LinearLayout) findViewById(R.id.date_container);
         for (int i = 0; i < dates.size(); i++) {
+
             View view = LayoutInflater.from(this).inflate(R.layout.ticket_date_time_count_container, dateContainer, false);
 
             final TextView dayText = (TextView) view.findViewById(R.id.event_day);
@@ -258,14 +259,16 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
 
         for (int i = 0; i < event.eventTimings.length; i++) {
             EventTime time = DateTimeUtils.getEventTime(event, i);
-            if (getEhPricesSize(time) > 0) {
-                if (eventTimes.containsKey(time.date)) {
-                    eventTimes.get(time.date).add(time);
-                } else {
-                    ArrayList<EventTime> timings = new ArrayList<>();
-                    timings.add(time);
-                    eventTimes.put(time.date, timings);
-                    dates.add(time.date);
+            if (time.longtime >= System.currentTimeMillis()) {
+                if (getEhPricesSize(time) > 0) {
+                    if (eventTimes.containsKey(time.date)) {
+                        eventTimes.get(time.date).add(time);
+                    } else {
+                        ArrayList<EventTime> timings = new ArrayList<>();
+                        timings.add(time);
+                        eventTimes.put(time.date, timings);
+                        dates.add(time.date);
+                    }
                 }
             }
         }

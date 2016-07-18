@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -40,6 +41,7 @@ import com.eventshigh.nearme.app.ui.animation.ResizeAnimation;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.squareup.timessquare.CalendarPickerView;
 
@@ -90,6 +92,9 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
     List<Event> filteredEvents;
 
+    Account account;
+    HorizontalScrollView sortFilter;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -101,6 +106,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         noMyEventsView = view.findViewById(R.id.view_no_my_event);
 
         dateFilter = (HorizontalScrollView) view.findViewById(R.id.date_filter);
+        sortFilter = (HorizontalScrollView) view.findViewById(R.id.sort_container);
         retryView = view.findViewById(R.id.view_retry);
         retryView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,6 +128,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         eventGridView.addOnScrollListener(onScrollListener);
 
         topProgressBar = view.findViewById(R.id.top_progress_bar);
+        account = new Account(activity);
         return view;
     }
 
@@ -597,7 +604,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         }*/
 
         LinearLayout horizontalDate = (LinearLayout) view.findViewById(R.id.date_container);
-        String[] dateRanges = {"Today", "Tomorrow", "Weekend", "Dates", "• • •"};
+        String[] dateRanges = {"Today", "Tomorrow", "Weekend", "Custom Dates", "• • •"};
         for (int i = 0; i < dateRanges.length; i++) {
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
             final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
@@ -637,7 +644,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                         checkIfCustomDateSelected();
                         startFilterAsyncTask(EventsGridActivity.DATE_FILTER, null, null, -1, DateTimeUtils.getWeekEndDates());
                         //filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
-                    } else if (filterText.getText().toString().equalsIgnoreCase("Dates")) {
+                    } else if (filterText.getText().toString().equalsIgnoreCase("Custom Dates")) {
                         showDateDialog();
                         Calendar currentYear = Calendar.getInstance();
                         Calendar nextYear = Calendar.getInstance();
@@ -659,7 +666,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                         collapseAnimation();
                         return;
                     }
-                    if (!(filterText.getText().toString().equalsIgnoreCase("Dates"))) {
+                    if (!(filterText.getText().toString().equalsIgnoreCase("Custom Dates"))) {
                         if (filterText.isSelected()) {
                             filterText.setSelected(false);
                         } else {
@@ -672,9 +679,9 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
         collapseAnimation();
 
-        final TextView trending = (TextView) view.findViewById(R.id.sort_trending);
-        final TextView price = (TextView) view.findViewById(R.id.sort_price);
-        final TextView distance = (TextView) view.findViewById(R.id.sort_distance);
+        trending = (TextView) view.findViewById(R.id.sort_trending);
+        price = (TextView) view.findViewById(R.id.sort_price);
+        distance = (TextView) view.findViewById(R.id.sort_distance);
         trending.setSelected(true);
         trending.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -703,15 +710,53 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         distance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!(sortState == SORT_STATE_DISTANCE)) {
-                    trending.setSelected(false);
-                    price.setSelected(false);
-                    distance.setSelected(true);
-                    sortAccToSortState(SORT_STATE_DISTANCE);
-                }
 
+                if (account.getLastLocality() != null) {
+                    if (!(sortState == SORT_STATE_DISTANCE)) {
+                        trending.setSelected(false);
+                        price.setSelected(false);
+                        distance.setSelected(true);
+                        sortAccToSortState(SORT_STATE_DISTANCE);
+                    }
+                } else {
+                    isDistanceClicked = true;
+                    Intent intent = new Intent(getActivity(), PlacesAutocompleteBoundedActivity.class);
+                    getActivity().startActivityForResult(intent, LaunchActivity.PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                }
             }
         });
+    }
+
+    TextView trending, price, distance;
+    boolean isDistanceClicked;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setSelectedLocalityDistanceText();
+        if (isDistanceClicked) {
+            makeDistanceSortTrue();
+            isDistanceClicked = false;
+        }
+    }
+
+    public void makeDistanceSortTrue() {
+        distance.setSelected(true);
+        price.setSelected(false);
+        trending.setSelected(false);
+        sortAccToSortState(SORT_STATE_DISTANCE);
+        sortFilter.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                sortFilter.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
+            }
+        }, 100L);
+
+    }
+
+    public void setSelectedLocalityDistanceText() {
+        if (account.getLastLocality() != null)
+            distance.setText("Distance from " + Utils.capitalize(account.getLastLocality().getName()));
     }
 
     public void sortAccToSortState(int sortState) {
@@ -727,9 +772,9 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             Collections.sort(filteredEvents, new EventPriceComparator());
         } else if (sortState == EventsGridActivity.SORT_STATE_DISTANCE) {
             if (new Account(activity).getLastLocality() != null)
-                Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastLocality().getLatLng()));
+                Collections.sort(filteredEvents, new EventDistanceComparator(account.getLastLocality().getLatLng()));
             else
-                Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastCity().cityBounds.getCenter()));
+                Collections.sort(filteredEvents, new EventDistanceComparator(account.getLastCity().cityBounds.getCenter()));
         }
 
 

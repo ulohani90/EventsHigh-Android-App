@@ -2,6 +2,7 @@ package com.eventshigh.nearme.app.activity;
 
 import android.Manifest;
 import android.Manifest.permission;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +10,9 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -71,6 +74,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
@@ -95,6 +101,7 @@ import io.branch.referral.Branch;
 import io.branch.referral.BranchError;
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
 
+
 /**
  * Application Main or launch activity.
  */
@@ -102,7 +109,7 @@ import pl.snowdog.material.ui.ToolbarColorizeHelper;
 public class LaunchActivity extends BaseContextActivity {
     // Constants
     public static final String DEFAULT_TAB_PARAM = LaunchActivity.class.getName() + "_default_tab";
-    int PLACE_AUTOCOMPLETE_REQUEST_CODE = 0x001;
+    public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 0x001;
     public static final int SUBMIT_REVIEW_REQUEST_CODE = 900;
 
 
@@ -130,6 +137,8 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String OFFERS_TAB = "Offers";
     public static final String MOVIES_TAB = "movies";
     public ArrayList<String> TABS = new ArrayList<>();
+
+    ProgressDialog progress;
 
 
     //Calculate no of time user resumes on to Home
@@ -484,13 +493,29 @@ public class LaunchActivity extends BaseContextActivity {
                     } else {
                         reportActionToAnalytics("unsupportedCity");
                     }
+
+                    // got the location, client is not needed.
+                    client.disconnect();
+
+
+                } else {
+                    drawer.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mConnectionCallbacks.onConnected(null);
+                        }
+                    }, 100);
+
+                   /* if (progress == null) {
+                        progress = ProgressDialog.show(LaunchActivity.this, null, "Finding Location..Please wait");
+                        startLocationUpdates();
+                    }*/
                 }
             }
-
-            // Start the next activity if possible or ask user for city.
-            client.disconnect();
-            //noinspection ConstantConditions
             mOnConnectionFailedListener.onConnectionFailed(null);
+            //noinspection ConstantConditions
+
+
         }
 
         @Override
@@ -498,6 +523,100 @@ public class LaunchActivity extends BaseContextActivity {
             // do nothing.
         }
     };
+
+    protected void startLocationUpdates() {
+        // Create the location request
+        LocationRequest mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(10 * 1000)
+                .setFastestInterval(2000);
+        // Request location updates
+        /*if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+
+            progress.dismiss();
+            Toast.makeText(LaunchActivity.this, "Could not connect. Permission not granted", Toast.LENGTH_SHORT).show();
+            return;
+        }*/
+        try {
+            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new android.location.LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    if (location != null) {
+                        progress.dismiss();
+                        LatLng latLng = LocationUtils.locationToLatLng(location);
+                        eventsContext.changeLocation(latLng);
+                        if (eventsContext.city != null) {
+                            account.setLastCity(eventsContext.city);
+                        } else {
+                            reportActionToAnalytics("unsupportedCity");
+                        }
+                    } else {
+                        progress.dismiss();
+                    }
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+
+                }
+            });
+           /* locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0L, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    if (location != null) {
+                        progress.dismiss();
+                        LatLng latLng = LocationUtils.locationToLatLng(location);
+                        eventsContext.changeLocation(latLng);
+                        if (eventsContext.city != null) {
+                            account.setLastCity(eventsContext.city);
+                        } else {
+                            reportActionToAnalytics("unsupportedCity");
+                        }
+                    } else {
+                        progress.dismiss();
+                    }
+                }
+            });*/
+           /* LocationServices.FusedLocationApi.requestLocationUpdates(client,
+                    mLocationRequest, new LocationListener() {
+                        @Override
+                        public void onLocationChanged(Location location) {
+                            if (location != null) {
+                                progress.dismiss();
+                                LatLng latLng = LocationUtils.locationToLatLng(location);
+                                eventsContext.changeLocation(latLng);
+                                if (eventsContext.city != null) {
+                                    account.setLastCity(eventsContext.city);
+                                } else {
+                                    reportActionToAnalytics("unsupportedCity");
+                                }
+                            } else {
+                                progress.dismiss();
+                            }
+                        }
+                    });*/
+        } catch (SecurityException e) {
+            progress.dismiss();
+        }
+    }
 
     private OnConnectionFailedListener mOnConnectionFailedListener = new OnConnectionFailedListener() {
         @Override
@@ -742,52 +861,6 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.getTabAt(4).setCustomView(tabFive);
     }
 
-    private void setupTabIcons() {
-
-        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabOne.setText("Me");
-        tabOne.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_events, 0, 0);
-        tabOne.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewPager.setCurrentItem(0);
-            }
-        });
-        tabsView.getTabAt(0).setCustomView(tabOne);
-
-        TextView tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabTwo.setText("Explore");
-        tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_explore, 0, 0);
-        tabTwo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewPager.setCurrentItem(1);
-            }
-        });
-        tabsView.getTabAt(1).setCustomView(tabTwo);
-
-        TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabThree.setText("Week");
-        tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_week, 0, 0);
-        tabThree.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewPager.setCurrentItem(2);
-            }
-        });
-        tabsView.getTabAt(2).setCustomView(tabThree);
-
-        TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabFour.setText("Alerts");
-        tabFour.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_notification, 0, 0);
-        tabFour.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewPager.setCurrentItem(3);
-            }
-        });
-        tabsView.getTabAt(3).setCustomView(tabFour);
-    }
 
     private void showNextScreen() {
         // If we do not have user city, use GoogleLocation api to get user location.
@@ -845,6 +918,8 @@ public class LaunchActivity extends BaseContextActivity {
                     toolbarTitleText.setText(placeName);
                     LocalityLatLong locality = new LocalityLatLong(placeName, latLng);
                     account.setLastLocality(locality);
+                    if (weekEventsFragment != null)
+                        weekEventsFragment.setSelectedLocalityDistanceText();
                     Log.i("TestActivity", "Place: " + placeName);
                 } else {
                     Toast.makeText(this, "Selected locality not found ", Toast.LENGTH_LONG).show();
@@ -914,6 +989,8 @@ public class LaunchActivity extends BaseContextActivity {
     ExploreFragment exploreFragment;
     private EventsFragment myEventsFragment;
 
+    NewWeekEventsFragment weekEventsFragment;
+
     /**
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
@@ -933,18 +1010,8 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public Fragment getItem(int position) {
             if (TABS.get(position).equals(MY_EVENTS_TAB)) {
-                /*EventsContext myEventsContext = new EventsContext(eventsContext.location,
-                        EventsHighEndpoints.QUERY_MY_EVENT);
-                myEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null);*/
-                String tabParam = "";
-                if (getIntent().hasExtra(MeFragment.TAB_PARAM)) {
-                    tabParam = getIntent().getStringExtra(MeFragment.TAB_PARAM);
-                }
-                EventsContext myEventsContext = new EventsContext(eventsContext.location,
-                        EventsHighEndpoints.QUERY_MY_EVENT);
-                Log.i("ME_TAB_PARAMS", tabParam);
-                MeFragment fragment = MeFragment.getInstance(myEventsContext, tabParam);
-                return fragment;
+
+                return EmptyFragment.newInstance(null);
             }
 
             if (TABS.get(position).equals(EXPLORE_TAB)) {
@@ -963,8 +1030,9 @@ public class LaunchActivity extends BaseContextActivity {
            /* if(TABS.get(position).equalsIgnoreCase(MOVIES_TAB)){
                 return new MoviesListFragment();
             }*/
-            return NewWeekEventsFragment.getInstance(eventsContext, false);
-            // return ThisWeekFragment.getInstance(eventsContext, true, 7);
+            weekEventsFragment = NewWeekEventsFragment.getInstance(eventsContext, false);
+            return weekEventsFragment;
+
         }
 
         @Override
@@ -1213,7 +1281,7 @@ public class LaunchActivity extends BaseContextActivity {
                         //reportActionToAnalytics("showEventDetails", label);
                         Intent detailIntent = new Intent(LaunchActivity.this, WriteReviewActivity.class);
                         Bundle bundle = new Bundle();
-                        bundle.putParcelable(EventDetailActivity.EVENT_OBJECT, event);
+                        bundle.putParcelable(NewEventDetailActivity.EVENT_OBJECT, event);
                         bundle.putString(MovieDetailActivity.OBJECT_TYPE, "event");
                         detailIntent.putExtras(bundle);
                         startActivity(detailIntent);

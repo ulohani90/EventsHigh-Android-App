@@ -84,13 +84,15 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
     LinearLayout statsLayout;
 
+    public static final String EVENT_OBJECT = "event_detail_object";
+
     @Override
     public View getViewForSnackbar() {
         return toolbar;
     }
 
-    public static final String EXTRA_EVENT_PARAM = EventDetailActivity.class.getSimpleName() + "_event";
-    public static final String EXTRA_PLAN_ID_PARAM = EventDetailActivity.class.getSimpleName() + "_plan_id";
+    public static final String EXTRA_EVENT_PARAM = NewEventDetailActivity.class.getSimpleName() + "_event";
+    public static final String EXTRA_PLAN_ID_PARAM = NewEventDetailActivity.class.getSimpleName() + "_plan_id";
 
     public static final String EVENT_REVIEWS = "event_reviews";
     public static final String EVENT_ID = "event_id";
@@ -103,7 +105,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupLayout(R.layout.new_event_detail_activity);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setUpToolBar(toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -391,11 +393,16 @@ public class NewEventDetailActivity extends BaseContextActivity {
         EventImagePagerAdapter imagePagerAdapter = new EventImagePagerAdapter();
         imagePager.setAdapter(imagePagerAdapter);
         dotsView.removeAllViews();
-        for (int i = 0; i < imagePagerAdapter.getCount(); i++) {
-            View view = getLayoutInflater().inflate(
-                    R.layout.view_dot_featured, dotsView, false);
-            view.setSelected(i == 0);
-            dotsView.addView(view);
+        if (imagePagerAdapter.getCount() > 1) {
+            dotsView.setVisibility(View.VISIBLE);
+            for (int i = 0; i < imagePagerAdapter.getCount(); i++) {
+                View view = getLayoutInflater().inflate(
+                        R.layout.view_dot_featured, dotsView, false);
+                view.setSelected(i == 0);
+                dotsView.addView(view);
+            }
+        } else {
+            dotsView.setVisibility(View.GONE);
         }
 
         imagePager.clearOnPageChangeListeners();
@@ -451,7 +458,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                             if (builder.length() > 0 && event.numViews > 0) {
                                 builder.append(" and ");
                             }
-                            builder.append(event.numViews > 0 ? (event.numViews + "+ people interested") : " interested");
+                            builder.append(event.numViews > 0 ? (event.numViews + " people interested") : " interested");
                             statsView.setText(builder.toString());
                             ((View) statsView.getParent()).setVisibility(View.VISIBLE);
                             statsView.setVisibility(View.VISIBLE);
@@ -460,10 +467,13 @@ public class NewEventDetailActivity extends BaseContextActivity {
                                 statsLayout.setVisibility(View.VISIBLE);
                                 ((ImageView) findViewById(R.id.img1)).setVisibility(View.VISIBLE);
                                 ((ImageView) findViewById(R.id.img2)).setVisibility(View.VISIBLE);
-                                ((ImageView) findViewById(R.id.img1)).setImageResource(Utils.getDummyImageResource());
-                                ((ImageView) findViewById(R.id.img2)).setImageResource(Utils.getDummyImageResource());
+                                int resource1 = getIntent().getExtras().getInt("resource_1", -1);
+                                int resource2 = getIntent().getExtras().getInt("resource_2", -1);
+
+                                ((ImageView) findViewById(R.id.img1)).setImageResource(resource1 != -1 ? resource1 : Utils.getDummyImageResource());
+                                ((ImageView) findViewById(R.id.img2)).setImageResource(resource2 != -1 ? resource2 : Utils.getDummyImageResource());
                                 StringBuilder builder = new StringBuilder();
-                                builder.append(event.numViews + "+ people interested");
+                                builder.append(event.numViews + " people interested");
                                 statsView.setText(builder.toString());
                                 ((View) statsView.getParent()).setVisibility(View.VISIBLE);
                                 statsView.setVisibility(View.VISIBLE);

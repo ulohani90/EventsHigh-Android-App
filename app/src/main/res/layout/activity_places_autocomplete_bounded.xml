@@ -29,6 +29,7 @@
                 android:maxLines="1"
                 android:paddingBottom="0dp"
                 android:paddingLeft="8dp"
+
                 android:paddingRight="8dp"
                 android:textColor="#ffffff"
                 android:textColorHint="#f0f0f0"
@@ -50,18 +51,19 @@
     </android.support.v7.widget.Toolbar>
 
     <LinearLayout
+        android:id="@+id/btn_change_city"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar_et"
         android:orientation="horizontal"
-        android:id="@+id/btn_change_city"
         android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:layout_below="@+id/toolbar_et">
+        android:paddingRight="16dp">
+
         <TextView
             android:id="@+id/tv_current_city"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="48dp"
+            android:layout_weight="1"
             android:drawablePadding="5dp"
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center_vertical"
@@ -69,6 +71,7 @@
             android:paddingBottom="8dp"
             android:text="Your City"
             android:textColor="#353535" />
+
         <TextView
             android:id="@+id/tv_change_city_text"
             android:layout_width="wrap_content"
@@ -78,15 +81,15 @@
             android:padding="5dp"
             android:paddingBottom="8dp"
             android:text="Change City"
-            android:textColor="#353535"/>
+            android:textColor="#353535" />
     </LinearLayout>
 
     <View
         android:id="@+id/seperation_view"
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:background="#dddddd"
-        android:layout_below="@+id/btn_change_city"/>
+        android:layout_below="@+id/btn_change_city"
+        android:background="#dddddd" />
 
     <TextView
         android:id="@+id/select_current_location"

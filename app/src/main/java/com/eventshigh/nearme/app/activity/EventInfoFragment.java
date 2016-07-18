@@ -66,7 +66,7 @@ public class EventInfoFragment extends Fragment {
     }
 
     TextView eventName;
-    TextView eventOrganizer, eventTime, timeDetails, addressView, travelTimeView, alsoOnView, addToCalender;
+    TextView eventOrganizer, eventTime, timeDetails, travelTimeView, alsoOnView, addToCalender;
     HorizontalScrollView futureTimesViewGroup;
     LinearLayout futureTimesView, youtubeFragment;
     WebView descriptionView;
@@ -113,7 +113,6 @@ public class EventInfoFragment extends Fragment {
         descriptionView = (WebView) view.findViewById(R.id.event_description);
         youtubeFragment = (LinearLayout) view.findViewById(R.id.youtube_fragment);
         addToCalender = (TextView) view.findViewById(R.id.btn_add_calender);
-        addressView = (TextView) view.findViewById(R.id.event_address);
         travelTimeView = (TextView) view.findViewById(R.id.event_travel_time);
         timeGroupView = view.findViewById(R.id.event_time_group);
         eventTimeFirstView = view.findViewById(R.id.event_time_first);
@@ -181,8 +180,8 @@ public class EventInfoFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        account = new Account(getActivity());
+        if (getActivity() != null)
+            account = new Account(getActivity());
 
         final Event event = getArguments().getParcelable("event");
         eventName.setText(event.title);
@@ -301,7 +300,7 @@ public class EventInfoFragment extends Fragment {
             }
         });
 
-        if (account.getLastCity().equals(City.BANGALORE)) {
+        if (account.getLastCity() != null && account.getLastCity().equals(City.BANGALORE)) {
             enquiryBtn.setVisibility(View.VISIBLE);
             callOrganizer.setVisibility(View.GONE);
             enquiryBtn.setOnClickListener(new View.OnClickListener() {

@@ -7,13 +7,13 @@
     <screenName name="com.eventshigh.nearme.app.activity.LaunchActivity">Launch</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.EventsMapsActivity">Maps</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.EventsGridActivity">Grid</screenName>
-    <screenName name="com.eventshigh.nearme.app.activity.EventDetailActivity">Details</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.NewEventDetailActivity">Details</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.PlanActivity">Plan</screenName>
-    <screenName name="com.eventshigh.nearme.app.activity.MyFriendsActivity">MyFriends</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.UserProfileActivity">UserProfile</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.BlogFeedActivity">BlogFeed</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.BlogEntryActivity">BlogEntry</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.CustomUrlActivity">CustomUrl</screenName>
-    <screenName name="com.eventshigh.nearme.app.activity.OnBoardingActivity">OnBoarding</screenName>
+    <screenName name="com.eventshigh.nearme.app.activity.NewOnboardingActivity">OnBoarding</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.PhoneLoginActivity">PhoneLogin</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.SettingsActivity">Settings</screenName>
     <screenName name="com.eventshigh.nearme.app.activity.AboutUsActivity">AboutUs</screenName>

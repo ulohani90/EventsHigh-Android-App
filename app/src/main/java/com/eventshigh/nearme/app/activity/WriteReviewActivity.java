@@ -78,7 +78,7 @@ public class WriteReviewActivity extends BaseActivity implements RatingBar.OnRat
             if (type.equals("movie")) {
                 movieDetailObject = bundle.getParcelable(MovieDetailActivity.MOVIE_DETAIL_OBJECT);
             } else {
-                event = bundle.getParcelable(EventDetailActivity.EVENT_OBJECT);
+                event = bundle.getParcelable(NewEventDetailActivity.EVENT_OBJECT);
             }
         }
 
@@ -110,8 +110,8 @@ public class WriteReviewActivity extends BaseActivity implements RatingBar.OnRat
 
     @Override
     public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-        if(fromUser)
-        onMovieRated(rating);
+        if (fromUser)
+            onMovieRated(rating);
     }
 
     //util method
@@ -119,7 +119,7 @@ public class WriteReviewActivity extends BaseActivity implements RatingBar.OnRat
         writeReviewDescriptionFragment =
                 WriteReviewDescriptionFragment.newInstance(this);
         Bundle args = new Bundle();
-        args.putFloat("rating_count",rating);
+        args.putFloat("rating_count", rating);
         writeReviewDescriptionFragment.setArguments(args);
         // Commit the transaction
         Handler handler = new Handler();
@@ -150,6 +150,8 @@ public class WriteReviewActivity extends BaseActivity implements RatingBar.OnRat
     public void verifyClicked() {
         startActivity(new Intent(this, PhoneLoginActivity.class));
     }
+
+
 
     @Override
     public void onBackPressed() {

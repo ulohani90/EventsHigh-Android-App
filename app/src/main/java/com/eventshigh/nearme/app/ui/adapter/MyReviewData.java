@@ -21,7 +21,7 @@ public class MyReviewData implements AdapterData{
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder card, int position) {
-        ((MyReviewCard)card).bindData(movieUserReviewObject);
+        ((MyReviewCard)card).bindData(movieUserReviewObject,baseContextActivity);
     }
 
     @Override

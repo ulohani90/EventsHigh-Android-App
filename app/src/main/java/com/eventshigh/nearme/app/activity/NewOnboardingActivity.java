@@ -19,7 +19,7 @@ import com.eventshigh.nearme.app.user.Preferences;
 /**
  * Created by umesh on 14/07/16.
  */
-public class NewOnboardingActivity extends AppCompatActivity {
+public class NewOnboardingActivity extends BaseActivity {
 
     LinearLayout dotsView;
     ViewPager pager;
@@ -46,6 +46,7 @@ public class NewOnboardingActivity extends AppCompatActivity {
         (findViewById(R.id.tell_us_interest)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                reportActionToAnalytics("tell_us_interest_click");
                 launchNextActivity();
             }
         });

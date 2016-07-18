@@ -64,7 +64,10 @@ import java.util.Arrays;
 public class UserProfileActivity extends BaseContextActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
     CallbackManager callbackManager;
 
+
     public static final String PROFILE_ID = "profile_id";
+
+    public static final String FROM_NOTIFICATION_PARAM = "is_from_notification";
 
     public ArrayList<String> TABS;
     CircularImageView userImage;
@@ -101,6 +104,8 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     private final String REVIEWS_TAB = "Reviews";
     private final String TICKETS_TAB = "Tickets";
     private final String FRIENDS_TAB = "Friends";
+
+    boolean isFromNotification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,8 +160,17 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         pager.addOnPageChangeListener(this);
         fabWriteReviews.setOnClickListener(this);
         fabWriteReviews.setVisibility(View.GONE);
+
+        if (getIntent().getBooleanExtra(FROM_NOTIFICATION_PARAM, false)) {
+            isFromNotification = true;
+        }
     }
 
+
+    @Override
+    public View getViewForSnackbar() {
+        return toolbar;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -164,6 +178,17 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             onBackPressed();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isFromNotification) {
+            Intent intent = new Intent(this, LaunchActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -184,8 +209,8 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             TABS.add(INTERESTS_TAB);
             TABS.add(FAVOURITES_TAB);
             TABS.add(FRIENDS_TAB);
-            TABS.add(REVIEWS_TAB);
             TABS.add(TICKETS_TAB);
+            TABS.add(REVIEWS_TAB);
             mobileNoProfileUser = account.getUserInfo().phoneNo;
         } else {
             if (profileInfo.getMyInterestEvents().size() != 0)
@@ -331,6 +356,10 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 }
             }
         });
+    }
+
+    public void setFriendsCount(int count) {
+        userFollowerCount.setText(count + "");
     }
 
 

@@ -336,6 +336,14 @@ public abstract class BaseContextActivity extends BaseActivity {
         startActivity(detailIntent, bundle);
     }
 
+    public void showEventDetailsWithUserImages(Event event, @Nullable String label, @Nullable Bundle bundle, Bundle resources) {
+        reportEventAction(event, "showEventDetails", label);
+        Intent detailIntent = new Intent(this, NewEventDetailActivity.class);
+        detailIntent.putExtra(NewEventDetailActivity.EXTRA_EVENT_PARAM, event);
+        detailIntent.putExtras(resources);
+        startActivity(detailIntent, bundle);
+    }
+
 
     public void seeAll() {
         reportActionToAnalytics("seeAll", eventsContext.getLabel());

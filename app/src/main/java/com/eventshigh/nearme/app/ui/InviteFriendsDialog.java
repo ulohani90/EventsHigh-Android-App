@@ -8,7 +8,7 @@ import android.view.View.OnClickListener;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.activity.EventDetailActivity;
+import com.eventshigh.nearme.app.activity.NewEventDetailActivity;
 import com.eventshigh.nearme.app.activity.PlanActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.user.Account;
@@ -40,9 +40,9 @@ public class InviteFriendsDialog {
                 activity.reportEventAction(event, "checkWithFriends", "inviteDialog");
 
                 Intent intent = new Intent(activity, PlanActivity.class);
-                intent.putExtra(EventDetailActivity.EXTRA_EVENT_PARAM, event);
+                intent.putExtra(NewEventDetailActivity.EXTRA_EVENT_PARAM, event);
                 if (planId != null) {
-                    intent.putExtra(EventDetailActivity.EXTRA_PLAN_ID_PARAM, planId);
+                    intent.putExtra(NewEventDetailActivity.EXTRA_PLAN_ID_PARAM, planId);
                 }
                 activity.startActivity(intent);
             }

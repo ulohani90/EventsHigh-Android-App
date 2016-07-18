@@ -357,7 +357,8 @@ public class EventsFragment extends BaseEventsFragment {
                 new Response.Listener<SocialActionsRequest.SocialActions>() {
                     @Override
                     public void onResponse(SocialActionsRequest.SocialActions socialActions, boolean isIntermediate) {
-                        eventsAdapter.setSocialActions(socialActions);
+                        if (isAdded() && !isFragmentDestroyed && eventsAdapter != null)
+                            eventsAdapter.setSocialActions(socialActions);
                     }
                 },
                 new Response.ErrorListener() {
@@ -417,7 +418,7 @@ public class EventsFragment extends BaseEventsFragment {
 
         topProgressBar.setVisibility(View.GONE);
 
-        if (myEvents.topicEvents.isEmpty() && myEvents.movies.isEmpty()) {
+        if (myEvents.topicEvents.get(0).events.isEmpty() && myEvents.movies.isEmpty()) {
             if (EventsHighEndpoints.isMyEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
                 noMyEventsView.setVisibility(View.VISIBLE);
                 noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_event));

@@ -14,17 +14,15 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BlogEntryActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
-import com.eventshigh.nearme.app.activity.EventDetailActivity;
-import com.eventshigh.nearme.app.activity.EventsGridActivity;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
-import com.eventshigh.nearme.app.activity.MeFragment;
 import com.eventshigh.nearme.app.activity.MovieBrowseActivity;
 import com.eventshigh.nearme.app.activity.MovieDetailActivity;
 import com.eventshigh.nearme.app.activity.NewEventDetailActivity;
 import com.eventshigh.nearme.app.activity.PointsBreakdownActivity;
 import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.activity.SelectInterestsActivity;
+import com.eventshigh.nearme.app.activity.UserProfileActivity;
 import com.eventshigh.nearme.app.activity.WriteReviewActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -47,6 +45,7 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.gcm.GcmListenerService;
+import com.zendesk.sdk.model.helpcenter.User;
 
 /**
  * See https://developers.google.com/cloud-messaging/android/client.
@@ -183,9 +182,8 @@ public class EHGcmListenerService extends GcmListenerService {
 
             String interestCount = getInterestCount(interestName.events.size());
             message = "So we thought of you. Explore " + interestCount + " experiences happening this week.";
-            Intent intent = new Intent(this, LaunchActivity.class);
-            intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, EventsHighEndpoints.QUERY_MY_EVENT);
-            intent.putExtra(MeFragment.TAB_PARAM, MeFragment.MY_INTEREST_EVENTS);
+            Intent intent = new Intent(this, UserProfileActivity.class);
+            intent.putExtra(UserProfileActivity.FROM_NOTIFICATION_PARAM, true);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
@@ -223,18 +221,18 @@ public class EHGcmListenerService extends GcmListenerService {
             intent.putExtra(MovieDetailActivity.FROM_NOTIFICATION_PARAM, true);
             intent.putExtra(MovieDetailActivity.MOVIE_ID, Integer.parseInt(movieId));
             contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        }else if(reviewFor != null){
-            Intent intent = new Intent(this,WriteReviewActivity.class);
+        } else if (reviewFor != null) {
+            Intent intent = new Intent(this, WriteReviewActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + title);
             intent.putExtra(WriteReviewActivity.FROM_NOTIFICATION_PARAM, true);
             intent.putExtra(MovieDetailActivity.OBJECT_TYPE, reviewFor);
-            intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_ID,reviewEntityId);
-            intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_IMAGE,reviewEntityImage);
-            intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_NAME,reviewedEntity);
+            intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_ID, reviewEntityId);
+            intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_IMAGE, reviewEntityImage);
+            intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_NAME, reviewedEntity);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
             //imageUrl = reviewEntityImage;
             notificationId = 2;
-        }else{
+        } else {
             Intent intent = new Intent(this,
                     contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + title);

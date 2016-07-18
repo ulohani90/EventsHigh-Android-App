@@ -136,7 +136,7 @@ public class TicketReviewActivity extends BaseActivity implements View.OnClickLi
 
     private void mapIntentData() {
 
-        event = bundle.getParcelable(EventDetailActivity.EVENT_OBJECT);
+        event = bundle.getParcelable(NewEventDetailActivity.EVENT_OBJECT);
         noOfTickets = (int) bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_TICKETS);
         total = bundle.getDouble(EventBookingDetailActivity.EVENT_TOTAL_PRICE);
         dateString = bundle.getString(EventBookingDetailActivity.EVENT_DATE_SELECTED);

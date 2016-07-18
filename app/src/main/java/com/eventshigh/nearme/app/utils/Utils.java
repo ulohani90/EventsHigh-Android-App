@@ -195,6 +195,7 @@ public class Utils {
     public static int getDummyImageResource() {
         Random random = new Random();
         int num = random.nextInt(20 - 1 + 1) + 1;
+
         switch (num) {
             case 1:
                 return R.drawable.ic_dummy_1;

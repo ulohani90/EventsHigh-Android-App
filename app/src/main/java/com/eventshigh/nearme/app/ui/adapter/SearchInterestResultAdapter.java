@@ -115,7 +115,7 @@ public class SearchInterestResultAdapter extends BaseAdapter implements Filterab
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             if (constraint != null) {
-                filteredTags.clear();
+                ArrayList<String> filteredTags = new ArrayList<>();
                 for (String tag : tags) {
                     if (tag.toLowerCase().startsWith(constraint.toString().toLowerCase())) {
                         filteredTags.add(tag);
@@ -133,14 +133,14 @@ public class SearchInterestResultAdapter extends BaseAdapter implements Filterab
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-           /* ArrayList<String> filteredList = (ArrayList<String>) results.values;
+            ArrayList<String> filteredList = (ArrayList<String>) results.values;
             if (results != null && results.count > 0) {
                 filteredTags.clear();
                 for (String c : filteredList) {
                     filteredTags.add(c);
-                }*/
-            notifyDataSetChanged();
-            //}
+                }
+                notifyDataSetChanged();
+            }
         }
     };
 

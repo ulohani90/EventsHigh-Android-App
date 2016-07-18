@@ -71,6 +71,8 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
     TextView currentCity, changeCityText;
     Toolbar toolbar;
 
+    boolean isShowSpecialText;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +91,7 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
                 .build();
         if (mGoogleApiClient != null)
             mGoogleApiClient.connect();
-        dataAdapter = new GooglePlacesAutocompleteAdapter(PlacesAutocompleteBoundedActivity.this, mGoogleApiClient, account.getLastCity().cityBounds, null,account.getLastCity().name());
+        dataAdapter = new GooglePlacesAutocompleteAdapter(PlacesAutocompleteBoundedActivity.this, mGoogleApiClient, account.getLastCity().cityBounds, null, account.getLastCity().name());
         listView = (ListView) findViewById(R.id.lv_search_place_list);
         listView.setAdapter(dataAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -114,27 +116,30 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
             });
         }
 
-        llChangeCity = (LinearLayout)findViewById(R.id.btn_change_city);
-        currentCity = (TextView)findViewById(R.id.tv_current_city);
+        llChangeCity = (LinearLayout) findViewById(R.id.btn_change_city);
+        currentCity = (TextView) findViewById(R.id.tv_current_city);
         currentCity.setText(account.getLastCity().name());
-        changeCityText = (TextView)findViewById(R.id.tv_change_city_text);
+        changeCityText = (TextView) findViewById(R.id.tv_change_city_text);
         SpannableString content = new SpannableString("Change City");
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
         changeCityText.setText(content);
-        etSearchBar.setHint("Search Locality in " + Utils.capitalize(account.getLastCity().name()));
+
         llChangeCity.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 CitySelectDialog.show(PlacesAutocompleteBoundedActivity.this, account, new CitySelectDialog.CitySelectionCallback() {
                     @Override
                     public void onCityChanged(City city) {
                         currentCity.setText(city.name());
-                        etSearchBar.setHint("Search Locality in "+Utils.capitalize(city.name()));
-                        dataAdapter.changeCity(city.name(),city.cityBounds);
+                        etSearchBar.setHint("Search Locality in " + Utils.capitalize(city.name()));
+                        dataAdapter.changeCity(city.name(), city.cityBounds);
                     }
                 });
             }
         });
+
+        etSearchBar.setHint("Search Locality in " + Utils.capitalize(account.getLastCity().name()));
+
     }
 
     GoogleApiClient googleApiClient;
@@ -175,6 +180,7 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
             @Override
             public void onResult(LocationSettingsResult result) {
                 final Status status = result.getStatus();
+
                 final LocationSettingsStates state = result.getLocationSettingsStates();
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:

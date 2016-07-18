@@ -45,7 +45,7 @@ public class AlarmUtils {
 
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, EventAlarmBroadcastReceiver.class);
-        intent.putExtra(EventNotificationIntentService.BUNDLE_EVENT_KEY, event);
+        intent.putExtra(EventNotificationIntentService.BUNDLE_EVENT_ID_KEY, event.id);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context, event.hashCode(), intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
 

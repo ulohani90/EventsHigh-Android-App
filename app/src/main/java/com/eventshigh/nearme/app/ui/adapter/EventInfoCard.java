@@ -25,7 +25,7 @@ public class EventInfoCard extends RecyclerView.ViewHolder {
 
 
     TextView eventName;
-    TextView eventOrganizer, eventTime, timeDetails, venueView, addressView, travelTimeView, alsoOnView, addToCalender;
+    TextView eventOrganizer, eventTime, timeDetails, venueView, travelTimeView, alsoOnView, addToCalender;
     HorizontalScrollView futureTimesViewGroup;
     LinearLayout futureTimesView, youtubeFragment;
     WebView descriptionView;
@@ -49,8 +49,6 @@ public class EventInfoCard extends RecyclerView.ViewHolder {
         descriptionView = (WebView) itemView.findViewById(R.id.event_description);
         youtubeFragment = (LinearLayout) itemView.findViewById(R.id.youtube_fragment);
         addToCalender = (TextView) itemView.findViewById(R.id.btn_add_calender);
-
-        addressView = (TextView) itemView.findViewById(R.id.event_address);
 
         travelTimeView = (TextView) itemView.findViewById(R.id.event_travel_time);
 

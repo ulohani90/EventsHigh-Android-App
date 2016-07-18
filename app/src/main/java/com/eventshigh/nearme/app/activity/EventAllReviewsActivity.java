@@ -33,9 +33,9 @@ public class EventAllReviewsActivity extends BaseContextActivity {
 
         eventsAdapter = new EventsAdapter(this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        if (getIntent().hasExtra(EventDetailActivity.EVENT_REVIEWS)) {
-            objs = getIntent().getParcelableArrayListExtra(EventDetailActivity.EVENT_REVIEWS);
-            eventId = getIntent().getStringExtra(EventDetailActivity.EVENT_ID);
+        if (getIntent().hasExtra(NewEventDetailActivity.EVENT_REVIEWS)) {
+            objs = getIntent().getParcelableArrayListExtra(NewEventDetailActivity.EVENT_REVIEWS);
+            eventId = getIntent().getStringExtra(NewEventDetailActivity.EVENT_ID);
         }
         AutofitRecyclerView exploreGridView = (AutofitRecyclerView) findViewById(R.id.event_grid);
         exploreGridView.setAdapter(eventsAdapter);
