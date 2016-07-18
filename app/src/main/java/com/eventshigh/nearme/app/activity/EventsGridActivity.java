@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -35,6 +36,8 @@ import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.model.LatLng;
 import com.squareup.timessquare.CalendarPickerView;
 
@@ -741,17 +744,26 @@ public class EventsGridActivity extends BaseContextActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
-            String placeName = data.getStringExtra("place_name");
-            LatLng latLng = data.getParcelableExtra("place_lat_lng");
-            if (latLng != null && placeName != null) {
-                distance.setText("Distance from " + Utils.capitalize(placeName));
-                makeDistanceSortTrue();
-                LocalityLatLong locality = new LocalityLatLong(placeName, latLng);
-                account.setLastLocality(locality);
-                Log.i("TestActivity", "Place: " + placeName);
-            } else {
-                Toast.makeText(this, "Selected locality not found ", Toast.LENGTH_LONG).show();
+            if (resultCode == RESULT_OK) {
+                String placeName = data.getStringExtra("place_name");
+                LatLng latLng = data.getParcelableExtra("place_lat_lng");
+                if (latLng != null && placeName != null) {
+                    distance.setText("Distance from " + Utils.capitalize(placeName));
+                    makeDistanceSortTrue();
+                    LocalityLatLong locality = new LocalityLatLong(placeName, latLng);
+                    account.setLastLocality(locality);
+                    Log.i("TestActivity", "Place: " + placeName);
+                } else {
+                    Toast.makeText(this, "Selected locality not found ", Toast.LENGTH_LONG).show();
+                }
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                // TODO: Handle the error.
+                Log.i("TestActivity", status.getStatusMessage());
+            } else if (resultCode == RESULT_CANCELED) {
+
             }
         }
     }
