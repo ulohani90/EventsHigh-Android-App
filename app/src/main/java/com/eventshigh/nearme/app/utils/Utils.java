@@ -188,7 +188,7 @@ public class Utils {
     }
 
     public static Double roundToTwoDecimalPlaces(Double value) {
-        DecimalFormat format = new DecimalFormat("#.##");
+        DecimalFormat format = new DecimalFormat("#.#");
         return Double.valueOf(format.format(value));
     }
 

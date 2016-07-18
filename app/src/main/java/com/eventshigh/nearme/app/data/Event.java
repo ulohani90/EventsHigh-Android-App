@@ -175,7 +175,8 @@ public class Event implements Parcelable {
 
     public Event(Parcel in) {
         this.id = in.readString();
-        this.city = City.valueOf(in.readString());
+        String cityName = in.readString();
+        this.city = Utils.checkIfStringEmpty(cityName) ? null : City.valueOf(cityName);
         this.title = in.readString();
         this.category = EventCategory.valueOf(in.readString());
 

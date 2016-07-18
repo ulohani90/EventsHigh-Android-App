@@ -467,9 +467,12 @@ public class NewEventDetailActivity extends BaseContextActivity {
                                 statsLayout.setVisibility(View.VISIBLE);
                                 ((ImageView) findViewById(R.id.img1)).setVisibility(View.VISIBLE);
                                 ((ImageView) findViewById(R.id.img2)).setVisibility(View.VISIBLE);
-                                int resource1 = getIntent().getExtras().getInt("resource_1", -1);
-                                int resource2 = getIntent().getExtras().getInt("resource_2", -1);
-
+                                int resource1 = -1;
+                                int resource2 = -1;
+                                if (getIntent().getExtras() != null) {
+                                    resource1 = getIntent().getExtras().getInt("resource_1", -1);
+                                    resource2 = getIntent().getExtras().getInt("resource_2", -1);
+                                }
                                 ((ImageView) findViewById(R.id.img1)).setImageResource(resource1 != -1 ? resource1 : Utils.getDummyImageResource());
                                 ((ImageView) findViewById(R.id.img2)).setImageResource(resource2 != -1 ? resource2 : Utils.getDummyImageResource());
                                 StringBuilder builder = new StringBuilder();
