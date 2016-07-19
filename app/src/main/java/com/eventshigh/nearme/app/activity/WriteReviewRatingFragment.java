@@ -52,14 +52,14 @@ public class WriteReviewRatingFragment extends Fragment {
         ivMoviePicture = (ImageView) rootView.findViewById(R.id.iv_write_review_movie_pic);
         ratingHeaderText = (TextView) rootView.findViewById(R.id.rate_header);
 
-        if (writeReviewActivity.isFromNotification){
-                tvMovieName.setText(writeReviewActivity.reviewEntityName);
-                Glide.with(this).load(writeReviewActivity.reviewEntityImage)
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
-                            .into(ivMoviePicture);
-                ratingHeaderText.setText("Please rate the "+ Utils.capitalize(writeReviewActivity.type)+"!");
-        }else{
+        if (writeReviewActivity.isFromNotification) {
+            tvMovieName.setText(writeReviewActivity.reviewEntityName);
+            Glide.with(this).load(writeReviewActivity.reviewEntityImage)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
+                    .into(ivMoviePicture);
+            ratingHeaderText.setText("Please rate the " + Utils.capitalize(writeReviewActivity.type) + "!");
+        } else {
             if (writeReviewActivity.type.equals("movie")) {
 
                 if (writeReviewActivity.movieDetailObject != null) {
@@ -70,7 +70,8 @@ public class WriteReviewRatingFragment extends Fragment {
                             .into(ivMoviePicture);
                 }
                 ratingHeaderText.setText("Please rate the Movie!");
-            } else {
+            } else if (writeReviewActivity.event != null) {
+
                 tvMovieName.setText(writeReviewActivity.event.title);
                 Glide.with(this).load(writeReviewActivity.event.imgUrl)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)

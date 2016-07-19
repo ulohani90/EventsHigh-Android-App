@@ -830,17 +830,18 @@ public class EventsFragment extends BaseEventsFragment {
     }
 
     public void sortData() {
-        if (sortState == EventsGridActivity.SORT_STATE_TRENDING) {
-            Collections.sort(filteredEvents, new EventScoreComparator());
-        } else if (sortState == EventsGridActivity.SORT_STATE_PRICE) {
-            Collections.sort(filteredEvents, new EventPriceComparator());
-        } else if (sortState == EventsGridActivity.SORT_STATE_DISTANCE) {
-            if (new Account(activity).getLastLocality() != null)
-                Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastLocality().getLatLng()));
-            else
-                Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastCity().cityBounds.getCenter()));
+        if (filteredEvents != null) {
+            if (sortState == EventsGridActivity.SORT_STATE_TRENDING) {
+                Collections.sort(filteredEvents, new EventScoreComparator());
+            } else if (sortState == EventsGridActivity.SORT_STATE_PRICE) {
+                Collections.sort(filteredEvents, new EventPriceComparator());
+            } else if (sortState == EventsGridActivity.SORT_STATE_DISTANCE) {
+                if (new Account(activity).getLastLocality() != null)
+                    Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastLocality().getLatLng()));
+                else
+                    Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastCity().cityBounds.getCenter()));
+            }
         }
-
 
     }
 
