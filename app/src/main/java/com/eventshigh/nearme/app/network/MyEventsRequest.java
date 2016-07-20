@@ -172,12 +172,6 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
 
         List<MovieDetailObject> movies = new ArrayList<>();
         List<TopicEvents> events = new ArrayList<>();
-        /*
-        RequestFuture<SocialInvitationsRequest.CommonInviteObject> socialInvites = RequestFuture.newFuture();
-        SocialInvitationsRequest.submit(context, priority, tag, shouldBypassCache,
-                socialInvites, socialInvites);
-                */
-
 
         MovieMarkerManager movieMarkerManager = MovieMarkerManager.getInstance(context);
         movieMarkerManager.waitForLoading();
@@ -185,17 +179,6 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
         MultiMovieRequest.submit(context, eventsContext, movieMarkerManager.getFavouritedMovies(),
                 priority, tag, shouldBypassCache, includeWithoutLocation, moviesList, moviesList);
 
-       /* for (String movieId : movieMarkerManager.getFavouritedMovies()) {
-            RequestFuture<MovieDetailObject> movieObj = RequestFuture.newFuture();
-            MovieDetailRequest.submit(context, Integer.parseInt(movieId),
-                    priority, movieObj, movieObj);
-            try {
-                addMoviesToResults(movies, movieObj);
-            } catch (RequestCancelledException e) {
-                isRequestCancelled = true;
-                return null;
-            }
-        }*/
 
         // Favourites event requests.
         EventsMarkerManager markerManager = EventsMarkerManager.getInstance(context);
@@ -205,18 +188,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
                 priority, tag, shouldBypassCache, includeWithoutLocation,true,favEvents, favEvents);
 
         // Look at invites and send the request for sent invitations.
-        /*
-        List<String> eventIds = new ArrayList<>();
-        try {
-            eventIds.addAll(socialInvites.get().getInvites().keySet());
-        } catch (InterruptedException | ExecutionException e) {
-            Crashlytics.getInstance().core.logException(e);
-        }
 
-        RequestFuture<List<Event>> invitedEvents = RequestFuture.newFuture();
-        MultiEventsRequest.submit(context, eventsContext, eventIds, priority, tag,
-                shouldBypassCache, true, invitedEvents, invitedEvents);
-                */
 
         // Build Result.
         try {

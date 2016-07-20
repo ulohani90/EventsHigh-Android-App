@@ -198,7 +198,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
 
                         if (!eventsCollection.events.isEmpty()) {
-                            noMyEventsView.setVisibility(View.GONE);
+
                             final String seeAllQuery = eventsContext.query.isEmpty() ||
                                     eventsContext.dateFilter.isEmpty() ? null : eventsContext.query;
                             if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
@@ -223,6 +223,8 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                                             noMyEventsView.setVisibility(View.VISIBLE);
                                             Toast.makeText(getActivity(), R.string.no_events, Toast.LENGTH_SHORT).show();
 
+                                        } else {
+                                            noMyEventsView.setVisibility(View.GONE);
                                         }
                                     }
                                     List<Event> filteredEvents = NewWeekEventsFragment.this.eventsCollection.events;
@@ -766,15 +768,17 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
     }
 
     public void sortData() {
-        if (sortState == EventsGridActivity.SORT_STATE_TRENDING) {
-            Collections.sort(filteredEvents, new EventScoreComparator());
-        } else if (sortState == EventsGridActivity.SORT_STATE_PRICE) {
-            Collections.sort(filteredEvents, new EventPriceComparator());
-        } else if (sortState == EventsGridActivity.SORT_STATE_DISTANCE) {
-            if (new Account(activity).getLastLocality() != null)
-                Collections.sort(filteredEvents, new EventDistanceComparator(account.getLastLocality().getLatLng()));
-            else
-                Collections.sort(filteredEvents, new EventDistanceComparator(account.getLastCity().cityBounds.getCenter()));
+        if (filteredEvents != null) {
+            if (sortState == EventsGridActivity.SORT_STATE_TRENDING) {
+                Collections.sort(filteredEvents, new EventScoreComparator());
+            } else if (sortState == EventsGridActivity.SORT_STATE_PRICE) {
+                Collections.sort(filteredEvents, new EventPriceComparator());
+            } else if (sortState == EventsGridActivity.SORT_STATE_DISTANCE) {
+                if (new Account(activity).getLastLocality() != null)
+                    Collections.sort(filteredEvents, new EventDistanceComparator(account.getLastLocality().getLatLng()));
+                else
+                    Collections.sort(filteredEvents, new EventDistanceComparator(account.getLastCity().cityBounds.getCenter()));
+            }
         }
 
 

@@ -56,6 +56,7 @@ public class MyReviewCard extends RecyclerView.ViewHolder {
     }
 
     public void bindData(final MovieUserReviewObject movieUserReviewObject, final BaseContextActivity activity) {
+
         entityName.setText(Utils.capitalize(movieUserReviewObject.getReviewEntity()));
         reviewText.setText(movieUserReviewObject.getReviewText());
         entityRating.setRating(movieUserReviewObject.getReviewRating());
@@ -88,18 +89,30 @@ public class MyReviewCard extends RecyclerView.ViewHolder {
             if (isMovieFavourite(movieUserReviewObject.getReviewedEntityId(), activity)) {
 
             }
-            favouriteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    addMovieFavourite(movieUserReviewObject.getMovieDetailObject(), activity);
-                }
-            });
-            favouritedButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    removeMovieFavourite(movieUserReviewObject.getMovieDetailObject(), activity);
-                }
-            });
+
+            if (movieUserReviewObject.getMovieDetailObject() != null && movieUserReviewObject.getMovieDetailObject().getMovieInfo() != null) {
+                favouriteButton.setVisibility(View.VISIBLE);
+                favouriteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addMovieFavourite(movieUserReviewObject.getMovieDetailObject(), activity);
+                    }
+                });
+            } else {
+                favouriteButton.setVisibility(View.GONE);
+            }
+
+            if (movieUserReviewObject.getMovieDetailObject() != null && movieUserReviewObject.getMovieDetailObject().getMovieInfo() != null) {
+                favouritedButton.setVisibility(View.VISIBLE);
+                favouritedButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        removeMovieFavourite(movieUserReviewObject.getMovieDetailObject(), activity);
+                    }
+                });
+            } else {
+                favouritedButton.setVisibility(View.GONE);
+            }
         } else if (movieUserReviewObject.getReviewFor().equalsIgnoreCase("event")) {
             if (isEventFavourite(movieUserReviewObject.getReviewedEntityId(), activity))
                 favouritedButton.setVisibility(View.VISIBLE);
@@ -112,18 +125,28 @@ public class MyReviewCard extends RecyclerView.ViewHolder {
                     activity.shareEventWithBranch(movieUserReviewObject.getEvent(), null, "MyReviews");
                 }
             });
-            favouriteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    addEventFavourite(movieUserReviewObject.getEvent(), activity);
-                }
-            });
-            favouritedButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    removeEventFavourite(movieUserReviewObject.getEvent(), activity);
-                }
-            });
+
+            if (movieUserReviewObject.getEvent() != null) {
+                favouriteButton.setVisibility(View.VISIBLE);
+                favouriteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addEventFavourite(movieUserReviewObject.getEvent(), activity);
+                    }
+                });
+            } else {
+                favouriteButton.setVisibility(View.GONE);
+            }
+            if (movieUserReviewObject.getEvent() != null) {
+                favouritedButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        removeEventFavourite(movieUserReviewObject.getEvent(), activity);
+                    }
+                });
+            } else {
+                favouritedButton.setVisibility(View.GONE);
+            }
         } else {
             shareButton.setVisibility(View.GONE);
             favouriteButton.setVisibility(View.GONE);

@@ -331,13 +331,17 @@ public class EventInfoFragment extends Fragment {
             }
         }
 
-
-        mapDirection.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDirections(event);
-            }
-        });
+        if (event.getMapQuery() != null) {
+            mapDirection.setVisibility(View.VISIBLE);
+            mapDirection.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showDirections(event);
+                }
+            });
+        } else {
+            mapDirection.setVisibility(View.GONE);
+        }
 
 
         if (event.reviewObjects.size() == 0) {
@@ -462,9 +466,11 @@ public class EventInfoFragment extends Fragment {
                 if (location != null) {
                     userLocation = LocationUtils.locationToLatLng(location);
                 }
-
-                String eventTravelTime = LocationUtils.getTravelTime(getActivity(),
-                        userLocation, event.location);
+                String eventTravelTime = null;
+                if (getActivity() != null) {
+                    eventTravelTime = LocationUtils.getTravelTime(getActivity(),
+                            userLocation, event.location);
+                }
                 travelTimeView.setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
                 view.findViewById(R.id.direction_separator).setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
                 if (eventTravelTime != null) {

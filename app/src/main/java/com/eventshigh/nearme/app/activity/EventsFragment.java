@@ -287,8 +287,12 @@ public class EventsFragment extends BaseEventsFragment {
                                             topProgressBar.setVisibility(View.GONE);
 
                                             if (eventsCollection.events.isEmpty()) {
+                                                noMyEventsView.setVisibility(View.VISIBLE);
+
                                                 // Failed. Show toast and return empty list.
                                                 Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+                                            } else {
+                                                noMyEventsView.setVisibility(View.GONE);
                                             }
                                         }
                                         List<Event> filteredEvents = EventsFragment.this.eventsCollection.events;
@@ -418,7 +422,7 @@ public class EventsFragment extends BaseEventsFragment {
 
         topProgressBar.setVisibility(View.GONE);
 
-        if (myEvents.topicEvents.get(0).events.isEmpty() && myEvents.movies.isEmpty()) {
+        if (myEvents == null || ((myEvents.topicEvents == null || myEvents.topicEvents.get(0).events.isEmpty()) && myEvents.movies.isEmpty())) {
             if (EventsHighEndpoints.isMyEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
                 noMyEventsView.setVisibility(View.VISIBLE);
                 noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_event));
@@ -431,8 +435,8 @@ public class EventsFragment extends BaseEventsFragment {
                 noMyEventsView.setVisibility(View.GONE);
                 retryView.setVisibility(View.VISIBLE);
             }
-        }
 
+        }
         if (!myEvents.topicEvents.isEmpty()) {
             if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
                 ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.topicEvents.get(0).events.get(0).imgUrl);

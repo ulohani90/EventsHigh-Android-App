@@ -231,7 +231,7 @@ public class MyReviewsFragment extends Fragment {
     private List<String> getMovies(List<MovieUserReviewObject> movieUserReviewObjectList) {
         List<String> movieList = new ArrayList<>();
         for (MovieUserReviewObject movieUserReviewObject : movieUserReviewObjectList) {
-            if (movieUserReviewObject.getReviewFor().equals("movie")) {
+            if (movieUserReviewObject.getReviewFor().equals("movie") && !movieList.contains(movieUserReviewObject.getReviewedEntityId())) {
                 movieList.add(movieUserReviewObject.getReviewedEntityId());
             }
         }
