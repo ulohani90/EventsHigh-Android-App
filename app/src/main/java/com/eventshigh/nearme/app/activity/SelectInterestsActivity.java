@@ -375,8 +375,8 @@ public class SelectInterestsActivity extends BaseActivity {
     }
 
     public void launchNextActivity() {
-        Intent phoneLoginIntent = new Intent(this, PhoneLoginActivity.class);
-        startActivity(phoneLoginIntent);
+        Intent fbLoginIntent = new Intent(this, FBLoginActivity.class);
+        startActivity(fbLoginIntent);
         finish();
     }
 

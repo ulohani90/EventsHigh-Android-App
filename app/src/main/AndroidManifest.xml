@@ -156,6 +156,21 @@
 
         </activity>
 
+
+        <activity
+            android:name=".activity.FBLoginActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".activity.NewOnboardingActivity"
             android:screenOrientation="portrait"
@@ -469,14 +484,14 @@
             android:name=".activity.UserProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar">
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="@string/fb_login_protocol_scheme" />
-            </intent-filter>
+            </intent-filter>-->
 
         </activity>
 
@@ -485,7 +500,8 @@
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+            android:theme="@style/FullyTranslucent"
+            tools:replace="android:theme"/>
         <activity
             android:name=".activity.GuestDetailActivity"
             android:label="@string/title_activity_guest_detail"

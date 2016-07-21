@@ -32,12 +32,19 @@ public class Account {
         public final String name;
         @Nullable
         public final String phoneNo;
+
         public final Boolean isVerified;
 
-        public UserInfo(@Nullable String name, @Nullable String phoneNo, Boolean isVerified) {
+        public final String email;
+
+        public final String profilePic;
+
+        public UserInfo(@Nullable String name, @Nullable String phoneNo, Boolean isVerified, @Nullable String email, String profilePic) {
             this.name = name;
             this.phoneNo = phoneNo;
             this.isVerified = isVerified;
+            this.email = email;
+            this.profilePic = profilePic;
         }
     }
 
@@ -48,6 +55,15 @@ public class Account {
     private static final String PREF_NAME = "name";
     private static final String PREF_MOBILE_NO = "mobile_no";
     private static final String PREF_MOBILE_NO_VERIFIED = "mobile_no_verified";
+
+    //Email ID of the user
+    private static final String PREF_EMAIL_ID = "email_id";
+
+
+    //Profile pic of the user
+    private static final String PREF_PROFILE_PIC = "profile_pic";
+
+    private static final String PREF_IS_USER_LOGIN_SUCCESS = "is_user_login_success";
 
     // Last city selection by user.
     private static final String PREF_LAST_CITY = "last_city";
@@ -103,7 +119,27 @@ public class Account {
         return new UserInfo(
                 accountInfo.getString(PREF_NAME, null),
                 accountInfo.getString(PREF_MOBILE_NO, null),
-                accountInfo.getBoolean(PREF_MOBILE_NO_VERIFIED, false));
+                accountInfo.getBoolean(PREF_MOBILE_NO_VERIFIED, false),
+                accountInfo.getString(PREF_EMAIL_ID, null),
+                accountInfo.getString(PREF_PROFILE_PIC, null));
+    }
+
+
+    public void recordEmailId(String name, String profilePic, String emailId) {
+
+        SharedPreferences.Editor editor = accountInfo.edit();
+        editor.putString(PREF_NAME, name);
+        editor.putString(PREF_EMAIL_ID, emailId);
+        editor.putString(PREF_PROFILE_PIC, profilePic);
+        //editor.remove(PREF_MOBILE_NO_VERIFIED);
+        editor.apply();
+
+        if (name != null) {
+            Crashlytics.setUserName(name);
+        }
+        if (emailId != null) {
+            Crashlytics.setUserIdentifier(emailId);
+        }
     }
 
     public void recordPhoneNumber(String name, String phoneNumber) {
@@ -156,6 +192,16 @@ public class Account {
         }
 
         return false;
+    }
+
+
+    public static void setPrefIsUserLoginSuccess(boolean prefIsUserLoginSuccess) {
+
+        accountInfo.edit().putBoolean(PREF_IS_USER_LOGIN_SUCCESS, prefIsUserLoginSuccess).apply();
+    }
+
+    public static boolean getPrefIsUserLoginSuccess() {
+        return accountInfo.getBoolean(PREF_IS_USER_LOGIN_SUCCESS, false);
     }
 
     public
