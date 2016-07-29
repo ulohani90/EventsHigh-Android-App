@@ -128,6 +128,11 @@ public class RedeemCouponActivity extends BaseActivity {
 
         fullNameEditText = fullName.getEditText();
         emailAddEditText = emailAdd.getEditText();
+
+        if (account.getUserInfo().isSignedIn) {
+            emailAddEditText.setText(account.getUserInfo().email);
+        }
+
         termsText = (TextView) findViewById(R.id.terms_text);
         if (account.getUserInfo().isVerified) {
             mobileEditText.setText(account.getUserInfo().phoneNo);
@@ -223,7 +228,7 @@ public class RedeemCouponActivity extends BaseActivity {
                                     @Override
                                     public void onResponse(JSONObject s, boolean isIntermediate) {
 
-                                       // updatePreferencesForOffer();
+                                        // updatePreferencesForOffer();
                                         if (progressDialog != null) {
                                             progressDialog.dismiss();
                                         }
@@ -268,7 +273,7 @@ public class RedeemCouponActivity extends BaseActivity {
                     if (selectedVoucherPos != -1) {
                         coupon.setErrorEnabled(false);
                         return true;
-                    } else{
+                    } else {
                         coupon.setErrorEnabled(true);
                         coupon.setError("No coupon selected.");
                         return false;

@@ -92,6 +92,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     JSONObject facebookJsonObject;
 
     private String mobileNoProfileUser;
+    private String emailProfileUser;
     private boolean isUserSelf;
 
     private LinearLayout verifyPhnLayout;
@@ -122,11 +123,10 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             }
 
         });
+        emailProfileUser = getIntent().getStringExtra(PROFILE_ID);
 
-        mobileNoProfileUser = getIntent().getStringExtra(PROFILE_ID);
-        //check if user's self profile
-        if (mobileNoProfileUser != null) {
-            if (mobileNoProfileUser.equalsIgnoreCase(account.getUserInfo().phoneNo)) {
+        if (emailProfileUser != null) {
+            if (emailProfileUser.equalsIgnoreCase(account.getUserInfo().email)) {
                 isUserSelf = true;
             } else {
                 isUserSelf = false;
@@ -134,6 +134,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         } else {
             isUserSelf = true;
         }
+
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         retryView = findViewById(R.id.view_retry);
@@ -195,9 +196,13 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     protected void onStart() {
         super.onStart();
         verifyPhnLayout.setVisibility(View.GONE);
-        if (Utils.checkIfStringEmpty(mobileNoProfileUser) && account.getUserInfo().isVerified) {
-            mobileNoProfileUser = account.getUserInfo().phoneNo;
+
+        if (Utils.checkIfStringEmpty(emailProfileUser) && account.getUserInfo().isSignedIn) {
+            emailProfileUser = account.getUserInfo().email;
         }
+       /* if (Utils.checkIfStringEmpty(mobileNoProfileUser) && account.getUserInfo().isVerified) {
+            mobileNoProfileUser = account.getUserInfo().phoneNo;
+        }*/
         fetchProfileInfo(true);
     }
 
@@ -211,7 +216,8 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             TABS.add(FRIENDS_TAB);
             TABS.add(TICKETS_TAB);
             TABS.add(REVIEWS_TAB);
-            mobileNoProfileUser = account.getUserInfo().phoneNo;
+            emailProfileUser = account.getUserInfo().email;
+            //mobileNoProfileUser = account.getUserInfo().phoneNo;
         } else {
             if (profileInfo.getMyInterestEvents().size() != 0)
                 TABS.add(INTERESTS_TAB);
@@ -220,7 +226,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             TABS.add(REVIEWS_TAB);
             btnFollow.setVisibility(View.VISIBLE);
 
-            if (friendsStore.isFollowing(mobileNoProfileUser)) {
+            if (friendsStore.isFollowing(emailProfileUser)) {
                 btnFollow.setSelected(true);
                 btnFollow.setText(R.string.ui_following);
 
@@ -278,33 +284,33 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     }
 
     private void fetchProfileInfo(boolean shouldByPassChange) {
-        if (Utils.checkIfStringEmpty(mobileNoProfileUser)) {
+        /*if (Utils.checkIfStringEmpty(mobileNoProfileUser)) {
             verifyPhnLayout.setVisibility(View.VISIBLE);
-        } else {
+        } else {*/
 
-            topProgressBar.setVisibility(View.VISIBLE);
-            retryView.setVisibility(View.GONE);
-            FetchProfileRequest.submit(this, mobileNoProfileUser, Request.Priority.HIGH,
-                    new Response.Listener<ProfileInfo>() {
-                        @Override
-                        public void onResponse(ProfileInfo profileInfo, boolean b) {
-                            if (isRunning()) {
-                                if (profileInfo != null) {
-                                    setViews(profileInfo);
-                                } else {
-                                    topProgressBar.setVisibility(View.GONE);
-                                    retryView.setVisibility(View.VISIBLE);
-                                }
+        topProgressBar.setVisibility(View.VISIBLE);
+        retryView.setVisibility(View.GONE);
+        FetchProfileRequest.submit(this, emailProfileUser, Request.Priority.HIGH,
+                new Response.Listener<ProfileInfo>() {
+                    @Override
+                    public void onResponse(ProfileInfo profileInfo, boolean b) {
+                        if (isRunning()) {
+                            if (profileInfo != null) {
+                                setViews(profileInfo);
+                            } else {
+                                topProgressBar.setVisibility(View.GONE);
+                                retryView.setVisibility(View.VISIBLE);
                             }
                         }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            topProgressBar.setVisibility(View.GONE);
-                            retryView.setVisibility(View.VISIBLE);
-                        }
-                    }, shouldByPassChange);
-        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        topProgressBar.setVisibility(View.GONE);
+                        retryView.setVisibility(View.VISIBLE);
+                    }
+                }, shouldByPassChange);
+        //  }
     }
 
     public void addToolbarView() {
@@ -375,18 +381,17 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 fbLoginButtonPressed();
                 break;
             case R.id.profile_share:
-                shareProfileWithBranch(userProfilePagerAdapter.getProfileInfo(), mobileNoProfileUser, null, "Profile");
+                shareProfileWithBranch(userProfilePagerAdapter.getProfileInfo(), emailProfileUser, null, "Profile");
                 break;
             case R.id.btn_follow:
                 if (btnFollow.isSelected()) {
-
                     reportActionToAnalytics("userFollowBtnClick");
-                    friendsStore.setFollowing(mobileNoProfileUser, mobileNoProfileUser, false);
+                    friendsStore.setFollowing(emailProfileUser, null, false);
                     btnFollow.setText(R.string.ui_follow);
                     btnFollow.setSelected(false);
                 } else {
                     reportActionToAnalytics("userUnFollowBtnClick");
-                    friendsStore.setFollowing(mobileNoProfileUser, mobileNoProfileUser, true);
+                    friendsStore.setFollowing(emailProfileUser, null, true);
                     btnFollow.setText(R.string.ui_following);
                     btnFollow.setSelected(true);
                     btnFollow.setSelected(true);
@@ -516,7 +521,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data != null) {
+        if (data != null && callbackManager != null) {
             callbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -558,13 +563,15 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
                 myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false, profileInfo);
                 return myInterestEventsFragment;
             } else if (TABS.get(position).equalsIgnoreCase(REVIEWS_TAB)) {
-                MyReviewsFragment myReviewsFragment = MyReviewsFragment.newInstance(eventsContext, profileInfo.getMovieUserReviewObjectArrayList(), mobileNoProfileUser);
+                MyReviewsFragment myReviewsFragment = MyReviewsFragment.newInstance(eventsContext, profileInfo.getMovieUserReviewObjectArrayList(), emailProfileUser);
                 return myReviewsFragment;
             } else if (TABS.get(position).equalsIgnoreCase(TICKETS_TAB)) {
                 MyTicketsFragment myTicketsFragment = new MyTicketsFragment();
                 return myTicketsFragment;
             } else if (TABS.get(position).equalsIgnoreCase(FRIENDS_TAB)) {
-                ContactsFragment fragment = ContactsFragment.newInstance(profileInfo);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("profile_info", profileInfo);
+                NewContactsFragment fragment = NewContactsFragment.newInstance(bundle);
                 return fragment;
             } else {
                 return null;

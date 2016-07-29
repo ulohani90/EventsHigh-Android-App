@@ -28,6 +28,8 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
 import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
+import com.eventshigh.nearme.app.ui.FBSigninDialog;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.DateTimeUtils.EventTime;
 import com.eventshigh.nearme.app.utils.LocationUtils;
@@ -103,6 +105,8 @@ public class EventCard extends ViewHolder {
 
 
     public void setFavouriteView(@Nullable EventMark eventMark) {
+
+
         favouriteView.setTag(eventMark);
         favouriteView.setImageResource(EventMark.isFavourite(eventMark) ?
                 R.drawable.ic_favorite_red_18dp : R.drawable.ic_favorite_border_black_18dp);
@@ -134,11 +138,18 @@ public class EventCard extends ViewHolder {
             @Override
             public void onClick(View v) {
                 EventMark oldMark = (EventMark) favouriteView.getTag();
+
+
                 EventMark newMark = EventMark.isFavourite(oldMark) ? null : EventMark.FAVOURITE;
+                if (newMark == EventMark.FAVOURITE && !(new Account(activity).getUserInfo().isSignedIn)) {
+                    FBSigninDialog.show(activity, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan_more, 0);
+                }
+
                 activity.reportEventAction(event,
                         EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
                         position);
                 activity.recordEventMark(event, newMark);
+
                 setFavouriteView(newMark);
                 if (EventMark.isFavourite(newMark)) {
                     activity.showMessage("Added to My Events");
@@ -355,6 +366,10 @@ public class EventCard extends ViewHolder {
             public void onClick(View v) {
                 EventMark oldMark = (EventMark) favouriteView.getTag();
                 EventMark newMark = EventMark.isFavourite(oldMark) ? null : EventMark.FAVOURITE;
+                if (newMark == EventMark.FAVOURITE && !(new Account(activity).getUserInfo().isSignedIn)) {
+                    FBSigninDialog.show(activity, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan_more, 0);
+                }
+
                 activity.reportEventAction(event,
                         EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
                         position);

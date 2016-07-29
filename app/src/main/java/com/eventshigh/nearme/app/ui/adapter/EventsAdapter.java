@@ -330,7 +330,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     @Nullable
     @Override
     public Set<SocialFriend> getSocialActions(String eventId) {
-        return socialActions == null? null: socialActions.eventFavourites.get(eventId);
+        return (socialActions == null || socialActions.eventFavourites==null )? null: socialActions.eventFavourites.get(eventId);
     }
 
     @Override

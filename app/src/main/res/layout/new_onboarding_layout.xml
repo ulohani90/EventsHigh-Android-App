@@ -15,6 +15,15 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/onboarding_img_height" />
 
+        <ImageView
+            android:id="@+id/arrow_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="120dp"
+            android:src="@drawable/ic_arrow_point_to_right" />
+
         <LinearLayout
             android:id="@+id/dots_parent"
             android:layout_width="match_parent"

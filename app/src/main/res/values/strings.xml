@@ -68,6 +68,7 @@
     <string name="ui_code">%1$s, we have sent a code to %2$s. Please enter it below.</string>
     <string name="ui_code_verified">%1$s, your phone number %2$s has been verified.</string>
     <string name="ui_verify_phone">Verify your phone number</string>
+    <string name="ui_signin_via_fb">Login via Facebook</string>
     <string name="ui_no_my_event">Personalize this section by clicking on ♥ to favourite events or follow categories and performers.\n\nNever miss events for\nyour interests again!</string>
     <string name="ui_view_location_on_map">View location on map</string>
     <string name="ui_my_events_message">Checkout the events for your interests.</string>
@@ -78,6 +79,8 @@
     <string name="ui_num_views_text">viewed this event</string>
     <string name="ui_num_saves_text">saved this event</string>
     <string name="ui_phone_verify_plan">Please register with your phone number before.</string>
+    <string name="ui_signin_fb_plan">Please login via facebook.</string>
+    <string name="ui_signin_fb_plan_more">Events are best with friends. Please login via facebook to stay connected with your friends on EventsHigh</string>
     <string name="ui_phone_verify_book">Please register with your phone number before continuing with Booking.</string>
     <string name="ui_phone_verify_pa">Events are best with friends. Please register with your phone number for personalized recommendations.</string>
     <string name="ui_share_and_care_text">Sharing is caring. Caring about the coolest events in the city that is. Get your friends onboard EH and adventure on.</string>
@@ -145,7 +148,7 @@
     <string name="num_movies">{0,choice,10&lt;{1} Movies|11&lt;{0} Followers \'|\' {1} Movies}</string>
 
     <!-- Contacts Upload -->
-    <string name="perm_upload_contacts">Events are best with friends. We would like to upload your contacts to our servers so that we can find friends for you.</string>
+    <string name="perm_upload_contacts">Events are best with friends. We would like to upload your contacts so that we can find friends for you.</string>
     <string name="contacts_upload_promise">We will not share your contacts to any third party, that\'s a promise!</string>
 
     <!-- FB -->

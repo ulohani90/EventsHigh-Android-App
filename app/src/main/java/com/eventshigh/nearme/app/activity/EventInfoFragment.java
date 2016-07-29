@@ -31,6 +31,7 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
+import com.eventshigh.nearme.app.ui.FBSigninDialog;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -139,7 +140,9 @@ public class EventInfoFragment extends Fragment {
             view.findViewById(R.id.review_card).setVisibility(View.VISIBLE);
             ((TextView) view.findViewById(R.id.tv_user_review_by)).setText(event.reviewObjects.get(0).getReviewBy());
             //Changing reviewers name clickable if profile_id available
-            if (event.reviewObjects.get(0).getReviewerId() != null && Utils.isValidPhone(event.reviewObjects.get(0).getReviewerId())) {
+            if (event.reviewObjects.get(0).getReviewerId() != null
+                    && Utils.isValidEmail(event.reviewObjects.get(0).getReviewerId())
+                    && !(event.reviewObjects.get(0).getReviewPlatform().equalsIgnoreCase("web"))) {
                 (view.findViewById(R.id.tv_user_review_by)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -390,8 +393,14 @@ public class EventInfoFragment extends Fragment {
                 writeReview(event);
             }
         });
+
         // Connect to Google API client to notify the view.
         getGoogleApiClient(event);
+        if (showWriteReview && view.findViewById(R.id.write_review).isShown()) {
+            writeReview(event);
+            showWriteReview = false;
+        }
+
     }
 
     LatLng userLocation;
@@ -430,16 +439,29 @@ public class EventInfoFragment extends Fragment {
         AppIndex.AppIndexApi.start(client, viewAction);
     }
 
+    boolean showWriteReview;
+
+    public void setShowWriteReview(boolean showWriteReview) {
+        this.showWriteReview = showWriteReview;
+    }
 
     public void writeReview(Event event) {
-        if (account.getUserInfo().phoneNo == null || account.getUserInfo().name == null) {
-            PhoneVerificationDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_verify_phone, R.string.ui_phone_verify_book);
+        if (!account.getUserInfo().isSignedIn) {
+            // PhoneVerificationDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_verify_phone, R.string.ui_phone_verify_book);
+
+           // FBSigninDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan, NewEventDetailActivity.REQUEST_FOR_RESULT_WRITE_REVIEW);
+
+            Intent intent = new Intent(activity, FBLoginActivity.class);
+            intent.putExtra("show_special_text", true);
+            intent.putExtra("hide_skip", true);
+            activity.startActivityForResult(intent, NewEventDetailActivity.REQUEST_FOR_RESULT_WRITE_REVIEW);
+
             return;
         }
         ((NewEventDetailActivity) getActivity()).reportActionToAnalytics("write_review_btn_click");
         Intent i = new Intent(getActivity(), WriteReviewActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putParcelable("movie_detail_object", event);
+        bundle.putParcelable(NewEventDetailActivity.EVENT_OBJECT, event);
         bundle.putString(MovieDetailActivity.OBJECT_TYPE, "event");
         i.putExtras(bundle);
         getActivity().startActivity(i);
@@ -483,8 +505,16 @@ public class EventInfoFragment extends Fragment {
     public void ama(Event event) {
         Account account = new Account(getActivity());
         Account.UserInfo userInfo = account.getUserInfo();
-        if (userInfo.phoneNo == null || userInfo.name == null) {
-            PhoneVerificationDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
+        if (!userInfo.isSignedIn) {
+            // PhoneVerificationDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
+
+            //FBSigninDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan, NewEventDetailActivity.REQUEST_FOR_RESULT_AMA);
+
+            Intent intent = new Intent(activity, FBLoginActivity.class);
+            intent.putExtra("show_special_text", true);
+            intent.putExtra("hide_skip", true);
+
+            activity.startActivityForResult(intent, NewEventDetailActivity.REQUEST_FOR_RESULT_AMA);
             return;
         }
 
@@ -518,8 +548,13 @@ public class EventInfoFragment extends Fragment {
         }
         Account account = new Account(getActivity());
         Account.UserInfo userInfo = account.getUserInfo();
-        if (userInfo.phoneNo == null || userInfo.name == null) {
-            PhoneVerificationDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
+        if (!userInfo.isSignedIn) {
+
+            //  FBSigninDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan, NewEventDetailActivity.REQUEST_FOR_RESULT_CALL_EVENT);
+            Intent intent = new Intent(activity, FBLoginActivity.class);
+            intent.putExtra("show_special_text", true);
+            intent.putExtra("hide_skip", true);
+            activity.startActivityForResult(intent, NewEventDetailActivity.REQUEST_FOR_RESULT_CALL_EVENT);
             return;
         }
 

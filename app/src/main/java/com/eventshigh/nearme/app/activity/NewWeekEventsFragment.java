@@ -736,8 +736,10 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
     public void onResume() {
         super.onResume();
         setSelectedLocalityDistanceText();
-        if (isDistanceClicked) {
-            makeDistanceSortTrue();
+        if (isDistanceClicked || ((LaunchActivity) getActivity()).isLocalityUpdated()) {
+            ((LaunchActivity) getActivity()).setIsLocalityUpdated(false);
+            if (account.getLastLocality() != null)
+                makeDistanceSortTrue();
             isDistanceClicked = false;
         }
     }
@@ -762,9 +764,11 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
     }
 
     public void sortAccToSortState(int sortState) {
-        this.sortState = sortState;
-        sortData();
-        eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+        if (filteredEvents != null) {
+            this.sortState = sortState;
+            sortData();
+            eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+        }
     }
 
     public void sortData() {

@@ -67,7 +67,7 @@ public class MovieUserReviewCard extends RecyclerView.ViewHolder {
             tvReviewBy.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (Utils.isValidPhone(review.getReviewerId())) {
+                    if (Utils.isValidEmail(review.getReviewerId()) && !(review.getReviewPlatform().equalsIgnoreCase("web"))) {
                         Intent intent = new Intent(activity, UserProfileActivity.class);
                         intent.putExtra(UserProfileActivity.PROFILE_ID, review.getReviewerId());
                         activity.startActivity(intent);
@@ -79,7 +79,7 @@ public class MovieUserReviewCard extends RecyclerView.ViewHolder {
             } else {
                 tvReviewBy.setTextColor(Color.parseColor("#666666"));
             }*/
-        }else{
+        } else {
             //tvReviewBy.setTextColor(Color.parseColor("#666666"));
         }
 

@@ -31,6 +31,7 @@
                 android:layout_height="wrap_content"
                 android:background="#eeeeee"
                 android:elevation="0dp"
+                app:layout_behavior="com.eventshigh.nearme.app.view.FlingBehavior"
                 android:fitsSystemWindows="true"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 

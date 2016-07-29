@@ -22,6 +22,7 @@ public class PhoneVerificationDialog {
                     public void onClick(DialogInterface dialog, int which) {
                         activity.reportActionToAnalytics("phoneVerificationAccepted");
                         activity.startActivity(new Intent(activity, PhoneLoginActivity.class));
+
                     }
                 })
                 .setCancelable(true)

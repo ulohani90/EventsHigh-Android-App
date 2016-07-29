@@ -174,12 +174,12 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
                 jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.reviewEntityId);
             } else if (writeReviewActivity.type.equals("movie")) {
                 jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.movieDetailObject.getMovieInfo().getId());
-            } else if (writeReviewActivity.type.equals("event")) {
+            } else if (writeReviewActivity.type.equals("event") && writeReviewActivity.event!=null) {
                 jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.event.id);
             }
             jsonObject.put(JSON_KEY_REVIEW_FOR, writeReviewActivity.type);
             jsonObject.put(JSON_KEY_REVIEW_ENTITY, tvMovieName.getText().toString());
-            jsonObject.put(JSON_KEY_REVIEWER_ID, (new Account(writeReviewActivity)).getUserInfo().phoneNo);
+            jsonObject.put(JSON_KEY_REVIEWER_ID, (new Account(writeReviewActivity)).getUserInfo().email);
             jsonObject.put(JSON_KEY_REVIEW_RATINGS, (int) rbMovieRating.getRating());
             jsonObject.put(JSON_KEY_REVIEW_TEXT, etWriteReviewDescription.getText().toString());
             jsonObject.put(JSON_KEY_REVIEW_BY, (new Account(writeReviewActivity)).getUserInfo().name);

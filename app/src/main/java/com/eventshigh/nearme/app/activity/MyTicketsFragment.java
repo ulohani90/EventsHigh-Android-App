@@ -55,7 +55,7 @@ public class MyTicketsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_my_tickets, container, false);
         myTicketsList = (AutofitRecyclerView) view.findViewById(R.id.my_tickets_grid);
         // More views.
-        noMyEventsView = view.findViewById(R.id.view_no_my_event);
+        noMyEventsView = view.findViewById(R.id.no_tickets_view);
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         retryView = view.findViewById(R.id.view_retry);
         view.findViewById(R.id.retry).setOnClickListener(new View.OnClickListener() {
@@ -66,10 +66,10 @@ public class MyTicketsFragment extends Fragment {
         });
         //phone verify
         account = new Account(context);
-        verifyPhnLayout = (LinearLayout)view.findViewById(R.id.verify_phn_layout);
+        verifyPhnLayout = (LinearLayout) view.findViewById(R.id.verify_phn_layout);
         (view.findViewById(R.id.verify_btn)).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 verifyClicked();
             }
         });
@@ -77,8 +77,8 @@ public class MyTicketsFragment extends Fragment {
         return view;
     }
 
-    public void verifyClicked(){
-        startActivity(new Intent(context,PhoneLoginActivity.class));
+    public void verifyClicked() {
+        startActivity(new Intent(context, PhoneLoginActivity.class));
     }
 
 
@@ -106,29 +106,29 @@ public class MyTicketsFragment extends Fragment {
     }
 
     private void fetchData(boolean shouldCache) {
-    if(Utils.checkIfStringEmpty(account.getUserInfo().phoneNo)){
-        verifyPhnLayout.setVisibility(View.VISIBLE);
-    }else{
-        verifyPhnLayout.setVisibility(View.GONE);
-        topProgressBar.setVisibility(View.VISIBLE);
-        retryView.setVisibility(View.GONE);
-        noMyEventsView.setVisibility(View.GONE);
-        MyTicketsRequest.submit(getActivity(), Request.Priority.IMMEDIATE, this, shouldCache, mTicketsListener, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, R.string.failed_load, Toast.LENGTH_SHORT).show();
-                topProgressBar.setVisibility(View.GONE);
-                retryView.setVisibility(View.VISIBLE);
-            }
-        }, false);
-    }
+        if (Utils.checkIfStringEmpty(account.getUserInfo().email)) {
+            verifyPhnLayout.setVisibility(View.VISIBLE);
+        } else {
+            verifyPhnLayout.setVisibility(View.GONE);
+            topProgressBar.setVisibility(View.VISIBLE);
+            retryView.setVisibility(View.GONE);
+            noMyEventsView.setVisibility(View.GONE);
+            MyTicketsRequest.submit(getActivity(), Request.Priority.IMMEDIATE, this, shouldCache, mTicketsListener, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    Toast.makeText(context, R.string.failed_load, Toast.LENGTH_SHORT).show();
+                    topProgressBar.setVisibility(View.GONE);
+                    retryView.setVisibility(View.VISIBLE);
+                }
+            }, false);
+        }
     }
 
     private Response.Listener<List<MyTicketObject>> mTicketsListener = new Response.Listener<List<MyTicketObject>>() {
         @Override
         public void onResponse(List<MyTicketObject> tickets, boolean isIntermediate) {
-            if (tickets != null)setAdapterData(tickets);
-            if(tickets == null || tickets.size() == 0)noMyEventsView.setVisibility(View.VISIBLE);
+            if (tickets != null) setAdapterData(tickets);
+            if (tickets == null || tickets.size() == 0) noMyEventsView.setVisibility(View.VISIBLE);
             topProgressBar.setVisibility(View.GONE);
 
 
@@ -148,7 +148,7 @@ public class MyTicketsFragment extends Fragment {
     EventsAdapter.OnMyTicketItemClickedListener myTicketItemClickedListener = new EventsAdapter.OnMyTicketItemClickedListener() {
         @Override
         public void onItemClicked(int pos) {
-            if (clickPosition == -1){
+            if (clickPosition == -1) {
                 clickPosition = pos;
             } else if (clickPosition == pos) {
                 clickPosition = -1;

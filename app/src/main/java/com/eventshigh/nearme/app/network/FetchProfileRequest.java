@@ -24,17 +24,17 @@ import java.security.GeneralSecurityException;
 
 public class FetchProfileRequest extends JsonRequest<ProfileInfo>{
 
-    public static void submit(Context context,String mobileNo,
+    public static void submit(Context context,String email,
                               Priority priority, Response.Listener<ProfileInfo> listener, Response.ErrorListener errorListener, boolean shouldByPassCache) {
 
         try {
-            String url = EventsHighEndpoints.API_URI_BASE +"api/user_info_for_mobile_no/"+mobileNo;
+            String url = EventsHighEndpoints.API_URI_BASE +"api/user_info_for_email/"+email;
             Uri uri = Uri.parse(url);
             url = Signer.sign(uri).toString();
             if (shouldByPassCache){
                 //url += "&cmode=bypass";
             }
-            FetchProfileRequest request = new FetchProfileRequest(mobileNo,
+            FetchProfileRequest request = new FetchProfileRequest(email,
                     url,priority,context, listener, errorListener, shouldByPassCache);
             request.setRetryPolicy(new DefaultRetryPolicy(60_000,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));

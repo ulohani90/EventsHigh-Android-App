@@ -30,29 +30,29 @@ import java.util.List;
  * @author shubham
  * @since 15/6/16.
  */
-public class MyTicketsRequest extends JsonRequest<List<MyTicketObject>>{
+public class MyTicketsRequest extends JsonRequest<List<MyTicketObject>> {
 
     private boolean reviewEvent = false;
 
     public static void submit(Context context, Priority priority,
                               Object tag, boolean shouldBypassCache, Response.Listener<List<MyTicketObject>> listener,
-                              Response.ErrorListener errorListener, boolean reviewEvent){
+                              Response.ErrorListener errorListener, boolean reviewEvent) {
 
-        String url = EventsHighEndpoints.API_URI_BASE+"mobileapp/my_tickets?mobile_no=";
-        url += (new Account(context)).getUserInfo().phoneNo;
-        if (shouldBypassCache){
+        String url = EventsHighEndpoints.API_URI_BASE + "mobileapp/my_tickets_for_email?email=";
+        url += (new Account(context)).getUserInfo().email;
+        if (shouldBypassCache) {
             url += "&cmode=bypass";
         }
         Uri uri = Uri.parse(url);
         try {
             uri = Signer.sign(uri);
-        }catch (GeneralSecurityException gse){
+        } catch (GeneralSecurityException gse) {
             Log.e("MyTicketsRequest", gse.toString());
-        }catch (UnsupportedEncodingException uee){
+        } catch (UnsupportedEncodingException uee) {
             Log.e("MyTicketsRequest", uee.toString());
         }
         MyTicketsRequest request = new MyTicketsRequest(
-                context, uri, shouldBypassCache, priority, listener, errorListener,reviewEvent);
+                context, uri, shouldBypassCache, priority, listener, errorListener, reviewEvent);
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }
@@ -76,7 +76,6 @@ public class MyTicketsRequest extends JsonRequest<List<MyTicketObject>>{
     }
 
 
-
     @Override
     protected Response<List<MyTicketObject>> parseNetworkResponse(NetworkResponse response) {
         try {
@@ -85,19 +84,21 @@ public class MyTicketsRequest extends JsonRequest<List<MyTicketObject>>{
             JSONObject eventJson = new JSONObject(jsonString);
 
             JSONArray itemsJson = new JSONArray();
-            if(eventJson.has("items"))
-            itemsJson = eventJson.getJSONArray("items");
+            if (eventJson.has("items"))
+                itemsJson = eventJson.getJSONArray("items");
 
             boolean hasSubmittedReview;
 
-            hasSubmittedReview= eventJson.getBoolean("hasSubmittedReview");
+            hasSubmittedReview = eventJson.getBoolean("hasSubmittedReview");
 
-            if(reviewEvent && hasSubmittedReview){
-                return Response.success(null,HttpHeaderParser.parseCacheHeaders(response));
-            }else{
+            if (reviewEvent && hasSubmittedReview) {
+                return Response.success(null, HttpHeaderParser.parseCacheHeaders(response));
+            } else {
+
                 return Response.success(MyTicketObject.fromJSON(itemsJson), HttpHeaderParser.parseCacheHeaders(response));
             }
         } catch (UnsupportedEncodingException | JSONException e) {
+            Log.i("Exception", e.getMessage());
             Crashlytics.getInstance().core.logException(e);
             return Response.error(new ParseError(e));
         }

@@ -91,7 +91,9 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
                 .build();
         if (mGoogleApiClient != null)
             mGoogleApiClient.connect();
-        dataAdapter = new GooglePlacesAutocompleteAdapter(PlacesAutocompleteBoundedActivity.this, mGoogleApiClient, account.getLastCity().cityBounds, null, account.getLastCity().name());
+
+
+        dataAdapter = new GooglePlacesAutocompleteAdapter(PlacesAutocompleteBoundedActivity.this, mGoogleApiClient, (account.getLastCity() != null) ? account.getLastCity().cityBounds : null, null, account.getLastCity().name());
         listView = (ListView) findViewById(R.id.lv_search_place_list);
         listView.setAdapter(dataAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

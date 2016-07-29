@@ -32,6 +32,7 @@ import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.network.MovieDetailRequest;
 import com.eventshigh.nearme.app.network.MyReviewsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.ui.FBSigninDialog;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -68,6 +69,8 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     private final String SHOWTIME = "showtime";
     private final String INFO = "info";
     public ArrayList<String> TABS;
+
+    public static final int REQUEST_RESULT_FOR_WRITE_MOVIE_REVIEW = 0x015;
 
     int movieId = 1798;
     ProgressBar topProgressBar;
@@ -199,7 +202,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
 
     public void findReviewsByUserForMovie(List<MovieUserReviewObject> reviews) {
         for (MovieUserReviewObject obj : reviews) {
-            if (obj.getReviewerId().equalsIgnoreCase(account.getUserInfo().phoneNo) && obj.getReviewedEntityId().equalsIgnoreCase(movieDetailOject.getMovieInfo().getId() + "")) {
+            if (obj.getReviewerId().equalsIgnoreCase(account.getUserInfo().email) && obj.getReviewedEntityId().equalsIgnoreCase(movieDetailOject.getMovieInfo().getId() + "")) {
                 movieDetailOject.getUserReviews().add(0, obj);
                 isMyReviewAdded = true;
                 break;
@@ -208,7 +211,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     }
 
     public void makeMyReviewsServerRequest(boolean shouldByPassCache) {
-        MyReviewsRequest.submit(this, account.getUserInfo().phoneNo, Request.Priority.IMMEDIATE, this, shouldByPassCache, mReviewListener, new Response.ErrorListener() {
+        MyReviewsRequest.submit(this, account.getUserInfo().email, Request.Priority.IMMEDIATE, this, shouldByPassCache, mReviewListener, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 Toast.makeText(MovieDetailActivity.this, R.string.failed_load,
@@ -359,7 +362,7 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
     }
 
     protected void animateFab(int position) {
-        if (!TABS.get(position).equalsIgnoreCase(USER_REVIEWS)){
+        if (!TABS.get(position).equalsIgnoreCase(USER_REVIEWS)) {
             if (fabWriteReviews.getVisibility() == View.VISIBLE) {
                 fabWriteReviews.setVisibility(View.GONE);
                 TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, 250);
@@ -376,22 +379,42 @@ public class MovieDetailActivity extends BaseContextActivity implements ViewPage
         }
     }
 
+
+    public void writeMovieReview() {
+        if (account.getUserInfo().phoneNo == null || account.getUserInfo().name == null) {
+            // PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
+            // FBSigninDialog.show(this, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan, REQUEST_RESULT_FOR_WRITE_MOVIE_REVIEW);
+            Intent intent = new Intent(this, FBLoginActivity.class);
+            intent.putExtra("show_special_text", true);
+            intent.putExtra("hide_skip", true);
+            startActivityForResult(intent, REQUEST_RESULT_FOR_WRITE_MOVIE_REVIEW);
+
+            return;
+        }
+        Intent i = new Intent(this, WriteReviewActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(MOVIE_DETAIL_OBJECT, movieDetailOject);
+        bundle.putString(OBJECT_TYPE, "movie");
+        i.putExtras(bundle);
+        startActivity(i);
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab_write_review:
-                if (account.getUserInfo().phoneNo == null || account.getUserInfo().name == null) {
-                    PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
-                    return;
-                }
-                Intent i = new Intent(this, WriteReviewActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(MOVIE_DETAIL_OBJECT, movieDetailOject);
-                bundle.putString(OBJECT_TYPE, "movie");
-                i.putExtras(bundle);
-                startActivity(i);
+                writeMovieReview();
                 // overridePendingTransition(R.anim.animate_slide_up, R.anim.stay);
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_RESULT_FOR_WRITE_MOVIE_REVIEW) {
+                writeMovieReview();
+            }
         }
     }
 }

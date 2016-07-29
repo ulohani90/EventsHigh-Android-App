@@ -6,9 +6,13 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -41,18 +45,51 @@ public class FBLoginActivity extends AppCompatActivity {
 
     ProgressDialog dialog;
 
+    boolean hideSkip;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_fb_login_layout);
+
+        hideSkip = getIntent().getBooleanExtra("hide_skip", false);
+
+
+        boolean showSpecialText = getIntent().getBooleanExtra("show_special_text", false);
         findViewById(R.id.fb_login).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 fbLoginButtonPressed();
             }
         });
+
+        TextView fbLoginText = (TextView) findViewById(R.id.fb_login_text);
+
+        TextView skip = (TextView) findViewById(R.id.skip_login);
+        if (hideSkip) {
+            skip.setVisibility(View.GONE);
+
+        } else {
+            skip.setVisibility(View.VISIBLE);
+            skip.setText("SKIP");
+            skip.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+
+        }
+
+        if (showSpecialText) {
+            fbLoginText.setText("Please login to continue the action");
+        } else {
+            fbLoginText.setText("See what's trending with your friends");
+        }
+
+
     }
 
     void fbLoginButtonPressed() {
@@ -140,8 +177,8 @@ public class FBLoginActivity extends AppCompatActivity {
                         //updateProfile();
                         dialog.dismiss();
                         try {
-                            new Account(FBLoginActivity.this).recordEmailId(object.getString("fb_name"), object.getString("fb_profile_pic"), object.getString("fb_email"));
-                            Toast.makeText(FBLoginActivity.this, "Your profile has been updated successfully.", Toast.LENGTH_SHORT).show();
+                            new Account(FBLoginActivity.this).recordEmailId(object.getString("fb_name"), object.getString("fb_profile_pic"), object.getString("fb_email"), true);
+                            setResult(RESULT_OK);
                             finish();
                         } catch (JSONException e) {
                             e.printStackTrace();

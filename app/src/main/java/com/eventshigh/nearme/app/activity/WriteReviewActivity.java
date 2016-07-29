@@ -92,17 +92,6 @@ public class WriteReviewActivity extends BaseActivity implements RatingBar.OnRat
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (account != null && !(account.getUserInfo().isVerified)) {
-            verifyPhnLayout.setClickable(true);
-            verifyPhnLayout.setVisibility(View.VISIBLE);
-        } else {
-            verifyPhnLayout.setVisibility(View.GONE);
-        }
-    }
-
 
     //on ratingbar touch inside rating review fragment
     float xDown;
@@ -150,7 +139,6 @@ public class WriteReviewActivity extends BaseActivity implements RatingBar.OnRat
     public void verifyClicked() {
         startActivity(new Intent(this, PhoneLoginActivity.class));
     }
-
 
 
     @Override

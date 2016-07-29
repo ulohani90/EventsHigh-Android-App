@@ -45,15 +45,15 @@ public class ProfileInfo implements Parcelable {
     private ArrayList<MovieUserReviewObject> movieUserReviewObjectArrayList;
     private ArrayList<MyEventsRequest.TopicEvents> myInterestEvents;
     private MyEventsRequest.MeEventFavouriteObject meEventFavouriteObject;
-    private List<UserContact> userContactList;
+    private List<NewSocialFriend> friendList;
 
     //getter and setters
-    public List<UserContact> getUserContactList() {
-        return userContactList;
+    public List<NewSocialFriend> getUserContactList() {
+        return friendList;
     }
 
-    public void setUserContactList(List<UserContact> userContactList) {
-        this.userContactList = userContactList;
+    public void setUserContactList(List<NewSocialFriend> friendList) {
+        this.friendList = friendList;
     }
 
     public String getEmail() {
@@ -129,7 +129,7 @@ public class ProfileInfo implements Parcelable {
                        ArrayList<MovieUserReviewObject> movieUserReviewObjects,
                        ArrayList<MyEventsRequest.TopicEvents> myInterestObjectList,
                        MyEventsRequest.MeEventFavouriteObject meEventFavouriteObject,
-                       List<UserContact> userContactList) {
+                       List<NewSocialFriend> friendList) {
         this.name = name;
         this.lastCity = lastCity;
         this.profilePic = profilePic;
@@ -137,7 +137,7 @@ public class ProfileInfo implements Parcelable {
         this.movieUserReviewObjectArrayList = movieUserReviewObjects;
         this.myInterestEvents = myInterestObjectList;
         this.meEventFavouriteObject = meEventFavouriteObject;
-        this.userContactList = userContactList;
+        this.friendList = friendList;
     }
 
     public ProfileInfo(Parcel in) {
@@ -146,12 +146,12 @@ public class ProfileInfo implements Parcelable {
         in.readTypedList(movieUserReviewObjectArrayList, MovieUserReviewObject.CREATOR);
         myInterestEvents = new ArrayList<>();
         in.readTypedList(myInterestEvents, MyEventsRequest.TopicEvents.CREATOR);
-        userContactList = new ArrayList<>();
-        in.readTypedList(userContactList, UserContact.CREATOR);
+        friendList = new ArrayList<>();
+        in.readTypedList(friendList, NewSocialFriend.CREATOR);
     }
 
 
-    public static ProfileInfo fromJson(JSONObject jsonObject, Context context, String profileMobileNo) {
+    public static ProfileInfo fromJson(JSONObject jsonObject, Context context, String profileEmail) {
         ArrayList<MyEventsRequest.TopicEvents> events = new ArrayList<>();
         ArrayList<MovieUserReviewObject> movieUserReviewObjects = new ArrayList<>();
 
@@ -164,7 +164,7 @@ public class ProfileInfo implements Parcelable {
 
                     List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"), true, null);
 
-                    if (profileMobileNo.equalsIgnoreCase(new Account(context).getUserInfo().phoneNo))
+                    if (profileEmail.equalsIgnoreCase(new Account(context).getUserInfo().email))
                         new Account(context).setIsFollowing(eventsJsonArray.getJSONObject(i).getString("topic"), true);
                     MyEventsRequest.TopicEvents eventData = new MyEventsRequest.TopicEvents(eventsJsonArray.getJSONObject(i).getString("topic"), topicEvents, eventsJsonArray.getJSONObject(i).getInt("event_count"));
                     events.add(eventData);
@@ -195,16 +195,28 @@ public class ProfileInfo implements Parcelable {
             List<MovieDetailObject> favouriteMovie = new ArrayList<>();
 
             if (jsonObject.has("fav_events")) {
-                List<Event> topicEvents = Event.fromJSON(context, jsonObject.getJSONArray("fav_events"), true, profileMobileNo.equalsIgnoreCase(new Account(context).getUserInfo().phoneNo));
+                List<Event> topicEvents = Event.fromJSON(context, jsonObject.getJSONArray("fav_events"), true, profileEmail.equalsIgnoreCase(new Account(context).getUserInfo().email));
                 favouriteTopicEvents.add(new MyEventsRequest.TopicEvents(MyEventsRequest.FAVOURITES_NAME, topicEvents));
             }
             if (jsonObject.has("fav_movies")) {
-                favouriteMovie = MovieDetailObject.fromJSON(context, jsonObject.getJSONArray("fav_movies"), profileMobileNo.equalsIgnoreCase(new Account(context).getUserInfo().phoneNo));
+                favouriteMovie = MovieDetailObject.fromJSON(context, jsonObject.getJSONArray("fav_movies"), profileEmail.equalsIgnoreCase(new Account(context).getUserInfo().email));
             }
 
-            List<UserContact> userContactList;
+            List<NewSocialFriend> friendList = new ArrayList<>();
             if (jsonObject.has("friends")) {
+
                 JSONArray friends = jsonObject.getJSONArray("friends");
+                FriendsStore friendsStore = new FriendsStore(context);
+                if (friends != null) {
+                    for (int i = 0; i < friends.length(); i++) {
+
+                        NewSocialFriend newFriend = NewSocialFriend.parseJsonObject(friends.getJSONObject(i));
+                        friendList.add(newFriend);
+                        if (profileEmail.equalsIgnoreCase(new Account(context).getUserInfo().email) && !friendsStore.isKeyExists(newFriend.getEmail()))
+                            friendsStore.setFollowing(newFriend.getEmail(), null, true);
+                    }
+                }
+               /* JSONArray friends = jsonObject.getJSONArray("friends");
                 String myMobileNo = new Account(context).getUserInfo().phoneNo;
                 Set<UserContact> contactOnEh = new HashSet<>();
                 FriendsStore friendsStore = new FriendsStore(context);
@@ -214,7 +226,7 @@ public class ProfileInfo implements Parcelable {
                         UserContact contact = ContactUtils.getContactForServerPhone(context, mobileNo);
                         if (contact != null) {
                             contactOnEh.add(contact);
-                            if (profileMobileNo.equalsIgnoreCase(new Account(context).getUserInfo().phoneNo) && !friendsStore.isKeyExists(mobileNo))
+                            if (profileEmail.equalsIgnoreCase(new Account(context).getUserInfo().email) && !friendsStore.isKeyExists(mobileNo))
                                 friendsStore.setFollowing(contact.mobileNo, contact.contactId, true);
                         }
                     }
@@ -230,14 +242,10 @@ public class ProfileInfo implements Parcelable {
                         }
                         return lhs.name.compareTo(rhs.name);
                     }
-                });
-            } else {
-                userContactList = new ArrayList<>();
+                });*/
             }
-
-
             return new ProfileInfo(profileName, profileLastCity, profilePic, email, movieUserReviewObjects,
-                    events, new MyEventsRequest.MeEventFavouriteObject(favouriteTopicEvents, favouriteMovie), userContactList);
+                    events, new MyEventsRequest.MeEventFavouriteObject(favouriteTopicEvents, favouriteMovie), friendList);
         } catch (JSONException jse) {
             Log.e("ProfileInfo Json Parse", jse.toString());
         }
@@ -259,7 +267,7 @@ public class ProfileInfo implements Parcelable {
         dest.writeTypedList(movieUserReviewObjectArrayList);
         dest.writeTypedList(myInterestEvents);
         dest.writeParcelable(meEventFavouriteObject, flags);
-        dest.writeTypedList(userContactList);
+        dest.writeTypedList(friendList);
     }
 
     private static String emptyIfNull(@Nullable String string) {

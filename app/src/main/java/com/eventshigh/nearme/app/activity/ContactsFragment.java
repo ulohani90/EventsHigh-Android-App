@@ -158,7 +158,7 @@ public class ContactsFragment extends Fragment {
             } else if (profileInfo.getUserContactList().isEmpty()) {
                 uploadContacts(shouldBypassCache);
             }
-            contactsAdapter.setMyContacts(profileInfo.getUserContactList(), FriendCardType.FOLLOW);
+           // contactsAdapter.setMyContacts(profileInfo.getUserContactList(), FriendCardType.FOLLOW);
         } else if (preferences.canUploadContacts()) {
             requestMyContactsFromServer(shouldBypassCache);
         } else {
@@ -207,7 +207,7 @@ public class ContactsFragment extends Fragment {
             if (contacts.isEmpty()) {
                 noFriendsOnEhView.setVisibility(View.VISIBLE);
             }
-            profileInfo.setUserContactList(contacts);
+           // profileInfo.setUserContactList(contacts);
             contactsAdapter.setMyContacts(contacts, FriendCardType.FOLLOW);
             ((UserProfileActivity)getActivity()).setFriendsCount(contacts.size());
         }

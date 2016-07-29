@@ -1,13 +1,17 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PersistableBundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,6 +27,10 @@ public class NewOnboardingActivity extends BaseActivity {
 
     LinearLayout dotsView;
     ViewPager pager;
+
+    View arrowRight;
+
+    boolean isArrowShown;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,7 +59,18 @@ public class NewOnboardingActivity extends BaseActivity {
             }
         });
 
+        arrowRight = findViewById(R.id.arrow_right);
+        isArrowShown = true;
+
     }
+
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            if (isRunning())
+                animateArrowForward();
+        }
+    };
 
     int images[] = {R.drawable.ic_onboarding_1, R.drawable.ic_onboarding_2, R.drawable.ic_onboarding_3, R.drawable.ic_onboarding_4};
 
@@ -85,11 +104,41 @@ public class NewOnboardingActivity extends BaseActivity {
         }
     }
 
+    public void hideArrow() {
+        ObjectAnimator anim = ObjectAnimator.ofFloat(arrowRight, View.ALPHA, 1, 0);
+        anim.setDuration(200);
+        anim.start();
+        anim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                arrowRight.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        isArrowShown = false;
+    }
+
     private class DotsSelector implements ViewPager.OnPageChangeListener {
 
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            // do nothing.
+            if (positionOffset > 0.2 && isArrowShown) {
+                hideArrow();
+            }
         }
 
         @Override
@@ -123,6 +172,76 @@ public class NewOnboardingActivity extends BaseActivity {
         // in onStart. If users kills the app or if app crashes for any reasons, we
         // do not show onboarding screen again.
         Preferences.getInstance(this).setShowOnboarding(false);
+
+
+    }
+
+
+    private void animateArrowForward() {
+        ObjectAnimator anim = ObjectAnimator.ofFloat(arrowRight, View.TRANSLATION_X, 0, 30f);
+        anim.setDuration(500);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.addListener(new Animator.AnimatorListener() {
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                animateArrowBackward();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+        });
+        anim.start();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isArrowShown) {
+            new Handler().postDelayed(runnable, 1000);
+        }
+    }
+
+    private void animateArrowBackward() {
+        ObjectAnimator anim = ObjectAnimator.ofFloat(arrowRight, View.TRANSLATION_X, 30, 0);
+        anim.setDuration(500);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.addListener(new Animator.AnimatorListener() {
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                animateArrowForward();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+        });
+        anim.start();
     }
 
 }

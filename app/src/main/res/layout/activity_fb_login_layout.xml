@@ -1,20 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     android:gravity="center"
+
     android:orientation="vertical">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/lgoin_page_bg" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="64dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/fb_login_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="See what's trending with your friends"
+            android:layout_marginBottom="24dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/fb_login"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:background="@drawable/facebook_btn_bg"
+            android:drawableLeft="@drawable/ic_fb_btn"
+            android:drawablePadding="20dp"
+            android:gravity="center"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:text="Continue with Facebook"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="We don't post anything without your permission"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
     <TextView
-        android:id="@+id/fb_login"
+        android:id="@+id/skip_login"
         android:layout_width="wrap_content"
-        android:layout_height="56dp"
-        android:background="#2F4984"
-        android:drawableLeft="@drawable/fb_24dp"
-        android:drawablePadding="20dp"
+        android:layout_height="48dp"
+        android:layout_gravity="end"
+        android:layout_marginTop="10dp"
         android:gravity="center"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:text="Sign in with Facebook"
-        android:textColor="@android:color/white" />
-</LinearLayout>
+        android:padding="10dp"
+        android:textColor="@android:color/white"
+        android:textSize="14sp" />
+</FrameLayout>

@@ -45,6 +45,7 @@ import com.eventshigh.nearme.app.network.MyReviewsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
+import com.eventshigh.nearme.app.ui.FBSigninDialog;
 import com.eventshigh.nearme.app.ui.InviteFriendsDialog;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.ui.RateAppDialog;
@@ -100,6 +101,11 @@ public class NewEventDetailActivity extends BaseContextActivity {
     LinearLayout dotsView;
     TextView bookView;
     View joinView;
+
+    public static final int REQUEST_FOR_RESULT_BOOK_TICKETS = 0x009;
+    public static final int REQUEST_FOR_RESULT_AMA = 0x010;
+    public static final int REQUEST_FOR_RESULT_CALL_EVENT = 0x011;
+    public static final int REQUEST_FOR_RESULT_WRITE_REVIEW = 0x012;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,8 +223,8 @@ public class NewEventDetailActivity extends BaseContextActivity {
             reportEventAction(event, "addFavourite");
 
             Account account = new Account(this);
-            if (!account.getUserInfo().isVerified) {
-                PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_pa);
+            if (!account.getUserInfo().isSignedIn) {
+                FBSigninDialog.show(this, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan_more, 1);
             }
         }
 
@@ -258,7 +264,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
     };
 
     public void makeMyReviewsServerRequest(boolean shouldByPassCache) {
-        MyReviewsRequest.submit(this, account.getUserInfo().phoneNo, Request.Priority.IMMEDIATE, this, shouldByPassCache, mReviewListener, new Response.ErrorListener() {
+        MyReviewsRequest.submit(this, account.getUserInfo().email, Request.Priority.IMMEDIATE, this, shouldByPassCache, mReviewListener, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 Toast.makeText(NewEventDetailActivity.this, R.string.failed_load,
@@ -283,7 +289,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
     public void findReviewsByUserForMovie(List<MovieUserReviewObject> reviews) {
         for (MovieUserReviewObject obj : reviews) {
-            if (obj.getReviewerId().equalsIgnoreCase(account.getUserInfo().phoneNo)
+            if (obj.getReviewerId().equalsIgnoreCase(account.getUserInfo().email)
                     && obj.getReviewedEntityId().equalsIgnoreCase(event.id + "")) {
                 event.reviewObjects.add(0, obj);
                 isMyReviewWritten = true;
@@ -371,7 +377,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
             bookView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    openBookingSite(v);
+                    openBookingSite();
                 }
             });
         }
@@ -542,11 +548,15 @@ public class NewEventDetailActivity extends BaseContextActivity {
     }
 
 
-    public void openBookingSite(View view) {
+    public void openBookingSite() {
         Account account = new Account(this);
         Account.UserInfo userInfo = account.getUserInfo();
-        if (userInfo.phoneNo == null || userInfo.name == null) {
-            PhoneVerificationDialog.show(this, R.string.ui_verify_phone, R.string.ui_phone_verify_book);
+        if (!userInfo.isSignedIn) {
+           // FBSigninDialog.show(this, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan, REQUEST_FOR_RESULT_BOOK_TICKETS);
+            Intent intent = new Intent(this, FBLoginActivity.class);
+            intent.putExtra("show_special_text", true);
+            intent.putExtra("hide_skip", true);
+            startActivityForResult(intent, REQUEST_FOR_RESULT_BOOK_TICKETS);
             return;
         }
 
@@ -737,5 +747,30 @@ public class NewEventDetailActivity extends BaseContextActivity {
         eventsMarkerEditor.close();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_FOR_RESULT_AMA) {
+                if (fragment != null) {
+                    fragment.ama(event);
+                }
+            }
+            if (requestCode == REQUEST_FOR_RESULT_BOOK_TICKETS) {
+                openBookingSite();
+            }
+            if (requestCode == REQUEST_FOR_RESULT_CALL_EVENT) {
+                if (fragment != null) {
+                    fragment.call(event);
+                }
+            }
 
+            if (requestCode == REQUEST_FOR_RESULT_WRITE_REVIEW) {
+                makeMyReviewsServerRequest(true);
+                if (fragment != null) {
+                    fragment.setShowWriteReview(true);
+
+                }
+            }
+        }
+    }
 }

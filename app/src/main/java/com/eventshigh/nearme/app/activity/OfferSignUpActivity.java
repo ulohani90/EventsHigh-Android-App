@@ -114,6 +114,9 @@ public class OfferSignUpActivity extends BaseActivity {
         mobileEditText = mobileNum.getEditText();
         fullNameEditText = fullName.getEditText();
         emailAddEditText = emailAdd.getEditText();
+        if (account.getUserInfo().isSignedIn) {
+            emailAddEditText.setText(account.getUserInfo().email);
+        }
         if (account.getUserInfo().isVerified) {
             mobileEditText.setText(account.getUserInfo().phoneNo);
             fullNameEditText.setText(account.getUserInfo().name);

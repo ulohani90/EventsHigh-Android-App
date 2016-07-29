@@ -12,7 +12,6 @@ import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -50,7 +49,6 @@ import com.eventshigh.nearme.app.broadcast.GeofenceStartService;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.LocalityLatLong;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.MyTicketObject;
@@ -68,23 +66,16 @@ import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.AutocompleteFilter;
-import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.PlusOneButton;
 import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
-import com.zendesk.sdk.model.helpcenter.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -110,6 +101,8 @@ public class LaunchActivity extends BaseContextActivity {
     // Constants
     public static final String DEFAULT_TAB_PARAM = LaunchActivity.class.getName() + "_default_tab";
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 0x001;
+
+    public static final int REQUEST_RESULT_FOR_FB_SIGN_IN = 0x002;
     public static final int SUBMIT_REVIEW_REQUEST_CODE = 900;
 
 
@@ -149,6 +142,8 @@ public class LaunchActivity extends BaseContextActivity {
     TextView currentCity;
 
     public final int MIN_SCREEN_VIEWS = 6;
+
+    boolean isLocalityUpdated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -809,8 +804,7 @@ public class LaunchActivity extends BaseContextActivity {
         tabOne.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LaunchActivity.this, UserProfileActivity.class);
-                startActivity(intent);
+                moveToProfilePage();
             }
         });
         tabsView.getTabAt(0).setCustomView(tabOne);
@@ -906,6 +900,15 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
+
+    public boolean isLocalityUpdated() {
+        return isLocalityUpdated;
+    }
+
+    public void setIsLocalityUpdated(boolean isLocalityUpdated) {
+        this.isLocalityUpdated = isLocalityUpdated;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -920,6 +923,7 @@ public class LaunchActivity extends BaseContextActivity {
                     account.setLastLocality(locality);
                     if (weekEventsFragment != null)
                         weekEventsFragment.setSelectedLocalityDistanceText();
+                    isLocalityUpdated = true;
                     Log.i("TestActivity", "Place: " + placeName);
                 } else {
                     Toast.makeText(this, "Selected locality not found ", Toast.LENGTH_LONG).show();
@@ -932,6 +936,9 @@ public class LaunchActivity extends BaseContextActivity {
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
             }
+        }
+        if (requestCode == REQUEST_RESULT_FOR_FB_SIGN_IN && resultCode == RESULT_OK) {
+            moveToProfilePage();
         }
 
         //Checking if the previous activity is launched on branch Auto deep link.
@@ -995,7 +1002,7 @@ public class LaunchActivity extends BaseContextActivity {
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
     private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
-            implements TabLayout.OnTabSelectedListener, ViewPager.OnPageChangeListener {
+            implements ViewPager.OnPageChangeListener {
 
 
         public ExploreScreenPagerAdapter() {
@@ -1045,13 +1052,14 @@ public class LaunchActivity extends BaseContextActivity {
             return TABS.get(position);
         }
 
-        @Override
+        /*@Override
         public void onTabSelected(TabLayout.Tab tab) {
 
             showActionBar();
 
             int position = tab.getPosition();
             if (position == 0) {
+                moveToProfilePage();
                 Intent intent = new Intent(LaunchActivity.this, UserProfileActivity.class);
                 startActivity(intent);
             } else {
@@ -1068,7 +1076,7 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public void onTabReselected(TabLayout.Tab tab) {
             // do nothing.
-        }
+        }*/
 
 
         @Override
@@ -1084,6 +1092,18 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public void onPageScrollStateChanged(int state) {
 
+        }
+    }
+
+    public void moveToProfilePage() {
+        if (account.getUserInfo().isSignedIn) {
+            Intent intent = new Intent(LaunchActivity.this, UserProfileActivity.class);
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(LaunchActivity.this, FBLoginActivity.class);
+            intent.putExtra("show_special_text", false);
+            intent.putExtra("hide_skip", true);
+            startActivityForResult(intent, REQUEST_RESULT_FOR_FB_SIGN_IN);
         }
     }
 
@@ -1178,6 +1198,7 @@ public class LaunchActivity extends BaseContextActivity {
                                 Intent intent = new Intent(LaunchActivity.this, UserProfileActivity.class);
                                 intent.putExtra(UserProfileActivity.PROFILE_ID, profileId);
                                 startActivity(intent);
+                                moveToProfilePage();
                             } else if (!referringParams.optBoolean("review", false)) {
                                 if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
                                     //showNextScreen();

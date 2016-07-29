@@ -223,6 +223,8 @@ public class GooglePlacesAutocompleteAdapter
                             .getAutocompletePredictions(mGoogleApiClient, constraint.toString(),
                                     mBounds, mPlaceFilter);
 
+
+
             // This method should have been called off the main UI thread. Block and wait for at most 60s
             // for a result from the API.
             AutocompletePredictionBuffer autocompletePredictions = results

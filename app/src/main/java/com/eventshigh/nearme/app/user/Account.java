@@ -39,12 +39,15 @@ public class Account {
 
         public final String profilePic;
 
-        public UserInfo(@Nullable String name, @Nullable String phoneNo, Boolean isVerified, @Nullable String email, String profilePic) {
+        public final Boolean isSignedIn;
+
+        public UserInfo(@Nullable String name, @Nullable String phoneNo, Boolean isVerified, @Nullable String email, String profilePic, Boolean isSignedIn) {
             this.name = name;
             this.phoneNo = phoneNo;
             this.isVerified = isVerified;
             this.email = email;
             this.profilePic = profilePic;
+            this.isSignedIn = isSignedIn;
         }
     }
 
@@ -121,16 +124,18 @@ public class Account {
                 accountInfo.getString(PREF_MOBILE_NO, null),
                 accountInfo.getBoolean(PREF_MOBILE_NO_VERIFIED, false),
                 accountInfo.getString(PREF_EMAIL_ID, null),
-                accountInfo.getString(PREF_PROFILE_PIC, null));
+                accountInfo.getString(PREF_PROFILE_PIC, null),
+                accountInfo.getBoolean(PREF_IS_USER_LOGIN_SUCCESS, false));
     }
 
 
-    public void recordEmailId(String name, String profilePic, String emailId) {
+    public void recordEmailId(String name, String profilePic, String emailId, Boolean isSignedIn) {
 
         SharedPreferences.Editor editor = accountInfo.edit();
         editor.putString(PREF_NAME, name);
         editor.putString(PREF_EMAIL_ID, emailId);
         editor.putString(PREF_PROFILE_PIC, profilePic);
+        editor.putBoolean(PREF_IS_USER_LOGIN_SUCCESS, isSignedIn);
         //editor.remove(PREF_MOBILE_NO_VERIFIED);
         editor.apply();
 

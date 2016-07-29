@@ -119,6 +119,8 @@
                     android:path="/"
                     android:scheme="https" />
 
+                <data android:scheme="eventshigh" />
+
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />

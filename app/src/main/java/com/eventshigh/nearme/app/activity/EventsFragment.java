@@ -405,7 +405,7 @@ public class EventsFragment extends BaseEventsFragment {
             }
         }
 
-        if (!myEvents.isEmpty()) {
+        if (!myEvents.isEmpty() && myEvents.get(0).events != null && myEvents.get(0).events.size() > 0) {
             if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
                 ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.get(0).events.get(0).imgUrl);
             }
@@ -422,7 +422,7 @@ public class EventsFragment extends BaseEventsFragment {
 
         topProgressBar.setVisibility(View.GONE);
 
-        if (myEvents == null || ((myEvents.topicEvents == null || myEvents.topicEvents.get(0).events.isEmpty()) && myEvents.movies.isEmpty())) {
+        if (myEvents == null || ((myEvents.topicEvents == null || myEvents.topicEvents.size() == 0 || myEvents.topicEvents.get(0).events == null || myEvents.topicEvents.get(0).events.isEmpty()) && myEvents.movies.isEmpty())) {
             if (EventsHighEndpoints.isMyEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
                 noMyEventsView.setVisibility(View.VISIBLE);
                 noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_event));
@@ -437,7 +437,7 @@ public class EventsFragment extends BaseEventsFragment {
             }
 
         }
-        if (!myEvents.topicEvents.isEmpty()) {
+        if (!myEvents.topicEvents.isEmpty() && myEvents.topicEvents.get(0).events != null && myEvents.topicEvents.get(0).events.size() > 0) {
             if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
                 ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.topicEvents.get(0).events.get(0).imgUrl);
             }
@@ -476,7 +476,7 @@ public class EventsFragment extends BaseEventsFragment {
                 }
             }
 
-            if (!isIntermediate || !myEvents.isEmpty()) {
+            if (!isIntermediate || (!myEvents.isEmpty() && myEvents.get(0).events != null || myEvents.get(0).events.size() > 0)) {
                 if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
                     ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.get(0).events.get(0).imgUrl);
                 }
@@ -516,7 +516,7 @@ public class EventsFragment extends BaseEventsFragment {
             }
 
             if (!isIntermediate) {
-                if (!myEvents.topicEvents.isEmpty()) {
+                if (!myEvents.topicEvents.isEmpty()  && myEvents.topicEvents.get(0).events != null || myEvents.topicEvents.get(0).events.size() > 0) {
                     if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
                         ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.topicEvents.get(0).events.get(0).imgUrl);
                     }
@@ -828,9 +828,11 @@ public class EventsFragment extends BaseEventsFragment {
     FilterAsyncTask filterAsyncTask;
 
     public void sortAccToSortState(int sortState) {
-        this.sortState = sortState;
-        sortData();
-        eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+        if(filteredEvents!=null) {
+            this.sortState = sortState;
+            sortData();
+            eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+        }
     }
 
     public void sortData() {

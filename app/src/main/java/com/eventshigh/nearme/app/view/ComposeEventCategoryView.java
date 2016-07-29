@@ -15,8 +15,10 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
+import com.eventshigh.nearme.app.activity.NewEventDetailActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.ui.FBSigninDialog;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.IntentUtils;
@@ -102,9 +104,8 @@ public class ComposeEventCategoryView extends FrameLayout implements ZRuntimeVie
                         Toast.makeText(context, "You unfollowed " + obj, Toast.LENGTH_SHORT).show();
                     } else {
                         activity.reportActionToAnalytics("addFollowing", obj);
-                        if (!account.getUserInfo().isVerified) {
-                            PhoneVerificationDialog.show(activity,
-                                    R.string.ui_verify_phone, R.string.ui_phone_verify_pa);
+                        if (!account.getUserInfo().isSignedIn) {
+                            FBSigninDialog.show(activity, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan_more, 0);
                         }
                         account.setIsFollowing(obj, true);
                         setMarkedViews(true);

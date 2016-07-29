@@ -11,12 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.RequestFuture;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
@@ -24,10 +22,8 @@ import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.network.MultiEventsRequest;
 import com.eventshigh.nearme.app.network.MultiMovieRequest;
-import com.eventshigh.nearme.app.network.MyReviewsRequest;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 import java.util.ArrayList;
@@ -49,14 +45,15 @@ public class MyReviewsFragment extends Fragment {
     Account account;
     LinearLayout verifyPhnLayout;
 
-    String userMobileNo;
+    String userEmail;
     public static final String EVENT_CONTEXT = "event_context";
     public static final String USER_MOBILE_NO = "mobile_no";
+    public static final String USER_EMAIL = "email";
 
     public static MyReviewsFragment newInstance(EventsContext eventsContext, ArrayList<MovieUserReviewObject> movieUserReviewObjectList, String userMobileNo) {
         Bundle args = new Bundle();
         args.putParcelable(EVENT_CONTEXT, eventsContext);
-        args.putString(USER_MOBILE_NO, userMobileNo);
+        args.putString(USER_EMAIL, userMobileNo);
         args.putParcelableArrayList("reviews", movieUserReviewObjectList);
         MyReviewsFragment fragment = new MyReviewsFragment();
         fragment.setArguments(args);
@@ -67,7 +64,7 @@ public class MyReviewsFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-        this.userMobileNo = getArguments().getString(USER_MOBILE_NO);
+        this.userEmail = getArguments().getString(USER_EMAIL);
     }
 
     @Nullable
@@ -168,7 +165,7 @@ public class MyReviewsFragment extends Fragment {
 
         if (movieUserReviewObjects == null || movieUserReviewObjects.size() == 0) {
             noMyEventsView.setVisibility(View.VISIBLE);
-            if (userMobileNo.equalsIgnoreCase(new Account(context).getUserInfo().phoneNo)) {
+            if (userEmail.equalsIgnoreCase(new Account(context).getUserInfo().email)) {
                 noMyEventsView.setText(getString(R.string.no_review_text));
             } else {
                 noMyEventsView.setText("No Reviews");

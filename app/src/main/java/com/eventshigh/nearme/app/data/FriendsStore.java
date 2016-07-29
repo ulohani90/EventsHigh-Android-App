@@ -12,23 +12,22 @@ public class FriendsStore {
 
     public FriendsStore(Context context) {
         this.context = context;
-        preferences = context.getSharedPreferences("my_friends", Context.MODE_PRIVATE);
+        preferences = context.getSharedPreferences("my_friends_email", Context.MODE_PRIVATE);
     }
 
-    public boolean isFollowing(String mobileNo) {
-
+    public boolean isFollowing(String email) {
 
         // By default we assume all friends are being followed, if the information is missing from prefs
-        return preferences.getBoolean(mobileNo, false);
+        return preferences.getBoolean(email, false);
     }
 
-    public boolean isKeyExists(String mobileNo) {
-        return preferences.contains(mobileNo);
+    public boolean isKeyExists(String email) {
+        return preferences.contains(email);
     }
 
-    public void setFollowing(String mobileNo, String contactId, boolean following) {
+    public void setFollowing(String email, String contactId, boolean following) {
 
-        new UserActionHelper(context).recordUserFollowAction(following ? UserActionHelper.UserFollowingAction.USER_FOLLOW : UserActionHelper.UserFollowingAction.USER_UNFOLLOW, mobileNo);
-        preferences.edit().putBoolean(mobileNo, following).apply();
+        new UserActionHelper(context).recordUserFollowAction(following ? UserActionHelper.UserFollowingAction.USER_FOLLOW : UserActionHelper.UserFollowingAction.USER_UNFOLLOW, email);
+        preferences.edit().putBoolean(email, following).apply();
     }
 }

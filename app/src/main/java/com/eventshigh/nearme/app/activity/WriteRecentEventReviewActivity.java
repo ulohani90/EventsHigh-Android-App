@@ -83,7 +83,7 @@ public class WriteRecentEventReviewActivity extends BaseContextActivity{
     public void placeReviewActionIfEvent() {
         try {
             final JSONObject jsonObject = new JSONObject();
-            jsonObject.put(JSON_KEY_REVIEWER_ID, (new Account(this)).getUserInfo().phoneNo);
+            jsonObject.put(JSON_KEY_REVIEWER_ID, (new Account(this)).getUserInfo().email);
             jsonObject.put(JSON_KEY_REVIEW_FOR, "event");
             jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, myTicketObject.getEventId());
             jsonObject.put(JSON_KEY_REVIEW_ENTITY, myTicketObject.getEventName());

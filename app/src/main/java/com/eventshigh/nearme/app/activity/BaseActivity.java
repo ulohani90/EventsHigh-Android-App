@@ -741,7 +741,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     //share profile
-    public void shareProfileWithBranch(final ProfileInfo profileInfo, String mobileNo, @Nullable final String packageName, @Nullable final String label) {
+    public void shareProfileWithBranch(final ProfileInfo profileInfo, String email, @Nullable final String packageName, @Nullable final String label) {
 
         BranchUniversalObject branchObject = new BranchUniversalObject();
 
@@ -750,9 +750,9 @@ public abstract class BaseActivity extends AppCompatActivity {
             referralLink = "https://play.google.com/store/apps/details?id=com.eventshigh.nearme.app&referrer=" + Utils.getAndroidId(this);
         }
         */
-        branchObject.setCanonicalIdentifier(mobileNo)
+        branchObject.setCanonicalIdentifier(email)
                 .setTitle(profileInfo.getName())//event.title.replaceAll("\"", " &quot "))
-                .addContentMetadata("profile_id", mobileNo)
+                .addContentMetadata("profile_id", email)
                 .setContentDescription("Check Events High Profile")//event.description.replaceAll("\"", " &quot "))
                 .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
         if (!Utils.checkIfStringEmpty(profileInfo.getProfilePic())) {
