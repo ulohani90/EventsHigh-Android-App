@@ -106,7 +106,7 @@ public class IntentUtils {
             param.query = "";
         }
         if (param.query.equalsIgnoreCase("this week")) {
-            param.query = "";
+            param.query = "this week";
             param.setDateFilter(Calendar.getInstance());
         }
 
@@ -211,7 +211,7 @@ public class IntentUtils {
     }
 
     private void processDetailViewIntent(Uri webUri) {
-        activity.showEventDetails(webUri, "deeplink");
+        activity.showEventDetails(webUri, webUri.toString());
         activity.finish();
     }
 }

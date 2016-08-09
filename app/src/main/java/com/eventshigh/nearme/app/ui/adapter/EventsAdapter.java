@@ -66,7 +66,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
     public void setSocialActions(@Nullable SocialActions socialActions) {
-        if(socialActions!=null) {
+        if (socialActions != null) {
             this.socialActions = socialActions;
             notifyDataSetChanged();
         }
@@ -83,6 +83,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         for (Event event : events) {
             dataToShow.add(new EventData("", event, false, activity, this));
         }
+
+
         if (categoryForSeeAll != null) {
             dataToShow.add(new SeeAllData(activity, categoryForSeeAll));
         }
@@ -106,16 +108,16 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
 
-    public void setMyTicketsData(List<MyTicketObject> objs, MyTicketsFragment myTicketsFragment){
+    public void setMyTicketsData(List<MyTicketObject> objs, MyTicketsFragment myTicketsFragment) {
         for (MyTicketObject obj : objs) {
             dataToShow.add(new MyTicketData(obj, activity, myTicketsFragment));
         }
         notifyDataSetChanged();
     }
 
-    public void setMyReviewsData(List<MovieUserReviewObject> objs){
+    public void setMyReviewsData(List<MovieUserReviewObject> objs) {
         for (MovieUserReviewObject obj : objs) {
-            dataToShow.add(new MyReviewData(obj,activity));
+            dataToShow.add(new MyReviewData(obj, activity));
         }
         notifyDataSetChanged();
     }
@@ -309,8 +311,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
-    public void addFollowCard(String title, int numEvents, int numFollowers, SocialInvitationsRequest.SpecialCoupons coupon) {
-        dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity, this, coupon));
+    public void addFollowCard(String title, int numEvents, int numFollowers) {
+        dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity, this));
     }
 
     @Override
@@ -330,7 +332,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     @Nullable
     @Override
     public Set<SocialFriend> getSocialActions(String eventId) {
-        return (socialActions == null || socialActions.eventFavourites==null )? null: socialActions.eventFavourites.get(eventId);
+        return (socialActions == null || socialActions.eventFavourites == null) ? null : socialActions.eventFavourites.get(eventId);
     }
 
     @Override
@@ -344,7 +346,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int type){
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int type) {
         return DataType.onCreateViewHolder(activity, viewGroup, type);
     }
 
@@ -358,11 +360,11 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
             ((MovieReviewData) dataToShow.get(position)).onBindViewHolder(card, position);
         } else if (card instanceof MovieUserReviewCard) {
             ((MovieUserReviewData) dataToShow.get(position)).onBindViewHolder(card, position);
-        }else if (card instanceof MyTicketCard){
-            ((MyTicketData) dataToShow.get(position)).onBindViewHolder(card, position,myTicketListener);
-        }else if(card instanceof MyReviewCard) {
+        } else if (card instanceof MyTicketCard) {
+            ((MyTicketData) dataToShow.get(position)).onBindViewHolder(card, position, myTicketListener);
+        } else if (card instanceof MyReviewCard) {
             ((MyReviewData) dataToShow.get(position)).onBindViewHolder(card, position);
-        }else{
+        } else {
             dataToShow.get(position).onBindViewHolder(card, position);
         }
     }
@@ -420,7 +422,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         void onItemClicked(int pos);
     }
 
-    public interface OnMyTicketItemClickedListener{
+    public interface OnMyTicketItemClickedListener {
         void onItemClicked(int pos);
     }
 

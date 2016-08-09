@@ -4,11 +4,15 @@ import android.Manifest;
 import android.Manifest.permission;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -16,14 +20,16 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -34,6 +40,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -80,6 +88,7 @@ import com.google.android.gms.plus.PlusOneButton.OnPlusOneClickListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -120,6 +129,8 @@ public class LaunchActivity extends BaseContextActivity {
 
     // GCM registration helper.
     private Account account;
+
+    FloatingActionButton fabWriteReviews;
 
     // Tabs.
     private int defaultTab = 1;
@@ -190,11 +201,54 @@ public class LaunchActivity extends BaseContextActivity {
             }
         }
 */
+        fabWriteReviews = (FloatingActionButton) findViewById(R.id.fab_write_review);
+
+        fabWriteReviews.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (viewPager.getCurrentItem() == 0) {
+                    reportActionToAnalytics("profileInterestFabClick");
+                    Intent i = new Intent(LaunchActivity.this, SelectInterestsActivity.class);
+                    startActivity(i);
+                } else if (viewPager.getCurrentItem() == 3) {
+
+                    if (weekEventsFragment != null) {
+                        if (weekEventsFragment.isMapShown) {
+                            if (weekEventsFragment.isMapListShown) {
+                                weekEventsFragment.hideMapEvents(EventsGridActivity.SHOW_EVENT_LIST_STATE);
+                            } else {
+                                weekEventsFragment.showListView();
+                            }
+                            fabWriteReviews.setImageResource(R.drawable.ic_browse_map);
+                            weekEventsFragment.collapseAnimation(weekEventsFragment.SHOW_SORT);
+                        } else {
+                            if (ActivityCompat.checkSelfPermission(LaunchActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                                    != PackageManager.PERMISSION_GRANTED) {
+                                // Request missing location permission.
+                                ActivityCompat.requestPermissions(LaunchActivity.this,
+                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
+
+                            } else {
+                                weekEventsFragment.hideListView();
+                                fabWriteReviews.setImageResource(R.drawable.ic_list_menu);
+                                weekEventsFragment.collapseAnimation(weekEventsFragment.HIDE_SORT);
+                            }
+
+                        }
+
+                    }
+
+                }
+            }
+        });
+        fabWriteReviews.setVisibility(View.GONE);
+
         setUserCityHeader();
         getIntent().getAction();
 
 
     }
+
 
     public void fetchEventAttendedDetails() {
         MyTicketsRequest.submit(this, Request.Priority.IMMEDIATE, this, true, mTicketsListener, new Response.ErrorListener() {
@@ -284,7 +338,7 @@ public class LaunchActivity extends BaseContextActivity {
         if (intent != null && intent.getAction() != null && intent.getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION)) {
 
             drawer.closeDrawers();
-            showExploreScreen();
+            showExploreScreen(-1);
         }
 
 
@@ -402,7 +456,7 @@ public class LaunchActivity extends BaseContextActivity {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         // Set visibility.
-        menu.findItem(R.id.action_show_map).setVisible(isPlayServicesPresent);
+        // menu.findItem(R.id.action_show_map).setVisible(isPlayServicesPresent);
 
         return true;
     }
@@ -412,6 +466,17 @@ public class LaunchActivity extends BaseContextActivity {
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
         return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public void showMapActivity() {
+        Intent intent = new Intent(this, EventsMapsActivity.class);
+        intent.putExtra(EventsMapsActivity.IS_CATEGORY_FILTER_VISIBLE, true);
+        intent.putExtra(EventsMapsActivity.IS_TODAY_SELECTED, true);
+        intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
+        intent.putExtra(EventsMapsActivity.IS_THIS_WEEK_VIEW, true);
+        startActivity(intent);
     }
 
     @Override
@@ -441,7 +506,14 @@ public class LaunchActivity extends BaseContextActivity {
                 // permission granted.
                 if (eventsContext.city == null && client != null) {
                     client.connect();
+                } else if (viewPager.getCurrentItem() == 3) {
+                    if (weekEventsFragment != null) {
+                        weekEventsFragment.hideListView();
+                        fabWriteReviews.setImageResource(R.drawable.ic_list_menu);
+                        weekEventsFragment.collapseAnimation(weekEventsFragment.HIDE_SORT);
+                    }
                 }
+
             }
             return;
         }
@@ -453,7 +525,7 @@ public class LaunchActivity extends BaseContextActivity {
         drawer.closeDrawer(GravityCompat.START);
         reportActionToAnalytics("cityChanged");
         eventsContext.changeLocation(city.cityBounds.getCenter());
-        showExploreScreen();
+        showExploreScreen(-1);
     }
 
     public static String[] removeElements(String[] input, String deleteMe) {
@@ -480,18 +552,29 @@ public class LaunchActivity extends BaseContextActivity {
                     ActivityCompat.checkSelfPermission(LaunchActivity.this, permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 Location location = LocationServices.FusedLocationApi.getLastLocation(client);
                 if (location != null) {
+                    try {
+                        LatLng latLng = LocationUtils.locationToLatLng(location);
 
-                    LatLng latLng = LocationUtils.locationToLatLng(location);
-                    eventsContext.changeLocation(latLng);
-                    if (eventsContext.city != null) {
-                        account.setLastCity(eventsContext.city);
-                    } else {
-                        reportActionToAnalytics("unsupportedCity");
+                        eventsContext.changeLocation(latLng);
+                        if (eventsContext.city != null) {
+                            account.setLastCity(eventsContext.city);
+                            Geocoder geocoder;
+                            List<Address> addresses;
+                            geocoder = new Geocoder(LaunchActivity.this, Locale.getDefault());
+
+
+                            addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                            if (addresses != null && addresses.size() > 0)
+                                account.setLastLocality(new LocalityLatLong(addresses.get(0).getSubLocality(), latLng));
+                        } else {
+                            reportActionToAnalytics("unsupportedCity");
+                        }
+
+                        // got the location, client is not needed.
+                        client.disconnect();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-
-                    // got the location, client is not needed.
-                    client.disconnect();
-
 
                 } else {
                     drawer.postDelayed(new Runnable() {
@@ -704,11 +787,13 @@ public class LaunchActivity extends BaseContextActivity {
         }
 
         if (viewPager.getAdapter() == null || (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION))) {
-            showExploreScreen();
+            showExploreScreen(-1);
         }
     }
 
-    private void showExploreScreen() {
+    ExploreScreenPagerAdapter adapter;
+
+    private void showExploreScreen(int suggestedTab) {
 /*
         if (!(account.getLastCity() == City.BANGALORE)) {
             TABS = new ArrayList<>();
@@ -741,9 +826,11 @@ public class LaunchActivity extends BaseContextActivity {
                     break;
                 }
             }
+        } else if (suggestedTab != -1) {
+            defaultTab = suggestedTab;
         }
 
-        ExploreScreenPagerAdapter adapter = new ExploreScreenPagerAdapter();
+        adapter = new ExploreScreenPagerAdapter();
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(defaultTab, false);
         viewPager.addOnPageChangeListener(listener);
@@ -762,12 +849,7 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                int position = tab.getPosition();
-                if (position == 0) {
-
-                } else {
-                    viewPager.setCurrentItem(tab.getPosition());
-                }
+                viewPager.setCurrentItem(tab.getPosition());
             }
 
             @Override
@@ -796,6 +878,34 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!account.getUserInfo().isSignedIn) {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(FbLoginFragment.LOGOUT_BROADCAST_ACTION);
+            registerReceiver(receiver, intentFilter);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try {
+            unregisterReceiver(receiver);
+        } catch (Exception e) {
+
+        }
+    }
+
+
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            showExploreScreen(0);
+        }
+    };
+
     private void setupTabIconsWithOffer() {
 
         TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
@@ -804,7 +914,7 @@ public class LaunchActivity extends BaseContextActivity {
         tabOne.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                moveToProfilePage();
+                viewPager.setCurrentItem(0);
             }
         });
         tabsView.getTabAt(0).setCustomView(tabOne);
@@ -979,6 +1089,28 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public void onPageSelected(int position) {
             reportActionToAnalytics("tabchange", TABS.get(position));
+            if (position == 3) {
+                if (weekEventsFragment != null && weekEventsFragment.isLoadingComplete) {
+                    if (weekEventsFragment.isMapShown) {
+                        fabWriteReviews.setImageResource(R.drawable.ic_list_menu);
+                    } else {
+                        fabWriteReviews.setImageResource(R.drawable.ic_browse_map);
+                    }
+
+                    animateFabIn();
+                } else {
+                    animateFabOut();
+                }
+
+            } else if (position == 0) {
+                fabWriteReviews.setImageResource(R.drawable.ic_edit);
+                if (profileFragment != null && profileFragment.getPager() != null && profileFragment.getPager().getCurrentItem() == 0) {
+                    animateFabIn();
+                }
+            } else {
+                animateFabOut();
+            }
+
         }
 
         @Override
@@ -987,6 +1119,9 @@ public class LaunchActivity extends BaseContextActivity {
         }
     };
 
+    public ViewPager getViewPager() {
+        return viewPager;
+    }
 
     public void setisPagerSwipeBlocked(boolean isPagerSwipeBlocked) {
         this.isPagerSwipeBlocked = isPagerSwipeBlocked;
@@ -998,10 +1133,12 @@ public class LaunchActivity extends BaseContextActivity {
 
     NewWeekEventsFragment weekEventsFragment;
 
+    UserProfileFragment profileFragment;
+
     /**
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
-    private class ExploreScreenPagerAdapter extends FragmentPagerAdapter
+    private class ExploreScreenPagerAdapter extends FragmentStatePagerAdapter
             implements ViewPager.OnPageChangeListener {
 
 
@@ -1009,16 +1146,20 @@ public class LaunchActivity extends BaseContextActivity {
             super(getSupportFragmentManager());
         }
 
-        @Override
-        public long getItemId(int position) {
-            return (eventsContext.toString() + TABS.get(position)).hashCode();
-        }
-
+        /* @Override
+         public long getItemId(int position) {
+             return (eventsContext.toString() + TABS.get(position)).hashCode();
+         }
+ */
         @Override
         public Fragment getItem(int position) {
             if (TABS.get(position).equals(MY_EVENTS_TAB)) {
-
-                return EmptyFragment.newInstance(null);
+                if (!account.getUserInfo().isSignedIn) {
+                    return FbLoginFragment.newInstance(true, false, false);
+                } else {
+                    profileFragment = UserProfileFragment.newInstance(eventsContext);
+                    return profileFragment;
+                }
             }
 
             if (TABS.get(position).equals(EXPLORE_TAB)) {
@@ -1043,14 +1184,19 @@ public class LaunchActivity extends BaseContextActivity {
         }
 
         @Override
+        public int getItemPosition(Object object) {
+            return PagerAdapter.POSITION_NONE;
+        }
+
+        @Override
         public int getCount() {
             return TABS.size();
         }
 
-        @Override
+        /*@Override
         public CharSequence getPageTitle(int position) {
             return TABS.get(position);
-        }
+        }*/
 
         /*@Override
         public void onTabSelected(TabLayout.Tab tab) {
@@ -1198,7 +1344,7 @@ public class LaunchActivity extends BaseContextActivity {
                                 Intent intent = new Intent(LaunchActivity.this, UserProfileActivity.class);
                                 intent.putExtra(UserProfileActivity.PROFILE_ID, profileId);
                                 startActivity(intent);
-                                moveToProfilePage();
+                                //  moveToProfilePage();
                             } else if (!referringParams.optBoolean("review", false)) {
                                 if (!referringParams.getBoolean("+is_first_session") && !referringParams.getBoolean("+clicked_branch_link")) {
                                     //showNextScreen();
@@ -1206,7 +1352,7 @@ public class LaunchActivity extends BaseContextActivity {
                                 } else {
                                     if (referringParams.has("event_id")) {
                                         showEventDetails(
-                                                EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), null);
+                                                EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, referringParams.getString("event_id")), "branch");
                                     } else if (referringParams.has("event_uri")) {
                                         Uri uri = Uri.parse(referringParams.getString("event_uri"));
                                         showSearchView(uri.getLastPathSegment());
@@ -1318,6 +1464,38 @@ public class LaunchActivity extends BaseContextActivity {
                     }
                 });
 
+    }
+
+
+    public void animateFabIn() {
+        if (viewPager.getCurrentItem() == 3 || (viewPager.getCurrentItem() == 0 && account.getUserInfo().isSignedIn) && fabWriteReviews.getVisibility() == View.GONE) {
+            fabWriteReviews.clearAnimation();
+            fabWriteReviews.setVisibility(View.VISIBLE);
+           /* TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 250, 0);
+            translateAnimation.setDuration(300);
+            fabWriteReviews.startAnimation(translateAnimation);
+
+            ScaleAnimation anim = new ScaleAnimation(0.0f, 1.0f, 0.0f, 1.0f, 0.5f, 0.5f);
+            anim.setDuration(200);
+            */
+
+            Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_scale_in);
+            fabWriteReviews.startAnimation(anim);
+        }
+    }
+
+    public void animateFabOut() {
+        if (fabWriteReviews.getVisibility() == View.VISIBLE) {
+            fabWriteReviews.setVisibility(View.GONE);
+            /*TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, 250);
+            translateAnimation.setDuration(300);
+
+            ScaleAnimation anim = new ScaleAnimation(1.0f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f);
+            anim.setDuration(200);*/
+            Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim_scale_out);
+            fabWriteReviews.startAnimation(anim);
+            fabWriteReviews.startAnimation(anim);
+        }
     }
 
 

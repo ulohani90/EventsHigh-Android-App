@@ -449,7 +449,7 @@ public class EventInfoFragment extends Fragment {
         if (!account.getUserInfo().isSignedIn) {
             // PhoneVerificationDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_verify_phone, R.string.ui_phone_verify_book);
 
-           // FBSigninDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan, NewEventDetailActivity.REQUEST_FOR_RESULT_WRITE_REVIEW);
+            // FBSigninDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan, NewEventDetailActivity.REQUEST_FOR_RESULT_WRITE_REVIEW);
 
             Intent intent = new Intent(activity, FBLoginActivity.class);
             intent.putExtra("show_special_text", true);
@@ -489,10 +489,14 @@ public class EventInfoFragment extends Fragment {
                     userLocation = LocationUtils.locationToLatLng(location);
                 }
                 String eventTravelTime = null;
-                if (getActivity() != null) {
-                    eventTravelTime = LocationUtils.getTravelTime(getActivity(),
-                            userLocation, event.location);
-                }
+                if (getActivity() != null)
+                    if (account.getLastLocality() != null) {
+                        eventTravelTime = LocationUtils.getTravelTime(getActivity(),
+                                account.getLastLocality().getLatLng(), event.location);
+                    } else if (userLocation != null) {
+                        eventTravelTime = LocationUtils.getTravelTime(getActivity(),
+                                userLocation, event.location);
+                    }
                 travelTimeView.setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
                 view.findViewById(R.id.direction_separator).setVisibility(eventTravelTime == null ? View.GONE : View.VISIBLE);
                 if (eventTravelTime != null) {

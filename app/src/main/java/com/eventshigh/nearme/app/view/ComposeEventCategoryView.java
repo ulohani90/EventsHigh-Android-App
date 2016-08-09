@@ -81,7 +81,7 @@ public class ComposeEventCategoryView extends FrameLayout implements ZRuntimeVie
     public void setContent(final BaseContextActivity activity, final Account account, final String obj, final Event event, final String action) {
         textView.setText(obj);
         setMarkedViews(account.isFollowing(obj));
-        categoryTagParent.setOnClickListener(new OnClickListener() {
+        followImg.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (activity != null) {
@@ -93,7 +93,7 @@ public class ComposeEventCategoryView extends FrameLayout implements ZRuntimeVie
                 }
             }
         });
-        followImg.setOnClickListener(new OnClickListener() {
+        categoryTagParent.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (activity != null && account != null) {

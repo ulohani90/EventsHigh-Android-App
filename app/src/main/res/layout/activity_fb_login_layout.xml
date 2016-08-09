@@ -26,11 +26,13 @@
             android:id="@+id/fb_login_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="See what's trending with your friends"
             android:layout_marginBottom="24dp"
-            android:textSize="16sp"
-            android:textColor="@android:color/white" />
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:lineSpacingExtra="3dp"
+            android:text="Create your profile and\nsee what's trending with your friends"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/fb_login"
@@ -61,8 +63,9 @@
         android:layout_height="48dp"
         android:layout_gravity="end"
         android:layout_marginTop="10dp"
+        android:foreground="?android:attr/selectableItemBackground"
         android:gravity="center"
         android:padding="10dp"
-        android:textColor="@android:color/white"
+        android:textColor="#999999"
         android:textSize="14sp" />
 </FrameLayout>

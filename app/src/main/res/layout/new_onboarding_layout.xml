@@ -22,7 +22,8 @@
             android:layout_gravity="end"
             android:layout_marginRight="20dp"
             android:layout_marginTop="120dp"
-            android:src="@drawable/ic_arrow_point_to_right" />
+            android:src="@drawable/ic_arrow_point_to_right"
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/dots_parent"

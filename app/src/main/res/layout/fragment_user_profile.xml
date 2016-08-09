@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:ignore="UnusedAttribute">
+
+
+        <include
+            android:id="@+id/view_retry"
+            layout="@layout/view_retry"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1000"
+            android:visibility="gone" />
+
+
+        <!-- <android.support.v7.widget.Toolbar
+             android:id="@+id/toolbar"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:background="#eeeeee"
+             android:minHeight="?android:attr/actionBarSize"
+             app:contentInsetStart="0dp"
+             app:navigationContentDescription="@string/abc_action_bar_up_description"
+             app:subtitleTextAppearance="@style/EHActionBarSubtitle"
+             app:theme="@style/EHActionBarTransparent"
+             tools:ignore="UnusedAttribute" />-->
+
+        <include layout="@layout/card_user_profile" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:visibility="invisible"
+
+            tools:ignore="UnusedAttribute" />
+
+
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_write_review"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:visibility="gone"
+        android:layout_margin="20dp"
+        android:src="@drawable/ic_edit" />
+
+    <include
+        android:id="@+id/verify_phone_container"
+        layout="@layout/view_phone_snack_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone"
+        tools:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/verify_phn_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#eeeeee">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="48dp"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:drawablePadding="10dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center_vertical"
+                android:text="Your have not signed in"
+                android:textColor="#555555"
+                android:textIsSelectable="false" />
+
+            <TextView
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Please login via facebook to view and manage your own profile."
+                android:textColor="#555555"
+                android:textIsSelectable="false"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/verify_btn"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/eh_button_done"
+                android:elevation="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:text="Login"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                tools:ignore="UnusedAttribute" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

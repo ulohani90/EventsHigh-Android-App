@@ -122,10 +122,15 @@ public class EventCard extends ViewHolder {
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
 
         // Set the travel time.
-        String travelTime = LocationUtils.getTravelTime(activity, activity.getUserLocation(), event.location);
-        if (travelTime != null) {
-            travelTimeView.setText(travelTime);
-            travelTimeView.setVisibility(View.VISIBLE);
+        Account account = new Account(activity);
+        if (account.getLastLocality() != null) {
+            String travelTime = LocationUtils.getTravelTime(activity, account.getLastLocality().getLatLng(), event.location);
+            if (travelTime != null) {
+                travelTimeView.setText(travelTime);
+                travelTimeView.setVisibility(View.VISIBLE);
+            } else {
+                travelTimeView.setVisibility(View.GONE);
+            }
         } else {
             travelTimeView.setVisibility(View.GONE);
         }
@@ -348,15 +353,28 @@ public class EventCard extends ViewHolder {
         bindEventView(event, activity, position, listener);
         eventInfo.setVisibility(View.VISIBLE);
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
-
+        Account account = new Account(activity);
         // Set the travel time.
-        String travelTime = LocationUtils.getTravelTime(activity, activity.getUserLocation(), event.location);
-        if (travelTime != null) {
-            travelTimeView.setText(travelTime);
-            travelTimeView.setVisibility(View.VISIBLE);
+        if (account.getLastLocality() != null) {
+            String travelTime = LocationUtils.getTravelTime(activity, account.getLastLocality().getLatLng(), event.location);
+            if (travelTime != null) {
+                travelTimeView.setText(travelTime);
+                travelTimeView.setVisibility(View.VISIBLE);
+            } else {
+                travelTimeView.setVisibility(View.GONE);
+            }
+        } else if (activity.getUserLocation() != null) {
+            String travelTime = LocationUtils.getTravelTime(activity, activity.getUserLocation(), event.location);
+            if (travelTime != null) {
+                travelTimeView.setText(travelTime);
+                travelTimeView.setVisibility(View.VISIBLE);
+            } else {
+                travelTimeView.setVisibility(View.GONE);
+            }
         } else {
             travelTimeView.setVisibility(View.GONE);
         }
+
 
         // Set actions handlers.
         favouriteView.setVisibility(View.VISIBLE);

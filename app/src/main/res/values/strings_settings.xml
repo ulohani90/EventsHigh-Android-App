@@ -16,6 +16,7 @@
     <string name="pref_title_delete_query_history">Delete Search History</string>
     <string name="message_delete_query_history">Search history was removed successfully!</string>
     <string name="personalize_text">Personalize</string>
+    <string name="edit_interests_text">Edit Interests</string>
     <string name="profile_text">My Profile</string>
 
     <!-- About US text -->

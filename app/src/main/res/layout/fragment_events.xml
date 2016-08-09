@@ -1,82 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:ignore="UnusedAttribute">
+    android:layout_height="match_parent">
 
-    <ProgressBar
-        android:id="@+id/top_progress_bar"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+    <FrameLayout
+        android:id="@+id/event_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="-4dp"
-        android:layout_marginTop="-4dp"
-        android:indeterminate="true" />
+        android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/view_no_my_event"
-        layout="@layout/view_no_my_event"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1000"
-        android:visibility="gone" />
+        <FrameLayout
+            android:id="@+id/map_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    <include
-        android:id="@+id/view_retry"
-        layout="@layout/view_retry"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1000"
-        android:visibility="gone" />
-
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-        <com.eventshigh.nearme.app.view.AutofitRecyclerView
-            android:id="@+id/event_grid"
+        <!-- <FrameLayout
+             android:id="@+id/event_card_container"
+             android:layout_width="@dimen/maps_event_card_width"
+             android:layout_height="wrap_content"
+             android:layout_gravity="bottom|start"
+             android:animateLayoutChanges="true" />-->
+        <View
+            android:id="@+id/dim_bg_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:columnWidth="@dimen/event_card_width"
-            android:horizontalSpacing="5dp"
-            android:outlineProvider="bounds"
-            android:paddingBottom="20dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:paddingTop="10dp"
-            android:verticalSpacing="5dp"
-            tools:listitem="@layout/card_event" />
-    </android.support.v4.widget.SwipeRefreshLayout>
+            android:background="#55000000"
+            android:clickable="true" />
+
+        <LinearLayout
+            android:id="@+id/map_clicked_events"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="200dp"
+            android:background="#FAFAFA"
+            android:gravity="bottom"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:gravity="end">
+
+                <TextView
+                    android:id="@+id/map_events_count"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="48dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="3 Events"
+                    android:textColor="#3e3e3e"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/cross_img"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_cancel_white_bg_24" />
+            </LinearLayout>
+
+            <com.eventshigh.nearme.app.view.AutofitRecyclerView
+                android:id="@+id/event_grid_map"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:columnWidth="@dimen/event_card_width"
+                android:horizontalSpacing="5dp"
+                android:outlineProvider="bounds"
+                android:paddingBottom="20dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="10dp"
+                android:verticalSpacing="5dp"
+                tools:listitem="@layout/card_event" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
 
     <LinearLayout
-        android:id="@+id/no_offer_layout"
+        android:id="@+id/events_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
+        android:background="#F5F5F5"
         android:orientation="vertical"
-        android:visibility="gone">
+        tools:ignore="UnusedAttribute">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <ProgressBar
+            android:id="@+id/top_progress_bar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/no_current_offers"
-            android:textColor="#666666"
-            android:textSize="16sp" />
+            android:layout_marginBottom="-4dp"
+            android:layout_marginTop="-4dp"
+            android:indeterminate="true" />
 
-        <TextView
-            android:id="@+id/contact_us_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="5dp"
-            android:text="For any queries, Contact us"
-            android:textColor="#666666"
-            android:textSize="15sp" />
+        <include
+            android:id="@+id/view_no_my_event"
+            layout="@layout/view_no_my_event"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1000"
+            android:visibility="gone" />
 
+        <include
+            android:id="@+id/view_retry"
+            layout="@layout/view_retry"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1000"
+            android:visibility="gone" />
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <com.eventshigh.nearme.app.view.AutofitRecyclerView
+                android:id="@+id/event_grid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:columnWidth="@dimen/event_card_width"
+                android:horizontalSpacing="5dp"
+                android:outlineProvider="bounds"
+                android:paddingBottom="20dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="10dp"
+                android:verticalSpacing="5dp"
+                tools:listitem="@layout/card_event" />
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+        <LinearLayout
+            android:id="@+id/no_offer_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/no_current_offers"
+                android:textColor="#666666"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/contact_us_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="For any queries, Contact us"
+                android:textColor="#666666"
+                android:textSize="15sp" />
+
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+
+
+</FrameLayout>

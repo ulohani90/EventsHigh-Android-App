@@ -19,7 +19,7 @@
     <Preference
         android:icon="@drawable/ic_personalize_nav"
         android:layout="@layout/navigation_menu_white_items"
-        android:title="@string/personalize_text">
+        android:title="@string/edit_interests_text">
         <intent
             android:targetClass="com.eventshigh.nearme.app.activity.SelectInterestsActivity"
             android:targetPackage="com.eventshigh.nearme.app" />

@@ -2,13 +2,17 @@ package com.eventshigh.nearme.app.activity;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PersistableBundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -160,7 +164,7 @@ public class NewOnboardingActivity extends BaseActivity {
         Intent phoneLoginIntent = new Intent(this, SelectInterestsActivity.class);
         phoneLoginIntent.putExtra("is_onboarding", true);
         startActivity(phoneLoginIntent);
-        finish();
+        // finish();
     }
 
 
@@ -171,11 +175,21 @@ public class NewOnboardingActivity extends BaseActivity {
         // We purposefully set the preference flag to not show on boarding screens
         // in onStart. If users kills the app or if app crashes for any reasons, we
         // do not show onboarding screen again.
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(FbLoginFragment.LOGOUT_BROADCAST_ACTION);
+        registerReceiver(receiver, intentFilter);
         Preferences.getInstance(this).setShowOnboarding(false);
 
 
     }
 
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(receiver);
+        super.onDestroy();
+    }
 
     private void animateArrowForward() {
         ObjectAnimator anim = ObjectAnimator.ofFloat(arrowRight, View.TRANSLATION_X, 0, 30f);
@@ -244,4 +258,11 @@ public class NewOnboardingActivity extends BaseActivity {
         anim.start();
     }
 
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            finish();
+        }
+    };
 }

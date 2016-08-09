@@ -332,6 +332,10 @@ public class DateTimeUtils {
         return builder.toString();
     }
 
+    public static String getDateFromMillisTime(long time) {
+        return new SimpleDateFormat("MM/dd/yyyy").format(new Date(time));
+    }
+
     public static long parseMovieTime(String time) {
         Date date = new Date();
         try {

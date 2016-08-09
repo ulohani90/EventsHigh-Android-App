@@ -634,12 +634,14 @@ public class Event implements Parcelable {
             //User Reviews
 
             ArrayList<MovieUserReviewObject> reviews = new ArrayList<>();
-            JSONArray reviewsArray = eventJson.getJSONArray("reviews");
-            if (reviewsArray != null) {
-                for (int l = 0; l < reviewsArray.length(); l++) {
-                    MovieUserReviewObject obj = new MovieUserReviewObject(reviewsArray.getJSONObject(l));
-                    if (obj.getReviewState() == null || obj.getReviewState().equalsIgnoreCase("published")) {
-                        reviews.add(obj);
+            if (eventJson.has("reviews")) {
+                JSONArray reviewsArray = eventJson.getJSONArray("reviews");
+                if (reviewsArray != null) {
+                    for (int l = 0; l < reviewsArray.length(); l++) {
+                        MovieUserReviewObject obj = new MovieUserReviewObject(reviewsArray.getJSONObject(l));
+                        if (obj.getReviewState() == null || obj.getReviewState().equalsIgnoreCase("published")) {
+                            reviews.add(obj);
+                        }
                     }
                 }
             }

@@ -11,6 +11,7 @@ import android.text.Spanned;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,161 +39,26 @@ import java.util.Arrays;
 /**
  * Created by umesh on 19/07/16.
  */
-public class FBLoginActivity extends AppCompatActivity {
-
-    CallbackManager callbackManager;
-    LoginResult loginResult;
-
-    ProgressDialog dialog;
-
-    boolean hideSkip;
-
+public class FBLoginActivity extends BaseActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        setContentView(R.layout.activity_fb_login_layout);
 
-        hideSkip = getIntent().getBooleanExtra("hide_skip", false);
+        setContentView(R.layout.empty_layout);
+
+        FrameLayout container = (FrameLayout) findViewById(R.id.container);
+
+
+        boolean hideSkip = getIntent().getBooleanExtra("hide_skip", false);
 
 
         boolean showSpecialText = getIntent().getBooleanExtra("show_special_text", false);
-        findViewById(R.id.fb_login).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fbLoginButtonPressed();
-            }
-        });
 
-        TextView fbLoginText = (TextView) findViewById(R.id.fb_login_text);
+        FbLoginFragment fragment = FbLoginFragment.newInstance(hideSkip, showSpecialText, true);
 
-        TextView skip = (TextView) findViewById(R.id.skip_login);
-        if (hideSkip) {
-            skip.setVisibility(View.GONE);
-
-        } else {
-            skip.setVisibility(View.VISIBLE);
-            skip.setText("SKIP");
-            skip.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                }
-            });
-
-        }
-
-        if (showSpecialText) {
-            fbLoginText.setText("Please login to continue the action");
-        } else {
-            fbLoginText.setText("See what's trending with your friends");
-        }
-
+        getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
 
     }
 
-    void fbLoginButtonPressed() {
-        dialog = ProgressDialog.show(this, null, "Fetching info. Please wait...");
-        LoginManager.getInstance().logOut();
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_friends"));
-        callbackManager = CallbackManager.Factory.create();
-
-        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginRes) {
-                dialog.dismiss();
-                loginResult = loginRes;
-                requestUserProfile();
-            }
-
-            @Override
-            public void onCancel() {
-                dialog.dismiss();
-                Toast.makeText(getBaseContext(), "Login Cancelled", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(FacebookException e) {
-                dialog.dismiss();
-                Log.e("Problem conn fb", e.toString());
-                Toast.makeText(getBaseContext(), "Problem connecting to Facebook", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-    }
-
-    void requestUserProfile() {
-        dialog = ProgressDialog.show(this, null, "Signing in. Please wait...");
-        System.out.println("onSuccess");
-        final String accessToken = loginResult.getAccessToken().getToken();
-        Log.i("accessToken", accessToken);
-
-        GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-
-            @Override
-            public void onCompleted(JSONObject object, GraphResponse response) {
-                Log.i("LoginActivity", response.toString());
-                // Get facebook data from login
-                if (object != null) {
-                    try {
-                        JSONObject responseObj = new JSONObject();
-
-                        String userId = object.getString("id");
-                        responseObj.put("fb_id", userId);
-                        responseObj.put("fb_profile_pic", "https://graph.facebook.com/" + userId + "/picture?type=large");
-                        String email = object.getString("email");
-                        responseObj.put("fb_email", email);
-                        String name = object.getString("name");
-                        responseObj.put("fb_name", name);
-                        responseObj.put("fb_token", accessToken);
-                        responseObj.put("android_id", Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
-
-                        addFacebookUserInfo(responseObj);
-
-                    } catch (JSONException e) {
-                        Log.i("User Profile", "JSON Exception");
-                    }
-                    Log.e("obj ", object.toString());
-                }
-            }
-        });
-
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "name, email");//add fields to fetch in graph response
-        request.setParameters(parameters);
-        request.executeAsync();
-    }
-
-    private void addFacebookUserInfo(final JSONObject object) {
-        AddFacebookUserInfoRequest.submit(this, object, Request.Priority.HIGH,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObject, boolean b) {
-                        //updateProfile();
-                        dialog.dismiss();
-                        try {
-                            new Account(FBLoginActivity.this).recordEmailId(object.getString("fb_name"), object.getString("fb_profile_pic"), object.getString("fb_email"), true);
-                            setResult(RESULT_OK);
-                            finish();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            dialog.dismiss();
-                            Toast.makeText(FBLoginActivity.this, "Some problem fetching info. Please try again", Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        dialog.dismiss();
-                        Toast.makeText(FBLoginActivity.this, "Some problem fetching info. Please try again", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
 }

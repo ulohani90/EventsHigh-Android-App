@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/transparent"
@@ -7,10 +9,12 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/profile_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/back_arrow"
@@ -36,8 +40,8 @@
             android:layout_height="match_parent"
             android:foreground="?android:attr/selectableItemBackground"
             android:scaleType="centerInside"
-            android:visibility="gone"
-            android:src="@drawable/ic_share" />
+            android:src="@drawable/ic_share"
+            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -46,16 +50,17 @@
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="top"
         android:layout_marginBottom="-4dp"
         android:layout_marginTop="-4dp"
         android:indeterminate="true" />
 
     <LinearLayout
+        android:id="@+id/profile_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#ffffff"
         android:orientation="vertical"
-        android:id="@+id/profile_view"
         android:visibility="gone">
 
 
@@ -289,16 +294,15 @@
                     android:id="@+id/facebook_fetch_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
                     android:layout_marginTop="8dp"
                     android:drawableLeft="@drawable/facebook"
                     android:drawablePadding="4dp"
                     android:gravity="center_vertical"
                     android:text="Use your Facebook info"
-                    android:layout_marginBottom="8dp"
                     android:textColor="#333333" />
             </LinearLayout>
 
         </FrameLayout>
     </LinearLayout>
-
 </LinearLayout>

@@ -1,17 +1,31 @@
 package com.eventshigh.nearme.app.activity;
 
+
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -41,14 +55,25 @@ import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
+import com.eventshigh.nearme.app.ui.MapMarkerManager;
+import com.eventshigh.nearme.app.ui.adapter.EventCard;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
+import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.eventshigh.nearme.app.view.ContactListView;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -94,6 +119,34 @@ public class EventsFragment extends BaseEventsFragment {
     public List<Event> filteredEvents;
 
 
+    LinearLayout eventListContainer;
+
+
+    //Map contents
+    SupportMapFragment mapFragment;
+    private GestureDetectorCompat gestureDetector;
+    // Manager for all markers drawn on map. Manager is responsible for hiding/showing markers
+    // on map.
+    private MapMarkerManager mapMarkerManager = new MapMarkerManager();
+
+    // Last marker for which the event info card is shown.
+    private Marker lastSelectedMarker;
+
+    // Google Map View shows to user using MapFragment.
+    private GoogleMap map;
+
+    // For performance reasons, we show events only where user has reasonable zoom level.
+    public static final int MIN_ZOOM_LEVEL = 9;
+    public static final int DEFAULT_ZOOM_LEVEL = 14;
+
+
+    boolean isMapShown;
+
+    TextView mapEventsCount;
+
+    boolean isMapListShown;
+
+
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
                                              boolean showCategories, boolean showEhInviteForNotification, SocialInvitationsRequest.SpecialCoupons special, boolean isTodaySelected, ProfileInfo profileInfo) {
         EventsFragment fragment = new EventsFragment();
@@ -123,6 +176,11 @@ public class EventsFragment extends BaseEventsFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_events, container, false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -185,7 +243,107 @@ public class EventsFragment extends BaseEventsFragment {
         if (getArguments() != null && getArguments().getParcelable("special_obj") != null)
             special = getArguments().getParcelable("special_obj");
 
+
+        // Setup the view.
+
+        eventListContainer = (LinearLayout) view.findViewById(R.id.events_list);
+        //eventCardContainer = (FrameLayout) view.findViewById(R.id.event_card_container);
+        mapClickedList = (LinearLayout) view.findViewById(R.id.map_clicked_events);
+        mapClickedEvents = (AutofitRecyclerView) view.findViewById(R.id.event_grid_map);
+        mapClickedEvents.getParent().requestDisallowInterceptTouchEvent(true);
+        dimBgView = view.findViewById(R.id.dim_bg_view);
+        dimBgView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideMapEvents(-1);
+            }
+        });
+        view.findViewById(R.id.cross_img).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideMapEvents(-1);
+            }
+        });
+        mapEventsCount = (TextView) view.findViewById(R.id.map_events_count);
+
+        hideMapEvents(-1);
     }
+
+    LinearLayout mapClickedList;
+    AutofitRecyclerView mapClickedEvents;
+    View dimBgView;
+
+
+    public static final int MOVE_VIEW_TO_POS = 2500;
+
+    public void hideListView() {
+        ObjectAnimator anim = ObjectAnimator.ofFloat(eventListContainer, View.TRANSLATION_Y, 0, MOVE_VIEW_TO_POS);
+        anim.setDuration(500);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                isMapShown = true;
+                setUpMapContents();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        anim.start();
+    }
+
+    public void showListView() {
+        eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+        if (showFollowCard) {
+            eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
+                    eventsCollection.numFollowers);
+        }
+
+        if (eventCardContainer != null) {
+            eventCardContainer.removeAllViews();
+        }
+        isMapShown = false;
+        ObjectAnimator anim = ObjectAnimator.ofFloat(eventListContainer, View.TRANSLATION_Y, MOVE_VIEW_TO_POS, 0);
+        anim.setDuration(500);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.start();
+    }
+
+
+    public void setUpMapContents() {
+        if (map == null) {
+            FragmentManager fm = getChildFragmentManager();
+            mapFragment = (SupportMapFragment) fm.findFragmentByTag("mapFragment");
+            if (mapFragment == null) {
+                mapFragment = new SupportMapFragment();
+                FragmentTransaction ft = fm.beginTransaction();
+                ft.add(R.id.map_container, mapFragment, "mapFragment");
+                ft.commit();
+                fm.executePendingTransactions();
+            }
+            setUpMap();
+            setupGestureDetectorIfNeeded();
+        } else {
+            mapMarkerManager.setEvents(map, filteredEvents);
+        }
+
+
+    }
+
+    FrameLayout eventCardContainer;
 
 
     @Override
@@ -252,6 +410,8 @@ public class EventsFragment extends BaseEventsFragment {
             DateCategoryRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, mMyEventsFetcherCallBack, mErrorListener);
         } else if (!eventsContext.query.isEmpty() && eventsContext.query.equalsIgnoreCase("today")) {
+
+            showFollowCard = false;
             Calendar endDate = Calendar.getInstance();
             endDate.setFirstDayOfWeek(Calendar.MONDAY);
             endDate.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
@@ -294,6 +454,9 @@ public class EventsFragment extends BaseEventsFragment {
                                             } else {
                                                 noMyEventsView.setVisibility(View.GONE);
                                             }
+
+                                            ((EventsGridActivity) getActivity()).filtersContainer.setVisibility(View.VISIBLE);
+                                            ((EventsGridActivity) getActivity()).fabBrowseMap.setVisibility(View.VISIBLE);
                                         }
                                         List<Event> filteredEvents = EventsFragment.this.eventsCollection.events;
                                         filteredEvents = filterEventsWithCategory(null, filteredEvents);
@@ -308,6 +471,7 @@ public class EventsFragment extends BaseEventsFragment {
                                         filteredEvents = filterEventsWithPrice(filteredEvents, -1);
                                         EventsFragment.this.filteredEvents = filteredEvents;
                                         sortData();
+
                                         eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
 
 
@@ -323,35 +487,7 @@ public class EventsFragment extends BaseEventsFragment {
             EventCollectionRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
                     shouldBypassCache, true, mEventsFetcherCallBack, mErrorListener);
         }
-        /*SocialInvitationsRequest.submit(activity, Priority.NORMAL, this, false, mSocialInvitesCallback,
-                new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        VolleyHelper.log(activity, volleyError);
-                    }
-                }
-        );*/
-
         // Load social actions.
-        /*if (showFollowCard) {
-            SocialActionsRequest.submit(activity, Priority.LOW, this, shouldBypassCache,
-                    new Listener<SocialActions>() {
-                        @Override
-                        public void onResponse(SocialActions socialActions, boolean isIntermediate) {
-
-                            activity.reportActionToAnalytics("showSocialInfo", "followers",
-                                    socialActions.getNumFollowers(eventsContext.query));
-                            eventsAdapter.setSocialActions(socialActions);
-                        }
-                    },
-                    new ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            VolleyHelper.log(activity, volleyError);
-                        }
-                    }
-            );
-        }*/
 
 
     }
@@ -361,8 +497,9 @@ public class EventsFragment extends BaseEventsFragment {
                 new Response.Listener<SocialActionsRequest.SocialActions>() {
                     @Override
                     public void onResponse(SocialActionsRequest.SocialActions socialActions, boolean isIntermediate) {
-                        if (isAdded() && !isFragmentDestroyed && eventsAdapter != null)
+                        if (isAdded() && !isFragmentDestroyed && eventsAdapter != null) {
                             eventsAdapter.setSocialActions(socialActions);
+                        }
                     }
                 },
                 new Response.ErrorListener() {
@@ -516,7 +653,7 @@ public class EventsFragment extends BaseEventsFragment {
             }
 
             if (!isIntermediate) {
-                if (!myEvents.topicEvents.isEmpty()  && myEvents.topicEvents.get(0).events != null || myEvents.topicEvents.get(0).events.size() > 0) {
+                if (!myEvents.topicEvents.isEmpty() && myEvents.topicEvents.get(0).events != null || myEvents.topicEvents.get(0).events.size() > 0) {
                     if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
                         ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.topicEvents.get(0).events.get(0).imgUrl);
                     }
@@ -570,9 +707,15 @@ public class EventsFragment extends BaseEventsFragment {
                     filteredEvents = filterEventsWithPrice(filteredEvents, -1);
                     EventsFragment.this.filteredEvents = filteredEvents;
                     sortData();
-                    eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
 
+                    eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
+                    if (showFollowCard) {
+                        eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
+                                eventsCollection.numFollowers);
+                    }
                     addSocialInvitationRequests();
+                    ((EventsGridActivity) getActivity()).filtersContainer.setVisibility(View.VISIBLE);
+                    ((EventsGridActivity) getActivity()).fabBrowseMap.setVisibility(View.VISIBLE);
                 /*if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                             eventsCollection.numFollowers, special);
@@ -828,10 +971,14 @@ public class EventsFragment extends BaseEventsFragment {
     FilterAsyncTask filterAsyncTask;
 
     public void sortAccToSortState(int sortState) {
-        if(filteredEvents!=null) {
+        if (filteredEvents != null) {
             this.sortState = sortState;
             sortData();
             eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+            if (showFollowCard) {
+                eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
+                        eventsCollection.numFollowers);
+            }
         }
     }
 
@@ -852,6 +999,11 @@ public class EventsFragment extends BaseEventsFragment {
     }
 
     public void startFilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, long... times) {
+
+        if (isMapListShown) {
+            hideMapEvents(-1);
+        }
+
         if (filterAsyncTask != null && !filterAsyncTask.isCancelled()) {
             filterAsyncTask.cancel(true);
 
@@ -899,16 +1051,262 @@ public class EventsFragment extends BaseEventsFragment {
         @Override
         protected void onPostExecute(List<Event> events) {
 
-            if (!isCancelled()) {
+            if (!isCancelled() && events != null) {
                 topProgressBar.setVisibility(View.GONE);
                 EventsFragment.this.filteredEvents = events;
-                sortData();
-                eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+
+                if (isMapShown) {
+                    mapMarkerManager.setEvents(map, filteredEvents);
+                } else {
+
+                    sortData();
+                    eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                    if (showFollowCard) {
+                        eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
+                                eventsCollection.numFollowers);
+                    }
+                }
                 if (events.isEmpty()) {
                     Snackbar.make(getView(), R.string.no_events, Snackbar.LENGTH_SHORT).show();
 
                 }
             }
         }
+    }
+
+
+    private void setUpMap() {
+        // Try to obtain the map from the SupportMapFragment.
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                map = googleMap;
+                map.setMyLocationEnabled(true);
+                map.setOnCameraChangeListener(mOnCameraChangeListener);
+                map.setOnMarkerClickListener(mOnMarkerClickListener);
+                map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
+                map.setOnMapClickListener(mOnMapClickListener);
+
+                LatLng location = eventsContext.location;
+                eventsContext.changeLocation(null);
+                updateUserLocation(location);
+            }
+        });
+    }
+
+    private void setupGestureDetectorIfNeeded() {
+        if (gestureDetector == null) {
+            gestureDetector = new GestureDetectorCompat(activity, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onDown(MotionEvent event) {
+                    return true;
+                }
+
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    activity.showEventDetails(mapMarkerManager.getEvent(lastSelectedMarker),
+                            eventsContext.getLabel(), null);
+                    return true;
+                }
+
+                @Override
+                public boolean onFling(MotionEvent event1, MotionEvent event2,
+                                       float velocityX, float velocityY) {
+                    if (Math.abs(velocityY) > Math.abs(velocityX)) {
+                        // this is either up or down movement, ignore.
+                        activity.reportActionToAnalytics("swipeVertical");
+                        return false;
+                    }
+
+                    activity.reportActionToAnalytics("swipe");
+                    Marker nextMarker = velocityX > 0 ?
+                            mapMarkerManager.getPrevMarker(lastSelectedMarker) :
+                            mapMarkerManager.getNextMarker(lastSelectedMarker);
+                    if (nextMarker != null) {
+                        lastSelectedMarker.hideInfoWindow();
+                        nextMarker.setVisible(true);
+                        nextMarker.showInfoWindow();
+                        updateUserLocation(nextMarker.getPosition());
+                        mOnMarkerClickListener.onMarkerClick(nextMarker);
+                    }
+                    return true;
+                }
+            });
+        }
+    }
+
+
+    private void showEventsListOnMap() {
+        EventsAdapter adapter = new EventsAdapter(activity);
+        mapClickedEvents.setAdapter(adapter);
+        List<Event> events = new ArrayList<>();
+
+        Event event = mapMarkerManager.getEvent(lastSelectedMarker);
+        events.add(event);
+        events.addAll(getEventsForSameAddress(event));
+        mapEventsCount.setText(events.size() + " Events");
+        adapter.setEvents(events, null, false);
+        if (((EventsGridActivity) getActivity()).isFiltersShown) {
+            ((EventsGridActivity) getActivity()).collapseAnimation(EventsGridActivity.SHOW_MAP_EVENTS_LIST);
+        } else {
+            bringMapEventsVisible();
+        }
+    }
+
+    public ArrayList<Event> getEventsForSameAddress(Event mappedEvent) {
+
+        ArrayList<Event> events = new ArrayList<>();
+        for (Event event : filteredEvents) {
+            if (event.id == mappedEvent.id || !(event.location != null)) {
+                continue;
+            }
+            if (event.location.equals(mappedEvent.location)) {
+                events.add(event);
+            }
+        }
+        return events;
+
+    }
+
+
+    public void hideMapEvents(final int state) {
+        AnimatorSet set = new AnimatorSet();
+        ObjectAnimator anim = ObjectAnimator.ofFloat(mapClickedList, View.TRANSLATION_Y, 0, MOVE_VIEW_TO_POS);
+        anim.setDuration(300);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        ObjectAnimator anim1 = ObjectAnimator.ofFloat(dimBgView, View.ALPHA, 1, 0);
+        anim1.setDuration(300);
+        anim1.setInterpolator(new AccelerateDecelerateInterpolator());
+        set.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                dimBgView.setVisibility(View.GONE);
+                lastSelectedMarker = null;
+                isMapListShown = false;
+                if (state == EventsGridActivity.SHOW_EVENT_LIST_STATE) {
+                    showListView();
+                } else if (state == EventsGridActivity.SHOW_FILTERS_STATE) {
+                    ((EventsGridActivity) getActivity()).expandAnimation();
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        set.playTogether(anim, anim1);
+        set.start();
+
+    }
+
+    public void bringMapEventsVisible() {
+
+        AnimatorSet set = new AnimatorSet();
+        ObjectAnimator anim = ObjectAnimator.ofFloat(mapClickedList, View.TRANSLATION_Y, MOVE_VIEW_TO_POS, 0);
+        anim.setDuration(300);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        ObjectAnimator anim1 = ObjectAnimator.ofFloat(dimBgView, View.ALPHA, 0, 1);
+        anim1.setDuration(300);
+        anim1.setInterpolator(new AccelerateDecelerateInterpolator());
+        dimBgView.setVisibility(View.VISIBLE);
+        set.playTogether(anim, anim1);
+        set.start();
+        isMapListShown = true;
+    }
+
+    private void showEventCard() {
+        View eventView = eventCardContainer.getChildAt(0);
+        Event event = mapMarkerManager.getEvent(lastSelectedMarker);
+        eventView = EventCard.getEventCard(
+                event, activity, eventView, eventCardContainer, false);
+        eventView.setOnTouchListener(
+                new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return gestureDetector.onTouchEvent(event);
+                    }
+                });
+        eventCardContainer.removeAllViews();
+        eventCardContainer.addView(eventView);
+    }
+
+
+    // ***********************
+    // Callbacks
+    // ***********************
+
+    // This is called when maps camera position is changed (zoom in, zoom out or
+    // user dragging the map around). We refresh the events listing if there is
+    // change in city otherwise we refresh the event markers shown to user.
+    private GoogleMap.OnCameraChangeListener mOnCameraChangeListener = new GoogleMap.OnCameraChangeListener() {
+        @Override
+        public void onCameraChange(CameraPosition cameraPosition) {
+            boolean isInfoWindowShown = mapMarkerManager.updateListingForProjection(map.getProjection());
+            if (!isInfoWindowShown) {
+                mOnMapClickListener.onMapClick(null);
+            }
+
+            if (!eventsContext.changeLocation(cameraPosition.target)) {
+
+                mapMarkerManager.setEvents(map, filteredEvents);
+            }
+        }
+    };
+
+    private GoogleMap.OnMapClickListener mOnMapClickListener = new GoogleMap.OnMapClickListener() {
+        @Override
+        public void onMapClick(LatLng latLng) {
+            if (latLng != null) {
+                activity.reportActionToAnalytics("onMapClick");
+            }
+            lastSelectedMarker = null;
+            // eventCardContainer.removeAllViews();
+        }
+    };
+
+    private GoogleMap.OnMarkerClickListener mOnMarkerClickListener = new GoogleMap.OnMarkerClickListener() {
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            activity.reportActionToAnalytics("onMarkerClick");
+            lastSelectedMarker = marker;
+            // showEventCard();
+            showEventsListOnMap();
+            return false;
+        }
+    };
+
+    // When user clicks on info window, we open the details screen.
+    private GoogleMap.OnInfoWindowClickListener mOnInfoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
+        @Override
+        public void onInfoWindowClick(Marker marker) {
+            activity.showEventDetails(mapMarkerManager.getEvent(marker), eventsContext.getLabel(), null);
+        }
+    };
+
+    private void updateUserLocation(@Nullable LatLng userLocation) {
+        if (userLocation == null) {
+            // do nothing.
+            return;
+        }
+
+        map.animateCamera(
+                CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.builder()
+                                .target(userLocation)
+                                .zoom(Math.max(map.getCameraPosition().zoom, DEFAULT_ZOOM_LEVEL))
+                                .build()
+                )
+        );
     }
 }

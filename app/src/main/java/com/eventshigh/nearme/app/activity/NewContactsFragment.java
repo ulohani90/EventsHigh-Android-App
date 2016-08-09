@@ -100,10 +100,12 @@ public class NewContactsFragment extends Fragment {
     }
 
     public void showInviteDialog() {
+        activity.reportActionToAnalytics("inviteFbFriends");
+
         String appLinkUrl, previewImageUrl;
 
         appLinkUrl = "https://fb.me/528284797367992";
-        previewImageUrl = "https://www.eventshigh.com/assets/images/logor.png";
+        previewImageUrl = "https://s3-us-west-2.amazonaws.com/ehasset/eh_tag_logo.jpg";
 
         if (AppInviteDialog.canShow()) {
             AppInviteContent content = new AppInviteContent.Builder()

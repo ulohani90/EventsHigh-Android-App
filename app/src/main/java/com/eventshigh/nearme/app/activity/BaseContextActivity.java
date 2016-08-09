@@ -82,7 +82,7 @@ public abstract class BaseContextActivity extends BaseActivity {
         }
 
         // Show the verify phone snakbar if needed.
-        showVerifyPhoneSnackbar();
+        // showVerifyPhoneSnackbar();
     }
 
     @Override
@@ -105,7 +105,7 @@ public abstract class BaseContextActivity extends BaseActivity {
 
         //AskForContactsDialog.show(BaseContextActivity.this, Preferences.getInstance(this));
         Intent inIntent = getIntent();
-        if (eventsContext.city != null && toolbar != null &&
+        if (eventsContext != null && eventsContext.city != null && toolbar != null &&
                 (inIntent == null || !Intent.ACTION_VIEW.equals(inIntent.getAction()))) {
             toolbar.postDelayed(new Runnable() {
                 @Override
@@ -139,12 +139,18 @@ public abstract class BaseContextActivity extends BaseActivity {
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
             } else {
                 reportActionToAnalytics("switchToMaps");
-                switchTo(EventsMapsActivity.class);
+                showMapActivity();
+                //switchTo(EventsMapsActivity.class);
             }
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    public void showMapActivity() {
+
     }
 
     @Override

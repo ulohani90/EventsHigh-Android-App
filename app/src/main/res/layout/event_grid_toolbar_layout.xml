@@ -27,5 +27,6 @@
         android:padding="8dp"
         android:text="+Follow"
         android:textColor="@color/follow_btn_color_selector"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:visibility="gone" />
 </LinearLayout>

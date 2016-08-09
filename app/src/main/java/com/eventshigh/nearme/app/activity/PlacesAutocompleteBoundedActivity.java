@@ -99,7 +99,6 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ;
                 PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
                         .getPlaceById(mGoogleApiClient, ((AutocompletePrediction) dataAdapter.getItem(position)).getPlaceId());
                 placeResult.setResultCallback(mUpdatePlaceDetailsCallback);

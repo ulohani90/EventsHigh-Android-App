@@ -1,10 +1,14 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -94,8 +98,11 @@ public class SelectInterestsActivity extends BaseActivity {
 
         setSupportActionBar(toolbar);
         if (!isOnboarding) {
+
+            titleText.setText("Edit Your Interests");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         } else {
+            titleText.setText("Add Your Interests");
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
 
@@ -104,6 +111,7 @@ public class SelectInterestsActivity extends BaseActivity {
         minFlowLayoutHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 54, getResources().getDisplayMetrics());
 
         loadTags();
+
 
     }
 
@@ -217,9 +225,25 @@ public class SelectInterestsActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(FbLoginFragment.LOGOUT_BROADCAST_ACTION);
+        registerReceiver(receiver, intentFilter);
         if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equals(BaseActivity.NOTIFICATION_ACTION)) {
             reportActionToAnalytics("openNotification");
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(receiver);
+        super.onDestroy();
     }
 
     @Override
@@ -227,9 +251,12 @@ public class SelectInterestsActivity extends BaseActivity {
         return toolbar;
     }
 
+
+    TextView titleText;
+
     public void addToolbarView(Toolbar toolbar) {
         View view = LayoutInflater.from(this).inflate(R.layout.skip_btn_layout, toolbar, false);
-
+        titleText = (TextView) view.findViewById(R.id.title);
         if (getIntent().getBooleanExtra(FROM_NOTIFICATION_PARAM, false)) {
             isFromNotification = true;
         }
@@ -377,7 +404,7 @@ public class SelectInterestsActivity extends BaseActivity {
     public void launchNextActivity() {
         Intent fbLoginIntent = new Intent(this, FBLoginActivity.class);
         startActivity(fbLoginIntent);
-        finish();
+        //finish();
     }
 
     public void closeActivity(boolean shouldStartHome) {
@@ -387,7 +414,6 @@ public class SelectInterestsActivity extends BaseActivity {
             startActivity(intent);
         } else if (isOnboarding) {
             launchNextActivity();
-
         } else {
             finish();
         }
@@ -400,7 +426,13 @@ public class SelectInterestsActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        closeActivity(isFromNotification);
+        if (isFromNotification) {
+            Intent intent = new Intent(this, LaunchActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        } else {
+            finish();
+        }
     }
 
     public List<EventSubcategory> getEventCategories(EventCategory category) {
@@ -475,4 +507,13 @@ public class SelectInterestsActivity extends BaseActivity {
         a.setDuration((int) (initialHeight / v.getContext().getResources().getDisplayMetrics().density));
         v.startAnimation(a);
     }
+
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("onReceive", "Logout in progress");
+
+            finish();
+        }
+    };
 }

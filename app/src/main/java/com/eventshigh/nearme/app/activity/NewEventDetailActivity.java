@@ -110,7 +110,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupLayout(R.layout.new_event_detail_activity);
+        setContentView(R.layout.new_event_detail_activity);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setUpToolBar(toolbar);
         setSupportActionBar(toolbar);
@@ -168,8 +168,13 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
         if (!isDataAttached) {
             String action = getIntent().getAction();
-            if (BaseActivity.NOTIFICATION_ACTION.equals(action)) {
-                reportActionToAnalytics("openNotification", getIntent().getData().getLastPathSegment());
+            if (action != null) {
+                if (BaseActivity.NOTIFICATION_ACTION.equals(action)) {
+                    reportActionToAnalytics("openNotification", getIntent().getData().getLastPathSegment());
+
+                } else if (action.equalsIgnoreCase(Intent.ACTION_VIEW)) {
+                    reportActionToAnalytics("deeplink", getIntent().getDataString());
+                }
             }
 
         /*findViewById(R.id.event_container).setMinimumHeight(
@@ -552,7 +557,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
         Account account = new Account(this);
         Account.UserInfo userInfo = account.getUserInfo();
         if (!userInfo.isSignedIn) {
-           // FBSigninDialog.show(this, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan, REQUEST_FOR_RESULT_BOOK_TICKETS);
+            // FBSigninDialog.show(this, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan, REQUEST_FOR_RESULT_BOOK_TICKETS);
             Intent intent = new Intent(this, FBLoginActivity.class);
             intent.putExtra("show_special_text", true);
             intent.putExtra("hide_skip", true);

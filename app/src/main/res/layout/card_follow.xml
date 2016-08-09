@@ -1,98 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:context=".activity.EventsGridActivity"
->
-    <TextView
-        android:id="@+id/cat_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:padding="6dp"
-        android:background="@drawable/rect_border"
-        android:textColor="@android:color/black"
-        android:textSize="17sp"
-        android:textAllCaps="true"
-        android:textIsSelectable="false"
-        tools:text="Music"
-    />
-
-    <TextView
-        android:id="@+id/subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="8dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="#CC000000"
-        android:textSize="14sp"
-        android:textIsSelectable="false"
-        tools:text="35 Followers | 39 Events"
-    />
+    android:paddingBottom="8dp"
+    android:paddingTop="8dp"
+    tools:context=".activity.EventsGridActivity">
 
     <TextView
         android:id="@+id/following_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="14dp"
-        android:paddingTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/eh_oval"
+        android:drawablePadding="4dp"
+        android:gravity="center_vertical"
         android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:background="@drawable/eh_oval"
-        android:textColor="@android:color/white"
-        android:textSize="12sp"
-        android:textStyle="bold"
+        android:paddingTop="8dp"
         android:text="@string/ui_following"
-        android:drawableStart="@drawable/ic_done_white_12dp"
-        android:drawablePadding="4dp"
-    />
+        android:textColor="@android:color/white"
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/follow_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="14dp"
-        android:paddingTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/follow_btn_bg"
         android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:background="@drawable/eh_oval"
-        android:textColor="@android:color/white"
-        android:textSize="12sp"
-        android:textStyle="bold"
+        android:paddingTop="8dp"
         android:text="@string/ui_follow"
-    />
+        android:textColor="#353535"
+        android:textSize="15sp" />
 
-    <com.eventshigh.nearme.app.view.ContactListView
-        android:id="@+id/followed_by"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/cat_title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:scrollbars="none"
-        android:padding="10dp"
-        app:contactPhotoSize="24dp"
-        app:contactPosition="center"
-        app:text=" follows this."
-    />
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/rect_border"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:padding="6dp"
+        android:textAllCaps="true"
+        android:textColor="#333333"
+        android:textIsSelectable="false"
+        android:textSize="17sp"
+        android:visibility="gone"
+        tools:text="Music" />
 
-    <include layout="@layout/card_discount_voucher"
-        android:id="@+id/discount_coupon"/>
-
-    <View
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/gray600"
-        android:layout_marginTop="4dp"
-        android:layout_marginLeft="-4dp"
-        android:layout_marginRight="-4dp"
-    />
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/separator"
+            android:layout_width="1dp"
+            android:layout_height="20dp"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:background="#696969" />
+
+        <TextView
+            android:id="@+id/followers_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/separator"
+            android:drawableLeft="@drawable/ic_followers"
+            android:drawablePadding="3dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:textColor="#696969"
+            android:textIsSelectable="false"
+            android:textSize="14sp"
+            tools:text="35 Followers" />
+
+
+        <TextView
+            android:id="@+id/events_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/separator"
+            android:drawableLeft="@drawable/ic_create_events_nav"
+            android:drawablePadding="3dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:textColor="#696969"
+            android:textIsSelectable="false"
+            android:textSize="14sp"
+            tools:text="39 Events" />
+    </RelativeLayout>
+
+
 </LinearLayout>

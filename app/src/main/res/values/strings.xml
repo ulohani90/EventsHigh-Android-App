@@ -148,7 +148,7 @@
     <string name="num_movies">{0,choice,10&lt;{1} Movies|11&lt;{0} Followers \'|\' {1} Movies}</string>
 
     <!-- Contacts Upload -->
-    <string name="perm_upload_contacts">Events are best with friends. We would like to upload your contacts so that we can find friends for you.</string>
+    <string name="perm_upload_contacts">Events are best with friends. Please upload your contacts so that we can find more friends for you.</string>
     <string name="contacts_upload_promise">We will not share your contacts to any third party, that\'s a promise!</string>
 
     <!-- FB -->

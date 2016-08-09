@@ -72,7 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:visibility="visible" />
+            android:visibility="gone" />
         <include
             android:id="@+id/view_retry"
             layout="@layout/view_retry"

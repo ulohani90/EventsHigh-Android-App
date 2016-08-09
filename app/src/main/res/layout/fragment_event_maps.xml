@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray200"
+    android:orientation="vertical">
+
+
+    <FrameLayout
+        android:id="@+id/event_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:elevation="8dp"
+        tools:ignore="UnusedAttribute">
+
+        <FrameLayout
+            android:id="@+id/map_container"
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <FrameLayout
+            android:id="@+id/event_card_container"
+            android:layout_width="@dimen/maps_event_card_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:animateLayoutChanges="true" />
+
+    </FrameLayout>
+
+</LinearLayout>

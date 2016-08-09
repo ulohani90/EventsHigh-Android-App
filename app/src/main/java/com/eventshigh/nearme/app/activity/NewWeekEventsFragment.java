@@ -1,5 +1,8 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,14 +12,20 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,7 +35,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventDistanceComparator;
 import com.eventshigh.nearme.app.data.EventPriceComparator;
@@ -36,6 +44,8 @@ import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
+import com.eventshigh.nearme.app.ui.MapMarkerManager;
+import com.eventshigh.nearme.app.ui.adapter.EventCard;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.ui.animation.ResizeAnimation;
 import com.eventshigh.nearme.app.user.Account;
@@ -43,6 +53,13 @@ import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.squareup.timessquare.CalendarPickerView;
 
 import java.util.ArrayList;
@@ -95,6 +112,47 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
     Account account;
     HorizontalScrollView sortFilter;
 
+    //Map contents
+    SupportMapFragment mapFragment;
+    private GestureDetectorCompat gestureDetector;
+    // Manager for all markers drawn on map. Manager is responsible for hiding/showing markers
+    // on map.
+    private MapMarkerManager mapMarkerManager = new MapMarkerManager();
+
+    // Last marker for which the event info card is shown.
+    private Marker lastSelectedMarker;
+
+    // Google Map View shows to user using MapFragment.
+    private GoogleMap map;
+
+    // For performance reasons, we show events only where user has reasonable zoom level.
+    public static final int MIN_ZOOM_LEVEL = 9;
+    public static final int DEFAULT_ZOOM_LEVEL = 14;
+
+
+    boolean isMapShown;
+
+    LinearLayout eventListContainer;
+
+    // FrameLayout eventCardContainer;
+
+    boolean isLoadingComplete;
+
+    HorizontalScrollView priceFilter;
+
+    LinearLayout mapClickedList;
+
+    AutofitRecyclerView mapClickedEvents;
+
+    View dimBgView;
+
+    TextView mapEventsCount;
+
+    boolean isMapListShown;
+
+    boolean isFiltersShown;
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -106,6 +164,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         noMyEventsView = view.findViewById(R.id.view_no_my_event);
 
         dateFilter = (HorizontalScrollView) view.findViewById(R.id.date_filter);
+        priceFilter = (HorizontalScrollView) view.findViewById(R.id.price_filter);
         sortFilter = (HorizontalScrollView) view.findViewById(R.id.sort_container);
         retryView = view.findViewById(R.id.view_retry);
         retryView.setOnClickListener(new View.OnClickListener() {
@@ -129,6 +188,26 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
         topProgressBar = view.findViewById(R.id.top_progress_bar);
         account = new Account(activity);
+        eventListContainer = (LinearLayout) view.findViewById(R.id.week_parent);
+        mapClickedList = (LinearLayout) view.findViewById(R.id.map_clicked_events);
+        mapClickedEvents = (AutofitRecyclerView) view.findViewById(R.id.event_grid_map);
+        mapClickedEvents.getParent().requestDisallowInterceptTouchEvent(true);
+        dimBgView = view.findViewById(R.id.dim_bg_view);
+        dimBgView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideMapEvents(-1);
+            }
+        });
+        view.findViewById(R.id.cross_img).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideMapEvents(-1);
+            }
+        });
+        mapEventsCount = (TextView) view.findViewById(R.id.map_events_count);
+
+        hideMapEvents(-1);
         return view;
     }
 
@@ -195,8 +274,6 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                         if (isDetached()) {
                             return;
                         }
-
-
                         if (!eventsCollection.events.isEmpty()) {
 
                             final String seeAllQuery = eventsContext.query.isEmpty() ||
@@ -224,8 +301,16 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                                             Toast.makeText(getActivity(), R.string.no_events, Toast.LENGTH_SHORT).show();
 
                                         } else {
+                                            isLoadingComplete = true;
+                                            if (getActivity() != null) {
+                                                filtersContainer.setVisibility(View.VISIBLE);
+                                                ((LaunchActivity) getActivity()).fabWriteReviews.setImageResource(R.drawable.ic_browse_map);
+                                                ((LaunchActivity) getActivity()).animateFabIn();
+                                            }
                                             noMyEventsView.setVisibility(View.GONE);
                                         }
+
+
                                     }
                                     List<Event> filteredEvents = NewWeekEventsFragment.this.eventsCollection.events;
                                     filteredEvents = filterEventsWithCategory(null, filteredEvents);
@@ -565,10 +650,12 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                         startFilterAsyncTask(EventsGridActivity.CATEGORY_FILTER, null, filterText.getText().toString(), -1, null);
                         //filterEventsWithCategory(filterText.getText().toString(), null);
                     }
+
+                    activity.reportActionToAnalytics("filters", "This week" + "-" + filterText.getText().toString());
                 }
             });
         }
-        /*LinearLayout horizontalprice = (LinearLayout) view.findViewById(R.id.price_container);
+        LinearLayout horizontalprice = (LinearLayout) view.findViewById(R.id.price_container);
         String[] priceRanges = {"Free", " \u20B9 ", "\u20B9 \u20B9", "\u20B9 \u20B9 \u20B9", "\u20B9 \u20B9 \u20B9 \u20B9"};
         for (int i = 0; i < priceRanges.length; i++) {
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
@@ -582,18 +669,24 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                     int position = (Integer) filterText.getTag();
                     if (position == 0) {
                         startFilterAsyncTask(EventsGridActivity.PRICE_FILTER, null, null, EventsGridActivity.FREE, null);
+                        activity.reportActionToAnalytics("filters", eventsContext.query + "-FREE");
                         // filterEventsWithPrice(null, EventsGridActivity.FREE);
                     } else if (position == 1) {
                         startFilterAsyncTask(EventsGridActivity.PRICE_FILTER, null, null, EventsGridActivity.UPTO_250, null);
                         //filterEventsWithPrice(null, EventsGridActivity.UPTO_250);
+                        activity.reportActionToAnalytics("filters", eventsContext.query + "uptp250");
                     } else if (position == 2) {
                         startFilterAsyncTask(EventsGridActivity.PRICE_FILTER, null, null, EventsGridActivity.PRICE_250_TO_750, null);
                         //filterEventsWithPrice(null, EventsGridActivity.PRICE_250_TO_750);
+                        activity.reportActionToAnalytics("filters", eventsContext.query + "price250to750");
                     } else if (position == 3) {
                         startFilterAsyncTask(EventsGridActivity.PRICE_FILTER, null, null, EventsGridActivity.PRICE_750_TO_1500, null);
+                        activity.reportActionToAnalytics
+                                ("filters", eventsContext.query + "price750to1500");
                         //filterEventsWithPrice(null, EventsGridActivity.PRICE_750_TO_1500);
                     } else {
                         startFilterAsyncTask(EventsGridActivity.PRICE_FILTER, null, null, EventsGridActivity.MORE_THAN_1500, null);
+                        activity.reportActionToAnalytics("filters", eventsContext.query + "moreThan1500");
                         //filterEventsWithPrice(null, EventsGridActivity.MORE_THAN_1500);
                     }
                     if (filterText.isSelected()) {
@@ -603,7 +696,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                     }
                 }
             });
-        }*/
+        }
 
         LinearLayout horizontalDate = (LinearLayout) view.findViewById(R.id.date_container);
         String[] dateRanges = {"Today", "Tomorrow", "Weekend", "Custom Dates", "• • •"};
@@ -637,14 +730,19 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                     if (filterText.getText().toString().equalsIgnoreCase("Today")) {
                         checkIfCustomDateSelected();
                         startFilterAsyncTask(EventsGridActivity.DATE_FILTER, null, null, -1, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+
+                        activity.reportActionToAnalytics("filters", "This week" + "-Today");
                         //filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Tomorrow")) {
                         checkIfCustomDateSelected();
                         startFilterAsyncTask(EventsGridActivity.DATE_FILTER, null, null, -1, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
+
+                        activity.reportActionToAnalytics("filters", "This week" + "-Tomorrow");
                         // filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
                     } else if (filterText.getText().toString().equalsIgnoreCase("Weekend")) {
                         checkIfCustomDateSelected();
                         startFilterAsyncTask(EventsGridActivity.DATE_FILTER, null, null, -1, DateTimeUtils.getWeekEndDates());
+                        activity.reportActionToAnalytics("filters", "This week" + "-Weekend");
                         //filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Custom Dates")) {
                         showDateDialog();
@@ -662,10 +760,16 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                                     .inMode(CalendarPickerView.SelectionMode.MULTIPLE);
                         }
                     } else if (filterText.getText().toString().equalsIgnoreCase("• • •")) {
-                        expandAnimation();
+                        if (isMapListShown) {
+                            hideMapEvents(EventsGridActivity.SHOW_FILTERS_STATE);
+                        } else {
+                            expandAnimation();
+                        }
+                        activity.reportActionToAnalytics("filters", "This week" + "-Expand");
                         return;
                     } else {
-                        collapseAnimation();
+                        collapseAnimation(-1);
+                        activity.reportActionToAnalytics("filters", "This week" + "-Collapse");
                         return;
                     }
                     if (!(filterText.getText().toString().equalsIgnoreCase("Custom Dates"))) {
@@ -679,7 +783,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             });
         }
 
-        collapseAnimation();
+        collapseAnimation(-1);
 
         trending = (TextView) view.findViewById(R.id.sort_trending);
         price = (TextView) view.findViewById(R.id.sort_price);
@@ -693,6 +797,8 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                     price.setSelected(false);
                     distance.setSelected(false);
                     sortAccToSortState(SORT_STATE_TRENDING);
+                    activity.reportActionToAnalytics("filters", "This week" + "-sortTrending");
+
                 }
             }
         });
@@ -705,6 +811,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                     price.setSelected(true);
                     distance.setSelected(false);
                     sortAccToSortState(SORT_STATE_PRICE);
+                    activity.reportActionToAnalytics("filters", "This week" + "-sortPrice");
                 }
             }
         });
@@ -719,6 +826,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                         price.setSelected(false);
                         distance.setSelected(true);
                         sortAccToSortState(SORT_STATE_DISTANCE);
+                        activity.reportActionToAnalytics("filters", "This week" + "-sortDistance");
                     }
                 } else {
                     isDistanceClicked = true;
@@ -827,10 +935,16 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             removeAllSelectedDateFilters();
             selectCustomDates.setSelected(true);
             long[] dates = new long[selectedDates.size()];
+            StringBuilder builder = new StringBuilder();
             for (int i = 0; i < selectedDates.size(); i++) {
+                if (i != 0) {
+                    builder.append("/");
+                }
                 dates[i] = selectedDates.get(i).getTime();
+                builder.append(DateTimeUtils.getDateFromMillisTime(selectedDates.get(i).getTime()));
             }
             startFilterAsyncTask(EventsGridActivity.DATE_FILTER, null, null, -1, dates);
+            activity.reportActionToAnalytics("filters", "This week" + "-" + builder.toString());
             //filterEventsWithDate(null, dates);
         }
     }
@@ -860,7 +974,11 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
     public void expandAnimation() {
         int targetHeight;
-        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+        if (!isMapShown) {
+            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+        } else {
+            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+        }
         ResizeAnimation resizeAnimation = new ResizeAnimation(filtersContainer, targetHeight);
         resizeAnimation.setDuration(100);
         resizeAnimation.setAnimationListener(new Animation.AnimationListener() {
@@ -884,6 +1002,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                     }, 100L);
                 }
                 addDrawable(R.drawable.ic_action_highlight_remove);
+                isFiltersShown = true;
             }
 
             @Override
@@ -894,7 +1013,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         filtersContainer.startAnimation(resizeAnimation);
     }
 
-    public void collapseAnimation() {
+    public void collapseAnimation(final int hideValue) {
         ResizeAnimation resizeAnimation = new ResizeAnimation(filtersContainer, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56), getResources().getDisplayMetrics()));
         resizeAnimation.setDuration(100);
         resizeAnimation.setAnimationListener(new Animation.AnimationListener() {
@@ -905,8 +1024,17 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
             @Override
             public void onAnimationEnd(Animation animation) {
+                isFiltersShown = false;
                 showMoreFilterText.setText("• • •");
                 addDrawable(-1);
+                if (hideValue == EventsGridActivity.SHOW_MAP_EVENTS_LIST) {
+                    bringMapEventsVisible();
+                } else if (hideValue == EventsGridActivity.SHOW_MAP_VIEW) {
+                    hideFilterComponents(HIDE_SORT);
+                    hideListView();
+                } else {
+                    hideFilterComponents(hideValue);
+                }
             }
 
             @Override
@@ -930,6 +1058,9 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
     FilterAsyncTask filterAsyncTask;
 
     public void startFilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, long... times) {
+        if (isMapListShown) {
+            hideMapEvents(-1);
+        }
         if (filterAsyncTask != null && !filterAsyncTask.isCancelled()) {
             filterAsyncTask.cancel(true);
 
@@ -983,8 +1114,12 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             if (!isCancelled() && events != null) {
                 topProgressBar.setVisibility(View.GONE);
                 NewWeekEventsFragment.this.filteredEvents = events;
-                sortData();
-                eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                if (isMapShown) {
+                    mapMarkerManager.setEvents(map, filteredEvents);
+                } else {
+                    sortData();
+                    eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                }
                 if (events.size() > 0) {
                     noMyEventsView.setVisibility(View.GONE);
                 } else {
@@ -1004,5 +1139,317 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             builder.append(times[i] + "");
         }
         return builder.toString();
+    }
+
+
+    public static final int MOVE_VIEW_TO_POS = 2500;
+
+    public void hideListView() {
+        ObjectAnimator anim = ObjectAnimator.ofFloat(eventListContainer, View.TRANSLATION_Y, 0, MOVE_VIEW_TO_POS);
+        anim.setDuration(500);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                isMapShown = true;
+                setUpMapContents();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        anim.start();
+    }
+
+    public void showListView() {
+        eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+        if (showFollowCard) {
+            eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
+                    eventsCollection.numFollowers);
+        }
+
+        isMapShown = false;
+        ObjectAnimator anim = ObjectAnimator.ofFloat(eventListContainer, View.TRANSLATION_Y, MOVE_VIEW_TO_POS, 0);
+        anim.setDuration(500);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.start();
+    }
+
+    public void setUpMapContents() {
+        if (map == null) {
+            FragmentManager fm = getChildFragmentManager();
+            mapFragment = (SupportMapFragment) fm.findFragmentByTag("supportMapFragment");
+            if (mapFragment == null) {
+                mapFragment = new SupportMapFragment();
+                FragmentTransaction ft = fm.beginTransaction();
+                ft.add(R.id.map_container, mapFragment, "supportMapFragment");
+                ft.commit();
+                fm.executePendingTransactions();
+            }
+            setUpMap();
+            setupGestureDetectorIfNeeded();
+        } else {
+            mapMarkerManager.setEvents(map, filteredEvents);
+        }
+
+
+    }
+
+    private void setUpMap() {
+        // Try to obtain the map from the SupportMapFragment.
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                map = googleMap;
+                map.setMyLocationEnabled(true);
+                map.setOnCameraChangeListener(mOnCameraChangeListener);
+                map.setOnMarkerClickListener(mOnMarkerClickListener);
+                map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
+                map.setOnMapClickListener(mOnMapClickListener);
+
+                LatLng location = eventsContext.location;
+                eventsContext.changeLocation(null);
+                updateUserLocation(location);
+            }
+        });
+    }
+
+    private void setupGestureDetectorIfNeeded() {
+        if (gestureDetector == null) {
+            gestureDetector = new GestureDetectorCompat(activity, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onDown(MotionEvent event) {
+                    return true;
+                }
+
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    activity.showEventDetails(mapMarkerManager.getEvent(lastSelectedMarker),
+                            eventsContext.getLabel(), null);
+                    return true;
+                }
+
+                @Override
+                public boolean onFling(MotionEvent event1, MotionEvent event2,
+                                       float velocityX, float velocityY) {
+                    if (Math.abs(velocityY) > Math.abs(velocityX)) {
+                        // this is either up or down movement, ignore.
+                        activity.reportActionToAnalytics("swipeVertical");
+                        return false;
+                    }
+
+                    activity.reportActionToAnalytics("swipe");
+                    Marker nextMarker = velocityX > 0 ?
+                            mapMarkerManager.getPrevMarker(lastSelectedMarker) :
+                            mapMarkerManager.getNextMarker(lastSelectedMarker);
+                    if (nextMarker != null) {
+                        lastSelectedMarker.hideInfoWindow();
+                        nextMarker.setVisible(true);
+                        nextMarker.showInfoWindow();
+                        updateUserLocation(nextMarker.getPosition());
+                        mOnMarkerClickListener.onMarkerClick(nextMarker);
+                    }
+                    return true;
+                }
+            });
+        }
+    }
+
+    private void showEventsListOnMap() {
+        EventsAdapter adapter = new EventsAdapter(activity);
+        mapClickedEvents.setAdapter(adapter);
+        List<Event> events = new ArrayList<>();
+
+        Event event = mapMarkerManager.getEvent(lastSelectedMarker);
+        events.add(event);
+        events.addAll(getEventsForSameAddress(event));
+        mapEventsCount.setText(events.size() + " Events");
+        adapter.setEvents(events, null, false);
+        if (isFiltersShown) {
+            collapseAnimation(EventsGridActivity.SHOW_MAP_EVENTS_LIST);
+        } else {
+            bringMapEventsVisible();
+        }
+    }
+
+    public ArrayList<Event> getEventsForSameAddress(Event mappedEvent) {
+
+        ArrayList<Event> events = new ArrayList<>();
+        for (Event event : filteredEvents) {
+            if (event.id == mappedEvent.id || !(event.location != null)) {
+                continue;
+            }
+            if (event.location.equals(mappedEvent.location)) {
+                events.add(event);
+            }
+        }
+        return events;
+
+    }
+
+
+    public void hideMapEvents(final int state) {
+        AnimatorSet set = new AnimatorSet();
+        ObjectAnimator anim = ObjectAnimator.ofFloat(mapClickedList, View.TRANSLATION_Y, 0, MOVE_VIEW_TO_POS);
+        anim.setDuration(300);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        ObjectAnimator anim1 = ObjectAnimator.ofFloat(dimBgView, View.ALPHA, 1, 0);
+        anim1.setDuration(300);
+        anim1.setInterpolator(new AccelerateDecelerateInterpolator());
+        set.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                dimBgView.setVisibility(View.GONE);
+                lastSelectedMarker = null;
+                isMapListShown = false;
+                if (state == EventsGridActivity.SHOW_EVENT_LIST_STATE) {
+                    showListView();
+                } else if (state == EventsGridActivity.SHOW_FILTERS_STATE) {
+                    expandAnimation();
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        set.playTogether(anim, anim1);
+        set.start();
+
+    }
+
+    public void bringMapEventsVisible() {
+
+        AnimatorSet set = new AnimatorSet();
+        ObjectAnimator anim = ObjectAnimator.ofFloat(mapClickedList, View.TRANSLATION_Y, MOVE_VIEW_TO_POS, 0);
+        anim.setDuration(300);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        ObjectAnimator anim1 = ObjectAnimator.ofFloat(dimBgView, View.ALPHA, 0, 1);
+        anim1.setDuration(300);
+        anim1.setInterpolator(new AccelerateDecelerateInterpolator());
+        dimBgView.setVisibility(View.VISIBLE);
+        set.playTogether(anim, anim1);
+        set.start();
+        isMapListShown = true;
+    }
+    /*private void showEventCard() {
+        View eventView = eventCardContainer.getChildAt(0);
+        Event event = mapMarkerManager.getEvent(lastSelectedMarker);
+        eventView = EventCard.getEventCard(
+                event, activity, eventView, eventCardContainer, false);
+        eventView.setOnTouchListener(
+                new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return gestureDetector.onTouchEvent(event);
+                    }
+                });
+        eventCardContainer.removeAllViews();
+        eventCardContainer.addView(eventView);
+    }*/
+
+
+    // ***********************
+    // Callbacks
+    // ***********************
+
+    // This is called when maps camera position is changed (zoom in, zoom out or
+    // user dragging the map around). We refresh the events listing if there is
+    // change in city otherwise we refresh the event markers shown to user.
+    private GoogleMap.OnCameraChangeListener mOnCameraChangeListener = new GoogleMap.OnCameraChangeListener() {
+        @Override
+        public void onCameraChange(CameraPosition cameraPosition) {
+            boolean isInfoWindowShown = mapMarkerManager.updateListingForProjection(map.getProjection());
+            if (!isInfoWindowShown) {
+                mOnMapClickListener.onMapClick(null);
+            }
+
+            if (!eventsContext.changeLocation(cameraPosition.target)) {
+
+                mapMarkerManager.setEvents(map, filteredEvents);
+            }
+        }
+    };
+
+    private GoogleMap.OnMapClickListener mOnMapClickListener = new GoogleMap.OnMapClickListener() {
+        @Override
+        public void onMapClick(LatLng latLng) {
+            if (latLng != null) {
+                activity.reportActionToAnalytics("onMapClick");
+            }
+            lastSelectedMarker = null;
+
+        }
+    };
+
+    private GoogleMap.OnMarkerClickListener mOnMarkerClickListener = new GoogleMap.OnMarkerClickListener() {
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            activity.reportActionToAnalytics("onMarkerClick");
+            lastSelectedMarker = marker;
+            showEventsListOnMap();
+            return false;
+        }
+    };
+
+    // When user clicks on info window, we open the details screen.
+    private GoogleMap.OnInfoWindowClickListener mOnInfoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
+        @Override
+        public void onInfoWindowClick(Marker marker) {
+            activity.showEventDetails(mapMarkerManager.getEvent(marker), eventsContext.getLabel(), null);
+        }
+    };
+
+    private void updateUserLocation(@Nullable LatLng userLocation) {
+        if (userLocation == null) {
+            // do nothing.
+            return;
+        }
+
+        map.animateCamera(
+                CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.builder()
+                                .target(userLocation)
+                                .zoom(Math.max(map.getCameraPosition().zoom, DEFAULT_ZOOM_LEVEL))
+                                .build()
+                )
+        );
+    }
+
+    public static final int SHOW_SORT = 1;
+    public static final int HIDE_SORT = 2;
+
+    public void hideFilterComponents(int hideValue) {
+        if (hideValue == SHOW_SORT) {
+            view.findViewById(R.id.sort_separator).setVisibility(View.VISIBLE);
+            sortFilter.setVisibility(View.VISIBLE);
+        } else if (hideValue == HIDE_SORT) {
+            view.findViewById(R.id.sort_separator).setVisibility(View.GONE);
+            sortFilter.setVisibility(View.GONE);
+        }
+
     }
 }

@@ -1,13 +1,17 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.Activity;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +21,9 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
@@ -26,25 +32,26 @@ import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
+import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.data.Locality;
 import com.eventshigh.nearme.app.data.LocalityLatLong;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
-import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
+import com.eventshigh.nearme.app.ui.FBSigninDialog;
 import com.eventshigh.nearme.app.ui.animation.ResizeAnimation;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.model.LatLng;
 import com.squareup.timessquare.CalendarPickerView;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import pl.snowdog.material.ui.ToolbarColorizeHelper;
 
@@ -54,7 +61,7 @@ import pl.snowdog.material.ui.ToolbarColorizeHelper;
 public class EventsGridActivity extends BaseContextActivity {
 
     private boolean showFollowCard;
-    private View fabShare;
+
 
     String shareImageUrl;
 
@@ -91,6 +98,13 @@ public class EventsGridActivity extends BaseContextActivity {
 
     LinearLayout filtersContainer;
 
+    boolean isMapVisible;
+
+    public View fabBrowseMap;
+
+    public static final int SHOW_EVENT_LIST_STATE = 1;
+    public static final int SHOW_FILTERS_STATE = 2;
+
 
     public static final String[] EXPLORE_TAGS = {
             EventCategory.NIGHTLIFE.categoryName,
@@ -120,7 +134,7 @@ public class EventsGridActivity extends BaseContextActivity {
         }
         filtersContainer = (LinearLayout) findViewById(R.id.filters_container);
         categoryFilter = (HorizontalScrollView) findViewById(R.id.category_filter);
-        // priceFilter = (HorizontalScrollView) findViewById(R.id.price_filter);
+        priceFilter = (HorizontalScrollView) findViewById(R.id.price_filter);
         sortFilter = (HorizontalScrollView) findViewById(R.id.sort_container);
         dateFilter = (HorizontalScrollView) findViewById(R.id.date_filter);
 
@@ -130,12 +144,43 @@ public class EventsGridActivity extends BaseContextActivity {
         }
 
         // Fab Share.
-        fabShare = findViewById(R.id.fab_share);
-        fabShare.setOnClickListener(new View.OnClickListener() {
+        fabBrowseMap = findViewById(R.id.fab_browse_map);
+        fabBrowseMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //shareEvents(eventsContext);
-                shareEventsWithBranch(eventsContext, shareImageUrl);
+                if (eventsFragment != null) {
+                    if (eventsFragment.isMapShown) {
+                        if (eventsFragment.isMapListShown) {
+
+                            eventsFragment.hideMapEvents(SHOW_EVENT_LIST_STATE);
+                        } else {
+                            eventsFragment.showListView();
+                        }
+
+                        ((FloatingActionButton) fabBrowseMap).setImageResource(R.drawable.ic_browse_map);
+                        collapseAnimation(SHOW_SORT);
+                    } else {
+                        if (ActivityCompat.checkSelfPermission(EventsGridActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            // Request missing location permission.
+                            ActivityCompat.requestPermissions(EventsGridActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
+
+                        } else {
+                            if (isFiltersShown) {
+                                collapseAnimation(SHOW_MAP_VIEW);
+                            } else {
+                                eventsFragment.hideListView();
+
+                                //collapseAnimation(HIDE_SORT);
+                            }
+                            ((FloatingActionButton) fabBrowseMap).setImageResource(R.drawable.ic_list_menu);
+                        }
+
+                    }
+
+                }
+
             }
         });
 
@@ -165,12 +210,11 @@ public class EventsGridActivity extends BaseContextActivity {
             isFromNotification = true;
         }
 
-
         // Add Events Fragment.
         Fragment eventFragment;
         if (!eventsContext.query.isEmpty()) {
 
-            if (eventsContext.query.equalsIgnoreCase("today") || eventsContext.query.contains(EventsHighEndpoints.QUERY_NEARME)) {
+            if (eventsContext.query.equalsIgnoreCase("this week") || eventsContext.query.equalsIgnoreCase("today") || eventsContext.query.contains(EventsHighEndpoints.QUERY_NEARME)) {
                 if (eventsContext.query.equalsIgnoreCase("today"))
                     isTodaySelected = true;
                 isCategoryFilterVisible = true;
@@ -190,15 +234,27 @@ public class EventsGridActivity extends BaseContextActivity {
             this.eventsFragment = eventFragment1;
             FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
             tr.replace(R.id.event_container, eventsFragment);
+            //
             tr.commit();
         } else {
             NewWeekEventsFragment thisWeekFragment = NewWeekEventsFragment.getInstance(eventsContext, false);
             FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-            tr.replace(R.id.event_container, thisWeekFragment);
+            //tr.setCustomAnimations(R.anim.animate_slide_up, R.anim.stay);
+            // tr.replace(R.id.event_container, thisWeekFragment);
             tr.commit();
         }
         addFiltersData();
 
+    }
+
+    EventsMapFragment mapFragment;
+
+    public void bringMapFragment() {
+        if (mapFragment == null) {
+            mapFragment = EventsMapFragment.newInstance(eventsContext, (ArrayList<Event>) eventsFragment.filteredEvents, false);
+        }
+        getFragmentManager().beginTransaction().setCustomAnimations(R.anim.fragment_slide_up_from_bottom, R.anim.stay).add(R.id.event_container, mapFragment).commit();
+        isMapVisible = true;
     }
 
 
@@ -209,29 +265,6 @@ public class EventsGridActivity extends BaseContextActivity {
             View view = LayoutInflater.from(this).inflate(R.layout.event_grid_toolbar_layout, toolbar, false);
             TextView title = (TextView) view.findViewById(R.id.title);
             title.setText(Utils.capitalize(eventsContext.query));
-            followBtn = (TextView) view.findViewById(R.id.follow_btn);
-            if (eventsContext.query.equalsIgnoreCase("today")) {
-                followBtn.setVisibility(View.GONE);
-            } else {
-                followBtn.setVisibility(View.VISIBLE);
-
-                followBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (followBtn.isSelected()) {
-                            unSelectFollowBtn();
-                        } else {
-                            selectFollowBtn();
-                        }
-                    }
-                });
-
-                if (account.isFollowing(eventsContext.query)) {
-                    changeFollowBtnState(true);
-                } else {
-                    changeFollowBtnState(false);
-                }
-            }
             toolbar.addView(view);
         }
     }
@@ -244,9 +277,8 @@ public class EventsGridActivity extends BaseContextActivity {
 
     public void selectFollowBtn() {
         reportActionToAnalytics("addFollowing", eventsContext.query);
-        if (!account.getUserInfo().isVerified) {
-            PhoneVerificationDialog.show(this,
-                    R.string.ui_verify_phone, R.string.ui_phone_verify_pa);
+        if (!account.getUserInfo().isSignedIn) {
+            FBSigninDialog.show(this, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan_more, 1);
         }
         account.setIsFollowing(eventsContext.query, true);
         changeFollowBtnState(true);
@@ -272,8 +304,9 @@ public class EventsGridActivity extends BaseContextActivity {
 
     TextView selectCustomDates, today, tomorrow, weekend;
 
+
     public void addFiltersData() {
-        isFiltersShown = true;
+
         final LinearLayout horizontalCategories = (LinearLayout) findViewById(R.id.category_container);
         final String[] categories = EXPLORE_TAGS;
         for (int i = 0; i < categories.length; i++) {
@@ -291,16 +324,18 @@ public class EventsGridActivity extends BaseContextActivity {
                         filterText.setSelected(true);
                     }
                     if (filterText.getText().toString().equalsIgnoreCase(EventsHighEndpoints.QUERY_FEATURED)) {
+
                         eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, "Featured", -1, null);
                         //eventsFragment.filterEventsWithCategory("Featured", null);
                     } else {
                         eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, filterText.getText().toString(), -1, null);
                         //eventsFragment.filterEventsWithCategory(filterText.getText().toString(), null);
                     }
+                    reportActionToAnalytics("filters", eventsContext.query + "-" + filterText);
                 }
             });
         }
-        /*LinearLayout horizontalprice = (LinearLayout) findViewById(R.id.price_container);
+        LinearLayout horizontalprice = (LinearLayout) findViewById(R.id.price_container);
         String[] priceRanges = {"Free", " \u20B9 ", "\u20B9 \u20B9", "\u20B9 \u20B9 \u20B9", "\u20B9 \u20B9 \u20B9 \u20B9"};
         for (int i = 0; i < priceRanges.length; i++) {
             View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
@@ -314,18 +349,23 @@ public class EventsGridActivity extends BaseContextActivity {
                     int position = (Integer) filterText.getTag();
                     if (position == 0) {
                         eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, FREE, null);
+                        reportActionToAnalytics("filters", eventsContext.query + "-FREE");
                         // eventsFragment.filterEventsWithPrice(null, FREE);
                     } else if (position == 1) {
                         eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, UPTO_250, null);
                         //eventsFragment.filterEventsWithPrice(null, UPTO_250);
+                        reportActionToAnalytics("filters", eventsContext.query + "uptp250");
                     } else if (position == 2) {
                         eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_250_TO_750, null);
+                        reportActionToAnalytics("filters", eventsContext.query + "price250to750");
                         //eventsFragment.filterEventsWithPrice(null, PRICE_250_TO_750);
                     } else if (position == 3) {
                         eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_750_TO_1500, null);
                         //eventsFragment.filterEventsWithPrice(null, PRICE_750_TO_1500);
+                        reportActionToAnalytics("filters", eventsContext.query + "price750to1500");
                     } else {
                         eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, MORE_THAN_1500, null);
+                        reportActionToAnalytics("filters", eventsContext.query + "moreThan1500");
                         //eventsFragment.filterEventsWithPrice(null, MORE_THAN_1500);
                     }
 
@@ -336,8 +376,9 @@ public class EventsGridActivity extends BaseContextActivity {
                     }
                 }
             });
-        }*/
-        collapseAnimation();
+        }
+
+        collapseAnimation(-1);
         LinearLayout horizontalDate = (LinearLayout) findViewById(R.id.date_container);
         String[] dateRanges = {"Today", "Tomorrow", "Weekend", "Custom Dates", "\u2022 • •"};
         for (int i = 0; i < dateRanges.length; i++) {
@@ -373,14 +414,18 @@ public class EventsGridActivity extends BaseContextActivity {
                     if (filterText.getText().toString().equalsIgnoreCase("Today")) {
                         checkIfCustomDateSelected();
                         eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                        reportActionToAnalytics("filters", eventsContext.query + "-Today");
+
                         //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Tomorrow")) {
                         checkIfCustomDateSelected();
                         eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
+                        reportActionToAnalytics("filters", eventsContext.query + "-Tomorrow");
                         // eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
                     } else if (filterText.getText().toString().equalsIgnoreCase("Weekend")) {
                         checkIfCustomDateSelected();
                         eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, DateTimeUtils.getWeekEndDates());
+                        reportActionToAnalytics("filters", eventsContext.query + "-Weekend");
                         //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Custom Dates")) {
 
@@ -390,17 +435,25 @@ public class EventsGridActivity extends BaseContextActivity {
                         nextYear.add(Calendar.DAY_OF_MONTH, 45);
 
                         if (selectedDates != null) {
-                            dialogView.init(currentYear.getTime(), nextYear.getTime()).inMode(CalendarPickerView.SelectionMode.MULTIPLE).withSelectedDates(selectedDates) //
-                            ;
+                            dialogView.init(currentYear.getTime(), nextYear.getTime()).inMode(CalendarPickerView.SelectionMode.MULTIPLE).withSelectedDates(selectedDates);
+
                         } else {
                             dialogView.init(currentYear.getTime(), nextYear.getTime()) //
                                     .inMode(CalendarPickerView.SelectionMode.MULTIPLE);
                         }
                     } else if (filterText.getText().toString().equalsIgnoreCase("• • •")) {
-                        expandAnimation();
+                        if (eventsFragment.isMapListShown) {
+                            eventsFragment.hideMapEvents(SHOW_FILTERS_STATE);
+                        } else {
+                            expandAnimation();
+                        }
+
+
+                        reportActionToAnalytics("filters", eventsContext.query + "-Expand");
                         return;
                     } else {
-                        collapseAnimation();
+                        collapseAnimation(-1);
+                        reportActionToAnalytics("filters", eventsContext.query + "-Collapse");
                         return;
                     }
                     if (!(filterText.getText().toString().equalsIgnoreCase("Custom Dates"))) {
@@ -426,6 +479,7 @@ public class EventsGridActivity extends BaseContextActivity {
                     price.setSelected(false);
                     distance.setSelected(false);
                     eventsFragment.sortAccToSortState(SORT_STATE_TRENDING);
+                    reportActionToAnalytics("filters", eventsContext.query + "-sortTrending");
                 }
             }
         });
@@ -438,6 +492,7 @@ public class EventsGridActivity extends BaseContextActivity {
                     price.setSelected(true);
                     distance.setSelected(false);
                     eventsFragment.sortAccToSortState(SORT_STATE_PRICE);
+                    reportActionToAnalytics("filters", eventsContext.query + "-sortPrice");
                 }
             }
         });
@@ -454,6 +509,7 @@ public class EventsGridActivity extends BaseContextActivity {
                         price.setSelected(false);
                         distance.setSelected(true);
                         eventsFragment.sortAccToSortState(SORT_STATE_DISTANCE);
+                        reportActionToAnalytics("filters", eventsContext.query + "-sortDistance");
                     }
                 } else {
                     Intent intent = new Intent(EventsGridActivity.this, PlacesAutocompleteBoundedActivity.class);
@@ -527,10 +583,17 @@ public class EventsGridActivity extends BaseContextActivity {
             removeAllSelectedDateFilters();
             selectCustomDates.setSelected(true);
             long[] dates = new long[selectedDates.size()];
+
+            StringBuilder builder = new StringBuilder();
             for (int i = 0; i < selectedDates.size(); i++) {
                 dates[i] = selectedDates.get(i).getTime();
+                if (i != 0) {
+                    builder.append("/");
+                }
+                builder.append(DateTimeUtils.getDateFromMillisTime(selectedDates.get(i).getTime()));
             }
             eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, dates);
+            reportActionToAnalytics("filters", eventsContext.query + "-" + builder.toString());
             //eventsFragment.filterEventsWithDate(null, dates);
         }
     }
@@ -551,16 +614,41 @@ public class EventsGridActivity extends BaseContextActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_event, menu);
+        getMenuInflater().inflate(R.menu.activity_event_menu, menu);
 
+        menu.findItem(R.id.action_share);
         // Set visibility.
-        menu.findItem(R.id.action_show_map).setVisible(isPlayServicesPresent);
-
-        if (showFollowCard || EventsHighEndpoints.isDateQuery(eventsContext.query)) {
-            fabShare.setVisibility(View.VISIBLE);
-        }
+        // menu.findItem(R.id.action_show_map).setVisible(isPlayServicesPresent);
 
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_share) {
+            shareEventsWithBranch(eventsContext, shareImageUrl);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+    /*
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_show_map) {
+            showMapActivity();
+        }
+        return super.onOptionsItemSelected(item);
+    }*/
+
+    @Override
+    public void showMapActivity() {
+        Intent intent = new Intent(this, EventsMapsActivity.class);
+        intent.putExtra(EventsMapsActivity.IS_CATEGORY_FILTER_VISIBLE, isCategoryFilterVisible);
+        intent.putExtra(EventsMapsActivity.IS_TODAY_SELECTED, isTodaySelected);
+        intent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
+        startActivity(intent);
     }
 
     private OnScrollListener doNothingScrollListener = new OnScrollListener() {
@@ -669,13 +757,24 @@ public class EventsGridActivity extends BaseContextActivity {
     public void expandAnimation() {
         int targetHeight;
         if (isCategoryFilterVisible) {
-            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+            if (eventsFragment.isMapShown) {
+                targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+            } else {
+                targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+            }
+
         } else {
-            targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 2), getResources().getDisplayMetrics());
+            if (eventsFragment.isMapShown) {
+                targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 2), getResources().getDisplayMetrics());
+            } else {
+                targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+            }
+
         }
 
         ResizeAnimation resizeAnimation = new ResizeAnimation(filtersContainer, targetHeight);
-        resizeAnimation.setDuration(100);
+        resizeAnimation.setDuration(200);
+        resizeAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
         resizeAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -684,6 +783,8 @@ public class EventsGridActivity extends BaseContextActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
+
+                isFiltersShown = true;
                 showMoreFilterText.setText("");
                 if (!weekend.isShown())
                     weekend.setVisibility(View.VISIBLE);
@@ -707,9 +808,27 @@ public class EventsGridActivity extends BaseContextActivity {
         filtersContainer.startAnimation(resizeAnimation);
     }
 
-    public void collapseAnimation() {
+    public static final int SHOW_SORT = 1;
+    public static final int HIDE_SORT = 2;
+    public static final int SHOW_MAP_EVENTS_LIST = 3;
+    public static final int SHOW_MAP_VIEW = 4;
+
+    public void hideFilterComponents(int hideValue) {
+        if (hideValue == SHOW_SORT) {
+            findViewById(R.id.sort_separator).setVisibility(View.VISIBLE);
+            sortFilter.setVisibility(View.VISIBLE);
+        } else if (hideValue == HIDE_SORT) {
+            findViewById(R.id.sort_separator).setVisibility(View.GONE);
+            sortFilter.setVisibility(View.GONE);
+        }
+
+    }
+
+    public void collapseAnimation(final int hideValue) {
+
         ResizeAnimation resizeAnimation = new ResizeAnimation(filtersContainer, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56), getResources().getDisplayMetrics()));
-        resizeAnimation.setDuration(100);
+        resizeAnimation.setDuration(200);
+        resizeAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
         resizeAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -718,9 +837,17 @@ public class EventsGridActivity extends BaseContextActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
+                isFiltersShown = false;
                 addDrawable(-1);
                 showMoreFilterText.setText("• • •");
-
+                if (hideValue == SHOW_MAP_EVENTS_LIST) {
+                    eventsFragment.bringMapEventsVisible();
+                } else if (hideValue == SHOW_MAP_VIEW) {
+                    hideFilterComponents(HIDE_SORT);
+                    eventsFragment.hideListView();
+                } else {
+                    hideFilterComponents(hideValue);
+                }
             }
 
             @Override
@@ -763,6 +890,22 @@ public class EventsGridActivity extends BaseContextActivity {
                 // TODO: Handle the error.
                 Log.i("TestActivity", status.getStatusMessage());
             } else if (resultCode == RESULT_CANCELED) {
+
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_LOCATION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (isFiltersShown) {
+                    collapseAnimation(SHOW_MAP_VIEW);
+                } else {
+                    eventsFragment.hideListView();
+                }
+
+                ((FloatingActionButton) fabBrowseMap).setImageResource(R.drawable.ic_list_menu);
 
             }
         }

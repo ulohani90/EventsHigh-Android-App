@@ -10,8 +10,78 @@
     tools:context=".activity.EventsGridActivity">
 
 
+    <FrameLayout
+        android:id="@+id/event_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/map_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <View
+            android:id="@+id/dim_bg_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#55000000"
+            android:clickable="true" />
+
+        <LinearLayout
+            android:id="@+id/map_clicked_events"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="200dp"
+            android:background="#FAFAFA"
+            android:gravity="bottom"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:gravity="end">
+
+                <TextView
+                    android:id="@+id/map_events_count"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="48dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="3 Events"
+                    android:textColor="#3e3e3e"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/cross_img"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_cancel_white_bg_24" />
+            </LinearLayout>
+
+            <com.eventshigh.nearme.app.view.AutofitRecyclerView
+                android:id="@+id/event_grid_map"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:columnWidth="@dimen/event_card_width"
+                android:horizontalSpacing="5dp"
+                android:outlineProvider="bounds"
+                android:paddingBottom="20dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="10dp"
+                android:verticalSpacing="5dp"
+                tools:listitem="@layout/card_event" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
     <LinearLayout
-        android:id="@+id/week_parent"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -23,6 +93,7 @@
             android:layout_height="wrap_content"
             android:background="@color/primary"
             android:orientation="vertical"
+            android:visibility="gone"
             app:layout_scrollFlags="scroll|enterAlways">
 
             <HorizontalScrollView
@@ -49,6 +120,7 @@
             </HorizontalScrollView>
 
             <View
+                android:id="@+id/category_separator"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#11ffffff" />
@@ -78,11 +150,12 @@
 
 
             <View
+                android:id="@+id/price_separator"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#11ffffff" />
 
-            <!--<HorizontalScrollView
+            <HorizontalScrollView
                 android:id="@+id/price_filter"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
@@ -103,7 +176,14 @@
                     android:paddingRight="10dp">
 
                 </LinearLayout>
-            </HorizontalScrollView>-->
+            </HorizontalScrollView>
+
+            <View
+                android:id="@+id/sort_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#11ffffff" />
+
             <HorizontalScrollView
                 android:id="@+id/sort_container"
                 android:layout_width="match_parent"
@@ -211,8 +291,10 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/week_parent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#FAFAFA"
             android:orientation="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 

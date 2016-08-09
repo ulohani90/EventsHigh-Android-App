@@ -116,6 +116,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         //phone verify
         account = new Account(this);
         verifyPhnLayout = (LinearLayout) findViewById(R.id.verify_phn_layout);
+        findViewById(R.id.top_progress_bar_activity).setVisibility(View.GONE);
         (findViewById(R.id.verify_btn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -315,12 +316,15 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
 
     public void addToolbarView() {
         View view = LayoutInflater.from(this).inflate(R.layout.card_user_profile, toolbar, false);
+
+        view.findViewById(R.id.profile_toolbar).setVisibility(View.VISIBLE);
         (view.findViewById(R.id.back_arrow)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
             }
         });
+
         userImage = (CircularImageView) view.findViewById(R.id.profile_image);
         shareButton = (ImageView) view.findViewById(R.id.profile_share);
         userName = (TextView) view.findViewById(R.id.profile_user_name);
