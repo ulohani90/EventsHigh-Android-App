@@ -120,7 +120,7 @@ public class EHGcmListenerService extends GcmListenerService {
             message = message.replace("Your friend", contact.name);
         }
 
-        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null && referEarn == null && special == null && pointsBreakdown == null && browseMovies == null && movieId == null && reviewFor == null) {
+        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null && referEarn == null && special == null && pointsBreakdown == null && browseMovies == null && movieId == null && reviewFor == null && reviewEntityId == null && reviewEntityImage == null && reviewedEntity == null) {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
             return null;
         }

@@ -13,7 +13,7 @@ import io.fabric.sdk.android.Fabric;
 /**
  * Created by umesh on 14/03/16.
  */
-public class EHApplication extends Application{
+public class EHApplication extends Application {
 
     @Override
     public void onCreate() {
@@ -23,10 +23,16 @@ public class EHApplication extends Application{
         new InitailizeSdks().execute();
     }
 
-    public class InitailizeSdks extends AsyncTask<Void,Void,Void>{
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        Runtime.getRuntime().gc();
+    }
+
+    public class InitailizeSdks extends AsyncTask<Void, Void, Void> {
 
         @Override
-        protected Void doInBackground(Void... params){
+        protected Void doInBackground(Void... params) {
             CrashlyticsCore core = new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build();
             Fabric.with(EHApplication.this, new Crashlytics.Builder().core(core).build());
             return null;

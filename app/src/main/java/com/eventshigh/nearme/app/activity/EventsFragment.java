@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -146,15 +147,18 @@ public class EventsFragment extends BaseEventsFragment {
 
     boolean isMapListShown;
 
+    boolean shouldAddPadding;
+
 
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
-                                             boolean showCategories, boolean showEhInviteForNotification, SocialInvitationsRequest.SpecialCoupons special, boolean isTodaySelected, ProfileInfo profileInfo) {
+                                             boolean showCategories, boolean showEhInviteForNotification, SocialInvitationsRequest.SpecialCoupons special, boolean isTodaySelected, ProfileInfo profileInfo, boolean shouldAddPadding) {
         EventsFragment fragment = new EventsFragment();
         Bundle args = getArgs(eventsContext, showFollowCard, showCategories);
         args.putBoolean(SHOW_EH_INVITE_NOTIFICATION_PARAM, showEhInviteForNotification);
         args.putBoolean(IS_TODAY_SELECTED, isTodaySelected);
         args.putParcelable("special_obj", special);
         args.putParcelable("profile_info", profileInfo);
+        args.putBoolean("should_add_padding", shouldAddPadding);
         fragment.setArguments(args);
         return fragment;
     }
@@ -167,7 +171,7 @@ public class EventsFragment extends BaseEventsFragment {
         if (onScrollListener == null) {
             onScrollListener = new HideActionBarOnScroll(this.activity);
         }
-
+        shouldAddPadding = getArguments().getBoolean("should_add_padding");
         if (getArguments() != null && getArguments().getParcelable("profile_info") != null)
             profileInfo = getArguments().getParcelable("profile_info");
 
@@ -188,6 +192,11 @@ public class EventsFragment extends BaseEventsFragment {
         // Setup the events adapter to show data.
         eventsAdapter = new EventsAdapter(activity);
         eventGridView = (AutofitRecyclerView) view.findViewById(R.id.event_grid);
+        if (shouldAddPadding)
+            eventGridView.setPadding((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()),
+                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics()),
+                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()),
+                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()));
         eventGridView.setAdapter(eventsAdapter);
         eventsAdapter.setOnItemClickedListener(new EventsAdapter.OnItemClickedListener() {
             @Override
@@ -305,13 +314,26 @@ public class EventsFragment extends BaseEventsFragment {
         anim.start();
     }
 
+    public int getPosition(String id) {
+        for (int i = 0; i < filteredEvents.size(); i++) {
+            if (filteredEvents.get(i).id.equalsIgnoreCase(id))
+                return i;
+        }
+        return -1;
+    }
+
+    int scrollToPos = -1;
+
     public void showListView() {
         eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
         if (showFollowCard) {
             eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                     eventsCollection.numFollowers);
         }
-
+        if (scrollToPos != -1) {
+            eventGridView.scrollToPosition(scrollToPos + 1);
+            scrollToPos = -1;
+        }
         if (eventCardContainer != null) {
             eventCardContainer.removeAllViews();
         }
@@ -391,7 +413,7 @@ public class EventsFragment extends BaseEventsFragment {
 
         // Stop all requests associated with this fragment and then submit new request.
         if (EventsHighEndpoints.isMyEventQuery(eventsContext.query)) {
-            if (profileInfo == null) {
+            if (profileInfo == null && profileInfo.getMeEventFavouriteObject() != null) {
                 asyncRequest = new MyEventsRequest(activity, eventsContext, Priority.IMMEDIATE, this,
                         shouldBypassCache, true, mMyFavEventsMoviesFetcherCallBack, mErrorListener);
                 asyncRequest.execute();
@@ -454,9 +476,12 @@ public class EventsFragment extends BaseEventsFragment {
                                             } else {
                                                 noMyEventsView.setVisibility(View.GONE);
                                             }
-
-                                            ((EventsGridActivity) getActivity()).filtersContainer.setVisibility(View.VISIBLE);
-                                            ((EventsGridActivity) getActivity()).fabBrowseMap.setVisibility(View.VISIBLE);
+                                            if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).filtersHeaderContainer != null) {
+                                                ((EventsGridActivity) getActivity()).filtersHeaderContainer.setVisibility(View.VISIBLE);
+                                            }
+                                            if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).fabBrowseMap != null) {
+                                                ((EventsGridActivity) getActivity()).fabBrowseMap.setVisibility(View.VISIBLE);
+                                            }
                                         }
                                         List<Event> filteredEvents = EventsFragment.this.eventsCollection.events;
                                         filteredEvents = filterEventsWithCategory(null, filteredEvents);
@@ -714,8 +739,13 @@ public class EventsFragment extends BaseEventsFragment {
                                 eventsCollection.numFollowers);
                     }
                     addSocialInvitationRequests();
-                    ((EventsGridActivity) getActivity()).filtersContainer.setVisibility(View.VISIBLE);
-                    ((EventsGridActivity) getActivity()).fabBrowseMap.setVisibility(View.VISIBLE);
+                    if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).filtersHeaderContainer != null) {
+
+                        ((EventsGridActivity) getActivity()).filtersHeaderContainer.setVisibility(View.VISIBLE);
+                    }
+                    if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).fabBrowseMap != null) {
+                        ((EventsGridActivity) getActivity()).fabBrowseMap.setVisibility(View.VISIBLE);
+                    }
                 /*if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                             eventsCollection.numFollowers, special);
@@ -1082,6 +1112,8 @@ public class EventsFragment extends BaseEventsFragment {
             public void onMapReady(GoogleMap googleMap) {
                 map = googleMap;
                 map.setMyLocationEnabled(true);
+                map.getUiSettings().setMyLocationButtonEnabled(true);
+                map.getUiSettings().setCompassEnabled(true);
                 map.setOnCameraChangeListener(mOnCameraChangeListener);
                 map.setOnMarkerClickListener(mOnMarkerClickListener);
                 map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
@@ -1136,16 +1168,18 @@ public class EventsFragment extends BaseEventsFragment {
     }
 
 
+    List<Event> mapEvents;
+
     private void showEventsListOnMap() {
         EventsAdapter adapter = new EventsAdapter(activity);
         mapClickedEvents.setAdapter(adapter);
-        List<Event> events = new ArrayList<>();
+        mapEvents = new ArrayList<>();
 
         Event event = mapMarkerManager.getEvent(lastSelectedMarker);
-        events.add(event);
-        events.addAll(getEventsForSameAddress(event));
-        mapEventsCount.setText(events.size() + " Events");
-        adapter.setEvents(events, null, false);
+        mapEvents.add(event);
+        mapEvents.addAll(getEventsForSameAddress(event));
+        mapEventsCount.setText(mapEvents.size() + " Events");
+        adapter.setEvents(mapEvents, null, false);
         if (((EventsGridActivity) getActivity()).isFiltersShown) {
             ((EventsGridActivity) getActivity()).collapseAnimation(EventsGridActivity.SHOW_MAP_EVENTS_LIST);
         } else {
@@ -1157,7 +1191,7 @@ public class EventsFragment extends BaseEventsFragment {
 
         ArrayList<Event> events = new ArrayList<>();
         for (Event event : filteredEvents) {
-            if (event.id == mappedEvent.id || !(event.location != null)) {
+            if (event.id.equalsIgnoreCase(mappedEvent.id) || !(event.location != null)) {
                 continue;
             }
             if (event.location.equals(mappedEvent.location)) {
@@ -1170,6 +1204,9 @@ public class EventsFragment extends BaseEventsFragment {
 
 
     public void hideMapEvents(final int state) {
+        if (state == EventsGridActivity.SHOW_EVENT_LIST_STATE) {
+            scrollToPos = getPosition(mapEvents.get(0).id);
+        }
         AnimatorSet set = new AnimatorSet();
         ObjectAnimator anim = ObjectAnimator.ofFloat(mapClickedList, View.TRANSLATION_Y, 0, MOVE_VIEW_TO_POS);
         anim.setDuration(300);

@@ -150,6 +150,8 @@ public enum EventCategory {
         return null;
     }
 
+
+
     public static boolean isACategory(String categoryName) {
         for (EventCategory category : EventCategory.values()) {
             if (category.categoryName.equalsIgnoreCase(categoryName))

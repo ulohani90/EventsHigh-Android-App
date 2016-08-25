@@ -556,14 +556,14 @@ public class NewEventDetailActivity extends BaseContextActivity {
     public void openBookingSite() {
         Account account = new Account(this);
         Account.UserInfo userInfo = account.getUserInfo();
-        if (!userInfo.isSignedIn) {
+        /*if (!userInfo.isSignedIn) {
             // FBSigninDialog.show(this, R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan, REQUEST_FOR_RESULT_BOOK_TICKETS);
             Intent intent = new Intent(this, FBLoginActivity.class);
             intent.putExtra("show_special_text", true);
             intent.putExtra("hide_skip", true);
             startActivityForResult(intent, REQUEST_FOR_RESULT_BOOK_TICKETS);
             return;
-        }
+        }*/
 
         showRateAppDialog = true;
         addToFavourite = true;

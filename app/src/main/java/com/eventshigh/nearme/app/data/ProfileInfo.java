@@ -18,6 +18,7 @@ import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -142,12 +143,22 @@ public class ProfileInfo implements Parcelable {
 
     public ProfileInfo(Parcel in) {
         profileId = in.readString();
+        name = in.readString();
+        lastCity = in.readString();
+        profilePic = in.readString();
+        email = in.readString();
+
         movieUserReviewObjectArrayList = new ArrayList<>();
         in.readTypedList(movieUserReviewObjectArrayList, MovieUserReviewObject.CREATOR);
+
         myInterestEvents = new ArrayList<>();
         in.readTypedList(myInterestEvents, MyEventsRequest.TopicEvents.CREATOR);
+
+        meEventFavouriteObject = in.readParcelable(MyEventsRequest.MeEventFavouriteObject.class.getClassLoader());
+
         friendList = new ArrayList<>();
         in.readTypedList(friendList, NewSocialFriend.CREATOR);
+
     }
 
 
@@ -160,7 +171,6 @@ public class ProfileInfo implements Parcelable {
                 JSONArray eventsJsonArray = jsonObject.getJSONArray("interest_events");
 
                 for (int i = 0; i < eventsJsonArray.length(); i++) {
-
 
                     List<Event> topicEvents = Event.fromJSON(eventsJsonArray.getJSONObject(i).getJSONArray("topic_events"), true, null);
 

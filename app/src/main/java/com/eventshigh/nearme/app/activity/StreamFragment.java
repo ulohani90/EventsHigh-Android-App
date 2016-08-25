@@ -14,6 +14,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.stream.StreamItem;
 import com.eventshigh.nearme.app.network.AlertsRequest;
 import com.eventshigh.nearme.app.task.StreamItemLoaderTask;
@@ -41,7 +42,7 @@ public class StreamFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_notifications, container, false);
         gridView = (RecyclerView) view.findViewById(R.id.grid);
-        topProgressBar = (ProgressBar)view.findViewById(R.id.top_progress_bar);
+        topProgressBar = (ProgressBar) view.findViewById(R.id.top_progress_bar);
         topProgressBar.setVisibility(View.VISIBLE);
         streamAdapter = new StreamAdapter(activity);
         gridView.setAdapter(streamAdapter);
@@ -73,9 +74,9 @@ public class StreamFragment extends Fragment {
             public void onContactLoad(List<StreamItem> streamItems) {
 
                 if (isAdded()) {
-                    if(streamItems.size() == 0){
-                            makeServerRequest();
-                    }else {
+                    if (streamItems.size() == 0) {
+                        makeServerRequest();
+                    } else {
                         topProgressBar.setVisibility(View.GONE);
                         streamAdapter.setStreamItems(streamItems);
                     }
@@ -84,14 +85,19 @@ public class StreamFragment extends Fragment {
         }).execute();
     }
 
-    public void makeServerRequest(){
-        AlertsRequest.submit(getActivity(),new Account(getActivity()).getLastCity(), Request.Priority.IMMEDIATE,this,true,mListener,mErrorListener);
+    public void makeServerRequest() {
+        City city = new Account(getActivity()).getLastCity();
+        if (city != null) {
+            AlertsRequest.submit(getActivity(), new Account(getActivity()).getLastCity(), Request.Priority.IMMEDIATE, this, true, mListener, mErrorListener);
+        } else {
+            AlertsRequest.submit(getActivity(), City.BANGALORE, Request.Priority.IMMEDIATE, this, true, mListener, mErrorListener);
+        }
     }
 
     Response.Listener<Boolean> mListener = new Response.Listener<Boolean>() {
         @Override
         public void onResponse(Boolean aBoolean, boolean b) {
-            if(aBoolean){
+            if (aBoolean) {
                 refresh();
             }
         }

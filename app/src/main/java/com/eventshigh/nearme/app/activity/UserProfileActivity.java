@@ -241,7 +241,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
         pager.setAdapter(userProfilePagerAdapter);
         tabsView.setupWithViewPager(pager);
         tabsView.setScrollPosition(0, 0, true);
-        animateFab(0);
+
 
         topProgressBar.setVisibility(View.GONE);
 
@@ -559,12 +559,12 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
             if (TABS.get(position).equalsIgnoreCase(FAVOURITES_TAB)) {
                 LatLng latLng = (new Account(context)).getLastCity().cityBounds.getCenter();
                 EventsContext myEventsContext = new EventsContext(latLng, EventsHighEndpoints.QUERY_MY_EVENT);
-                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null, false, profileInfo);
+                myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null, false, profileInfo, false);
                 return myFavouritesFragment;
             } else if (TABS.get(position).equalsIgnoreCase(INTERESTS_TAB)) {
                 EventsContext myEventsContext = new EventsContext(eventsContext.location,
                         EventsHighEndpoints.QUERY_MY_INTEREST_EVENTS);
-                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false, profileInfo);
+                myInterestEventsFragment = EventsFragment.getInstance(myEventsContext, false, true, false, null, false, profileInfo, false);
                 return myInterestEventsFragment;
             } else if (TABS.get(position).equalsIgnoreCase(REVIEWS_TAB)) {
                 MyReviewsFragment myReviewsFragment = MyReviewsFragment.newInstance(eventsContext, profileInfo.getMovieUserReviewObjectArrayList(), emailProfileUser);
@@ -597,7 +597,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     @Override
     public void onPageSelected(int position) {
         reportActionToAnalytics("profile_tab_change", TABS.get(position));
-        animateFab(position);
+        //animateFab(position);
     }
 
     @Override
@@ -608,25 +608,6 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     @Override
     public void onPageScrollStateChanged(int state) {
         Log.e("", state + " state changed");
-    }
-
-
-    protected void animateFab(int position) {
-        if (!TABS.get(position).equalsIgnoreCase(INTERESTS_TAB)) {
-            if (fabWriteReviews.getVisibility() == View.VISIBLE) {
-                fabWriteReviews.setVisibility(View.GONE);
-                TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, 250);
-                translateAnimation.setDuration(300);
-                fabWriteReviews.startAnimation(translateAnimation);
-            }
-        } else {
-            //Set First Reviewer Text Visible
-            fabWriteReviews.clearAnimation();
-            fabWriteReviews.setVisibility(View.VISIBLE);
-            TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 250, 0);
-            translateAnimation.setDuration(300);
-            fabWriteReviews.startAnimation(translateAnimation);
-        }
     }
 
 

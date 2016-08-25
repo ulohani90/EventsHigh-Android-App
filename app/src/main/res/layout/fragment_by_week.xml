@@ -32,6 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="200dp"
+
             android:background="#FAFAFA"
             android:gravity="bottom"
             android:orientation="vertical">
@@ -69,7 +70,7 @@
                 android:columnWidth="@dimen/event_card_width"
                 android:horizontalSpacing="5dp"
                 android:outlineProvider="bounds"
-                android:paddingBottom="20dp"
+                android:paddingBottom="64dp"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:paddingTop="10dp"
@@ -80,215 +81,9 @@
 
     </FrameLayout>
 
-    <LinearLayout
-
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-
-        <LinearLayout
-            android:id="@+id/filters_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/primary"
-            android:orientation="vertical"
-            android:visibility="gone"
-            app:layout_scrollFlags="scroll|enterAlways">
-
-            <HorizontalScrollView
-                android:id="@+id/date_filter"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:clipChildren="false"
-                android:gravity="center_vertical"
-                android:scrollbarSize="1dp"
-                android:scrollbarThumbHorizontal="@drawable/scrollbar_gradient_drawable"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:id="@+id/date_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp">
-
-                </LinearLayout>
-            </HorizontalScrollView>
-
-            <View
-                android:id="@+id/category_separator"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#11ffffff" />
-
-            <HorizontalScrollView
-                android:id="@+id/category_filter"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:clipChildren="false"
-                android:gravity="center_vertical"
-                android:scrollbarSize="1dp"
-                android:scrollbarThumbHorizontal="@drawable/scrollbar_gradient_drawable"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:id="@+id/category_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp">
-
-                </LinearLayout>
-            </HorizontalScrollView>
-
-
-            <View
-                android:id="@+id/price_separator"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#11ffffff" />
-
-            <HorizontalScrollView
-                android:id="@+id/price_filter"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:clipChildren="false"
-                android:gravity="center_vertical"
-                android:scrollbarSize="1dp"
-                android:scrollbarThumbHorizontal="@drawable/scrollbar_gradient_drawable"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:id="@+id/price_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp">
-
-                </LinearLayout>
-            </HorizontalScrollView>
-
-            <View
-                android:id="@+id/sort_separator"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#11ffffff" />
-
-            <HorizontalScrollView
-                android:id="@+id/sort_container"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:animateLayoutChanges="true"
-                android:clipChildren="false"
-                android:gravity="center_vertical"
-                android:scrollbars="none">
-
-                <LinearLayout
-
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:clipToPadding="false"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp">
-
-                    <TextView
-
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:background="@drawable/filter_tag_selector_bg"
-                        android:gravity="center"
-                        android:paddingBottom="5dp"
-                        android:paddingLeft="15dp"
-                        android:paddingRight="15dp"
-                        android:paddingTop="5dp"
-                        android:text="Sort by :"
-                        android:textColor="@color/filter_tag_color_selector"
-                        android:textSize="14sp" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingLeft="5dp"
-                        android:paddingRight="5dp">
-
-                        <TextView
-                            android:id="@+id/sort_trending"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:background="@drawable/filter_tag_selector_bg"
-                            android:gravity="center"
-                            android:paddingBottom="5dp"
-                            android:paddingLeft="15dp"
-                            android:paddingRight="15dp"
-                            android:paddingTop="5dp"
-                            android:text="Trending"
-                            android:textColor="@color/filter_tag_color_selector"
-                            android:textSize="14sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingLeft="5dp"
-                        android:paddingRight="5dp">
-
-                        <TextView
-                            android:id="@+id/sort_price"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:background="@drawable/filter_tag_selector_bg"
-                            android:gravity="center"
-                            android:paddingBottom="5dp"
-                            android:paddingLeft="15dp"
-                            android:paddingRight="15dp"
-                            android:paddingTop="5dp"
-                            android:text="Price"
-                            android:textColor="@color/filter_tag_color_selector"
-                            android:textSize="14sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingLeft="5dp"
-                        android:paddingRight="5dp">
-
-                        <TextView
-                            android:id="@+id/sort_distance"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:background="@drawable/filter_tag_selector_bg"
-                            android:gravity="center"
-                            android:paddingBottom="5dp"
-                            android:paddingLeft="15dp"
-                            android:paddingRight="15dp"
-                            android:paddingTop="5dp"
-                            android:text="Distance"
-                            android:textColor="@color/filter_tag_color_selector"
-                            android:textSize="14sp" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-            </HorizontalScrollView>
-        </LinearLayout>
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:id="@+id/week_parent"
@@ -323,14 +118,236 @@
                     android:paddingBottom="20dp"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    android:paddingTop="10dp"
+                    android:paddingTop="100dp"
                     android:verticalSpacing="5dp"
                     tools:listitem="@layout/card_event" />
             </android.support.v4.widget.SwipeRefreshLayout>
         </LinearLayout>
 
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/filters_header_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/filters_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/primary"
+                android:orientation="vertical"
+                app:layout_scrollFlags="scroll|enterAlways">
+
+                <HorizontalScrollView
+                    android:id="@+id/date_filter"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:clipChildren="false"
+                    android:gravity="center_vertical"
+                    android:scrollbarSize="1dp"
+                    android:scrollbarThumbHorizontal="@drawable/scrollbar_gradient_drawable"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/date_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="false"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp">
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <View
+                    android:id="@+id/category_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#11ffffff" />
+
+                <HorizontalScrollView
+                    android:id="@+id/category_filter"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:clipChildren="false"
+                    android:gravity="center_vertical"
+                    android:scrollbarSize="1dp"
+                    android:scrollbarThumbHorizontal="@drawable/scrollbar_gradient_drawable"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/category_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="false"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp">
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+
+                <View
+                    android:id="@+id/price_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#11ffffff" />
+
+                <HorizontalScrollView
+                    android:id="@+id/price_filter"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:clipChildren="false"
+                    android:gravity="center_vertical"
+                    android:scrollbarSize="1dp"
+                    android:scrollbarThumbHorizontal="@drawable/scrollbar_gradient_drawable"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/price_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="false"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp">
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <View
+                    android:id="@+id/sort_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#11ffffff" />
+
+                <HorizontalScrollView
+                    android:id="@+id/sort_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:animateLayoutChanges="true"
+                    android:clipChildren="false"
+                    android:gravity="center_vertical"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:clipToPadding="false"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp">
+
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:background="@drawable/filter_tag_selector_bg"
+                            android:gravity="center"
+                            android:paddingBottom="5dp"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="15dp"
+                            android:paddingTop="5dp"
+                            android:text="Sort by :"
+                            android:textColor="@color/filter_tag_color_selector"
+                            android:textSize="14sp" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp">
+
+                            <TextView
+                                android:id="@+id/sort_trending"
+                                android:layout_width="wrap_content"
+                                android:layout_height="36dp"
+                                android:background="@drawable/filter_tag_selector_bg"
+                                android:gravity="center"
+                                android:paddingBottom="5dp"
+                                android:paddingLeft="15dp"
+                                android:paddingRight="15dp"
+                                android:paddingTop="5dp"
+                                android:text="Trending"
+                                android:textColor="@color/filter_tag_color_selector"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp">
+
+                            <TextView
+                                android:id="@+id/sort_price"
+                                android:layout_width="wrap_content"
+                                android:layout_height="36dp"
+                                android:background="@drawable/filter_tag_selector_bg"
+                                android:gravity="center"
+                                android:paddingBottom="5dp"
+                                android:paddingLeft="15dp"
+                                android:paddingRight="15dp"
+                                android:paddingTop="5dp"
+                                android:text="Price"
+                                android:textColor="@color/filter_tag_color_selector"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp">
+
+                            <TextView
+                                android:id="@+id/sort_distance"
+                                android:layout_width="wrap_content"
+                                android:layout_height="36dp"
+                                android:background="@drawable/filter_tag_selector_bg"
+                                android:gravity="center"
+                                android:paddingBottom="5dp"
+                                android:paddingLeft="15dp"
+                                android:paddingRight="15dp"
+                                android:paddingTop="5dp"
+                                android:text="Distance"
+                                android:textColor="@color/filter_tag_color_selector"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/expand_btn"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/red_rounded_corner_bg"
+                android:gravity="center"
+                android:src="@drawable/ic_keyboard_arrow_down_white_24dp"
+
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
+
+    </FrameLayout>
 
     <include
         android:id="@+id/view_no_my_event"

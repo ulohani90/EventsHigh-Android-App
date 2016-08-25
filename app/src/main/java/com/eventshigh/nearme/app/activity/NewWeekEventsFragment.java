@@ -27,6 +27,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -97,7 +98,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
     private boolean showEhInviteForNotification;
     View view;
 
-    LinearLayout filtersContainer;
+    LinearLayout filtersContainer, filterHeaderContainer;
     HorizontalScrollView dateFilter;
 
     public static final int SORT_STATE_TRENDING = 1;
@@ -152,6 +153,8 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
     boolean isFiltersShown;
 
+    ImageView expandBtn;
+
 
     @Nullable
     @Override
@@ -161,8 +164,21 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         eventGridView = (AutofitRecyclerView) view.findViewById(R.id.event_grid);
         eventGridView.setAdapter(eventsAdapter);
         filtersContainer = (LinearLayout) view.findViewById(R.id.filters_container);
+        filterHeaderContainer = (LinearLayout) view.findViewById(R.id.filters_header_container);
         noMyEventsView = view.findViewById(R.id.view_no_my_event);
-
+        expandBtn = (ImageView) view.findViewById(R.id.expand_btn);
+        expandBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isFiltersShown) {
+                    collapseAnimation(-1);
+                    activity.reportActionToAnalytics("filters", eventsContext.query + "-Collapse");
+                } else {
+                    expandAnimation();
+                    activity.reportActionToAnalytics("filters", eventsContext.query + "-Expand");
+                }
+            }
+        });
         dateFilter = (HorizontalScrollView) view.findViewById(R.id.date_filter);
         priceFilter = (HorizontalScrollView) view.findViewById(R.id.price_filter);
         sortFilter = (HorizontalScrollView) view.findViewById(R.id.sort_container);
@@ -304,6 +320,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                                             isLoadingComplete = true;
                                             if (getActivity() != null) {
                                                 filtersContainer.setVisibility(View.VISIBLE);
+                                                filterHeaderContainer.setVisibility(View.VISIBLE);
                                                 ((LaunchActivity) getActivity()).fabWriteReviews.setImageResource(R.drawable.ic_browse_map);
                                                 ((LaunchActivity) getActivity()).animateFabIn();
                                             }
@@ -622,7 +639,6 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
     View showFiltersView;
 
-    TextView showMoreFilterText;
 
     TextView selectCustomDates, today, tomorrow, weekend;
 
@@ -699,24 +715,19 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         }
 
         LinearLayout horizontalDate = (LinearLayout) view.findViewById(R.id.date_container);
-        String[] dateRanges = {"Today", "Tomorrow", "Weekend", "Custom Dates", "• • •"};
+        String[] dateRanges = {"Today", "Tomorrow", "Weekend", "Custom Dates"};
         for (int i = 0; i < dateRanges.length; i++) {
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
             final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
             filterText.setText(dateRanges[i]);
 
             if (i == dateRanges.length - 1) {
-                showFiltersView = view;
-                showMoreFilterText = filterText;
-                showMoreFilterText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
-                showMoreFilterText.setTypeface(null, Typeface.BOLD);
-            } else if (i == dateRanges.length - 2) {
                 selectCustomDates = filterText;
-                selectCustomDates.setVisibility(View.GONE);
-            } else if (i == dateRanges.length - 3) {
+                //  selectCustomDates.setVisibility(View.GONE);
+            } else if (i == dateRanges.length - 2) {
                 weekend = filterText;
-                weekend.setVisibility(View.GONE);
-            } else if (i == dateRanges.length - 4) {
+                // weekend.setVisibility(View.GONE);
+            } else if (i == dateRanges.length - 3) {
                 tomorrow = filterText;
             } else {
                 today = filterText;
@@ -857,12 +868,12 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         price.setSelected(false);
         trending.setSelected(false);
         sortAccToSortState(SORT_STATE_DISTANCE);
-        sortFilter.postDelayed(new Runnable() {
+       /* sortFilter.postDelayed(new Runnable() {
             @Override
             public void run() {
                 sortFilter.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
             }
-        }, 100L);
+        }, 100L);*/
 
     }
 
@@ -989,20 +1000,22 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                showMoreFilterText.setText("");
+
                 if (!weekend.isShown())
                     weekend.setVisibility(View.VISIBLE);
                 if (!selectCustomDates.isShown()) {
                     selectCustomDates.setVisibility(View.VISIBLE);
-                    dateFilter.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
-                    dateFilter.postDelayed(new Runnable() {
+                    // dateFilter.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
+                    /*dateFilter.postDelayed(new Runnable() {
                         public void run() {
                             dateFilter.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
                         }
-                    }, 100L);
+                    }, 100L);*/
                 }
                 addDrawable(R.drawable.ic_action_highlight_remove);
                 isFiltersShown = true;
+                updateExpandBtn();
+
             }
 
             @Override
@@ -1012,6 +1025,18 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         });
         filtersContainer.startAnimation(resizeAnimation);
     }
+
+    public void updateExpandBtn() {
+        if (isFiltersShown) {
+
+            expandBtn.setImageResource(R.drawable.ic_keyboard_arrow_up_white_24dp);
+        } else {
+
+            expandBtn.setImageResource(R.drawable.ic_keyboard_arrow_down_white_24dp);
+        }
+
+    }
+
 
     public void collapseAnimation(final int hideValue) {
         ResizeAnimation resizeAnimation = new ResizeAnimation(filtersContainer, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56), getResources().getDisplayMetrics()));
@@ -1024,8 +1049,9 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
             @Override
             public void onAnimationEnd(Animation animation) {
+                //dateFilter.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
                 isFiltersShown = false;
-                showMoreFilterText.setText("• • •");
+                updateExpandBtn();
                 addDrawable(-1);
                 if (hideValue == EventsGridActivity.SHOW_MAP_EVENTS_LIST) {
                     bringMapEventsVisible();
@@ -1052,7 +1078,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             drawableLeft.setBounds(0, 0, drawableLeft.getIntrinsicWidth(), drawableLeft.getIntrinsicHeight());
 
         }
-        showMoreFilterText.setCompoundDrawables(drawableLeft, null, null, null);
+        // showMoreFilterText.setCompoundDrawables(drawableLeft, null, null, null);
     }
 
     FilterAsyncTask filterAsyncTask;
@@ -1179,12 +1205,16 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                     eventsCollection.numFollowers);
         }
-
+        if (scrollToPos != -1) {
+            eventGridView.scrollToPosition(scrollToPos);
+            scrollToPos = -1;
+        }
         isMapShown = false;
         ObjectAnimator anim = ObjectAnimator.ofFloat(eventListContainer, View.TRANSLATION_Y, MOVE_VIEW_TO_POS, 0);
         anim.setDuration(500);
         anim.setInterpolator(new AccelerateDecelerateInterpolator());
         anim.start();
+
     }
 
     public void setUpMapContents() {
@@ -1208,12 +1238,14 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
     }
 
     private void setUpMap() {
-        // Try to obtain the map from the SupportMapFragment.
+        // Try to obtain the map from the SupportMapFragmentoscroll.
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 map = googleMap;
                 map.setMyLocationEnabled(true);
+                map.getUiSettings().setMyLocationButtonEnabled(true);
+                map.getUiSettings().setCompassEnabled(true);
                 map.setOnCameraChangeListener(mOnCameraChangeListener);
                 map.setOnMarkerClickListener(mOnMarkerClickListener);
                 map.setOnInfoWindowClickListener(mOnInfoWindowClickListener);
@@ -1267,16 +1299,19 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         }
     }
 
+
+    List<Event> mapEvents;
+
     private void showEventsListOnMap() {
         EventsAdapter adapter = new EventsAdapter(activity);
         mapClickedEvents.setAdapter(adapter);
-        List<Event> events = new ArrayList<>();
+        mapEvents = new ArrayList<>();
 
         Event event = mapMarkerManager.getEvent(lastSelectedMarker);
-        events.add(event);
-        events.addAll(getEventsForSameAddress(event));
-        mapEventsCount.setText(events.size() + " Events");
-        adapter.setEvents(events, null, false);
+        mapEvents.add(event);
+        mapEvents.addAll(getEventsForSameAddress(event));
+        mapEventsCount.setText(mapEvents.size() + " Events");
+        adapter.setEvents(mapEvents, null, false);
         if (isFiltersShown) {
             collapseAnimation(EventsGridActivity.SHOW_MAP_EVENTS_LIST);
         } else {
@@ -1299,8 +1334,20 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
     }
 
+    public int getPosition(String id) {
+        for (int i = 0; i < filteredEvents.size(); i++) {
+            if (filteredEvents.get(i).id.equalsIgnoreCase(id))
+                return i;
+        }
+        return -1;
+    }
+
+    int scrollToPos = -1;
 
     public void hideMapEvents(final int state) {
+        if (state == EventsGridActivity.SHOW_EVENT_LIST_STATE) {
+            scrollToPos = getPosition(mapEvents.get(0).id);
+        }
         AnimatorSet set = new AnimatorSet();
         ObjectAnimator anim = ObjectAnimator.ofFloat(mapClickedList, View.TRANSLATION_Y, 0, MOVE_VIEW_TO_POS);
         anim.setDuration(300);

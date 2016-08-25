@@ -25,6 +25,18 @@ public enum City {
         this.countryCode = countryCode;
     }
 
+
+    public static
+    @Nullable
+    City parseCity(String cityName) {
+        try {
+            return valueOf(cityName);
+        } catch (IllegalArgumentException e) {
+
+        }
+        return null;
+    }
+
     public static City getCity(@Nullable LatLng point) {
         if (point == null) {
             return null;

@@ -214,6 +214,7 @@ public class LaunchActivity extends BaseContextActivity {
 
                     if (weekEventsFragment != null) {
                         if (weekEventsFragment.isMapShown) {
+                            reportActionToAnalytics("hideMapFabClick");
                             if (weekEventsFragment.isMapListShown) {
                                 weekEventsFragment.hideMapEvents(EventsGridActivity.SHOW_EVENT_LIST_STATE);
                             } else {
@@ -222,6 +223,7 @@ public class LaunchActivity extends BaseContextActivity {
                             fabWriteReviews.setImageResource(R.drawable.ic_browse_map);
                             weekEventsFragment.collapseAnimation(weekEventsFragment.SHOW_SORT);
                         } else {
+                            reportActionToAnalytics("showMapFabClick");
                             if (ActivityCompat.checkSelfPermission(LaunchActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
                                     != PackageManager.PERMISSION_GRANTED) {
                                 // Request missing location permission.
@@ -229,6 +231,7 @@ public class LaunchActivity extends BaseContextActivity {
                                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
 
                             } else {
+
                                 weekEventsFragment.hideListView();
                                 fabWriteReviews.setImageResource(R.drawable.ic_list_menu);
                                 weekEventsFragment.collapseAnimation(weekEventsFragment.HIDE_SORT);

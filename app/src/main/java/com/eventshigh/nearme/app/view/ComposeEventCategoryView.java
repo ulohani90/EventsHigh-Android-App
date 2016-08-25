@@ -16,6 +16,7 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.activity.NewEventDetailActivity;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.ui.FBSigninDialog;
@@ -87,8 +88,13 @@ public class ComposeEventCategoryView extends FrameLayout implements ZRuntimeVie
                 if (activity != null) {
                     activity.reportEventAction(event, action, obj);
                     Intent searchIntent = new Intent(activity, LaunchActivity.class);
-                    searchIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT,
-                            new EventsContext(account.getLastCity().cityBounds.getCenter(), obj.toLowerCase()));
+                    if (account.getLastCity() != null && account.getLastCity().cityBounds != null)
+                        searchIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT,
+                                new EventsContext(account.getLastCity().cityBounds.getCenter(), obj.toLowerCase()));
+                    else
+                        searchIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT,
+                                new EventsContext(City.BANGALORE.cityBounds.getCenter(), obj.toLowerCase()));
+
                     activity.startActivity(searchIntent);
                 }
             }

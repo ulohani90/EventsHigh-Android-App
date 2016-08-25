@@ -517,8 +517,11 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
             }
         }
         SpannableString string = new SpannableString(builder.toString());
-        string.setSpan(new StyleSpan(Typeface.BOLD), 0, 14, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        try {
+            string.setSpan(new StyleSpan(Typeface.BOLD), 0, 14, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        } catch (IndexOutOfBoundsException e) {
 
+        }
         return string.toString();
     }
 

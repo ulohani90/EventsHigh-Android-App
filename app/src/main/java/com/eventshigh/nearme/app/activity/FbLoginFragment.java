@@ -20,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.network.AddFacebookUserInfoRequest;
+import com.eventshigh.nearme.app.ui.AppAlertDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -184,19 +185,41 @@ public class FbLoginFragment extends Fragment {
                     try {
                         JSONObject responseObj = new JSONObject();
 
-                        String userId = object.getString("id");
-                        responseObj.put("fb_id", userId);
-                        responseObj.put("fb_profile_pic", "https://graph.facebook.com/" + userId + "/picture?type=large");
-                        String email = object.getString("email");
-                        responseObj.put("fb_email", email);
-                        String name = object.getString("name");
-                        responseObj.put("fb_name", name);
+                        if (object.has("id")) {
+                            String userId = object.getString("id");
+                            responseObj.put("fb_id", userId);
+                            responseObj.put("fb_profile_pic", "https://graph.facebook.com/" + userId + "/picture?type=large");
+                        } else {
+                            dialog.dismiss();
+                            AppAlertDialog.show("Problem connecting to facebook", "No facebook Id associated with this facebook account.", activity);
+                            return;
+                        }
+
+                        if (object.has("email")) {
+                            String email = object.getString("email");
+                            responseObj.put("fb_email", email);
+                        } else {
+                            dialog.dismiss();
+                            AppAlertDialog.show("Problem connecting to facebook", "No email associated with this facebook account.", activity);
+                            return;
+                        }
+
+                        if (object.has("name")) {
+                            String name = object.getString("name");
+                            responseObj.put("fb_name", name);
+                        } else {
+                            dialog.dismiss();
+                            AppAlertDialog.show("Problem connecting to facebook", "No name associated with this facebook account.", activity);
+                            return;
+                        }
+
                         responseObj.put("fb_token", accessToken);
                         responseObj.put("android_id", Settings.Secure.getString(activity.getContentResolver(), Settings.Secure.ANDROID_ID));
 
                         addFacebookUserInfo(responseObj);
 
                     } catch (JSONException e) {
+                        dialog.dismiss();
                         Log.i("User Profile", "JSON Exception");
                     }
                     Log.e("obj ", object.toString());
