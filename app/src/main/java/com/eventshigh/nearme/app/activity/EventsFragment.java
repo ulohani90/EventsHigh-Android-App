@@ -346,22 +346,23 @@ public class EventsFragment extends BaseEventsFragment {
 
 
     public void setUpMapContents() {
-        if (map == null) {
-            FragmentManager fm = getChildFragmentManager();
-            mapFragment = (SupportMapFragment) fm.findFragmentByTag("mapFragment");
-            if (mapFragment == null) {
-                mapFragment = new SupportMapFragment();
-                FragmentTransaction ft = fm.beginTransaction();
-                ft.add(R.id.map_container, mapFragment, "mapFragment");
-                ft.commit();
-                fm.executePendingTransactions();
+        if (isAdded()) {
+            if (map == null) {
+                FragmentManager fm = getChildFragmentManager();
+                mapFragment = (SupportMapFragment) fm.findFragmentByTag("mapFragment");
+                if (mapFragment == null) {
+                    mapFragment = new SupportMapFragment();
+                    FragmentTransaction ft = fm.beginTransaction();
+                    ft.add(R.id.map_container, mapFragment, "mapFragment");
+                    ft.commit();
+                    fm.executePendingTransactions();
+                }
+                setUpMap();
+                setupGestureDetectorIfNeeded();
+            } else {
+                mapMarkerManager.setEvents(map, filteredEvents);
             }
-            setUpMap();
-            setupGestureDetectorIfNeeded();
-        } else {
-            mapMarkerManager.setEvents(map, filteredEvents);
         }
-
 
     }
 
@@ -598,15 +599,19 @@ public class EventsFragment extends BaseEventsFragment {
                 retryView.setVisibility(View.VISIBLE);
             }
 
-        }
-        if (!myEvents.topicEvents.isEmpty() && myEvents.topicEvents.get(0).events != null && myEvents.topicEvents.get(0).events.size() > 0) {
-            if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
-                ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.topicEvents.get(0).events.get(0).imgUrl);
+
+        } else {
+            if (!myEvents.topicEvents.isEmpty() && myEvents.topicEvents.get(0).events != null && myEvents.topicEvents.get(0).events.size() > 0) {
+                if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
+                    ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.topicEvents.get(0).events.get(0).imgUrl);
+                }
+                eventsAdapter.setTopicEvents(myEvents.topicEvents, eventsContext, eventGridView.getSpanCount() * 2);
+
+
             }
-            eventsAdapter.setTopicEvents(myEvents.topicEvents, eventsContext, eventGridView.getSpanCount() * 2);
-        }
-        if (!myEvents.movies.isEmpty()) {
-            eventsAdapter.setMoviesListData(myEvents.movies, eventsContext, true, myEvents.topicEvents.isEmpty() ? true : false);
+            if (!myEvents.movies.isEmpty()) {
+                eventsAdapter.setMoviesListData(myEvents.movies, eventsContext, true, myEvents.topicEvents.isEmpty() ? true : false);
+            }
         }
         //    eventGridView.scrollToPosition(scrollPosition);
         isLoading = false;
@@ -876,7 +881,7 @@ public class EventsFragment extends BaseEventsFragment {
 
                     secondLoop:
                     for (int j = 0; j < filterEventTimes.size(); j++) {
-                        for (int k = 0; k < allEvents.get(i).eventTimings.length; k++) {
+                        for (int k = 0; k < allEvents.get(i).eventTimings.size(); k++) {
                             if (filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime()) {
                                 filteredEvents.add(allEvents.get(i));
                                 break secondLoop;

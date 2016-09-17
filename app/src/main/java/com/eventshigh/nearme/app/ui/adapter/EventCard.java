@@ -281,8 +281,8 @@ public class EventCard extends ViewHolder {
 
         EventTime eventTime = DateTimeUtils.getEventTime(event, 0);
         EventTime lastEventTime = null;
-        if (event.eventTimings.length > 1) {
-            lastEventTime = DateTimeUtils.getEventTime(event, event.eventTimings.length - 1);
+        if (event.eventTimings.size() > 1) {
+            lastEventTime = DateTimeUtils.getEventTime(event, event.eventTimings.size() - 1);
         }
         if (eventTime == null) {
             eventTimeView.setVisibility(View.INVISIBLE);

@@ -73,6 +73,8 @@ import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.LocationUtils;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -1065,6 +1067,13 @@ public class LaunchActivity extends BaseContextActivity {
             if (resultCode == RESULT_OK)
                 super.onBackPressed();
         }
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == FBLoginActivity.RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            fbLoginFragment.handleSignInResult(result);
+        }
+
     }
 
     private final OnCitySelectionListener mCitySelectionListener = new OnCitySelectionListener() {
@@ -1138,6 +1147,8 @@ public class LaunchActivity extends BaseContextActivity {
 
     UserProfileFragment profileFragment;
 
+    private FbLoginFragment fbLoginFragment;
+
     /**
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
@@ -1158,7 +1169,8 @@ public class LaunchActivity extends BaseContextActivity {
         public Fragment getItem(int position) {
             if (TABS.get(position).equals(MY_EVENTS_TAB)) {
                 if (!account.getUserInfo().isSignedIn) {
-                    return FbLoginFragment.newInstance(true, false, false);
+                    fbLoginFragment = FbLoginFragment.newInstance(true, false, false);
+                    return fbLoginFragment;
                 } else {
                     profileFragment = UserProfileFragment.newInstance(eventsContext);
                     return profileFragment;

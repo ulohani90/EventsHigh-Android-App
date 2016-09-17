@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.data.Event;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -136,7 +137,7 @@ public class DateTimeUtils {
 
     public static Date getEventDate(Event event, int occurrenceNo) {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date(event.eventTimings[occurrenceNo]));
+        cal.setTime(new Date(event.eventTimings.get(occurrenceNo)));
         return toMidnight(cal, event.city.timeZone).getTime();
     }
 
@@ -165,12 +166,12 @@ public class DateTimeUtils {
     public static
     @Nullable
     EventTime getEventTime(Event event, int index) {
-        if (index >= event.eventTimings.length) {
+        if (index >= event.eventTimings.size()) {
             return null;
         }
 
-        return dateToEventTime(new Date(event.eventTimings[index]),
-                TimeZone.getTimeZone(event.city.timeZone), event.eventTimings[index]);
+        return dateToEventTime(new Date(event.eventTimings.get(index)),
+                TimeZone.getTimeZone(event.city.timeZone), event.eventTimings.get(index));
     }
 
 
@@ -357,4 +358,46 @@ public class DateTimeUtils {
         return weekendDates;
 
     }
+
+    private static final SimpleDateFormat HH_MM_SS_FORMAT = new SimpleDateFormat("hh:mm:ss");
+
+    public static long getTimeInMillis(String time) {
+        Date date = new Date();
+        try {
+            date = HH_MM_SS_FORMAT.parse(time);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date.getTime();
+    }
+
+    public static String getSessionDate(long time) {
+        StringBuilder builder = new StringBuilder();
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(time);
+        builder.append(cal.get(Calendar.DAY_OF_MONTH));
+        builder.append(" ");
+        builder.append(new SimpleDateFormat("MMM").format(cal.getTime()));
+        return builder.toString();
+    }
+
+    public static DateFormat d1 = new SimpleDateFormat("yyyy-mm-dd");
+    public static DateFormat d2 = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
+    public static DateFormat d3 = new SimpleDateFormat("hh:mm a");
+
+    public static String getSessionTime(String startTime, String endTime) {
+        StringBuilder builder = new StringBuilder();
+        try {
+
+            long ts = d2.parse(d1.format(new Date()) + " " + startTime).getTime();
+            builder.append(d3.format(new Date(ts)));
+            builder.append(" - ");
+            long te = d2.parse(d1.format(new Date()) + " " + endTime).getTime();
+            builder.append(d3.format(new Date(te)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return builder.toString();
+    }
+
 }

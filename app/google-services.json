@@ -1,1 +1,64 @@
-{"project_info":{"project_id":"white-collector-661","project_number":"708156551009","name":"EventsHigh"},"client":[{"client_info":{"client_id":"android:com.eventshigh.nearme.app","client_type":1,"android_client_info":{"package_name":"com.eventshigh.nearme.app"}},"oauth_client":[{"client_id":"708156551009-ichfs9ae4thgig1qei9ke5mh8r0jqe1n.apps.googleusercontent.com","client_type":1,"android_info":{"package_name":"com.eventshigh.nearme.app","certificate_hash":"87b3db4d04bbf1cba148d4b709979f5778d2616f"}}],"services":{"analytics_service":{"status":2,"analytics_property":{"tracking_id":"UA-46999528-1"}},"cloud_messaging_service":{"status":2,"apns_config":[]},"appinvite_service":{"status":2,"other_platform_oauth_client":[]},"google_signin_service":{"status":1},"ads_service":{"status":1}}}]}
+{
+  "project_info": {
+    "project_number": "708156551009",
+    "project_id": "white-collector-661"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708156551009:android:1a29889c14e27467",
+        "android_client_info": {
+          "package_name": "com.eventshigh.nearme.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "708156551009-eahuva11ife9k2s2rlsfaeesl3di2blb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.eventshigh.nearme.app",
+            "certificate_hash": "6243A2693A61F3A420EDD02B30D300881F3B6E1B"
+          }
+        },
+        {
+          "client_id": "708156551009-ichfs9ae4thgig1qei9ke5mh8r0jqe1n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.eventshigh.nearme.app",
+            "certificate_hash": "87B3DB4D04BBF1CBA148D4B709979F5778D2616F"
+          }
+        },
+        {
+          "client_id": "708156551009-b2tv3ajql72j31kb5rlf8ahhi6n9olrt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGkRhA4-4U2mawKzGrKkCxOlEdYdQxrdM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-46999528-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "708156551009-b2tv3ajql72j31kb5rlf8ahhi6n9olrt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

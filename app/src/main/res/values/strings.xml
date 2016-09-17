@@ -35,6 +35,7 @@
     <string name="action_submit">Submit</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_add_to_calender">Add to Calendar</string>
+    <string name="learn_more_text"><u>Learn More</u></string>
 
     <!-- Menu items -->
     <string name="menu_edit_location">Change Location</string>
@@ -245,4 +246,7 @@
     <string name="title_activity_test">TestActivity</string>
 
     <string name="no_review_text">No reviews yet.\nWrite a review and share your experience with others.</string>
+    <string name="fb_sign_in_error_facebook_id_string">We could not find a facebook id associated with your Facebook account. Please login with your Google account. </string>
+    <string name="fb_sign_in_error_name_string">We could not find a name associated with your Facebook account. Please login with your Google account. </string>
+    <string name="fb_sign_in_error_email_string">We could not find an email associated with your Facebook account. Please verify your email with your Google account. </string>
 </resources>

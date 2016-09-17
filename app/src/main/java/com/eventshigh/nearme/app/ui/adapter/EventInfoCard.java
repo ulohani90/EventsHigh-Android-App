@@ -78,14 +78,14 @@ public class EventInfoCard extends RecyclerView.ViewHolder {
             }
 
             futureTimesView.removeAllViews();
-            if (event.eventTimings.length > 1) {
-                for (int i = 1; i < event.eventTimings.length; i++) {
+            if (event.eventTimings.size() > 1) {
+                for (int i = 1; i < event.eventTimings.size(); i++) {
                     eventTime = DateTimeUtils.getEventTime(event, i);
                     if (eventTime == null) {
                         break;
                     }
 
-                    final Date eventDateCurr = new Date(event.eventTimings[i]);
+                    final Date eventDateCurr = new Date(event.eventTimings.get(i));
                     View timeView = activity.getLayoutInflater().inflate(
                             R.layout.view_event_time, futureTimesView, false);
                     ((TextView) timeView.findViewById(R.id.event_day)).setText(

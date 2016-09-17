@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.MyTicketsFragment;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventSession;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
@@ -30,9 +32,11 @@ import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView.SpanAllColumnLookup;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -63,6 +67,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
         dataToShow = new ArrayList<>();
         setHasStableIds(true);
+    }
+
+    public void setSessionsData(List<EventSession> sessions, City city) {
+        dataToShow.clear();
+        for (EventSession session : sessions) {
+            dataToShow.add(new EventSessionData(session, activity, city));
+        }
+        notifyDataSetChanged();
     }
 
     public void setSocialActions(@Nullable SocialActions socialActions) {

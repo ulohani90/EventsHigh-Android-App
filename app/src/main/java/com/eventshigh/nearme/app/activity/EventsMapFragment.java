@@ -625,7 +625,7 @@ public class EventsMapFragment extends Fragment {
 
                     secondLoop:
                     for (int j = 0; j < filterEventTimes.size(); j++) {
-                        for (int k = 0; k < allEvents.get(i).eventTimings.length; k++) {
+                        for (int k = 0; k < allEvents.get(i).eventTimings.size(); k++) {
                             if (filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime()) {
                                 filteredEvents.add(allEvents.get(i));
                                 break secondLoop;

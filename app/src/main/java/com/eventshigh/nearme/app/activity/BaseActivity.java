@@ -527,8 +527,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .putExtra(Events.DESCRIPTION, event.getEventShareURI())
                 .putExtra(Events.EVENT_LOCATION, event.getShortAddress());
 
-        if (date == null && event.eventTimings.length > 0) {
-            date = new Date(event.eventTimings[0]);
+        if (date == null && event.eventTimings.size() > 0) {
+            date = new Date(event.eventTimings.get(0));
         }
 
         if (date != null) {

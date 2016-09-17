@@ -209,14 +209,14 @@ public class EventInfoFragment extends Fragment {
             }
 
             futureTimesView.removeAllViews();
-            if (event.eventTimings.length > 1) {
-                for (int i = 1; i < event.eventTimings.length; i++) {
+            if (event.eventTimings.size() > 1) {
+                for (int i = 1; i < event.eventTimings.size(); i++) {
                     eventTime = DateTimeUtils.getEventTime(event, i);
                     if (eventTime == null) {
                         break;
                     }
 
-                    final Date eventDateCurr = new Date(event.eventTimings[i]);
+                    final Date eventDateCurr = new Date(event.eventTimings.get(i));
                     View timeView = LayoutInflater.from(getActivity()).inflate(
                             R.layout.view_event_time, futureTimesView, false);
                     ((TextView) timeView.findViewById(R.id.event_day)).setText(
@@ -273,10 +273,10 @@ public class EventInfoFragment extends Fragment {
         eventVenueText.setText(string);
         travelTimeView.setVisibility(View.GONE);
         view.findViewById(R.id.direction_separator).setVisibility(View.GONE);
-        if (event.performers != null && event.performers.length > 0) {
+        if (event.performers != null && event.performers.size() > 0) {
             performersHeader.setVisibility(View.VISIBLE);
             performersFlowLayout.setVisibility(View.VISIBLE);
-            performersFlowLayout.setRecipientForEventCategories((BaseContextActivity) getActivity(), new Account(getActivity()), new ArrayList<String>(Arrays.asList(event.performers)), event, "performerAsTag");
+            performersFlowLayout.setRecipientForEventCategories((BaseContextActivity) getActivity(), new Account(getActivity()), new ArrayList<String>(event.performers), event, "performerAsTag");
 
         } else {
             performersHeader.setVisibility(View.GONE);
@@ -470,14 +470,20 @@ public class EventInfoFragment extends Fragment {
     }
 
     public String getAverageRating(Event event) {
+
         double sum = 0.0;
         int count = 0;
         for (int i = 0; i < event.reviewObjects.size(); i++) {
-            sum += event.reviewObjects.get(i).getReviewRating();
-            count++;
-        }
+            try {
+                sum += event.reviewObjects.get(i).getReviewRating();
+                count++;
+            } catch (NumberFormatException e) {
 
+            }
+        }
         return Utils.roundToTwoDecimalPlaces(((sum / count))) + "/5.0";
+
+
     }
 
     private void populateEventTravelTime(Event event) {

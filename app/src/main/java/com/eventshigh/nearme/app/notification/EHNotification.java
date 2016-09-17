@@ -69,7 +69,7 @@ public class EHNotification {
 
         title = event.title;
         CharSequence relativeTime = DateUtils.getRelativeDateTimeString(
-                context, event.eventTimings[0],
+                context, event.eventTimings.get(0),
                 DateUtils.DAY_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0);
         message = String.format(
                 context.getResources().getString(R.string.event_time_venue),

@@ -30,6 +30,8 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,6 +42,10 @@ import java.util.Arrays;
  * Created by umesh on 19/07/16.
  */
 public class FBLoginActivity extends BaseActivity {
+
+    public static final int RC_SIGN_IN = 89;
+
+    FbLoginFragment fragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,10 +61,21 @@ public class FBLoginActivity extends BaseActivity {
 
         boolean showSpecialText = getIntent().getBooleanExtra("show_special_text", false);
 
-        FbLoginFragment fragment = FbLoginFragment.newInstance(hideSkip, showSpecialText, true);
+        fragment = FbLoginFragment.newInstance(hideSkip, showSpecialText, true);
 
         getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            fragment.handleSignInResult(result);
+        }
     }
 
 }

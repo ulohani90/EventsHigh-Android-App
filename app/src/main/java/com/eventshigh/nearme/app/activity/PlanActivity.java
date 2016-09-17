@@ -39,6 +39,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,26 +119,26 @@ public class PlanActivity extends BaseActivity {
     }
 
     public void whatsapp(View view) {
-        shareEventWithBranch(event, PACKAGE_NAME_WHATSAPP,null);
+        shareEventWithBranch(event, PACKAGE_NAME_WHATSAPP, null);
     }
 
     public void facebook(View view) {
-        shareEventWithBranch(event, PACKAGE_NAME_FACEBOOK,null);
+        shareEventWithBranch(event, PACKAGE_NAME_FACEBOOK, null);
     }
 
     public void twitter(View view) {
-        shareEventWithBranch(event, PACKAGE_NAME_TWITTER,null);
+        shareEventWithBranch(event, PACKAGE_NAME_TWITTER, null);
     }
 
     private void publishPlan(Runnable callback) {
         if (!isPlanPublished) {
             try {
                 String url = Signer.sign(
-                    UpdateAccountInfoService.getBaseUri(this, "register_event_to_plan")
-                            .appendQueryParameter("plan_id", planId)
-                            .appendQueryParameter("event_id", event.id)
-                            .appendQueryParameter("expiry_timestamp", Long.toString(max(event.eventTimings)))
-                            .build()
+                        UpdateAccountInfoService.getBaseUri(this, "register_event_to_plan")
+                                .appendQueryParameter("plan_id", planId)
+                                .appendQueryParameter("event_id", event.id)
+                                .appendQueryParameter("expiry_timestamp", Long.toString(max(event.eventTimings)))
+                                .build()
                 ).toString();
                 JsonObjectRequest request = new JsonObjectRequest(url, null,
                         new PublishPlanIdListener(callback), tryAgainErrorListener);
@@ -301,12 +302,12 @@ public class PlanActivity extends BaseActivity {
         }
     }
 
-    private static long max(long[] arr) {
-        return arr.length == 0 ? 0 : max(arr, 0, arr.length);
+    private static long max(List<Long> arr) {
+        return arr.size() == 0 ? 0 : max(arr, 0, arr.size());
     }
 
-    private static long max(long[] arr, int start, int end) {
-        return (start >= end - 1) ? arr[start]
-                : Math.max(arr[start], max(arr, start + 1, end));
+    private static long max(List<Long> arr, int start, int end) {
+        return (start >= end - 1) ? arr.get(start)
+                : Math.max(arr.get(start), max(arr, start + 1, end));
     }
 }

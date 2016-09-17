@@ -261,8 +261,15 @@ public class NewEventDetailActivity extends BaseContextActivity {
     private Response.Listener<Event> mEventListener = new Response.Listener<Event>() {
         @Override
         public void onResponse(final Event event, boolean isIntermediate) {
-            NewEventDetailActivity.this.event = event;
-            makeMyReviewsServerRequest(false);
+            if (event != null) {
+                NewEventDetailActivity.this.event = event;
+                makeMyReviewsServerRequest(false);
+            } else {
+                Toast.makeText(NewEventDetailActivity.this, R.string.failed_load,
+                        Toast.LENGTH_SHORT).show();
+
+                finish();
+            }
             // populateView(event);
 
         }
@@ -422,10 +429,13 @@ public class NewEventDetailActivity extends BaseContextActivity {
         TABS = new ArrayList<>();
 
         TABS.add(INFO_TAB);
-        if (event.descriptionSections != null && event.descriptionSections.length > 0) {
+        if (event.descriptionSections != null && event.descriptionSections.size() > 0) {
             for (EventDescriptionSection section : event.descriptionSections) {
                 TABS.add(section.name);
             }
+        }
+        if (event.sessions != null && event.sessions.size() > 0) {
+            TABS.add(event.sessionTitlePhrase != null ? event.sessionTitlePhrase : "Sessions");
         }
 
 
@@ -506,38 +516,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                     }
                 }
         );
-        /*SocialInvitationsRequest.submit(this, Request.Priority.LOW, this, false,
-                new Response.Listener<SocialInvitationsRequest.CommonInviteObject>() {
-                    @Override
-                    public void onResponse(SocialInvitationsRequest.CommonInviteObject commonInviteObject, boolean isIntermediate) {
-                        SocialInvitationsRequest.SocialInvite invite = commonInviteObject.getInvites().get(event.id);
-                        if (invite == null || invite.getInvitedBy() == null) {
-                            reportActionToAnalytics("showSocialInfo", "invitedBy", 0);
-                            return;
-                        }
 
-                        planId = invite.getPlanId();
-                        Set<SocialFriend> allInvitedBy = invite.getAllInvitedBy();
-                        Set<SocialFriend> allParticipants = invite.getAllParticipants();
-                        reportActionToAnalytics("showSocialInfo", "invitedBy", allInvitedBy.size());
-
-                        String prefix = allInvitedBy.size() == 1 ?
-                                allInvitedBy.iterator().next().getName() : "";
-                        String suffix = allParticipants.size() < 3 ? "" : "and " + (allParticipants.size() - 2) + " more friends";
-
-                        ContactListView invitedByView = (ContactListView) findViewById(R.id.invited_by);
-                        invitedByView.setVisibility(View.VISIBLE);
-                        invitedByView.setText(prefix + " has invited you " + suffix);
-                        invitedByView.setFollowers(NewEventDetailActivity.this, allInvitedBy, allParticipants);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        VolleyHelper.log(NewEventDetailActivity.this, volleyError);
-                    }
-                }
-        );*/
 
     }
 
@@ -613,7 +592,10 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 fragment = EventInfoFragment.newInstance(bundle);
                 return fragment;
             }
-            bundle.putString("description", event.descriptionSections[position - 1].description);
+            if (position == TABS.size() - 1) {
+                return EventSessionDetailFragment.newInstance((ArrayList) event.sessions, event.city);
+            }
+            bundle.putString("description", event.descriptionSections.get(position - 1).description);
             return EventDetailCustomFragment.newInstance(bundle);
 
         }

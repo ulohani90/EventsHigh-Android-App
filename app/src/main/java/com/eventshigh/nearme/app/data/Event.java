@@ -62,7 +62,7 @@ public class Event implements Parcelable {
     public final boolean ehRecommended;
     public final float uberScore;
 
-    public final long[] eventTimings;    // each start time is stored as milliseconds since epoch.
+    public final List<Long> eventTimings;    // each start time is stored as milliseconds since epoch.
 
     @Nullable
     public final LatLng location;
@@ -75,7 +75,7 @@ public class Event implements Parcelable {
     public final boolean isCleanVenue;
 
 
-    public final String[] performers;
+    public final List<String> performers;
 
     @Nullable
     public final String organizerName;
@@ -99,7 +99,7 @@ public class Event implements Parcelable {
 
     public final ArrayList<EhPrices> ehPrices;
 
-    public final EventDescriptionSection[] descriptionSections;
+    public final List<EventDescriptionSection> descriptionSections;
 
     public final ArrayList<MovieUserReviewObject> reviewObjects;
 
@@ -108,21 +108,25 @@ public class Event implements Parcelable {
     @Nullable
     public final List<AdditionalTicketField> additionalTicketFieldList;
 
+    public final List<EventSession> sessions;
+
+    public final String sessionTitlePhrase;
+
 
     public Event(String id, City city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, ArrayList<String> allImages, @Nullable String sourceUrl,
                  @Nullable String bookingUrl, @Nullable String bookingText,
                  int numViews, int numSaves, boolean ehRecommended,
-                 float uberScore, long[] eventTimings,
+                 float uberScore, List<Long> eventTimings,
                  @Nullable LatLng location, @Nullable String venue, @Nullable String locality,
                  @Nullable String address, boolean isCleanVenue,
-                 String[] performers,
+                 List<String> performers,
                  String organizerName, String organizerPhone, String organizerWebsite,
                  String organizerEmail, String organizerLink, ArrayList<EhPrices> ehPrices,
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
-                 EventDescriptionSection[] descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
-                 @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList) {
+                 List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
+                 @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -171,6 +175,8 @@ public class Event implements Parcelable {
 
         this.requestPerAttendeeData = Utils.checkIfUnknown(requestPerAttendeeData);
         this.additionalTicketFieldList = additionalTicketFieldList;
+        this.sessions = sessions;
+        this.sessionTitlePhrase = sessionTitlePhrase;
     }
 
     public Event(Parcel in) {
@@ -197,7 +203,8 @@ public class Event implements Parcelable {
         this.ehRecommended = in.createBooleanArray()[0];
         this.uberScore = in.readFloat();
 
-        this.eventTimings = in.createLongArray();
+        this.eventTimings = new ArrayList<>();
+        in.readList(eventTimings, Long.class.getClassLoader());
         LatLng sLocation = (LatLng) in.readParcelable(LatLng.class.getClassLoader());
         this.location = sLocation != null && city.cityBounds.contains(sLocation) ? sLocation : null;
         this.venue = Utils.checkIfUnknown(in.readString());
@@ -205,7 +212,8 @@ public class Event implements Parcelable {
         this.address = Utils.checkIfUnknown(in.readString());
         this.isCleanVenue = venue != null && in.createBooleanArray()[0];
 
-        this.performers = in.createStringArray();
+        this.performers = new ArrayList<>();
+        in.readStringList(performers);
 
         this.organizerName = Utils.checkIfUnknown(in.readString());
         this.organizerPhone = Utils.checkIfUnknown(in.readString());
@@ -220,12 +228,17 @@ public class Event implements Parcelable {
         this.currency = Utils.checkIfUnknown(in.readString());
         this.priceName = in.readString();
         this.priceNote = in.readString();
-        this.descriptionSections = in.createTypedArray(EventDescriptionSection.CREATOR);
+        descriptionSections = new ArrayList<>();
+        in.readTypedList(descriptionSections, EventDescriptionSection.CREATOR);
+        // this.descriptionSections = in.createTypedArray(EventDescriptionSection.CREATOR);
         reviewObjects = new ArrayList<>();
         in.readTypedList(reviewObjects, MovieUserReviewObject.CREATOR);
         this.requestPerAttendeeData = in.readString();
         additionalTicketFieldList = new ArrayList<>();
         in.readTypedList(additionalTicketFieldList, AdditionalTicketField.CREATOR);
+        sessions = new ArrayList<>();
+        in.readTypedList(sessions, EventSession.CREATOR);
+        sessionTitlePhrase = in.readString();
     }
 
     public Uri getEventDetailsURI() {
@@ -345,7 +358,7 @@ public class Event implements Parcelable {
         dest.writeBooleanArray(new boolean[]{ehRecommended});
         dest.writeFloat(uberScore);
 
-        dest.writeLongArray(eventTimings);
+        dest.writeList(eventTimings);
 
         dest.writeParcelable(location == null ? new LatLng(0, 0) : location, flags);
         dest.writeString(emptyIfNull(venue));
@@ -353,7 +366,7 @@ public class Event implements Parcelable {
         dest.writeString(emptyIfNull(address));
         dest.writeBooleanArray(new boolean[]{isCleanVenue});
 
-        dest.writeStringArray(performers);
+        dest.writeStringList(performers);
 
         dest.writeString(emptyIfNull(organizerName));
         dest.writeString(emptyIfNull(organizerPhone));
@@ -367,11 +380,13 @@ public class Event implements Parcelable {
         dest.writeString(emptyIfNull(currency));
         dest.writeString(priceName);
         dest.writeString(priceNote);
-        dest.writeTypedArray(descriptionSections, flags);
+        dest.writeTypedList(descriptionSections);
         dest.writeTypedList(reviewObjects);
 
         dest.writeString(requestPerAttendeeData);
         dest.writeTypedList(additionalTicketFieldList);
+        dest.writeTypedList(sessions);
+        dest.writeString(sessionTitlePhrase);
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -514,18 +529,18 @@ public class Event implements Parcelable {
                 Collections.sort(eventTimings.subList(1, eventTimings.size()));
             }
 
-            long[] eventTimingsArr = new long[eventTimings.size()];
+          /*  long[] eventTimingsArr = new long[eventTimings.size()];
             int i = 0;
             for (Long eventTime : eventTimings) {
                 eventTimingsArr[i] = eventTime;
                 i++;
-            }
+            }*/
 
             // Performers
             JSONArray participantsInfo = eventJson.optJSONArray("participants");
             List<String> performers = new ArrayList<>(participantsInfo == null ? 0 : participantsInfo.length());
             if (participantsInfo != null) {
-                for (i = 0; i < participantsInfo.length(); i++) {
+                for (int i = 0; i < participantsInfo.length(); i++) {
                     String performer = participantsInfo.getJSONObject(i).optString("name");
                     if (performer != null) {
                         performers.add(performer);
@@ -681,6 +696,18 @@ public class Event implements Parcelable {
                 }
             }
 
+            List<EventSession> sessions = new ArrayList<>();
+
+            JSONArray sessionsJsonArray = eventJson.optJSONArray("sessions");
+            if (sessionsJsonArray != null) {
+                for (int i = 0; i < sessionsJsonArray.length(); i++) {
+                    sessions.add(new EventSession(sessionsJsonArray.getJSONObject(i)));
+                }
+            }
+            String sessionTitlePhrase = null;
+            if (eventJson.has("session_title_phrase")) {
+                sessionTitlePhrase = Utils.checkIfUnknown(eventJson.optString("session_title_phrase"));
+            }
 
             return new Event(id,
                     city,
@@ -702,7 +729,7 @@ public class Event implements Parcelable {
                     eh_recommends,
                     uberScore,
 
-                    eventTimingsArr,
+                    eventTimings,
 
                     new LatLng(lat, lon),
                     venue,
@@ -710,7 +737,7 @@ public class Event implements Parcelable {
                     address,
                     isCleanVenue,
 
-                    performers.toArray(new String[performers.size()]),
+                    performers,
 
                     organizerName,
                     organizerPhone,
@@ -723,10 +750,11 @@ public class Event implements Parcelable {
                     currency,
                     ehPriceName,
                     ehPriceNote,
-                    descriptionSections.toArray(new EventDescriptionSection[descriptionSections.size()]),
+                    descriptionSections,
                     reviews,
                     requestPerAttendeeData,
-                    additionalTicketFieldList
+                    additionalTicketFieldList,
+                    sessions, sessionTitlePhrase
             );
         } catch (IllegalArgumentException e) {
             Crashlytics.logException(e);

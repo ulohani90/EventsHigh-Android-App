@@ -257,7 +257,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
         dates = new ArrayList<>();
         eventTimes = new HashMap<>();
 
-        for (int i = 0; i < event.eventTimings.length; i++) {
+        for (int i = 0; i < event.eventTimings.size(); i++) {
             EventTime time = DateTimeUtils.getEventTime(event, i);
             if (time.longtime >= System.currentTimeMillis()) {
                 if (getEhPricesSize(time) > 0) {

@@ -30,7 +30,6 @@ public enum EventCategory {
     TECH("Technology"),
     ART("Arts & Culture"),
     FOOD,
-
     COMEDY,
     DANCE,
     DJ,
@@ -46,7 +45,6 @@ public enum EventCategory {
     SPIRITUAL,
     THEATRE,
     EDITOR_PICKS("Editor's Picks"),
-
     FREE_EVENTS,
     OTHER;
 
@@ -68,7 +66,7 @@ public enum EventCategory {
      */
     public BitmapDescriptor icon() {
         BitmapDescriptor icon = CATEGORY_ICONS.get(this);
-        if (icon == null) {
+        if (icon == null && this != null) {
             icon = BitmapDescriptorFactory.fromResource(getIconResourceId());
             CATEGORY_ICONS.put(this, icon);
         }
@@ -92,6 +90,7 @@ public enum EventCategory {
 
     public int getIconResourceId() {
         int resId = R.drawable.icon_other;
+
         try {
             resId = R.drawable.class.getField("icon_" + toString().toLowerCase()).getInt(null);
         } catch (IllegalAccessException e) {
@@ -149,7 +148,6 @@ public enum EventCategory {
         }
         return null;
     }
-
 
 
     public static boolean isACategory(String categoryName) {

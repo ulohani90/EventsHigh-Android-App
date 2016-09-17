@@ -30,6 +30,12 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +45,7 @@ import java.util.Arrays;
 /**
  * Created by umesh on 02/08/16.
  */
-public class FbLoginFragment extends Fragment {
+public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener {
     CallbackManager callbackManager;
     LoginResult loginResult;
 
@@ -54,6 +60,8 @@ public class FbLoginFragment extends Fragment {
     BaseActivity activity;
 
     boolean closeActivity;
+
+    GoogleApiClient mGoogleApiClient;
 
     public static FbLoginFragment newInstance(boolean hideSkip, boolean showSpecialText, boolean closeActivity) {
 
@@ -79,6 +87,20 @@ public class FbLoginFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(activity);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestServerAuthCode("708156551009-b2tv3ajql72j31kb5rlf8ahhi6n9olrt.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .enableAutoManage(getActivity() /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
     }
 
     @Nullable
@@ -169,6 +191,8 @@ public class FbLoginFragment extends Fragment {
         }
     }
 
+    JSONObject responseObj;
+
     void requestUserProfile() {
         dialog = ProgressDialog.show(activity, null, "Signing in. Please wait...");
         System.out.println("onSuccess");
@@ -183,7 +207,7 @@ public class FbLoginFragment extends Fragment {
                 // Get facebook data from login
                 if (object != null) {
                     try {
-                        JSONObject responseObj = new JSONObject();
+                        responseObj = new JSONObject();
 
                         if (object.has("id")) {
                             String userId = object.getString("id");
@@ -191,30 +215,46 @@ public class FbLoginFragment extends Fragment {
                             responseObj.put("fb_profile_pic", "https://graph.facebook.com/" + userId + "/picture?type=large");
                         } else {
                             dialog.dismiss();
-                            AppAlertDialog.show("Problem connecting to facebook", "No facebook Id associated with this facebook account.", activity);
+                            AppAlertDialog.show("No facebook id found", getString(R.string.fb_sign_in_error_facebook_id_string), activity, new OnStartGoogleLoginListener() {
+                                @Override
+                                public void onStartGoogleLogin() {
+                                    startGoogleLoginProcess();
+                                }
+                            });
                             return;
                         }
+                        if (object.has("name")) {
+                            String name = object.getString("name");
+                            responseObj.put("fb_name", name);
+                        } else {
+                            dialog.dismiss();
+                            AppAlertDialog.show("No name found", getString(R.string.fb_sign_in_error_name_string), activity, new OnStartGoogleLoginListener() {
+                                @Override
+                                public void onStartGoogleLogin() {
+                                    startGoogleLoginProcess();
+                                }
+                            });
+                            return;
+                        }
+
+                        responseObj.put("fb_token", accessToken);
+                        responseObj.put("android_id", Settings.Secure.getString(activity.getContentResolver(), Settings.Secure.ANDROID_ID));
+
 
                         if (object.has("email")) {
                             String email = object.getString("email");
                             responseObj.put("fb_email", email);
                         } else {
                             dialog.dismiss();
-                            AppAlertDialog.show("Problem connecting to facebook", "No email associated with this facebook account.", activity);
+                            AppAlertDialog.show("No email found", getString(R.string.fb_sign_in_error_email_string), activity, new OnStartGoogleLoginListener() {
+                                @Override
+                                public void onStartGoogleLogin() {
+                                    startGoogleLoginProcess();
+                                }
+                            });
                             return;
                         }
 
-                        if (object.has("name")) {
-                            String name = object.getString("name");
-                            responseObj.put("fb_name", name);
-                        } else {
-                            dialog.dismiss();
-                            AppAlertDialog.show("Problem connecting to facebook", "No name associated with this facebook account.", activity);
-                            return;
-                        }
-
-                        responseObj.put("fb_token", accessToken);
-                        responseObj.put("android_id", Settings.Secure.getString(activity.getContentResolver(), Settings.Secure.ANDROID_ID));
 
                         addFacebookUserInfo(responseObj);
 
@@ -231,6 +271,33 @@ public class FbLoginFragment extends Fragment {
         parameters.putString("fields", "name, email");//add fields to fetch in graph response
         request.setParameters(parameters);
         request.executeAsync();
+    }
+
+
+    public void startGoogleLoginProcess() {
+        dialog = ProgressDialog.show(activity, null, "Checking google info. Please wait...");
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        getActivity().startActivityForResult(signInIntent, FBLoginActivity.RC_SIGN_IN);
+    }
+
+    public void handleSignInResult(GoogleSignInResult result) {
+        dialog.dismiss();
+        Log.d("Google sign in user", "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
+            GoogleSignInAccount acct = result.getSignInAccount();
+            try {
+
+                responseObj.put("fb_email", acct.getEmail());
+                dialog = ProgressDialog.show(activity, null, "Signing in. Please wait...");
+                addFacebookUserInfo(responseObj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            Toast.makeText(getActivity(), "Problem connecting to Google", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void addFacebookUserInfo(final JSONObject object) {
@@ -260,5 +327,23 @@ public class FbLoginFragment extends Fragment {
                         Toast.makeText(activity, "Some problem fetching info. Please try again", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+
+    public interface OnStartGoogleLoginListener {
+        void onStartGoogleLogin();
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mGoogleApiClient.stopAutoManage(getActivity());
+        mGoogleApiClient.disconnect();
     }
 }
