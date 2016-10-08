@@ -259,7 +259,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
 
         for (int i = 0; i < event.eventTimings.size(); i++) {
             EventTime time = DateTimeUtils.getEventTime(event, i);
-            if (time.longtime >= System.currentTimeMillis()) {
+            if (time.longtime > (System.currentTimeMillis() + 7200000)) {
                 if (getEhPricesSize(time) > 0) {
                     if (eventTimes.containsKey(time.date)) {
                         eventTimes.get(time.date).add(time);
@@ -545,6 +545,7 @@ public class EventBookingDetailActivity extends BaseActivity implements View.OnC
                     EventTime time = DateTimeUtils.dateToEventTime(new Date(ehPrices.occurences.get(j)), TimeZone.getTimeZone(event.city.timeZone));
                     if (eventTime.equals(time)) {
                         results.add(ehPrices);
+                        break;
                     }
                 }
             }

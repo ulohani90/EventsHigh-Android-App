@@ -20,12 +20,14 @@
         android:id="@+id/tag_separator"
         android:layout_width="1dp"
         android:layout_height="match_parent"
-        android:background="@color/category_tag_separator_color" />
+        android:background="@color/category_tag_separator_color"
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/follow_cancel"
         android:layout_width="32dp"
         android:layout_height="33dp"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_cancel_white_bg_24" />
+        android:src="@drawable/ic_cancel_white_bg_24"
+        android:visibility="gone" />
 </LinearLayout>

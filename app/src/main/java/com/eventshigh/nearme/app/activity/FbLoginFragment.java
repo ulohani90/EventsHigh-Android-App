@@ -100,6 +100,13 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
     @Override
     public void onStart() {
         super.onStart();
+       // mGoogleApiClient.connect();
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
         mGoogleApiClient.connect();
     }
 
@@ -339,11 +346,18 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
         void onStartGoogleLogin();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mGoogleApiClient.stopAutoManage(getActivity());
+        mGoogleApiClient.disconnect();
+    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mGoogleApiClient.stopAutoManage(getActivity());
-        mGoogleApiClient.disconnect();
+
+      /*  mGoogleApiClient.stopAutoManage(getActivity());
+        mGoogleApiClient.disconnect();*/
     }
 }

@@ -38,6 +38,8 @@ public class EventSessionDetailFragment extends Fragment {
 
     City city;
 
+    BaseContextActivity activity;
+
     public static EventSessionDetailFragment newInstance(ArrayList<EventSession> sessions, City city) {
 
         Bundle args = new Bundle();
@@ -53,6 +55,7 @@ public class EventSessionDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         this.sessions = getArguments().getParcelableArrayList("sessions");
         this.city = (City) getArguments().getSerializable("city");
+        activity = (BaseContextActivity) getActivity();
     }
 
     @Nullable
@@ -138,6 +141,7 @@ public class EventSessionDetailFragment extends Fragment {
                         selectedDateView.setSelected(false);
                         date.setSelected(true);
                         selectedDateView = date;
+                        activity.reportActionToAnalytics("sessionDateSelected", DateTimeUtils.getDateFromMillisTime(dateValue));
                         addVenueData(dateValue);
                     }
                 });
@@ -159,6 +163,7 @@ public class EventSessionDetailFragment extends Fragment {
         venueSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                activity.reportActionToAnalytics("sessionVenueSelected", dateVenueHashMap.get(key).get(position));
                 addSessionsData(dateVenueHashMap.get(key).get(position), key);
             }
 
@@ -179,7 +184,7 @@ public class EventSessionDetailFragment extends Fragment {
         }
         sessionsList.setAdapter(sessionsAdapter);
         ArrayList<EventSession> sessionsData = getSessionForDay(venueSessionsMap.get(venue), date);
-        sessionsAdapter.setSessionsData(sessionsData,city);
+        sessionsAdapter.setSessionsData(sessionsData, city);
 
     }
 

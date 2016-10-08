@@ -53,6 +53,7 @@ public class ComposeInterestView extends FrameLayout implements ZRuntimeView {
                 R.layout.compose_interest_layout, null);
         textView = (TextView) view.findViewById(R.id.interest_name);
         followImg = (ImageView) view.findViewById(R.id.follow_cancel);
+        followImg.setVisibility(View.GONE);
         //  categoryTagParent = (LinearLayout) view.findViewById(R.id.category_tag_parent);
         this.addView(view);
     }

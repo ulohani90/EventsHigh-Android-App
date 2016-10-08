@@ -92,7 +92,10 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
         if (mGoogleApiClient != null)
             mGoogleApiClient.connect();
 
-
+        if (account.getLastCity() == null) {
+            Toast.makeText(this, "No city selected", Toast.LENGTH_SHORT).show();
+            this.finish();
+        }
         dataAdapter = new GooglePlacesAutocompleteAdapter(PlacesAutocompleteBoundedActivity.this, mGoogleApiClient, (account.getLastCity() != null) ? account.getLastCity().cityBounds : null, null, account.getLastCity().name());
         listView = (ListView) findViewById(R.id.lv_search_place_list);
         listView.setAdapter(dataAdapter);

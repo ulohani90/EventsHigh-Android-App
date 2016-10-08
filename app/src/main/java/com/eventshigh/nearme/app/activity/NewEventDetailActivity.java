@@ -551,7 +551,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
         final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
 
-        if (event.bookingUrl.contains("https://ticketing.eventshigh.com/checkout3.jsp?eid=" + event.id)) {
+        if (event.bookingUrl.equalsIgnoreCase("https://ticketing.eventshigh.com/checkout3.jsp?eid=" + event.id) && !isEventInNext24Hrs() && isNoAdditionalField()) {
             /*
             bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
             bookingUriBuilder.appendQueryParameter("name", userInfo.name);
@@ -569,6 +569,26 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 Crashlytics.getInstance().core.logException(e);
                 showMessage(R.string.retry);
             }
+        }
+
+    }
+
+    public boolean isNoAdditionalField() {
+        if ((event.additionalTicketFieldList == null) || (event.additionalTicketFieldList != null && event.additionalTicketFieldList.size() == 0)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isEventInNext24Hrs() {
+        if (event.eventTimings != null && event.eventTimings.size() > 0) {
+            if ((event.eventTimings.get(0) - System.currentTimeMillis()) < 86400000) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
         }
 
     }
@@ -592,7 +612,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 fragment = EventInfoFragment.newInstance(bundle);
                 return fragment;
             }
-            if (position == TABS.size() - 1) {
+            if (event.sessions != null && event.sessions.size() > 0 && position == TABS.size() - 1) {
                 return EventSessionDetailFragment.newInstance((ArrayList) event.sessions, event.city);
             }
             bundle.putString("description", event.descriptionSections.get(position - 1).description);

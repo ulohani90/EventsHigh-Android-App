@@ -34,6 +34,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -325,10 +326,16 @@ public class TicketReviewActivity extends BaseActivity implements View.OnClickLi
             if (!Utils.checkIfStringEmpty(location)) {
                 reportActionToAnalytics("proceed");
                 Intent intent = new Intent(TicketReviewActivity.this, CustomUrlActivity.class);
-                Uri myUri = Uri.parse(EventsHighEndpoints.GATEWAY_URI_BASE + location);
-                intent.putExtra(TicketReviewActivity.IS_PAYMENT, true);
-                intent.setData(myUri);
-                startActivityForResult(intent, PAYMENT_REQ_CODE);
+                try {
+                    String url = new URL(new URL(EventsHighEndpoints.GATEWAY_URI_BASE), location).toString();
+
+                    //Uri myUri = Uri.parse(EventsHighEndpoints.GATEWAY_URI_BASE + location);
+                    intent.putExtra(TicketReviewActivity.IS_PAYMENT, true);
+                    intent.setData(Uri.parse(url));
+                    startActivityForResult(intent, PAYMENT_REQ_CODE);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
             } else {
                 Toast.makeText(getApplicationContext(), "Try Again", Toast.LENGTH_SHORT).show();
             }

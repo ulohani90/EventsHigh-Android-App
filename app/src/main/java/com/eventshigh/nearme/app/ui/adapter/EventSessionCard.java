@@ -29,6 +29,7 @@ public class EventSessionCard extends RecyclerView.ViewHolder {
     TextView sessionDesc;
     TopCropImageView sessionImg;
     TextView learnMore;
+    TextView sessionPerformers;
 
 
     public static EventSessionCard newInstance(Activity activity, ViewGroup parent) {
@@ -43,6 +44,7 @@ public class EventSessionCard extends RecyclerView.ViewHolder {
         sessionDesc = (TextView) itemView.findViewById(R.id.session_desc);
         sessionImg = (TopCropImageView) itemView.findViewById(R.id.session_img);
         learnMore = (TextView) itemView.findViewById(R.id.learn_more);
+        sessionPerformers = (TextView) itemView.findViewById(R.id.session_performers);
 
     }
 
@@ -65,7 +67,7 @@ public class EventSessionCard extends RecyclerView.ViewHolder {
             sessionImg.setVisibility(View.GONE);
         }
 
-        if (session.getRelatedEId() != null && session.getRelatedEId().length() > 0) {
+        if (session.getRelatedEId() != null && session.getRelatedEId().length() > 0 && !(session.getRelatedEId().equalsIgnoreCase("empty"))) {
             learnMore.setVisibility(View.VISIBLE);
             learnMore.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -75,6 +77,13 @@ public class EventSessionCard extends RecyclerView.ViewHolder {
             });
         } else {
             learnMore.setVisibility(View.GONE);
+        }
+        if (session.getPerformers() != null && session.getPerformers().length() > 0) {
+            sessionPerformers.setVisibility(View.VISIBLE);
+            sessionPerformers.setText("With: " + session.getPerformers());
+
+        } else {
+            sessionPerformers.setVisibility(View.GONE);
         }
     }
 }

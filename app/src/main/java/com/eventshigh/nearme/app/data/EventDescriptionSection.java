@@ -23,7 +23,7 @@ public class EventDescriptionSection implements Parcelable {
     }
 
     /**********************************
-     Parcel management methods.
+     * Parcel management methods.
      *********************************/
     @Override
     public int describeContents() {
@@ -39,19 +39,19 @@ public class EventDescriptionSection implements Parcelable {
     // This is used to regenerate your object. All Parcelables must have
     // a CREATOR that implements these two methods
     public static final Parcelable.Creator<EventDescriptionSection> CREATOR =
-        new Parcelable.Creator<EventDescriptionSection>() {
-            public EventDescriptionSection createFromParcel(Parcel in) {
-                return new EventDescriptionSection(in.readString(), in.readString());
-            }
+            new Parcelable.Creator<EventDescriptionSection>() {
+                public EventDescriptionSection createFromParcel(Parcel in) {
+                    return new EventDescriptionSection(in.readString(), in.readString());
+                }
 
-            public EventDescriptionSection[] newArray(int size) {
-                return new EventDescriptionSection[size];
-            }
-        };
+                public EventDescriptionSection[] newArray(int size) {
+                    return new EventDescriptionSection[size];
+                }
+            };
 
 
     /**********************************
-     Helper static methods, used for JSON parsing
+     * Helper static methods, used for JSON parsing
      *********************************/
     public static EventDescriptionSection fromJSON(JSONObject jsonObject) throws JSONException, ParseException {
         return new EventDescriptionSection(jsonObject.getString("name"), jsonObject.getString("description"));
@@ -61,8 +61,13 @@ public class EventDescriptionSection implements Parcelable {
         List<EventDescriptionSection> eventDescriptionSections = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
-                EventDescriptionSection descriptionSection = fromJSON(jsonArray.getJSONObject(i));
-                eventDescriptionSections.add(descriptionSection);
+                JSONObject obj = jsonArray.getJSONObject(i);
+
+                String desc = obj.optString("description");
+                if (desc != null && desc.length() > 0) {
+                    EventDescriptionSection descriptionSection = fromJSON(jsonArray.getJSONObject(i));
+                    eventDescriptionSections.add(descriptionSection);
+                }
             } catch (JSONException | ParseException e) {
                 Crashlytics.getInstance().core.logException(e);
             }
