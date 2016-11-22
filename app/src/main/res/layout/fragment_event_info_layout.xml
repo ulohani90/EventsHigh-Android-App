@@ -195,7 +195,6 @@
             android:text="@string/action_direction"
             android:textSize="12sp" />
 
-
     </LinearLayout>
 
     <View
@@ -209,19 +208,33 @@
         android:layout_height="wrap_content"
         android:background="@color/button_gray">
 
-        <TextView
-            android:id="@+id/event_organizer"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="4.3"
-            android:drawableLeft="@drawable/ic_orgnizer"
-            android:drawablePadding="8dp"
-            android:gravity="center_vertical"
-            android:padding="10dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="10dp">
 
-            android:textColor="#353535"
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/event_organizer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="4.3"
+                android:drawableLeft="@drawable/ic_orgnizer"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:textColor="#353535"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/trusted_partner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/ic_trusted_text" />
+        </LinearLayout>
 
         <FrameLayout
             android:layout_width="96dp"

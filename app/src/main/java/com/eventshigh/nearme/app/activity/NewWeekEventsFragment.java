@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -7,13 +8,17 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
@@ -904,7 +909,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             }
         }
 
-
+        arrangeEventsForSponsered();
     }
 
     CalendarPickerView dialogView;
@@ -1243,7 +1248,11 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 map = googleMap;
-                map.setMyLocationEnabled(true);
+
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    map.setMyLocationEnabled(true);
+                }
                 map.getUiSettings().setMyLocationButtonEnabled(true);
                 map.getUiSettings().setCompassEnabled(true);
                 map.setOnCameraChangeListener(mOnCameraChangeListener);
@@ -1256,6 +1265,11 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                 updateUserLocation(location);
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
     }
 
     private void setupGestureDetectorIfNeeded() {
@@ -1498,5 +1512,19 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             sortFilter.setVisibility(View.GONE);
         }
 
+    }
+
+    public void arrangeEventsForSponsered() {
+        if (filteredEvents != null) {
+            int posCount = 0;
+            for (int i = 0; i < filteredEvents.size(); i++) {
+                if (filteredEvents.get(i).isSponsoredEvent) {
+                    Event event = filteredEvents.get(i);
+                    filteredEvents.remove(i);
+                    filteredEvents.add(posCount, event);
+                    posCount++;
+                }
+            }
+        }
     }
 }

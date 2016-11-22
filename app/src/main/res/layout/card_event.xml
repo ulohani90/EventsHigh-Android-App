@@ -76,6 +76,14 @@
             android:layout_marginStart="8dp"
             android:src="@drawable/eh_recommend"
             tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/trusted_partner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="-3dp"
+            android:src="@drawable/ic_trusted_list" />
     </RelativeLayout>
 
     <View
@@ -109,6 +117,18 @@
             android:textColor="#555555"
             android:textIsSelectable="false"
             tools:text="My Awesome Event with a long long title!" />
+
+        <TextView
+            android:id="@+id/is_sponsered_event"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="10dp"
+            android:drawableLeft="@drawable/ic_star_sponsored"
+            android:drawablePadding="4dp"
+            android:text="SPONSORED"
+            android:textColor="#36889B"
+            android:textSize="10sp" />
 
         <LinearLayout
             android:layout_width="match_parent"

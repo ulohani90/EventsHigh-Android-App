@@ -60,6 +60,8 @@ public class EventCard extends ViewHolder {
     private final ImageView img1, img2;
     private final ContactListView contactListView;
     private final LinearLayout statsLayout;
+    private final ImageView trustedPartner;
+    private final TextView sponsoredEvent;
 
 
     public static EventCard newInstance(Activity activity, ViewGroup parent,
@@ -100,6 +102,8 @@ public class EventCard extends ViewHolder {
         img2 = (ImageView) cardView.findViewById(R.id.img2);
         contactListView = (ContactListView) cardView.findViewById(R.id.followed_by);
         statsLayout = (LinearLayout) cardView.findViewById(R.id.stats_parent);
+        trustedPartner = (ImageView) cardView.findViewById(R.id.trusted_partner);
+        sponsoredEvent = (TextView) cardView.findViewById(R.id.is_sponsered_event);
         addShadow = isAddShadow;
     }
 
@@ -343,6 +347,17 @@ public class EventCard extends ViewHolder {
         share.setVisibility(View.GONE);
 
         infoArrowView.setVisibility(View.GONE);
+
+        if (event.isPrimaryOrganizer) {
+            trustedPartner.setVisibility(View.VISIBLE);
+        } else {
+            trustedPartner.setVisibility(View.GONE);
+        }
+        if (event.isSponsoredEvent) {
+            sponsoredEvent.setVisibility(View.VISIBLE);
+        } else {
+            sponsoredEvent.setVisibility(View.GONE);
+        }
     }
 
     @SuppressLint("SetTextI18n")

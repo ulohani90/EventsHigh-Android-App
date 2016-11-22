@@ -91,6 +91,8 @@ public class EventInfoFragment extends Fragment {
 
     LinearLayout eventInfoLayout;
 
+    ImageView trustedPartner;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,6 +134,7 @@ public class EventInfoFragment extends Fragment {
         reviewsCount = (TextView) view.findViewById(R.id.reviews_count);
 
         eventInfoLayout = (LinearLayout) view.findViewById(R.id.event_info_layout);
+        trustedPartner = (ImageView) view.findViewById(R.id.trusted_partner);
         return view;
     }
 
@@ -399,6 +402,12 @@ public class EventInfoFragment extends Fragment {
         if (showWriteReview && view.findViewById(R.id.write_review).isShown()) {
             writeReview(event);
             showWriteReview = false;
+        }
+
+        if (event.isPrimaryOrganizer) {
+            trustedPartner.setVisibility(View.VISIBLE);
+        } else {
+            trustedPartner.setVisibility(View.GONE);
         }
 
     }
