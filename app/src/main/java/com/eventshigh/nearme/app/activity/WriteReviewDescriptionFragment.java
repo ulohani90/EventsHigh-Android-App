@@ -168,50 +168,60 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
 
 
     public void placeReviewAction() {
-        try {
-            final JSONObject jsonObject = new JSONObject();
-            if (writeReviewActivity.isFromNotification) {
-                jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.reviewEntityId);
-            } else if (writeReviewActivity.type.equals("movie")) {
-                jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.movieDetailObject.getMovieInfo().getId());
-            } else if (writeReviewActivity.type.equals("event") && writeReviewActivity.event!=null) {
-                jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.event.id);
-            }
-            jsonObject.put(JSON_KEY_REVIEW_FOR, writeReviewActivity.type);
-            jsonObject.put(JSON_KEY_REVIEW_ENTITY, tvMovieName.getText().toString());
-            jsonObject.put(JSON_KEY_REVIEWER_ID, (new Account(writeReviewActivity)).getUserInfo().email);
-            jsonObject.put(JSON_KEY_REVIEW_RATINGS, (int) rbMovieRating.getRating());
-            jsonObject.put(JSON_KEY_REVIEW_TEXT, etWriteReviewDescription.getText().toString());
-            jsonObject.put(JSON_KEY_REVIEW_BY, (new Account(writeReviewActivity)).getUserInfo().name);
-            jsonObject.put(JSON_KEY_CITY, (new Account(writeReviewActivity)).getLastCity().name());
-            jsonObject.put(JSON_KEY_REVIEW_PLATFORM, "android");
-            jsonObject.put(JSON_KEY_REVIEW_DEVICE_ID, Settings.Secure.getString
-                    (getContext().getContentResolver(), Settings.Secure.ANDROID_ID));
+        if (new Account(writeReviewActivity).getUserInfo() != null) {
 
-            progress = ProgressDialog.show(getActivity(), null, "Submitting Review. Please Wait...");
-            MovieReviewSubmitRequest.submit(writeReviewActivity,
-                    jsonObject, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject jsonObject, boolean b) {
-                            if (getActivity() != null) {
+
+            try {
+                final JSONObject jsonObject = new JSONObject();
+                if (writeReviewActivity.isFromNotification) {
+                    jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.reviewEntityId);
+                } else if (writeReviewActivity.type.equals("movie")) {
+                    jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.movieDetailObject.getMovieInfo().getId());
+                } else if (writeReviewActivity.type.equals("event") && writeReviewActivity.event != null) {
+                    jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.event.id);
+                }
+                jsonObject.put(JSON_KEY_REVIEW_FOR, writeReviewActivity.type);
+                jsonObject.put(JSON_KEY_REVIEW_ENTITY, tvMovieName.getText().toString());
+                jsonObject.put(JSON_KEY_REVIEWER_ID, (new Account(writeReviewActivity)).getUserInfo().email);
+                jsonObject.put(JSON_KEY_REVIEW_RATINGS, (int) rbMovieRating.getRating());
+                jsonObject.put(JSON_KEY_REVIEW_TEXT, etWriteReviewDescription.getText().toString());
+                jsonObject.put(JSON_KEY_REVIEW_BY, (new Account(writeReviewActivity)).getUserInfo().name);
+                jsonObject.put(JSON_KEY_CITY, (new Account(writeReviewActivity)).getLastCity().name());
+                jsonObject.put(JSON_KEY_REVIEW_PLATFORM, "android");
+                jsonObject.put(JSON_KEY_REVIEW_DEVICE_ID, Settings.Secure.getString
+                        (getContext().getContentResolver(), Settings.Secure.ANDROID_ID));
+
+                progress = ProgressDialog.show(getActivity(), null, "Submitting Review. Please Wait...");
+                MovieReviewSubmitRequest.submit(writeReviewActivity,
+                        jsonObject, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject jsonObject, boolean b) {
+                                if (getActivity() != null) {
+                                    if (progress != null)
+                                        progress.dismiss();
+                                    Preferences.getInstance(getActivity()).setIsReviewAdded(true);
+                                    Log.i("Message Success", "true");
+                                    Toast.makeText(getActivity(), "Your review has been added successfully", Toast.LENGTH_SHORT).show();
+                                    closeParentActivity();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError volleyError) {
                                 if (progress != null)
                                     progress.dismiss();
-                                Preferences.getInstance(getActivity()).setIsReviewAdded(true);
-                                Log.i("Message Success", "true");
-                                Toast.makeText(getActivity(), "Your review has been added successfully", Toast.LENGTH_SHORT).show();
-                                closeParentActivity();
+                                Log.i("Message failure", "true" + jsonObject.toString());
                             }
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            if (progress != null)
-                                progress.dismiss();
-                            Log.i("Message failure", "true" + jsonObject.toString());
-                        }
-                    });
-        } catch (JSONException e) {
-            Crashlytics.getInstance().core.logException(e);
+                        });
+            } catch (JSONException e) {
+                Crashlytics.getInstance().core.logException(e);
+            }
+        } else {
+            Intent intent = new Intent(writeReviewActivity, FBLoginActivity.class);
+            intent.putExtra("show_special_text", true);
+            intent.putExtra("hide_skip", true);
+            startActivity(intent);
+            return;
         }
     }
 

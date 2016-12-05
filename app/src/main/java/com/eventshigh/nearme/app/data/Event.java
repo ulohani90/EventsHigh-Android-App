@@ -116,6 +116,8 @@ public class Event implements Parcelable {
 
     public final boolean isSponsoredEvent;
 
+    public final int ticketingEnabledStatus;
+
 
     public Event(String id, City city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
@@ -130,7 +132,7 @@ public class Event implements Parcelable {
                  String organizerEmail, String organizerLink, ArrayList<EhPrices> ehPrices,
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
                  List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
-                 @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent) {
+                 @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -183,6 +185,7 @@ public class Event implements Parcelable {
         this.sessionTitlePhrase = sessionTitlePhrase;
         this.isPrimaryOrganizer = isPrimaryOrganizer;
         this.isSponsoredEvent = isSponsoredEvent;
+        this.ticketingEnabledStatus = ticketingEnabledStatus;
     }
 
     public Event(Parcel in) {
@@ -247,6 +250,7 @@ public class Event implements Parcelable {
         sessionTitlePhrase = in.readString();
         isPrimaryOrganizer = in.createBooleanArray()[0];
         isSponsoredEvent = in.createBooleanArray()[0];
+        ticketingEnabledStatus = in.readInt();
     }
 
     public Uri getEventDetailsURI() {
@@ -397,6 +401,7 @@ public class Event implements Parcelable {
         dest.writeString(sessionTitlePhrase);
         dest.writeBooleanArray(new boolean[]{isPrimaryOrganizer});
         dest.writeBooleanArray(new boolean[]{isSponsoredEvent});
+        dest.writeInt(ticketingEnabledStatus);
 
     }
 
@@ -729,6 +734,8 @@ public class Event implements Parcelable {
             if (eventJson.has("sponsor_info")) {
                 isSponsoredEvent = eventJson.getJSONObject("sponsor_info").getString("is_sponsored_event").equalsIgnoreCase("on");
             }
+
+            int ticketingEnabledStatus = eventJson.getInt("ticketing_enabled_status");
             return new Event(id,
                     city,
                     title,
@@ -774,7 +781,7 @@ public class Event implements Parcelable {
                     reviews,
                     requestPerAttendeeData,
                     additionalTicketFieldList,
-                    sessions, sessionTitlePhrase, isPrimaryOrganizer, isSponsoredEvent
+                    sessions, sessionTitlePhrase, isPrimaryOrganizer, isSponsoredEvent, ticketingEnabledStatus
             );
         } catch (IllegalArgumentException e) {
             Crashlytics.logException(e);
@@ -828,9 +835,13 @@ public class Event implements Parcelable {
     public static List<Event> parseUpcomingEvents(JSONObject eventsJSON,
                                                   boolean includeWithoutLocation, OnPartialDataLoadingComplete listener) throws JSONException {
         JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
-
-
-        return fromJSON(upcomingEvents, includeWithoutLocation, listener);
+        List<Event> allEvents = new ArrayList<>();
+        allEvents.addAll(fromJSON(upcomingEvents, includeWithoutLocation, listener));
+        if (eventsJSON.has("evergreen_events")) {
+            JSONArray evergreenEvents = eventsJSON.getJSONArray("evergreen_events");
+            allEvents.addAll(fromJSON(evergreenEvents, includeWithoutLocation, listener));
+        }
+        return allEvents;
     }
 
 

@@ -511,12 +511,17 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
                     secondLoop:
 
                     for (int j = 0; j < filterEventTimes.size(); j++) {
-                        for (int k = 0; k < allEvents.get(i).eventTimings.size(); k++) {
-                            if (filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime()) {
-                                filteredEvents.add(allEvents.get(i));
-                                break secondLoop;
+                        if (allEvents.get(i).eventTimings == null || allEvents.get(i).eventTimings.size() == 0) {
+                            filteredEvents.add(allEvents.get(i));
+                            break secondLoop;
+                        } else {
+                            for (int k = 0; k < allEvents.get(i).eventTimings.size(); k++) {
+                                if (filterEventTimes.get(j) == DateTimeUtils.getEventDate(allEvents.get(i), k).getTime()) {
+                                    filteredEvents.add(allEvents.get(i));
+                                    break secondLoop;
 
 
+                                }
                             }
                         }
                     }
@@ -873,12 +878,6 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         price.setSelected(false);
         trending.setSelected(false);
         sortAccToSortState(SORT_STATE_DISTANCE);
-       /* sortFilter.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                sortFilter.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
-            }
-        }, 100L);*/
 
     }
 
@@ -899,6 +898,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         if (filteredEvents != null) {
             if (sortState == EventsGridActivity.SORT_STATE_TRENDING) {
                 Collections.sort(filteredEvents, new EventScoreComparator());
+                arrangeEventsForSponsered();
             } else if (sortState == EventsGridActivity.SORT_STATE_PRICE) {
                 Collections.sort(filteredEvents, new EventPriceComparator());
             } else if (sortState == EventsGridActivity.SORT_STATE_DISTANCE) {
@@ -909,7 +909,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
             }
         }
 
-        arrangeEventsForSponsered();
+
     }
 
     CalendarPickerView dialogView;

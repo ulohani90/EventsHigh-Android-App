@@ -289,7 +289,7 @@ public class EventCard extends ViewHolder {
             lastEventTime = DateTimeUtils.getEventTime(event, event.eventTimings.size() - 1);
         }
         if (eventTime == null) {
-            eventTimeView.setVisibility(View.INVISIBLE);
+            eventTimeView.setVisibility(View.GONE);
         } else {
             eventTimeView.setVisibility(View.VISIBLE);
             if (lastEventTime == null) {

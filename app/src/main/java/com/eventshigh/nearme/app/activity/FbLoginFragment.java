@@ -42,6 +42,8 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
+import static com.eventshigh.nearme.app.activity.FBLoginActivity.RC_SIGN_IN;
+
 /**
  * Created by umesh on 02/08/16.
  */
@@ -100,7 +102,7 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
     @Override
     public void onStart() {
         super.onStart();
-       // mGoogleApiClient.connect();
+        // mGoogleApiClient.connect();
     }
 
 
@@ -192,7 +194,10 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (callbackManager != null && data != null) {
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        } else if (callbackManager != null && data != null) {
             super.onActivityResult(requestCode, resultCode, data);
             callbackManager.onActivityResult(requestCode, resultCode, data);
         }
@@ -204,7 +209,7 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
         dialog = ProgressDialog.show(activity, null, "Signing in. Please wait...");
         System.out.println("onSuccess");
         final String accessToken = loginResult.getAccessToken().getToken();
-        Log.i("accessToken", accessToken);
+        // Log.i("accessToken", accessToken);
 
         GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
 
@@ -284,7 +289,7 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
     public void startGoogleLoginProcess() {
         dialog = ProgressDialog.show(activity, null, "Checking google info. Please wait...");
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        getActivity().startActivityForResult(signInIntent, FBLoginActivity.RC_SIGN_IN);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     public void handleSignInResult(GoogleSignInResult result) {
@@ -356,8 +361,7 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-      /*  mGoogleApiClient.stopAutoManage(getActivity());
+        /*mGoogleApiClient.stopAutoManage(getActivity());
         mGoogleApiClient.disconnect();*/
     }
 }

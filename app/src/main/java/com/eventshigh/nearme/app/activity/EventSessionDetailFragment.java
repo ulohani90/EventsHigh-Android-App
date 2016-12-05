@@ -184,7 +184,8 @@ public class EventSessionDetailFragment extends Fragment {
         }
         sessionsList.setAdapter(sessionsAdapter);
         ArrayList<EventSession> sessionsData = getSessionForDay(venueSessionsMap.get(venue), date);
-        sessionsAdapter.setSessionsData(sessionsData, city);
+        if (sessionsData != null)
+            sessionsAdapter.setSessionsData(sessionsData, city);
 
     }
 

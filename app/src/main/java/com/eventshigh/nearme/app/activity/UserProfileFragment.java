@@ -27,6 +27,7 @@ import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.FriendsStore;
 import com.eventshigh.nearme.app.data.ProfileInfo;
@@ -376,7 +377,13 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         @Override
         public Fragment getItem(int position) {
             if (TABS.get(position).equalsIgnoreCase(FAVOURITES_TAB)) {
-                LatLng latLng = (new Account(context)).getLastCity().cityBounds.getCenter();
+                City lastCity = (new Account(context)).getLastCity();
+                LatLng latLng;
+                if (lastCity != null) {
+                    latLng = (new Account(context)).getLastCity().cityBounds.getCenter();
+                } else {
+                    latLng = City.BANGALORE.cityBounds.getCenter();
+                }
                 EventsContext myEventsContext = new EventsContext(latLng, EventsHighEndpoints.QUERY_MY_EVENT);
                 myFavouritesFragment = EventsFragment.getInstance(myEventsContext, false, false, false, null, false, profileInfo, false);
                 return myFavouritesFragment;

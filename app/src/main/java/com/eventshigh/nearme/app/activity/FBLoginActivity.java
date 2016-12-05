@@ -67,7 +67,7 @@ public class FBLoginActivity extends BaseActivity {
 
     }
 
-    @Override
+   /* @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -76,6 +76,6 @@ public class FBLoginActivity extends BaseActivity {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             fragment.handleSignInResult(result);
         }
-    }
+    }*/
 
 }

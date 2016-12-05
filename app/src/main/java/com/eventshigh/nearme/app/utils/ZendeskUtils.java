@@ -9,6 +9,8 @@ import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.zendesk.logger.Logger;
 import com.zendesk.sdk.feedback.impl.BaseZendeskFeedbackConfiguration;
 import com.zendesk.sdk.model.access.AnonymousIdentity;
+import com.zendesk.sdk.model.request.CustomField;
+import com.zendesk.sdk.network.SdkOptions;
 import com.zendesk.sdk.network.impl.ZendeskConfig;
 
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ public class ZendeskUtils {
 
     public static void setEventFeedbackConfiguration(Context context, Event event) {
         ZendeskConfig.INSTANCE.setContactConfiguration(new EventFeedbackConfiguration(context, event));
+
     }
 
     public static class FeedbackConfiguration extends BaseZendeskFeedbackConfiguration {
@@ -62,9 +65,11 @@ public class ZendeskUtils {
             }
             return tags;
         }
+
+
     }
 
-    public static class EventFeedbackConfiguration  extends FeedbackConfiguration {
+    public static class EventFeedbackConfiguration extends FeedbackConfiguration {
         private final Event event;
 
         public EventFeedbackConfiguration(Context context, Event event) {
@@ -82,6 +87,8 @@ public class ZendeskUtils {
         public List<String> getTags() {
             List<String> tags = super.getTags();
             tags.add("e:" + event.id);
+
+            tags.add("o:" + "umesh\\@eventshigh.com");
             return tags;
         }
 

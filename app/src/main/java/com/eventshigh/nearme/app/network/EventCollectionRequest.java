@@ -192,8 +192,12 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
 
         for (Iterator<Event> it = events.iterator(); it.hasNext(); ) {
             Event event = it.next();
-
-            boolean isPastEvent = true;
+            boolean isPastEvent;
+            if (event.eventTimings == null || event.eventTimings.size() == 0) {
+                isPastEvent = false;
+            } else {
+                isPastEvent = true;
+            }
             for (long eventTiming : event.eventTimings) {
                 if (eventTiming < aDayBack) {
                     continue;

@@ -324,6 +324,8 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
     boolean isDataAttached;
 
+    @SuppressWarnings("ResourceType")
+
     public void addAdapterData() {
         if (isFavourite(event)) {
             favAction.setSelected(true);
@@ -494,7 +496,9 @@ public class NewEventDetailActivity extends BaseContextActivity {
                                     resource1 = getIntent().getExtras().getInt("resource_1", -1);
                                     resource2 = getIntent().getExtras().getInt("resource_2", -1);
                                 }
-                                ((ImageView) findViewById(R.id.img1)).setImageResource(resource1 != -1 ? resource1 : Utils.getDummyImageResource());
+                                // ((ImageView) findViewById(R.id.img1)).setImageDrawable(getResources().getDrawable());
+
+                                ((ImageView) findViewById(R.id.img1)).setImageResource((resource1 != -1 ? resource1 : Utils.getDummyImageResource()));
                                 ((ImageView) findViewById(R.id.img2)).setImageResource(resource2 != -1 ? resource2 : Utils.getDummyImageResource());
                                 StringBuilder builder = new StringBuilder();
                                 builder.append(event.numViews + " people interested");
@@ -551,7 +555,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
         final Uri.Builder bookingUriBuilder = Uri.parse(event.bookingUrl).buildUpon();
 
-        if (event.bookingUrl.equalsIgnoreCase("https://ticketing.eventshigh.com/checkout3.jsp?eid=" + event.id) && !isEventInNext24Hrs() && isNoAdditionalField()) {
+        if (event.bookingUrl.equalsIgnoreCase("https://ticketing.eventshigh.com/checkout3.jsp?eid=" + event.id) && !isEventInNext24Hrs() && isNoAdditionalField() && (event.ticketingEnabledStatus != 0)) {
             /*
             bookingUriBuilder.appendQueryParameter("did", Utils.getAndroidId(this));
             bookingUriBuilder.appendQueryParameter("name", userInfo.name);
