@@ -217,7 +217,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
                 it.remove();
                 EventsMarkerManager.Editor eventsMarkerEditor =
                         EventsMarkerManager.getInstance(context).getEditor();
-                eventsMarkerEditor.recordEventMark(event, null);
+                eventsMarkerEditor.recordEventMark(event, null, false);
                 eventsMarkerEditor.close();
 
             }

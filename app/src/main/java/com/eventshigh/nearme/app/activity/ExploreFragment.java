@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request.Priority;
@@ -29,6 +31,7 @@ import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.ui.adapter.LocalitiesAdapter;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
 import java.util.List;
@@ -59,6 +62,8 @@ public class ExploreFragment extends BaseEventsFragment {
         return fragment;
     }
 
+    String endDate = "2017-01-01 00:00:00.0";
+
     private EventsAdapter eventsAdapter;
     private View topProgressBar;
 
@@ -68,6 +73,8 @@ public class ExploreFragment extends BaseEventsFragment {
 
     private List<Locality> selectedLocalities;
     private Account account;
+
+    TextView verifyMobileBtn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -90,6 +97,9 @@ public class ExploreFragment extends BaseEventsFragment {
         accept = (ImageView) view.findViewById(R.id.accept_tick);
         close = (ImageView) view.findViewById(R.id.close_view);
 
+        verifyMobileBtn = (TextView) view.findViewById(R.id.verify_mobile_btn);
+
+
         eventsAdapter.setOnEditClickListener(new EventsAdapter.OnEditClickListener() {
             @Override
             public void onEditcliked() {
@@ -97,6 +107,29 @@ public class ExploreFragment extends BaseEventsFragment {
                 showCitySelectionView();
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (verifyMobileBtn != null) {
+            if (account.getUserInfo().isVerified) {
+                verifyMobileBtn.setVisibility(View.GONE);
+            } else {
+                if (account.getUserInfo().phoneNo != null) {
+                    verifyMobileBtn.setVisibility(View.VISIBLE);
+                    verifyMobileBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(activity, PhoneLoginActivity.class);
+                            startActivity(intent);
+                        }
+                    });
+                } else {
+                    verifyMobileBtn.setVisibility(View.GONE);
+                }
+            }
+        }
     }
 
     public void animateLocalityViewOut() {
@@ -208,7 +241,9 @@ public class ExploreFragment extends BaseEventsFragment {
             /*eventsAdapter.setExploreCategories(eventCollection, selectedLocalities,
                     eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE :
                             (eventsContext.city == City.CHENNAI ? EXPLORE_TAGS_CHENNAI : EXPLORE_TAGS), "movies");*/
-            eventsAdapter.setNewExploreCategories(eventCollection, EXPLORE_TAGS);
+
+
+            eventsAdapter.setNewExploreCategories(eventCollection, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(endDate)));
             topProgressBar.setVisibility(View.GONE);
             if (!isIntermediate) {
                /* EventInvitationsRequest.submit(activity, eventsContext, Priority.IMMEDIATE, this,
@@ -235,7 +270,7 @@ public class ExploreFragment extends BaseEventsFragment {
             topProgressBar.setVisibility(View.GONE);
 
             if (eventsAdapter.getItemCount() == 0) {
-                eventsAdapter.setNewExploreCategories(null, EXPLORE_TAGS);
+                eventsAdapter.setNewExploreCategories(null, EXPLORE_TAGS, (System.currentTimeMillis() < DateTimeUtils.parseOfferTime(endDate)));
                /* eventsAdapter.setExploreCategories(null,
                         Locality.getLocalities(eventsContext.city, false),
                         eventsContext.city == City.BANGALORE ? EXPLORE_TAGS_BANGALORE : EXPLORE_TAGS, "movies");*/

@@ -60,6 +60,8 @@ public class SelectInterestsActivity extends BaseActivity {
 
     LinearLayout selectedCategoryContainer;
 
+    boolean isLogout;
+
 
     public static final EventCategory[] categories = {
             EventCategory.EDITOR_PICKS,
@@ -93,7 +95,7 @@ public class SelectInterestsActivity extends BaseActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         account = new Account(this);
         isOnboarding = getIntent().getBooleanExtra(ONBOARDING_FLOW, false);
-
+        isLogout = getIntent().getBooleanExtra("is_logout", isLogout);
         addToolbarView(toolbar);
 
         setSupportActionBar(toolbar);
@@ -403,6 +405,8 @@ public class SelectInterestsActivity extends BaseActivity {
 
     public void launchNextActivity() {
         Intent fbLoginIntent = new Intent(this, FBLoginActivity.class);
+        fbLoginIntent.putExtra("is_onboarding", isOnboarding);
+        fbLoginIntent.putExtra("is_logout", isLogout);
         startActivity(fbLoginIntent);
         //finish();
     }

@@ -122,7 +122,7 @@ public class MyReviewCard extends RecyclerView.ViewHolder {
             shareButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activity.shareEventWithBranch(movieUserReviewObject.getEvent(), null, "MyReviews");
+                    activity.shareEvent(movieUserReviewObject.getEvent(), null, "MyReviews");
                 }
             });
 
@@ -168,7 +168,7 @@ public class MyReviewCard extends RecyclerView.ViewHolder {
 
         EventsMarkerManager.Editor eventsMarkerEditor =
                 EventsMarkerManager.getInstance(activity).getEditor();
-        eventsMarkerEditor.recordEventMark(event, null);
+        eventsMarkerEditor.recordEventMark(event, null, false);
         setFavouriteView(false);
         eventsMarkerEditor.close();
     }
@@ -182,7 +182,7 @@ public class MyReviewCard extends RecyclerView.ViewHolder {
         }
         EventsMarkerManager.Editor eventsMarkerEditor =
                 EventsMarkerManager.getInstance(activity).getEditor();
-        eventsMarkerEditor.recordEventMark(event, EventsMarkerManager.EventMark.FAVOURITE);
+        eventsMarkerEditor.recordEventMark(event, EventsMarkerManager.EventMark.FAVOURITE, false);
         setFavouriteView(true);
         eventsMarkerEditor.close();
     }

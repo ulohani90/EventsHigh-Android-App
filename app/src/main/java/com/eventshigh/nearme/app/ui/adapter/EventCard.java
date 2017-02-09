@@ -157,7 +157,7 @@ public class EventCard extends ViewHolder {
                 activity.reportEventAction(event,
                         EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
                         position);
-                activity.recordEventMark(event, newMark);
+                activity.recordEventMark(event, newMark, false);
 
                 setFavouriteView(newMark);
                 if (EventMark.isFavourite(newMark)) {
@@ -237,7 +237,7 @@ public class EventCard extends ViewHolder {
         share.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.shareEventWithBranch(event, null, null);
+                activity.shareEvent(event, null, null);
             }
         });
     }
@@ -406,7 +406,7 @@ public class EventCard extends ViewHolder {
                 activity.reportEventAction(event,
                         EventMark.isFavourite(newMark) ? "addFavourite" : "removeFavourite",
                         position);
-                activity.recordEventMark(event, newMark);
+                activity.recordEventMark(event, newMark, false);
                 setFavouriteView(newMark);
                 if (EventMark.isFavourite(newMark)) {
                     activity.showMessage("Added to My Events");
@@ -494,7 +494,7 @@ public class EventCard extends ViewHolder {
         share.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.shareEventWithBranch(event, null, null);
+                activity.shareEvent(event, null, null);
             }
         });
     }

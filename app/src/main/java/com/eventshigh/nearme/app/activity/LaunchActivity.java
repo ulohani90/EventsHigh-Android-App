@@ -184,8 +184,6 @@ public class LaunchActivity extends BaseContextActivity {
                         == PackageManager.PERMISSION_GRANTED) {
             startService(new Intent(this, GeofenceStartService.class));
         }
-
-
         //fetchEventAttendedDetails();
 
         if (isFinishing()) {
@@ -314,7 +312,6 @@ public class LaunchActivity extends BaseContextActivity {
         }
     }
 
-
     TextView toolbarTitleText;
 
     public void setUserCityHeader() {
@@ -430,6 +427,15 @@ public class LaunchActivity extends BaseContextActivity {
 
         // new InitiateBranchAsyncTask(getIntent().getData()).execute();
         loadBranchInstance();
+
+
+        updateNavDrawer();
+    }
+
+    public void updateNavDrawer() {
+        EHPreferenceFragment fragment = (EHPreferenceFragment) getFragmentManager().findFragmentByTag("preference_frag");
+        if (fragment != null)
+            fragment.updateView();
     }
 
     private void setLightToolbarIcons() {
@@ -893,7 +899,7 @@ public class LaunchActivity extends BaseContextActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (!account.getUserInfo().isSignedIn) {
+        if (!account.getUserInfo().isSignedIn || account.getUserInfo().phoneNo == null || account.getUserInfo().name == null) {
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(FbLoginFragment.LOGOUT_BROADCAST_ACTION);
             registerReceiver(receiver, intentFilter);
@@ -914,6 +920,7 @@ public class LaunchActivity extends BaseContextActivity {
     BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            updateNavDrawer();
             showExploreScreen(0);
         }
     };
@@ -1156,6 +1163,8 @@ public class LaunchActivity extends BaseContextActivity {
 
     private FbLoginFragment fbLoginFragment;
 
+    private PhoneLoginFragment phoneLoginFragment;
+
     /**
      * An SlidingTabPagerAdapter which populates tabs and content for LaunchActivity.
      */
@@ -1176,8 +1185,11 @@ public class LaunchActivity extends BaseContextActivity {
         public Fragment getItem(int position) {
             if (TABS.get(position).equals(MY_EVENTS_TAB)) {
                 if (!account.getUserInfo().isSignedIn) {
-                    fbLoginFragment = FbLoginFragment.newInstance(true, false, false);
+                    fbLoginFragment = FbLoginFragment.newInstance(true, false, false, false);
                     return fbLoginFragment;
+                } else if (account.getUserInfo().phoneNo == null || account.getUserInfo().name == null) {
+                    phoneLoginFragment = PhoneLoginFragment.newInstance(true, false, false);
+                    return phoneLoginFragment;
                 } else {
                     profileFragment = UserProfileFragment.newInstance(eventsContext);
                     return profileFragment;
@@ -1273,6 +1285,8 @@ public class LaunchActivity extends BaseContextActivity {
             intent.putExtra("hide_skip", true);
             startActivityForResult(intent, REQUEST_RESULT_FOR_FB_SIGN_IN);
         }
+
+        updateNavDrawer();
     }
 
    /* public class InitiateBranchAsyncTask extends AsyncTask<Void, Void, JSONObject> {

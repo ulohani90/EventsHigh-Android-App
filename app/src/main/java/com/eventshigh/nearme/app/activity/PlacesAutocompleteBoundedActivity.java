@@ -163,7 +163,12 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
 
                         }
                     })
-                    .addOnConnectionFailedListener(this).build();
+                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                        @Override
+                        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+                        }
+                    }).build();
             googleApiClient.connect();
         }
 
@@ -212,6 +217,8 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
                                     e.printStackTrace();
                                 }
                             }
+                        } else {
+                            Toast.makeText(PlacesAutocompleteBoundedActivity.this, "Location Permission not allowed.", Toast.LENGTH_SHORT).show();
                         }
 
                         break;
@@ -228,6 +235,7 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
                         }
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+
                         // Location settings are not satisfied. However, we have no way to fix the
                         // settings so we won't show the dialog.
                         break;

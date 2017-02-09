@@ -2,16 +2,21 @@ package com.eventshigh.nearme.app.data;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.stream.AdditionalTicketField;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
+import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -26,6 +31,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -118,6 +124,11 @@ public class Event implements Parcelable {
 
     public final int ticketingEnabledStatus;
 
+    public final String zone;
+
+    public final ArrayList<EventFilterAttribute> attributes;
+
+    public final HashMap<String, Boolean> attributeValues;
 
     public Event(String id, City city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
@@ -132,7 +143,8 @@ public class Event implements Parcelable {
                  String organizerEmail, String organizerLink, ArrayList<EhPrices> ehPrices,
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
                  List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
-                 @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus) {
+                 @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus, String zone,
+                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -186,6 +198,9 @@ public class Event implements Parcelable {
         this.isPrimaryOrganizer = isPrimaryOrganizer;
         this.isSponsoredEvent = isSponsoredEvent;
         this.ticketingEnabledStatus = ticketingEnabledStatus;
+        this.zone = zone;
+        this.attributes = attributes;
+        this.attributeValues = attributeValues;
     }
 
     public Event(Parcel in) {
@@ -251,6 +266,11 @@ public class Event implements Parcelable {
         isPrimaryOrganizer = in.createBooleanArray()[0];
         isSponsoredEvent = in.createBooleanArray()[0];
         ticketingEnabledStatus = in.readInt();
+        zone = in.readString();
+        attributes = new ArrayList<>();
+        in.readTypedList(attributes, EventFilterAttribute.CREATOR);
+        attributeValues = new HashMap<>();
+        in.readMap(attributeValues, Boolean.class.getClassLoader());
     }
 
     public Uri getEventDetailsURI() {
@@ -402,7 +422,9 @@ public class Event implements Parcelable {
         dest.writeBooleanArray(new boolean[]{isPrimaryOrganizer});
         dest.writeBooleanArray(new boolean[]{isSponsoredEvent});
         dest.writeInt(ticketingEnabledStatus);
-
+        dest.writeString(zone);
+        dest.writeTypedList(attributes);
+        dest.writeMap(attributeValues);
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -735,7 +757,32 @@ public class Event implements Parcelable {
                 isSponsoredEvent = eventJson.getJSONObject("sponsor_info").getString("is_sponsored_event").equalsIgnoreCase("on");
             }
 
-            int ticketingEnabledStatus = eventJson.getInt("ticketing_enabled_status");
+            String zone = eventJson.optString("zone");
+            if (zone.equalsIgnoreCase("unknown") && venue.equalsIgnoreCase("outside " + city.name())) {
+                zone = "Outside " + (city.name());
+            }
+
+            ArrayList<EventFilterAttribute> attributes = new ArrayList<>();
+            HashMap<String, Boolean> attributeValues = new HashMap<>();
+            if (eventJson.has("attributes")) {
+                if (eventJson.optJSONObject("attributes").has("include_value_attributes")) {
+                    if (eventJson.optJSONObject("attributes").optJSONObject("include_value_attributes").has("include_values")) {
+                        JSONArray jsonArray = eventJson.optJSONObject("attributes").optJSONObject("include_value_attributes").optJSONArray("include_values");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            String name = jsonObject.optString("name");
+                            boolean value = jsonObject.optBoolean("is_included");
+                            attributes.add(new EventFilterAttribute(name, value));
+                            attributeValues.put(name, value);
+                        }
+
+                        //attributes = EventFilterAttribute.getAttributes(jsonArray);
+                    }
+                }
+            }
+
+
+            int ticketingEnabledStatus = eventJson.optInt("ticketing_enabled_status");
             return new Event(id,
                     city,
                     title,
@@ -763,9 +810,7 @@ public class Event implements Parcelable {
                     locality,
                     address,
                     isCleanVenue,
-
                     performers,
-
                     organizerName,
                     organizerPhone,
                     organizerWebsite,
@@ -781,9 +826,10 @@ public class Event implements Parcelable {
                     reviews,
                     requestPerAttendeeData,
                     additionalTicketFieldList,
-                    sessions, sessionTitlePhrase, isPrimaryOrganizer, isSponsoredEvent, ticketingEnabledStatus
+                    sessions, sessionTitlePhrase, isPrimaryOrganizer, isSponsoredEvent, ticketingEnabledStatus, zone, attributes, attributeValues
             );
         } catch (IllegalArgumentException e) {
+            Log.i("Exception caught", e.getMessage());
             Crashlytics.logException(e);
             return null;
         }
@@ -820,7 +866,7 @@ public class Event implements Parcelable {
                 Event event = fromJSON(jsonArray.getJSONObject(i));
                 if (event != null && (includeWithoutLocation || event.location != null)) {
                     if (isForSavingAction)
-                        ((BaseContextActivity) context).recordEventMark(event, EventsMarkerManager.EventMark.FAVOURITE);
+                        ((BaseContextActivity) context).recordEventMark(event, EventsMarkerManager.EventMark.FAVOURITE,isForSavingAction);
                     events.add(event);
 
                 }
@@ -867,17 +913,28 @@ public class Event implements Parcelable {
         return query;
     }
 
-    public Intent getShowDirectionsOnMapIntent() {
+    public Intent getShowDirectionsOnMapIntent(Context context) {
         String query = getMapQuery();
-        if (query == null) {
+        if (query == null || !isPackageExisted(context, "com.google.android.apps.maps")) {
             return null;
         }
 
         // From https://developers.google.com/maps/documentation/android/intents
         Uri locationUri = Uri.parse("google.navigation:q=" + query);
         Intent mapIntent = new Intent(android.content.Intent.ACTION_VIEW, locationUri);
+        PackageManager manager = context.getPackageManager();
         mapIntent.setPackage("com.google.android.apps.maps");
         return mapIntent;
+    }
+
+    public boolean isPackageExisted(Context context, String targetPackage) {
+        PackageManager pm = context.getPackageManager();
+        try {
+            PackageInfo info = pm.getPackageInfo(targetPackage, PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+        return true;
     }
 
 

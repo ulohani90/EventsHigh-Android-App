@@ -1,7 +1,10 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.provider.Settings;
@@ -57,17 +60,40 @@ public class FBLoginActivity extends BaseActivity {
 
 
         boolean hideSkip = getIntent().getBooleanExtra("hide_skip", false);
-
+        boolean isLogout = getIntent().getBooleanExtra("is_logout", false);
 
         boolean showSpecialText = getIntent().getBooleanExtra("show_special_text", false);
 
-        fragment = FbLoginFragment.newInstance(hideSkip, showSpecialText, true);
+        fragment = FbLoginFragment.newInstance(hideSkip, showSpecialText, isLogout, true);
 
         getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
 
     }
 
-   /* @Override
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(FbLoginFragment.LOGOUT_BROADCAST_ACTION);
+        registerReceiver(receiver, intentFilter);
+    }
+
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("onReceive", "Logout in progress");
+
+            finish();
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
+    }
+
+    /* @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 

@@ -159,7 +159,7 @@ public class TicketConfirmationActivity extends BaseActivity implements View.OnC
 
     void startMapActivity() {
         if (event.location != null) {
-            Intent intent = event.getShowDirectionsOnMapIntent();
+            Intent intent = event.getShowDirectionsOnMapIntent(this);
             startActivity(intent);
         } else {
             Toast.makeText(TicketConfirmationActivity.this, "Map location not available", Toast.LENGTH_SHORT).show();

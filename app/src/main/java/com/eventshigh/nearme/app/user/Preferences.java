@@ -19,8 +19,7 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_OFFER_ACTED_ID = "offers_acted";
     public static final String PREF_NOTIFICATION_ACTIVE = "notification_active";
     public static final String PREF_REVIEW_ADDED = "is_review_added";
-
-
+    public static final String PREF_IS_FAV_UPDATED = "is_fav_updated";
 
 
     private final Context context;
@@ -33,6 +32,7 @@ public class Preferences implements OnSharedPreferenceChangeListener {
     }
 
     private static Preferences instance;
+
     public static synchronized Preferences getInstance(Context context) {
         if (instance == null) {
             instance = new Preferences(context);
@@ -78,7 +78,7 @@ public class Preferences implements OnSharedPreferenceChangeListener {
         sharedPreferences.edit().putLong(PREF_LAST_TIME_ASKED_CONTACTS, System.currentTimeMillis()).apply();
     }
 
-    public long getLastUploadContactsAsked () {
+    public long getLastUploadContactsAsked() {
         return sharedPreferences.getLong(PREF_LAST_TIME_ASKED_CONTACTS, 0);
     }
 
@@ -95,6 +95,16 @@ public class Preferences implements OnSharedPreferenceChangeListener {
         return sharedPreferences.getBoolean(PREF_INTEREST_UPDATED, false);
     }
 
+
+    public void setIsFavUpdated(boolean isFavUpdated) {
+        sharedPreferences.edit().putBoolean(PREF_IS_FAV_UPDATED, isFavUpdated).apply();
+    }
+
+    public boolean isFavUpdated() {
+        return sharedPreferences.getBoolean(PREF_IS_FAV_UPDATED, false);
+    }
+
+
     public void setShowReferral(boolean shouldShowReferal) {
         sharedPreferences.edit().putBoolean(PREF_SHOW_REFERRAL, shouldShowReferal).apply();
     }
@@ -103,10 +113,16 @@ public class Preferences implements OnSharedPreferenceChangeListener {
         return sharedPreferences.getBoolean(PREF_SHOW_REFERRAL, false);
     }
 
-    public void setPrefOfferActedId(String id){
+    public void setPrefOfferActedId(String id) {
         sharedPreferences.edit().putString(PREF_OFFER_ACTED_ID, id).apply();
     }
-    public String getPrefOfferActedId(){
+
+    public String getPrefOfferActedId() {
         return sharedPreferences.getString(PREF_OFFER_ACTED_ID, "");
+    }
+
+    public void clearPreferences() {
+        sharedPreferences.edit().clear().commit();
+
     }
 }

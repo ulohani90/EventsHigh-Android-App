@@ -38,9 +38,11 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
     public static String FAVOURITES_NAME = "my events";
     private static String INVITATIONS_NAME = "invitations";
     public static String MOVIES_NAME = "my movies";
+    public static String MY_UPCOMING_FAVOURITES_NAME = "my upcoming favourites";
+    public static String MY_PAST_FAVOURITES_NAME = "my past favourites";
 
 
-    public static class MeEventFavouriteObject implements Parcelable{
+    public static class MeEventFavouriteObject implements Parcelable {
         public final List<TopicEvents> topicEvents;
 
         public final List<MovieDetailObject> movies;
@@ -50,7 +52,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
             this.movies = movies;
         }
 
-        public MeEventFavouriteObject(Parcel in){
+        public MeEventFavouriteObject(Parcel in) {
             this.topicEvents = new ArrayList<>();
             in.readTypedList(this.topicEvents, TopicEvents.CREATOR);
             this.movies = new ArrayList<>();
@@ -73,6 +75,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
                     public MeEventFavouriteObject createFromParcel(Parcel in) {
                         return new MeEventFavouriteObject(in);
                     }
+
                     public MeEventFavouriteObject[] newArray(int size) {
                         return new MeEventFavouriteObject[size];
                     }
@@ -81,7 +84,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
 
     }
 
-    public static class TopicEvents implements Parcelable{
+    public static class TopicEvents implements Parcelable {
         public final String topicName;
         public final List<Event> events;
         public final int numEvents;
@@ -96,7 +99,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
             this.numEvents = numEvents;
         }
 
-        public TopicEvents(Parcel in){
+        public TopicEvents(Parcel in) {
             this.topicName = in.readString();
             events = new ArrayList<>();
             in.readTypedList(events, Event.CREATOR);
@@ -130,7 +133,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
 
     public static boolean isSpecialTag(String name) {
         name = name.toLowerCase();
-        return name.equals(FAVOURITES_NAME) || name.equals(INVITATIONS_NAME) || name.equals(MOVIES_NAME);
+        return name.equals(FAVOURITES_NAME) || name.equals(INVITATIONS_NAME) || name.equals(MOVIES_NAME) || name.equalsIgnoreCase(MY_UPCOMING_FAVOURITES_NAME) || name.equalsIgnoreCase(MY_PAST_FAVOURITES_NAME);
     }
 
     public static void submit(Context context, EventsContext eventsContext, Priority priority,
@@ -185,7 +188,7 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
         markerManager.waitForLoading();
         RequestFuture<List<Event>> favEvents = RequestFuture.newFuture();
         MultiEventsRequest.submit(context, eventsContext, markerManager.getFavouritedEvents(),
-                priority, tag, shouldBypassCache, includeWithoutLocation,true,favEvents, favEvents);
+                priority, tag, shouldBypassCache, includeWithoutLocation, true, favEvents, favEvents);
 
         // Look at invites and send the request for sent invitations.
 

@@ -140,7 +140,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
             public void onClick(View v) {
                 if (event != null) {
                     showRateAppDialog = true;
-                    shareEventWithBranch(event, null, "Toolbar");
+                    shareEvent(event, null, "Toolbar");
                 }
             }
         });
@@ -235,7 +235,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
         EventsMarkerManager.Editor eventsMarkerEditor =
                 EventsMarkerManager.getInstance(this).getEditor();
-        eventsMarkerEditor.recordEventMark(event, EventsMarkerManager.EventMark.FAVOURITE);
+        eventsMarkerEditor.recordEventMark(event, EventsMarkerManager.EventMark.FAVOURITE, false);
         //mark view as favourite
         eventsMarkerEditor.close();
     }
@@ -362,7 +362,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
         findViewById(R.id.share_whatsapp_layout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                shareEventWithBranch(event, PACKAGE_NAME_WHATSAPP, " bottombar");
+                shareEvent(event, PACKAGE_NAME_WHATSAPP, " bottombar");
             }
         });
 
@@ -753,7 +753,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
         EventsMarkerManager.Editor eventsMarkerEditor =
                 EventsMarkerManager.getInstance(this).getEditor();
-        eventsMarkerEditor.recordEventMark(event, null);
+        eventsMarkerEditor.recordEventMark(event, null, false);
 
         eventsMarkerEditor.close();
     }

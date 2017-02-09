@@ -280,8 +280,8 @@ public abstract class BaseContextActivity extends BaseActivity {
         return eventsMarkerManager.getEventMark(event.id);
     }
 
-    public void recordEventMark(Event event, @Nullable EventMark mark) {
-        eventsMarkerManager.getEditor().recordEventMark(event, mark).close();
+    public void recordEventMark(Event event, @Nullable EventMark mark, boolean isNoChangePreference) {
+        eventsMarkerManager.getEditor().recordEventMark(event, mark, isNoChangePreference).close();
     }
 
     public void recordMovieMark(MovieInfoObject movie, @Nullable MovieMarkerManager.MovieMark mark) {

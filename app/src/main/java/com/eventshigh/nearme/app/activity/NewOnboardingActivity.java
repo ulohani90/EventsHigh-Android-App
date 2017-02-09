@@ -36,10 +36,13 @@ public class NewOnboardingActivity extends BaseActivity {
 
     boolean isArrowShown;
 
+    boolean isLogout;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_onboarding_layout);
+        isLogout = getIntent().getBooleanExtra("is_logout", false);
         pager = (ViewPager) findViewById(R.id.pager);
         dotsView = (LinearLayout) findViewById(R.id.dots_parent);
         ImagePagerAdapter imagePagerAdapter = new ImagePagerAdapter();
@@ -163,6 +166,7 @@ public class NewOnboardingActivity extends BaseActivity {
     private void launchNextActivity() {
         Intent phoneLoginIntent = new Intent(this, SelectInterestsActivity.class);
         phoneLoginIntent.putExtra("is_onboarding", true);
+        phoneLoginIntent.putExtra("is_logout", isLogout);
         startActivity(phoneLoginIntent);
         // finish();
     }

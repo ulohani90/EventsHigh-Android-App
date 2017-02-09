@@ -71,11 +71,14 @@ public class ZendeskUtils {
 
     public static class EventFeedbackConfiguration extends FeedbackConfiguration {
         private final Event event;
+        private final Context context;
+
 
         public EventFeedbackConfiguration(Context context, Event event) {
             super(context);
 
             this.event = event;
+            this.context = context;
         }
 
         @Override
@@ -87,8 +90,12 @@ public class ZendeskUtils {
         public List<String> getTags() {
             List<String> tags = super.getTags();
             tags.add("e:" + event.id);
-
-            tags.add("o:" + "umesh\\@eventshigh.com");
+            if (event.organizerEmail != null)
+                tags.add("o:" + event.organizerEmail);
+            UserInfo userInfo = new Account(context).getUserInfo();
+            if (userInfo.phoneNo != null) {
+                tags.add("m:" + userInfo.phoneNo);
+            }
             return tags;
         }
 

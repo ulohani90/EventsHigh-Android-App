@@ -126,6 +126,34 @@
                         </HorizontalScrollView>
 
                         <View
+                            android:id="@+id/zone_separator"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#11ffffff" />
+
+                        <HorizontalScrollView
+                            android:id="@+id/zone_filter"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:animateLayoutChanges="true"
+                            android:clipChildren="false"
+                            android:gravity="center_vertical"
+                            android:scrollbars="none">
+
+                            <LinearLayout
+                                android:id="@+id/zone_container"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:clipToPadding="false"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp">
+
+                            </LinearLayout>
+                        </HorizontalScrollView>
+
+                        <View
                             android:id="@+id/price_separator"
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
@@ -152,6 +180,7 @@
 
                             </LinearLayout>
                         </HorizontalScrollView>
+
 
                         <View
                             android:id="@+id/sort_separator"
@@ -290,6 +319,22 @@
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_special_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="88dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:src="@drawable/ic_filter_white"
+        android:visibility="gone"
+        app:backgroundTint="#449F14"
+        app:borderWidth="0dp"
+        app:elevation="8dp"
+        tools:ignore="PrivateResource"
+        tools:visibility="visible" />
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_browse_map"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -301,4 +346,79 @@
         app:elevation="8dp"
         tools:ignore="PrivateResource"
         tools:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/special_filter_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#9fa7b3"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center_vertical"
+                android:text="Select Filter"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+
+        </LinearLayout>
+
+
+        <com.eventshigh.nearme.app.view.AutofitRecyclerView
+            android:id="@+id/special_filter_grid"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:columnWidth="@dimen/event_card_width"
+            android:horizontalSpacing="1dp"
+            android:outlineProvider="bounds" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/close_filter"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="#9fa7b3"
+                android:fontFamily="sans-serif-medium"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:text="CANCEL"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/apply_filters"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="2"
+                android:background="@drawable/eh_button_cta"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:text="APPLY"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
 </FrameLayout>

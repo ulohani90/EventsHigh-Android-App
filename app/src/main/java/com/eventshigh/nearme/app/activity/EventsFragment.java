@@ -152,6 +152,8 @@ public class EventsFragment extends BaseEventsFragment {
 
     boolean shouldAddPadding;
 
+    boolean isListContentShown;
+
 
     public static EventsFragment getInstance(EventsContext eventsContext, boolean showFollowCard,
                                              boolean showCategories, boolean showEhInviteForNotification, SocialInvitationsRequest.SpecialCoupons special, boolean isTodaySelected, ProfileInfo profileInfo, boolean shouldAddPadding) {
@@ -189,6 +191,7 @@ public class EventsFragment extends BaseEventsFragment {
     public void onResume() {
         super.onResume();
     }
+
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -379,7 +382,9 @@ public class EventsFragment extends BaseEventsFragment {
             fetchNewListing(Preferences.getInstance(getActivity()).isInterestUpdated());
             Preferences.getInstance(getActivity()).setIsInterestUpdated(false);
         } else {
-            fetchNewListing(false);
+            if (!isListContentShown) {
+                fetchNewListing(false);
+            }
         }
 
     }
@@ -483,9 +488,12 @@ public class EventsFragment extends BaseEventsFragment {
                                             if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).filtersHeaderContainer != null) {
                                                 ((EventsGridActivity) getActivity()).filtersHeaderContainer.setVisibility(View.VISIBLE);
                                             }
-                                            if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).fabBrowseMap != null) {
+                                            if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).fabBrowseMap != null && !((EventsGridActivity) getActivity()).isFabFilterVisible) {
                                                 ((EventsGridActivity) getActivity()).fabBrowseMap.setVisibility(View.VISIBLE);
+                                                // ((EventsGridActivity) getActivity()).fabSpecialFilter.setVisibility(View.VISIBLE);
                                             }
+
+                                            isListContentShown = true;
                                         }
                                         List<Event> filteredEvents = EventsFragment.this.eventsCollection.events;
                                         filteredEvents = filterEventsWithCategory(null, filteredEvents);
@@ -498,6 +506,8 @@ public class EventsFragment extends BaseEventsFragment {
                                         }
 
                                         filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                                        filteredEvents = filterEventsWithZone(null, filteredEvents);
+                                        filteredEvents = filterEventsWithSpecialFilters(filteredEvents, null);
                                         EventsFragment.this.filteredEvents = filteredEvents;
                                         sortData();
 
@@ -650,7 +660,7 @@ public class EventsFragment extends BaseEventsFragment {
                 if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
                     ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.get(0).events.get(0).imgUrl);
                 }
-
+                isListContentShown = true;
                 eventsAdapter.setTopicEvents(myEvents, eventsContext, eventGridView.getSpanCount() * 2);
 
                 //    eventGridView.scrollToPosition(scrollPosition);
@@ -690,11 +700,12 @@ public class EventsFragment extends BaseEventsFragment {
                     if (getActivity() != null && (getActivity()) instanceof EventsGridActivity) {
                         ((EventsGridActivity) getActivity()).setShareImageUrl(myEvents.topicEvents.get(0).events.get(0).imgUrl);
                     }
-
+                    isListContentShown = true;
                     eventsAdapter.setTopicEvents(myEvents.topicEvents, eventsContext, eventGridView.getSpanCount() * 2);
                 }
                 if (!myEvents.movies.isEmpty()) {
                     eventsAdapter.setMoviesListData(myEvents.movies, eventsContext, true, myEvents.topicEvents.isEmpty() ? true : false);
+                    isListContentShown = true;
                 }
                 //    eventGridView.scrollToPosition(scrollPosition);
             }
@@ -738,8 +749,15 @@ public class EventsFragment extends BaseEventsFragment {
                     }
 
                     filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                    filteredEvents = filterEventsWithZone(null, filteredEvents);
+                    filteredEvents = filterEventsWithSpecialFilters(filteredEvents, null);
+
                     EventsFragment.this.filteredEvents = filteredEvents;
+
                     sortData();
+
+                    if (filteredEvents != null && filteredEvents.size() > 0)
+                        ((EventsGridActivity) getActivity()).addSpecialFilterGrid(filteredEvents.get(0).attributes);
 
                     eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
                     if (showFollowCard) {
@@ -751,9 +769,11 @@ public class EventsFragment extends BaseEventsFragment {
 
                         ((EventsGridActivity) getActivity()).filtersHeaderContainer.setVisibility(View.VISIBLE);
                     }
-                    if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).fabBrowseMap != null) {
+                    if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).fabBrowseMap != null && !((EventsGridActivity) getActivity()).isFabFilterVisible) {
                         ((EventsGridActivity) getActivity()).fabBrowseMap.setVisibility(View.VISIBLE);
+                        //((EventsGridActivity) getActivity()).fabSpecialFilter.setVisibility(View.VISIBLE);
                     }
+                    isListContentShown = true;
                 /*if (showFollowCard) {
                     eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
                             eventsCollection.numFollowers, special);
@@ -839,6 +859,63 @@ public class EventsFragment extends BaseEventsFragment {
             if (totalEvents == null) {
                 filteredEvents = filterEventsWithDate(filteredEvents, -1);
                 filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                filteredEvents = filterEventsWithZone(null, filteredEvents);
+                filteredEvents = filterEventsWithSpecialFilters(filteredEvents, null);
+                /*eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                if (filteredEvents.isEmpty()) {
+                    // Failed. Show toast and return empty list.
+                    Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+
+                }*/
+            }
+            return filteredEvents;
+        }
+        return null;
+    }
+
+    ArrayList<String> filterZoneName;
+
+    public List<Event> filterEventsWithZone(String zone, List<Event> totalEvents) {
+        List<Event> allEvents;
+
+        if (totalEvents == null && eventsCollection != null) {
+
+            allEvents = eventsCollection.events;
+        } else {
+            allEvents = totalEvents;
+        }
+
+        if (allEvents != null) {
+            if (filterZoneName == null)
+                filterZoneName = new ArrayList<>();
+            if (zone != null) {
+                if (filterZoneName.contains(zone)) {
+                    filterZoneName.remove(zone);
+                } else {
+                    filterZoneName.add(zone);
+                }
+            }
+            List<Event> filteredEvents = new ArrayList<>();
+            if (filterZoneName.size() > 0) {
+                for (int i = 0; i < allEvents.size(); i++) {
+                    for (int j = 0; j < filterZoneName.size(); j++) {
+
+                        if (allEvents.get(i).zone.equalsIgnoreCase(filterZoneName.get(j))) {
+                            filteredEvents.add(allEvents.get(i));
+                            break;
+                        }
+                    }
+                }
+            } else {
+                filteredEvents = allEvents;
+            }
+
+            if (totalEvents == null) {
+                filteredEvents = filterEventsWithCategory(null, filteredEvents);
+                filteredEvents = filterEventsWithDate(filteredEvents, -1);
+                filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                filteredEvents = filterEventsWithSpecialFilters(filteredEvents, null);
+
                 /*eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.isEmpty()) {
                     // Failed. Show toast and return empty list.
@@ -905,6 +982,8 @@ public class EventsFragment extends BaseEventsFragment {
             if (totalEvents == null) {
                 filteredEvents = filterEventsWithCategory(null, filteredEvents);
                 filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                filteredEvents = filterEventsWithZone(null, filteredEvents);
+                filteredEvents = filterEventsWithSpecialFilters(filteredEvents, null);
                /* eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.isEmpty()) {
                     // Failed. Show toast and return empty list.
@@ -997,6 +1076,8 @@ public class EventsFragment extends BaseEventsFragment {
             if (totalEvents == null) {
                 filteredEvents = filterEventsWithCategory(null, filteredEvents);
                 filteredEvents = filterEventsWithDate(filteredEvents, -1);
+                filteredEvents = filterEventsWithZone(null, filteredEvents);
+                filteredEvents = filterEventsWithSpecialFilters(filteredEvents, null);
                 /*eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.isEmpty()) {
                     // Failed. Show toast and return empty list.
@@ -1008,6 +1089,79 @@ public class EventsFragment extends BaseEventsFragment {
         }
 
 
+        return null;
+    }
+
+    ArrayList<String> filterSpecialFilters;
+
+    public List<Event> filterEventsWithSpecialFilters(List<Event> totalEvents, ArrayList<String> specialFilters) {
+        List<Event> allEvents;
+        if (totalEvents == null && eventsCollection != null) {
+
+            allEvents = eventsCollection.events;
+        } else {
+            allEvents = totalEvents;
+        }
+
+        if (allEvents != null) {
+
+            if (filterSpecialFilters == null) {
+                filterSpecialFilters = new ArrayList<>();
+            }
+
+            if (specialFilters != null) {
+                filterSpecialFilters.clear();
+                for (String filter : specialFilters) {
+                    if (filter != null) {
+                        if (filterSpecialFilters.contains(filter)) {
+                            filterSpecialFilters.remove(filter);
+                        } else {
+                            filterSpecialFilters.add(filter);
+                        }
+                    }
+                }
+            }
+            List<Event> filteredEvents = new ArrayList<>();
+            if (filterSpecialFilters.size() > 0) {
+                for (int i = 0; i < allEvents.size(); i++) {
+                    //  System.out.println("Event Name - " + allEvents.get(i).title + " Event ID: -" + allEvents.get(i).id);
+                    if (allEvents.get(i).attributeValues != null && allEvents.get(i).attributeValues.size() > 0) {
+                        boolean isSatisfyingAll = true;
+                        secondLoop:
+                        for (int j = 0; j < filterSpecialFilters.size(); j++) {
+
+                            if (!(allEvents.get(i).attributeValues.containsKey(filterSpecialFilters.get(j)) && allEvents.get(i).attributeValues.get(filterSpecialFilters.get(j)))) {
+                                isSatisfyingAll = false;
+                                break secondLoop;
+                            }
+                        }
+                        if (isSatisfyingAll) {
+                            filteredEvents.add(allEvents.get(i));
+
+                        }
+                    } else {
+
+
+                    }
+                }
+            } else {
+                filteredEvents = allEvents;
+            }
+
+            if (totalEvents == null) {
+                filteredEvents = filterEventsWithCategory(null, filteredEvents);
+                filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                filteredEvents = filterEventsWithZone(null, filteredEvents);
+                filteredEvents = filterEventsWithDate(filteredEvents, -1);
+               /* eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                if (filteredEvents.isEmpty()) {
+                    // Failed. Show toast and return empty list.
+                    Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+
+                }*/
+            }
+            return filteredEvents;
+        }
         return null;
     }
 
@@ -1056,7 +1210,7 @@ public class EventsFragment extends BaseEventsFragment {
         }
     }
 
-    public void startFilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, long... times) {
+    public void startFilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, String zone, ArrayList<String> specialFilters, long... times) {
 
         if (isMapListShown) {
             hideMapEvents(-1);
@@ -1064,12 +1218,12 @@ public class EventsFragment extends BaseEventsFragment {
 
         if (filterAsyncTask != null && !filterAsyncTask.isCancelled()) {
             filterAsyncTask.cancel(true);
-
         }
-        filterAsyncTask = new FilterAsyncTask(type, totalEvents, category, priceValue, times);
+        filterAsyncTask = new FilterAsyncTask(type, totalEvents, category, priceValue, zone, specialFilters, times);
         filterAsyncTask.execute();
 
     }
+
 
     public class FilterAsyncTask extends AsyncTask<Void, Void, List<Event>> {
 
@@ -1079,12 +1233,18 @@ public class EventsFragment extends BaseEventsFragment {
         long[] times;
         int type;
 
-        public FilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, long... times) {
+        String zone;
+
+        ArrayList<String> specialFilters;
+
+        public FilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, String zone, ArrayList<String> specialFilters, long... times) {
             this.type = type;
             this.totalEvents = totalEvents;
             this.category = category;
             this.priceValue = priceValue;
             this.times = times;
+            this.zone = zone;
+            this.specialFilters = specialFilters;
         }
 
         @Override
@@ -1101,7 +1261,10 @@ public class EventsFragment extends BaseEventsFragment {
                     return filterEventsWithDate(totalEvents, times);
                 case EventsGridActivity.CATEGORY_FILTER:
                     return filterEventsWithCategory(category, totalEvents);
-
+                case EventsGridActivity.ZONE_FILTER:
+                    return filterEventsWithZone(zone, totalEvents);
+                case EventsGridActivity.SPECIAL_FILTER:
+                    return filterEventsWithSpecialFilters(totalEvents, specialFilters);
             }
             return null;
         }

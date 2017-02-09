@@ -342,4 +342,8 @@ public class Account {
     private static String getKeyForTag(String tag) {
         return PREF_FOLLOW_KEY_PREFIX + EventCategory.toCategoryParsableString(tag);
     }
+
+    public void clearAccountDetails() {
+        accountInfo.edit().clear().commit();
+    }
 }

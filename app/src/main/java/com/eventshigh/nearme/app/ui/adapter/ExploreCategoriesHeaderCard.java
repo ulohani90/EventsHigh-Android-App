@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
 import android.content.Intent;
+import android.provider.Settings;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.EventsGridActivity;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 
@@ -21,7 +23,7 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
 
 
-    ImageView whatsHot, nearBy;
+    ImageView whatsHot, nearBy, newYearImage;
 
     public static ExploreCategoriesHeaderCard newInstance(final BaseActivity activity, ViewGroup parent) {
         View view = activity.getLayoutInflater().inflate(R.layout.explore_categories_header_card, parent, false);
@@ -32,15 +34,28 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
         super(itemView);
         whatsHot = (ImageView) itemView.findViewById(R.id.whats_hot);
         nearBy = (ImageView) itemView.findViewById(R.id.nearby);
+        newYearImage = (ImageView) itemView.findViewById(R.id.new_year_img);
     }
 
-    public void bindData(final BaseContextActivity activity) {
+    public void bindData(final BaseContextActivity activity, boolean showNewYearCard) {
         whatsHot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 activity.showSearchView(EventsHighEndpoints.QUERY_FEATURED);
             }
         });
+
+        if (!showNewYearCard) {
+            newYearImage.setVisibility(View.GONE);
+        } else {
+            newYearImage.setVisibility(View.VISIBLE);
+            newYearImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.showSearchView("New Year Parties");
+                }
+            });
+        }
 
 
         nearBy.setOnClickListener(new View.OnClickListener() {

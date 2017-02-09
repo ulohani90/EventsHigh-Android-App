@@ -37,7 +37,8 @@ public enum DataType {
     MY_TICKETS_CARD(26),
     EVENT_INFO_CARD(27),
     MY_REVIEW_CARD(28),
-    EVENT_SESSION_CARD(29);
+    EVENT_SESSION_CARD(29),
+    EVENT_FILTER_ATTRIBUTE_CARD(30);
 
     public final int typeId;
 
@@ -160,6 +161,9 @@ public enum DataType {
 
         if (typeId == EVENT_SESSION_CARD.typeId) {
             return EventSessionCard.newInstance(activity, parent);
+        }
+        if (typeId == EVENT_FILTER_ATTRIBUTE_CARD.typeId) {
+            return EventFilterAttributeCard.newInstance(activity, parent);
         }
 
         throw new IllegalArgumentException("invalid typeid");

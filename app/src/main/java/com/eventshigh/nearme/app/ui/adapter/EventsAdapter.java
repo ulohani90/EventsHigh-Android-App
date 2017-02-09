@@ -10,6 +10,9 @@ import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.MyTicketsFragment;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventComparator;
+import com.eventshigh.nearme.app.data.EventFilterAttribute;
+import com.eventshigh.nearme.app.data.EventOccurenceComparator;
 import com.eventshigh.nearme.app.data.EventSession;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
@@ -38,7 +41,9 @@ import com.eventshigh.nearme.app.view.AutofitRecyclerView.SpanAllColumnLookup;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,6 +94,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
+    public void setSpecialFilters(ArrayList<EventFilterAttribute> attributes, ArrayList<String> selectedFilters) {
+        dataToShow.clear();
+        for (EventFilterAttribute attribute : attributes) {
+            dataToShow.add(new EventFilterAttributeData(activity, attribute, selectedFilters));
+        }
+        notifyDataSetChanged();
+    }
+
     public void setEvents(List<Event> events, @Nullable String categoryForSeeAll,
                           boolean showEhInviteForNotification) {
         dataToShow.clear();
@@ -105,6 +118,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         }
 
         notifyDataSetChanged();
+    }
+
+    public void setEventFilterAttributes() {
+
     }
 
     public void setMoviesListData(List<MovieDetailObject> objs, EventsContext eventsContext, boolean addHeader, boolean clearOldData) {
@@ -163,24 +180,72 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         for (int i = 0; i < topicEvents.size(); i++) {
             TopicEvents topicEvent = topicEvents.get(i);
             List<Event> events = topicEvent.events;
+            Collections.sort(events, new EventOccurenceComparator());
             if (events.isEmpty()) {
                 continue;
             }
 
             boolean isFavourite = MyEventsRequest.isSpecialTag(topicEvent.topicName);
-            if (!isFavourite && events.size() > maxPerCategory) {
-                events = events.subList(0, maxPerCategory);
+
+            if (isFavourite) {
+                List<Event> sortedEvents = new ArrayList<>();
+                for (Iterator<Event> iterator = events.iterator(); iterator.hasNext(); ) {
+                    Event value = iterator.next();
+                    if (value.eventTimings != null) {
+                        for (Long duration : value.eventTimings) {
+                            if (duration > System.currentTimeMillis()) {
+                                sortedEvents.add(value);
+                                iterator.remove();
+                                break;
+                            }
+                        }
+                    } else {
+                        sortedEvents.add(value);
+                        iterator.remove();
+                    }
+                }
+
+                Collections.sort(sortedEvents, new EventOccurenceComparator());
+                List<Event> upcomingEvents = new ArrayList<>(sortedEvents);
+                if (upcomingEvents.size() > 0) {
+                    dataToShow.add(new HeaderData(activity, eventsContext, "My Upcoming Favourites", upcomingEvents.size(), HeaderData.TYPE_EVENT));
+                    boolean isFirstEvent = true;
+                    for (Event event : upcomingEvents) {
+                        dataToShow.add(new EventData("My Upcoming Favourites", event, isFirstEvent, activity, this));
+                        isFirstEvent = false;
+                    }
+                }
+
+                Collections.sort(events, new EventOccurenceComparator());
+                List<Event> pastEvents = new ArrayList<>(events);
+                if (pastEvents.size() > 0) {
+                    dataToShow.add(new HeaderData(activity, eventsContext, "My Past Favourites", pastEvents.size(), HeaderData.TYPE_EVENT));
+                    boolean isSecondFirstEvent = true;
+                    for (Event event : pastEvents) {
+                        dataToShow.add(new EventData("My Past Favourites", event, isSecondFirstEvent, activity, this));
+                        isSecondFirstEvent = false;
+                    }
+                }
+            } else {
+                if (events.size() > maxPerCategory) {
+                    events = events.subList(0, maxPerCategory);
+                }
+                dataToShow.add(new HeaderData(activity, eventsContext, topicEvent.topicName, topicEvent.numEvents, HeaderData.TYPE_EVENT));
+                boolean isFirstEvent = true;
+                for (Event event : events) {
+                    dataToShow.add(new EventData(topicEvent.topicName, event, isFirstEvent, activity, this));
+                    isFirstEvent = false;
+                }
             }
 
-            dataToShow.add(new HeaderData(activity, eventsContext, topicEvent.topicName, topicEvent.numEvents, HeaderData.TYPE_EVENT));
-            boolean isFirstEvent = true;
-            for (Event event : events) {
-                dataToShow.add(new EventData(topicEvent.topicName, event, isFirstEvent, activity, this));
-                isFirstEvent = false;
-            }
+
         }
 
         notifyDataSetChanged();
+    }
+
+    public void getUpcomingEvents() {
+
     }
 
     public void setEventInfoObject(Event event) {
@@ -233,7 +298,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     }
 
-    public void setNewExploreCategories(@Nullable EventCollection eventCollection, String[] tags) {
+    public void setNewExploreCategories(@Nullable EventCollection eventCollection, String[] tags, boolean showNewYearImage) {
         dataToShow.clear();
         if (eventCollection != null) {
             if (!eventCollection.events.isEmpty()) {
@@ -241,7 +306,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
                         eventCollection.events));
             }
         }
-        dataToShow.add(new ExploreCategoryHeaderData(activity));
+        dataToShow.add(new ExploreCategoryHeaderData(activity, showNewYearImage));
 
         for (String tag : tags) {
             dataToShow.add(new NewExploreCategoryData(tag, activity, this));

@@ -150,7 +150,7 @@
             android:name="com.eventshigh.nearme.app.activity.EHPreferenceFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:tag="preference_frag" />
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

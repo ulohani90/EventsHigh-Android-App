@@ -33,6 +33,7 @@ import com.eventshigh.nearme.app.data.FriendsStore;
 import com.eventshigh.nearme.app.data.ProfileInfo;
 import com.eventshigh.nearme.app.network.FetchProfileRequest;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.CircularImageView;
@@ -97,6 +98,8 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     BaseActivity activity;
 
     EventsContext eventsContext;
+
+    boolean isRequestCompleted;
 
     public static UserProfileFragment newInstance(EventsContext eventsContext) {
         Bundle bundle = new Bundle();
@@ -181,12 +184,14 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         if (account.getUserInfo().isSignedIn) {
             emailProfileUser = account.getUserInfo().email;
             loginViaFBLayout.setVisibility(View.GONE);
-            fetchProfileInfo(true);
+            if (Preferences.getInstance(activity).isInterestUpdated() || Preferences.getInstance(activity).isFavUpdated() || !isRequestCompleted) {
+                fetchProfileInfo(true);
+                Preferences.getInstance(activity).setIsFavUpdated(false);
+                Preferences.getInstance(activity).setIsInterestUpdated(false);
+            }
         } else {
             loginViaFBLayout.setVisibility(View.VISIBLE);
-
         }
-
 
     }
 
@@ -199,6 +204,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     public void onResponse(ProfileInfo profileInfo, boolean b) {
                         if (isAdded()) {
                             if (profileInfo != null) {
+                                isRequestCompleted = true;
                                 setViews(profileInfo);
                             } else {
                                 topProgressBar.setVisibility(View.GONE);

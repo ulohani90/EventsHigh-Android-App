@@ -274,6 +274,7 @@ public class EventInfoFragment extends Fragment {
             string.setSpan(new RelativeSizeSpan(1.2f), 0, event.venue.length() + 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         }
         eventVenueText.setText(string);
+
         travelTimeView.setVisibility(View.GONE);
         view.findViewById(R.id.direction_separator).setVisibility(View.GONE);
         if (event.performers != null && event.performers.size() > 0) {
@@ -337,7 +338,7 @@ public class EventInfoFragment extends Fragment {
             }
         }
 
-        if (event.getMapQuery() != null) {
+        if (!(string.toString().equalsIgnoreCase("Outside " + event.city)) && event.getMapQuery() != null) {
             mapDirection.setVisibility(View.VISIBLE);
             mapDirection.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -524,16 +525,18 @@ public class EventInfoFragment extends Fragment {
     public void ama(Event event) {
         Account account = new Account(getActivity());
         Account.UserInfo userInfo = account.getUserInfo();
-        if (!userInfo.isSignedIn) {
-            // PhoneVerificationDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
+        if (userInfo.phoneNo == null) {
+            PhoneVerificationDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
 
             //FBSigninDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan, NewEventDetailActivity.REQUEST_FOR_RESULT_AMA);
 
+/*
             Intent intent = new Intent(activity, FBLoginActivity.class);
             intent.putExtra("show_special_text", true);
             intent.putExtra("hide_skip", true);
 
             activity.startActivityForResult(intent, NewEventDetailActivity.REQUEST_FOR_RESULT_AMA);
+*/
             return;
         }
 
@@ -591,7 +594,7 @@ public class EventInfoFragment extends Fragment {
         ((NewEventDetailActivity) getActivity()).addToFavourite = true;
         ((NewEventDetailActivity) getActivity()).reportEventAction(event, "showDirections");
 
-        Intent intent = event.getShowDirectionsOnMapIntent();
+        Intent intent = event.getShowDirectionsOnMapIntent(activity);
         if (intent == null) {
             ((NewEventDetailActivity) getActivity()).reportActionToAnalytics("skipDirectionsNoLocation");
             ((NewEventDetailActivity) getActivity()).showMessage(R.string.failed_event_location);

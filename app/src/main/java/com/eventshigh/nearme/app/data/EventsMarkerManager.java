@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.util.Pair;
 
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.AlarmUtils;
 
@@ -19,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Manages the user personalization -- his favourite and dismissed events. The favourite or
  * dismissed information is stored as {@link EventMark}. {@link EventMark} can be updated
  * through {@link Editor} class.
- *
+ * <p>
  * It is very efficient to check for event mark as it is kept in-memory and backed by
  * DB for persistent storage.
  */
@@ -31,8 +32,8 @@ public class EventsMarkerManager {
      * to DB.
      */
     public enum EventMark {
-        FAVOURITE (1),
-        DISMISSED (2);
+        FAVOURITE(1),
+        DISMISSED(2);
 
         public final int value;
 
@@ -44,7 +45,9 @@ public class EventsMarkerManager {
             return eventMark != null && eventMark == FAVOURITE;
         }
 
-        public static @Nullable EventMark getPrefFromValue(int value) {
+        public static
+        @Nullable
+        EventMark getPrefFromValue(int value) {
             for (EventMark pref : EventMark.values()) {
                 if (pref.value == value) {
                     return pref;
@@ -80,14 +83,16 @@ public class EventsMarkerManager {
             database.close();
         }
 
-        public Editor recordEventMark(Event event, @Nullable EventMark mark) {
-            if(event!=null) {
+        public Editor recordEventMark(Event event, @Nullable EventMark mark, boolean isNoChangePreference) {
+            if (event != null) {
                 if (mark == null) {
-                    removeEventMark(event);
+                    removeEventMark(event, isNoChangePreference);
                 } else {
                     eventMarkMap.put(event.id, mark);
                     if (EventMark.isFavourite(mark)) {
                         AlarmUtils.setEventAlarm(context, event);
+                        if (!isNoChangePreference)
+                            Preferences.getInstance(context).setIsFavUpdated(true);
                         new UserActionHelper(context).recordAction(
                                 UserActionHelper.EventAction.ADD_FAVORITE, event.id);
                     }
@@ -97,9 +102,11 @@ public class EventsMarkerManager {
             return this;
         }
 
-        public Editor removeEventMark(Event event) {
+        public Editor removeEventMark(Event event, boolean isNoChangePreference) {
             EventMark mark = eventMarkMap.remove(event.id);
             if (EventMark.isFavourite(mark)) {
+                if (!isNoChangePreference)
+                    Preferences.getInstance(context).setIsFavUpdated(true);
                 new UserActionHelper(context).recordAction(
                         UserActionHelper.EventAction.REMOVE_FAVORITE, event.id);
             }
@@ -112,6 +119,7 @@ public class EventsMarkerManager {
      * Singleton Instance.
      */
     private static EventsMarkerManager instance;
+
     public static synchronized EventsMarkerManager getInstance(Context context) {
         if (instance == null) {
             instance = new EventsMarkerManager(context);
@@ -151,7 +159,9 @@ public class EventsMarkerManager {
         }
     }
 
-    public @Nullable EventMark getEventMark(String eventId) {
+    public
+    @Nullable
+    EventMark getEventMark(String eventId) {
         return eventMarkMap.get(eventId);
     }
 

@@ -244,4 +244,8 @@ public class Utils {
         }
     }
 
+    public static String getUnderscoreString(String name) {
+        name = name.replace(" ", "_").replace("/", "_").replace("-", "_");
+        return name.toLowerCase();
+    }
 }

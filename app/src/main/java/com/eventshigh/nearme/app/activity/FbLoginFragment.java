@@ -65,12 +65,15 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
 
     GoogleApiClient mGoogleApiClient;
 
-    public static FbLoginFragment newInstance(boolean hideSkip, boolean showSpecialText, boolean closeActivity) {
+    boolean isLogout;
+
+    public static FbLoginFragment newInstance(boolean hideSkip, boolean showSpecialText, boolean isLogout, boolean closeActivity) {
 
         Bundle args = new Bundle();
         args.putBoolean("hide_skip", hideSkip);
         args.putBoolean("show_special_text", showSpecialText);
         args.putBoolean("close_activity", closeActivity);
+        args.putBoolean("is_logout", isLogout);
         FbLoginFragment fragment = new FbLoginFragment();
         fragment.setArguments(args);
         return fragment;
@@ -81,6 +84,7 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
         super.onAttach(context);
         activity = (BaseActivity) getActivity();
         hideSkip = getArguments().getBoolean("hide_skip", false);
+        isLogout = getArguments().getBoolean("is_logout", false);
         showSpecialText = getArguments().getBoolean("show_special_text", false);
         closeActivity = getArguments().getBoolean("close_activity", false);
     }
@@ -112,6 +116,7 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
         mGoogleApiClient.connect();
     }
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -139,8 +144,7 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
                 @Override
                 public void onClick(View v) {
                     activity.reportActionToAnalytics("skipClicked");
-                    clearBackStackActivities();
-                    activity.finish();
+                    openPhoneLoginActivity();
                 }
             });
 
@@ -153,6 +157,13 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
         }
 
         return view;
+    }
+
+    public void openPhoneLoginActivity() {
+        Intent intent = new Intent(activity, PhoneLoginActivity.class);
+        intent.putExtra("hide_skip", true);
+        intent.putExtra("is_logout", isLogout);
+        activity.startActivity(intent);
     }
 
     public void clearBackStackActivities() {
@@ -312,6 +323,12 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
         }
     }
 
+    public void startLaunchActivity() {
+        Intent intent = new Intent(getActivity(), LaunchActivity.class);
+        startActivity(intent);
+    }
+
+
     private void addFacebookUserInfo(final JSONObject object) {
         AddFacebookUserInfoRequest.submit(activity, object, Request.Priority.HIGH,
                 new Response.Listener<JSONObject>() {
@@ -322,9 +339,14 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
                         try {
                             new Account(activity).recordEmailId(object.getString("fb_name"), object.getString("fb_profile_pic"), object.getString("fb_email"), true);
                             activity.setResult(Activity.RESULT_OK);
+
                             clearBackStackActivities();
-                            if (closeActivity)
+                            if (isLogout) {
+                                openPhoneLoginActivity();
+                            }
+                            /*if (closeActivity)
                                 activity.finish();
+*/
                         } catch (JSONException e) {
                             e.printStackTrace();
                             dialog.dismiss();
@@ -354,6 +376,11 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
     @Override
     public void onPause() {
         super.onPause();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
         mGoogleApiClient.stopAutoManage(getActivity());
         mGoogleApiClient.disconnect();
     }

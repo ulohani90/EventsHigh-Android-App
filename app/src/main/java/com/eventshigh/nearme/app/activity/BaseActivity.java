@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
@@ -49,6 +50,10 @@ import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -344,7 +349,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     /**
      * Helper method to share an Event.
      */
-    public void shareEvent(final Event event, @Nullable final String packageName) {
+    public void shareEvent(final Event event, @Nullable final String packageName, @Nullable final String label) {
         String src = null;
         if (packageName != null) {
             src = packageName.split("\\.")[1];
@@ -357,14 +362,14 @@ public abstract class BaseActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String shortenUri, boolean isIntermediate) {
                         dialog.dismiss();
-                        shareEvent(event, shortenUri, packageName, null);
+                        shareEvent(event, shortenUri, packageName, label);
                     }
                 },
                 new ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         dialog.dismiss();
-                        shareEvent(event, eventShareUri, packageName, null);
+                        shareEvent(event, eventShareUri, packageName, label);
                     }
                 }
         );
@@ -430,7 +435,10 @@ public abstract class BaseActivity extends AppCompatActivity {
                                     R.string.share_event_twitter_text : R.string.share_event_text),
                             event.title + (event.isCleanVenue ? " @ " + event.venue : ""), eventUri, referralCode)
             );
-
+            // Uri uri = Uri.parse(event.imgUrl);
+           /* sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse((new URL(event.imgUrl)).toURI().toString()));
+            sendIntent.setType("image*//*");
+            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);*/
             sendIntent.setType("text/plain");
             if (packageName != null) {
                 sendIntent.setPackage(packageName);

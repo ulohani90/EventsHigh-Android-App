@@ -1,6 +1,8 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +16,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -35,15 +40,19 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventCategory;
+import com.eventshigh.nearme.app.data.EventFilterAttribute;
 import com.eventshigh.nearme.app.data.LocalityLatLong;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.ui.FBSigninDialog;
+import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.ui.animation.ResizeAnimation;
 import com.eventshigh.nearme.app.user.Account;
+import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
+import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.model.LatLng;
@@ -51,6 +60,7 @@ import com.squareup.timessquare.CalendarPickerView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -71,11 +81,11 @@ public class EventsGridActivity extends BaseContextActivity {
     EventsFragment eventsFragment;
 
 
-    HorizontalScrollView categoryFilter, priceFilter, dateFilter, sortFilter;
+    HorizontalScrollView categoryFilter, priceFilter, dateFilter, sortFilter, zoneFilter;
 
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 0x002;
 
-    boolean isCategoryFilterVisible;
+    boolean isCategoryFilterVisible, isZoneFilterVisible, isDateFilterVisible;
 
     boolean isTodaySelected;
 
@@ -86,9 +96,12 @@ public class EventsGridActivity extends BaseContextActivity {
 
     Account account;
 
-    public static final int PRICE_FILTER = 3;
+
     public static final int CATEGORY_FILTER = 1;
     public static final int DATE_FILTER = 2;
+    public static final int PRICE_FILTER = 3;
+    public static final int ZONE_FILTER = 4;
+    public static final int SPECIAL_FILTER = 5;
 
 
     public static final int FREE = 1;
@@ -103,11 +116,16 @@ public class EventsGridActivity extends BaseContextActivity {
 
     boolean isMapVisible;
 
-    public View fabBrowseMap;
+    public View fabBrowseMap, fabSpecialFilter;
 
     public static final int SHOW_EVENT_LIST_STATE = 1;
     public static final int SHOW_FILTERS_STATE = 2;
 
+
+    boolean isFabFilterVisible;
+
+
+    ArrayList<String> specialFilters, previousSelectedFilters;
 
     public static final String[] EXPLORE_TAGS = {
             EventCategory.NIGHTLIFE.categoryName,
@@ -122,6 +140,10 @@ public class EventsGridActivity extends BaseContextActivity {
             EventCategory.FOOD.categoryName
 
     };
+
+    AutofitRecyclerView specialFilterGrid;
+
+    LinearLayout specialFilterLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +177,7 @@ public class EventsGridActivity extends BaseContextActivity {
         priceFilter = (HorizontalScrollView) findViewById(R.id.price_filter);
         sortFilter = (HorizontalScrollView) findViewById(R.id.sort_container);
         dateFilter = (HorizontalScrollView) findViewById(R.id.date_filter);
+        zoneFilter = (HorizontalScrollView) findViewById(R.id.zone_filter);
 
         // Show query as title.
         if (!eventsContext.query.isEmpty()) {
@@ -169,7 +192,6 @@ public class EventsGridActivity extends BaseContextActivity {
                 if (eventsFragment != null) {
                     if (eventsFragment.isMapShown) {
                         if (eventsFragment.isMapListShown) {
-
                             eventsFragment.hideMapEvents(SHOW_EVENT_LIST_STATE);
                         } else {
                             eventsFragment.showListView();
@@ -184,13 +206,11 @@ public class EventsGridActivity extends BaseContextActivity {
                             // Request missing location permission.
                             ActivityCompat.requestPermissions(EventsGridActivity.this,
                                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
-
                         } else {
                             if (isFiltersShown) {
                                 collapseAnimation(SHOW_MAP_VIEW);
                             } else {
                                 eventsFragment.hideListView();
-
                                 //collapseAnimation(HIDE_SORT);
                             }
                             ((FloatingActionButton) fabBrowseMap).setImageResource(R.drawable.ic_list_menu);
@@ -203,6 +223,15 @@ public class EventsGridActivity extends BaseContextActivity {
             }
         });
 
+
+        fabSpecialFilter = findViewById(R.id.fab_special_filter);
+        fabSpecialFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                copyArrayListContents(previousSelectedFilters, specialFilters);
+                translateSpecialFilterUp();
+            }
+        });
         // Should we show follow widget?
         showFollowCard = !eventsContext.query.isEmpty() &&
                 eventsContext.dateFilter.isEmpty() &&
@@ -238,9 +267,33 @@ public class EventsGridActivity extends BaseContextActivity {
                     isTodaySelected = true;
                 isCategoryFilterVisible = true;
                 findViewById(R.id.category_filter).setVisibility(View.VISIBLE);
+                findViewById(R.id.zone_separator).setVisibility(View.VISIBLE);
             } else {
                 isCategoryFilterVisible = false;
                 findViewById(R.id.category_filter).setVisibility(View.GONE);
+                findViewById(R.id.zone_separator).setVisibility(View.GONE);
+            }
+
+            if (eventsContext.query.equalsIgnoreCase("New Year Parties") || eventsContext.query.equalsIgnoreCase("Parties & Nightlife")) {
+                if (eventsContext.query.equalsIgnoreCase("New Year Parties")) {
+                    isDateFilterVisible = false;
+                    dateFilter.setVisibility(View.GONE);
+                    findViewById(R.id.category_separator).setVisibility(View.GONE);
+                } else {
+                    isDateFilterVisible = true;
+                    findViewById(R.id.category_separator).setVisibility(View.VISIBLE);
+                    dateFilter.setVisibility(View.VISIBLE);
+                }
+                isZoneFilterVisible = true;
+                zoneFilter.setVisibility(View.VISIBLE);
+                findViewById(R.id.price_separator).setVisibility(View.VISIBLE);
+            } else {
+                isZoneFilterVisible = false;
+                isDateFilterVisible = true;
+                dateFilter.setVisibility(View.VISIBLE);
+                zoneFilter.setVisibility(View.GONE);
+
+                findViewById(R.id.price_separator).setVisibility(View.GONE);
             }
 
             boolean showEhInviteForNotification = getIntent() != null &&
@@ -263,7 +316,100 @@ public class EventsGridActivity extends BaseContextActivity {
             tr.commit();
         }
         addFiltersData();
+        specialFilterLayout = (LinearLayout) findViewById(R.id.special_filter_layout);
+        specialFilterGrid = (AutofitRecyclerView) findViewById(R.id.special_filter_grid);
+        findViewById(R.id.close_filter).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                copyArrayListContents(previousSelectedFilters, specialFilters);
+                translateSpecialFilterDown(false);
+                specialFilterAdapter.notifyDataSetChanged();
+            }
+        });
+        findViewById(R.id.apply_filters).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                if (!equalLists(specialFilters, previousSelectedFilters)) {
+
+                    copyArrayListContents(specialFilters, previousSelectedFilters);
+                    translateSpecialFilterDown(true);
+                } else {
+                    translateSpecialFilterDown(false);
+                }
+                if (specialFilters != null && specialFilters.size() > 0) {
+                    ((FloatingActionButton) fabSpecialFilter).setImageResource(R.drawable.ic_filter_tick);
+                } else {
+                    ((FloatingActionButton) fabSpecialFilter).setImageResource(R.drawable.ic_filter_white);
+                }
+
+            }
+        });
+    }
+
+    public void copyArrayListContents(ArrayList<String> copyFrom, ArrayList<String> copyTo) {
+        if (copyFrom == null && copyTo == null) {
+            return;
+        }
+        if (copyFrom == null) {
+            copyTo = null;
+            return;
+        }
+        if (copyTo == null) {
+            copyTo = new ArrayList<>();
+        }
+        copyTo.clear();
+        for (String text : copyFrom) {
+            copyTo.add(text);
+        }
+    }
+
+    public boolean equalLists(List<String> one, List<String> two) {
+        if (one == null && two == null) {
+            return true;
+        }
+
+        if ((one == null && two != null)
+                || one != null && two == null
+                || one.size() != two.size()) {
+            return false;
+        }
+
+        //to avoid messing the order of the lists we will use a copy
+        //as noted in comments by A. R. S.
+        one = new ArrayList<String>(one);
+        two = new ArrayList<String>(two);
+
+        Collections.sort(one);
+        Collections.sort(two);
+        return one.equals(two);
+    }
+
+    EventsAdapter specialFilterAdapter;
+
+    public void addSpecialFilterGrid(ArrayList<EventFilterAttribute> attributes) {
+        if (attributes != null && attributes.size() > 0) {
+            if (isFabFilterVisible) {
+                fabSpecialFilter.setVisibility(View.GONE);
+                fabBrowseMap.setVisibility(View.GONE);
+            } else {
+                fabSpecialFilter.setVisibility(View.VISIBLE);
+                fabBrowseMap.setVisibility(View.VISIBLE);
+            }
+            if (specialFilters == null) {
+                specialFilters = new ArrayList<>();
+            }
+            if (previousSelectedFilters == null) {
+                previousSelectedFilters = new ArrayList<>();
+            }
+            specialFilters = new ArrayList<>(previousSelectedFilters);
+            specialFilterAdapter = new EventsAdapter(this);
+            specialFilterGrid.setLayoutManager(new LinearLayoutManager(this));
+            specialFilterAdapter.setSpecialFilters(attributes, specialFilters);
+            specialFilterGrid.setAdapter(specialFilterAdapter);
+        } else {
+            fabSpecialFilter.setVisibility(View.GONE);
+        }
     }
 
     EventsMapFragment mapFragment;
@@ -335,10 +481,10 @@ public class EventsGridActivity extends BaseContextActivity {
                     }
                     if (filterText.getText().toString().equalsIgnoreCase(EventsHighEndpoints.QUERY_FEATURED)) {
 
-                        eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, "Featured", -1, null);
+                        eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, "Featured", -1, null, null);
                         //eventsFragment.filterEventsWithCategory("Featured", null);
                     } else {
-                        eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, filterText.getText().toString(), -1, null);
+                        eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, filterText.getText().toString(), -1, null, null, null);
                         //eventsFragment.filterEventsWithCategory(filterText.getText().toString(), null);
                     }
                     reportActionToAnalytics("filters", eventsContext.query + "-" + filterText);
@@ -348,7 +494,7 @@ public class EventsGridActivity extends BaseContextActivity {
         LinearLayout horizontalprice = (LinearLayout) findViewById(R.id.price_container);
         String[] priceRanges = {"Free", " \u20B9 ", "\u20B9 \u20B9", "\u20B9 \u20B9 \u20B9", "\u20B9 \u20B9 \u20B9 \u20B9"};
         for (int i = 0; i < priceRanges.length; i++) {
-            View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalCategories, false);
+            View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, horizontalprice, false);
             final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
             filterText.setText(priceRanges[i]);
             horizontalprice.addView(view);
@@ -358,23 +504,23 @@ public class EventsGridActivity extends BaseContextActivity {
                 public void onClick(View v) {
                     int position = (Integer) filterText.getTag();
                     if (position == 0) {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, FREE, null);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, FREE, null, null, null);
                         reportActionToAnalytics("filters", eventsContext.query + "-FREE");
                         // eventsFragment.filterEventsWithPrice(null, FREE);
                     } else if (position == 1) {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, UPTO_250, null);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, UPTO_250, null, null, null);
                         //eventsFragment.filterEventsWithPrice(null, UPTO_250);
                         reportActionToAnalytics("filters", eventsContext.query + "uptp250");
                     } else if (position == 2) {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_250_TO_750, null);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_250_TO_750, null, null, null);
                         reportActionToAnalytics("filters", eventsContext.query + "price250to750");
                         //eventsFragment.filterEventsWithPrice(null, PRICE_250_TO_750);
                     } else if (position == 3) {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_750_TO_1500, null);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_750_TO_1500, null, null, null);
                         //eventsFragment.filterEventsWithPrice(null, PRICE_750_TO_1500);
                         reportActionToAnalytics("filters", eventsContext.query + "price750to1500");
                     } else {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, MORE_THAN_1500, null);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, MORE_THAN_1500, null, null, null);
                         reportActionToAnalytics("filters", eventsContext.query + "moreThan1500");
                         //eventsFragment.filterEventsWithPrice(null, MORE_THAN_1500);
                     }
@@ -383,6 +529,42 @@ public class EventsGridActivity extends BaseContextActivity {
                         filterText.setSelected(false);
                     } else {
                         filterText.setSelected(true);
+                    }
+                }
+            });
+        }
+
+
+        LinearLayout zoneContainer = (LinearLayout) findViewById(R.id.zone_container);
+        final String[] zones = getZonesAccordingToCity();
+
+        for (int i = 0; i < zones.length + 1; i++) {
+            View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, zoneContainer, false);
+            final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
+            if (i == 0) {
+                filterText.setText("Zone:");
+            } else {
+                filterText.setText(zones[i - 1]);
+            }
+
+            zoneContainer.addView(view);
+            filterText.setTag(i);
+            filterText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    int position = (Integer) filterText.getTag();
+                    if (position != 0) {
+                        position = position - 1;
+                        eventsFragment.startFilterAsyncTask(ZONE_FILTER, null, null, -1, zones[position], null, null);
+                        reportActionToAnalytics("filters", eventsContext.query + "-" + zones[position]);
+                        // eventsFragment.filterEventsWithPrice(null, FREE);
+
+                        if (filterText.isSelected()) {
+                            filterText.setSelected(false);
+                        } else {
+                            filterText.setSelected(true);
+                        }
                     }
                 }
             });
@@ -419,18 +601,18 @@ public class EventsGridActivity extends BaseContextActivity {
                 public void onClick(View v) {
                     if (filterText.getText().toString().equalsIgnoreCase("Today")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
                         reportActionToAnalytics("filters", eventsContext.query + "-Today");
 
                         //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Tomorrow")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
                         reportActionToAnalytics("filters", eventsContext.query + "-Tomorrow");
                         // eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
                     } else if (filterText.getText().toString().equalsIgnoreCase("Weekend")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, DateTimeUtils.getWeekEndDates());
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, DateTimeUtils.getWeekEndDates());
                         reportActionToAnalytics("filters", eventsContext.query + "-Weekend");
                         //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Custom Dates")) {
@@ -512,6 +694,18 @@ public class EventsGridActivity extends BaseContextActivity {
         });
     }
 
+    public String[] getZonesAccordingToCity() {
+        if (account.getLastCity() == City.BANGALORE) {
+            return new String[]{"Central Bangalore", "East Bangalore", "North Bangalore", "South Bangalore", "West Bangalore", "Outside " + Utils.capitalize(City.BANGALORE.name())};
+        } else if (account.getLastCity() == City.CHENNAI) {
+            return new String[]{"Central Chennai", "North Chennai", "South Chennai", "Outside " + Utils.capitalize(City.CHENNAI.name())};
+        } else if (account.getLastCity() == City.DELHI) {
+            return new String[]{"Central Delhi", "East Delhi", "Ghaziabad", "Greater Noida", "Gurgaon", "Noida", "South Delhi", "South West Delhi", "West Delhi", "Outside " + Utils.capitalize(City.DELHI.name())};
+        } else {
+            return new String[]{"Mumbai Central Suburbs", "Mumbai Harbour", "Mumbai Mira Road & Beyond", "Mumbai South", "Mumbai Western Suburbs", "Outside " + Utils.capitalize(City.MUMBAI.name())};
+        }
+    }
+
     TextView trending, price, distance;
 
     public void removeAllSelectedDateFilters() {
@@ -584,7 +778,7 @@ public class EventsGridActivity extends BaseContextActivity {
                 }
                 builder.append(DateTimeUtils.getDateFromMillisTime(selectedDates.get(i).getTime()));
             }
-            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, dates);
+            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, dates);
             reportActionToAnalytics("filters", eventsContext.query + "-" + builder.toString());
             //eventsFragment.filterEventsWithDate(null, dates);
         }
@@ -618,11 +812,10 @@ public class EventsGridActivity extends BaseContextActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_share) {
-            shareEventsWithBranch(eventsContext, shareImageUrl);
+            shareEvents(eventsContext);
         }
         return super.onOptionsItemSelected(item);
     }
-
 
 
     /*
@@ -739,27 +932,83 @@ public class EventsGridActivity extends BaseContextActivity {
 
     @Override
     public void onBackPressed() {
-        if (isFromNotification) {
-            Intent intent = new Intent(this, LaunchActivity.class);
-            startActivity(intent);
+        if (isFabFilterVisible) {
+            translateSpecialFilterDown(false);
+        } else {
+            if (isFromNotification) {
+                Intent intent = new Intent(this, LaunchActivity.class);
+                startActivity(intent);
+            }
+
+            super.onBackPressed();
         }
-        super.onBackPressed();
     }
 
     public void expandAnimation() {
         int targetHeight;
         if (isCategoryFilterVisible) {
             if (eventsFragment.isMapShown) {
-                targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+                if (isZoneFilterVisible) {
+                    if (isDateFilterVisible) {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                    } else {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+                    }
+                } else {
+                    if (isDateFilterVisible) {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+                    } else {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 2), getResources().getDisplayMetrics());
+                    }
+                }
             } else {
-                targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                if (isZoneFilterVisible) {
+                    if (isDateFilterVisible) {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 5), getResources().getDisplayMetrics());
+                    } else {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                    }
+                } else {
+                    if (isDateFilterVisible) {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                    } else {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+                    }
+                }
+
             }
 
         } else {
             if (eventsFragment.isMapShown) {
-                targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 2), getResources().getDisplayMetrics());
+                if (isZoneFilterVisible) {
+                    if (isDateFilterVisible) {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+                    } else {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 2), getResources().getDisplayMetrics());
+                    }
+                } else {
+                    if (isDateFilterVisible) {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 2), getResources().getDisplayMetrics());
+                    } else {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 1), getResources().getDisplayMetrics());
+                    }
+                }
+
             } else {
-                targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+                if (isZoneFilterVisible) {
+                    if (isDateFilterVisible) {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                    } else {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+                    }
+                } else {
+                    if (isDateFilterVisible) {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+                    } else {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 2), getResources().getDisplayMetrics());
+                    }
+                }
+
             }
 
         }
@@ -933,4 +1182,125 @@ public class EventsGridActivity extends BaseContextActivity {
         }, 100L);
 
     }
+
+    int filterHeight = 2500;
+
+
+    public void translateSpecialFilterDown(final boolean isRefreshData) {
+        ObjectAnimator anim = ObjectAnimator.ofFloat(specialFilterLayout, View.TRANSLATION_Y, 0, filterHeight);
+        anim.setDuration(500);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                isFabFilterVisible = false;
+                if (specialFilters != null && isRefreshData) {
+                    eventsFragment.startFilterAsyncTask(SPECIAL_FILTER, null, null, -1, null, specialFilters, -1);
+                    // Toast.makeText(EventsGridActivity.this, specialFilters.size() + " filters selected", Toast.LENGTH_SHORT).show();
+
+                }
+                showFab(fabSpecialFilter);
+                showFab(fabBrowseMap);
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        anim.start();
+    }
+
+    public void translateSpecialFilterUp() {
+
+        ObjectAnimator anim = ObjectAnimator.ofFloat(specialFilterLayout, View.TRANSLATION_Y, filterHeight, 0);
+        anim.setDuration(500);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                specialFilterLayout.setVisibility(View.VISIBLE);
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                isFabFilterVisible = true;
+                hideFab(fabBrowseMap);
+                hideFab(fabSpecialFilter);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        anim.start();
+    }
+
+    //Hide fab
+    public void hideFab(final View view) {
+        Animation scaleDown = AnimationUtils.loadAnimation(this, R.anim.scale_down);
+        scaleDown.setDuration(200);
+        scaleDown.setInterpolator(new AccelerateDecelerateInterpolator());
+        scaleDown.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        view.startAnimation(scaleDown);
+    }
+
+    //Show Fab
+    public void showFab(final View view) {
+        Animation scaleDown = AnimationUtils.loadAnimation(this, R.anim.scale_up);
+        scaleDown.setDuration(200);
+        scaleDown.setInterpolator(new AccelerateDecelerateInterpolator());
+        scaleDown.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                view.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        view.startAnimation(scaleDown);
+    }
+
+
 }
