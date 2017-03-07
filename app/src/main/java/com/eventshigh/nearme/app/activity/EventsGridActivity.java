@@ -20,6 +20,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
@@ -30,6 +31,7 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -92,6 +94,7 @@ public class EventsGridActivity extends BaseContextActivity {
     public static final int SORT_STATE_TRENDING = 1;
     public static final int SORT_STATE_PRICE = 2;
     public static final int SORT_STATE_DISTANCE = 3;
+    public static final int SORT_STATE_TIME = 4;
 
 
     Account account;
@@ -102,6 +105,7 @@ public class EventsGridActivity extends BaseContextActivity {
     public static final int PRICE_FILTER = 3;
     public static final int ZONE_FILTER = 4;
     public static final int SPECIAL_FILTER = 5;
+    public static final int TICKETED_FILTER = 6;
 
 
     public static final int FREE = 1;
@@ -481,10 +485,10 @@ public class EventsGridActivity extends BaseContextActivity {
                     }
                     if (filterText.getText().toString().equalsIgnoreCase(EventsHighEndpoints.QUERY_FEATURED)) {
 
-                        eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, "Featured", -1, null, null);
+                        eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, "Featured", -1, null, null, false);
                         //eventsFragment.filterEventsWithCategory("Featured", null);
                     } else {
-                        eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, filterText.getText().toString(), -1, null, null, null);
+                        eventsFragment.startFilterAsyncTask(CATEGORY_FILTER, null, filterText.getText().toString(), -1, null, null, false, null);
                         //eventsFragment.filterEventsWithCategory(filterText.getText().toString(), null);
                     }
                     reportActionToAnalytics("filters", eventsContext.query + "-" + filterText);
@@ -504,23 +508,23 @@ public class EventsGridActivity extends BaseContextActivity {
                 public void onClick(View v) {
                     int position = (Integer) filterText.getTag();
                     if (position == 0) {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, FREE, null, null, null);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, FREE, null, null, false, null);
                         reportActionToAnalytics("filters", eventsContext.query + "-FREE");
                         // eventsFragment.filterEventsWithPrice(null, FREE);
                     } else if (position == 1) {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, UPTO_250, null, null, null);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, UPTO_250, null, null, false, null);
                         //eventsFragment.filterEventsWithPrice(null, UPTO_250);
                         reportActionToAnalytics("filters", eventsContext.query + "uptp250");
                     } else if (position == 2) {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_250_TO_750, null, null, null);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_250_TO_750, null, null, false, null);
                         reportActionToAnalytics("filters", eventsContext.query + "price250to750");
                         //eventsFragment.filterEventsWithPrice(null, PRICE_250_TO_750);
                     } else if (position == 3) {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_750_TO_1500, null, null, null);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, PRICE_750_TO_1500, null, null, false, null);
                         //eventsFragment.filterEventsWithPrice(null, PRICE_750_TO_1500);
                         reportActionToAnalytics("filters", eventsContext.query + "price750to1500");
                     } else {
-                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, MORE_THAN_1500, null, null, null);
+                        eventsFragment.startFilterAsyncTask(PRICE_FILTER, null, null, MORE_THAN_1500, null, null, false, null);
                         reportActionToAnalytics("filters", eventsContext.query + "moreThan1500");
                         //eventsFragment.filterEventsWithPrice(null, MORE_THAN_1500);
                     }
@@ -556,7 +560,7 @@ public class EventsGridActivity extends BaseContextActivity {
                     int position = (Integer) filterText.getTag();
                     if (position != 0) {
                         position = position - 1;
-                        eventsFragment.startFilterAsyncTask(ZONE_FILTER, null, null, -1, zones[position], null, null);
+                        eventsFragment.startFilterAsyncTask(ZONE_FILTER, null, null, -1, zones[position], null, false, null);
                         reportActionToAnalytics("filters", eventsContext.query + "-" + zones[position]);
                         // eventsFragment.filterEventsWithPrice(null, FREE);
 
@@ -601,18 +605,18 @@ public class EventsGridActivity extends BaseContextActivity {
                 public void onClick(View v) {
                     if (filterText.getText().toString().equalsIgnoreCase("Today")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
                         reportActionToAnalytics("filters", eventsContext.query + "-Today");
 
                         //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Tomorrow")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
                         reportActionToAnalytics("filters", eventsContext.query + "-Tomorrow");
                         // eventsFragment.filterEventsWithDate(null, DateTimeUtils.getCurrentDate(System.currentTimeMillis()).getTime() + DateTimeUtils.MILLISECONDS_IN_A_DAY);
                     } else if (filterText.getText().toString().equalsIgnoreCase("Weekend")) {
                         checkIfCustomDateSelected();
-                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, DateTimeUtils.getWeekEndDates());
+                        eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, DateTimeUtils.getWeekEndDates());
                         reportActionToAnalytics("filters", eventsContext.query + "-Weekend");
                         //eventsFragment.filterEventsWithDate(null, DateTimeUtils.getWeekEndDates());
                     } else if (filterText.getText().toString().equalsIgnoreCase("Custom Dates")) {
@@ -644,6 +648,7 @@ public class EventsGridActivity extends BaseContextActivity {
         trending = (TextView) findViewById(R.id.sort_trending);
         price = (TextView) findViewById(R.id.sort_price);
         distance = (TextView) findViewById(R.id.sort_distance);
+        time = (TextView) findViewById(R.id.sort_time);
         trending.setSelected(true);
         trending.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -652,11 +657,13 @@ public class EventsGridActivity extends BaseContextActivity {
                     trending.setSelected(true);
                     price.setSelected(false);
                     distance.setSelected(false);
+                    time.setSelected(false);
                     eventsFragment.sortAccToSortState(SORT_STATE_TRENDING);
                     reportActionToAnalytics("filters", eventsContext.query + "-sortTrending");
                 }
             }
         });
+
 
         price.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -665,11 +672,27 @@ public class EventsGridActivity extends BaseContextActivity {
                     trending.setSelected(false);
                     price.setSelected(true);
                     distance.setSelected(false);
+                    time.setSelected(false);
                     eventsFragment.sortAccToSortState(SORT_STATE_PRICE);
                     reportActionToAnalytics("filters", eventsContext.query + "-sortPrice");
                 }
             }
         });
+
+        time.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!(eventsFragment.sortState == SORT_STATE_TIME)) {
+                    trending.setSelected(false);
+                    price.setSelected(false);
+                    distance.setSelected(false);
+                    time.setSelected(true);
+                    eventsFragment.sortAccToSortState(SORT_STATE_TIME);
+                    reportActionToAnalytics("filters", eventsContext.query + "-sortTime");
+                }
+            }
+        });
+
 
         if (account.getLastLocality() != null) {
             distance.setText("Distance from " + Utils.capitalize(account.getLastLocality().getName()));
@@ -682,6 +705,7 @@ public class EventsGridActivity extends BaseContextActivity {
                         trending.setSelected(false);
                         price.setSelected(false);
                         distance.setSelected(true);
+                        time.setSelected(false);
                         eventsFragment.sortAccToSortState(SORT_STATE_DISTANCE);
                         reportActionToAnalytics("filters", eventsContext.query + "-sortDistance");
                     }
@@ -689,6 +713,19 @@ public class EventsGridActivity extends BaseContextActivity {
                     Intent intent = new Intent(EventsGridActivity.this, PlacesAutocompleteBoundedActivity.class);
                     intent.putExtra("show_special_text", true);
                     startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                }
+            }
+        });
+        ticketedEventsSwitch = (SwitchCompat) findViewById(R.id.ticketed_events);
+        ticketedEventsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    eventsFragment.startFilterAsyncTask(TICKETED_FILTER, null, null, -1, null, null, true);
+                    reportActionToAnalytics("filters", eventsContext.query + "-showTicketedEvents");
+                } else {
+                    eventsFragment.startFilterAsyncTask(TICKETED_FILTER, null, null, -1, null, null, false);
+                    reportActionToAnalytics("filters", eventsContext.query + "-showAllEvents");
                 }
             }
         });
@@ -706,7 +743,9 @@ public class EventsGridActivity extends BaseContextActivity {
         }
     }
 
-    TextView trending, price, distance;
+    TextView trending, price, distance, time;
+
+    SwitchCompat ticketedEventsSwitch;
 
     public void removeAllSelectedDateFilters() {
         if (today.isSelected()) {
@@ -778,7 +817,7 @@ public class EventsGridActivity extends BaseContextActivity {
                 }
                 builder.append(DateTimeUtils.getDateFromMillisTime(selectedDates.get(i).getTime()));
             }
-            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, dates);
+            eventsFragment.startFilterAsyncTask(DATE_FILTER, null, null, -1, null, null, false, dates);
             reportActionToAnalytics("filters", eventsContext.query + "-" + builder.toString());
             //eventsFragment.filterEventsWithDate(null, dates);
         }
@@ -950,6 +989,38 @@ public class EventsGridActivity extends BaseContextActivity {
             if (eventsFragment.isMapShown) {
                 if (isZoneFilterVisible) {
                     if (isDateFilterVisible) {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 5), getResources().getDisplayMetrics());
+                    } else {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                    }
+                } else {
+                    if (isDateFilterVisible) {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                    } else {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
+                    }
+                }
+            } else {
+                if (isZoneFilterVisible) {
+                    if (isDateFilterVisible) {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 6), getResources().getDisplayMetrics());
+                    } else {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 5), getResources().getDisplayMetrics());
+                    }
+                } else {
+                    if (isDateFilterVisible) {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 5), getResources().getDisplayMetrics());
+                    } else {
+                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
+                    }
+                }
+
+            }
+
+        } else {
+            if (eventsFragment.isMapShown) {
+                if (isZoneFilterVisible) {
+                    if (isDateFilterVisible) {
                         targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
                     } else {
                         targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
@@ -961,6 +1032,7 @@ public class EventsGridActivity extends BaseContextActivity {
                         targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 2), getResources().getDisplayMetrics());
                     }
                 }
+
             } else {
                 if (isZoneFilterVisible) {
                     if (isDateFilterVisible) {
@@ -973,39 +1045,6 @@ public class EventsGridActivity extends BaseContextActivity {
                         targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
                     } else {
                         targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
-                    }
-                }
-
-            }
-
-        } else {
-            if (eventsFragment.isMapShown) {
-                if (isZoneFilterVisible) {
-                    if (isDateFilterVisible) {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
-                    } else {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 2), getResources().getDisplayMetrics());
-                    }
-                } else {
-                    if (isDateFilterVisible) {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 2), getResources().getDisplayMetrics());
-                    } else {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 1), getResources().getDisplayMetrics());
-                    }
-                }
-
-            } else {
-                if (isZoneFilterVisible) {
-                    if (isDateFilterVisible) {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 4), getResources().getDisplayMetrics());
-                    } else {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
-                    }
-                } else {
-                    if (isDateFilterVisible) {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 3), getResources().getDisplayMetrics());
-                    } else {
-                        targetHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (56 * 2), getResources().getDisplayMetrics());
                     }
                 }
 
@@ -1200,7 +1239,7 @@ public class EventsGridActivity extends BaseContextActivity {
             public void onAnimationEnd(Animator animation) {
                 isFabFilterVisible = false;
                 if (specialFilters != null && isRefreshData) {
-                    eventsFragment.startFilterAsyncTask(SPECIAL_FILTER, null, null, -1, null, specialFilters, -1);
+                    eventsFragment.startFilterAsyncTask(SPECIAL_FILTER, null, null, -1, null, specialFilters, false, -1);
                     // Toast.makeText(EventsGridActivity.this, specialFilters.size() + " filters selected", Toast.LENGTH_SHORT).show();
 
                 }

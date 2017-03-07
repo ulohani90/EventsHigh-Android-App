@@ -60,7 +60,7 @@
     <color name="movie_text_grey_color">#999999</color>
     <color name="movie_submit_green_color">#4caf50</color>
 
-<color name="transparent_white">#33FFFFFF</color>
+    <color name="transparent_white">#33FFFFFF</color>
 
     <color name="eh_button_color">#E78E31</color>
     <color name="eh_button_dark_color">#cc7e2d</color>
@@ -68,4 +68,7 @@
     <color name="eh_share_button_color">#76A930</color>
     <color name="eh_share_button_dark_color">#6c9a2c</color>
     <color name="category_tag_separator_color">#BABABA</color>
+
+    <color name="switch_on_color">#51cf63</color>
+    <color name="switch_off_color">#e5e6e8</color>
 </resources>

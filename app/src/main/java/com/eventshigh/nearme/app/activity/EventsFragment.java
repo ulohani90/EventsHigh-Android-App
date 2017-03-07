@@ -44,6 +44,7 @@ import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventDistanceComparator;
 import com.eventshigh.nearme.app.data.EventPriceComparator;
 import com.eventshigh.nearme.app.data.EventScoreComparator;
+import com.eventshigh.nearme.app.data.EventTimeComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.ProfileInfo;
 import com.eventshigh.nearme.app.data.SocialFriend;
@@ -861,6 +862,7 @@ public class EventsFragment extends BaseEventsFragment {
                 filteredEvents = filterEventsWithPrice(filteredEvents, -1);
                 filteredEvents = filterEventsWithZone(null, filteredEvents);
                 filteredEvents = filterEventsWithSpecialFilters(filteredEvents, null);
+                filteredEvents = filterEventsForTicketedEvents(filteredEvents, showTicketedEvents);
                 /*eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.isEmpty()) {
                     // Failed. Show toast and return empty list.
@@ -915,7 +917,7 @@ public class EventsFragment extends BaseEventsFragment {
                 filteredEvents = filterEventsWithDate(filteredEvents, -1);
                 filteredEvents = filterEventsWithPrice(filteredEvents, -1);
                 filteredEvents = filterEventsWithSpecialFilters(filteredEvents, null);
-
+                filteredEvents = filterEventsForTicketedEvents(filteredEvents, showTicketedEvents);
                 /*eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.isEmpty()) {
                     // Failed. Show toast and return empty list.
@@ -984,6 +986,7 @@ public class EventsFragment extends BaseEventsFragment {
                 filteredEvents = filterEventsWithPrice(filteredEvents, -1);
                 filteredEvents = filterEventsWithZone(null, filteredEvents);
                 filteredEvents = filterEventsWithSpecialFilters(filteredEvents, null);
+                filteredEvents = filterEventsForTicketedEvents(filteredEvents, showTicketedEvents);
                /* eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.isEmpty()) {
                     // Failed. Show toast and return empty list.
@@ -1078,6 +1081,7 @@ public class EventsFragment extends BaseEventsFragment {
                 filteredEvents = filterEventsWithDate(filteredEvents, -1);
                 filteredEvents = filterEventsWithZone(null, filteredEvents);
                 filteredEvents = filterEventsWithSpecialFilters(filteredEvents, null);
+                filteredEvents = filterEventsForTicketedEvents(filteredEvents, showTicketedEvents);
                 /*eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.isEmpty()) {
                     // Failed. Show toast and return empty list.
@@ -1153,6 +1157,51 @@ public class EventsFragment extends BaseEventsFragment {
                 filteredEvents = filterEventsWithPrice(filteredEvents, -1);
                 filteredEvents = filterEventsWithZone(null, filteredEvents);
                 filteredEvents = filterEventsWithDate(filteredEvents, -1);
+                filteredEvents = filterEventsForTicketedEvents(filteredEvents, showTicketedEvents);
+               /* eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
+                if (filteredEvents.isEmpty()) {
+                    // Failed. Show toast and return empty list.
+                    Snackbar.make(topProgressBar, R.string.no_events, Snackbar.LENGTH_SHORT).show();
+
+                }*/
+            }
+            return filteredEvents;
+        }
+        return null;
+    }
+
+    boolean showTicketedEvents;
+
+    public List<Event> filterEventsForTicketedEvents(List<Event> totalEvents, boolean showTicketedEvents) {
+        List<Event> allEvents;
+        if (totalEvents == null && eventsCollection != null) {
+
+            allEvents = eventsCollection.events;
+        } else {
+            allEvents = totalEvents;
+        }
+
+        if (allEvents != null) {
+
+            List<Event> filteredEvents = new ArrayList<>();
+            if (showTicketedEvents) {
+                this.showTicketedEvents = true;
+                for (int i = 0; i < allEvents.size(); i++) {
+                    //  System.out.println("Event Name - " + allEvents.get(i).title + " Event ID: -" + allEvents.get(i).id);
+                    if (allEvents.get(i).isEhTicketing) {
+                        filteredEvents.add(allEvents.get(i));
+                    }
+                }
+            } else {
+                this.showTicketedEvents = false;
+                filteredEvents = allEvents;
+            }
+
+            if (totalEvents == null) {
+                filteredEvents = filterEventsWithCategory(null, filteredEvents);
+                filteredEvents = filterEventsWithPrice(filteredEvents, -1);
+                filteredEvents = filterEventsWithZone(null, filteredEvents);
+                filteredEvents = filterEventsWithDate(filteredEvents, -1);
                /* eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                 if (filteredEvents.isEmpty()) {
                     // Failed. Show toast and return empty list.
@@ -1191,6 +1240,8 @@ public class EventsFragment extends BaseEventsFragment {
                     Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastLocality().getLatLng()));
                 else
                     Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastCity().cityBounds.getCenter()));
+            } else if (sortState == EventsGridActivity.SORT_STATE_TIME) {
+                Collections.sort(filteredEvents, new EventTimeComparator());
             }
         }
 
@@ -1210,7 +1261,7 @@ public class EventsFragment extends BaseEventsFragment {
         }
     }
 
-    public void startFilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, String zone, ArrayList<String> specialFilters, long... times) {
+    public void startFilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, String zone, ArrayList<String> specialFilters, boolean showTicketedEvents, long... times) {
 
         if (isMapListShown) {
             hideMapEvents(-1);
@@ -1219,7 +1270,7 @@ public class EventsFragment extends BaseEventsFragment {
         if (filterAsyncTask != null && !filterAsyncTask.isCancelled()) {
             filterAsyncTask.cancel(true);
         }
-        filterAsyncTask = new FilterAsyncTask(type, totalEvents, category, priceValue, zone, specialFilters, times);
+        filterAsyncTask = new FilterAsyncTask(type, totalEvents, category, priceValue, zone, specialFilters, showTicketedEvents, times);
         filterAsyncTask.execute();
 
     }
@@ -1237,13 +1288,16 @@ public class EventsFragment extends BaseEventsFragment {
 
         ArrayList<String> specialFilters;
 
-        public FilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, String zone, ArrayList<String> specialFilters, long... times) {
+        boolean showTicketedEvents;
+
+        public FilterAsyncTask(int type, List<Event> totalEvents, String category, int priceValue, String zone, ArrayList<String> specialFilters, boolean showTicketedEvents, long... times) {
             this.type = type;
             this.totalEvents = totalEvents;
             this.category = category;
             this.priceValue = priceValue;
             this.times = times;
             this.zone = zone;
+            this.showTicketedEvents = showTicketedEvents;
             this.specialFilters = specialFilters;
         }
 
@@ -1265,7 +1319,10 @@ public class EventsFragment extends BaseEventsFragment {
                     return filterEventsWithZone(zone, totalEvents);
                 case EventsGridActivity.SPECIAL_FILTER:
                     return filterEventsWithSpecialFilters(totalEvents, specialFilters);
+                case EventsGridActivity.TICKETED_FILTER:
+                    return filterEventsForTicketedEvents(totalEvents, showTicketedEvents);
             }
+
             return null;
         }
 
@@ -1396,6 +1453,15 @@ public class EventsFragment extends BaseEventsFragment {
         }
         return events;
 
+    }
+
+
+    public void filterTicketedEvents(boolean showTicketedEvents) {
+        if (showTicketedEvents) {
+
+        } else {
+
+        }
     }
 
 

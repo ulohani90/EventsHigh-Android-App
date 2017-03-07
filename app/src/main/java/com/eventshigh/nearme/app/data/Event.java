@@ -130,6 +130,10 @@ public class Event implements Parcelable {
 
     public final HashMap<String, Boolean> attributeValues;
 
+    public final boolean isEvergreen;
+
+    public final boolean isEhTicketing;
+
     public Event(String id, City city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, ArrayList<String> allImages, @Nullable String sourceUrl,
@@ -144,7 +148,7 @@ public class Event implements Parcelable {
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
                  List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
                  @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus, String zone,
-                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues) {
+                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -201,6 +205,8 @@ public class Event implements Parcelable {
         this.zone = zone;
         this.attributes = attributes;
         this.attributeValues = attributeValues;
+        this.isEvergreen = isEvergreen;
+        this.isEhTicketing = isEhTicketing;
     }
 
     public Event(Parcel in) {
@@ -271,6 +277,8 @@ public class Event implements Parcelable {
         in.readTypedList(attributes, EventFilterAttribute.CREATOR);
         attributeValues = new HashMap<>();
         in.readMap(attributeValues, Boolean.class.getClassLoader());
+        isEvergreen = in.createBooleanArray()[0];
+        isEhTicketing = in.createBooleanArray()[0];
     }
 
     public Uri getEventDetailsURI() {
@@ -425,6 +433,9 @@ public class Event implements Parcelable {
         dest.writeString(zone);
         dest.writeTypedList(attributes);
         dest.writeMap(attributeValues);
+        dest.writeBooleanArray(new boolean[]{isEvergreen});
+        dest.writeBooleanArray(new boolean[]{isEhTicketing});
+
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -781,7 +792,8 @@ public class Event implements Parcelable {
                 }
             }
 
-
+            boolean isEvergreen = eventJson.optBoolean("evergreen");
+            boolean isEhTicketing = eventJson.optBoolean("is_eh_ticketing");
             int ticketingEnabledStatus = eventJson.optInt("ticketing_enabled_status");
             return new Event(id,
                     city,
@@ -826,7 +838,14 @@ public class Event implements Parcelable {
                     reviews,
                     requestPerAttendeeData,
                     additionalTicketFieldList,
-                    sessions, sessionTitlePhrase, isPrimaryOrganizer, isSponsoredEvent, ticketingEnabledStatus, zone, attributes, attributeValues
+                    sessions,
+                    sessionTitlePhrase,
+                    isPrimaryOrganizer,
+                    isSponsoredEvent,
+                    ticketingEnabledStatus,
+                    zone, attributes,
+                    attributeValues,
+                    isEvergreen, isEhTicketing
             );
         } catch (IllegalArgumentException e) {
             Log.i("Exception caught", e.getMessage());
@@ -866,7 +885,7 @@ public class Event implements Parcelable {
                 Event event = fromJSON(jsonArray.getJSONObject(i));
                 if (event != null && (includeWithoutLocation || event.location != null)) {
                     if (isForSavingAction)
-                        ((BaseContextActivity) context).recordEventMark(event, EventsMarkerManager.EventMark.FAVOURITE,isForSavingAction);
+                        ((BaseContextActivity) context).recordEventMark(event, EventsMarkerManager.EventMark.FAVOURITE, isForSavingAction);
                     events.add(event);
 
                 }
