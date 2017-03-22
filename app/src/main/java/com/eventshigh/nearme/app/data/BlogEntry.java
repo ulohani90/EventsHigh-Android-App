@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
+import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
+import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,26 +19,21 @@ import java.util.List;
 
 public class BlogEntry implements Parcelable {
     public final String title;
-    public final String snippet;
-    public final String contents;
     public final String thumbnail;
-    public final String thumbnailSmall;
-    public final String url;
     public final Date pubDate;
+    public final String url;
+    public String description;
 
-    public BlogEntry(String title, String snippet, String contents, String thumbnail,
-                     String thumbnailSmall, String url, Date pubDate) {
+    public BlogEntry(String title, String thumbnail, Date pubDate, String url, String description) {
         this.title = title;
-        this.snippet = snippet;
-        this.contents = contents;
         this.thumbnail = thumbnail;
-        this.thumbnailSmall = thumbnailSmall;
-        this.url = url;
         this.pubDate = pubDate;
+        this.url = url;
+        this.description = description;
     }
 
     /**********************************
-     Parcel management methods.
+     * Parcel management methods.
      *********************************/
     @Override
     public int describeContents() {
@@ -46,12 +43,10 @@ public class BlogEntry implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(title);
-        dest.writeString(snippet);
-        dest.writeString(contents);
         dest.writeString(thumbnail);
-        dest.writeString(thumbnailSmall);
-        dest.writeString(url);
         dest.writeLong(pubDate.getTime());
+        dest.writeString(url);
+        dest.writeString(description);
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -61,11 +56,9 @@ public class BlogEntry implements Parcelable {
                 public BlogEntry createFromParcel(Parcel in) {
                     return new BlogEntry(in.readString(),
                             in.readString(),
+                            new Date(in.readLong()),
                             in.readString(),
-                            in.readString(),
-                            in.readString(),
-                            in.readString(),
-                            new Date(in.readLong())
+                            in.readString()
                     );
                 }
 
@@ -75,17 +68,15 @@ public class BlogEntry implements Parcelable {
             };
 
     /**********************************
-     Helper static methods, used for JSON parsing
+     * Helper static methods, used for JSON parsing
      *********************************/
     public static BlogEntry parse(JSONObject blogEntryJson) throws JSONException, ParseException {
-        return new BlogEntry(blogEntryJson.getString("title"),
-                blogEntryJson.getString("excerpt"),
-                blogEntryJson.getString("content"),
-                blogEntryJson.getJSONObject("thumbnail_images").getJSONObject("full").getString("url"),
-                blogEntryJson.getJSONObject("thumbnail_images").getJSONObject("thumbnail").getString("url"),
-                blogEntryJson.getString("url"),
-                DateTimeUtils.parseBlogDate(blogEntryJson.getString("date"))
-            );
+        return new BlogEntry(blogEntryJson.optString("title"),
+                blogEntryJson.optString("featured_image_url"),
+                DateTimeUtils.parseBlogDate(blogEntryJson.optString("updated_at")),
+                EventsHighEndpoints.WEB_URI_BASE + "post/" + blogEntryJson.optInt("id"),
+                blogEntryJson.optString("description")
+        );
     }
 
     public static List<BlogEntry> parse(JSONArray blogEntriesJson) {

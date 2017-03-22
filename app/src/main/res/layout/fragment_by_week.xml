@@ -315,6 +315,29 @@
                             android:paddingRight="5dp">
 
                             <TextView
+                                android:id="@+id/sort_time"
+                                android:layout_width="wrap_content"
+                                android:layout_height="36dp"
+                                android:background="@drawable/filter_tag_selector_bg"
+                                android:gravity="center"
+                                android:paddingBottom="5dp"
+                                android:paddingLeft="15dp"
+                                android:paddingRight="15dp"
+                                android:paddingTop="5dp"
+                                android:text="Time"
+                                android:textColor="@color/filter_tag_color_selector"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp">
+
+                            <TextView
                                 android:id="@+id/sort_distance"
                                 android:layout_width="wrap_content"
                                 android:layout_height="36dp"
@@ -332,6 +355,26 @@
 
                     </LinearLayout>
                 </HorizontalScrollView>
+
+                <View
+                    android:id="@+id/ticketing_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#11ffffff" />
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/ticketed_events"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:checked="false"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="5dp"
+                    android:text="Show events ticketed with Events High"
+                    android:textColor="@android:color/white"
+                    android:theme="@style/SCBSwitch" />
             </LinearLayout>
 
             <ImageView

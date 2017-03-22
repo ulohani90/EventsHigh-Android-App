@@ -134,6 +134,8 @@ public class Event implements Parcelable {
 
     public final boolean isEhTicketing;
 
+    public final ArrayList<EventZendeskTicketObject> faqs;
+
     public Event(String id, City city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, ArrayList<String> allImages, @Nullable String sourceUrl,
@@ -148,7 +150,7 @@ public class Event implements Parcelable {
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
                  List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
                  @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus, String zone,
-                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing) {
+                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -207,6 +209,7 @@ public class Event implements Parcelable {
         this.attributeValues = attributeValues;
         this.isEvergreen = isEvergreen;
         this.isEhTicketing = isEhTicketing;
+        this.faqs = faqs;
     }
 
     public Event(Parcel in) {
@@ -279,6 +282,8 @@ public class Event implements Parcelable {
         in.readMap(attributeValues, Boolean.class.getClassLoader());
         isEvergreen = in.createBooleanArray()[0];
         isEhTicketing = in.createBooleanArray()[0];
+        faqs = new ArrayList<>();
+        in.readTypedList(faqs, EventZendeskTicketObject.CREATOR);
     }
 
     public Uri getEventDetailsURI() {
@@ -435,6 +440,7 @@ public class Event implements Parcelable {
         dest.writeMap(attributeValues);
         dest.writeBooleanArray(new boolean[]{isEvergreen});
         dest.writeBooleanArray(new boolean[]{isEhTicketing});
+        dest.writeTypedList(faqs);
 
     }
 
@@ -769,6 +775,9 @@ public class Event implements Parcelable {
             }
 
             String zone = eventJson.optString("zone");
+            if (zone == null || venue == null) {
+                System.out.println("Event Id :: " + id);
+            }
             if (zone.equalsIgnoreCase("unknown") && venue.equalsIgnoreCase("outside " + city.name())) {
                 zone = "Outside " + (city.name());
             }
@@ -795,6 +804,16 @@ public class Event implements Parcelable {
             boolean isEvergreen = eventJson.optBoolean("evergreen");
             boolean isEhTicketing = eventJson.optBoolean("is_eh_ticketing");
             int ticketingEnabledStatus = eventJson.optInt("ticketing_enabled_status");
+
+            ArrayList<EventZendeskTicketObject> faqs = new ArrayList<>();
+            if (eventJson.has("zendesk_tickets")) {
+                JSONArray zendeskTickets = eventJson.optJSONArray("zendesk_tickets");
+                for (int i = 0; i < zendeskTickets.length(); i++) {
+                    faqs.add(EventZendeskTicketObject.parseZendeskObj(zendeskTickets.getJSONObject(i)));
+                }
+            }
+
+
             return new Event(id,
                     city,
                     title,
@@ -845,7 +864,7 @@ public class Event implements Parcelable {
                     ticketingEnabledStatus,
                     zone, attributes,
                     attributeValues,
-                    isEvergreen, isEhTicketing
+                    isEvergreen, isEhTicketing, faqs
             );
         } catch (IllegalArgumentException e) {
             Log.i("Exception caught", e.getMessage());
@@ -899,12 +918,21 @@ public class Event implements Parcelable {
 
     public static List<Event> parseUpcomingEvents(JSONObject eventsJSON,
                                                   boolean includeWithoutLocation, OnPartialDataLoadingComplete listener) throws JSONException {
-        JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
+
+
         List<Event> allEvents = new ArrayList<>();
-        allEvents.addAll(fromJSON(upcomingEvents, includeWithoutLocation, listener));
+
         if (eventsJSON.has("evergreen_events")) {
             JSONArray evergreenEvents = eventsJSON.getJSONArray("evergreen_events");
-            allEvents.addAll(fromJSON(evergreenEvents, includeWithoutLocation, listener));
+            if (eventsJSON.has("upcoming_events")) {
+                allEvents.addAll(fromJSON(evergreenEvents, includeWithoutLocation, null));
+            } else {
+                allEvents.addAll(fromJSON(evergreenEvents, includeWithoutLocation, listener));
+            }
+        }
+        if (eventsJSON.has("upcoming_events")) {
+            JSONArray upcomingEvents = eventsJSON.getJSONArray("upcoming_events");
+            allEvents.addAll(fromJSON(upcomingEvents, includeWithoutLocation, listener));
         }
         return allEvents;
     }

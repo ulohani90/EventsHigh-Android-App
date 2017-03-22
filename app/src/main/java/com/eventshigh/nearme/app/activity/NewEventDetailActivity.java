@@ -81,6 +81,8 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
     public static final String INFO_TAB = "Info";
 
+    public static final String FAQS_TAB = "FAQS";
+
     String planId;
 
     LinearLayout statsLayout;
@@ -431,6 +433,9 @@ public class NewEventDetailActivity extends BaseContextActivity {
         TABS = new ArrayList<>();
 
         TABS.add(INFO_TAB);
+        if (event.faqs != null && event.faqs.size() > 0) {
+            TABS.add(FAQS_TAB);
+        }
         if (event.descriptionSections != null && event.descriptionSections.size() > 0) {
             for (EventDescriptionSection section : event.descriptionSections) {
                 TABS.add(section.name);
@@ -612,15 +617,28 @@ public class NewEventDetailActivity extends BaseContextActivity {
             Bundle bundle = new Bundle();
             if (position == 0) {
                 bundle.putParcelable("event", event);
-
                 fragment = EventInfoFragment.newInstance(bundle);
                 return fragment;
             }
-            if (event.sessions != null && event.sessions.size() > 0 && position == TABS.size() - 1) {
-                return EventSessionDetailFragment.newInstance((ArrayList) event.sessions, event.city);
+
+            if (event.faqs != null && event.faqs.size() > 0) {
+                if (position == 1) {
+                    bundle.putParcelableArrayList("faqs", event.faqs);
+                    return EventFaqsSection.newInstance(bundle);
+                } else {
+                    if (event.sessions != null && event.sessions.size() > 0 && position == TABS.size() - 1) {
+                        return EventSessionDetailFragment.newInstance((ArrayList) event.sessions, event.city);
+                    }
+                    bundle.putString("description", event.descriptionSections.get(position - 2).description);
+                    return EventDetailCustomFragment.newInstance(bundle);
+                }
+            } else {
+                if (event.sessions != null && event.sessions.size() > 0 && position == TABS.size() - 1) {
+                    return EventSessionDetailFragment.newInstance((ArrayList) event.sessions, event.city);
+                }
+                bundle.putString("description", event.descriptionSections.get(position - 1).description);
+                return EventDetailCustomFragment.newInstance(bundle);
             }
-            bundle.putString("description", event.descriptionSections.get(position - 1).description);
-            return EventDetailCustomFragment.newInstance(bundle);
 
         }
 

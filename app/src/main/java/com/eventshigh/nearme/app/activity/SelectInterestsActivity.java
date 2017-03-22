@@ -99,13 +99,17 @@ public class SelectInterestsActivity extends BaseActivity {
         addToolbarView(toolbar);
 
         setSupportActionBar(toolbar);
+
+        TextView doneButton = (TextView) findViewById(R.id.done_btn);
         if (!isOnboarding) {
 
             titleText.setText("Edit Your Interests");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            doneButton.setText("Update");
         } else {
             titleText.setText("Add Your Interests");
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            doneButton.setText("Next");
         }
 
         categoriesList = (ExpandableListView) findViewById(R.id.categories_list);

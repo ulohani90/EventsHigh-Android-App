@@ -53,6 +53,7 @@
     <Preference
         android:icon="@drawable/ic_blog_nav"
         android:layout="@layout/navigation_menu_white_items"
+
         android:title="@string/title_blog">
         <intent
             android:targetClass="com.eventshigh.nearme.app.activity.BlogFeedActivity"

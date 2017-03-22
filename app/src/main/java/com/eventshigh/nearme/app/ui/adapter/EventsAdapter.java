@@ -14,6 +14,7 @@ import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventFilterAttribute;
 import com.eventshigh.nearme.app.data.EventOccurenceComparator;
 import com.eventshigh.nearme.app.data.EventSession;
+import com.eventshigh.nearme.app.data.EventZendeskTicketObject;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.Locality;
 import com.eventshigh.nearme.app.data.MovieDetailObject;
@@ -98,6 +99,14 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         dataToShow.clear();
         for (EventFilterAttribute attribute : attributes) {
             dataToShow.add(new EventFilterAttributeData(activity, attribute, selectedFilters));
+        }
+        notifyDataSetChanged();
+    }
+
+    public void setEventFaqs(ArrayList<EventZendeskTicketObject> objs) {
+        dataToShow.clear();
+        for (EventZendeskTicketObject obj : objs) {
+            dataToShow.add(new EventFaqData(obj, activity));
         }
         notifyDataSetChanged();
     }

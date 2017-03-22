@@ -38,7 +38,8 @@ public enum DataType {
     EVENT_INFO_CARD(27),
     MY_REVIEW_CARD(28),
     EVENT_SESSION_CARD(29),
-    EVENT_FILTER_ATTRIBUTE_CARD(30);
+    EVENT_FILTER_ATTRIBUTE_CARD(30),
+    EVENT_FAQ_CARD(31);
 
     public final int typeId;
 
@@ -53,7 +54,7 @@ public enum DataType {
                 || typeId == POINTS.typeId || typeId == TOTAL_POINT_HEADER.typeId
                 || typeId == POINT_BREAKDWON.typeId || typeId == MOVIE_CATEGORY.typeId
                 || typeId == EXPLORE_CATEGORY_HEADER.typeId || typeId == MY_TICKETS_CARD.typeId
-                || typeId == EVENT_INFO_CARD.typeId || typeId == MY_REVIEW_CARD.typeId;
+                || typeId == EVENT_INFO_CARD.typeId || typeId == MY_REVIEW_CARD.typeId || typeId == EVENT_FAQ_CARD.typeId;
     }
 
     public static ViewHolder onCreateViewHolder(BaseActivity activity, ViewGroup parent, int typeId) {
@@ -164,6 +165,10 @@ public enum DataType {
         }
         if (typeId == EVENT_FILTER_ATTRIBUTE_CARD.typeId) {
             return EventFilterAttributeCard.newInstance(activity, parent);
+        }
+
+        if (typeId == EVENT_FAQ_CARD.typeId) {
+            return EventFaqCard.newInstance(activity, parent);
         }
 
         throw new IllegalArgumentException("invalid typeid");

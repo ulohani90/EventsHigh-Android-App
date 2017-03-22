@@ -136,7 +136,7 @@ public class BlogEntryActivity extends BaseActivity {
         topProgressBar.setVisibility(View.GONE);
         toolbar.setTitle(Html.fromHtml(blogEntry.title));
 
-        String html = String.format(BLOG_HTML_FORMAT, blogEntry.title, blogEntry.thumbnail, blogEntry.contents);
+        String html = String.format(BLOG_HTML_FORMAT, blogEntry.title, blogEntry.thumbnail, blogEntry.description);
         webView.loadDataWithBaseURL(blogEntry.url, html, "text/html", "UTF-8", "");
 
         final int screenHeight = getResources().getDisplayMetrics().heightPixels;

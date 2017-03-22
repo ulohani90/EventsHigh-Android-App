@@ -27,8 +27,8 @@ public class BlogFeedRequest extends JsonRequest<List<BlogEntry>> {
     /**
      * Helper method to submit a volley request to fetch blog entries.
      *
-     * @param context an application context to initiate the volley.
-     * @param listener callback on success.
+     * @param context       an application context to initiate the volley.
+     * @param listener      callback on success.
      * @param errorListener callback on failures.
      */
     public static void submit(Context context, Priority priority, boolean shouldBypassCache,
@@ -56,9 +56,9 @@ public class BlogFeedRequest extends JsonRequest<List<BlogEntry>> {
     /**
      * Creates a new request.
      *
-     * @param url URL to fetch the JSON from
-     * @param priority priority of request.
-     * @param listener Listener to receive the JSON response
+     * @param url           URL to fetch the JSON from
+     * @param priority      priority of request.
+     * @param listener      Listener to receive the JSON response
      * @param errorListener Error listener, or null to ignore errors.
      */
     public BlogFeedRequest(Context context, String url, Priority priority, boolean shouldBypassCache,
@@ -83,7 +83,7 @@ public class BlogFeedRequest extends JsonRequest<List<BlogEntry>> {
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             JSONObject blogEntriesJson = new JSONObject(jsonString);
-            return Response.success(BlogEntry.parse(blogEntriesJson.getJSONArray("posts")),
+            return Response.success(BlogEntry.parse(blogEntriesJson.getJSONArray("blog_posts")),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException | JSONException e) {
             Crashlytics.getInstance().core.logException(e);

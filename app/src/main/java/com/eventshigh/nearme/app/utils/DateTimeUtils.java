@@ -221,6 +221,7 @@ public class DateTimeUtils {
         }
     }
 
+
     private static final SimpleDateFormat BROWSE_DATE_FORMAT = new SimpleDateFormat("EEE-dd-MMM-yyyy", Locale.US);
 
     public static
@@ -398,6 +399,23 @@ public class DateTimeUtils {
             e.printStackTrace();
         }
         return builder.toString();
+    }
+
+    public static String getDateFromLongTime(long time) {
+        Date date = new Date(time);
+        DateFormat formatter = new SimpleDateFormat("hh:mm a, dd MMM yyyy");
+        return formatter.format(date);
+    }
+
+    public static long parseZendeskTicketDate(String time) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Date date = new Date();
+        try {
+            date = sdf.parse(time);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date.getTime();
     }
 
 }

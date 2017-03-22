@@ -36,7 +36,7 @@ public class BlogEntryCard extends ViewHolder {
     }
 
     public void bindView(final BlogEntry blogEntry, final BaseActivity activity) {
-        Glide.with(activity).load(blogEntry.thumbnailSmall)
+        Glide.with(activity).load(blogEntry.thumbnail)
                 .placeholder(R.drawable.ic_launcher).crossFade().centerCrop().transform(new CircleTransform(activity))
                 .into(imageView);
         titleView.setText(Html.fromHtml(blogEntry.title));
