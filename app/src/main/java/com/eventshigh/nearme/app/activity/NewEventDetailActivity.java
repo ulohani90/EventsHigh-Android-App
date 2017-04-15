@@ -572,6 +572,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
         } else {
             try {
+                bookingUriBuilder.appendQueryParameter("src","eh-android");
                 CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
                         getString(R.string.title_book));
             } catch (Exception e) {

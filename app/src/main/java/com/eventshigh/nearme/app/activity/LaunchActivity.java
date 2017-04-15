@@ -255,8 +255,6 @@ public class LaunchActivity extends BaseContextActivity {
 
         setUserCityHeader();
         getIntent().getAction();
-
-
     }
 
 
@@ -348,7 +346,10 @@ public class LaunchActivity extends BaseContextActivity {
 
             drawer.closeDrawers();
             showExploreScreen(-1);
-        }
+        }/*else if(intent != null && intent.getAction()!=null && intent.getAction().equalsIgnoreCase(Intent.ACTION_SEARCH)){
+            eventsContext = IntentUtils.processIntent(this,intent);
+            showNextScreen();
+        }*/
 
 
     }
@@ -1024,8 +1025,9 @@ public class LaunchActivity extends BaseContextActivity {
             if (special != null)
                 outIntent.putExtra("special_obj", special);
             outIntent.putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, eventsContext);
-            startActivity(outIntent);
             finish();
+            startActivity(outIntent);
+
         }
     }
 
