@@ -1,0 +1,19 @@
+{
+  "presets": ["react-native"],
+  "plugins": [
+    ["module-resolver", {
+      "root": ["./js"],
+      "alias": {
+        "app": "./js",
+        "component": "./js/components",
+        "container": "./js/containers",
+        "reducer": "./js/reducers",
+        "action": "./js/actions",
+        "saga": "./js/sagas",
+        "route": "./js/routes",
+        "image": "./js/images",
+        "lib": "./js/lib"
+      }
+    }]
+  ]
+}

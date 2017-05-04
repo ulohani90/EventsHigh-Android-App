@@ -436,7 +436,10 @@
         <activity
             android:name=".activity.CipherChatActivity"
             android:screenOrientation="portrait"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
            />
+        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
 
 
         <!-- Receivers within our application -->

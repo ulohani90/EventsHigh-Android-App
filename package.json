@@ -1,0 +1,34 @@
+{
+  "name": "events-high",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node node_modules/react-native/local-cli/cli.js start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Njuta/android-app.git"
+  },
+  "author": "Akash Chauhan <akash@eventshigh.com>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/Njuta/android-app/issues"
+  },
+  "homepage": "https://github.com/Njuta/android-app#readme",
+  "dependencies": {
+    "react": "^16.0.0-alpha.6",
+    "react-native": "^0.44.0",
+    "react-redux": "^5.0.4",
+    "redux": "^3.6.0",
+    "redux-logger": "^3.0.1",
+    "redux-persist": "^4.8.0",
+    "redux-saga": "^0.15.1",
+    "reduxsauce": "^0.5.0"
+  },
+  "devDependencies": {
+    "babel-plugin-module-resolver": "^2.7.0",
+    "babel-preset-react-native": "^1.9.1"
+  }
+}
