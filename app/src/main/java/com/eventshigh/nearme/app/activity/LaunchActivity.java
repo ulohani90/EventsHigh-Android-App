@@ -404,7 +404,7 @@ public class LaunchActivity extends BaseContextActivity {
 
         currentCity = (TextView) findViewById(R.id.current_city);
         if (account.getLastCity() != null) {
-            if (account.getLastLocality() != null && account.getLastLocality().getName().length() > 0) {
+            if (account.getLastLocality() != null && account.getLastLocality().getName().length() > 0 && !account.getLastLocality().getName().equalsIgnoreCase("null")) {
                 toolbarTitleText.setText(account.getLastLocality().getName());
             } else {
                 toolbarTitleText.setText(account.getLastCity().name());
@@ -794,6 +794,10 @@ public class LaunchActivity extends BaseContextActivity {
         super.onPause();
         if (drawer != null)
             drawer.closeDrawers();
+
+        if (client != null && client.isConnected()) {
+            client.disconnect();
+        }
     }
 
     private void refreshIfOldData() {
@@ -886,7 +890,7 @@ public class LaunchActivity extends BaseContextActivity {
             tab.select();
         }
         if (account.getLastCity() != null) {
-            if (account.getLastLocality() != null && account.getLastLocality().getName().length() > 0) {
+            if (account.getLastLocality() != null && account.getLastLocality().getName().length() > 0 && !account.getLastLocality().getName().equalsIgnoreCase("null")) {
                 toolbarTitleText.setText(account.getLastLocality().getName());
             } else {
                 toolbarTitleText.setText(account.getLastCity().name());
@@ -1002,7 +1006,9 @@ public class LaunchActivity extends BaseContextActivity {
             } else {
                 client.connect();
             }
-            return;
+            if (eventsContext.city == null) {
+                return;
+            }
         }
 
         // If we do not have query, show explore screen.
@@ -1048,7 +1054,7 @@ public class LaunchActivity extends BaseContextActivity {
             if (resultCode == RESULT_OK) {
                 String placeName = data.getStringExtra("place_name");
                 LatLng latLng = data.getParcelableExtra("place_lat_lng");
-                if (latLng != null && placeName != null) {
+                if (latLng != null && placeName != null && !placeName.equalsIgnoreCase("null")) {
                     toolbarTitleText.setText(placeName);
                     LocalityLatLong locality = new LocalityLatLong(placeName, latLng);
                     account.setLastLocality(locality);
@@ -1057,7 +1063,16 @@ public class LaunchActivity extends BaseContextActivity {
                     isLocalityUpdated = true;
                     Log.i("TestActivity", "Place: " + placeName);
                 } else {
-                    Toast.makeText(this, "Selected locality not found ", Toast.LENGTH_LONG).show();
+                    if (account.getLastCity() != null) {
+                        if (account.getLastLocality() != null && account.getLastLocality().getName().length() > 0 && !account.getLastLocality().getName().equalsIgnoreCase("null")) {
+                            toolbarTitleText.setText(account.getLastLocality().getName());
+                        } else {
+                            toolbarTitleText.setText(account.getLastCity().name());
+
+                        }
+                    }
+
+                    Toast.makeText(this, "Selected locality not found", Toast.LENGTH_LONG).show();
                 }
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);

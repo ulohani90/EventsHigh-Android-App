@@ -44,7 +44,9 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
             this.tagFollowers = tagFollowers;
         }
 
-        public @Nullable Set<SocialFriend> getTagFollowers(String tag) {
+        public
+        @Nullable
+        Set<SocialFriend> getTagFollowers(String tag) {
             return tagFollowers.get(EventCategory.toCategoryParsableString(tag));
         }
 
@@ -55,7 +57,7 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
     }
 
     public static void submit(Context context, Priority priority, Object tag, boolean shouldBypassCache,
-            Listener<SocialActions> listener, ErrorListener errorListener) {
+                              Listener<SocialActions> listener, ErrorListener errorListener) {
         try {
             Uri getSocialActionsUri =
                     UpdateAccountInfoService.getBaseUri(context, "get_social_actions").build();
@@ -73,7 +75,7 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
     private final Uri getSocialActionsUri;
 
     public SocialActionsRequest(Context context, Uri getSocialActionsUri, Priority priority,
-            boolean shouldBypassCache,  Listener<SocialActions> listener, ErrorListener errorListener)
+                                boolean shouldBypassCache, Listener<SocialActions> listener, ErrorListener errorListener)
             throws GeneralSecurityException, UnsupportedEncodingException {
         super(Method.GET, Signer.sign(getSocialActionsUri).toString(), null, listener, errorListener);
         setShouldBypassCache(shouldBypassCache);
@@ -94,37 +96,38 @@ public class SocialActionsRequest extends JsonRequest<SocialActions> {
 
     @Override
     protected Response<SocialActions> parseNetworkResponse(NetworkResponse response) {
-        Map<String, Set<SocialFriend>> eventFavourites  = Utils.getMap();
+        Map<String, Set<SocialFriend>> eventFavourites = Utils.getMap();
         Map<String, Set<SocialFriend>> tagFollowers = Utils.getMap();
 
         try {
             String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
             JSONObject resp = new JSONObject(jsonString);
-            JSONArray friends = resp.getJSONArray("social");
+
+            JSONArray friends = resp.optJSONArray("social");
             String myMobileNo = new Account(context).getUserInfo().phoneNo;
+            if (friends != null) {
+                for (int i = 0; i < friends.length(); i++) {
+                    String mobileNo = friends.getJSONObject(i).getString("mobile_no");
+                    if (mobileNo.equalsIgnoreCase(myMobileNo)) {
+                        continue;
+                    }
+                    UserContact contact = ContactUtils.getContactForServerPhone(context, mobileNo);
+                    if (contact == null) {
+                        continue;
+                    }
 
-            for (int i = 0; i < friends.length(); i++) {
-                String mobileNo = friends.getJSONObject(i).getString("mobile_no");
-                if (mobileNo.equalsIgnoreCase(myMobileNo)) {
-                    continue;
-                }
-                UserContact contact = ContactUtils.getContactForServerPhone(context, mobileNo);
-                if (contact == null) {
-                    continue;
-                }
+                    JSONArray favouritesArray = friends.getJSONObject(i).getJSONArray("favourites");
+                    for (int j = 0; j < favouritesArray.length(); j++) {
+                        add(eventFavourites, favouritesArray.getString(j), new SocialFriend(contact));
+                    }
 
-                JSONArray favouritesArray = friends.getJSONObject(i).getJSONArray("favourites");
-                for (int j = 0; j < favouritesArray.length(); j++) {
-                    add(eventFavourites, favouritesArray.getString(j), new SocialFriend(contact));
-                }
-
-                JSONArray followingsArray = friends.getJSONObject(i).getJSONArray("followings");
-                for (int j = 0; j < followingsArray.length(); j++) {
-                    String key = EventCategory.toCategoryParsableString(followingsArray.getString(j));
-                    add(tagFollowers, key, new SocialFriend(contact));
+                    JSONArray followingsArray = friends.getJSONObject(i).getJSONArray("followings");
+                    for (int j = 0; j < followingsArray.length(); j++) {
+                        String key = EventCategory.toCategoryParsableString(followingsArray.getString(j));
+                        add(tagFollowers, key, new SocialFriend(contact));
+                    }
                 }
             }
-
             return Response.success(new SocialActions(eventFavourites, tagFollowers),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (Exception e) {

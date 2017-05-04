@@ -280,6 +280,40 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp" />
 
+
+    <LinearLayout
+        android:id="@+id/event_source_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/source_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp"
+            android:text="Source"
+            android:textAllCaps="true"
+            android:textColor="#CC383F3F"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/source_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:text="Source"
+            android:textColor="#CC383F3F"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/performers_header"
         android:layout_width="wrap_content"

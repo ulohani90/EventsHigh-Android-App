@@ -1298,7 +1298,7 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
         if (showFollowCard) {
             eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
-                    eventsCollection.numFollowers);
+                    eventsCollection.numFollowers, false);
         }
         if (scrollToPos != -1) {
             eventGridView.scrollToPosition(scrollToPos);

@@ -80,6 +80,21 @@
                         android:textSize="15sp"
                         android:visibility="gone"
                         tools:text="₹ 200 - 500" />
+                    <TextView
+                        android:id="@+id/event_discount"
+                        style="@style/EventCardText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|end"
+                        android:layout_marginTop="20dp"
+                        android:background="@drawable/discount_tag_drawable_bg"
+                        android:fontFamily="sans-serif-medium"
+                        android:padding="11dp"
+                        android:textColor="#CCFFFFFF"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp"
+                        android:visibility="gone"
+                        tools:text="₹ 200 - 500" />
                 </FrameLayout>
 
 

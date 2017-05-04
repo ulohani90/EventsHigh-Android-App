@@ -42,6 +42,9 @@ import java.util.regex.Pattern;
 public class Event implements Parcelable {
     private static final Pattern YOUTUBE_FINDER = Pattern.compile("www.youtube.com/embed/([^\"]*)\"");
 
+    private static final String CONSTANT_DISCOUNT_PERCENTAGE = "Discount Percentage";
+    private static final String CONSTANT_DISCOUNT_PERCENTAGE_TEXT = "offer message";
+
     public final String id;
     public final City city;
     public final String title;
@@ -136,6 +139,12 @@ public class Event implements Parcelable {
 
     public final ArrayList<EventZendeskTicketObject> faqs;
 
+    public String discountPercentage;
+
+
+    //DiscountPercentageText is given priority above discountPercentage
+    public String discountPercentageText;
+
     public Event(String id, City city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, ArrayList<String> allImages, @Nullable String sourceUrl,
@@ -150,7 +159,7 @@ public class Event implements Parcelable {
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
                  List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
                  @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus, String zone,
-                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs) {
+                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -210,6 +219,8 @@ public class Event implements Parcelable {
         this.isEvergreen = isEvergreen;
         this.isEhTicketing = isEhTicketing;
         this.faqs = faqs;
+        this.discountPercentage = discountPercentage;
+        this.discountPercentageText = discountPercentageText;
     }
 
     public Event(Parcel in) {
@@ -284,6 +295,8 @@ public class Event implements Parcelable {
         isEhTicketing = in.createBooleanArray()[0];
         faqs = new ArrayList<>();
         in.readTypedList(faqs, EventZendeskTicketObject.CREATOR);
+        discountPercentage = in.readString();
+        discountPercentageText = in.readString();
     }
 
     public Uri getEventDetailsURI() {
@@ -441,7 +454,8 @@ public class Event implements Parcelable {
         dest.writeBooleanArray(new boolean[]{isEvergreen});
         dest.writeBooleanArray(new boolean[]{isEhTicketing});
         dest.writeTypedList(faqs);
-
+        dest.writeString(discountPercentage);
+        dest.writeString(discountPercentageText);
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -782,6 +796,8 @@ public class Event implements Parcelable {
                 zone = "Outside " + (city.name());
             }
 
+            String discountPercentage = null;
+            String discountPercentageText = null;
             ArrayList<EventFilterAttribute> attributes = new ArrayList<>();
             HashMap<String, Boolean> attributeValues = new HashMap<>();
             if (eventJson.has("attributes")) {
@@ -799,6 +815,20 @@ public class Event implements Parcelable {
                         //attributes = EventFilterAttribute.getAttributes(jsonArray);
                     }
                 }
+                if (eventJson.optJSONObject("attributes").has("key_value_attributes") && eventJson.optJSONObject("attributes").optJSONObject("key_value_attributes").has("key_values")) {
+                    JSONArray keyValuePairArray = eventJson.optJSONObject("attributes").optJSONObject("key_value_attributes").optJSONArray("key_values");
+                    for (int i = 0; i < keyValuePairArray.length(); i++) {
+                        JSONObject obj = keyValuePairArray.optJSONObject(i);
+                        if (obj.getString("key").equalsIgnoreCase(CONSTANT_DISCOUNT_PERCENTAGE_TEXT)) {
+                            discountPercentageText = obj.getString("value");
+                        }
+                        if (obj.getString("key").equalsIgnoreCase(CONSTANT_DISCOUNT_PERCENTAGE)) {
+                            discountPercentage = obj.getString("value");
+                        }
+
+                    }
+                }
+
             }
 
             boolean isEvergreen = eventJson.optBoolean("evergreen");
@@ -864,7 +894,11 @@ public class Event implements Parcelable {
                     ticketingEnabledStatus,
                     zone, attributes,
                     attributeValues,
-                    isEvergreen, isEhTicketing, faqs
+                    isEvergreen,
+                    isEhTicketing,
+                    faqs,
+                    discountPercentage,
+                    discountPercentageText
             );
         } catch (IllegalArgumentException e) {
             Log.i("Exception caught", e.getMessage());

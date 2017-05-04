@@ -397,8 +397,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
-    public void addFollowCard(String title, int numEvents, int numFollowers) {
-        dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity, this));
+    public void addFollowCard(String title, int numEvents, int numFollowers, boolean isNearMeQuery) {
+        dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity, this,isNearMeQuery));
     }
 
     @Override

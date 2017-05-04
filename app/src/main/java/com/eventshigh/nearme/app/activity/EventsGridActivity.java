@@ -128,6 +128,8 @@ public class EventsGridActivity extends BaseContextActivity {
 
     boolean isFabFilterVisible;
 
+    boolean isNearMeQuery;
+
 
     ArrayList<String> specialFilters, previousSelectedFilters;
 
@@ -269,6 +271,13 @@ public class EventsGridActivity extends BaseContextActivity {
             if (eventsContext.query.equalsIgnoreCase("this week") || eventsContext.query.equalsIgnoreCase("today") || eventsContext.query.contains(EventsHighEndpoints.QUERY_NEARME)) {
                 if (eventsContext.query.equalsIgnoreCase("today"))
                     isTodaySelected = true;
+
+                if (eventsContext.query.contains(EventsHighEndpoints.QUERY_NEARME)) {
+                    isNearMeQuery = true;
+                } else {
+                    isNearMeQuery = false;
+                }
+
                 isCategoryFilterVisible = true;
                 findViewById(R.id.category_filter).setVisibility(View.VISIBLE);
                 findViewById(R.id.zone_separator).setVisibility(View.VISIBLE);
@@ -649,7 +658,11 @@ public class EventsGridActivity extends BaseContextActivity {
         price = (TextView) findViewById(R.id.sort_price);
         distance = (TextView) findViewById(R.id.sort_distance);
         time = (TextView) findViewById(R.id.sort_time);
-        trending.setSelected(true);
+        if (EventsHighEndpoints.isNearMeQuery(eventsContext.query) && (new Account(this).getLastLocality() != null || getUserLocation() != null)) {
+            distance.setSelected(true);
+        } else {
+            trending.setSelected(true);
+        }
         trending.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

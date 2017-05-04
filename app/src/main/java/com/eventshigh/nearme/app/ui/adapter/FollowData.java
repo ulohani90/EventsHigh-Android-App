@@ -11,15 +11,17 @@ public class FollowData implements AdapterData {
     public final int numFollowers;
     public final BaseContextActivity activity;
     public final SocialDataProvider socialDataProvider;
+    public final boolean isNearMeQuery;
 
 
     public FollowData(String title, int numEvents, int numFollowers, BaseContextActivity activity,
-                      SocialDataProvider socialDataProvider) {
+                      SocialDataProvider socialDataProvider, boolean isNearMeQuery) {
         this.title = title;
         this.numEvents = numEvents;
         this.numFollowers = numFollowers;
         this.activity = activity;
         this.socialDataProvider = socialDataProvider;
+        this.isNearMeQuery = isNearMeQuery;
 
     }
 

@@ -31,6 +31,8 @@ import java.util.regex.Pattern;
  */
 public class Utils {
 
+    public static final String ADWORDS_CONVERSION_ID = "959501249";
+
     public static final String YOUTUBE_API_KEY = "AIzaSyACL1eHX6pkvIAsFk1VqN-TDAgzS14Pwek";
 
     private static final int TITLE_MAX_LENGHT = 32;

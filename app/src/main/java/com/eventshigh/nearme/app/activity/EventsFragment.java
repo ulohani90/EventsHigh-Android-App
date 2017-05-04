@@ -335,7 +335,7 @@ public class EventsFragment extends BaseEventsFragment {
         eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
         if (showFollowCard) {
             eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
-                    eventsCollection.numFollowers);
+                    eventsCollection.numFollowers,((EventsGridActivity)getActivity()).isNearMeQuery);
         }
         if (scrollToPos != -1) {
             eventGridView.scrollToPosition(scrollToPos + 1);
@@ -755,6 +755,10 @@ public class EventsFragment extends BaseEventsFragment {
 
                     EventsFragment.this.filteredEvents = filteredEvents;
 
+                    if (EventsHighEndpoints.isNearMeQuery(eventsContext.query) && (new Account(getActivity()).getLastLocality() != null || activity.getUserLocation() != null)) {
+                        sortState = EventsGridActivity.SORT_STATE_DISTANCE;
+                    }
+
                     sortData();
 
                     if (filteredEvents != null && filteredEvents.size() > 0)
@@ -763,7 +767,7 @@ public class EventsFragment extends BaseEventsFragment {
                     eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
                     if (showFollowCard) {
                         eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
-                                eventsCollection.numFollowers);
+                                eventsCollection.numFollowers,((EventsGridActivity)getActivity()).isNearMeQuery);
                     }
                     addSocialInvitationRequests();
                     if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).filtersHeaderContainer != null) {
@@ -1223,7 +1227,7 @@ public class EventsFragment extends BaseEventsFragment {
             eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
             if (showFollowCard) {
                 eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
-                        eventsCollection.numFollowers);
+                        eventsCollection.numFollowers,((EventsGridActivity)getActivity()).isNearMeQuery);
             }
         }
     }
@@ -1236,10 +1240,13 @@ public class EventsFragment extends BaseEventsFragment {
             } else if (sortState == EventsGridActivity.SORT_STATE_PRICE) {
                 Collections.sort(filteredEvents, new EventPriceComparator());
             } else if (sortState == EventsGridActivity.SORT_STATE_DISTANCE) {
-                if (new Account(activity).getLastLocality() != null)
+                if (new Account(activity).getLastLocality() != null) {
                     Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastLocality().getLatLng()));
-                else
+                } else if (activity.getUserLocation() != null) {
+                    Collections.sort(filteredEvents, new EventDistanceComparator(eventsContext.location));
+                } else {
                     Collections.sort(filteredEvents, new EventDistanceComparator(new Account(activity).getLastCity().cityBounds.getCenter()));
+                }
             } else if (sortState == EventsGridActivity.SORT_STATE_TIME) {
                 Collections.sort(filteredEvents, new EventTimeComparator());
             }
@@ -1342,7 +1349,7 @@ public class EventsFragment extends BaseEventsFragment {
                     eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                     if (showFollowCard) {
                         eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
-                                eventsCollection.numFollowers);
+                                eventsCollection.numFollowers,((EventsGridActivity)getActivity()).isNearMeQuery);
                     }
                 }
                 if (events.isEmpty() && getView() != null) {

@@ -15,6 +15,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,6 +93,10 @@ public class EventInfoFragment extends Fragment {
     BaseContextActivity activity;
 
     LinearLayout eventInfoLayout;
+
+    LinearLayout eventSourceLayout;
+
+    TextView eventSrcText;
 
     ImageView trustedPartner;
 
@@ -135,6 +142,8 @@ public class EventInfoFragment extends Fragment {
 
         eventInfoLayout = (LinearLayout) view.findViewById(R.id.event_info_layout);
         trustedPartner = (ImageView) view.findViewById(R.id.trusted_partner);
+        eventSourceLayout = (LinearLayout) view.findViewById(R.id.event_source_layout);
+        eventSrcText = (TextView) view.findViewById(R.id.source_link);
         return view;
     }
 
@@ -143,20 +152,6 @@ public class EventInfoFragment extends Fragment {
             view.findViewById(R.id.review_card).setVisibility(View.VISIBLE);
             ((TextView) view.findViewById(R.id.tv_user_review_by)).setText(event.reviewObjects.get(0).getReviewBy());
             //Changing reviewers name clickable if profile_id available
-            if (event.reviewObjects.get(0).getReviewerId() != null
-                    && Utils.isValidEmail(event.reviewObjects.get(0).getReviewerId())
-                    && !(event.reviewObjects.get(0).getReviewPlatform().equalsIgnoreCase("web"))) {
-                (view.findViewById(R.id.tv_user_review_by)).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(activity, UserProfileActivity.class);
-                        intent.putExtra(UserProfileActivity.PROFILE_ID, event.reviewObjects.get(0).getReviewerId());
-                        startActivity(intent);
-                    }
-                });
-
-
-            }
 
 
             ((RatingBar) view.findViewById(R.id.rb_user_review_rating)).setRating(event.reviewObjects.get(0).getReviewRating());
@@ -170,6 +165,21 @@ public class EventInfoFragment extends Fragment {
             ImageView reviewerImage = (ImageView) view.findViewById(R.id.civ_user_review);
             int size = reviewerImage.getLayoutParams().height;
             reviewerImage.setImageDrawable(UserContact.getDrawableForName(event.reviewObjects.get(0).getReviewBy(), size));
+
+            if (event.reviewObjects.get(0).getReviewerId() != null
+                    && Utils.isValidEmail(event.reviewObjects.get(0).getReviewerId())
+                    && !(event.reviewObjects.get(0).getReviewPlatform().equalsIgnoreCase("web"))) {
+                (view.findViewById(R.id.tv_user_review_by)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(activity, UserProfileActivity.class);
+                        intent.putExtra(UserProfileActivity.PROFILE_ID, event.reviewObjects.get(0).getReviewerId());
+                        startActivity(intent);
+                    }
+                });
+
+            }
+
             /*
             Glide.with(this).load("url")
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -178,6 +188,8 @@ public class EventInfoFragment extends Fragment {
             */
             //  findViewById(R.id.ll_event_write_review).setVisibility(View.GONE);
             Preferences.getInstance(getActivity()).setIsReviewAdded(false);
+
+            view.invalidate();
         }
 
     }
@@ -306,6 +318,34 @@ public class EventInfoFragment extends Fragment {
                 save(event);
             }
         });
+
+
+        if (event.sourceUrl != null && event.sourceUrl.length() > 0) {
+            try {
+                URL url = new URL(event.sourceUrl);
+                String host = url.getHost();
+                if (!host.equalsIgnoreCase("www.eventshigh.com")) {
+                    eventSourceLayout.setVisibility(View.VISIBLE);
+                    SpannableString hostString = new SpannableString(host);
+                    hostString.setSpan(new UnderlineSpan(), 0, host.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    eventSrcText.setText(hostString);
+                    eventSourceLayout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ((NewEventDetailActivity) getActivity()).openSourceSite(v);
+                        }
+                    });
+
+                } else {
+                    eventSourceLayout.setVisibility(View.GONE);
+                }
+            } catch (MalformedURLException e) {
+                eventSourceLayout.setVisibility(View.GONE);
+            }
+        } else {
+            eventSourceLayout.setVisibility(View.GONE);
+        }
+
 
         if (account.getLastCity() != null && account.getLastCity().equals(City.BANGALORE)) {
             enquiryBtn.setVisibility(View.VISIBLE);

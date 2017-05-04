@@ -50,7 +50,7 @@
             android:targetClass="com.eventshigh.nearme.app.activity.ReferralCodeActivity"
             android:targetPackage="com.eventshigh.nearme.app" />
     </Preference>
-    <Preference
+    <!--<Preference
         android:icon="@drawable/ic_blog_nav"
         android:layout="@layout/navigation_menu_white_items"
 
@@ -58,7 +58,7 @@
         <intent
             android:targetClass="com.eventshigh.nearme.app.activity.BlogFeedActivity"
             android:targetPackage="com.eventshigh.nearme.app" />
-    </Preference>
+    </Preference>-->
 
     <!--android:summary="support@eventshigh.com"-->
     <Preference

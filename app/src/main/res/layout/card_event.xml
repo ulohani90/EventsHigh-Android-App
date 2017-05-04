@@ -66,6 +66,22 @@
             android:textSize="15sp"
             tools:text="₹ 200 - 500" />
 
+        <TextView
+            android:id="@+id/event_discount"
+            style="@style/EventCardText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/event_venue"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/discount_tag_drawable_bg"
+            android:fontFamily="sans-serif-medium"
+            android:padding="11dp"
+            android:textColor="#CCFFFFFF"
+            android:textIsSelectable="false"
+            android:textSize="15sp"
+            tools:text="₹ 200 - 500" />
+
         <ImageView
             android:id="@+id/event_recommended"
             android:layout_width="wrap_content"

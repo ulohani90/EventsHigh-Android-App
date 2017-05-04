@@ -62,6 +62,7 @@ public class EventCard extends ViewHolder {
     private final LinearLayout statsLayout;
     private final ImageView trustedPartner;
     private final TextView sponsoredEvent;
+    private final TextView discountTag;
 
 
     public static EventCard newInstance(Activity activity, ViewGroup parent,
@@ -105,6 +106,7 @@ public class EventCard extends ViewHolder {
         trustedPartner = (ImageView) cardView.findViewById(R.id.trusted_partner);
         sponsoredEvent = (TextView) cardView.findViewById(R.id.is_sponsered_event);
         addShadow = isAddShadow;
+        discountTag = (TextView) cardView.findViewById(R.id.event_discount);
     }
 
 
@@ -320,6 +322,16 @@ public class EventCard extends ViewHolder {
             priceView.setVisibility(View.VISIBLE);
             priceView.setText(priceString);
         }
+        if (event.discountPercentageText != null) {
+            discountTag.setVisibility(View.VISIBLE);
+            discountTag.setText(event.discountPercentageText);
+        } else if (event.discountPercentage != null) {
+            discountTag.setVisibility(View.VISIBLE);
+            discountTag.setText(event.discountPercentage + "% OFF");
+        } else {
+            discountTag.setVisibility(View.GONE);
+
+        }
 
         //
         if (addShadow) {
@@ -370,7 +382,7 @@ public class EventCard extends ViewHolder {
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
         Account account = new Account(activity);
         // Set the travel time.
-        if (account.getLastLocality() != null) {
+        if (account.getLastLocality() != null ) {
             String travelTime = LocationUtils.getTravelTime(activity, account.getLastLocality().getLatLng(), event.location);
             if (travelTime != null) {
                 travelTimeView.setText(travelTime);

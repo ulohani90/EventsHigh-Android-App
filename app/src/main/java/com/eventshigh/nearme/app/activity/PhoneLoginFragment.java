@@ -309,7 +309,7 @@ public class PhoneLoginFragment extends Fragment {
 
     public void changeNumber(View view) {
         activity.reportActionToAnalytics("changeNumber");
-        account.removeUserInfo();
+    //    account.removeUserInfo();
         setRequestMobileNoView();
     }
 

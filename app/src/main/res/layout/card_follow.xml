@@ -59,25 +59,16 @@
         tools:text="Music" />
 
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <View
-            android:id="@+id/separator"
-            android:layout_width="1dp"
-            android:layout_height="20dp"
-            android:layout_centerInParent="true"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:background="#696969" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center">
 
         <TextView
             android:id="@+id/followers_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toStartOf="@id/separator"
-            android:drawableLeft="@drawable/ic_followers"
             android:drawablePadding="3dp"
             android:ellipsize="end"
             android:gravity="center_vertical"
@@ -86,7 +77,14 @@
             android:textIsSelectable="false"
             android:textSize="14sp"
             tools:text="35 Followers" />
-
+        <View
+            android:id="@+id/separator"
+            android:layout_width="1dp"
+            android:layout_height="20dp"
+            android:layout_toRightOf="@id/followers_count"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:background="#696969" />
 
         <TextView
             android:id="@+id/events_count"

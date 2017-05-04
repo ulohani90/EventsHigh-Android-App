@@ -29,6 +29,7 @@ public class FollowCard extends ViewHolder {
     private View followingButton;
     private TextView followersCount;
     private TextView eventsCount;
+    private View separator;
 
 
     public static FollowCard newInstance(final BaseActivity activity, ViewGroup parent) {
@@ -45,12 +46,21 @@ public class FollowCard extends ViewHolder {
         eventsCount = (TextView) itemView.findViewById(R.id.events_count);
         followButton = itemView.findViewById(R.id.follow_button);
         followingButton = itemView.findViewById(R.id.following_button);
+        separator = itemView.findViewById(R.id.separator);
     }
 
     public void populate(final FollowData data) {
         titleView.setText(data.title);
 
-        followersCount.setText(data.numFollowers + " Followers");
+        if (data.isNearMeQuery) {
+            followersCount.setVisibility(View.GONE);
+            separator.setVisibility(View.GONE);
+        } else {
+            followersCount.setVisibility(View.VISIBLE);
+            separator.setVisibility(View.VISIBLE);
+            followersCount.setText(data.numFollowers + " Followers");
+        }
+
         eventsCount.setText(data.numEvents + " Events");
 
         final Account account = new Account(data.activity);

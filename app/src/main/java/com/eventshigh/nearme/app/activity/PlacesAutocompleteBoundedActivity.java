@@ -84,6 +84,8 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
     private static final int PERMISSION_ACCESS_COARSE_LOCATION = 0x02;
     private LocationRequest mLocationRequest;
 
+    boolean isSelectLocationClicked;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,6 +130,7 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
             locView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    isSelectLocationClicked = true;
                     onSelectLocationClick();
                 }
             });
@@ -165,6 +168,7 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
     // GoogleApiClient googleApiClient;
 
     public void onSelectLocationClick() {
+
        /* if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .enableAutoManage(this, 0 *//* clientId *//*, this)
@@ -199,69 +203,71 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
             mGoogleApiClient.connect();
         }*/
 
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(30 * 1000);
-        locationRequest.setFastestInterval(5 * 1000);
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(locationRequest);
 
-        //**************************
-        builder.setAlwaysShow(true); //this is the key ingredient
-        //**************************
+        if (mGoogleApiClient.isConnected()) {
+            LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationRequest.setInterval(30 * 1000);
+            locationRequest.setFastestInterval(5 * 1000);
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                    .addLocationRequest(locationRequest);
 
-        PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-            @Override
-            public void onResult(LocationSettingsResult result) {
-                final Status status = result.getStatus();
+            //**************************
+            builder.setAlwaysShow(true); //this is the key ingredient
+            //**************************
 
-                final LocationSettingsStates state = result.getLocationSettingsStates();
-                switch (status.getStatusCode()) {
-                    case LocationSettingsStatusCodes.SUCCESS:
+            PendingResult<LocationSettingsResult> result =
+                    LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
+            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+                @Override
+                public void onResult(LocationSettingsResult result) {
+                    final Status status = result.getStatus();
 
-                        if (ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                                ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    final LocationSettingsStates state = result.getLocationSettingsStates();
+                    switch (status.getStatusCode()) {
+                        case LocationSettingsStatusCodes.SUCCESS:
 
-                            Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                            if (location != null) {
+                            if (ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                                    ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-                                handleNewLocation(location);
+                                Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                                if (location != null) {
+
+                                    handleNewLocation(location);
+                                } else {
+                                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, PlacesAutocompleteBoundedActivity.this);
+                                }
                             } else {
-                                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, PlacesAutocompleteBoundedActivity.this);
+                                if (ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(PlacesAutocompleteBoundedActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_ACCESS_FINE_LOCATION);
+                                } else {
+                                    ActivityCompat.requestPermissions(PlacesAutocompleteBoundedActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_ACCESS_COARSE_LOCATION);
+                                }
+                                // Toast.makeText(PlacesAutocompleteBoundedActivity.this, "Location Permission not allowed.", Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            if (ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                ActivityCompat.requestPermissions(PlacesAutocompleteBoundedActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_ACCESS_FINE_LOCATION);
-                            } else {
-                                ActivityCompat.requestPermissions(PlacesAutocompleteBoundedActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_ACCESS_COARSE_LOCATION);
+
+                            break;
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            // Location settings are not satisfied. But could be fixed by showing the user
+                            // a dialog.
+                            try {
+                                // Show the dialog by calling startResolutionForResult(),
+                                // and check the result in onActivityResult().
+                                status.startResolutionForResult(
+                                        PlacesAutocompleteBoundedActivity.this, 1000);
+                            } catch (IntentSender.SendIntentException e) {
+                                // Ignore the error.
                             }
-                            // Toast.makeText(PlacesAutocompleteBoundedActivity.this, "Location Permission not allowed.", Toast.LENGTH_SHORT).show();
-                        }
+                            break;
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
 
-                        break;
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        // Location settings are not satisfied. But could be fixed by showing the user
-                        // a dialog.
-                        try {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            status.startResolutionForResult(
-                                    PlacesAutocompleteBoundedActivity.this, 1000);
-                        } catch (IntentSender.SendIntentException e) {
-                            // Ignore the error.
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-
-                        // Location settings are not satisfied. However, we have no way to fix the
-                        // settings so we won't show the dialog.
-                        break;
+                            // Location settings are not satisfied. However, we have no way to fix the
+                            // settings so we won't show the dialog.
+                            break;
+                    }
                 }
-            }
-        });
-
+            });
+        }
     }
 
     private void handleNewLocation(Location location) {
@@ -270,8 +276,8 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
         List<Address> addresses = null;
         try {
             addresses = gcd.getFromLocation(latLng.latitude, latLng.longitude, 1);
-            if (addresses.size() > 0) {
-                System.out.println(addresses.get(0).getLocality());
+            if (addresses.size() > 0 && addresses.get(0).getLocality() != null) {
+                // System.out.println(addresses.get(0).getLocality());
                 Intent intent = new Intent();
                 intent.putExtra("place_lat_lng", latLng);
                 intent.putExtra("place_name", addresses.get(0).getSubLocality());
@@ -442,7 +448,9 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-
+        if (isSelectLocationClicked) {
+            onSelectLocationClick();
+        }
     }
 
     @Override

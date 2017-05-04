@@ -55,9 +55,12 @@ import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.ContactListView;
 import com.eventshigh.nearme.app.view.SmartViewPager;
+import com.google.ads.conversiontracking.AdWordsRemarketingReporter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -188,7 +191,8 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 event = getIntent().getParcelableExtra(EXTRA_EVENT_PARAM);
                 makeMyReviewsServerRequest(false);
 
-            } else {
+            } else if (getIntent().getData() != null) {
+
                 EventRequest.submit(this, getIntent().getData(), Request.Priority.IMMEDIATE, mEventListener,
                         new Response.ErrorListener() {
                             @Override
@@ -337,6 +341,16 @@ public class NewEventDetailActivity extends BaseContextActivity {
         isDataAttached = true;
         title.setText(event.title);
 
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("dynx_itemid", event.id);
+        params.put("dynx_pagetype", "offerdetail");
+
+
+        AdWordsRemarketingReporter.reportWithConversionId(
+                getApplicationContext(),
+                Utils.ADWORDS_CONVERSION_ID,
+                params);
+
         final TextView eventPrice = (TextView) findViewById(R.id.event_price);
         String priceString = event.getPriceString();
         if (priceString == null) {
@@ -345,6 +359,17 @@ public class NewEventDetailActivity extends BaseContextActivity {
             eventPrice.setVisibility(View.VISIBLE);
             eventPrice.setText(priceString);
         }
+        TextView eventDiscount = (TextView) findViewById(R.id.event_discount);
+        if (event.discountPercentageText != null) {
+            eventDiscount.setVisibility(View.VISIBLE);
+            eventDiscount.setText(event.discountPercentageText);
+        } else if (event.discountPercentage != null) {
+            eventDiscount.setVisibility(View.VISIBLE);
+            eventDiscount.setText(event.discountPercentage + "% OFF");
+        } else {
+            eventDiscount.setVisibility(View.GONE);
+        }
+
         viewPager.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent e) {
                 // How far the user has to scroll before it locks the parent vertical scrolling.
@@ -412,6 +437,8 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 }
             });
         }
+
+
         EventImagePagerAdapter imagePagerAdapter = new EventImagePagerAdapter();
         imagePager.setAdapter(imagePagerAdapter);
         dotsView.removeAllViews();
@@ -572,7 +599,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
         } else {
             try {
-                bookingUriBuilder.appendQueryParameter("src","eh-android");
+                bookingUriBuilder.appendQueryParameter("src", "eh-android");
                 CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
                         getString(R.string.title_book));
             } catch (Exception e) {
@@ -675,7 +702,10 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
         @Override
         public int getCount() {
-            return event.allImages.size();
+            if (event.allImages != null) {
+                return event.allImages.size();
+            }
+            return 0;
         }
 
         @Override
