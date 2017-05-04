@@ -217,6 +217,9 @@ public class LaunchActivity extends BaseContextActivity {
                     reportActionToAnalytics("profileInterestFabClick");
                     Intent i = new Intent(LaunchActivity.this, SelectInterestsActivity.class);
                     startActivity(i);
+                }else if(viewPager.getCurrentItem() == 1){
+                    Intent intent = new Intent(LaunchActivity.this, CipherChatActivity.class);
+                    startActivity(intent);
                 } else if (viewPager.getCurrentItem() == 3) {
 
                     if (weekEventsFragment != null) {
@@ -251,7 +254,7 @@ public class LaunchActivity extends BaseContextActivity {
                 }
             }
         });
-        fabWriteReviews.setVisibility(View.GONE);
+        fabWriteReviews.setVisibility(View.VISIBLE);
 
         setUserCityHeader();
         getIntent().getAction();
@@ -1150,7 +1153,10 @@ public class LaunchActivity extends BaseContextActivity {
                 if (profileFragment != null && profileFragment.getPager() != null && profileFragment.getPager().getCurrentItem() == 0) {
                     animateFabIn();
                 }
-            } else {
+            } else if(position == 1){
+                fabWriteReviews.setImageResource(R.drawable.ic_cal);
+                animateFabIn();
+            }else{
                 animateFabOut();
             }
 
@@ -1521,7 +1527,7 @@ public class LaunchActivity extends BaseContextActivity {
 
 
     public void animateFabIn() {
-        if (viewPager.getCurrentItem() == 3 || (viewPager.getCurrentItem() == 0 && account.getUserInfo().isSignedIn) && fabWriteReviews.getVisibility() == View.GONE) {
+        if (viewPager.getCurrentItem() == 3 || viewPager.getCurrentItem() == 1 ||(viewPager.getCurrentItem() == 0 && account.getUserInfo().isSignedIn) && fabWriteReviews.getVisibility() == View.GONE) {
             fabWriteReviews.clearAnimation();
             fabWriteReviews.setVisibility(View.VISIBLE);
            /* TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 250, 0);

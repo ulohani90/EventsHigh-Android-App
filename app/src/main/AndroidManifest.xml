@@ -402,6 +402,8 @@
             android:label="@string/pref_title_phone_no"
             android:parentActivityName=".activity.LaunchActivity"
             android:screenOrientation="portrait">
+
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LaunchActivity" />
@@ -431,6 +433,10 @@
             android:label="@string/ui_reviews_text"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar" />
+        <activity
+            android:name=".activity.CipherChatActivity"
+            android:screenOrientation="portrait"
+           />
 
 
         <!-- Receivers within our application -->
