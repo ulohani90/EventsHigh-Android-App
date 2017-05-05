@@ -440,6 +440,17 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
            />
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+        <service android:name="io.fullstack.firestack.FirestackMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <service android:name="io.fullstack.firestack.FirestackInstanceIdService" android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
 
 
         <!-- Receivers within our application -->

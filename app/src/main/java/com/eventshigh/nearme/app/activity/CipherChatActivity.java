@@ -16,6 +16,8 @@ import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainReactPackage;
 
+import io.fullstack.firestack.FirestackPackage;
+
 /**
  * This file is part of android-app
  * Created by Akash Chauhan <akash6190 [at] gmail [dot] com>
@@ -36,6 +38,7 @@ public class CipherChatActivity extends Activity implements DefaultHardwareBackB
                 .setBundleAssetName("index.android.bundle")
                 .setJSMainModuleName("index.android")
                 .addPackage(new MainReactPackage())
+                .addPackage(new FirestackPackage(this))
                 .setUseDeveloperSupport(BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();
