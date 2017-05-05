@@ -1,5 +1,17 @@
 import React, { Component } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+// import Firestack from 'react-native-firestack'
+import {
+  APP_ID,
+  DB_URL,
+  STORAGE_BUCKET,
+  API_KEY,
+  CLIENT_ID,
+  PROJECT_ID
+} from 'react-native-dotenv';
+
 import { NativeRouter, Route, Redirect } from 'react-router-native'
 
 import { ROUTE_APP, ROUTE_EVENT_LIST, ROUTE_EVENT } from 'route/names';
@@ -7,6 +19,33 @@ import { ROUTE_APP, ROUTE_EVENT_LIST, ROUTE_EVENT } from 'route/names';
 
 import EventList from 'container/EventList';
 import Event from 'container/Event';
+
+
+const PrivateRoute = connect(mapStateToProps)(({ props, component: Component, ...rest }) => {
+  console.log("private route", props);
+  return <Route {...rest} render={props => (
+    props.authenticated ? (
+      <Component {...props}/>
+    ) : (
+      <Redirect to="/login" />
+        // pathname: '/login',
+        // state: { from: props.location }
+      // }}/>
+    )
+  )}/>
+})
+
+
+const LoginRoute = connect(mapStateToProps)(({ props, ...rest }) => {
+  console.log(props);
+  return <Route {...rest} render={ props => (
+    props.authenticated ? (
+      <Redirect to="/" />
+      ) : (
+      <Text> This will be login page.</Text>
+    )
+  )}/>
+})
 
 class AppNavigator extends Component {
   constructor(props) {
@@ -26,23 +65,43 @@ class AppNavigator extends Component {
   //   this.props.navPop(ROUTE_APP)
   // }
 
+  // componentWillMount() {
+  //   const firestack = new Firestack({
+  //       applicationId: APP_ID,
+  //       debug: __DEV__,
+  //       databaseUrl: DB_URL,
+  //       storageBucket: STORAGE_BUCKET,
+  //       apiKey: API_KEY,
+  //       clientId: CLIENT_ID,
+  //     });
+  //   console.log(firestack)
+  //   // debugger
+  // }
+
   render() {
+    const loggedInRoutes = [
+      <Route exact path="/" render={() => <Redirect to={ROUTE_EVENT_LIST} />}/>,
+      <Route path={ROUTE_EVENT_LIST} component={EventList}/> ,
+      <Route path={ROUTE_EVENT} component={Event}/>
+    ]
     return (
       <NativeRouter>
         <View style={styles.container}>
-          <Route exact path="/" render={() => <Redirect to={ROUTE_EVENT_LIST} />}/>
-          <Route path={ROUTE_EVENT_LIST} component={EventList}/>
-          <Route path={ROUTE_EVENT} component={Event}/>
+          {this.props.authenticated ? loggedInRoutes : <Text>User needs to login</Text>}
         </View>
       </NativeRouter>
     )
   }
 }
+const mapStateToProps = state => ({
+  authenticated: !!state.app.user
+})
 
-export default AppNavigator;
+export default connect(mapStateToProps)(AppNavigator);
 
 const styles = StyleSheet.create({
   container: {
     height: 100
   }
 })
+

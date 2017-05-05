@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.user;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.preference.Preference;
 import android.support.annotation.Nullable;
 
 import com.crashlytics.android.Crashlytics;
@@ -89,6 +88,9 @@ public class Account {
     // The prefix to the shared prefs key used to save follow tags for this user
     private static final String PREF_FOLLOW_KEY_PREFIX = "follow_";
 
+    // Access token from facebook if present
+    private static final String PREF_ACCESS_TOKEN = "access_token";
+
     private static boolean disableSnackBar = false;
 
     // shared and static accountInfo which usages shared preference to store records.
@@ -129,13 +131,14 @@ public class Account {
     }
 
 
-    public void recordEmailId(String name, String profilePic, String emailId, Boolean isSignedIn) {
+    public void recordEmailId(String name, String profilePic, String emailId, String accessToken, Boolean isSignedIn) {
 
         SharedPreferences.Editor editor = accountInfo.edit();
         editor.putString(PREF_NAME, name);
         editor.putString(PREF_EMAIL_ID, emailId);
         editor.putString(PREF_PROFILE_PIC, profilePic);
         editor.putBoolean(PREF_IS_USER_LOGIN_SUCCESS, isSignedIn);
+        editor.putString(PREF_ACCESS_TOKEN, accessToken);
         //editor.remove(PREF_MOBILE_NO_VERIFIED);
         editor.apply();
 

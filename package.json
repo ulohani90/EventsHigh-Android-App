@@ -21,7 +21,8 @@
     "firebase": "^3.9.0",
     "react": "^16.0.0-alpha.6",
     "react-native": "^0.44.0",
-    "react-native-firestack": "2.3.1",
+    "react-native-firestack": "^2.3.9",
+    "react-native-sensitive-info": "^4.0.0",
     "react-redux": "^5.0.4",
     "react-router-native": "^4.1.1",
     "redux": "^3.6.0",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "babel-plugin-module-resolver": "^2.7.0",
-    "babel-preset-react-native": "^1.9.1"
+    "babel-preset-react-native": "^1.9.1",
+    "react-native-dotenv": "0.0.4"
   }
 }

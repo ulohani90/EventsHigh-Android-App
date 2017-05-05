@@ -1,4 +1,8 @@
 export const STARTUP_ACTION = 'STARTUP_ACTION';
+export const CHECK_LOGIN = 'CHECK_LOGIN';
+
+export const LOGIN_USER = 'LOGIN_USER';
+export const LOGOUT_USER = 'LOGOUT_USER';
 
  export const NAV_PUSH = 'NAV_PUSH';
  export const NAV_POP = 'NAV_POP';

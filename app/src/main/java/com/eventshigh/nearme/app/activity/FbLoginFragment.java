@@ -337,7 +337,7 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
                         //updateProfile();
                         dialog.dismiss();
                         try {
-                            new Account(activity).recordEmailId(object.getString("fb_name"), object.getString("fb_profile_pic"), object.getString("fb_email"), true);
+                            new Account(activity).recordEmailId(object.getString("fb_name"), object.getString("fb_profile_pic"), object.getString("fb_email"), object.getString("fb_token"), true);
                             activity.setResult(Activity.RESULT_OK);
 
                             clearBackStackActivities();
