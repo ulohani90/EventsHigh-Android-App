@@ -1,4 +1,4 @@
-import { LOGIN_USER, LOGOUT_USER } from 'action/types';
+import { LOGIN_USER, LOGOUT_USER, FETCH_MY_EVENTS } from 'action/types';
 
 
 export const loginUser = (user) => ({
@@ -9,3 +9,10 @@ export const loginUser = (user) => ({
 export const logoutUser = () => ({
   type: LOGOUT_USER
 })
+
+export const fetchMyEvents = () => ({
+  type: FETCH_MY_EVENTS
+})
+
+
+export const getCurrentUser = ({app}) => app.user

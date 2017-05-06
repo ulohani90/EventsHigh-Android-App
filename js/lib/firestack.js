@@ -1,4 +1,4 @@
-import Firestack from 'react-native-firestack'
+import Firestack, { FirestackModule } from 'react-native-firestack'
 import {
   APP_ID,
   DB_URL,
@@ -10,16 +10,13 @@ import {
 
 // setting up firebase
 console.log("Creating Firestack instance");
-const firestack = new Firestack()
+const firestack = new Firestack({
+  databaseUrl: DB_URL,
+  storageBucket: STORAGE_BUCKET,
+})
 
-// console.log(DB_URL);
-// firestack.database.setPersistence(true);
-// firebase.initializeApp({
-//   apiKey: API_KEY,
-//   authDomain: `${PROJECT_ID}.firebaseapp.com`,
-//   databaseURL: DB_URL,
-//   storageBucket: STORAGE_BUCKET,
-//   // messagingSenderId: ,
-// });
+firestack.database.setPersistence(true);
+
+export const getModule = (r) => new FirestackModule(r, { firestack });
 
 export default firestack;

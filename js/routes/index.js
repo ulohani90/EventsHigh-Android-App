@@ -12,13 +12,13 @@ import {
   PROJECT_ID
 } from 'react-native-dotenv';
 
-import { NativeRouter, Route, Redirect } from 'react-router-native'
+import { NativeRouter, Route, Redirect, Switch, AndroidBackButton } from 'react-router-native'
 
 import { ROUTE_APP, ROUTE_EVENT_LIST, ROUTE_EVENT } from 'route/names';
 // import { navPop, updateRouteParams } from 'action/navigation';
 
 import EventList from 'container/EventList';
-import Event from 'container/Event';
+import EventPage from 'container/Event';
 
 
 const PrivateRoute = connect(mapStateToProps)(({ props, component: Component, ...rest }) => {
@@ -79,16 +79,19 @@ class AppNavigator extends Component {
   // }
 
   render() {
-    const loggedInRoutes = [
-      <Route exact path="/" render={() => <Redirect to={ROUTE_EVENT_LIST} />}/>,
-      <Route path={ROUTE_EVENT_LIST} component={EventList}/> ,
-      <Route path={ROUTE_EVENT} component={Event}/>
-    ]
     return (
       <NativeRouter>
+        <AndroidBackButton>
         <View style={styles.container}>
-          {this.props.authenticated ? loggedInRoutes : <Text>User needs to login</Text>}
+          {this.props.authenticated ? (
+            <Switch>
+              <Route exact path="/" render={() => <Redirect to={ROUTE_EVENT_LIST} />}/>
+              <Route path={ROUTE_EVENT_LIST} component={EventList}/>
+              <Route path={ROUTE_EVENT} component={EventPage}/>
+            </Switch>
+          ) : <Text>User needs to login</Text>}
         </View>
+        </AndroidBackButton>
       </NativeRouter>
     )
   }
@@ -101,7 +104,7 @@ export default connect(mapStateToProps)(AppNavigator);
 
 const styles = StyleSheet.create({
   container: {
-    height: 100
+    flex: 1
   }
 })
 

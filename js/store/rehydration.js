@@ -4,17 +4,16 @@ import startupAction from 'action';
 
 export const REDUX_PERSIST = {
   active: true,
-  reducerVersion: '1', // need to update whenever we make a huge change in redux actions and release
+  reducerVersion: '2', // need to update whenever we make a huge change in redux actions and release
   keyPrefix: 'EventsHigh',
   storeConfig: {
-    storage: AsyncStorage
+    storage: AsyncStorage,
+    blacklist: ['firestack']
   }
 }
 
 export const updateReducers = (store) => {
   const { reducerVersion, storeConfig: config } = REDUX_PERSIST;
-
-
   AsyncStorage.getItem('reducerVersion').then((localVersion) => {
     if(localVersion !== reducerVersion) {
       persistStore(store, config).purge();

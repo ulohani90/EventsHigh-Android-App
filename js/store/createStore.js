@@ -2,9 +2,12 @@ import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
 import createSagaMiddleware, { END } from 'redux-saga';
 import { autoRehydrate } from 'redux-persist'
 import { updateReducers } from './rehydration'
-import { createLogger } from 'redux-logger';
-import reducers from 'app/reducers';
+import logger from 'redux-logger';
+import firestack from 'lib/firestack';
+import makeRootReducer from 'app/reducers';
 import rootSaga from 'app/sagas';
+import { composeWithDevTools } from 'remote-redux-devtools';
+
 
 export let Store = null
 
@@ -22,19 +25,23 @@ export default configureStore = (initialState) => {
     'persist/REHYDRATE'
   ]
 
-  const loggerMiddleware = createLogger({
-    predicate: () => __DEV__
-  });
-  // if(__DEV__) {
-  //   middleware.push(loggerMiddleware)
-  // }
+  // const loggerMiddleware = createLogger({
+  //   predicate: () => __DEV__
+  // });
+  let composeEnhancer = compose;
+  if(__DEV__) {
+    // middleware.push(logger);
+    composeEnhancer = composeWithDevTools;
+  }
 
   enhancers.push(applyMiddleware(...middleware));
   enhancers.push(autoRehydrate());
 
-  const store = createStore(reducers, initialState, compose(...enhancers));
+  const store = createStore(makeRootReducer(), initialState, composeEnhancer(...enhancers));
+  store.asyncReducers = {};
 
   updateReducers(store);
+  firestack.setStore(store);
   sagaMiddleware.run(rootSaga);
 
   Store = store;

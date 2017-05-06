@@ -1,6 +1,11 @@
 export const STARTUP_ACTION = 'STARTUP_ACTION';
 export const CHECK_LOGIN = 'CHECK_LOGIN';
 
+export const FETCH_MY_EVENTS = 'FETCH_MY_EVENTS';
+
+export const POST_MESSAGE = 'POST_MESSAGE';
+export const FETCH_MESSAGES = 'FETCH_MESSAGES';
+
 export const LOGIN_USER = 'LOGIN_USER';
 export const LOGOUT_USER = 'LOGOUT_USER';
 
