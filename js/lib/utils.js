@@ -7,3 +7,10 @@ export const getMsgRefName = (eventId, messageId)  => {
   }
   return refName
 }
+
+export const objToSortedArray = (obj, key="timestamp") => Object
+  .keys( obj ).sort(function( a, b ) {
+    return obj[a][key] - obj[b][key];
+  }).map(function( sortedKey ) {
+    return obj[sortedKey];
+  });

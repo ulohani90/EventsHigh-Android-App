@@ -4,9 +4,13 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Message from 'component/Message';
 import { fetchMessages } from 'action/messaging'
-import { getMsgRefName } from 'lib/utils';
+import { getMsgRefName, objToSortedArray } from 'lib/utils';
 import { getModule } from 'lib/firestack'
 class MessageList extends Component {
+  constructor(props) {
+    super(props);
+    this.msgList = null;
+  }
   componentWillMount() {
     const { eventId, messageId } = this.props;
     // this.props.fetchMessages(eventId, messageId);
@@ -14,15 +18,20 @@ class MessageList extends Component {
     this.inst.listen();
   }
 
+  // componentWillUpdate(prevProps, prevState) {
+    // this.msgList.scrollToEnd();
+  // }
+
   renderItem({ item }) {
     return <Message {...item} />
   }
   render() {
     return <View style={styles.container}>
       <FlatList
-        data={this.props.messages.items}
+        ref={(fl) => { this.msgList = fl}}
+        data={this.props.messages}
         renderItem={this.renderItem}
-        keyItereator={(i, idx) => `${i._key}-${idx}`}
+        keyExtractor={(i, idx) => `${i._key}-${idx}`}
       />
     </View>
   }
@@ -33,7 +42,7 @@ const mapStateToProps = (state, ownProps) => {
   const msgProp = state[getMsgRefName(ownProps.eventId, ownProps.messageId)];
 
   if(msgProp && msgProp.items) {
-    props.messages = msgProp;
+    props.messages = objToSortedArray(msgProp.items, 'timestamp');
   } else {
     props.messages = [];
   }
