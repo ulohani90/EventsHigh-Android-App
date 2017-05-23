@@ -274,6 +274,7 @@ public class EventsGridActivity extends BaseContextActivity {
 
                 if (eventsContext.query.contains(EventsHighEndpoints.QUERY_NEARME)) {
                     isNearMeQuery = true;
+                    showFollowCard = false;
                 } else {
                     isNearMeQuery = false;
                 }

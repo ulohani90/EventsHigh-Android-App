@@ -1372,9 +1372,15 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
 
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
-                    activity.showEventDetails(mapMarkerManager.getEvent(lastSelectedMarker),
-                            eventsContext.getLabel(), null);
-                    return true;
+                    Event event = mapMarkerManager.getEvent(lastSelectedMarker);
+                    if (event != null) {
+
+                        activity.showEventDetails(event,
+                                eventsContext.getLabel(), null);
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
 
                 @Override
@@ -1412,14 +1418,16 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
         mapEvents = new ArrayList<>();
 
         Event event = mapMarkerManager.getEvent(lastSelectedMarker);
-        mapEvents.add(event);
-        mapEvents.addAll(getEventsForSameAddress(event));
-        mapEventsCount.setText(mapEvents.size() + " Events");
-        adapter.setEvents(mapEvents, null, false);
-        if (isFiltersShown) {
-            collapseAnimation(EventsGridActivity.SHOW_MAP_EVENTS_LIST);
-        } else {
-            bringMapEventsVisible();
+        if (event != null) {
+            mapEvents.add(event);
+            mapEvents.addAll(getEventsForSameAddress(event));
+            mapEventsCount.setText(mapEvents.size() + " Events");
+            adapter.setEvents(mapEvents, null, false);
+            if (isFiltersShown) {
+                collapseAnimation(EventsGridActivity.SHOW_MAP_EVENTS_LIST);
+            } else {
+                bringMapEventsVisible();
+            }
         }
     }
 
@@ -1570,7 +1578,10 @@ public class NewWeekEventsFragment extends BaseEventsFragment {
     private GoogleMap.OnInfoWindowClickListener mOnInfoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
         @Override
         public void onInfoWindowClick(Marker marker) {
-            activity.showEventDetails(mapMarkerManager.getEvent(marker), eventsContext.getLabel(), null);
+            Event event = mapMarkerManager.getEvent(marker);
+            if (event != null) {
+                activity.showEventDetails(event, eventsContext.getLabel(), null);
+            }
         }
     };
 

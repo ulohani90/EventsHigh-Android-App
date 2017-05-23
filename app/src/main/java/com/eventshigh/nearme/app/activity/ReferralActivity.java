@@ -277,7 +277,7 @@ public class ReferralActivity extends BaseActivity {
         Intent intent = new Intent(this, LaunchActivity.class);
         intent.setAction(REDEEM_ACTION);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, LaunchActivity.OFFERS_TAB);
+      //  intent.putExtra(LaunchActivity.DEFAULT_TAB_PARAM, LaunchActivity.OFFERS_TAB);
         startActivity(intent);
         this.finish();
     }

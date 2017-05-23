@@ -203,9 +203,14 @@ public class EventsMapFragment extends Fragment {
 
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
-                    activity.showEventDetails(mapMarkerManager.getEvent(lastSelectedMarker),
-                            eventsContext.getLabel(), null);
-                    return true;
+                    Event event = mapMarkerManager.getEvent(lastSelectedMarker);
+                    if (event != null) {
+                        activity.showEventDetails(event,
+                                eventsContext.getLabel(), null);
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
 
                 @Override
@@ -237,17 +242,19 @@ public class EventsMapFragment extends Fragment {
     private void showEventCard() {
         View eventView = eventCardContainer.getChildAt(0);
         Event event = mapMarkerManager.getEvent(lastSelectedMarker);
-        eventView = EventCard.getEventCard(
-                event, activity, eventView, eventCardContainer, false);
-        eventView.setOnTouchListener(
-                new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return gestureDetector.onTouchEvent(event);
-                    }
-                });
-        eventCardContainer.removeAllViews();
-        eventCardContainer.addView(eventView);
+        if (event != null) {
+            eventView = EventCard.getEventCard(
+                    event, activity, eventView, eventCardContainer, false);
+            eventView.setOnTouchListener(
+                    new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            return gestureDetector.onTouchEvent(event);
+                        }
+                    });
+            eventCardContainer.removeAllViews();
+            eventCardContainer.addView(eventView);
+        }
     }
 
 
@@ -298,7 +305,13 @@ public class EventsMapFragment extends Fragment {
     private GoogleMap.OnInfoWindowClickListener mOnInfoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
         @Override
         public void onInfoWindowClick(Marker marker) {
-            activity.showEventDetails(mapMarkerManager.getEvent(marker), eventsContext.getLabel(), null);
+            Event event = mapMarkerManager.getEvent(marker);
+            if (event != null) {
+                activity.showEventDetails(event, eventsContext.getLabel(), null);
+            } else {
+
+
+            }
         }
     };
 /*

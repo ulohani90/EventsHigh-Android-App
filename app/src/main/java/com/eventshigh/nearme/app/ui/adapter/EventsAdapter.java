@@ -188,7 +188,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
         for (int i = 0; i < topicEvents.size(); i++) {
             TopicEvents topicEvent = topicEvents.get(i);
-            List<Event> events = topicEvent.events;
+            List<Event> events = new ArrayList<>(topicEvent.events);
             Collections.sort(events, new EventOccurenceComparator());
             if (events.isEmpty()) {
                 continue;

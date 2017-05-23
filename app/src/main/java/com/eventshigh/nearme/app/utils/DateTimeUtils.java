@@ -354,8 +354,7 @@ public class DateTimeUtils {
         c.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
         weekendDates[0] = toMidnight(c, null).getTime().getTime();
 
-        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        weekendDates[1] = toMidnight(c, null).getTime().getTime();
+        weekendDates[1] = weekendDates[0] + DateTimeUtils.MILLISECONDS_IN_A_DAY;
         return weekendDates;
 
     }

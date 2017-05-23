@@ -335,7 +335,7 @@ public class EventsFragment extends BaseEventsFragment {
         eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
         if (showFollowCard) {
             eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
-                    eventsCollection.numFollowers,((EventsGridActivity)getActivity()).isNearMeQuery);
+                    eventsCollection.numFollowers, getActivity() != null ? ((EventsGridActivity) getActivity()).isNearMeQuery : false);
         }
         if (scrollToPos != -1) {
             eventGridView.scrollToPosition(scrollToPos + 1);
@@ -486,10 +486,10 @@ public class EventsFragment extends BaseEventsFragment {
                                             } else {
                                                 noMyEventsView.setVisibility(View.GONE);
                                             }
-                                            if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).filtersHeaderContainer != null) {
+                                            if (getActivity() != null && getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).filtersHeaderContainer != null) {
                                                 ((EventsGridActivity) getActivity()).filtersHeaderContainer.setVisibility(View.VISIBLE);
                                             }
-                                            if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).fabBrowseMap != null && !((EventsGridActivity) getActivity()).isFabFilterVisible) {
+                                            if (getActivity() != null && getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).fabBrowseMap != null && !((EventsGridActivity) getActivity()).isFabFilterVisible) {
                                                 ((EventsGridActivity) getActivity()).fabBrowseMap.setVisibility(View.VISIBLE);
                                                 // ((EventsGridActivity) getActivity()).fabSpecialFilter.setVisibility(View.VISIBLE);
                                             }
@@ -767,14 +767,14 @@ public class EventsFragment extends BaseEventsFragment {
                     eventsAdapter.setEvents(filteredEvents, seeAllQuery, showEhInviteForNotification);
                     if (showFollowCard) {
                         eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
-                                eventsCollection.numFollowers,((EventsGridActivity)getActivity()).isNearMeQuery);
+                                eventsCollection.numFollowers, getActivity() != null ? ((EventsGridActivity) getActivity()).isNearMeQuery : false);
                     }
                     addSocialInvitationRequests();
-                    if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).filtersHeaderContainer != null) {
+                    if (getActivity() != null && getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).filtersHeaderContainer != null) {
 
                         ((EventsGridActivity) getActivity()).filtersHeaderContainer.setVisibility(View.VISIBLE);
                     }
-                    if (getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).fabBrowseMap != null && !((EventsGridActivity) getActivity()).isFabFilterVisible) {
+                    if (getActivity() != null && getActivity() instanceof EventsGridActivity && ((EventsGridActivity) getActivity()).fabBrowseMap != null && !((EventsGridActivity) getActivity()).isFabFilterVisible) {
                         ((EventsGridActivity) getActivity()).fabBrowseMap.setVisibility(View.VISIBLE);
                         //((EventsGridActivity) getActivity()).fabSpecialFilter.setVisibility(View.VISIBLE);
                     }
@@ -1227,7 +1227,7 @@ public class EventsFragment extends BaseEventsFragment {
             eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
             if (showFollowCard) {
                 eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
-                        eventsCollection.numFollowers,((EventsGridActivity)getActivity()).isNearMeQuery);
+                        eventsCollection.numFollowers, getActivity() != null ? ((EventsGridActivity) getActivity()).isNearMeQuery : false);
             }
         }
     }
@@ -1336,7 +1336,7 @@ public class EventsFragment extends BaseEventsFragment {
         @Override
         protected void onPostExecute(List<Event> events) {
 
-            if (!isCancelled() && events != null) {
+            if (!isCancelled() && events != null && getActivity() != null) {
                 topProgressBar.setVisibility(View.GONE);
                 EventsFragment.this.filteredEvents = events;
 
@@ -1349,7 +1349,7 @@ public class EventsFragment extends BaseEventsFragment {
                     eventsAdapter.setEvents(filteredEvents, null, showEhInviteForNotification);
                     if (showFollowCard) {
                         eventsAdapter.addFollowCard(eventsContext.query, eventsCollection.events.size(),
-                                eventsCollection.numFollowers,((EventsGridActivity)getActivity()).isNearMeQuery);
+                                eventsCollection.numFollowers, getActivity() != null ? ((EventsGridActivity) getActivity()).isNearMeQuery : false);
                     }
                 }
                 if (events.isEmpty() && getView() != null) {
@@ -1396,9 +1396,15 @@ public class EventsFragment extends BaseEventsFragment {
 
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
-                    activity.showEventDetails(mapMarkerManager.getEvent(lastSelectedMarker),
-                            eventsContext.getLabel(), null);
-                    return true;
+                    Event event = mapMarkerManager.getEvent(lastSelectedMarker);
+                    if (event != null) {
+                        activity.showEventDetails(event,
+                                eventsContext.getLabel(), null);
+                        return true;
+                    } else {
+
+                        return false;
+                    }
                 }
 
                 @Override
@@ -1436,14 +1442,18 @@ public class EventsFragment extends BaseEventsFragment {
         mapEvents = new ArrayList<>();
 
         Event event = mapMarkerManager.getEvent(lastSelectedMarker);
-        mapEvents.add(event);
-        mapEvents.addAll(getEventsForSameAddress(event));
-        mapEventsCount.setText(mapEvents.size() + " Events");
-        adapter.setEvents(mapEvents, null, false);
-        if (((EventsGridActivity) getActivity()).isFiltersShown) {
-            ((EventsGridActivity) getActivity()).collapseAnimation(EventsGridActivity.SHOW_MAP_EVENTS_LIST);
-        } else {
-            bringMapEventsVisible();
+        if (event != null) {
+            mapEvents.add(event);
+            mapEvents.addAll(getEventsForSameAddress(event));
+            mapEventsCount.setText(mapEvents.size() + " Events");
+            adapter.setEvents(mapEvents, null, false);
+            if (getActivity() != null) {
+                if (((EventsGridActivity) getActivity()).isFiltersShown) {
+                    ((EventsGridActivity) getActivity()).collapseAnimation(EventsGridActivity.SHOW_MAP_EVENTS_LIST);
+                } else {
+                    bringMapEventsVisible();
+                }
+            }
         }
     }
 
@@ -1534,17 +1544,19 @@ public class EventsFragment extends BaseEventsFragment {
     private void showEventCard() {
         View eventView = eventCardContainer.getChildAt(0);
         Event event = mapMarkerManager.getEvent(lastSelectedMarker);
-        eventView = EventCard.getEventCard(
-                event, activity, eventView, eventCardContainer, false);
-        eventView.setOnTouchListener(
-                new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return gestureDetector.onTouchEvent(event);
-                    }
-                });
-        eventCardContainer.removeAllViews();
-        eventCardContainer.addView(eventView);
+        if (event != null) {
+            eventView = EventCard.getEventCard(
+                    event, activity, eventView, eventCardContainer, false);
+            eventView.setOnTouchListener(
+                    new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            return gestureDetector.onTouchEvent(event);
+                        }
+                    });
+            eventCardContainer.removeAllViews();
+            eventCardContainer.addView(eventView);
+        }
     }
 
 
@@ -1596,7 +1608,13 @@ public class EventsFragment extends BaseEventsFragment {
     private GoogleMap.OnInfoWindowClickListener mOnInfoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
         @Override
         public void onInfoWindowClick(Marker marker) {
-            activity.showEventDetails(mapMarkerManager.getEvent(marker), eventsContext.getLabel(), null);
+            Event event = mapMarkerManager.getEvent(marker);
+            if (event != null) {
+                activity.showEventDetails(event, eventsContext.getLabel(), null);
+            } else {
+
+
+            }
         }
     };
 

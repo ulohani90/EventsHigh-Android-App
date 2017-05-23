@@ -141,7 +141,7 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String EXPLORE_TAB = "explore";
     public static final String NOTIFICATIONS_TAB = "Notifications";
     public static final String THIS_WEEK_TAB = "this week";
-    public static final String OFFERS_TAB = "Offers";
+   // public static final String OFFERS_TAB = "Offers";
     public static final String MOVIES_TAB = "movies";
     public ArrayList<String> TABS = new ArrayList<>();
 
@@ -217,7 +217,7 @@ public class LaunchActivity extends BaseContextActivity {
                     reportActionToAnalytics("profileInterestFabClick");
                     Intent i = new Intent(LaunchActivity.this, SelectInterestsActivity.class);
                     startActivity(i);
-                } else if (viewPager.getCurrentItem() == 3) {
+                } else if (viewPager.getCurrentItem() == 2) {
 
                     if (weekEventsFragment != null) {
                         if (weekEventsFragment.isMapShown) {
@@ -525,7 +525,7 @@ public class LaunchActivity extends BaseContextActivity {
                 // permission granted.
                 if (eventsContext.city == null && client != null) {
                     client.connect();
-                } else if (viewPager.getCurrentItem() == 3) {
+                } else if (viewPager.getCurrentItem() == 2) {
                     if (weekEventsFragment != null) {
                         weekEventsFragment.hideListView();
                         fabWriteReviews.setImageResource(R.drawable.ic_list_menu);
@@ -836,7 +836,7 @@ public class LaunchActivity extends BaseContextActivity {
         TABS = new ArrayList<>();
         TABS.add(MY_EVENTS_TAB);
         TABS.add(EXPLORE_TAB);
-        TABS.add(OFFERS_TAB);
+    //    TABS.add(OFFERS_TAB);
         TABS.add(THIS_WEEK_TAB);
         //   TABS.add(MOVIES_TAB);
         TABS.add(NOTIFICATIONS_TAB);
@@ -955,16 +955,16 @@ public class LaunchActivity extends BaseContextActivity {
         tabsView.getTabAt(1).setCustomView(tabTwo);
 
 
-        TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+       /* TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabThree.setText("Offers");
         tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_offer, 0, 0);
-        tabThree.setOnClickListener(new View.OnClickListener() {
+        tabThree.setOnClickListener(new View.OnClickListenerfab() {
             @Override
             public void onClick(View v) {
                 viewPager.setCurrentItem(2);
             }
         });
-        tabsView.getTabAt(2).setCustomView(tabThree);
+        tabsView.getTabAt(2).setCustomView(tabThree);*/
 
         TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabFour.setText("Week");
@@ -972,10 +972,10 @@ public class LaunchActivity extends BaseContextActivity {
         tabFour.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewPager.setCurrentItem(3);
+                viewPager.setCurrentItem(2);
             }
         });
-        tabsView.getTabAt(3).setCustomView(tabFour);
+        tabsView.getTabAt(2).setCustomView(tabFour);
 
         TextView tabFive = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabFive.setText("Alerts");
@@ -983,10 +983,10 @@ public class LaunchActivity extends BaseContextActivity {
         tabFive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewPager.setCurrentItem(4);
+                viewPager.setCurrentItem(3);
             }
         });
-        tabsView.getTabAt(4).setCustomView(tabFive);
+        tabsView.getTabAt(3).setCustomView(tabFive);
     }
 
 
@@ -1132,7 +1132,7 @@ public class LaunchActivity extends BaseContextActivity {
         @Override
         public void onPageSelected(int position) {
             reportActionToAnalytics("tabchange", TABS.get(position));
-            if (position == 3) {
+            if (position == 2) {
                 if (weekEventsFragment != null && weekEventsFragment.isLoadingComplete) {
                     if (weekEventsFragment.isMapShown) {
                         fabWriteReviews.setImageResource(R.drawable.ic_list_menu);
@@ -1218,9 +1218,9 @@ public class LaunchActivity extends BaseContextActivity {
                 return exploreFragment;
 
             }
-            if (TABS.get(position).equals(OFFERS_TAB)) {
+           /* if (TABS.get(position).equals(OFFERS_TAB)) {
                 return new OffersFragment();
-            }
+            }*/
 
             if (TABS.get(position).equals(NOTIFICATIONS_TAB)) {
                 return new StreamFragment();
@@ -1521,7 +1521,7 @@ public class LaunchActivity extends BaseContextActivity {
 
 
     public void animateFabIn() {
-        if (viewPager.getCurrentItem() == 3 || (viewPager.getCurrentItem() == 0 && account.getUserInfo().isSignedIn) && fabWriteReviews.getVisibility() == View.GONE) {
+        if (viewPager.getCurrentItem() == 2 || (viewPager.getCurrentItem() == 0 && account.getUserInfo().isSignedIn) && fabWriteReviews.getVisibility() == View.GONE) {
             fabWriteReviews.clearAnimation();
             fabWriteReviews.setVisibility(View.VISIBLE);
            /* TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 250, 0);

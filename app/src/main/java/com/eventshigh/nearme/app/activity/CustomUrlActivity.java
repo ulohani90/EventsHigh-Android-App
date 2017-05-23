@@ -261,7 +261,7 @@ public class CustomUrlActivity extends BaseActivity {
         webSettings.setBuiltInZoomControls(false);
         WebView.setWebContentsDebuggingEnabled(true);
         webSettings.setLoadWithOverviewMode(true);
-        webSettings.setUseWideViewPort(true);
+        webSettings.setUseWideViewPort(false);
 
 
         // Enable Caching.
@@ -283,7 +283,7 @@ public class CustomUrlActivity extends BaseActivity {
 
         // Setup a new web view client so we can listen in on events and also customize
         // web view behavior.
-        webView.setInitialScale(1);
+      //  webView.setInitialScale(1);
 
         webView.setWebViewClient(new EHWebViewClient(activity, isPayment,
                 useProgressBar ? activity.findViewById(R.id.top_progress_bar) : null));

@@ -2,7 +2,9 @@ package com.eventshigh.nearme.app.activity;
 
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -12,7 +14,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -57,6 +63,8 @@ import com.eventshigh.nearme.app.view.ContactListView;
 import com.eventshigh.nearme.app.view.SmartViewPager;
 import com.google.ads.conversiontracking.AdWordsRemarketingReporter;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -598,13 +606,39 @@ public class NewEventDetailActivity extends BaseContextActivity {
             startActivity(intent);
 
         } else {
-            try {
-                bookingUriBuilder.appendQueryParameter("src", "eh-android");
-                CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
-                        getString(R.string.title_book));
-            } catch (Exception e) {
-                Crashlytics.getInstance().core.logException(e);
-                showMessage(R.string.retry);
+            if (event.bookingUrl.contains("ticketing.eventshigh.com")) {
+                try {
+                    bookingUriBuilder.appendQueryParameter("src", "eh-android");
+                    CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
+                            getString(R.string.title_book));
+                } catch (Exception e) {
+                    Crashlytics.getInstance().core.logException(e);
+                    showMessage(R.string.retry);
+                }
+            }else{
+                try {
+                    URL url = new URL(event.bookingUrl);
+                    String host = url.getHost();
+                    SpannableString messageText = new SpannableString("You are being redirected to "+ host +". Please click confirm to proceed further.");
+                    messageText.setSpan(new StyleSpan(Typeface.BOLD),28,(28 + host.length()),SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    new AlertDialog.Builder(NewEventDetailActivity.this).setMessage(messageText).setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            bookingUriBuilder.appendQueryParameter("src", "eh-android");
+                            CustomUrlActivity.launchCustomUrl(NewEventDetailActivity.this, bookingUriBuilder.build(),
+                                    getString(R.string.title_book));
+                        }
+                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
+                }catch(MalformedURLException e){
+
+
+                }
             }
         }
 

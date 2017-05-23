@@ -1,7 +1,9 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -25,12 +28,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.UserContact;
+import com.eventshigh.nearme.app.network.RequestToCallApi;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.FBSigninDialog;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
@@ -49,6 +57,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.zendesk.sdk.feedback.ui.ContactZendeskActivity;
+
+import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -99,6 +109,8 @@ public class EventInfoFragment extends Fragment {
     TextView eventSrcText;
 
     ImageView trustedPartner;
+
+    ProgressDialog progressDialog;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -346,8 +358,40 @@ public class EventInfoFragment extends Fragment {
             eventSourceLayout.setVisibility(View.GONE);
         }
 
+        if (event.organizerPhone != null && event.organizerPhone.length() > 0 && !event.skipRequestToCall) {
+            enquiryBtn.setVisibility(View.VISIBLE);
+            callOrganizer.setVisibility(View.GONE);
+            enquiryBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    requestCallOrganizer(event);
+                }
+            });
 
-        if (account.getLastCity() != null && account.getLastCity().equals(City.BANGALORE)) {
+        } else {
+
+            if (event.organizerName != null) {
+                eventInfoLayout.setVisibility(View.VISIBLE);
+            } else {
+                eventInfoLayout.setVisibility(View.GONE);
+            }
+
+            if (account.getLastCity() != null && account.getLastCity().equals(City.BANGALORE)) {
+                enquiryBtn.setVisibility(View.VISIBLE);
+                enquiryBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ama(event);
+                    }
+                });
+            } else {
+                enquiryBtn.setVisibility(View.GONE);
+            }
+            callOrganizer.setVisibility(View.GONE);
+        }
+
+
+        /*if (account.getLastCity() != null && account.getLastCity().equals(City.BANGALORE)) {
             enquiryBtn.setVisibility(View.VISIBLE);
             callOrganizer.setVisibility(View.GONE);
             enquiryBtn.setOnClickListener(new View.OnClickListener() {
@@ -376,7 +420,7 @@ public class EventInfoFragment extends Fragment {
                 enquiryBtn.setVisibility(View.GONE);
                 callOrganizer.setVisibility(View.GONE);
             }
-        }
+        }*/
 
         if (!(string.toString().equalsIgnoreCase("Outside " + event.city)) && event.getMapQuery() != null) {
             mapDirection.setVisibility(View.VISIBLE);
@@ -562,24 +606,15 @@ public class EventInfoFragment extends Fragment {
         }
     }
 
+
     public void ama(Event event) {
-        Account account = new Account(getActivity());
+
+        final Account account = new Account(getActivity());
         Account.UserInfo userInfo = account.getUserInfo();
         if (userInfo.phoneNo == null) {
             PhoneVerificationDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
-
-            //FBSigninDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_signin_via_fb, R.string.ui_signin_fb_plan, NewEventDetailActivity.REQUEST_FOR_RESULT_AMA);
-
-/*
-            Intent intent = new Intent(activity, FBLoginActivity.class);
-            intent.putExtra("show_special_text", true);
-            intent.putExtra("hide_skip", true);
-
-            activity.startActivityForResult(intent, NewEventDetailActivity.REQUEST_FOR_RESULT_AMA);
-*/
             return;
         }
-
         Preferences preferences = Preferences.getInstance(getActivity());
         if (!preferences.canUploadContacts()) {
             if (AskForContactsDialog.checkIfToShow(((NewEventDetailActivity) getActivity()), preferences)) {
@@ -587,12 +622,54 @@ public class EventInfoFragment extends Fragment {
             }
         }
 
-
         ((NewEventDetailActivity) getActivity()).reportEventAction(event, "ama");
         ZendeskUtils.initZendesk(getActivity());
         ZendeskUtils.setEventFeedbackConfiguration(getActivity(), event);
         Intent feedbackIntent = new Intent(getActivity(), ContactZendeskActivity.class);
         getActivity().startActivity(feedbackIntent);
+
+    }
+
+
+    public void requestCallOrganizer(Event event) {
+        final Account account = new Account(getActivity());
+        Account.UserInfo userInfo = account.getUserInfo();
+        if (userInfo.phoneNo == null) {
+            PhoneVerificationDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_verify_phone, R.string.ui_phone_verify_plan);
+            return;
+        }
+
+        activity.reportEventAction(event, "enquiry_request_to_call");
+        progressDialog = ProgressDialog.show(activity, null, "Submitting request. Please wait..");
+        RequestToCallApi.submit(activity, userInfo.phoneNo, event.organizerPhone, event.id, event.organizerAccountName, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject jsonObject, boolean b) {
+                if (progressDialog != null) {
+                    progressDialog.dismiss();
+                }
+                showCallReceivingDialog();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                if (progressDialog != null) {
+                    progressDialog.dismiss();
+                }
+                Toast.makeText(activity, "Some problem occurred. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+    }
+
+    public void showCallReceivingDialog() {
+        new AlertDialog.Builder(activity).setMessage("We will connect you to the organizer shortly").setTitle("Request Received").setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        }).show();
+
     }
 
     public void save(Event event) {

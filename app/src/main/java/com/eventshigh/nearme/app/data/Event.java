@@ -97,6 +97,8 @@ public class Event implements Parcelable {
     @Nullable
     public final String organizerLink;
 
+    public final String organizerAccountName;
+
     public final double minPrice;
     public final double maxPrice;
     @Nullable
@@ -145,6 +147,8 @@ public class Event implements Parcelable {
     //DiscountPercentageText is given priority above discountPercentage
     public String discountPercentageText;
 
+    public final boolean skipRequestToCall;
+
     public Event(String id, City city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, ArrayList<String> allImages, @Nullable String sourceUrl,
@@ -155,11 +159,11 @@ public class Event implements Parcelable {
                  @Nullable String address, boolean isCleanVenue,
                  List<String> performers,
                  String organizerName, String organizerPhone, String organizerWebsite,
-                 String organizerEmail, String organizerLink, ArrayList<EhPrices> ehPrices,
+                 String organizerEmail, String organizerLink, String organizerAccountName, ArrayList<EhPrices> ehPrices,
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
                  List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
                  @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus, String zone,
-                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText) {
+                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText, boolean skipRequestToCall) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -195,6 +199,7 @@ public class Event implements Parcelable {
         this.organizerWebsite = Utils.checkIfUnknown(organizerWebsite);
         this.organizerEmail = Utils.checkIfUnknown(organizerEmail);
         this.organizerLink = Utils.checkIfUnknown(organizerLink);
+        this.organizerAccountName = Utils.checkIfUnknown(organizerAccountName);
 
         this.ehPrices = ehPrices;
         this.minPrice = minPrice;
@@ -221,6 +226,7 @@ public class Event implements Parcelable {
         this.faqs = faqs;
         this.discountPercentage = discountPercentage;
         this.discountPercentageText = discountPercentageText;
+        this.skipRequestToCall = skipRequestToCall;
     }
 
     public Event(Parcel in) {
@@ -264,6 +270,7 @@ public class Event implements Parcelable {
         this.organizerWebsite = Utils.checkIfUnknown(in.readString());
         this.organizerEmail = Utils.checkIfUnknown(in.readString());
         this.organizerLink = Utils.checkIfUnknown(in.readString());
+        this.organizerAccountName = Utils.checkIfUnknown(in.readString());
 
         ehPrices = new ArrayList<>();
         in.readTypedList(ehPrices, EhPrices.CREATOR);
@@ -297,6 +304,7 @@ public class Event implements Parcelable {
         in.readTypedList(faqs, EventZendeskTicketObject.CREATOR);
         discountPercentage = in.readString();
         discountPercentageText = in.readString();
+        skipRequestToCall = in.createBooleanArray()[0];
     }
 
     public Uri getEventDetailsURI() {
@@ -431,6 +439,7 @@ public class Event implements Parcelable {
         dest.writeString(emptyIfNull(organizerWebsite));
         dest.writeString(emptyIfNull(organizerEmail));
         dest.writeString(emptyIfNull(organizerLink));
+        dest.writeString(emptyIfNull(organizerAccountName));
 
         dest.writeTypedList(ehPrices);
         dest.writeDouble(minPrice);
@@ -456,6 +465,7 @@ public class Event implements Parcelable {
         dest.writeTypedList(faqs);
         dest.writeString(discountPercentage);
         dest.writeString(discountPercentageText);
+        dest.writeBooleanArray(new boolean[]{skipRequestToCall});
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -618,11 +628,24 @@ public class Event implements Parcelable {
             }
 
             // Organizer Info.
-            String organizerName = mashup == null ? null : mashup.optString("organizer_name");
-            String organizerPhone = mashup == null ? null : mashup.optString("organizer_phone");
-            String organizerWebsite = mashup == null ? null : mashup.optString("organizer_website");
-            String organizerEmail = mashup == null ? null : mashup.optString("organizer_email");
-            String organizerLink = mashup == null ? null : mashup.optString("organizer_link");
+
+            String organizerName = null;
+            String organizerPhone = null;
+            String organizerWebsite = null;
+            String organizerEmail = null;
+            String organizerLink = null;
+            if(eventJson.has("attributes") && eventJson.optJSONObject("attributes").has("organizer_info")){
+                JSONObject organizerInfo = eventJson.optJSONObject("attributes").optJSONObject("organizer_info");
+                organizerName = organizerInfo.optString("name");
+                organizerPhone = organizerInfo.optString("phone");
+                organizerEmail = organizerInfo.optString("email");
+                organizerWebsite = organizerInfo.optString("website");
+
+            }
+
+            String organizerAccountName = eventJson.optString("organizer_account_name");
+
+            boolean skipRequestToCall = eventJson.optBoolean("skip_request_to_call");
 
             // Price.
             double minPrice = -1, maxPrice = -1;
@@ -877,6 +900,7 @@ public class Event implements Parcelable {
                     organizerWebsite,
                     organizerEmail,
                     organizerLink,
+                    organizerAccountName,
                     ehPrices,
                     minPrice,
                     maxPrice,
@@ -898,7 +922,7 @@ public class Event implements Parcelable {
                     isEhTicketing,
                     faqs,
                     discountPercentage,
-                    discountPercentageText
+                    discountPercentageText, skipRequestToCall
             );
         } catch (IllegalArgumentException e) {
             Log.i("Exception caught", e.getMessage());

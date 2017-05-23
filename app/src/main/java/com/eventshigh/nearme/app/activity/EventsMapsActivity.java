@@ -288,9 +288,14 @@ public class EventsMapsActivity extends BaseContextActivity {
 
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
-                    showEventDetails(mapMarkerManager.getEvent(lastSelectedMarker),
-                            eventsContext.getLabel(), null);
-                    return true;
+                    Event event = mapMarkerManager.getEvent(lastSelectedMarker);
+                    if (event != null) {
+                        showEventDetails(event,
+                                eventsContext.getLabel(), null);
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
 
                 @Override
@@ -322,17 +327,19 @@ public class EventsMapsActivity extends BaseContextActivity {
     private void showEventCard() {
         View eventView = eventCardContainer.getChildAt(0);
         Event event = mapMarkerManager.getEvent(lastSelectedMarker);
-        eventView = EventCard.getEventCard(
-                event, EventsMapsActivity.this, eventView, eventCardContainer, false);
-        eventView.setOnTouchListener(
-                new OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return gestureDetector.onTouchEvent(event);
-                    }
-                });
-        eventCardContainer.removeAllViews();
-        eventCardContainer.addView(eventView);
+        if (event != null) {
+            eventView = EventCard.getEventCard(
+                    event, EventsMapsActivity.this, eventView, eventCardContainer, false);
+            eventView.setOnTouchListener(
+                    new OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            return gestureDetector.onTouchEvent(event);
+                        }
+                    });
+            eventCardContainer.removeAllViews();
+            eventCardContainer.addView(eventView);
+        }
     }
 
 
@@ -382,7 +389,13 @@ public class EventsMapsActivity extends BaseContextActivity {
     private OnInfoWindowClickListener mOnInfoWindowClickListener = new OnInfoWindowClickListener() {
         @Override
         public void onInfoWindowClick(Marker marker) {
-            showEventDetails(mapMarkerManager.getEvent(marker), eventsContext.getLabel(), null);
+            Event event = mapMarkerManager.getEvent(marker);
+            if (event != null) {
+                showEventDetails(event, eventsContext.getLabel(), null);
+            } else {
+
+            }
+
         }
     };
 

@@ -28,14 +28,24 @@ public class SettingsActivity extends BaseActivity {
 
             if (intent.getAction().equals("com.eventshigh.add_event")) {
                 reportActionToAnalytics("addEvent");
+                Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.eventshigh.pulse");
+                if (launchIntent != null) {
+                    startActivity(launchIntent);//null pointer check in case package name was not found
+                }else{
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.eventshigh.pulse")));
+                    } catch (android.content.ActivityNotFoundException anfe) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.eventshigh.pulse")));
+                    }
 
-                try {
+                }
+                /*try {
                     startActivity(new Intent(Intent.ACTION_SENDTO,
                             Uri.parse("mailto:listings@eventshigh.com")));
                 } catch (ActivityNotFoundException e) {
                     // No activity to open url. ignore.
                     Crashlytics.getInstance().core.logException(e);
-                }
+                }*/
             }
             if(intent.getAction().equalsIgnoreCase("contact_support")){
                 reportActionToAnalytics("contact_support");

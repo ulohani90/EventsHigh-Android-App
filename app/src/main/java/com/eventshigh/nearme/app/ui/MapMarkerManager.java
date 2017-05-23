@@ -80,27 +80,28 @@ public class MapMarkerManager {
     // ***********************
 
     public Event getEvent(Marker marker) {
-        return markers.get(marker).event;
+
+        return markers != null ? markers.get(marker).event : null;
     }
 
     public void setEvents(GoogleMap map, List<Event> events) {
         map.clear();
         markers.clear();
 
-        for(Event event : events) {
+        for (Event event : events) {
             if (event.location == null) {
                 continue;
             }
 
             MarkerInfo markerInfo = new MarkerInfo(event);
             Marker marker = map.addMarker(
-                new MarkerOptions()
-                    .position(new LatLng(event.location.latitude, event.location.longitude))
-                    .title(Utils.shortenIfNeeded(event.title))
-                    .visible(false)
-                    .icon(event.ehRecommended ? event.category.recommendationIcon()
-                            : markerInfo.canShowAsDot ? EventCategory.circleIcon()
-                            : event.category.icon())
+                    new MarkerOptions()
+                            .position(new LatLng(event.location.latitude, event.location.longitude))
+                            .title(Utils.shortenIfNeeded(event.title))
+                            .visible(false)
+                            .icon(event.ehRecommended ? event.category.recommendationIcon()
+                                    : markerInfo.canShowAsDot ? EventCategory.circleIcon()
+                                    : event.category.icon())
             );
             markers.put(marker, markerInfo);
         }
@@ -256,7 +257,7 @@ public class MapMarkerManager {
             LatLng marker = null;
             int numMinMarkers = Math.min(MIN_EVENTS_TO_SHOW, markerPositions.size());
             for (LatLng m : markerPositions) {
-                numMinMarkers --;
+                numMinMarkers--;
                 if (numMinMarkers <= 0) {
                     marker = m;
                     break;

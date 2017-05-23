@@ -415,6 +415,11 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         }
 
         @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
+
+        @Override
         public CharSequence getPageTitle(int position) {
             return TABS.get(position);
         }
