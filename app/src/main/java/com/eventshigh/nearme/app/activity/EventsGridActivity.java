@@ -298,9 +298,15 @@ public class EventsGridActivity extends BaseContextActivity {
                     findViewById(R.id.category_separator).setVisibility(View.VISIBLE);
                     dateFilter.setVisibility(View.VISIBLE);
                 }
-                isZoneFilterVisible = true;
-                zoneFilter.setVisibility(View.VISIBLE);
-                findViewById(R.id.price_separator).setVisibility(View.VISIBLE);
+                if (eventsContext.city.equals(City.GOA)) {
+                    isZoneFilterVisible = false;
+                    zoneFilter.setVisibility(View.GONE);
+                    findViewById(R.id.price_separator).setVisibility(View.GONE);
+                } else {
+                    isZoneFilterVisible = true;
+                    zoneFilter.setVisibility(View.VISIBLE);
+                    findViewById(R.id.price_separator).setVisibility(View.VISIBLE);
+                }
             } else {
                 isZoneFilterVisible = false;
                 isDateFilterVisible = true;
@@ -551,37 +557,38 @@ public class EventsGridActivity extends BaseContextActivity {
 
         LinearLayout zoneContainer = (LinearLayout) findViewById(R.id.zone_container);
         final String[] zones = getZonesAccordingToCity();
+        if (zones != null) {
+            for (int i = 0; i < zones.length + 1; i++) {
+                View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, zoneContainer, false);
+                final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
+                if (i == 0) {
+                    filterText.setText("Zone:");
+                } else {
+                    filterText.setText(zones[i - 1]);
+                }
 
-        for (int i = 0; i < zones.length + 1; i++) {
-            View view = LayoutInflater.from(this).inflate(R.layout.filter_tags_layout, zoneContainer, false);
-            final TextView filterText = (TextView) view.findViewById(R.id.filter_text);
-            if (i == 0) {
-                filterText.setText("Zone:");
-            } else {
-                filterText.setText(zones[i - 1]);
-            }
+                zoneContainer.addView(view);
+                filterText.setTag(i);
+                filterText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
 
-            zoneContainer.addView(view);
-            filterText.setTag(i);
-            filterText.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+                        int position = (Integer) filterText.getTag();
+                        if (position != 0) {
+                            position = position - 1;
+                            eventsFragment.startFilterAsyncTask(ZONE_FILTER, null, null, -1, zones[position], null, false, null);
+                            reportActionToAnalytics("filters", eventsContext.query + "-" + zones[position]);
+                            // eventsFragment.filterEventsWithPrice(null, FREE);
 
-                    int position = (Integer) filterText.getTag();
-                    if (position != 0) {
-                        position = position - 1;
-                        eventsFragment.startFilterAsyncTask(ZONE_FILTER, null, null, -1, zones[position], null, false, null);
-                        reportActionToAnalytics("filters", eventsContext.query + "-" + zones[position]);
-                        // eventsFragment.filterEventsWithPrice(null, FREE);
-
-                        if (filterText.isSelected()) {
-                            filterText.setSelected(false);
-                        } else {
-                            filterText.setSelected(true);
+                            if (filterText.isSelected()) {
+                                filterText.setSelected(false);
+                            } else {
+                                filterText.setSelected(true);
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }
 
         collapseAnimation(-1);
@@ -752,8 +759,16 @@ public class EventsGridActivity extends BaseContextActivity {
             return new String[]{"Central Chennai", "North Chennai", "South Chennai", "Outside " + Utils.capitalize(City.CHENNAI.name())};
         } else if (account.getLastCity() == City.DELHI) {
             return new String[]{"Central Delhi", "East Delhi", "Ghaziabad", "Greater Noida", "Gurgaon", "Noida", "South Delhi", "South West Delhi", "West Delhi", "Outside " + Utils.capitalize(City.DELHI.name())};
-        } else {
+        } else if (account.getLastCity() == City.MUMBAI) {
             return new String[]{"Mumbai Central Suburbs", "Mumbai Harbour", "Mumbai Mira Road & Beyond", "Mumbai South", "Mumbai Western Suburbs", "Outside " + Utils.capitalize(City.MUMBAI.name())};
+        } else if (account.getLastCity() == City.HYDERABAD) {
+            return new String[]{"Central Hyderabad", "East Hyderabad", "North Hyderabad", "South Hyderabad", "West Hyderabad", "Hyderabad Outer"};
+        } else if (account.getLastCity() == City.KOLKATA) {
+            return new String[]{"Kolkata Central", "Kolkata East", "Kolkata North", "Kolkata South"};
+        } else if (account.getLastCity() == City.PUNE) {
+            return new String[]{"Central Pune", "East Pune", "North Pune", "South Pune", "West Pune", "Pune Outer"};
+        } else {
+            return null;
         }
     }
 

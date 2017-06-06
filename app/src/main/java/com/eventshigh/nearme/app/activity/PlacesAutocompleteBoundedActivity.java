@@ -86,6 +86,8 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
 
     boolean isSelectLocationClicked;
 
+    boolean isLocationPermissionGranted = true;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -290,6 +292,14 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
                     new Account(PlacesAutocompleteBoundedActivity.this).setLastCity(City.DELHI);
                 } else if (addresses.get(0).getLocality().equalsIgnoreCase("Mumbai")) {
                     new Account(PlacesAutocompleteBoundedActivity.this).setLastCity(City.MUMBAI);
+                } else if (addresses.get(0).getLocality().equalsIgnoreCase("Kolkata")) {
+                    new Account(PlacesAutocompleteBoundedActivity.this).setLastCity(City.KOLKATA);
+                } else if (addresses.get(0).getLocality().equalsIgnoreCase("Hyderabad")) {
+                    new Account(PlacesAutocompleteBoundedActivity.this).setLastCity(City.HYDERABAD);
+                } else if (addresses.get(0).getLocality().equalsIgnoreCase("Pune")) {
+                    new Account(PlacesAutocompleteBoundedActivity.this).setLastCity(City.PUNE);
+                } else if (addresses.get(0).getLocality().equalsIgnoreCase("Goa")) {
+                    new Account(PlacesAutocompleteBoundedActivity.this).setLastCity(City.GOA);
                 }
 
                 setResult(Activity.RESULT_OK, intent);
@@ -319,7 +329,7 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
     @Override
     protected void onPause() {
         super.onPause();
-        if (mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient.isConnected() && isLocationPermissionGranted) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
@@ -462,7 +472,12 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_ACCESS_FINE_LOCATION || requestCode == PERMISSION_ACCESS_COARSE_LOCATION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                isLocationPermissionGranted = true;
                 onSelectLocationClick();
+            } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                isLocationPermissionGranted = false;
+                Toast.makeText(PlacesAutocompleteBoundedActivity.this, "Location permission is off. Please grant location permission from settings.", Toast.LENGTH_SHORT).show();
+
             }
         }
     }

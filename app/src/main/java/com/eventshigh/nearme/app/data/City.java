@@ -8,12 +8,17 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 /**
  * Represents the City as supported by EventsHigh.
+ * SWNE
  */
 public enum City {
     BANGALORE(12.784305f, 77.352505f, 13.178402f, 77.840023f, "GMT+0530", "IN"),
     DELHI(28.370917f, 76.803156f, 28.882014f, 77.432123f, "GMT+0530", "IN"),
     MUMBAI(18.863098f, 72.750398f, 19.295282f, 73.071748f, "GMT+0530", "IN"),
-    CHENNAI(12.822149f, 79.979980f, 13.324029f, 80.393727f, "GMT+0530", "IN");
+    CHENNAI(12.822149f, 79.979980f, 13.324029f, 80.393727f, "GMT+0530", "IN"),
+    GOA(14.894509f, 73.684082f, 15.799917f, 74.340533f, "GMT+0530", "IN"),
+    KOLKATA(22.343629f, 88.193636f, 23.008363f, 88.542870f, "GMT+0530", "IN"),
+    HYDERABAD(17.216889f, 78.159922f, 17.607809f, 78.656169f, "GMT+0530", "IN"),
+    PUNE(18.413478f, 73.739478f, 18.635755f, 73.986457f, "GMT+0530", "IN");
 
     public final LatLngBounds cityBounds;
     public final String timeZone;
