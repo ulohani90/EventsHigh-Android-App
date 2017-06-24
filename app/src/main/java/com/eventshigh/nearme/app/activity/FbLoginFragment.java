@@ -70,6 +70,7 @@ public class FbLoginFragment extends Fragment implements GoogleApiClient.OnConne
     public static FbLoginFragment newInstance(boolean hideSkip, boolean showSpecialText, boolean isLogout, boolean closeActivity) {
 
         Bundle args = new Bundle();
+
         args.putBoolean("hide_skip", hideSkip);
         args.putBoolean("show_special_text", showSpecialText);
         args.putBoolean("close_activity", closeActivity);

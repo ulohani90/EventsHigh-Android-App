@@ -749,7 +749,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            View view = getLayoutInflater().inflate(R.layout.card_refer, container, false);
+            View view = NewEventDetailActivity.this.getLayoutInflater().inflate(R.layout.card_refer, container, false);
             TextView helloUserText = (TextView) view.findViewById(R.id.hello_user_text);
             helloUserText.setVisibility(View.GONE);
             ImageView banner = (ImageView) view.findViewById(R.id.banner_img);

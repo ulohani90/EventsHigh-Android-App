@@ -3,6 +3,7 @@ package com.eventshigh.nearme.app.network;
 import android.content.Context;
 import android.view.View;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
@@ -98,6 +99,8 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         EventCollectionRequest request = new EventCollectionRequest(
                 context, url, eventsContext, priority, shouldBypassCache, includeWithoutLocation,
                 listener, errorListener, pListener);
+        request.setRetryPolicy(new DefaultRetryPolicy(60_000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         request.setTag(tag);
         VolleyHelper.addToRequestQueue(context, request);
     }

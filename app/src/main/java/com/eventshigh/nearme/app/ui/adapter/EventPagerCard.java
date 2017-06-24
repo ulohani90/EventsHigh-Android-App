@@ -31,13 +31,17 @@ public class EventPagerCard extends ViewHolder {
         viewPager.setAdapter(adapter);
 
         dotsView.removeAllViews();
-        for (int i = 0; i < adapter.getCount(); i++) {
-            View view = eventPagerData.activity.getLayoutInflater().inflate(
-                    R.layout.view_dot_featured, dotsView, false);
-            view.setSelected(i == 0);
-            dotsView.addView(view);
+        if (adapter.getCount() > 1) {
+            dotsView.setVisibility(View.VISIBLE);
+            for (int i = 0; i < adapter.getCount(); i++) {
+                View view = eventPagerData.activity.getLayoutInflater().inflate(
+                        R.layout.view_dot_featured, dotsView, false);
+                view.setSelected(i == 0);
+                dotsView.addView(view);
+            }
+        } else {
+            dotsView.setVisibility(View.GONE);
         }
-
         viewPager.clearOnPageChangeListeners();
         viewPager.addOnPageChangeListener(new DotsSelector(eventPagerData.activity));
     }

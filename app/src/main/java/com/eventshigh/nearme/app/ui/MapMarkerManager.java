@@ -97,7 +97,7 @@ public class MapMarkerManager {
             Marker marker = map.addMarker(
                     new MarkerOptions()
                             .position(new LatLng(event.location.latitude, event.location.longitude))
-                            .title(Utils.shortenIfNeeded(event.title))
+                            .title(Utils.shortenIfNeeded(event.title) != null ? Utils.shortenIfNeeded(event.title) : "")
                             .visible(false)
                             .icon(event.ehRecommended ? event.category.recommendationIcon()
                                     : markerInfo.canShowAsDot ? EventCategory.circleIcon()

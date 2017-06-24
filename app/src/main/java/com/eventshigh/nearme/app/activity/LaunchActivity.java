@@ -141,7 +141,7 @@ public class LaunchActivity extends BaseContextActivity {
     public static final String EXPLORE_TAB = "explore";
     public static final String NOTIFICATIONS_TAB = "Notifications";
     public static final String THIS_WEEK_TAB = "this week";
-   // public static final String OFFERS_TAB = "Offers";
+    // public static final String OFFERS_TAB = "Offers";
     public static final String MOVIES_TAB = "movies";
     public ArrayList<String> TABS = new ArrayList<>();
 
@@ -796,6 +796,7 @@ public class LaunchActivity extends BaseContextActivity {
             drawer.closeDrawers();
 
         if (client != null && client.isConnected()) {
+            // client.stopAutoManage(this);
             client.disconnect();
         }
     }
@@ -836,7 +837,7 @@ public class LaunchActivity extends BaseContextActivity {
         TABS = new ArrayList<>();
         TABS.add(MY_EVENTS_TAB);
         TABS.add(EXPLORE_TAB);
-    //    TABS.add(OFFERS_TAB);
+        //    TABS.add(OFFERS_TAB);
         TABS.add(THIS_WEEK_TAB);
         //   TABS.add(MOVIES_TAB);
         TABS.add(NOTIFICATIONS_TAB);

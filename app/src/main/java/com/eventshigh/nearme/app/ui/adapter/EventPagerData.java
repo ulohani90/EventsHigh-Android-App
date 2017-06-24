@@ -30,6 +30,6 @@ public class EventPagerData implements AdapterData {
 
     @Override
     public String getId() {
-        return events.get(0).id;
+        return events.size() > 0 ? events.get(0).id : "hello_card";
     }
 }

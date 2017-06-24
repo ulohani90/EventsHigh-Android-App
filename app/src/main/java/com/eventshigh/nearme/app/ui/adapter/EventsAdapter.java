@@ -310,10 +310,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     public void setNewExploreCategories(@Nullable EventCollection eventCollection, String[] tags, boolean showNewYearImage) {
         dataToShow.clear();
         if (eventCollection != null) {
-            if (!eventCollection.events.isEmpty()) {
+            //if (!eventCollection.events.isEmpty()) {
                 dataToShow.add(new EventPagerData(activity, eventCollection.showReferrer,
                         eventCollection.events));
-            }
+            //}
         }
         dataToShow.add(new ExploreCategoryHeaderData(activity, showNewYearImage));
 

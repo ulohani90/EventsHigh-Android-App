@@ -35,6 +35,7 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,9 +65,12 @@ public class FBLoginActivity extends BaseActivity {
 
         boolean showSpecialText = getIntent().getBooleanExtra("show_special_text", false);
 
+        // GoogleApiClient.Builder builder = new GoogleApiClient.Builder(this);
+
         fragment = FbLoginFragment.newInstance(hideSkip, showSpecialText, isLogout, true);
 
         getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
+
 
     }
 

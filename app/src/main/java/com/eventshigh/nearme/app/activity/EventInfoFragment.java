@@ -359,15 +359,24 @@ public class EventInfoFragment extends Fragment {
         }
 
         if (event.organizerPhone != null && event.organizerPhone.length() > 0 && !event.skipRequestToCall) {
-            enquiryBtn.setVisibility(View.VISIBLE);
-            callOrganizer.setVisibility(View.GONE);
-            enquiryBtn.setOnClickListener(new View.OnClickListener() {
+            enquiryBtn.setVisibility(View.GONE);
+            callOrganizer.setVisibility(View.VISIBLE);
+            callOrganizer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    requestCallOrganizer(event);
+                    requestCallOrganizer(event, event.organizerPhone);
                 }
             });
 
+        } else if (event.skipRequestToCall && event.skipCallbackupPhone != null) {
+            enquiryBtn.setVisibility(View.GONE);
+            callOrganizer.setVisibility(View.VISIBLE);
+            callOrganizer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    requestCallOrganizer(event, event.skipCallbackupPhone);
+                }
+            });
         } else {
 
             if (event.organizerName != null) {
@@ -378,6 +387,7 @@ public class EventInfoFragment extends Fragment {
 
             if (account.getLastCity() != null && account.getLastCity().equals(City.BANGALORE)) {
                 enquiryBtn.setVisibility(View.VISIBLE);
+                
                 enquiryBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -631,7 +641,7 @@ public class EventInfoFragment extends Fragment {
     }
 
 
-    public void requestCallOrganizer(Event event) {
+    public void requestCallOrganizer(Event event, String organizerPhone) {
         final Account account = new Account(getActivity());
         Account.UserInfo userInfo = account.getUserInfo();
         if (userInfo.phoneNo == null) {
@@ -641,7 +651,7 @@ public class EventInfoFragment extends Fragment {
 
         activity.reportEventAction(event, "enquiry_request_to_call");
         progressDialog = ProgressDialog.show(activity, null, "Submitting request. Please wait..");
-        RequestToCallApi.submit(activity, userInfo.phoneNo, event.organizerPhone, event.id, event.organizerAccountName, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
+        RequestToCallApi.submit(activity, userInfo.phoneNo, organizerPhone, event.id, event.organizerAccountName, Request.Priority.HIGH, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject jsonObject, boolean b) {
                 if (progressDialog != null) {

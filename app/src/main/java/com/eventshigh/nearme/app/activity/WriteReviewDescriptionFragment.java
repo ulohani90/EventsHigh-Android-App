@@ -168,7 +168,7 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
 
 
     public void placeReviewAction() {
-        if (new Account(writeReviewActivity).getUserInfo() != null) {
+        if ((new Account(writeReviewActivity)).getUserInfo() != null && (new Account(writeReviewActivity)).getLastCity() != null) {
 
 
             try {

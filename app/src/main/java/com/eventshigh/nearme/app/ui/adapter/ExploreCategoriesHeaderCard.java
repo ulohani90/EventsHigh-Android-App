@@ -62,18 +62,21 @@ public class ExploreCategoriesHeaderCard extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
                 activity.reportActionToAnalytics("showSearchView", "nearme");
-                EventsContext param;
+                EventsContext param = null;
                 Account account = new Account(activity);
                 if (account.getLastLocality() != null) {
                     param = new EventsContext(account.getLastLocality().getLatLng(), EventsHighEndpoints.QUERY_NEARME + " (" + account.getLastLocality().getName() + ")");
-                } else {
+                } else if (account.getLastCity() != null) {
                     param = new EventsContext(account.getLastCity().cityBounds.getCenter(), EventsHighEndpoints.QUERY_NEARME);
-                }
+                } else {
 
-                param.removeDateFilter();
-                Intent intent = new Intent(activity, EventsGridActivity.class)
-                        .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
-                activity.startActivity(intent);
+                }
+                if (param != null) {
+                    param.removeDateFilter();
+                    Intent intent = new Intent(activity, EventsGridActivity.class)
+                            .putExtra(IntentUtils.EXTRA_EVENT_CONTEXT, param);
+                    activity.startActivity(intent);
+                }
             }
         });
     }

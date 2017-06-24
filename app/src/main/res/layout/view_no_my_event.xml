@@ -1,38 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:fillViewport="true"
-    android:layout_height="match_parent">
-<FrameLayout
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/eh_bg"
->
-    <TextView
-        android:id="@+id/no_my_event_heading"
-        style="?android:attr/textAppearanceMedium"
+    android:fillViewport="true">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="24dp"
-        android:paddingTop="24dp"
-        android:gravity="center_horizontal|top"
-        android:textColor="@android:color/white"
-        android:text="@string/ui_no_my_event"
-    />
-    <TextView
+        android:orientation="vertical">
 
-        style="@style/EHButtonCTA"
-        android:id="@+id/explore_events"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="64dp"
-        android:padding="9dp"
-        android:layout_gravity="center_horizontal|bottom"
-        android:gravity="center"
-        android:text="@string/action_explore_events"
-    />
-</FrameLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/eh_bg">
+
+            <TextView
+                android:id="@+id/no_my_event_heading"
+                style="?android:attr/textAppearanceMedium"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="24dp"
+                android:gravity="center_horizontal|top"
+                android:paddingTop="24dp"
+                android:text="@string/ui_no_my_event"
+                android:textColor="@android:color/white" />
+
+            <TextView
+
+                android:id="@+id/explore_events"
+                style="@style/EHButtonCTA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|bottom"
+                android:layout_marginBottom="64dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:padding="9dp"
+                android:text="@string/action_explore_events" />
+        </FrameLayout>
+    </LinearLayout>
 </ScrollView>

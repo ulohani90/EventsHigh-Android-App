@@ -38,8 +38,12 @@ public class Utils {
     private static final int TITLE_MAX_LENGHT = 32;
 
     public static String shortenIfNeeded(String title) {
-        return title.length() < TITLE_MAX_LENGHT ? title :
-                title.substring(0, TITLE_MAX_LENGHT - 3) + "...";
+        try {
+            return title.length() < TITLE_MAX_LENGHT ? title :
+                    title.substring(0, TITLE_MAX_LENGHT - 3) + "...";
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static String capitalize(String original) {
@@ -190,8 +194,12 @@ public class Utils {
     }
 
     public static Double roundToTwoDecimalPlaces(Double value) {
-        DecimalFormat format = new DecimalFormat("#.#");
-        return Double.valueOf(format.format(value));
+        try {
+            DecimalFormat format = new DecimalFormat("#.#");
+            return Double.valueOf(format.format(value));
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
     }
 
     public static int getDummyImageResource() {

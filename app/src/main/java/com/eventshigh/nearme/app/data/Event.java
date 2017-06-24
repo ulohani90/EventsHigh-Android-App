@@ -149,6 +149,8 @@ public class Event implements Parcelable {
 
     public final boolean skipRequestToCall;
 
+    public final String skipCallbackupPhone;
+
     public Event(String id, City city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, ArrayList<String> allImages, @Nullable String sourceUrl,
@@ -163,7 +165,7 @@ public class Event implements Parcelable {
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
                  List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
                  @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus, String zone,
-                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText, boolean skipRequestToCall) {
+                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText, boolean skipRequestToCall, String skipCallbackupPhone) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -227,6 +229,7 @@ public class Event implements Parcelable {
         this.discountPercentage = discountPercentage;
         this.discountPercentageText = discountPercentageText;
         this.skipRequestToCall = skipRequestToCall;
+        this.skipCallbackupPhone = skipCallbackupPhone;
     }
 
     public Event(Parcel in) {
@@ -305,6 +308,7 @@ public class Event implements Parcelable {
         discountPercentage = in.readString();
         discountPercentageText = in.readString();
         skipRequestToCall = in.createBooleanArray()[0];
+        skipCallbackupPhone = in.readString();
     }
 
     public Uri getEventDetailsURI() {
@@ -321,6 +325,7 @@ public class Event implements Parcelable {
         else
             return requestPerAttendeeData.equals("on");
     }
+
 
     public Uri getEventShareURI(@Nullable String src) {
         return EventsHighEndpoints.getEventShareURI(this, src);
@@ -466,6 +471,7 @@ public class Event implements Parcelable {
         dest.writeString(discountPercentage);
         dest.writeString(discountPercentageText);
         dest.writeBooleanArray(new boolean[]{skipRequestToCall});
+        dest.writeString(skipCallbackupPhone);
     }
 
     // This is used to regenerate your object. All Parcelables must have
@@ -634,7 +640,7 @@ public class Event implements Parcelable {
             String organizerWebsite = null;
             String organizerEmail = null;
             String organizerLink = null;
-            if(eventJson.has("attributes") && eventJson.optJSONObject("attributes").has("organizer_info")){
+            if (eventJson.has("attributes") && eventJson.optJSONObject("attributes").has("organizer_info")) {
                 JSONObject organizerInfo = eventJson.optJSONObject("attributes").optJSONObject("organizer_info");
                 organizerName = organizerInfo.optString("name");
                 organizerPhone = organizerInfo.optString("phone");
@@ -646,6 +652,7 @@ public class Event implements Parcelable {
             String organizerAccountName = eventJson.optString("organizer_account_name");
 
             boolean skipRequestToCall = eventJson.optBoolean("skip_request_to_call");
+            String skipCallBackupPhone = eventJson.optString("skip_call_backup_phone");
 
             // Price.
             double minPrice = -1, maxPrice = -1;
@@ -922,7 +929,9 @@ public class Event implements Parcelable {
                     isEhTicketing,
                     faqs,
                     discountPercentage,
-                    discountPercentageText, skipRequestToCall
+                    discountPercentageText,
+                    skipRequestToCall,
+                    skipCallBackupPhone
             );
         } catch (IllegalArgumentException e) {
             Log.i("Exception caught", e.getMessage());
@@ -944,7 +953,11 @@ public class Event implements Parcelable {
                         listener.onPartialLoadingComplete(events);
                         events = new ArrayList<>();
                     } else if (i == jsonArray.length() - 1) {
-                        listener.onFullDataLoadingComplete(events.subList(20, events.size()));
+                        if (events.size() > 20) {
+                            listener.onFullDataLoadingComplete(events.subList(20, events.size()));
+                        } else {
+                            listener.onFullDataLoadingComplete(events);
+                        }
                     }
                 }
             } catch (JSONException | ParseException e) {

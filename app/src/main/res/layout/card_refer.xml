@@ -8,9 +8,7 @@
         android:id="@+id/banner_img"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="@string/title_refer"
         android:scaleType="centerCrop"
-
         tools:layout_height="200dp" />
 
 
@@ -26,7 +24,6 @@
         android:layout_gravity="end|bottom"
         android:layout_marginBottom="28dp"
         android:layout_marginRight="12dp"
-        android:text="Hello Umesh"
         android:textColor="@android:color/white"
         android:textSize="32sp" />
 </FrameLayout>
