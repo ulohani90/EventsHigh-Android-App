@@ -101,17 +101,18 @@ public class DateTimeUtils {
 
     public static final long MILLISECONDS_IN_A_DAY = 86400000;
 
-    private static final SimpleDateFormat FULL_DATE_TIME_FORMAT =
-            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.US);
+    // private static final SimpleDateFormat FULL_DATE_TIME_MILLIS_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-    private static final SimpleDateFormat FULL_DATE_TIME_MILLIS_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-
-    private static final SimpleDateFormat DD_MM_YYYY_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+   // private static final SimpleDateFormat DD_MM_YYYY_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 
     public static
     @Nullable
     Date mergeDateTime(String date, String time, String timeZone) throws ParseException {
+
+        SimpleDateFormat FULL_DATE_TIME_FORMAT =
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.US);
+
         if (date == null || date.isEmpty() || date.equalsIgnoreCase("null")) {
             return null;
         }
@@ -255,6 +256,7 @@ public class DateTimeUtils {
 
     public static long parseOfferTime(String time) {
         Date date = new Date();
+        SimpleDateFormat FULL_DATE_TIME_MILLIS_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         try {
             date = FULL_DATE_TIME_MILLIS_FORMAT.parse(time);
         } catch (ParseException e) {
@@ -339,6 +341,7 @@ public class DateTimeUtils {
     }
 
     public static long parseMovieTime(String time) {
+        SimpleDateFormat DD_MM_YYYY_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         try {
             date = DD_MM_YYYY_FORMAT.parse(time);

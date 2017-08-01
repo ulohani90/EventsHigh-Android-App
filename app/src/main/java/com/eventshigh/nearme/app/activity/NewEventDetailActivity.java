@@ -417,36 +417,42 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
         statsView.setText(" and " + event.numViews + " more viewed this");
 */
-        bookView.setVisibility(event.bookingUrl != null && event.bookingUrl.length() > 0 ? View.VISIBLE : View.GONE);
-        if (event.bookingText != null) {
-            bookView.setText(event.bookingText);
+
+        if (event.bookingUrl != null && event.bookingUrl.toLowerCase().contains("bookmyshow")) {
+            bookView.setVisibility(View.GONE);
+            joinView.setVisibility(View.GONE);
+        } else {
+
+            bookView.setVisibility(event.bookingUrl != null && event.bookingUrl.length() > 0 ? View.VISIBLE : View.GONE);
+            if (event.bookingText != null) {
+                bookView.setText(event.bookingText);
+            }
+
+            if (bookView.isShown()) {
+                bookView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openBookingSite();
+                    }
+                });
+            }
+
+
+            joinView.setVisibility(
+                    (bookView.getVisibility() != View.VISIBLE && event.sourceUrl != null &&
+                            event.sourceUrl.contains("facebook.com/"))
+                            ? View.VISIBLE : View.GONE);
+
+            if (joinView.isShown()) {
+                joinView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openSourceSite(v);
+                    }
+                });
+            }
+
         }
-
-        if (bookView.isShown()) {
-            bookView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    openBookingSite();
-                }
-            });
-        }
-
-
-        joinView.setVisibility(
-                (bookView.getVisibility() != View.VISIBLE && event.sourceUrl != null &&
-                        event.sourceUrl.contains("facebook.com/"))
-                        ? View.VISIBLE : View.GONE);
-
-        if (joinView.isShown()) {
-            joinView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    openSourceSite(v);
-                }
-            });
-        }
-
-
         EventImagePagerAdapter imagePagerAdapter = new EventImagePagerAdapter();
         imagePager.setAdapter(imagePagerAdapter);
         dotsView.removeAllViews();
@@ -615,12 +621,12 @@ public class NewEventDetailActivity extends BaseContextActivity {
                     Crashlytics.getInstance().core.logException(e);
                     showMessage(R.string.retry);
                 }
-            }else{
+            } else {
                 try {
                     URL url = new URL(event.bookingUrl);
                     String host = url.getHost();
-                    SpannableString messageText = new SpannableString("You are being redirected to "+ host +". Please click confirm to proceed further.");
-                    messageText.setSpan(new StyleSpan(Typeface.BOLD),28,(28 + host.length()),SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    SpannableString messageText = new SpannableString("You are being redirected to " + host + ". Please click confirm to proceed further.");
+                    messageText.setSpan(new StyleSpan(Typeface.BOLD), 28, (28 + host.length()), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
                     new AlertDialog.Builder(NewEventDetailActivity.this).setMessage(messageText).setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -635,7 +641,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                             dialog.dismiss();
                         }
                     }).show();
-                }catch(MalformedURLException e){
+                } catch (MalformedURLException e) {
 
 
                 }

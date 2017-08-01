@@ -258,7 +258,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LaunchActivity" />
 
-            <intent-filter
+            <!--<intent-filter
                 android:autoVerify="true"
                 tools:ignore="UnusedAttribute">
                 <data
@@ -270,7 +270,7 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
+            </intent-filter>-->
         </activity>
         <activity
             android:name=".activity.BlogEntryActivity"
@@ -284,7 +284,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.BlogFeedActivity" />
 
-            <intent-filter
+            <!--<intent-filter
                 android:autoVerify="true"
                 tools:ignore="UnusedAttribute">
                 <data
@@ -296,7 +296,7 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
+            </intent-filter>-->
         </activity>
 
         <activity

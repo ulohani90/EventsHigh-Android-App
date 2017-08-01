@@ -387,7 +387,7 @@ public class EventInfoFragment extends Fragment {
 
             if (account.getLastCity() != null && account.getLastCity().equals(City.BANGALORE)) {
                 enquiryBtn.setVisibility(View.VISIBLE);
-                
+
                 enquiryBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -724,7 +724,8 @@ public class EventInfoFragment extends Fragment {
         Intent intent = event.getShowDirectionsOnMapIntent(activity);
         if (intent == null) {
             ((NewEventDetailActivity) getActivity()).reportActionToAnalytics("skipDirectionsNoLocation");
-            ((NewEventDetailActivity) getActivity()).showMessage(R.string.failed_event_location);
+            Toast.makeText(getActivity(), getString(R.string.failed_event_location), Toast.LENGTH_SHORT).show();
+            //((NewEventDetailActivity) getActivity()).showMessage(R.string.failed_event_location);
             return;
         }
 
@@ -733,7 +734,8 @@ public class EventInfoFragment extends Fragment {
         } catch (ActivityNotFoundException e) {
             // No activity to open maps.
             Crashlytics.getInstance().core.logException(e);
-            ((NewEventDetailActivity) getActivity()).showMessage(R.string.no_map_app);
+            Toast.makeText(getActivity(), getString(R.string.no_map_app), Toast.LENGTH_SHORT).show();
+            //  ((NewEventDetailActivity) getActivity()).showMessage(R.string.no_map_app);
         }
     }
 
