@@ -12,12 +12,41 @@
         android:id="@+id/event_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:fontFamily="sans-serif-medium"
-        android:padding="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
         android:text="Jashn-e-Mohit"
         android:textColor="#333333"
         android:textSize="20sp" />
 
+    <TextView
+        android:id="@+id/event_price"
+        style="@style/EventCardText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:paddingLeft="10dp"
+        android:textColor="#666666"
+        android:textIsSelectable="false"
+        android:textSize="18sp"
+        tools:text="₹ 200 - 500" />
+
+    <TextView
+        android:id="@+id/event_discount"
+        style="@style/EventCardText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textColor="#CC40930B"
+        android:textIsSelectable="false"
+        android:textSize="16sp"
+        tools:text="10% Off" />
 
     <View
         android:layout_width="match_parent"

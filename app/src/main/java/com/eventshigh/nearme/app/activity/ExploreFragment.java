@@ -42,7 +42,7 @@ import java.util.List;
 public class ExploreFragment extends BaseEventsFragment {
     public static final String[] EXPLORE_TAGS = {
             EventCategory.TODAY.categoryName,
-            EventCategory.MOVIES.categoryName,
+            //EventCategory.MOVIES.categoryName,
             EventCategory.NIGHTLIFE.categoryName,
             EventCategory.LIVE_PERFORMANCES.categoryName,
             EventCategory.OUTDOORS.categoryName,
@@ -52,7 +52,7 @@ public class ExploreFragment extends BaseEventsFragment {
             EventCategory.WORKSHOPS.categoryName,
             EventCategory.TECH.categoryName,
             EventCategory.ART.categoryName,
-            EventCategory.FOOD.categoryName
+        //    EventCategory.FOOD.categoryName
 
     };
 

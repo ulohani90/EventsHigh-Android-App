@@ -88,6 +88,7 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
 
     boolean isLocationPermissionGranted = true;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -223,49 +224,51 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
             result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
                 @Override
                 public void onResult(LocationSettingsResult result) {
-                    final Status status = result.getStatus();
+                    if (mGoogleApiClient.isConnected()) {
+                        final Status status = result.getStatus();
 
-                    final LocationSettingsStates state = result.getLocationSettingsStates();
-                    switch (status.getStatusCode()) {
-                        case LocationSettingsStatusCodes.SUCCESS:
+                        final LocationSettingsStates state = result.getLocationSettingsStates();
+                        switch (status.getStatusCode()) {
+                            case LocationSettingsStatusCodes.SUCCESS:
 
-                            if (ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                                    ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                if (ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                                        ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-                                Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                                if (location != null) {
+                                    Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                                    if (location != null) {
 
-                                    handleNewLocation(location);
+                                        handleNewLocation(location);
+                                    } else {
+                                        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, PlacesAutocompleteBoundedActivity.this);
+                                    }
                                 } else {
-                                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, PlacesAutocompleteBoundedActivity.this);
+                                    if (ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                        ActivityCompat.requestPermissions(PlacesAutocompleteBoundedActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_ACCESS_FINE_LOCATION);
+                                    } else {
+                                        ActivityCompat.requestPermissions(PlacesAutocompleteBoundedActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_ACCESS_COARSE_LOCATION);
+                                    }
+                                    // Toast.makeText(PlacesAutocompleteBoundedActivity.this, "Location Permission not allowed.", Toast.LENGTH_SHORT).show();
                                 }
-                            } else {
-                                if (ActivityCompat.checkSelfPermission(PlacesAutocompleteBoundedActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                    ActivityCompat.requestPermissions(PlacesAutocompleteBoundedActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_ACCESS_FINE_LOCATION);
-                                } else {
-                                    ActivityCompat.requestPermissions(PlacesAutocompleteBoundedActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_ACCESS_COARSE_LOCATION);
+
+                                break;
+                            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                                // Location settings are not satisfied. But could be fixed by showing the user
+                                // a dialog.
+                                try {
+                                    // Show the dialog by calling startResolutionForResult(),
+                                    // and check the result in onActivityResult().
+                                    status.startResolutionForResult(
+                                            PlacesAutocompleteBoundedActivity.this, 1000);
+                                } catch (IntentSender.SendIntentException e) {
+                                    // Ignore the error.
                                 }
-                                // Toast.makeText(PlacesAutocompleteBoundedActivity.this, "Location Permission not allowed.", Toast.LENGTH_SHORT).show();
-                            }
+                                break;
+                            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
 
-                            break;
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            // Location settings are not satisfied. But could be fixed by showing the user
-                            // a dialog.
-                            try {
-                                // Show the dialog by calling startResolutionForResult(),
-                                // and check the result in onActivityResult().
-                                status.startResolutionForResult(
-                                        PlacesAutocompleteBoundedActivity.this, 1000);
-                            } catch (IntentSender.SendIntentException e) {
-                                // Ignore the error.
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-
-                            // Location settings are not satisfied. However, we have no way to fix the
-                            // settings so we won't show the dialog.
-                            break;
+                                // Location settings are not satisfied. However, we have no way to fix the
+                                // settings so we won't show the dialog.
+                                break;
+                        }
                     }
                 }
             });
