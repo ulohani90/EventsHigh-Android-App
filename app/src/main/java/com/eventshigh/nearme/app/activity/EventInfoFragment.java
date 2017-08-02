@@ -91,6 +91,8 @@ public class EventInfoFragment extends Fragment {
 
     TextView eventVenueText;
 
+    TextView eventPrice, eventDiscount;
+
     private GoogleApiClient client;
     private Action viewAction = null;
 
@@ -156,6 +158,8 @@ public class EventInfoFragment extends Fragment {
         trustedPartner = (ImageView) view.findViewById(R.id.trusted_partner);
         eventSourceLayout = (LinearLayout) view.findViewById(R.id.event_source_layout);
         eventSrcText = (TextView) view.findViewById(R.id.source_link);
+        eventPrice = (TextView) view.findViewById(R.id.event_price);
+        eventDiscount = (TextView) view.findViewById(R.id.event_discount);
         return view;
     }
 
@@ -215,6 +219,23 @@ public class EventInfoFragment extends Fragment {
 
         final Event event = getArguments().getParcelable("event");
         eventName.setText(event.title);
+        String priceString = event.getPriceString();
+        if (priceString == null) {
+            eventPrice.setVisibility(View.GONE);
+        } else {
+            eventPrice.setVisibility(View.VISIBLE);
+            eventPrice.setText(priceString);
+        }
+        if (event.discountPercentageText != null) {
+            eventDiscount.setVisibility(View.VISIBLE);
+            eventDiscount.setText(event.discountPercentageText);
+        } else if (event.discountPercentage != null) {
+            eventDiscount.setVisibility(View.VISIBLE);
+            eventDiscount.setText(event.discountPercentage + "% OFF");
+        } else {
+            eventDiscount.setVisibility(View.GONE);
+        }
+
         if (event.organizerName != null) {
             eventOrganizer.setText("By " + event.organizerName);
         }

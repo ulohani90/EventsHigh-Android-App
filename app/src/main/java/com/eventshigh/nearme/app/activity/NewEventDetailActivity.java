@@ -359,7 +359,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 Utils.ADWORDS_CONVERSION_ID,
                 params);
 
-        final TextView eventPrice = (TextView) findViewById(R.id.event_price);
+        /*final TextView eventPrice = (TextView) findViewById(R.id.event_price);
         String priceString = event.getPriceString();
         if (priceString == null) {
             eventPrice.setVisibility(View.GONE);
@@ -376,7 +376,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
             eventDiscount.setText(event.discountPercentage + "% OFF");
         } else {
             eventDiscount.setVisibility(View.GONE);
-        }
+        }*/
 
         viewPager.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent e) {

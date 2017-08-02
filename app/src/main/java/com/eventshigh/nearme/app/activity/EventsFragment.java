@@ -200,9 +200,9 @@ public class EventsFragment extends BaseEventsFragment {
         eventsAdapter = new EventsAdapter(activity);
         eventGridView = (AutofitRecyclerView) view.findViewById(R.id.event_grid);
         if (shouldAddPadding)
-            eventGridView.setPadding((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()),
+            eventGridView.setPadding((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics()),
                     (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics()),
-                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()),
+                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics()),
                     (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()));
         eventGridView.setAdapter(eventsAdapter);
         eventsAdapter.setOnItemClickedListener(new EventsAdapter.OnItemClickedListener() {

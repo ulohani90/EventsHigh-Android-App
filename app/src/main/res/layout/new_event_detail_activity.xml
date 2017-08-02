@@ -80,6 +80,7 @@
                         android:textSize="15sp"
                         android:visibility="gone"
                         tools:text="₹ 200 - 500" />
+
                     <TextView
                         android:id="@+id/event_discount"
                         style="@style/EventCardText"
@@ -109,10 +110,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:clipChildren="false"
                         android:paddingBottom="18dp"
                         android:paddingLeft="18dp"
                         android:paddingRight="8dp"
-                        android:clipChildren="false"
                         android:paddingTop="18dp"
                         android:visibility="gone"
                         app:contactPhotoSize="28dp"

@@ -44,7 +44,12 @@ public class EventCard extends ViewHolder {
     private final ImageView recommendedView;
     private final TextView titleView;
     private final ImageView favouriteView;
-    private final TextView eventTimeView;
+    //private final TextView eventTimeView;
+    private final TextView eventDay;
+    private final TextView eventDate;
+    private final TextView eventTimeText;
+    private final LinearLayout eventTimeLayout;
+    private final View eventTimeSeparator;
     private final TextView priceView;
     private final TextView venueView;
     private final TextView travelTimeView;
@@ -67,7 +72,7 @@ public class EventCard extends ViewHolder {
 
     public static EventCard newInstance(Activity activity, ViewGroup parent,
                                         boolean shouldAdjustImageHeight, boolean isAddShadow) {
-        View view = activity.getLayoutInflater().inflate(R.layout.card_event, parent, false);
+        View view = activity.getLayoutInflater().inflate(R.layout.new_card_event, parent, false);
         return new EventCard(view, shouldAdjustImageHeight, isAddShadow);
     }
 
@@ -89,7 +94,12 @@ public class EventCard extends ViewHolder {
         eventLocation = (TextView) cardView.findViewById(R.id.event_location);
         titleView = (TextView) cardView.findViewById(R.id.event_title);
         favouriteView = (ImageView) cardView.findViewById(R.id.action_favourite);
-        eventTimeView = (TextView) cardView.findViewById(R.id.event_time);
+        // eventTimeView = (TextView) cardView.findViewById(R.id.event_time);
+        eventDay = (TextView) cardView.findViewById(R.id.event_day);
+        eventDate = (TextView) cardView.findViewById(R.id.event_date);
+        eventTimeText = (TextView) cardView.findViewById(R.id.event_time);
+        eventTimeLayout = (LinearLayout) cardView.findViewById(R.id.event_time_layout);
+        eventTimeSeparator = cardView.findViewById(R.id.event_time_separator);
         priceView = (TextView) cardView.findViewById(R.id.event_price);
         venueView = (TextView) cardView.findViewById(R.id.event_venue);
         travelTimeView = (TextView) cardView.findViewById(R.id.event_travel_time);
@@ -291,17 +301,24 @@ public class EventCard extends ViewHolder {
             lastEventTime = DateTimeUtils.getEventTime(event, event.eventTimings.size() - 1);
         }
         if (eventTime == null) {
-            eventTimeView.setVisibility(View.GONE);
+            eventTimeLayout.setVisibility(View.GONE);
+            eventTimeSeparator.setVisibility(View.GONE);
+            //  eventTimeView.setVisibility(View.GONE);
         } else {
-            eventTimeView.setVisibility(View.VISIBLE);
-            if (lastEventTime == null) {
+            eventTimeLayout.setVisibility(View.VISIBLE);
+            eventTimeSeparator.setVisibility(View.VISIBLE);
+            //eventTimeView.setVisibility(View.VISIBLE);
+            eventDay.setText(eventTime.day.toUpperCase());
+            eventDate.setText(eventTime.date);
+            eventTimeText.setText(eventTime.time);
+            /*if (lastEventTime == null) {
 
                 eventTimeView.setText(eventTime.toString());
             } else {
                 SpannableString dateString = new SpannableString(eventTime.toString() + " - " + lastEventTime.toString());
                 dateString.setSpan(new StyleSpan(Typeface.BOLD), eventTime.toString().length(), eventTime.toString().length() + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 eventTimeView.setText(dateString);
-            }
+            }*/
 
         }
 
@@ -382,7 +399,7 @@ public class EventCard extends ViewHolder {
         arrowView.setVisibility(isFirstEvent ? View.VISIBLE : View.GONE);
         Account account = new Account(activity);
         // Set the travel time.
-        if (account.getLastLocality() != null ) {
+        if (account.getLastLocality() != null) {
             String travelTime = LocationUtils.getTravelTime(activity, account.getLastLocality().getLatLng(), event.location);
             if (travelTime != null) {
                 travelTimeView.setText(travelTime);
