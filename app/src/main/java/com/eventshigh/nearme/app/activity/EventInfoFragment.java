@@ -50,9 +50,6 @@ import com.eventshigh.nearme.app.utils.LocationUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.eventshigh.nearme.app.view.ZCustomFlowLayout;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -92,7 +89,6 @@ public class EventInfoFragment extends Fragment {
     TextView eventVenueText;
 
     private GoogleApiClient client;
-    private Action viewAction = null;
 
     Account account;
 
@@ -387,7 +383,7 @@ public class EventInfoFragment extends Fragment {
 
             if (account.getLastCity() != null && account.getLastCity().equals(City.BANGALORE)) {
                 enquiryBtn.setVisibility(View.VISIBLE);
-                
+
                 enquiryBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -516,7 +512,6 @@ public class EventInfoFragment extends Fragment {
         }
 
         client = new GoogleApiClient.Builder(getActivity())
-                .addApi(AppIndex.API)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
@@ -532,15 +527,6 @@ public class EventInfoFragment extends Fragment {
                 .build();
         client.connect();
         Uri webUri = event.getEventDetailsURI();
-        viewAction = new Action.Builder(Action.TYPE_VIEW)
-                .setObject(new Thing.Builder()
-                        .setName(event.title)
-                        .setId(webUri.toString())
-                        .setUrl(Utils.getAppUri(webUri))
-                        .build())
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-        AppIndex.AppIndexApi.start(client, viewAction);
     }
 
     boolean showWriteReview;
@@ -746,9 +732,6 @@ public class EventInfoFragment extends Fragment {
     public void onStop() {
         super.onStop();
         if (client != null && client.isConnected()) {
-            if (viewAction != null) {
-                AppIndex.AppIndexApi.end(client, viewAction);
-            }
             client.disconnect();
         }
     }

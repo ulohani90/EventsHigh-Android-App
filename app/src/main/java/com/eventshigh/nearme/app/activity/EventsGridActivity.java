@@ -56,7 +56,6 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.model.LatLng;
 import com.squareup.timessquare.CalendarPickerView;
 
@@ -1211,10 +1210,6 @@ public class EventsGridActivity extends BaseContextActivity {
                 } else {
                     Toast.makeText(this, "Selected locality not found ", Toast.LENGTH_LONG).show();
                 }
-            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
-                Status status = PlaceAutocomplete.getStatus(this, data);
-                // TODO: Handle the error.
-                Log.i("TestActivity", status.getStatusMessage());
             } else if (resultCode == RESULT_CANCELED) {
 
             }
