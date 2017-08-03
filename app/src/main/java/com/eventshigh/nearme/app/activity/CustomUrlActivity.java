@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.net.UrlQuerySanitizer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -31,8 +30,6 @@ import com.eventshigh.nearme.app.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -41,7 +38,7 @@ public class CustomUrlActivity extends BaseActivity {
     public static final String EXTRA_TITLE_KEY = CustomUrlActivity.class.getName() + ".title";
 
     private WebView webView;
-    private static boolean isPayment;
+    // private static boolean isPayment;
     private ValueCallback<Uri> mUploadMessage;
     private ValueCallback<Uri[]> mUploadMessageArray;
     private final static int FILECHOOSER_RESULTCODE = 1;
@@ -52,7 +49,7 @@ public class CustomUrlActivity extends BaseActivity {
 
     public static void launchCustomUrl(Context context, Uri webUri, @Nullable String title) {
         Intent intent = new Intent(context,
-                webUri.getHost().equalsIgnoreCase(BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
+                CustomUrlActivity.class);
         intent.setData(webUri);
         if (title != null) {
             intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);
@@ -66,7 +63,7 @@ public class CustomUrlActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_url);
         webView = (WebView) findViewById(R.id.web_view);
-        isPayment = getIntent().getBooleanExtra(TicketReviewActivity.IS_PAYMENT, false);
+
         setupNewWebView(webView, this, true);
 
         // Set title.
@@ -172,7 +169,7 @@ public class CustomUrlActivity extends BaseActivity {
 
         // Setup a new web view client so we can listen in on events and also customize
         // web view behavior.
-        webView.setWebViewClient(new EHWebViewClient(activity, isPayment,
+        webView.setWebViewClient(new EHWebViewClient(activity,
                 useProgressBar ? activity.findViewById(R.id.top_progress_bar) : null));
         webView.setWebChromeClient(new WebChromeClient() {
             //The undocumented magic method override
@@ -283,9 +280,9 @@ public class CustomUrlActivity extends BaseActivity {
 
         // Setup a new web view client so we can listen in on events and also customize
         // web view behavior.
-      //  webView.setInitialScale(1);
+        //  webView.setInitialScale(1);
 
-        webView.setWebViewClient(new EHWebViewClient(activity, isPayment,
+        webView.setWebViewClient(new EHWebViewClient(activity,
                 useProgressBar ? activity.findViewById(R.id.top_progress_bar) : null));
         webView.setWebChromeClient(new WebChromeClient());
         webSettings.setPluginState(PluginState.ON);
@@ -322,8 +319,8 @@ public class CustomUrlActivity extends BaseActivity {
                     }
                 }
             }
-                mUploadMessageArray.onReceiveValue(results);
-                mUploadMessage = null;
+            mUploadMessageArray.onReceiveValue(results);
+            mUploadMessage = null;
 
 
         } else {
@@ -340,12 +337,11 @@ public class CustomUrlActivity extends BaseActivity {
         private BaseActivity activity;
         @Nullable
         private View progressBar;
-        private boolean isPayment;
 
-        public EHWebViewClient(BaseActivity activity, boolean isPayment, @Nullable View progressBar) {
+        public EHWebViewClient(BaseActivity activity, @Nullable View progressBar) {
             this.activity = activity;
             this.progressBar = progressBar;
-            this.isPayment = isPayment;
+
         }
 
         @Override
@@ -354,25 +350,7 @@ public class CustomUrlActivity extends BaseActivity {
                 activity.reportActionToAnalytics("startLoading");
                 progressBar.setVisibility(View.VISIBLE);
             }
-            if (isPayment) {
-                if (isPayment) {
-                    Log.e("custom URLs ", url);
-                    if (url.toLowerCase().contains(("ticket.jsp").toLowerCase())) {
-                        UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(url);
-                        Intent intent = new Intent();
-                        intent.putExtra(TicketReviewActivity.BOOKING_ID, sanitizer.getValue("booking"));
-                        intent.putExtra(TicketReviewActivity.TICKETING_LINK, url);
-                        intent.putExtra(TicketReviewActivity.IS_PAYMENT_SUCCESS, true);
-                        activity.setResult(RESULT_OK, intent);
-                        activity.finish();
-                    } else if (url.toLowerCase().contains(("failed.html").toLowerCase())) {
-                        Intent intent = new Intent();
-                        intent.putExtra(TicketReviewActivity.IS_PAYMENT_SUCCESS, false);
-                        activity.setResult(RESULT_OK, intent);
-                        activity.finish();
-                    }
-                }
-            }
+
         }
 
         @Override

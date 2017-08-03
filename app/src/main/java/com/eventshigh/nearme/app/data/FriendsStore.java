@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.data;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 
 public class FriendsStore {

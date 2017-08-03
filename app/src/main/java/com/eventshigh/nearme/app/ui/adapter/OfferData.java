@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.ui.adapter;
 
 import android.support.v7.widget.RecyclerView;
 
-import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.stream.OfferObject;
 

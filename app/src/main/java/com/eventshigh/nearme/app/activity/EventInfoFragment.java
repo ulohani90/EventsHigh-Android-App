@@ -40,7 +40,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.RequestToCallApi;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
-import com.eventshigh.nearme.app.ui.FBSigninDialog;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -61,9 +60,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Random;
 
 /**
  * Created by umesh on 17/06/16.
@@ -109,6 +106,8 @@ public class EventInfoFragment extends Fragment {
     ImageView trustedPartner;
 
     ProgressDialog progressDialog;
+
+    public static final String OBJECT_TYPE = "movie";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -573,7 +572,7 @@ public class EventInfoFragment extends Fragment {
         Intent i = new Intent(getActivity(), WriteReviewActivity.class);
         Bundle bundle = new Bundle();
         bundle.putParcelable(NewEventDetailActivity.EVENT_OBJECT, event);
-        bundle.putString(MovieDetailActivity.OBJECT_TYPE, "event");
+        bundle.putString(OBJECT_TYPE, "event");
         i.putExtras(bundle);
         getActivity().startActivity(i);
         getActivity().overridePendingTransition(R.anim.animate_slide_up, R.anim.stay);

@@ -10,10 +10,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
-import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.stream.OfferObject;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Signer;
 
 import org.json.JSONArray;

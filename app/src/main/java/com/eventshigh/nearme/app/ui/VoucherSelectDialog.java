@@ -4,9 +4,7 @@ import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.stream.VoucherObject;
-import com.eventshigh.nearme.app.user.Account;
 
 import java.util.ArrayList;
 

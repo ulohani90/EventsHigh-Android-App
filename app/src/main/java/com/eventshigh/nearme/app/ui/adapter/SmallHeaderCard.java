@@ -2,18 +2,15 @@ package com.eventshigh.nearme.app.ui.adapter;
 
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
-import com.eventshigh.nearme.app.activity.LaunchActivity;
 
 public class SmallHeaderCard extends ViewHolder {
     private final TextView titleView;

@@ -10,21 +10,15 @@ import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.MyTicketsFragment;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventFilterAttribute;
 import com.eventshigh.nearme.app.data.EventOccurenceComparator;
 import com.eventshigh.nearme.app.data.EventSession;
 import com.eventshigh.nearme.app.data.EventZendeskTicketObject;
 import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.data.Locality;
-import com.eventshigh.nearme.app.data.MovieDetailObject;
-import com.eventshigh.nearme.app.data.MovieInfoObject;
-import com.eventshigh.nearme.app.data.MovieReviewObject;
 import com.eventshigh.nearme.app.data.MovieShowTimeObject;
 import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.data.MyTicketObject;
 import com.eventshigh.nearme.app.data.SocialFriend;
-import com.eventshigh.nearme.app.data.TrendingTopic;
 import com.eventshigh.nearme.app.data.stream.OfferObject;
 import com.eventshigh.nearme.app.data.stream.PointsObject;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
@@ -32,15 +26,12 @@ import com.eventshigh.nearme.app.network.FeaturedEventsRequest.EventCollection;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.MyPointsBreakdownRequest;
-import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView.SpanAllColumnLookup;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -131,18 +122,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
     public void setEventFilterAttributes() {
 
-    }
-
-    public void setMoviesListData(List<MovieDetailObject> objs, EventsContext eventsContext, boolean addHeader, boolean clearOldData) {
-        if (clearOldData)
-            dataToShow.clear();
-        if (addHeader) {
-            dataToShow.add(new HeaderData(activity, eventsContext, MyEventsRequest.MOVIES_NAME, objs.size(), HeaderData.TYPE_MOVIE));
-        }
-        for (MovieDetailObject obj : objs) {
-            dataToShow.add(new MovieListData(obj, activity));
-        }
-        notifyDataSetChanged();
     }
 
 
@@ -253,32 +232,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
-    public void getUpcomingEvents() {
-
-    }
-
-    public void setEventInfoObject(Event event) {
-        dataToShow.clear();
-        dataToShow.add(new EventInfoData(event, activity));
-        notifyDataSetChanged();
-
-    }
-
-    public void setInfoObject(MovieInfoObject obj) {
-        dataToShow.clear();
-        dataToShow.add(new MovieInfoData(obj, activity));
-        notifyDataSetChanged();
-    }
-
-    public void setMovieReviews(ArrayList<MovieReviewObject> objs) {
-        dataToShow.clear();
-        for (MovieReviewObject obj : objs) {
-            dataToShow.add(new MovieReviewData(obj, activity));
-        }
-        notifyDataSetChanged();
-    }
-
-
     public void setUserMovieReviews(ArrayList<MovieUserReviewObject> objs, String reviewForId) {
         dataToShow.clear();
 
@@ -324,38 +277,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         notifyDataSetChanged();
     }
 
-    public void setExploreCategories(@Nullable EventCollection eventCollection,
-                                     List<Locality> localities, String[] tags, String movies) {
-        dataToShow.clear();
 
-        if (eventCollection != null) {
-            if (!eventCollection.events.isEmpty()) {
-                dataToShow.add(new EventPagerData(activity, eventCollection.showReferrer,
-                        eventCollection.events));
-            }
-            if (!eventCollection.trendingTopics.isEmpty()) {
-                dataToShow.add(new SmallHeaderData(activity.getString(R.string.ui_browse_featured)));
-                for (TrendingTopic trendingTopic : eventCollection.trendingTopics) {
-                    dataToShow.add(new TrendingCategoryData(trendingTopic, activity, this));
-                }
-            }
-        }
-
-        if (!localities.isEmpty()) {
-            dataToShow.add(new SmallHeaderData(activity, activity.getString(R.string.ui_browse_loc), true, 0));
-            for (int i = 0; i < localities.size(); i++) {
-                dataToShow.add(new LocalityData(localities.get(i), activity, getMaterialColor(i)));
-            }
-        }
-
-        dataToShow.add(new SmallHeaderData(activity.getString(R.string.ui_browse_cat)));
-
-        dataToShow.add(new MovieCategoryData("movies", activity, this));
-        for (String tag : tags) {
-            dataToShow.add(new ExploreCategoryData(tag, activity, this));
-        }
-        notifyDataSetChanged();
-    }
 
     public int getMaterialColor(int i) {
         switch (i) {

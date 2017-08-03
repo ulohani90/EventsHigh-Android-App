@@ -1,21 +1,13 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.media.Image;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
@@ -23,7 +15,6 @@ import com.eventshigh.nearme.app.activity.UserProfileActivity;
 import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.eventshigh.nearme.app.view.CircularImageView;
 
 /**
  * @author shubham

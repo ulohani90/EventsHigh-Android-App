@@ -10,7 +10,6 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
-import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.MyTicketObject;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -22,8 +21,6 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

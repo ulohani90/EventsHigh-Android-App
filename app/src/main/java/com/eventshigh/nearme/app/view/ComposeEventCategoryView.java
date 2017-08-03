@@ -12,18 +12,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
-import com.eventshigh.nearme.app.activity.NewEventDetailActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.ui.FBSigninDialog;
-import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.IntentUtils;
-import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by umesh on 21/06/16.

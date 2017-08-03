@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -15,8 +14,6 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.stream.AdditionalTicketField;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
-import com.eventshigh.nearme.app.network.EventCollectionRequest;
-import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -26,7 +23,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -253,7 +249,7 @@ public class Event implements Parcelable {
 
         this.numViews = in.readInt();
         this.numSaves = in.readInt();
-        this.ehRecommended = in.createBooleanArray()[0];
+        this.ehRecommended = in.readInt() == 1;
         this.uberScore = in.readFloat();
 
         this.eventTimings = new ArrayList<>();
@@ -263,7 +259,7 @@ public class Event implements Parcelable {
         this.venue = Utils.checkIfUnknown(in.readString());
         this.locality = Utils.checkIfUnknown(in.readString());
         this.address = Utils.checkIfUnknown(in.readString());
-        this.isCleanVenue = venue != null && in.createBooleanArray()[0];
+        this.isCleanVenue = venue != null && in.readInt() == 1;
 
         this.performers = new ArrayList<>();
         in.readStringList(performers);
@@ -293,22 +289,80 @@ public class Event implements Parcelable {
         sessions = new ArrayList<>();
         in.readTypedList(sessions, EventSession.CREATOR);
         sessionTitlePhrase = in.readString();
-        isPrimaryOrganizer = in.createBooleanArray()[0];
-        isSponsoredEvent = in.createBooleanArray()[0];
+        isPrimaryOrganizer = in.readInt() == 1;
+        isSponsoredEvent = in.readInt() == 1;
         ticketingEnabledStatus = in.readInt();
         zone = in.readString();
         attributes = new ArrayList<>();
         in.readTypedList(attributes, EventFilterAttribute.CREATOR);
         attributeValues = new HashMap<>();
         in.readMap(attributeValues, Boolean.class.getClassLoader());
-        isEvergreen = in.createBooleanArray()[0];
-        isEhTicketing = in.createBooleanArray()[0];
+        isEvergreen = in.readInt() == 1;
+        isEhTicketing = in.readInt() == 1;
         faqs = new ArrayList<>();
         in.readTypedList(faqs, EventZendeskTicketObject.CREATOR);
         discountPercentage = in.readString();
         discountPercentageText = in.readString();
-        skipRequestToCall = in.createBooleanArray()[0];
+        skipRequestToCall = in.readInt() == 1;
         skipCallbackupPhone = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(city.toString());
+        dest.writeString(title);
+        dest.writeString(category.toString());
+        dest.writeString(description);
+        dest.writeStringList(tags);
+        dest.writeString(emptyIfNull(youtubeVideoId));
+        dest.writeString(emptyIfNull(imgUrl));
+        dest.writeStringList(allImages);
+        dest.writeString(emptyIfNull(sourceUrl));
+        dest.writeString(emptyIfNull(bookingUrl));
+        dest.writeString(emptyIfNull(bookingText));
+        dest.writeInt(numViews);
+        dest.writeInt(numSaves);
+        dest.writeInt(ehRecommended ? 1 : 0);
+        dest.writeFloat(uberScore);
+        dest.writeList(eventTimings);
+        dest.writeParcelable(location == null ? new LatLng(0, 0) : location, flags);
+        dest.writeString(emptyIfNull(venue));
+        dest.writeString(emptyIfNull(locality));
+        dest.writeString(emptyIfNull(address));
+        dest.writeInt(isCleanVenue ? 1 : 0);
+        dest.writeStringList(performers);
+        dest.writeString(emptyIfNull(organizerName));
+        dest.writeString(emptyIfNull(organizerPhone));
+        dest.writeString(emptyIfNull(organizerWebsite));
+        dest.writeString(emptyIfNull(organizerEmail));
+        dest.writeString(emptyIfNull(organizerLink));
+        dest.writeString(emptyIfNull(organizerAccountName));
+        dest.writeTypedList(ehPrices);
+        dest.writeDouble(minPrice);
+        dest.writeDouble(maxPrice);
+        dest.writeString(emptyIfNull(currency));
+        dest.writeString(priceName);
+        dest.writeString(priceNote);
+        dest.writeTypedList(descriptionSections);
+        dest.writeTypedList(reviewObjects);
+        dest.writeString(requestPerAttendeeData);
+        dest.writeTypedList(additionalTicketFieldList);
+        dest.writeTypedList(sessions);
+        dest.writeString(sessionTitlePhrase);
+        dest.writeInt(isPrimaryOrganizer ? 1 : 0);
+        dest.writeInt(isSponsoredEvent ? 1 : 0);
+        dest.writeInt(ticketingEnabledStatus);
+        dest.writeString(zone);
+        dest.writeTypedList(attributes);
+        dest.writeMap(attributeValues);
+        dest.writeInt(isEvergreen ? 1 : 0);
+        dest.writeInt(isEhTicketing ? 1 : 0);
+        dest.writeTypedList(faqs);
+        dest.writeString(discountPercentage);
+        dest.writeString(discountPercentageText);
+        dest.writeInt(skipRequestToCall ? 1 : 0);
+        dest.writeString(skipCallbackupPhone);
     }
 
     public Uri getEventDetailsURI() {
@@ -407,72 +461,6 @@ public class Event implements Parcelable {
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(city.toString());
-        dest.writeString(title);
-        dest.writeString(category.toString());
-
-        dest.writeString(description);
-        dest.writeStringList(tags);
-        dest.writeString(emptyIfNull(youtubeVideoId));
-
-        dest.writeString(emptyIfNull(imgUrl));
-        dest.writeStringList(allImages);
-        dest.writeString(emptyIfNull(sourceUrl));
-        dest.writeString(emptyIfNull(bookingUrl));
-        dest.writeString(emptyIfNull(bookingText));
-
-        dest.writeInt(numViews);
-        dest.writeInt(numSaves);
-        dest.writeBooleanArray(new boolean[]{ehRecommended});
-        dest.writeFloat(uberScore);
-
-        dest.writeList(eventTimings);
-
-        dest.writeParcelable(location == null ? new LatLng(0, 0) : location, flags);
-        dest.writeString(emptyIfNull(venue));
-        dest.writeString(emptyIfNull(locality));
-        dest.writeString(emptyIfNull(address));
-        dest.writeBooleanArray(new boolean[]{isCleanVenue});
-
-        dest.writeStringList(performers);
-
-        dest.writeString(emptyIfNull(organizerName));
-        dest.writeString(emptyIfNull(organizerPhone));
-        dest.writeString(emptyIfNull(organizerWebsite));
-        dest.writeString(emptyIfNull(organizerEmail));
-        dest.writeString(emptyIfNull(organizerLink));
-        dest.writeString(emptyIfNull(organizerAccountName));
-
-        dest.writeTypedList(ehPrices);
-        dest.writeDouble(minPrice);
-        dest.writeDouble(maxPrice);
-        dest.writeString(emptyIfNull(currency));
-        dest.writeString(priceName);
-        dest.writeString(priceNote);
-        dest.writeTypedList(descriptionSections);
-        dest.writeTypedList(reviewObjects);
-
-        dest.writeString(requestPerAttendeeData);
-        dest.writeTypedList(additionalTicketFieldList);
-        dest.writeTypedList(sessions);
-        dest.writeString(sessionTitlePhrase);
-        dest.writeBooleanArray(new boolean[]{isPrimaryOrganizer});
-        dest.writeBooleanArray(new boolean[]{isSponsoredEvent});
-        dest.writeInt(ticketingEnabledStatus);
-        dest.writeString(zone);
-        dest.writeTypedList(attributes);
-        dest.writeMap(attributeValues);
-        dest.writeBooleanArray(new boolean[]{isEvergreen});
-        dest.writeBooleanArray(new boolean[]{isEhTicketing});
-        dest.writeTypedList(faqs);
-        dest.writeString(discountPercentage);
-        dest.writeString(discountPercentageText);
-        dest.writeBooleanArray(new boolean[]{skipRequestToCall});
-        dest.writeString(skipCallbackupPhone);
-    }
 
     // This is used to regenerate your object. All Parcelables must have
     // a CREATOR that implements these two methods

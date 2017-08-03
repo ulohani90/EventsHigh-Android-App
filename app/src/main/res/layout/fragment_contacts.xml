@@ -47,7 +47,6 @@
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:orientation="vertical"
-        android:id="@+id/view_upload_contacts"
         android:padding="12dp"
         android:gravity="center_horizontal"
         android:visibility="gone"
@@ -74,7 +73,6 @@
             android:textSize="12sp"
             />
         <TextView
-            android:id="@+id/upload_contacts_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"

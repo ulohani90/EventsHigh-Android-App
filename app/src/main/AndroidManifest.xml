@@ -248,56 +248,6 @@
             </intent-filter>
 
         </activity>
-        <activity
-            android:name=".activity.BlogFeedActivity"
-            android:exported="true"
-            android:label="@string/title_blog"
-            android:parentActivityName=".activity.LaunchActivity"
-            android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.LaunchActivity" />
-
-            <!--<intent-filter
-                android:autoVerify="true"
-                tools:ignore="UnusedAttribute">
-                <data
-                    android:host="blog.eventshigh.com"
-                    android:path="/"
-                    android:scheme="https" />
-
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>-->
-        </activity>
-        <activity
-            android:name=".activity.BlogEntryActivity"
-            android:exported="true"
-            android:hardwareAccelerated="true"
-            android:label="@string/title_blog"
-            android:parentActivityName=".activity.BlogFeedActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.BlogFeedActivity" />
-
-            <!--<intent-filter
-                android:autoVerify="true"
-                tools:ignore="UnusedAttribute">
-                <data
-                    android:host="blog.eventshigh.com"
-                    android:pathPrefix="/2"
-                    android:scheme="https" />
-
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>-->
-        </activity>
 
         <activity
             android:name=".activity.NewEventDetailActivity"
@@ -342,26 +292,11 @@
             android:theme="@style/NoActionBar"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".activity.MovieDetailActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:hardwareAccelerated="true"
-            android:label="@string/app_name"
-            android:theme="@style/NoActionBar">
-
-        </activity>
-        <activity
             android:name=".activity.PointsBreakdownActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:hardwareAccelerated="true"
             android:label="@string/points_breakdown"
             android:theme="@style/NoActionBar" />
-        <activity
-            android:name=".activity.MovieBrowseActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:hardwareAccelerated="true"
-            android:theme="@style/NoActionBar">
-
-        </activity>
         <activity
             android:name=".activity.RedeemCouponActivity"
             android:screenOrientation="portrait"
@@ -369,11 +304,6 @@
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.ReferralCodeActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/NoActionBar"
-            android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".activity.EventBookingDetailActivity"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar"
             android:windowSoftInputMode="stateHidden" />
@@ -411,17 +341,6 @@
             android:label="@string/pref_title_about_us"
             android:launchMode="singleTask"
             android:parentActivityName=".activity.LaunchActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.LaunchActivity" />
-        </activity>
-        <activity
-            android:name=".activity.ReferralActivity"
-            android:hardwareAccelerated="false"
-            android:label="@string/title_refer"
-            android:launchMode="singleTask"
-            android:parentActivityName=".activity.LaunchActivity"
-            android:theme="@style/NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LaunchActivity" />
@@ -516,25 +435,6 @@
             android:label="@string/app_name"
             android:theme="@style/FullyTranslucent"
             tools:replace="android:theme" />
-        <activity
-            android:name=".activity.GuestDetailActivity"
-            android:label="@string/title_activity_guest_detail"
-            android:screenOrientation="portrait"
-            android:theme="@style/NoActionBar"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".activity.TicketReviewActivity"
-            android:label="@string/title_activity_review"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activity.TicketConfirmationActivity"
-            android:label="@string/title_activity_ticket_confirmation"
-            android:parentActivityName=".activity.LaunchActivity"
-            android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.LaunchActivity" />
-        </activity>
 
         <service android:name=".broadcast.GeofenceTransitionsIntentService" />
         <service

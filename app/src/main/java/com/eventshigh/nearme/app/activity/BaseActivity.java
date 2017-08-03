@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
@@ -29,9 +28,6 @@ import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.data.MovieDetailObject;
-import com.eventshigh.nearme.app.data.MovieInfoObject;
-import com.eventshigh.nearme.app.data.MovieMarkerManager;
 import com.eventshigh.nearme.app.data.ProfileInfo;
 import com.eventshigh.nearme.app.data.stream.OfferObject;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
@@ -50,10 +46,6 @@ import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -606,10 +598,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         return EventsMarkerManager.getInstance(this).isFavourite(event.id);
     }
 
-    public boolean isMovieFavourite(MovieInfoObject movie) {
-        return MovieMarkerManager.getInstance(this).isFavourite(movie.getId() + "");
-    }
-
     public void reportEventAction(Event event, String actionName) {
         reportEventAction(event, actionName, null);
     }
@@ -621,15 +609,6 @@ public abstract class BaseActivity extends AppCompatActivity {
                     1,
                     isFavourite(event) ? "Favourite" : "No-Favourite",
                     event.ehRecommended ? "Recommended" : "Non-Recommended");
-        }
-    }
-
-    public void reportMovieAction(MovieInfoObject movieInfoObject, String actionName, @Nullable String label) {
-        if (movieInfoObject != null) {
-            reportActionToAnalytics(actionName,
-                    label == null ? "" : label,
-                    1,
-                    isMovieFavourite(movieInfoObject) ? "Favourite" : "No-Favourite");
         }
     }
 
@@ -689,52 +668,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         return false;
     }
 
-    public void shareMovie(final MovieDetailObject movie) {
-        shareMovieInitiatedTimestamp = System.currentTimeMillis();
-        BranchUniversalObject branchObject = new BranchUniversalObject();
-        String referrerId = new Account(this).getReferrerId();
-        branchObject.setCanonicalIdentifier(movie.getMovieInfo().getId() + "").setTitle(movie.getMovieInfo().getName().replaceAll("\"", " &quot "))
-                .addContentMetadata("movie_id", movie.getMovieInfo().getId() + "")
-                .setContentDescription(movie.getMovieInfo().getName().replaceAll("\"", " &quot "))
-                .setContentImageUrl(movie.getMovieInfo().getImg_url())
-                .setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PRIVATE);
-        branchObject.registerView();
-        String uri = EventsHighEndpoints.WEB_URI_BASE + "movie/" + movie.getMovieInfo().getId();
-        LinkProperties linkProperties = new LinkProperties()
-                .setFeature("sharing")
-                .addControlParameter("$always_deeplink", "true")
-                .addControlParameter("$desktop_url", uri);
-        //.addControlParameter("$android_url", referralLink)
-        //.addControlParameter("$ios_url", "http://www.eventshigh.com");
-        final ProgressDialog dialog = OneSecDialog.show(this);
-        branchObject.generateShortUrl(this, linkProperties, new Branch.BranchLinkCreateListener() {
-            @Override
-            public void onLinkCreate(String url, BranchError error) {
-                if (dialog != null) {
-                    dialog.dismiss();
-                }
-                if (error == null) {
-                    reportActionToAnalytics("movieShareInitiated", movie.getMovieInfo().getName());
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT,
-                            String.format(
-                                    getString(
-                                            R.string.share_movie_text),
-                                    movie.getMovieInfo().getName(), url)
-                    );
-
-                    sendIntent.setType("text/plain");
-                    startActivity(Intent.createChooser(sendIntent, "Share"));
-                } else {
-                    //   if (error.getErrorCode() == -113) {
-                    showMessage(error.getMessage());
-                    // }
-                }
-            }
-        });
-
-    }
 
     void startTicketShareActivity(int noOfTickets, Event event, String ticketLink) {
         shareMovieInitiatedTimestamp = System.currentTimeMillis();

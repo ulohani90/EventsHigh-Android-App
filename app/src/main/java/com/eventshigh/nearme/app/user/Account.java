@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.user;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.preference.Preference;
 import android.support.annotation.Nullable;
 
 import com.crashlytics.android.Crashlytics;

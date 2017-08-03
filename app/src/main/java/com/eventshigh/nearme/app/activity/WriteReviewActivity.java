@@ -4,26 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.MovieDetailObject;
-import com.eventshigh.nearme.app.network.EventRequest;
-import com.eventshigh.nearme.app.network.MovieDetailRequest;
-import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
 
 public class WriteReviewActivity extends BaseActivity implements RatingBar.OnRatingBarChangeListener {
@@ -39,7 +26,7 @@ public class WriteReviewActivity extends BaseActivity implements RatingBar.OnRat
 
     WriteReviewRatingFragment writeReviewRatingFragment;
     WriteReviewDescriptionFragment writeReviewDescriptionFragment;
-    MovieDetailObject movieDetailObject;
+
     Event event;
 
     String type = "";
@@ -68,18 +55,14 @@ public class WriteReviewActivity extends BaseActivity implements RatingBar.OnRat
         bundle = this.getIntent().getExtras();
         if (bundle != null) {
             isFromNotification = getIntent().getBooleanExtra(FROM_NOTIFICATION_PARAM, false);
-            type = getIntent().getStringExtra(MovieDetailActivity.OBJECT_TYPE);
+            type = getIntent().getStringExtra(EventInfoFragment.OBJECT_TYPE);
         }
         if (isFromNotification) {
             reviewEntityId = getIntent().getStringExtra(REVIEW_ENTITY_ID);
             reviewEntityImage = getIntent().getStringExtra(REVIEW_ENTITY_IMAGE);
             reviewEntityName = getIntent().getStringExtra(REVIEW_ENTITY_NAME);
         } else {
-            if (type.equals("movie")) {
-                movieDetailObject = bundle.getParcelable(MovieDetailActivity.MOVIE_DETAIL_OBJECT);
-            } else {
                 event = bundle.getParcelable(NewEventDetailActivity.EVENT_OBJECT);
-            }
         }
 
         if (savedInstanceState == null) {

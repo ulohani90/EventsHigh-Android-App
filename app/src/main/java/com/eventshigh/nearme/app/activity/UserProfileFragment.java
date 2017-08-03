@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,7 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -40,7 +38,6 @@ import com.eventshigh.nearme.app.view.CircularImageView;
 import com.facebook.CallbackManager;
 import com.google.android.gms.maps.model.LatLng;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -225,8 +222,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private void setViews(ProfileInfo profileInfo) {
 
 
-        int favCount = profileInfo.getMeEventFavouriteObject().topicEvents.get(0).events.size() +
-                profileInfo.getMeEventFavouriteObject().movies.size();
+        int favCount = profileInfo.getMeEventFavouriteObject().topicEvents.get(0).events.size();
         TABS = new ArrayList<>();
         TABS.add(INTERESTS_TAB);
         TABS.add(FAVOURITES_TAB);

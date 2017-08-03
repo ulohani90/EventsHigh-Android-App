@@ -3,16 +3,12 @@ package com.eventshigh.nearme.app.ui.adapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.data.MovieDetailObject;
-
 import com.eventshigh.nearme.app.data.MovieShowTimeObject;
 import com.eventshigh.nearme.app.data.ShowDates;
-import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.view.ZCustomFlowLayout;
 
 import java.util.ArrayList;

@@ -1,15 +1,10 @@
 package com.eventshigh.nearme.app.view;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.ScrollView;
-
-import com.eventshigh.nearme.app.R;
-
-import java.util.logging.LogManager;
 
 /**
  * Created by umesh on 21/06/16.

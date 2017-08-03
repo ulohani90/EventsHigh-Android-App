@@ -1,12 +1,9 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,17 +57,7 @@ public class WriteReviewRatingFragment extends Fragment {
                     .into(ivMoviePicture);
             ratingHeaderText.setText("Please rate the " + Utils.capitalize(writeReviewActivity.type) + "!");
         } else {
-            if (writeReviewActivity.type.equals("movie")) {
-
-                if (writeReviewActivity.movieDetailObject != null) {
-                    tvMovieName.setText(writeReviewActivity.movieDetailObject.getMovieInfo().getName());
-                    Glide.with(this).load(writeReviewActivity.movieDetailObject.getMovieInfo().getImg_url())
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
-                            .into(ivMoviePicture);
-                }
-                ratingHeaderText.setText("Please rate the Movie!");
-            } else if (writeReviewActivity.event != null) {
+            if (writeReviewActivity.event != null) {
 
                 tvMovieName.setText(writeReviewActivity.event.title);
                 Glide.with(this).load(writeReviewActivity.event.imgUrl)

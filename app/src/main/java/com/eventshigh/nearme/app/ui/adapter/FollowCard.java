@@ -1,13 +1,6 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.text.Html;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.UnderlineSpan;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -15,13 +8,8 @@ import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.ui.FBSigninDialog;
-import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.view.ContactListView;
-
-import java.text.MessageFormat;
 
 public class FollowCard extends ViewHolder {
     private TextView titleView;

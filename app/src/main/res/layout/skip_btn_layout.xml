@@ -15,7 +15,6 @@
         android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/skip_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right|center_vertical"

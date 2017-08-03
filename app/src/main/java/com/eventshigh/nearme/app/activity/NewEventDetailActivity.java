@@ -11,15 +11,12 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
-import android.text.style.TypefaceSpan;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -29,7 +26,6 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,15 +41,12 @@ import com.eventshigh.nearme.app.data.EventDescriptionSection;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.data.SocialFriend;
-import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.network.MyReviewsRequest;
 import com.eventshigh.nearme.app.network.SocialActionsRequest;
-import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.FBSigninDialog;
 import com.eventshigh.nearme.app.ui.InviteFriendsDialog;
-import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.ui.RateAppDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -607,14 +600,22 @@ public class NewEventDetailActivity extends BaseContextActivity {
             bookingUriBuilder.appendQueryParameter("name", userInfo.name);
             bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
             bookingUriBuilder.appendQueryParameter("src", "eh-android");*/
-            Intent intent = new Intent(this, EventBookingDetailActivity.class);
-            intent.putExtra("event", event);
-            startActivity(intent);
 
         } else {
             if (event.bookingUrl.contains("ticketing.eventshigh.com")) {
                 try {
                     bookingUriBuilder.appendQueryParameter("src", "eh-android");
+                    if (userInfo != null) {
+                        if (userInfo.name != null && userInfo.name.length() > 0) {
+                            bookingUriBuilder.appendQueryParameter("name", userInfo.name);
+                        }
+                        if (userInfo.email != null && userInfo.email.length() > 0) {
+                            bookingUriBuilder.appendQueryParameter("email", userInfo.email);
+                        }
+                        if (userInfo.phoneNo != null && userInfo.phoneNo.length() > 0) {
+                            bookingUriBuilder.appendQueryParameter("mobile", userInfo.phoneNo);
+                        }
+                    }
                     CustomUrlActivity.launchCustomUrl(this, bookingUriBuilder.build(),
                             getString(R.string.title_book));
                 } catch (Exception e) {

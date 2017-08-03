@@ -1,12 +1,10 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -14,7 +12,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
-import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.data.stream.PointsObject;
 
 /**
@@ -90,8 +87,8 @@ public class PointsCard extends RecyclerView.ViewHolder{
             pointActionButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(activity, ReferralActivity.class);
-                    activity.startActivity(intent);
+                 //   Intent intent = new Intent(activity, ReferralActivity.class);
+                  //  activity.startActivity(intent);
                 }
             });
 

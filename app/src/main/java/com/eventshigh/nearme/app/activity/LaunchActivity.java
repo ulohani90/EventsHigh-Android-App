@@ -59,10 +59,8 @@ import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.LocalityLatLong;
-import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.MyTicketObject;
 import com.eventshigh.nearme.app.network.EventRequest;
-import com.eventshigh.nearme.app.network.MovieDetailRequest;
 import com.eventshigh.nearme.app.network.MyTicketsRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
@@ -80,7 +78,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -341,11 +338,11 @@ public class LaunchActivity extends BaseContextActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         this.setIntent(intent);
-        if (intent != null && intent.getAction() != null && intent.getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION)) {
+       /* if (intent != null && intent.getAction() != null && intent.getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION)) {
 
             drawer.closeDrawers();
             showExploreScreen(-1);
-        }/*else if(intent != null && intent.getAction()!=null && intent.getAction().equalsIgnoreCase(Intent.ACTION_SEARCH)){
+        }*//*else if(intent != null && intent.getAction()!=null && intent.getAction().equalsIgnoreCase(Intent.ACTION_SEARCH)){
             eventsContext = IntentUtils.processIntent(this,intent);
             showNextScreen();
         }*/
@@ -361,9 +358,9 @@ public class LaunchActivity extends BaseContextActivity {
         if (toolbar != null) {
             setLightToolbarIcons();
         }
-        if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION)) {
+        /*if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION)) {
             getIntent().setAction(null);
-        }
+        }*/
 
         //invalidateOptionsMenu();
         // We show the onboarding If this is first activity and there was no
@@ -809,7 +806,7 @@ public class LaunchActivity extends BaseContextActivity {
             return;
         }
 
-        if (viewPager.getAdapter() == null || (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equalsIgnoreCase(ReferralActivity.REDEEM_ACTION))) {
+        if (viewPager.getAdapter() == null) {
             showExploreScreen(-1);
         }
     }
@@ -1414,11 +1411,6 @@ public class LaunchActivity extends BaseContextActivity {
                                             });
 
                                         }
-                                    } else if (referringParams.has("movie_id")) {
-                                        int id = referringParams.getInt("movie_id");
-                                        Intent intent = new Intent(LaunchActivity.this, MovieDetailActivity.class);
-                                        intent.putExtra(MovieDetailActivity.MOVIE_ID, id);
-                                        startActivity(intent);
                                     }
 
                                     /*if (referringParams.has("referrer2")) {
@@ -1442,9 +1434,6 @@ public class LaunchActivity extends BaseContextActivity {
                                     } else if (referringParams.has("event_uri")) {
                                         Uri uri = Uri.parse(referringParams.getString("event_uri"));
                                         showSearchView(uri.getLastPathSegment());
-                                    } else if (referringParams.has("movie_id")) {
-                                        int id = referringParams.getInt("movie_id");
-                                        writeMovieReview(id, null);
                                     }
 
                                 }
@@ -1461,7 +1450,7 @@ public class LaunchActivity extends BaseContextActivity {
             }, getIntent().getData(), LaunchActivity.this);
     }
 
-    public void writeMovieReview(int movieId, @Nullable String label) {
+    /*public void writeMovieReview(int movieId, @Nullable String label) {
         //reportActionToAnalytics("showEventDetails", label);
         if (movieId != -1)
             MovieDetailRequest.submit(this, movieId, Request.Priority.IMMEDIATE,
@@ -1486,7 +1475,7 @@ public class LaunchActivity extends BaseContextActivity {
                         }
                     });
 
-    }
+    }*/
 
     public void writeEventReview(Uri eventDetailsURI, @Nullable String label) {
 
@@ -1497,7 +1486,7 @@ public class LaunchActivity extends BaseContextActivity {
                         Intent detailIntent = new Intent(LaunchActivity.this, WriteReviewActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putParcelable(NewEventDetailActivity.EVENT_OBJECT, event);
-                        bundle.putString(MovieDetailActivity.OBJECT_TYPE, "event");
+                        bundle.putString(EventInfoFragment.OBJECT_TYPE, "event");
                         detailIntent.putExtras(bundle);
                         startActivity(detailIntent);
                     }

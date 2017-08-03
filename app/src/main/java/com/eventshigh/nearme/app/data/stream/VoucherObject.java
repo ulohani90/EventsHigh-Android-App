@@ -3,8 +3,6 @@ package com.eventshigh.nearme.app.data.stream;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import org.json.JSONObject;
-
 /**
  * Created by umesh on 16/04/16.
  */

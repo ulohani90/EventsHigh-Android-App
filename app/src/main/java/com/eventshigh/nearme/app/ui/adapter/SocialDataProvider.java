@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.ui.adapter;
 import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.data.SocialFriend;
-import com.eventshigh.nearme.app.network.SocialActionsRequest;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 
 import java.util.Set;

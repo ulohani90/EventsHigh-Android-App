@@ -3,13 +3,6 @@ package com.eventshigh.nearme.app.data.stream;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.data.EventDescriptionSection;
-import com.eventshigh.nearme.app.utils.DateTimeUtils;
-import com.google.android.gms.maps.model.LatLng;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**

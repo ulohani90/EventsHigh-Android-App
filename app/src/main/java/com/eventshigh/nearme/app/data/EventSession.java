@@ -181,8 +181,8 @@ public class EventSession implements Parcelable {
         endDate = in.readLong();
         startTime = in.readString();
         endTime = in.readString();
-        isStandAlone = in.createBooleanArray()[0];
-        isSessionTicketing = in.createBooleanArray()[0];
+        isStandAlone = in.readInt() == 1;
+        isSessionTicketing = in.readInt() == 1;
         relatedEId = in.readString();
 
     }
@@ -218,8 +218,8 @@ public class EventSession implements Parcelable {
         dest.writeLong(endDate);
         dest.writeString(startTime);
         dest.writeString(endTime);
-        dest.writeBooleanArray(new boolean[]{isStandAlone});
-        dest.writeBooleanArray(new boolean[]{isSessionTicketing});
+        dest.writeInt(isStandAlone ? 1 : 0);
+        dest.writeInt(isSessionTicketing ? 1 : 0);
         dest.writeString(relatedEId);
 
     }

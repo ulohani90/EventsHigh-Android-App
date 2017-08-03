@@ -7,8 +7,6 @@ import android.support.v7.app.AlertDialog;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.FBLoginActivity;
-import com.eventshigh.nearme.app.activity.NewEventDetailActivity;
-import com.eventshigh.nearme.app.activity.PhoneLoginActivity;
 
 /**
  * Created by umesh on 21/07/16.

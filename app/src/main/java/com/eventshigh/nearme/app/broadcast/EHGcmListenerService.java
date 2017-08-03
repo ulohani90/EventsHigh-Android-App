@@ -12,22 +12,18 @@ import android.util.Log;
 import com.android.volley.Request;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.activity.BlogEntryActivity;
 import com.eventshigh.nearme.app.activity.CustomUrlActivity;
+import com.eventshigh.nearme.app.activity.EventInfoFragment;
 import com.eventshigh.nearme.app.activity.FeedbackActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
-import com.eventshigh.nearme.app.activity.MovieBrowseActivity;
-import com.eventshigh.nearme.app.activity.MovieDetailActivity;
 import com.eventshigh.nearme.app.activity.NewEventDetailActivity;
 import com.eventshigh.nearme.app.activity.PointsBreakdownActivity;
-import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.activity.SelectInterestsActivity;
 import com.eventshigh.nearme.app.activity.UserProfileActivity;
 import com.eventshigh.nearme.app.activity.WriteReviewActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.FriendsStore;
-import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.data.stream.EventNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
@@ -45,7 +41,6 @@ import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.utils.ZendeskUtils;
 import com.google.android.gms.gcm.GcmListenerService;
-import com.zendesk.sdk.model.helpcenter.User;
 
 /**
  * See https://developers.google.com/cloud-messaging/android/client.
@@ -84,11 +79,9 @@ public class EHGcmListenerService extends GcmListenerService {
         String mobileNo = Utils.checkIfUnknown(msg.getString("mobile"));
         String personalisedNotif = Utils.checkIfUnknown(msg.getString("personalised_notif"));
         String personalizeInterest = Utils.checkIfUnknown(msg.getString("perosnalize_interest"));
-        String referEarn = Utils.checkIfUnknown(msg.getString("refer_earn"));
+
         String special = Utils.checkIfUnknown(msg.getString("special"));
         String pointsBreakdown = Utils.checkIfUnknown(msg.getString("points_breakdown"));
-        String browseMovies = Utils.checkIfUnknown(msg.getString("browse_movies"));
-        String movieId = Utils.checkIfUnknown(msg.getString("movie_id"));
 
         String reviewFor = Utils.checkIfUnknown(msg.getString("review_for"));
         String reviewEntityId = Utils.checkIfUnknown(msg.getString("review_entity_id"));
@@ -120,7 +113,7 @@ public class EHGcmListenerService extends GcmListenerService {
             message = message.replace("Your friend", contact.name);
         }
 
-        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null && referEarn == null && special == null && pointsBreakdown == null && browseMovies == null && movieId == null && reviewFor == null && reviewEntityId == null && reviewEntityImage == null && reviewedEntity == null) {
+        if (eventId == null && query == null && contestUrl == null && ticket == null && target == null && personalisedNotif == null && personalizeInterest == null && special == null && pointsBreakdown == null && reviewFor == null && reviewEntityId == null && reviewEntityImage == null && reviewedEntity == null) {
             Log.w(LOG_TAG, "Invalid notification, nether eventId, query, ticket or contest param passed");
             return null;
         }
@@ -192,11 +185,6 @@ public class EHGcmListenerService extends GcmListenerService {
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             intent.putExtra(SelectInterestsActivity.FROM_NOTIFICATION_PARAM, true);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        } else if (referEarn != null) {
-            Intent intent = new Intent(this, ReferralActivity.class);
-            intent.setAction(BaseActivity.NOTIFICATION_ACTION);
-            intent.putExtra(ReferralActivity.FROM_NOTIFICATION_PARAM, true);
-            contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else if (special != null) {
             Intent intent = new Intent(this, LaunchActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + "specials");
@@ -209,23 +197,11 @@ public class EHGcmListenerService extends GcmListenerService {
             intent.setAction(BaseActivity.NOTIFICATION_ACTION);
             intent.putExtra(PointsBreakdownActivity.FROM_NOTIFICATION_PARAM, true);
             contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        } else if (browseMovies != null) {
-            Intent intent = new Intent(this, MovieBrowseActivity.class);
-            intent.setAction(BaseActivity.NOTIFICATION_ACTION + browseMovies);
-            intent.putExtra(MovieBrowseActivity.FROM_NOTIFICATION_PARAM, true);
-            intent.putExtra(MovieBrowseActivity.TAB_NAME, browseMovies);
-            contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        } else if (movieId != null) {
-            Intent intent = new Intent(this, MovieDetailActivity.class);
-            intent.setAction(BaseActivity.NOTIFICATION_ACTION + movieId);
-            intent.putExtra(MovieDetailActivity.FROM_NOTIFICATION_PARAM, true);
-            intent.putExtra(MovieDetailActivity.MOVIE_ID, Integer.parseInt(movieId));
-            contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         } else if (reviewFor != null) {
             Intent intent = new Intent(this, WriteReviewActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + title);
             intent.putExtra(WriteReviewActivity.FROM_NOTIFICATION_PARAM, true);
-            intent.putExtra(MovieDetailActivity.OBJECT_TYPE, reviewFor);
+            intent.putExtra(EventInfoFragment.OBJECT_TYPE, reviewFor);
             intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_ID, reviewEntityId);
             intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_IMAGE, reviewEntityImage);
             intent.putExtra(WriteReviewActivity.REVIEW_ENTITY_NAME, reviewedEntity);
@@ -233,8 +209,7 @@ public class EHGcmListenerService extends GcmListenerService {
             //imageUrl = reviewEntityImage;
             notificationId = 2;
         } else {
-            Intent intent = new Intent(this,
-                    contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
+            Intent intent = new Intent(this, CustomUrlActivity.class);
             intent.setAction(BaseActivity.NOTIFICATION_ACTION + title);
             intent.setData(Uri.parse(contestUrl));
             intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);

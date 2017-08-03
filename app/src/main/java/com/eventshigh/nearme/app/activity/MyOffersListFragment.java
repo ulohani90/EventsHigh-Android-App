@@ -23,12 +23,9 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.Locality;
-import com.eventshigh.nearme.app.data.stream.PointsObject;
 import com.eventshigh.nearme.app.network.OffersRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
-import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.Signer;
@@ -38,9 +35,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 
 /**
  * Created by umesh on 15/04/16.

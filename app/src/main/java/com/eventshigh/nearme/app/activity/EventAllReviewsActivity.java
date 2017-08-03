@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.activity;
 
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.eventshigh.nearme.app.R;

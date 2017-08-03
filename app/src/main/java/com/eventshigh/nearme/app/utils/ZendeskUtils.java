@@ -9,8 +9,6 @@ import com.eventshigh.nearme.app.user.Account.UserInfo;
 import com.zendesk.logger.Logger;
 import com.zendesk.sdk.feedback.impl.BaseZendeskFeedbackConfiguration;
 import com.zendesk.sdk.model.access.AnonymousIdentity;
-import com.zendesk.sdk.model.request.CustomField;
-import com.zendesk.sdk.network.SdkOptions;
 import com.zendesk.sdk.network.impl.ZendeskConfig;
 
 import java.util.ArrayList;

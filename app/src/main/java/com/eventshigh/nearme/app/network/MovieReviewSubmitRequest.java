@@ -5,34 +5,16 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.NetworkResponse;
-import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
-import com.crashlytics.android.Crashlytics;
-import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
-import com.eventshigh.nearme.app.data.MovieDetailObject;
-import com.eventshigh.nearme.app.data.UserContact;
-import com.eventshigh.nearme.app.task.ReportTimingTask;
-import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
-import com.eventshigh.nearme.app.utils.Signer;
-import com.eventshigh.nearme.app.utils.Utils;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.GeneralSecurityException;
-import java.util.List;
 
 /**
  * @author shubham

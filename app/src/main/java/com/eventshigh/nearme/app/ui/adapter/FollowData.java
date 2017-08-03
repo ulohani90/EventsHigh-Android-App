@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.ui.adapter;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
-import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 
 public class FollowData implements AdapterData {
     public final String title;

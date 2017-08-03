@@ -26,9 +26,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -40,14 +38,12 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.EventComparator;
 import com.eventshigh.nearme.app.data.EventDistanceComparator;
 import com.eventshigh.nearme.app.data.EventPriceComparator;
 import com.eventshigh.nearme.app.data.EventScoreComparator;
 import com.eventshigh.nearme.app.data.EventTimeComparator;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.ProfileInfo;
-import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.data.stream.EhPrices;
 import com.eventshigh.nearme.app.network.DateCategoryRequest;
 import com.eventshigh.nearme.app.network.EventCollectionRequest;
@@ -56,7 +52,6 @@ import com.eventshigh.nearme.app.network.MobileUserEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 import com.eventshigh.nearme.app.network.SocialActionsRequest;
-import com.eventshigh.nearme.app.network.SocialActionsRequest.SocialActions;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
@@ -67,13 +62,9 @@ import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
-import com.eventshigh.nearme.app.utils.IntentUtils;
-import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
-import com.eventshigh.nearme.app.view.ContactListView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -84,7 +75,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Fragment to show events.
@@ -599,7 +589,7 @@ public class EventsFragment extends BaseEventsFragment {
 
         topProgressBar.setVisibility(View.GONE);
 
-        if (myEvents == null || ((myEvents.topicEvents == null || myEvents.topicEvents.size() == 0 || myEvents.topicEvents.get(0).events == null || myEvents.topicEvents.get(0).events.isEmpty()) && myEvents.movies.isEmpty())) {
+        if (myEvents == null || ((myEvents.topicEvents == null || myEvents.topicEvents.size() == 0 || myEvents.topicEvents.get(0).events == null || myEvents.topicEvents.get(0).events.isEmpty()))) {
             if (EventsHighEndpoints.isMyEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
                 noMyEventsView.setVisibility(View.VISIBLE);
                 noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_event));
@@ -623,9 +613,7 @@ public class EventsFragment extends BaseEventsFragment {
 
 
             }
-            if (!myEvents.movies.isEmpty()) {
-                eventsAdapter.setMoviesListData(myEvents.movies, eventsContext, true, myEvents.topicEvents.isEmpty() ? true : false);
-            }
+
         }
         //    eventGridView.scrollToPosition(scrollPosition);
         isLoading = false;
@@ -680,7 +668,7 @@ public class EventsFragment extends BaseEventsFragment {
             if (!isIntermediate) {
                 topProgressBar.setVisibility(View.GONE);
 
-                if (myEvents.topicEvents.isEmpty() && myEvents.movies.isEmpty()) {
+                if (myEvents.topicEvents.isEmpty()) {
                     if (EventsHighEndpoints.isMyEventQuery(eventsContext.query) && retryView.getVisibility() == View.GONE) {
                         noMyEventsView.setVisibility(View.VISIBLE);
                         noEventHeaderText.setText(getResources().getString(R.string.ui_no_my_event));
@@ -704,10 +692,7 @@ public class EventsFragment extends BaseEventsFragment {
                     isListContentShown = true;
                     eventsAdapter.setTopicEvents(myEvents.topicEvents, eventsContext, eventGridView.getSpanCount() * 2);
                 }
-                if (!myEvents.movies.isEmpty()) {
-                    eventsAdapter.setMoviesListData(myEvents.movies, eventsContext, true, myEvents.topicEvents.isEmpty() ? true : false);
-                    isListContentShown = true;
-                }
+
                 //    eventGridView.scrollToPosition(scrollPosition);
             }
             isLoading = false;

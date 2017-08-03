@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.method.DateTimeKeyListener;
 
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 
@@ -10,7 +9,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by umesh on 15/03/17.

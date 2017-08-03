@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.ui;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SearchRecentSuggestionsProvider;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -19,7 +18,6 @@ import com.eventshigh.nearme.app.network.EventSuggestRequest;
 import com.eventshigh.nearme.app.network.TagsSuggestRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
 
 import java.util.List;

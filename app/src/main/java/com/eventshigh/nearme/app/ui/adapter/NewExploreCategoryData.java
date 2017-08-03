@@ -7,7 +7,6 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 /**
  * Created by umesh on 10/06/16.

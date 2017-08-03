@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.MyTicketsFragment;
-import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.data.MyTicketObject;
 
 /**

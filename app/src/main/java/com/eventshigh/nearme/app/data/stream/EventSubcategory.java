@@ -2,9 +2,6 @@ package com.eventshigh.nearme.app.data.stream;
 
 import com.eventshigh.nearme.app.data.EventCategory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by umesh on 15/03/16.
  */

@@ -3,7 +3,6 @@ package com.eventshigh.nearme.app.network;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -11,14 +10,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.EventsContext;
+import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import com.eventshigh.nearme.app.network.MyEventsRequest.TopicEvents;
 
 /**
  * Created by umesh on 22/04/16.

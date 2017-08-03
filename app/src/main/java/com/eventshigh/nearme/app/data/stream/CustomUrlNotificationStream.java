@@ -5,9 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
-import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.StreamDbHelper;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 
 import org.json.JSONException;
 import org.json.JSONObject;

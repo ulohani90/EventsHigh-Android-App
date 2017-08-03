@@ -4,8 +4,6 @@
     <!-- Title -->
     <string name="app_name">EventsHigh</string>
     <string name="title_book">Book Ticket</string>
-    <string name="title_pick_interest">Pick Your Interests</string>
-    <string name="title_my_friends">My Friends</string>
 
     <!-- Actions -->
     <string name="action_skip">Skip</string>
@@ -16,54 +14,28 @@
     <string name="action_verify_code">Verify Code</string>
     <string name="action_change_no">Change</string>
     <string name="action_register">Register</string>
-    <string name="action_find_event">Show Events</string>
-    <string name="action_reset">Reset</string>
-    <string name="action_apply_filter">Apply Filter</string>
     <string name="action_new_feedback">Send New Feedback</string>
     <string name="action_direction">Directions</string>
-    <string name="action_calendar">Calendar</string>
     <string name="action_ama">Enquiries</string>
 
     <string name="action_show_map">Show on map</string>
-    <string name="action_check_out">Check out</string>
-    <string name="action_settings">Settings</string>
     <string name="action_explore_events">Explore Events</string>
     <string name="action_check_friends">Invite</string>
-    <string name="action_done">Done</string>
     <string name="action_confirm">Confirm</string>
     <string name="action_signup">Sign Up</string>
     <string name="action_submit">Submit</string>
-    <string name="action_cancel">Cancel</string>
     <string name="action_add_to_calender">Add to Calendar</string>
     <string name="learn_more_text"><u>Learn More</u></string>
 
     <!-- Menu items -->
-    <string name="menu_edit_location">Change Location</string>
     <string name="menu_open_in_browser">Open In Browser</string>
-    <string name="menu_shortcut">Add to homescreen</string>
-    <string name="menu_refresh">Refresh</string>
 
     <!-- Blog -->
-    <string name="title_blog">EventsHigh Blog</string>
-    <string name="share_blog_text">Hey! Found a nice article by EventsHigh, check it out. \n\n%1$s\n\n%2$s</string>
 
     <!-- Other Strings used in UI -->
     <string name="ui_follow">Follow</string>
     <string name="ui_following">Following</string>
-    <string name="ui_favourite">Add to My Events</string>
-    <string name="ui_favourited">Added to My Events</string>
-    <string name="ui_organizer">Organizer Details</string>
-    <string name="ui_performer">Performers</string>
-    <string name="ui_categories">Categories</string>
-    <string name="ui_description">Description</string>
-    <string name="ui_name">Name - </string>
-    <string name="ui_address">Address - </string>
-    <string name="ui_email">Email - </string>
-    <string name="ui_phone">Phone - </string>
-    <string name="ui_website">Website - </string>
     <string name="ui_also_on">Also on …</string>
-    <string name="ui_read_more">Read More …</string>
-    <string name="ui_referrer_default">Like this app? Tell your friends!</string>
     <string name="ui_enter_phone_number_hint">Your Phone Number</string>
     <string name="ui_enter_name_hint">Your Name</string>
     <string name="ui_code">%1$s, we have sent a code to %2$s. Please enter it below.</string>
@@ -71,45 +43,24 @@
     <string name="ui_verify_phone">Verify your phone number</string>
     <string name="ui_signin_via_fb">Login via Facebook</string>
     <string name="ui_no_my_event">Personalize this section by clicking on ♥ to favourite events or follow categories and performers.\n\nNever miss events for\nyour interests again!</string>
-    <string name="ui_view_location_on_map">View location on map</string>
-    <string name="ui_my_events_message">Checkout the events for your interests.</string>
-    <string name="ui_price">Price</string>
     <string name="ui_browse_featured">What\'s Trending</string>
-    <string name="ui_browse_cat">Browse By Category</string>
-    <string name="ui_browse_loc">Browse By Locality</string>
-    <string name="ui_num_views_text">viewed this event</string>
-    <string name="ui_num_saves_text">saved this event</string>
     <string name="ui_phone_verify_plan">Please register with your phone number before.</string>
-    <string name="ui_signin_fb_plan">Please login via facebook.</string>
     <string name="ui_signin_fb_plan_more">Events are best with friends. Please login via facebook to stay connected with your friends on EventsHigh</string>
-    <string name="ui_phone_verify_book">Please register with your phone number before continuing with Booking.</string>
     <string name="ui_phone_verify_pa">Events are best with friends. Please register with your phone number for personalized recommendations.</string>
     <string name="ui_share_and_care_text">Sharing is caring. Caring about the coolest events in the city that is. Get your friends onboard EH and adventure on.</string>
     <string name="ui_spread_word_text">Spread the word. Get everyone on EH and make everyday an adventure.</string>
     <string name="ui_share_earn_text">Share with your friends. The more people, the more spectacular adventure. </string>
-    <string name="ui_voucher_text">Voucher</string>
     <string name="ui_mobile_number_text">Mobile Number</string>
     <string name="ui_fullname_text">Full Name</string>
     <string name="ui_email_text">Email Id</string>
-    <string name="ui_you_earned_points">You have earned total %1$s points</string>
     <string name="ui_no_my_interest">Personalize this section by following categories and performers.\n\nNever miss events for\nyour interests again!</string>
     <string name="ui_enter_referral_code">Referral Code</string>
     <string name="ui_reviews_text">Reviews</string>
 
     <!-- Onbaording message -->
-    <string name="onboarding_title_details">One Stop Shop</string>
-    <string name="onboarding_title_favorites">Personlized Feed</string>
-    <string name="onboarding_title_notification">Never Miss Out</string>
-    <string name="onboarding_details">There are hundreds of places to see events online. We search them all at once so you don\'t have to. See every event in the city, ranked from best to worst.</string>
-    <string name="onboarding_favorites">Customize your feed by tracking your favorite performers and venues, letting you browse when all your favorites are in town.</string>
-    <string name="onboarding_notification">Be the first to know about newly announced &amp; upcoming events by tracking artists and venues. Our handy notifications will keep you in the loop.</string>
-    <string name="onboarding_next">Next</string>
     <string name="onboarding_skip">Skip</string>
 
     <!-- Helper messages -->
-    <string name="loading">Loading …</string>
-    <string name="zoom">Please zoom in to see interesting events!</string>
-    <string name="ask_locality">Enter an area or city</string>
 
     <!-- Sharing -->
     <string name="action_share">Share</string>
@@ -122,14 +73,10 @@
     <string name="share_app_message">Love only grows by sharing. You can only have more for yourself by sharing the app with friends. The more you share, the better would be your experience.</string>
     <string name="share_app_notification_message">Liked this notification? Share EventsHigh app with your contacts and they can also experience the high! Get your gang together.</string>
     <string name="share_coupon_text">Hey! found an Offer on EventsHigh, check it out.\n\nNote: Only available on App!\n\n%1$s\n\n%2$s\n\n Use my referral code %3$s</string>
-    <string name="share_movie_text">Hey! found a Movie on EventsHigh, check it out.\n\n%1$s\n\n%2$s</string>
 
     <!-- Failed messages -->
     <string name="failed_load">Oops! Something\'s gone wrong. Let\'s try that again.</string>
     <string name="failed_refresh">Not able to refresh, this is old info.</string>
-    <string name="unsupported_city">Sorry! We are not in your city. But we will be there soon!</string>
-    <string name="failed_locality">Uh oh! Not able to find your area. Want to try again?</string>
-    <string name="failed_save">That didn\'t work out. Lets try again!</string>
     <string name="failed_share">We couldn\'t share as there is no app installed at the other end. </string>
     <string name="failed_location">Sorry! We didn\'t get your location.</string>
     <string name="failed_event_location">Sorry! We are not able to find the location for this event!</string>
@@ -138,11 +85,9 @@
     <string name="no_whatsapp">WhatsApp application not found!</string>
     <string name="no_events">Uh oh! No events found!</string>
     <string name="retry">Oops! You\'ve stumped us. Let\'s try again.</string>
-    <string name="no_price">Contact Organizer for Price.</string>
 
     <!-- formatting -->
     <string name="event_time_details">{0,choice,0#Happening Today|1#Happening Tomorrow|1&lt;{0} days from now}</string>
-    <string name="event_detail_from">Event details from: %s</string>
     <string name="event_time_venue">%1$s, %2$s</string>
     <string name="event_distance_and_time">%d mins</string>
     <string name="num_events">{0,choice,10&lt;{1} Events|11&lt;{0} Followers \'|\' {1} Events}</string>
@@ -163,9 +108,6 @@
     <!-- Rating -->
     <string name="rate_app_text">Loving EventsHigh? Give us 5 stars!</string>
     <string name="feedback_text">How can we improve?</string>
-    <string name="rate_app_no">No, Thanks</string>
-    <string name="rate_app_now">Now</string>
-    <string name="rate_app_later">Later</string>
     <string name="rate_now">Rate Now</string>
     <string name="feedback">Give Feedback</string>
 
@@ -180,17 +122,11 @@
     <string name="contact_fragment_title" tools:ignore="UnusedResources">Contact EventsHigh</string>
 
     <!--Select Interest Activity-->
-    <string name="personalize_exp_text">Personalize your experience</string>
-    <string name="personalize_message">We\'ll get you hooked up with the stuff you love the most.</string>
 
-
-    <string name="player_error">Error initializing YouTube player</string>
-    <string name="view_all">View all Coupons</string>
 
     <string name="terms_condition_text">\u2022 Eligible on friends who installs the EventsHigh app for first time.&lt;br> \u2022 Both you and your friend needs to register using phone number.&lt;br>\u2022 You can use use your wallet points on our Offers page.&lt;br>\u2022 Wallet points are not transferable.&lt;br>\u2022 EventsHigh team reserves the right to cancel or change any Offer. EventsHigh team decision will be final.&lt;br>\u2022 For any queries, please write to us at &lt;b>support@eventshigh.com&lt;/b>.</string>
 
     <string name="activity_image_trans">Offer Image transition</string>
-    <string name="activity_movie_trans">Movie Image transition</string>
 
     <string name="enter_details_text">Enter Details</string>
     <string name="points_breakdown">Points Breakdown</string>
@@ -198,28 +134,15 @@
     <string name="no_current_offers">No offers in your city. Do check the app after sometime.</string>
 
     <!--Movies-->
-    <string name="title_movies">Movies</string>
-    <string name="title_referral_code">Referral Code</string>
     <string name="title_activity_write_review">Rate and Review</string>
 
     <!--WriteReview-->
-    <string name="write_review_title">Title</string>
     <string name="write_review_description">Write review</string>
 
     <!-- user profile-->
     <string name="fb_login_protocol_scheme">fb1728186420799822</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_user_profile">Profile</string>
-    <string name="title_activity_guest_detail">Guest Details</string>
-
-    <string name="title_activity_booking_details">BookingDetailsActivity</string>
-
-    <string name="ui_add_follow">+Follow</string>
-
-    <string name="title_activity_review">Confirm your reservation</string>
-    <string name="title_activity_ticket_confirmation">Ticket Confirmation</string>
 
 
     <string name="explore_ten_category_text">Here are 10 ways to think about\nyour next outing!</string>
@@ -243,7 +166,6 @@
     <string name="geofence_transition_exited">Exited</string>
     <string name="unknown_geofence_transition">Unknown Transition</string>
     <string name="geofence_transition_notification_text">Click notification to return to app</string>
-    <string name="title_activity_test">TestActivity</string>
 
     <string name="no_review_text">No reviews yet.\nWrite a review and share your experience with others.</string>
     <string name="fb_sign_in_error_facebook_id_string">We could not find a facebook id associated with your Facebook account. Please login with your Google account. </string>

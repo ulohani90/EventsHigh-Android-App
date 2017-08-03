@@ -1,19 +1,9 @@
 package com.eventshigh.nearme.app.view;
 
-import android.annotation.TargetApi;
-import android.app.Fragment;
 import android.content.Context;
-import android.os.Build;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 import android.widget.ListView;
 import android.widget.ScrollView;
 

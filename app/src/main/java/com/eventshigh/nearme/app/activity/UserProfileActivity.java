@@ -1,11 +1,8 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
@@ -14,13 +11,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -37,20 +32,16 @@ import com.eventshigh.nearme.app.data.FriendsStore;
 import com.eventshigh.nearme.app.data.ProfileInfo;
 import com.eventshigh.nearme.app.network.AddFacebookUserInfoRequest;
 import com.eventshigh.nearme.app.network.FetchProfileRequest;
-import com.eventshigh.nearme.app.network.MovieReviewSubmitRequest;
-import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.CircularImageView;
-import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.maps.model.LatLng;
@@ -208,8 +199,7 @@ public class UserProfileActivity extends BaseContextActivity implements View.OnC
     }
 
     private void setViews(ProfileInfo profileInfo) {
-        int favCount = profileInfo.getMeEventFavouriteObject().topicEvents.get(0).events.size() +
-                profileInfo.getMeEventFavouriteObject().movies.size();
+        int favCount = profileInfo.getMeEventFavouriteObject().topicEvents.get(0).events.size();
         TABS = new ArrayList<>();
         if (isUserSelf) {
             TABS.add(INTERESTS_TAB);

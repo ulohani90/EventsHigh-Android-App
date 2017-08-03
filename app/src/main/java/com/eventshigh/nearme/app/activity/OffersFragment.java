@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.activity;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,14 +15,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.EventsContext;
-import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
-import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
-
-import java.util.Calendar;
-import java.util.Locale;
 
 /**
  * Created by umesh on 15/04/16.

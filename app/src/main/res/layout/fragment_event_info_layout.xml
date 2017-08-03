@@ -317,7 +317,6 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/source_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -420,7 +419,6 @@
 
 
     <LinearLayout
-        android:id="@+id/ll_event_write_review"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
@@ -430,7 +428,6 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/reviews_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
@@ -502,7 +499,6 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/no_review_text"
                 style="@style/EHText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

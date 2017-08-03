@@ -1,8 +1,6 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +8,6 @@ import android.widget.TextView;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
-import com.eventshigh.nearme.app.activity.MovieBrowseActivity;
 import com.eventshigh.nearme.app.data.EventCategory;
 
 /**
@@ -44,10 +41,7 @@ public class ExploreCategoryCard extends RecyclerView.ViewHolder {
         categoryName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (data.tag.equalsIgnoreCase(EventCategory.MOVIES.categoryName)) {
-                    Intent intent = new Intent(data.activity, MovieBrowseActivity.class);
-                    data.activity.startActivity(intent);
-                } else if(data.tag.equalsIgnoreCase(EventCategory.TECH.categoryName)){
+                if(data.tag.equalsIgnoreCase(EventCategory.TECH.categoryName)){
                     data.activity.showSearchView("Tech");
                 }else{
                     data.activity.showSearchView(data.tag);

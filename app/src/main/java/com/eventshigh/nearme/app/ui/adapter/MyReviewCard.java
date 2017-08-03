@@ -14,8 +14,6 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.data.MovieDetailObject;
-import com.eventshigh.nearme.app.data.MovieMarkerManager;
 import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
@@ -74,46 +72,7 @@ public class MyReviewCard extends RecyclerView.ViewHolder {
         } else {
             reviewedTime.setVisibility(View.GONE);
         }
-        if (movieUserReviewObject.getReviewFor().equalsIgnoreCase("movie")) {
-            if (isMovieFavourite(movieUserReviewObject.getReviewedEntityId(), activity))
-                favouritedButton.setVisibility(View.VISIBLE);
-            else
-                favouritedButton.setVisibility(View.GONE);
-
-            shareButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.shareMovie(movieUserReviewObject.getMovieDetailObject());
-                }
-            });
-            if (isMovieFavourite(movieUserReviewObject.getReviewedEntityId(), activity)) {
-
-            }
-
-            if (movieUserReviewObject.getMovieDetailObject() != null && movieUserReviewObject.getMovieDetailObject().getMovieInfo() != null) {
-                favouriteButton.setVisibility(View.VISIBLE);
-                favouriteButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        addMovieFavourite(movieUserReviewObject.getMovieDetailObject(), activity);
-                    }
-                });
-            } else {
-                favouriteButton.setVisibility(View.GONE);
-            }
-
-            if (movieUserReviewObject.getMovieDetailObject() != null && movieUserReviewObject.getMovieDetailObject().getMovieInfo() != null) {
-                favouritedButton.setVisibility(View.VISIBLE);
-                favouritedButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        removeMovieFavourite(movieUserReviewObject.getMovieDetailObject(), activity);
-                    }
-                });
-            } else {
-                favouritedButton.setVisibility(View.GONE);
-            }
-        } else if (movieUserReviewObject.getReviewFor().equalsIgnoreCase("event")) {
+        if (movieUserReviewObject.getReviewFor().equalsIgnoreCase("event")) {
             if (isEventFavourite(movieUserReviewObject.getReviewedEntityId(), activity))
                 favouritedButton.setVisibility(View.VISIBLE);
             else
@@ -159,10 +118,6 @@ public class MyReviewCard extends RecyclerView.ViewHolder {
         return EventsMarkerManager.getInstance(activity).isFavourite(id);
     }
 
-    private boolean isMovieFavourite(String id, BaseContextActivity activity) {
-        return MovieMarkerManager.getInstance(activity).isFavourite(id);
-    }
-
     private void removeEventFavourite(Event event, BaseContextActivity activity) {
         activity.reportEventAction(event, "removeFavourite");
 
@@ -183,31 +138,6 @@ public class MyReviewCard extends RecyclerView.ViewHolder {
         EventsMarkerManager.Editor eventsMarkerEditor =
                 EventsMarkerManager.getInstance(activity).getEditor();
         eventsMarkerEditor.recordEventMark(event, EventsMarkerManager.EventMark.FAVOURITE, false);
-        setFavouriteView(true);
-        eventsMarkerEditor.close();
-    }
-
-    private void removeMovieFavourite(MovieDetailObject movie, BaseContextActivity activity) {
-        activity.reportMovieAction(movie.getMovieInfo(), "removeMovieFavourite", movie.getMovieInfo().getName());
-
-        MovieMarkerManager.Editor movieMarkerEditor =
-                MovieMarkerManager.getInstance(activity).getEditor();
-        movieMarkerEditor.recordMovieMark(movie.getMovieInfo(), null);
-        setFavouriteView(false);
-        movieMarkerEditor.close();
-    }
-
-    private void addMovieFavourite(MovieDetailObject movie, BaseContextActivity activity) {
-        activity.reportMovieAction(movie.getMovieInfo(), "addMovieFavourite", movie.getMovieInfo().getName());
-
-        Account account = new Account(activity);
-        if (!account.getUserInfo().isVerified) {
-            PhoneVerificationDialog.show(activity, R.string.ui_verify_phone, R.string.ui_phone_verify_pa);
-        }
-
-        MovieMarkerManager.Editor eventsMarkerEditor =
-                MovieMarkerManager.getInstance(activity).getEditor();
-        eventsMarkerEditor.recordMovieMark(movie.getMovieInfo(), MovieMarkerManager.MovieMark.FAVOURITE);
         setFavouriteView(true);
         eventsMarkerEditor.close();
     }

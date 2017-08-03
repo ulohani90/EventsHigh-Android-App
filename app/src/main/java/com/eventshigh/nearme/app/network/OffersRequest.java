@@ -5,12 +5,10 @@ import android.content.Context;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.stream.OfferObject;
 import com.eventshigh.nearme.app.data.stream.PointsObject;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -20,7 +18,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.ArrayList;
 

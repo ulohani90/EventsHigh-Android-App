@@ -16,9 +16,6 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
-import com.eventshigh.nearme.app.data.MovieDetailObject;
-import com.eventshigh.nearme.app.data.MovieMarkerManager;
-import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.network.EventCollectionRequest.EventsCollection;
 
 import java.util.ArrayList;
@@ -45,24 +42,19 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
     public static class MeEventFavouriteObject implements Parcelable {
         public final List<TopicEvents> topicEvents;
 
-        public final List<MovieDetailObject> movies;
-
-        public MeEventFavouriteObject(List<TopicEvents> topicEvents, List<MovieDetailObject> movies) {
+        public MeEventFavouriteObject(List<TopicEvents> topicEvents) {
             this.topicEvents = topicEvents;
-            this.movies = movies;
+
         }
 
         public MeEventFavouriteObject(Parcel in) {
             this.topicEvents = new ArrayList<>();
             in.readTypedList(this.topicEvents, TopicEvents.CREATOR);
-            this.movies = new ArrayList<>();
-            in.readTypedList(this.movies, MovieDetailObject.CREATOR);
         }
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeTypedList(topicEvents);
-            dest.writeTypedList(movies);
         }
 
         @Override
@@ -173,14 +165,8 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
             return null;
         }
 
-        List<MovieDetailObject> movies = new ArrayList<>();
-        List<TopicEvents> events = new ArrayList<>();
 
-        MovieMarkerManager movieMarkerManager = MovieMarkerManager.getInstance(context);
-        movieMarkerManager.waitForLoading();
-        RequestFuture<List<MovieDetailObject>> moviesList = RequestFuture.newFuture();
-        MultiMovieRequest.submit(context, eventsContext, movieMarkerManager.getFavouritedMovies(),
-                priority, tag, shouldBypassCache, includeWithoutLocation, moviesList, moviesList);
+        List<TopicEvents> events = new ArrayList<>();
 
 
         // Favourites event requests.
@@ -197,9 +183,9 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
         try {
             // addEventsToResults(events, INVITATIONS_NAME, invitedEvents);
             addEventsToResults(events, FAVOURITES_NAME, favEvents);
-            addMoviesToResults(movies, moviesList);
 
-            return new MeEventFavouriteObject(events, movies);
+
+            return new MeEventFavouriteObject(events);
         } catch (RequestCancelledException e) {
             isRequestCancelled = true;
             return null;
@@ -237,17 +223,6 @@ public class MyEventsRequest extends AsyncTask<Void, Void, MyEventsRequest.MeEve
         }
     }
 
-    private static void addMoviesToResults(List<MovieDetailObject> result,
-                                           RequestFuture<List<MovieDetailObject>> movieFuture) throws RequestCancelledException {
-        try {
-            result.addAll(movieFuture.get(10, TimeUnit.SECONDS));
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            if (movieFuture.isCancelled()) {
-                throw new RequestCancelledException();
-            }
-            Crashlytics.getInstance().core.logException(e);
-        }
-    }
 
     private static void addCollectionToResults(List<TopicEvents> result, String name,
                                                RequestFuture<EventsCollection> eventsFuture) throws RequestCancelledException {

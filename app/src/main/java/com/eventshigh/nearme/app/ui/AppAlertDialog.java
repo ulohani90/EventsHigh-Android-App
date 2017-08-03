@@ -3,11 +3,8 @@ package com.eventshigh.nearme.app.ui;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 
-import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.FbLoginFragment;
-import com.eventshigh.nearme.app.user.Preferences;
-import com.eventshigh.nearme.app.user.UserContactsUploader;
 
 /**
  * Created by umesh on 25/08/16.

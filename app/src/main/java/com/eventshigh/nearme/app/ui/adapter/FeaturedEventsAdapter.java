@@ -1,16 +1,13 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
-import android.content.Intent;
 import android.support.v4.view.PagerAdapter;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.user.Account;
 
 /**

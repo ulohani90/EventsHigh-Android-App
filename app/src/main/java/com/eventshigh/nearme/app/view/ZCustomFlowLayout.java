@@ -1,8 +1,5 @@
 package com.eventshigh.nearme.app.view;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
@@ -10,7 +7,8 @@ import android.view.View;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.user.Account;
-import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
 
 /**
  * This Class Defines the FlowLayout Class for adding and removing the Compose

@@ -70,14 +70,6 @@ public enum DataType {
             return FollowCard.newInstance(activity, parent);
         }
 
-        if (typeId == TRENDING_CATEGORY.typeId) {
-            return TrendingCategoryCard.newInstance(activity, parent);
-        }
-
-        if (typeId == EXPLORE_CATEGORY.typeId) {
-            return TrendingCategoryCard.newInstance(activity, parent);
-        }
-
         if (typeId == SMALL_HEADER.typeId) {
             return SmallHeaderCard.newInstance(activity, parent);
         }
@@ -132,15 +124,6 @@ public enum DataType {
         }
         if (typeId == SHOWTIME.typeId) {
             return ShowTimeCard.newInstance(activity, parent);
-        }
-        if (typeId == MOVIE_INFO.typeId) {
-            return MovieInfoCard.newInstance(activity, parent);
-        }
-        if (typeId == MOVIE_LIST_CARD.typeId) {
-            return MovieListCard.newInstance(activity, parent);
-        }
-        if (typeId == MOVIE_CATEGORY.typeId) {
-            return TrendingCategoryCard.newInstance(activity, parent);
         }
         if (typeId == NEW_EXPLORE_CATEOGRY.typeId) {
             return ExploreCategoryCard.newInstance(activity, parent);

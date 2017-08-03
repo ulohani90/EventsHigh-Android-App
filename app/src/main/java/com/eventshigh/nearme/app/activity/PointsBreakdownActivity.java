@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.MenuItem;
@@ -11,16 +10,11 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.network.MyPointsBreakdownRequest;
 import com.eventshigh.nearme.app.ui.HideActionBarOnScroll;
 import com.eventshigh.nearme.app.ui.adapter.EventsAdapter;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
-
-import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
-import java.util.List;
 
 /**
  * Created by umesh on 22/04/16.

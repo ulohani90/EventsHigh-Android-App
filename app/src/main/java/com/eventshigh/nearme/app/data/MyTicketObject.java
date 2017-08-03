@@ -6,13 +6,11 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.squareup.okhttp.internal.Util;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 

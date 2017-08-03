@@ -4,17 +4,11 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.net.Uri;
 
-
 import com.android.volley.Request;
-import com.android.volley.Response;
 import com.android.volley.toolbox.RequestFuture;
 import com.eventshigh.nearme.app.data.Event;
-import com.eventshigh.nearme.app.data.MovieDetailObject;
 import com.eventshigh.nearme.app.network.EventRequest;
 import com.eventshigh.nearme.app.notification.EHNotification;
-
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by umesh on 26/04/16.

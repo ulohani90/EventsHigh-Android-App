@@ -19,7 +19,6 @@
         android:textSize="12sp" />
 
     <View
-        android:id="@+id/tag_separator"
         android:layout_width="1dp"
         android:layout_height="match_parent"
         android:background="@drawable/category_tag_separator_bg" />

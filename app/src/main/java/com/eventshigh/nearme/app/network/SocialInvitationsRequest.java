@@ -15,14 +15,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
-import com.eventshigh.nearme.app.data.City;
-import com.eventshigh.nearme.app.data.EventCategory;
-import com.eventshigh.nearme.app.data.EventDescriptionSection;
 import com.eventshigh.nearme.app.data.SocialFriend;
-import com.eventshigh.nearme.app.network.SocialInvitationsRequest.SocialInvite;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.Signer;
-import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;

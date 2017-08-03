@@ -1,6 +1,7 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -8,13 +9,9 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.app.Activity;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.SpannableString;
@@ -54,7 +51,6 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.io.IOException;
 import java.util.List;
@@ -82,6 +78,8 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
     private static final int PERMISSION_ACCESS_FINE_LOCATION = 0x01;
 
     private static final int PERMISSION_ACCESS_COARSE_LOCATION = 0x02;
+
+    private static final int SET_LOCATION_SETTINGS_ON = 0x01001;
     private LocationRequest mLocationRequest;
 
     boolean isSelectLocationClicked;
@@ -258,7 +256,7 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
                                     // Show the dialog by calling startResolutionForResult(),
                                     // and check the result in onActivityResult().
                                     status.startResolutionForResult(
-                                            PlacesAutocompleteBoundedActivity.this, 1000);
+                                            PlacesAutocompleteBoundedActivity.this, SET_LOCATION_SETTINGS_ON);
                                 } catch (IntentSender.SendIntentException e) {
                                     // Ignore the error.
                                 }
@@ -490,6 +488,8 @@ public class PlacesAutocompleteBoundedActivity extends BaseActivity implements T
         if (requestCode == PERMISSION_ACCESS_COARSE_LOCATION || requestCode == PERMISSION_ACCESS_FINE_LOCATION) {
 
             onSelectLocationClick();
+        } else if (requestCode == SET_LOCATION_SETTINGS_ON && resultCode != Activity.RESULT_OK) {
+            isSelectLocationClicked = false;
         }
     }
 }

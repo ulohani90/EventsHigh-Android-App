@@ -1,12 +1,10 @@
 package com.eventshigh.nearme.app.ui.adapter;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,7 +15,6 @@ import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.UserProfileActivity;
 import com.eventshigh.nearme.app.data.FriendsStore;
 import com.eventshigh.nearme.app.data.NewSocialFriend;
-import com.eventshigh.nearme.app.data.SocialFriend;
 import com.eventshigh.nearme.app.view.CircularImageView;
 
 import java.util.ArrayList;

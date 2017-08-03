@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.network;
 
 import android.content.Context;
-import android.view.View;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;

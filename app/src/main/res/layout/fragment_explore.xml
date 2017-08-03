@@ -63,7 +63,6 @@
                 android:src="@drawable/ic_close_white_24dp" />
 
             <TextView
-                android:id="@+id/choose_locality_text"
                 style="?android:attr/textAppearanceMedium"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

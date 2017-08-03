@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView.Adapter;
 import android.view.ViewGroup;
 
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
-import com.eventshigh.nearme.app.data.stream.QueryNotificationStreamItem;
 import com.eventshigh.nearme.app.data.stream.StreamItem;
 
 import java.util.ArrayList;

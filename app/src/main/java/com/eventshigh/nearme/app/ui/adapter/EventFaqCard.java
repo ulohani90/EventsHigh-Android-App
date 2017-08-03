@@ -2,7 +2,6 @@ package com.eventshigh.nearme.app.ui.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

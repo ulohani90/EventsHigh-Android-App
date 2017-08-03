@@ -16,9 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -31,13 +29,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.network.MovieReviewSubmitRequest;
-import com.eventshigh.nearme.app.network.RecordUserAction;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.GcmRegistration;
 import com.eventshigh.nearme.app.user.Preferences;
-import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.CircularImageView;
 
 import org.json.JSONException;
@@ -91,13 +85,6 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
 
         btnReviewSubmit = (TextView) rootView.findViewById(R.id.btn_write_review);
 
-        if (writeReviewActivity.movieDetailObject != null && writeReviewActivity.type.equals("movie")) {
-            Glide.with(writeReviewActivity).load(writeReviewActivity.movieDetailObject.getMovieInfo().getImg_url())
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.drawable.eh_default_event).crossFade().centerCrop()
-                    .into(ivMoviePicture);
-            tvMovieName.setText(writeReviewActivity.movieDetailObject.getMovieInfo().getName());
-        }
 
         if (writeReviewActivity.event != null && writeReviewActivity.type.equals("event")) {
             Glide.with(writeReviewActivity).load(writeReviewActivity.event.imgUrl)
@@ -175,8 +162,6 @@ public class WriteReviewDescriptionFragment extends Fragment implements View.OnC
                 final JSONObject jsonObject = new JSONObject();
                 if (writeReviewActivity.isFromNotification) {
                     jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.reviewEntityId);
-                } else if (writeReviewActivity.type.equals("movie")) {
-                    jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.movieDetailObject.getMovieInfo().getId());
                 } else if (writeReviewActivity.type.equals("event") && writeReviewActivity.event != null) {
                     jsonObject.put(JSON_KEY_REVIEW_ENTITY_ID, writeReviewActivity.event.id);
                 }

@@ -12,7 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by umesh on 22/12/16.
@@ -27,13 +26,14 @@ public class EventFilterAttribute implements Parcelable {
 
     protected EventFilterAttribute(Parcel in) {
         name = in.readString();
-        value = in.readByte() != 0;
+        value = in.readInt() == 1;
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
-        dest.writeByte((byte) (value ? 1 : 0));
+        dest.writeInt(value ? 1 : 0);
+        
     }
 
     @Override

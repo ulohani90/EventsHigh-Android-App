@@ -15,10 +15,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
-
 import com.eventshigh.nearme.app.activity.OfferSignUpActivity;
 import com.eventshigh.nearme.app.activity.RedeemCouponActivity;
-import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.stream.OfferObject;
 import com.eventshigh.nearme.app.data.stream.VoucherObject;

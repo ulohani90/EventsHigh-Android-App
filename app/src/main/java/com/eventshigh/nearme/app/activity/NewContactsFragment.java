@@ -10,26 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
-import com.eventshigh.nearme.app.data.NewSocialFriend;
 import com.eventshigh.nearme.app.data.ProfileInfo;
-import com.eventshigh.nearme.app.ui.adapter.ContactsAdapter;
 import com.eventshigh.nearme.app.ui.adapter.NewContactsAdapter;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
-import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
 import com.facebook.share.model.AppInviteContent;
 import com.facebook.share.widget.AppInviteDialog;
-
-import org.json.JSONArray;
-
-import java.util.List;
 
 
 /**

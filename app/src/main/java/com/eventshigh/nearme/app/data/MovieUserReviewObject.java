@@ -7,8 +7,6 @@ import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONObject;
 
-import java.net.URL;
-
 /**
  * @author shubham
  * @since 16/5/16.
@@ -38,7 +36,6 @@ public class MovieUserReviewObject implements Parcelable {
     private long createdAt;
 
     private Event event;
-    private MovieDetailObject movieDetailObject;
 
 
     public MovieUserReviewObject(Parcel in) {
@@ -56,13 +53,9 @@ public class MovieUserReviewObject implements Parcelable {
         this.reviewedEntityImage = in.readString();
         this.reviewedEntityLocation = in.readString();
         this.createdAt = in.readLong();
-        if (reviewFor != null) {
-            if (reviewFor.equalsIgnoreCase("event")) {
-                this.event = in.readParcelable(Event.class.getClassLoader());
-            } else if (reviewFor.equalsIgnoreCase("movie")) {
-                this.movieDetailObject = in.readParcelable(MovieUserReviewObject.class.getClassLoader());
-            }
-        }
+        this.event = in.readParcelable(Event.class.getClassLoader());
+
+
     }
 
 
@@ -87,15 +80,6 @@ public class MovieUserReviewObject implements Parcelable {
         } catch (Exception e) {
         }
 
-    }
-
-    //setters and getters
-    public MovieDetailObject getMovieDetailObject() {
-        return movieDetailObject;
-    }
-
-    public void setMovieDetailObject(MovieDetailObject movieDetailObject) {
-        this.movieDetailObject = movieDetailObject;
     }
 
     public Event getEvent() {
@@ -242,11 +226,8 @@ public class MovieUserReviewObject implements Parcelable {
         dest.writeString(reviewedEntityImage);
         dest.writeString(reviewedEntityLocation);
         dest.writeLong(createdAt);
-        if (reviewFor.equalsIgnoreCase("event")) {
-            dest.writeParcelable(event, flags);
-        } else if (reviewFor.equalsIgnoreCase("movie")) {
-            dest.writeParcelable(movieDetailObject, flags);
-        }
+        dest.writeParcelable(event, flags);
+
     }
 
     public static final Parcelable.Creator<MovieUserReviewObject> CREATOR =

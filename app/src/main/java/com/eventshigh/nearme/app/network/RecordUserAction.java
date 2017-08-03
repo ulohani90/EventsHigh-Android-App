@@ -9,8 +9,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
-import com.eventshigh.nearme.app.data.UserContact;
-import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.UserActionHelper;
 import com.eventshigh.nearme.app.utils.Signer;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -21,7 +19,6 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
-import java.util.List;
 
 /**
  * Created by umesh on 25/04/16.

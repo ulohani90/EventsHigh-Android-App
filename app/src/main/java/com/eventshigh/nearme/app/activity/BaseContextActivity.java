@@ -1,7 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
 import android.Manifest;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -22,16 +21,12 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
-import com.eventshigh.nearme.app.data.MovieInfoObject;
-import com.eventshigh.nearme.app.data.MovieMarkerManager;
 import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
 import com.eventshigh.nearme.app.utils.IntentUtils;
 import com.eventshigh.nearme.app.utils.Utils;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -44,7 +39,7 @@ import com.google.android.gms.maps.model.LatLng;
 public abstract class BaseContextActivity extends BaseActivity {
     protected EventsContext eventsContext;
     protected EventsMarkerManager eventsMarkerManager;
-    protected MovieMarkerManager moviesMarkerManager;
+
 
     protected Toolbar toolbar;
 
@@ -54,7 +49,7 @@ public abstract class BaseContextActivity extends BaseActivity {
 
         // Initialize the EventsMarkerManager.Editor.
         eventsMarkerManager = EventsMarkerManager.getInstance(this);
-        moviesMarkerManager = MovieMarkerManager.getInstance(this);
+
 
         // Setup GoogleApiClient
         if (eventsContext != null) {
@@ -253,20 +248,6 @@ public abstract class BaseContextActivity extends BaseActivity {
         eventsMarkerManager.getEditor().recordEventMark(event, mark, isNoChangePreference).close();
     }
 
-    public void recordMovieMark(MovieInfoObject movie, @Nullable MovieMarkerManager.MovieMark mark) {
-        moviesMarkerManager.getEditor().recordMovieMark(movie, mark).close();
-    }
-
-    public boolean isMovieFavourite(MovieInfoObject movie) {
-        return moviesMarkerManager.isFavourite(movie.getId() + "");
-    }
-
-    public
-    @Nullable
-    MovieMarkerManager.MovieMark getMovieMark(MovieInfoObject movie) {
-        return moviesMarkerManager.getMovieMark(movie.getId() + "");
-    }
-
 
     public void reportEventAction(Event event, String actionName, int position) {
         reportActionToAnalytics(actionName,
@@ -330,7 +311,7 @@ public abstract class BaseContextActivity extends BaseActivity {
 
     public void showCustomUrlActivity(String contestUrl, String title) {
         Intent intent = new Intent(this,
-                contestUrl.contains(CustomUrlActivity.BLOG_HOST) ? BlogEntryActivity.class : CustomUrlActivity.class);
+                CustomUrlActivity.class);
         intent.setData(Uri.parse(contestUrl));
         intent.putExtra(CustomUrlActivity.EXTRA_TITLE_KEY, title);
         startActivity(intent);

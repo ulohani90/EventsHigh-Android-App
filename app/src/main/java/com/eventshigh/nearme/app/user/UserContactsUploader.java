@@ -19,7 +19,6 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.ContactsUploadRequest;
-import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.utils.ContactUtils;
 
 import org.json.JSONObject;

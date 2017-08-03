@@ -23,7 +23,6 @@ import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.Utils;
 import com.eventshigh.nearme.app.view.AutofitRecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

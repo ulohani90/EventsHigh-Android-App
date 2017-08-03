@@ -1,6 +1,5 @@
 package com.eventshigh.nearme.app.data;
 
-import android.app.Application;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Parcel;
@@ -8,28 +7,16 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.android.volley.ParseError;
-import com.android.volley.Response;
-import com.android.volley.toolbox.HttpHeaderParser;
-import com.crashlytics.android.Crashlytics;
-import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.network.MyEventsRequest;
 import com.eventshigh.nearme.app.user.Account;
-import com.eventshigh.nearme.app.user.Preferences;
-import com.eventshigh.nearme.app.utils.ContactUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
-import com.eventshigh.nearme.app.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author shubham
@@ -202,16 +189,12 @@ public class ProfileInfo implements Parcelable {
             }
 
             List<MyEventsRequest.TopicEvents> favouriteTopicEvents = new ArrayList<>();
-            List<MovieDetailObject> favouriteMovie = new ArrayList<>();
+
 
             if (jsonObject.has("fav_events")) {
                 List<Event> topicEvents = Event.fromJSON(context, jsonObject.getJSONArray("fav_events"), true, profileEmail.equalsIgnoreCase(new Account(context).getUserInfo().email));
                 favouriteTopicEvents.add(new MyEventsRequest.TopicEvents(MyEventsRequest.FAVOURITES_NAME, topicEvents));
             }
-            if (jsonObject.has("fav_movies")) {
-                favouriteMovie = MovieDetailObject.fromJSON(context, jsonObject.getJSONArray("fav_movies"), profileEmail.equalsIgnoreCase(new Account(context).getUserInfo().email));
-            }
-
             List<NewSocialFriend> friendList = new ArrayList<>();
             if (jsonObject.has("friends")) {
 
@@ -255,7 +238,7 @@ public class ProfileInfo implements Parcelable {
                 });*/
             }
             return new ProfileInfo(profileName, profileLastCity, profilePic, email, movieUserReviewObjects,
-                    events, new MyEventsRequest.MeEventFavouriteObject(favouriteTopicEvents, favouriteMovie), friendList);
+                    events, new MyEventsRequest.MeEventFavouriteObject(favouriteTopicEvents), friendList);
         } catch (JSONException jse) {
             Log.e("ProfileInfo Json Parse", jse.toString());
         }

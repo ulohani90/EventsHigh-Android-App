@@ -12,7 +12,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.EventsGridActivity;
-import com.eventshigh.nearme.app.activity.ReferralActivity;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.network.EventInvitationsRequest.EventInvitation;
 import com.eventshigh.nearme.app.network.SocialInvitationsRequest;
@@ -85,8 +84,8 @@ public class EventInvitationCard extends ViewHolder {
                     intent.putExtra("special_obj",special);
                     activity.startActivity(intent);
                 }else{
-                    Intent intent = new Intent(activity, ReferralActivity.class);
-                    activity.startActivity(intent);
+                  //  Intent intent = new Intent(activity, ReferralActivity.class);
+                   // activity.startActivity(intent);
                 }
 
             }

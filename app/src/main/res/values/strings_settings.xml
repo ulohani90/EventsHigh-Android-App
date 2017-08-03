@@ -2,23 +2,16 @@
     <string name="title_activity_settings">Settings</string>
 
     <!-- General settings -->
-    <string name="pref_header_general">General</string>
-    <string name="pref_title_offers">Offers</string>
     <string name="pref_title_add_event">Create Event</string>
-    <string name="pref_title_share_app">Invite Your Friend</string>
     <string name="pref_title_send_feedback">Message EventsHigh</string>
     <string name="pref_title_about_us">About EventsHigh</string>
-    <string name="pref_title_change_location">Change City</string>
     <string name="pref_title_rate_us">Rate us on Google Play</string>
     <string name="pref_title_logout">Logout</string>
 
     <!-- Account Settings -->
     <string name="pref_title_phone_no">Register Phone Number</string>
-    <string name="pref_title_delete_query_history">Delete Search History</string>
     <string name="message_delete_query_history">Search history was removed successfully!</string>
-    <string name="personalize_text">Personalize</string>
     <string name="edit_interests_text">Edit Interests</string>
-    <string name="profile_text">My Profile</string>
 
     <!-- About US text -->
     <string name="vision">Vision</string>

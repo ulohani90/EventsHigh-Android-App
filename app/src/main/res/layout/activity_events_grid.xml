@@ -20,7 +20,6 @@
             android:layout_height="match_parent">
 
             <android.support.design.widget.AppBarLayout
-                android:id="@+id/app_bar_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fitsSystemWindows="true"
@@ -316,7 +315,6 @@
                         </HorizontalScrollView>
 
                         <View
-                            android:id="@+id/ticketing_separator"
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:background="#11ffffff" />
