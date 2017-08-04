@@ -33,6 +33,7 @@ android {
         targetSdkVersion 25
         versionCode 361
         versionName "3.6.1"
+        resConfigs "en"
     }
     signingConfigs {
         debug {
@@ -44,6 +45,7 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
         }
     }
 

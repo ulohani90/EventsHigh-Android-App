@@ -157,7 +157,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                     Long.toString(secForShare));
 
             Preferences preferences = Preferences.getInstance(this);
-            
+
         }
         if (shareEventsInitiatedTimestamp > 0) {
             long secForShare = (System.currentTimeMillis() - shareEventsInitiatedTimestamp) / 1000;

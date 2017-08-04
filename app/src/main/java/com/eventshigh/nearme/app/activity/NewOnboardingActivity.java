@@ -44,15 +44,15 @@ public class NewOnboardingActivity extends BaseActivity {
         ImagePagerAdapter imagePagerAdapter = new ImagePagerAdapter();
         pager.setAdapter(imagePagerAdapter);
         dotsView.removeAllViews();
-        for (int i = 0; i < imagePagerAdapter.getCount(); i++) {
+       /* for (int i = 0; i < imagePagerAdapter.getCount(); i++) {
             View view = getLayoutInflater().inflate(
                     R.layout.view_dot_featured, dotsView, false);
             view.setSelected(i == 0);
             dotsView.addView(view);
-        }
+        }*/
 
         pager.clearOnPageChangeListeners();
-        pager.addOnPageChangeListener(new DotsSelector());
+        //  pager.addOnPageChangeListener(new DotsSelector());
 
         (findViewById(R.id.tell_us_interest)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,7 +75,7 @@ public class NewOnboardingActivity extends BaseActivity {
         }
     };
 
-    int images[] = {R.drawable.ic_onboarding_1, R.drawable.ic_onboarding_2, R.drawable.ic_onboarding_3, R.drawable.ic_onboarding_4};
+    int images[] = {R.drawable.ic_onboarding_1};
 
     public class ImagePagerAdapter extends PagerAdapter {
 

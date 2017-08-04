@@ -41,7 +41,6 @@ public class ExploreCategoryCard extends RecyclerView.ViewHolder {
         categoryName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
                 data.activity.showSearchView(data.tag);
 
             }
