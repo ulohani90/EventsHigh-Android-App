@@ -55,12 +55,10 @@
             android:id="@+id/event_recommended"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:layout_marginBottom="5dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:src="@drawable/eh_recommend"
-
-            android:visibility="gone"
             tools:ignore="ContentDescription" />
 
         <ImageView
