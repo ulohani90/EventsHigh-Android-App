@@ -18,8 +18,6 @@ import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.ui.AskForContactsDialog;
-import com.eventshigh.nearme.app.ui.AskForContactsDialog.ContactsRequestCallback;
 import com.eventshigh.nearme.app.ui.OneSecDialog;
 import com.eventshigh.nearme.app.user.Preferences;
 import com.eventshigh.nearme.app.utils.Signer;
@@ -46,24 +44,8 @@ public class EhInviteNotificationCard extends ViewHolder {
             @Override
             public void onClick(View v) {
                 Preferences prefs = Preferences.getInstance(activity);
-                if (! prefs.canUploadContacts()) {
-                    AskForContactsDialog.show(activity, prefs, new ContactsRequestCallback() {
-                        @Override
-                        public void onContactsUploadAccepted() {
-                            activity.reportActionToAnalytics("shareAppAcceptOnNotification");
-                            recordUserConsent(activity);
-                        }
-
-                        @Override
-                        public void onContactsUploadRejected() {
-                            // do nothing.
-                            activity.reportActionToAnalytics("shareAppRejectOnNotification");
-                        }
-                    });
-                } else {
-                    activity.reportActionToAnalytics("shareAppOnNotification");
-                    recordUserConsent(activity);
-                }
+                activity.reportActionToAnalytics("shareAppOnNotification");
+                recordUserConsent(activity);
             }
         });
     }

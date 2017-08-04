@@ -147,6 +147,8 @@ public class Event implements Parcelable {
 
     public final String skipCallbackupPhone;
 
+    public final String destination;
+
     public Event(String id, City city, String title, EventCategory category,
                  String description, ArrayList<String> tags, @Nullable String youtubeVideoId,
                  @Nullable String imgUrl, ArrayList<String> allImages, @Nullable String sourceUrl,
@@ -161,7 +163,7 @@ public class Event implements Parcelable {
                  double minPrice, double maxPrice, @Nullable String currency, String priceName, String priceNote,
                  List<EventDescriptionSection> descriptionSections, ArrayList<MovieUserReviewObject> reviewObjects,
                  @Nullable String requestPerAttendeeData, @Nullable List<AdditionalTicketField> additionalTicketFieldList, List<EventSession> sessions, String sessionTitlePhrase, boolean isPrimaryOrganizer, boolean isSponsoredEvent, int ticketingEnabledStatus, String zone,
-                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText, boolean skipRequestToCall, String skipCallbackupPhone) {
+                 ArrayList<EventFilterAttribute> attributes, HashMap<String, Boolean> attributeValues, boolean isEvergreen, boolean isEhTicketing, ArrayList<EventZendeskTicketObject> faqs, String discountPercentage, String discountPercentageText, boolean skipRequestToCall, String skipCallbackupPhone, String destination) {
         this.id = id;
         this.city = city;
         this.title = title;
@@ -226,6 +228,7 @@ public class Event implements Parcelable {
         this.discountPercentageText = discountPercentageText;
         this.skipRequestToCall = skipRequestToCall;
         this.skipCallbackupPhone = skipCallbackupPhone;
+        this.destination = destination;
     }
 
     public Event(Parcel in) {
@@ -305,6 +308,7 @@ public class Event implements Parcelable {
         discountPercentageText = in.readString();
         skipRequestToCall = in.readInt() == 1;
         skipCallbackupPhone = in.readString();
+        destination = in.readString();
     }
 
     @Override
@@ -363,6 +367,7 @@ public class Event implements Parcelable {
         dest.writeString(discountPercentageText);
         dest.writeInt(skipRequestToCall ? 1 : 0);
         dest.writeString(skipCallbackupPhone);
+        dest.writeString(destination);
     }
 
     public Uri getEventDetailsURI() {
@@ -543,6 +548,9 @@ public class Event implements Parcelable {
                 address = venueJson.optString("address");
                 isCleanVenue = venueJson.optBoolean("clean_venue", false);
             }
+
+
+            String destination = eventJson.optString("destination");
 
             String locality = null;
             if (localityJson != null) {
@@ -919,7 +927,7 @@ public class Event implements Parcelable {
                     discountPercentage,
                     discountPercentageText,
                     skipRequestToCall,
-                    skipCallBackupPhone
+                    skipCallBackupPhone, destination
             );
         } catch (IllegalArgumentException e) {
             Log.i("Exception caught", e.getMessage());

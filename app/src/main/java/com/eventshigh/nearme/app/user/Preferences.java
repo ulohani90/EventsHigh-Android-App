@@ -12,8 +12,6 @@ import android.preference.PreferenceManager;
  */
 public class Preferences implements OnSharedPreferenceChangeListener {
     public static final String PREF_SHOW_ONBOARDING = "show_onboarding";
-    public static final String PREF_UPLOAD_CONTACTS = "upload_contacts";
-    public static final String PREF_LAST_TIME_ASKED_CONTACTS = "last_time_asked_contacts";
     public static final String PREF_INTEREST_UPDATED = "interest_updated";
     public static final String PREF_SHOW_REFERRAL = "show_referral";
     public static final String PREF_OFFER_ACTED_ID = "offers_acted";
@@ -65,22 +63,6 @@ public class Preferences implements OnSharedPreferenceChangeListener {
         return sharedPreferences.getBoolean(PREF_NOTIFICATION_ACTIVE, false);
     }
 
-
-    public void setCanUploadContacts(boolean shouldUploadContacts) {
-        sharedPreferences.edit().putBoolean(PREF_UPLOAD_CONTACTS, shouldUploadContacts).apply();
-    }
-
-    public boolean canUploadContacts() {
-        return sharedPreferences.getBoolean(PREF_UPLOAD_CONTACTS, false);
-    }
-
-    public void setUploadContactsAsked() {
-        sharedPreferences.edit().putLong(PREF_LAST_TIME_ASKED_CONTACTS, System.currentTimeMillis()).apply();
-    }
-
-    public long getLastUploadContactsAsked() {
-        return sharedPreferences.getLong(PREF_LAST_TIME_ASKED_CONTACTS, 0);
-    }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {

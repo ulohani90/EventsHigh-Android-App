@@ -315,10 +315,12 @@ public class EventCard extends ViewHolder {
             }*/
 
         }
-
         if (event.venue != null) {
-            eventLocation.setVisibility(View.VISIBLE);
-            eventLocation.setText(event.venue);
+            if (event.venue.equalsIgnoreCase("Outside " + event.city) && event.destination != null && event.destination.length() > 0) {
+                eventLocation.setText(event.destination);
+            } else {
+                eventLocation.setText(event.venue);
+            }
         } else {
             eventLocation.setVisibility(View.GONE);
         }

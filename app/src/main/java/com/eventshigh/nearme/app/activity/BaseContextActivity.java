@@ -21,7 +21,6 @@ import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.EventsMarkerManager.EventMark;
-import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.utils.DateTimeUtils;
 import com.eventshigh.nearme.app.utils.EventsHighEndpoints;
@@ -68,7 +67,7 @@ public abstract class BaseContextActivity extends BaseActivity {
         // Upload contacts
 
         //AskForContactsDialog.show(BaseContextActivity.this, Preferences.getInstance(this));
-        Intent inIntent = getIntent();
+       /* Intent inIntent = getIntent();
         if (eventsContext != null && eventsContext.city != null && toolbar != null &&
                 (inIntent == null || !Intent.ACTION_VIEW.equals(inIntent.getAction()))) {
             toolbar.postDelayed(new Runnable() {
@@ -79,7 +78,7 @@ public abstract class BaseContextActivity extends BaseActivity {
                     }
                 }
             }, 5000);
-        }
+        }*/
     }
 
     @Override

@@ -32,7 +32,6 @@ import com.eventshigh.nearme.app.data.ProfileInfo;
 import com.eventshigh.nearme.app.data.stream.OfferObject;
 import com.eventshigh.nearme.app.network.URLShortenerRequest;
 import com.eventshigh.nearme.app.network.VolleyHelper;
-import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.OneSecDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -158,10 +157,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                     Long.toString(secForShare));
 
             Preferences preferences = Preferences.getInstance(this);
-            if (secForShare > 5 && !preferences.canUploadContacts()) {
-                AskForContactsDialog.show(this, preferences);
-
-            }
+            
         }
         if (shareEventsInitiatedTimestamp > 0) {
             long secForShare = (System.currentTimeMillis() - shareEventsInitiatedTimestamp) / 1000;
@@ -233,13 +229,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                                            @NonNull int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
             // If request is cancelled, the result arrays are empty.
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                AskForContactsDialog.doNeedful(this);
-            } else {
-                // permission denied.
-                Preferences preferences = Preferences.getInstance(this);
-                preferences.setCanUploadContacts(false);
-            }
+
             return;
         }
 

@@ -39,7 +39,6 @@ import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.RequestToCallApi;
-import com.eventshigh.nearme.app.ui.AskForContactsDialog;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
 import com.eventshigh.nearme.app.user.Account;
 import com.eventshigh.nearme.app.user.Preferences;
@@ -300,9 +299,22 @@ public class EventInfoFragment extends Fragment {
         });
 
         StringBuilder builder = new StringBuilder();
-        if (event.venue != null) {
-            builder.append(event.venue + "\n");
+
+        int endIndex = 0;
+        if (event.venue != null && event.city != null) {
+            if (event.venue.equalsIgnoreCase("Outside " + event.city) && event.destination != null && event.destination.length() > 0) {
+                builder.append(event.destination + "\n");
+                endIndex = event.destination.length();
+            } else {
+                builder.append(event.venue + "\n");
+                endIndex = event.venue.length();
+            }
         }
+
+
+        /*if (event.venue != null) {
+            builder.append(event.venue + "\n");
+        }*/
         if (event.address != null) {
             builder.append(event.address);
         } else {
@@ -310,8 +322,8 @@ public class EventInfoFragment extends Fragment {
         }
         SpannableString string = new SpannableString(builder.toString());
         if (event.venue != null) {
-            string.setSpan(new ForegroundColorSpan(Color.parseColor("#353535")), 0, event.venue.length() + 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-            string.setSpan(new RelativeSizeSpan(1.2f), 0, event.venue.length() + 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            string.setSpan(new ForegroundColorSpan(Color.parseColor("#353535")), 0, endIndex + 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            string.setSpan(new RelativeSizeSpan(1.2f), 0, endIndex + 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         }
         eventVenueText.setText(string);
 
@@ -632,11 +644,7 @@ public class EventInfoFragment extends Fragment {
             return;
         }
         Preferences preferences = Preferences.getInstance(getActivity());
-        if (!preferences.canUploadContacts()) {
-            if (AskForContactsDialog.checkIfToShow(((NewEventDetailActivity) getActivity()), preferences)) {
-                return;
-            }
-        }
+
 
         ((NewEventDetailActivity) getActivity()).reportEventAction(event, "ama");
         ZendeskUtils.initZendesk(getActivity());

@@ -41,11 +41,9 @@ public class ExploreCategoryCard extends RecyclerView.ViewHolder {
         categoryName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(data.tag.equalsIgnoreCase(EventCategory.TECH.categoryName)){
-                    data.activity.showSearchView("Tech");
-                }else{
-                    data.activity.showSearchView(data.tag);
-                }
+                
+                data.activity.showSearchView(data.tag);
+
             }
         });
     }
