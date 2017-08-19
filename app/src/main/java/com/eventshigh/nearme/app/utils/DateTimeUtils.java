@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventInfoObject;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -103,7 +104,7 @@ public class DateTimeUtils {
 
     // private static final SimpleDateFormat FULL_DATE_TIME_MILLIS_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-   // private static final SimpleDateFormat DD_MM_YYYY_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    // private static final SimpleDateFormat DD_MM_YYYY_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 
     public static
@@ -136,7 +137,19 @@ public class DateTimeUtils {
         return (int) TimeUnit.MILLISECONDS.toDays(eventDate.getTime() - today.getTime());
     }
 
+    public static int getDaysLater(EventInfoObject event) {
+        Date eventDate = DateTimeUtils.getEventDate(event, 0);
+        Date today = DateTimeUtils.toMidnight(Calendar.getInstance(), event.city.timeZone).getTime();
+        return (int) TimeUnit.MILLISECONDS.toDays(eventDate.getTime() - today.getTime());
+    }
+
     public static Date getEventDate(Event event, int occurrenceNo) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date(event.eventTimings.get(occurrenceNo)));
+        return toMidnight(cal, event.city.timeZone).getTime();
+    }
+
+    public static Date getEventDate(EventInfoObject event, int occurrenceNo) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date(event.eventTimings.get(occurrenceNo)));
         return toMidnight(cal, event.city.timeZone).getTime();
@@ -167,6 +180,17 @@ public class DateTimeUtils {
     public static
     @Nullable
     EventTime getEventTime(Event event, int index) {
+        if (index >= event.eventTimings.size()) {
+            return null;
+        }
+
+        return dateToEventTime(new Date(event.eventTimings.get(index)),
+                TimeZone.getTimeZone(event.city.timeZone), event.eventTimings.get(index));
+    }
+
+    public static
+    @Nullable
+    EventTime getEventTime(EventInfoObject event, int index) {
         if (index >= event.eventTimings.size()) {
             return null;
         }

@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventInfoObject;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.ProfileInfo;
 import com.zendesk.util.StringUtils;
@@ -67,7 +68,7 @@ public class EventsHighEndpoints {
 
     private static final String API_ENDPOINT_NOTIFICATIONS_FORMAT = API_URI_BASE + "api/get_latest_alerts/%s";
 
-    public static final String API_ENDPOINT_REQUEST_CALLBACK = API_URI_BASE+ "api/request_callback";
+    public static final String API_ENDPOINT_REQUEST_CALLBACK = API_URI_BASE + "api/request_callback";
 
     public static final String QUERY_MY_EVENT = "my events";
     public static final String QUERY_MY_INTEREST_EVENTS = "my_interest_events";
@@ -85,7 +86,24 @@ public class EventsHighEndpoints {
         return getEventDetailsURI(event.city, sb.toString());
     }
 
+    public static Uri getEventDetailsURI(EventInfoObject event) {
+        StringBuilder sb = new StringBuilder(event.id);
+        String[] titleKgrams = event.title.replaceAll("\\p{C}", "").split("[\\p{Punct}\\s]+");
+        for (int i = 0; i < 5 && i < titleKgrams.length; i++) {
+            sb.append("-");
+            sb.append(titleKgrams[i]);
+        }
+
+        return getEventDetailsURI(event.city, sb.toString());
+    }
+
     public static Uri getEventShareURI(Event event, @Nullable String src) {
+        return getEventDetailsURI(event.city, event.id).buildUpon()
+                .appendQueryParameter("src", "ehm" + (src == null ? "" : "_" + src))
+                .build();
+    }
+
+    public static Uri getEventShareURI(EventInfoObject event, @Nullable String src) {
         return getEventDetailsURI(event.city, event.id).buildUpon()
                 .appendQueryParameter("src", "ehm" + (src == null ? "" : "_" + src))
                 .build();
@@ -113,7 +131,7 @@ public class EventsHighEndpoints {
                 .build();
     }
 
-    public static Uri getProfileDetailsURI(String profileId){
+    public static Uri getProfileDetailsURI(String profileId) {
         return Uri.parse(WEB_URI_BASE).buildUpon()
                 .appendPath("profile")
                 .appendPath(profileId)
@@ -219,7 +237,6 @@ public class EventsHighEndpoints {
     public static String getApiEndpPointForMyReviews(String phoneNo) {
         return String.format(API_ENDPOINTS_MY_REVIEWS_FORMAT, phoneNo);
     }
-
 
 
     public static String getApiEndPointForAlerts(String cityName) {

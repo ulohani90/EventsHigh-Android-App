@@ -258,7 +258,7 @@ public class CustomUrlActivity extends BaseActivity {
         webSettings.setBuiltInZoomControls(false);
         WebView.setWebContentsDebuggingEnabled(true);
         webSettings.setLoadWithOverviewMode(true);
-        webSettings.setUseWideViewPort(false);
+        webSettings.setUseWideViewPort(true);
 
 
         // Enable Caching.

@@ -38,6 +38,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventDescriptionSection;
+import com.eventshigh.nearme.app.data.EventInfoObject;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.MovieUserReviewObject;
 import com.eventshigh.nearme.app.data.SocialFriend;
@@ -191,7 +192,6 @@ public class NewEventDetailActivity extends BaseContextActivity {
             if (getIntent().hasExtra(EXTRA_EVENT_PARAM)) {
                 event = getIntent().getParcelableExtra(EXTRA_EVENT_PARAM);
                 makeMyReviewsServerRequest(false);
-
             } else if (getIntent().getData() != null) {
 
                 EventRequest.submit(this, getIntent().getData(), Request.Priority.IMMEDIATE, mEventListener,
@@ -685,7 +685,9 @@ public class NewEventDetailActivity extends BaseContextActivity {
         public Fragment getItem(int position) {
             Bundle bundle = new Bundle();
             if (position == 0) {
-                bundle.putParcelable("event", event);
+
+
+                bundle.putParcelable("event_info_object", new EventInfoObject(event));
                 fragment = EventInfoFragment.newInstance(bundle);
                 return fragment;
             }
@@ -853,7 +855,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_FOR_RESULT_AMA) {
                 if (fragment != null) {
-                    fragment.ama(event);
+                    fragment.ama(new EventInfoObject(event));
                 }
             }
             if (requestCode == REQUEST_FOR_RESULT_BOOK_TICKETS) {

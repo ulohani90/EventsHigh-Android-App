@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.utils.Utils;
 
 /**
  * Created by umesh on 20/06/16.
@@ -37,11 +38,14 @@ public class EventDetailCustomFragment extends BaseEventsFragment {
         super.onViewCreated(view, savedInstanceState);
         description = getArguments().getString("description");
         CustomUrlActivity.setupWebView(descriptionView, (BaseContextActivity) getActivity(), false);
-        descriptionView.loadData(toHtmlNoFrame(description.trim()), "text/html; charset=UTF-8", null);
+        descriptionView.loadData(Utils.changedHeaderHtml(description.trim()), "text/html; charset=UTF-8", null);
+        // descriptionView.loadData(toHtmlNoFrame(description.trim()), "text/html; charset=UTF-8", null);
 
     }
 
     private static String toHtmlNoFrame(String html) {
         return "<body>" + html.replaceAll("<iframe.*/iframe>", "") + "</body>";
     }
+
+
 }

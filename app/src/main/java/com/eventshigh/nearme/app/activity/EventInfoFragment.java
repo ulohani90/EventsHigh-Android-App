@@ -37,6 +37,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventInfoObject;
 import com.eventshigh.nearme.app.data.UserContact;
 import com.eventshigh.nearme.app.network.RequestToCallApi;
 import com.eventshigh.nearme.app.ui.PhoneVerificationDialog;
@@ -157,7 +158,7 @@ public class EventInfoFragment extends Fragment {
         return view;
     }
 
-    public void updateReview(final Event event) {
+    public void updateReview(final EventInfoObject event) {
         if (event.reviewObjects.size() > 0) {
             view.findViewById(R.id.review_card).setVisibility(View.VISIBLE);
             ((TextView) view.findViewById(R.id.tv_user_review_by)).setText(event.reviewObjects.get(0).getReviewBy());
@@ -211,7 +212,7 @@ public class EventInfoFragment extends Fragment {
         if (getActivity() != null)
             account = new Account(getActivity());
 
-        final Event event = getArguments().getParcelable("event");
+        final EventInfoObject event = getArguments().getParcelable("event_info_object");
         eventName.setText(event.title);
         String priceString = event.getPriceString();
         if (priceString == null) {
@@ -237,7 +238,7 @@ public class EventInfoFragment extends Fragment {
         timeGroupView.setVisibility(eventTime == null ? View.GONE : View.VISIBLE);
         if (!event.description.isEmpty()) {
             CustomUrlActivity.setupWebView(descriptionView, (BaseContextActivity) getActivity(), false);
-            descriptionView.loadData(toHtmlNoFrame(event.description), "text/html; charset=UTF-8", null);
+            descriptionView.loadData(Utils.changedHeaderHtml(event.description), "text/html; charset=UTF-8", null);
         }
         if (eventTime != null) {
             this.eventTime.setText(eventTime.toString());
@@ -537,7 +538,7 @@ public class EventInfoFragment extends Fragment {
 
     LatLng userLocation;
 
-    private void getGoogleApiClient(final Event event) {
+    private void getGoogleApiClient(final EventInfoObject event) {
         if (client != null && client.isConnected()) {
             populateEventTravelTime(event);
             return;
@@ -567,7 +568,7 @@ public class EventInfoFragment extends Fragment {
         this.showWriteReview = showWriteReview;
     }
 
-    public void writeReview(Event event) {
+    public void writeReview(EventInfoObject event) {
         if (!account.getUserInfo().isSignedIn) {
             // PhoneVerificationDialog.show(((NewEventDetailActivity) getActivity()), R.string.ui_verify_phone, R.string.ui_phone_verify_book);
 
@@ -591,7 +592,7 @@ public class EventInfoFragment extends Fragment {
 
     }
 
-    public String getAverageRating(Event event) {
+    public String getAverageRating(EventInfoObject event) {
 
         double sum = 0.0;
         int count = 0;
@@ -608,7 +609,7 @@ public class EventInfoFragment extends Fragment {
 
     }
 
-    private void populateEventTravelTime(Event event) {
+    private void populateEventTravelTime(EventInfoObject event) {
         if (activity != null) {
             if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -635,7 +636,7 @@ public class EventInfoFragment extends Fragment {
     }
 
 
-    public void ama(Event event) {
+    public void ama(EventInfoObject event) {
 
         final Account account = new Account(getActivity());
         Account.UserInfo userInfo = account.getUserInfo();
@@ -655,7 +656,7 @@ public class EventInfoFragment extends Fragment {
     }
 
 
-    public void requestCallOrganizer(Event event, String organizerPhone) {
+    public void requestCallOrganizer(EventInfoObject event, String organizerPhone) {
         final Account account = new Account(getActivity());
         Account.UserInfo userInfo = account.getUserInfo();
         if (userInfo.phoneNo == null) {
@@ -696,7 +697,7 @@ public class EventInfoFragment extends Fragment {
 
     }
 
-    public void save(Event event) {
+    public void save(EventInfoObject event) {
         ((NewEventDetailActivity) getActivity()).showRateAppDialog = true;
         ((NewEventDetailActivity) getActivity()).addToFavourite = true;
         ((NewEventDetailActivity) getActivity()).reportEventAction(event, "addToCalendar");
@@ -731,7 +732,7 @@ public class EventInfoFragment extends Fragment {
         ((NewEventDetailActivity) getActivity()).startActivitySafe(intent);
     }
 
-    public void showDirections(Event event) {
+    public void showDirections(EventInfoObject event) {
         ((NewEventDetailActivity) getActivity()).addToFavourite = true;
         ((NewEventDetailActivity) getActivity()).reportEventAction(event, "showDirections");
 

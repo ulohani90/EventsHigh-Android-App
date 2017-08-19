@@ -16,6 +16,7 @@ import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.activity.LaunchActivity;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventInfoObject;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.ui.FBSigninDialog;
 import com.eventshigh.nearme.app.user.Account;
@@ -75,7 +76,7 @@ public class ComposeEventCategoryView extends FrameLayout implements ZRuntimeVie
         super.onAttachedToWindow();
     }
 
-    public void setContent(final BaseContextActivity activity, final Account account, final String obj, final Event event, final String action) {
+    public void setContent(final BaseContextActivity activity, final Account account, final String obj, final EventInfoObject event, final String action) {
         textView.setText(obj);
         setMarkedViews(account.isFollowing(obj));
         followImg.setOnClickListener(new OnClickListener() {

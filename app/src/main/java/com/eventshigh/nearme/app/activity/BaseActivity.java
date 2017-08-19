@@ -26,6 +26,7 @@ import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventInfoObject;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
 import com.eventshigh.nearme.app.data.ProfileInfo;
@@ -537,6 +538,36 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    public void addToCalendar(EventInfoObject event, @Nullable Date date) {
+        reportEventAction(event, "addToCalendar", GAHelper.getDateReportString(date));
+
+        Intent intent = new Intent(Intent.ACTION_INSERT)
+                .setData(Events.CONTENT_URI)
+                .putExtra(Events.TITLE, event.title)
+                .putExtra(Events.EVENT_LOCATION, event.getFullAddress())
+                .putExtra(Events.DESCRIPTION, event.getEventShareURI())
+                .putExtra(Events.EVENT_LOCATION, event.getShortAddress());
+
+        if (date == null && event.eventTimings.size() > 0) {
+            date = new Date(event.eventTimings.get(0));
+        }
+
+        if (date != null) {
+            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, date.getTime());
+            if (DateTimeUtils.getTimeString(date, TimeZone.getTimeZone(event.city.timeZone)) == null) {
+                intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
+            }
+        }
+
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // No activity to open cal.
+            Crashlytics.getInstance().core.logException(e);
+            showMessage(R.string.no_cal_app);
+        }
+    }
+
     public void shareCoupon(final OfferObject offer) {
         final String referralCode = new Account(this).getReferrerCode();
         shareOfferInitiatedTimestamp = System.currentTimeMillis();
@@ -588,11 +619,29 @@ public abstract class BaseActivity extends AppCompatActivity {
         return EventsMarkerManager.getInstance(this).isFavourite(event.id);
     }
 
+    public boolean isFavourite(EventInfoObject event) {
+        return EventsMarkerManager.getInstance(this).isFavourite(event.id);
+    }
+
     public void reportEventAction(Event event, String actionName) {
         reportEventAction(event, actionName, null);
     }
 
+    public void reportEventAction(EventInfoObject event, String actionName) {
+        reportEventAction(event, actionName, null);
+    }
+
     public void reportEventAction(Event event, String actionName, @Nullable String label) {
+        if (event != null) {
+            reportActionToAnalytics(actionName,
+                    label == null ? "" : label,
+                    1,
+                    isFavourite(event) ? "Favourite" : "No-Favourite",
+                    event.ehRecommended ? "Recommended" : "Non-Recommended");
+        }
+    }
+
+    public void reportEventAction(EventInfoObject event, String actionName, @Nullable String label) {
         if (event != null) {
             reportActionToAnalytics(actionName,
                     label == null ? "" : label,

@@ -258,4 +258,13 @@ public class Utils {
         name = name.replace(" ", "_").replace("/", "_").replace("-", "_");
         return name.toLowerCase();
     }
+
+    public static String changedHeaderHtml(String htmlText) {
+
+        String head = "<head><meta name=\"viewport\" content=\"width=device-width, user-scalable=yes\" /></head>";
+
+        String closedTag = "</body></html>";
+        String changeFontHtml = head + htmlText + closedTag;
+        return changeFontHtml;
+    }
 }

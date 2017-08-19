@@ -17,6 +17,7 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
 import com.eventshigh.nearme.app.R;
+import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
 import com.eventshigh.nearme.app.data.EventsContext;
 import com.eventshigh.nearme.app.data.EventsMarkerManager;
@@ -287,14 +288,16 @@ public abstract class BaseContextActivity extends BaseActivity {
     public void showEventDetails(Event event, @Nullable String label, @Nullable Bundle bundle) {
         reportEventAction(event, "showEventDetails", label);
         Intent detailIntent = new Intent(this, NewEventDetailActivity.class);
-        detailIntent.putExtra(NewEventDetailActivity.EXTRA_EVENT_PARAM, event);
+
+        detailIntent.setData(EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, event.id));
+        //detailIntent.putExtra(NewEventDetailActivity.EVENT_ID, event.id);
         startActivity(detailIntent, bundle);
     }
 
     public void showEventDetailsWithUserImages(Event event, @Nullable String label, @Nullable Bundle bundle, Bundle resources) {
         reportEventAction(event, "showEventDetails", label);
         Intent detailIntent = new Intent(this, NewEventDetailActivity.class);
-        detailIntent.putExtra(NewEventDetailActivity.EXTRA_EVENT_PARAM, event);
+        detailIntent.setData(EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, event.id));
         detailIntent.putExtras(resources);
         startActivity(detailIntent, bundle);
     }

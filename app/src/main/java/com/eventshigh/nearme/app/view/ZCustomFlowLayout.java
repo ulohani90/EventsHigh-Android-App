@@ -6,6 +6,7 @@ import android.view.View;
 
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventInfoObject;
 import com.eventshigh.nearme.app.user.Account;
 
 import java.util.ArrayList;
@@ -104,7 +105,7 @@ public class ZCustomFlowLayout extends ZFlowLayout {
 
     }
 
-    public void setRecipientForEventCategories(BaseContextActivity activity, Account account, ArrayList<String> tags, Event event, String action) {
+    public void setRecipientForEventCategories(BaseContextActivity activity, Account account, ArrayList<String> tags, EventInfoObject event, String action) {
 
         if (this.getChildCount() > 0)
             this.removeAllViews();
