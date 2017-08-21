@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
 import com.eventshigh.nearme.app.data.Event;
@@ -262,6 +263,7 @@ public class EventCard extends ViewHolder {
                 if (img2.getTag() != null) {
                     bundle.putInt("resource_2", (int) img2.getTag());
                 }
+
                 activity.showEventDetailsWithUserImages(event, "", null, bundle);
             }
         });

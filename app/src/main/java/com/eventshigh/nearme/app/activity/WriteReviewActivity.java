@@ -11,6 +11,7 @@ import android.widget.RatingBar;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventInfoObject;
 import com.eventshigh.nearme.app.user.Account;
 
 public class WriteReviewActivity extends BaseActivity implements RatingBar.OnRatingBarChangeListener {
@@ -27,7 +28,7 @@ public class WriteReviewActivity extends BaseActivity implements RatingBar.OnRat
     WriteReviewRatingFragment writeReviewRatingFragment;
     WriteReviewDescriptionFragment writeReviewDescriptionFragment;
 
-    Event event;
+    EventInfoObject event;
 
     String type = "";
     boolean isFromNotification;

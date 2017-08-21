@@ -16,6 +16,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
+import com.crashlytics.android.Crashlytics;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
@@ -117,10 +118,6 @@ public abstract class BaseContextActivity extends BaseActivity {
 
     }
 
-    @Override
-    public View getViewForSnackbar() {
-        return toolbar;
-    }
 
     protected void setupLayout(@LayoutRes int layoutResID) {
         // Setup the UI.
@@ -280,6 +277,7 @@ public abstract class BaseContextActivity extends BaseActivity {
 
     public void showEventDetails(Uri eventDetailsURI, @Nullable String label) {
         reportActionToAnalytics("showEventDetails", label);
+        Crashlytics.setString("Event_id", eventDetailsURI.toString());
         Intent detailIntent = new Intent(this, NewEventDetailActivity.class);
         detailIntent.setData(eventDetailsURI);
         startActivity(detailIntent);
@@ -287,14 +285,15 @@ public abstract class BaseContextActivity extends BaseActivity {
 
     public void showEventDetails(Event event, @Nullable String label, @Nullable Bundle bundle) {
         reportEventAction(event, "showEventDetails", label);
+        Crashlytics.setString("Event_id", event.id);
         Intent detailIntent = new Intent(this, NewEventDetailActivity.class);
-
         detailIntent.setData(EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, event.id));
         //detailIntent.putExtra(NewEventDetailActivity.EVENT_ID, event.id);
         startActivity(detailIntent, bundle);
     }
 
     public void showEventDetailsWithUserImages(Event event, @Nullable String label, @Nullable Bundle bundle, Bundle resources) {
+        Crashlytics.setString("Event_id", event.id);
         reportEventAction(event, "showEventDetails", label);
         Intent detailIntent = new Intent(this, NewEventDetailActivity.class);
         detailIntent.setData(EventsHighEndpoints.getEventDetailsURI(City.BANGALORE, event.id));

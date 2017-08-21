@@ -94,10 +94,6 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
     public static final String EVENT_OBJECT = "event_detail_object";
 
-    @Override
-    public View getViewForSnackbar() {
-        return toolbar;
-    }
 
     public static final String EXTRA_EVENT_PARAM = NewEventDetailActivity.class.getSimpleName() + "_event";
     public static final String EXTRA_PLAN_ID_PARAM = NewEventDetailActivity.class.getSimpleName() + "_plan_id";
@@ -688,6 +684,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
 
                 bundle.putParcelable("event_info_object", new EventInfoObject(event));
+                // System.out.println("Bundle size " + bundle.size());
                 fragment = EventInfoFragment.newInstance(bundle);
                 return fragment;
             }

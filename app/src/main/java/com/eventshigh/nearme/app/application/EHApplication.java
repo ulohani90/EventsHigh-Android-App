@@ -33,8 +33,10 @@ public class EHApplication extends Application {
 
         @Override
         protected Void doInBackground(Void... params) {
-            CrashlyticsCore core = new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build();
+            //.disabled(BuildConfig.DEBUG).
+            CrashlyticsCore core = new CrashlyticsCore.Builder().build();
             Fabric.with(EHApplication.this, new Crashlytics.Builder().core(core).build());
+
             return null;
         }
     }

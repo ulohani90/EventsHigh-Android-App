@@ -58,6 +58,7 @@ import com.eventshigh.nearme.app.broadcast.GeofenceStartService;
 import com.eventshigh.nearme.app.broadcast.UpdateAccountInfoService;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
+import com.eventshigh.nearme.app.data.EventInfoObject;
 import com.eventshigh.nearme.app.data.LocalityLatLong;
 import com.eventshigh.nearme.app.data.MyTicketObject;
 import com.eventshigh.nearme.app.network.EventRequest;
@@ -1485,7 +1486,7 @@ public class LaunchActivity extends BaseContextActivity {
                         //reportActionToAnalytics("showEventDetails", label);
                         Intent detailIntent = new Intent(LaunchActivity.this, WriteReviewActivity.class);
                         Bundle bundle = new Bundle();
-                        bundle.putParcelable(NewEventDetailActivity.EVENT_OBJECT, event);
+                        bundle.putParcelable(NewEventDetailActivity.EVENT_OBJECT, new EventInfoObject(event));
                         bundle.putString(EventInfoFragment.OBJECT_TYPE, "event");
                         detailIntent.putExtras(bundle);
                         startActivity(detailIntent);
