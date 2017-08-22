@@ -17,6 +17,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -1225,6 +1226,18 @@ public class LaunchActivity extends BaseContextActivity {
             weekEventsFragment = NewWeekEventsFragment.getInstance(eventsContext, false);
             return weekEventsFragment;
 
+        }
+
+        @Override
+        public Parcelable saveState() {
+            Bundle bundle = (Bundle) super.saveState();
+            if (bundle != null) {
+                // Never maintain any states from the base class, just null it out
+                bundle.putParcelableArray("states", null);
+            } else {
+                // do nothing
+            }
+            return bundle;
         }
 
         @Override

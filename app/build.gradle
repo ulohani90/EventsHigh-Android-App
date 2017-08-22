@@ -85,6 +85,7 @@ dependencies {
     }
     compile files('libs/YouTubeAndroidPlayerApi.jar')
     compile files('libs/GoogleConversionTrackingSdk-2.2.4.jar')
+    compile 'com.gu.android:toolargetool:0.1.2@aar'
 }
 
 apply plugin: 'com.google.gms.google-services'

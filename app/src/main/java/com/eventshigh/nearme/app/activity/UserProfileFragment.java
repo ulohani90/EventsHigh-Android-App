@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -105,6 +106,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         fragment.setArguments(bundle);
         return fragment;
     }
+
 
     @Override
     public void onAttach(Context context) {
@@ -423,6 +425,18 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         @Override
         public int getCount() {
             return TABS.size();
+        }
+
+        @Override
+        public Parcelable saveState() {
+            Bundle bundle = (Bundle) super.saveState();
+            if (bundle != null) {
+                // Never maintain any states from the base class, just null it out
+                bundle.putParcelableArray("states", null);
+            } else {
+                // do nothing
+            }
+            return bundle;
         }
     }
 

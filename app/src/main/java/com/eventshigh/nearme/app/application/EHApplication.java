@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.eventshigh.nearme.app.BuildConfig;
+import com.gu.toolargetool.TooLargeTool;
 
 import io.branch.referral.Branch;
 import io.fabric.sdk.android.Fabric;
@@ -18,6 +19,7 @@ public class EHApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        TooLargeTool.startLogging(this);
         Branch.getAutoInstance(EHApplication.this);
         // Twitter CrashAnalytics
         new InitailizeSdks().execute();

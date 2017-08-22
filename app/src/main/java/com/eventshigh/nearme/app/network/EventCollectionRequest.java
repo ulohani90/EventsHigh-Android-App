@@ -67,6 +67,7 @@ public class EventCollectionRequest extends JsonRequest<EventsCollection> {
         String url;
         try {
             url = EventsHighEndpoints.getApiEndpoint(eventsContext);
+            System.out.println("Api hit: " + url);
         } catch (IllegalArgumentException e) {
             errorListener.onErrorResponse(new VolleyError("Invalid Query", e));
             return;
