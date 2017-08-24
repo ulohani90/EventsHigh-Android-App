@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
+import com.eventshigh.nearme.app.activity.MyTicketsActivity;
 import com.eventshigh.nearme.app.activity.MyTicketsFragment;
 import com.eventshigh.nearme.app.data.City;
 import com.eventshigh.nearme.app.data.Event;
@@ -125,9 +126,10 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
 
-    public void setMyTicketsData(List<MyTicketObject> objs, MyTicketsFragment myTicketsFragment) {
+    public void setMyTicketsData(List<MyTicketObject> objs, MyTicketsActivity ticketsActivity) {
+        dataToShow.clear();
         for (MyTicketObject obj : objs) {
-            dataToShow.add(new MyTicketData(obj, activity, myTicketsFragment));
+            dataToShow.add(new MyTicketData(obj, activity, ticketsActivity));
         }
         notifyDataSetChanged();
     }
@@ -264,8 +266,8 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
         dataToShow.clear();
         if (eventCollection != null) {
             //if (!eventCollection.events.isEmpty()) {
-                dataToShow.add(new EventPagerData(activity, eventCollection.showReferrer,
-                        eventCollection.events));
+            dataToShow.add(new EventPagerData(activity, eventCollection.showReferrer,
+                    eventCollection.events));
             //}
         }
         dataToShow.add(new ExploreCategoryHeaderData(activity, showNewYearImage));
@@ -276,7 +278,6 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
 
         notifyDataSetChanged();
     }
-
 
 
     public int getMaterialColor(int i) {
@@ -320,7 +321,7 @@ public class EventsAdapter extends RecyclerView.Adapter<ViewHolder> implements S
     }
 
     public void addFollowCard(String title, int numEvents, int numFollowers, boolean isNearMeQuery) {
-        dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity, this,isNearMeQuery));
+        dataToShow.add(0, new FollowData(title, numEvents, numFollowers, activity, this, isNearMeQuery));
     }
 
     @Override

@@ -1141,9 +1141,9 @@ public class LaunchActivity extends BaseContextActivity {
 
             } else if (position == 0) {
                 fabWriteReviews.setImageResource(R.drawable.ic_edit);
-                if (profileFragment != null && profileFragment.getPager() != null && profileFragment.getPager().getCurrentItem() == 0) {
-                    animateFabIn();
-                }
+                // if (profileFragment != null && profileFragment.getPager() != null && profileFragment.getPager().getCurrentItem() == 0) {
+                //   animateFabIn();
+                //}
             } else {
                 animateFabOut();
             }
@@ -1170,7 +1170,7 @@ public class LaunchActivity extends BaseContextActivity {
 
     NewWeekEventsFragment weekEventsFragment;
 
-    UserProfileFragment profileFragment;
+    NewUserProfileFragment profileFragment;
 
     private FbLoginFragment fbLoginFragment;
 
@@ -1202,7 +1202,7 @@ public class LaunchActivity extends BaseContextActivity {
                     phoneLoginFragment = PhoneLoginFragment.newInstance(true, false, false);
                     return phoneLoginFragment;
                 } else {
-                    profileFragment = UserProfileFragment.newInstance(eventsContext);
+                    profileFragment = NewUserProfileFragment.newInstance(eventsContext);
                     return profileFragment;
                 }
             }

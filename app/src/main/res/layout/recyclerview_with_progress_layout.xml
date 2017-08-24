@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ProgressBar
+        android:id="@+id/top_progress_bar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="-4dp"
+        android:layout_marginTop="-4dp"
+        android:indeterminate="true" />
+
+    <include
+        android:id="@+id/view_no_my_event"
+        layout="@layout/view_no_my_event"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1000"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/view_retry"
+        layout="@layout/view_retry"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1000"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/no_tickets_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="64dp"
+        android:gravity="center_horizontal"
+        android:text="No Tickets"
+        android:textSize="18sp"
+        android:visibility="gone" />
+
+
+    <com.eventshigh.nearme.app.view.AutofitRecyclerView
+        android:id="@+id/event_grid"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:columnWidth="@dimen/event_card_width"
+        android:horizontalSpacing="5dp"
+        android:outlineProvider="bounds"
+        android:paddingBottom="20dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="10dp"
+        android:verticalSpacing="5dp"
+        tools:listitem="@layout/card_event" />
+
+</LinearLayout>

@@ -351,6 +351,25 @@
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBar" />
 
+        <activity
+            android:name=".activity.FragmentContainerActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.MyInterestsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.MyFavouritesActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.MyFriendsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.MyTicketsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.MyReviewsActivity"
+            android:screenOrientation="portrait" />
+
 
         <!-- Receivers within our application -->
         <!-- Receives the Install referrer from play store -->

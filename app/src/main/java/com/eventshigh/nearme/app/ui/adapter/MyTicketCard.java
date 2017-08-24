@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.eventshigh.nearme.app.R;
 import com.eventshigh.nearme.app.activity.BaseActivity;
 import com.eventshigh.nearme.app.activity.BaseContextActivity;
+import com.eventshigh.nearme.app.activity.MyTicketsActivity;
 import com.eventshigh.nearme.app.activity.MyTicketsFragment;
 import com.eventshigh.nearme.app.data.MyTicketObject;
 import com.eventshigh.nearme.app.utils.Utils;
@@ -22,7 +23,7 @@ import java.util.List;
  * @since 15/6/16.
  */
 
-public class MyTicketCard extends RecyclerView.ViewHolder{
+public class MyTicketCard extends RecyclerView.ViewHolder {
 
     TextView tvEventName, tvEventLocation, tvNoTickets;
     TextView tvBookingId, tvGuestName, tvGuestEmail, tvGuestPhone;
@@ -43,29 +44,29 @@ public class MyTicketCard extends RecyclerView.ViewHolder{
 
     public MyTicketCard(View itemView) {
         super(itemView);
-        tvEventName = (TextView)itemView.findViewById(R.id.tv_event_name);
-        tvEventLocation = (TextView)itemView.findViewById(R.id.tv_event_location);
-        tvNoTickets = (TextView)itemView.findViewById(R.id.tv_no_of_tickets);
+        tvEventName = (TextView) itemView.findViewById(R.id.tv_event_name);
+        tvEventLocation = (TextView) itemView.findViewById(R.id.tv_event_location);
+        tvNoTickets = (TextView) itemView.findViewById(R.id.tv_no_of_tickets);
 
-        tvBookingId = (TextView)itemView.findViewById(R.id.tv_event_booking_id);
-        tvGuestName = (TextView)itemView.findViewById(R.id.tv_event_guest_name);
-        tvGuestEmail = (TextView)itemView.findViewById(R.id.tv_event_guest_email);
-        tvGuestPhone = (TextView)itemView.findViewById(R.id.tv_event_guest_phone);
+        tvBookingId = (TextView) itemView.findViewById(R.id.tv_event_booking_id);
+        tvGuestName = (TextView) itemView.findViewById(R.id.tv_event_guest_name);
+        tvGuestEmail = (TextView) itemView.findViewById(R.id.tv_event_guest_email);
+        tvGuestPhone = (TextView) itemView.findViewById(R.id.tv_event_guest_phone);
 
-        tvDate = (TextView)itemView.findViewById(R.id.tv_event_date);
-        tvTime = (TextView)itemView.findViewById(R.id.tv_event_time);
-        tvSeat = (TextView)itemView.findViewById(R.id.tv_ticket_description);
+        tvDate = (TextView) itemView.findViewById(R.id.tv_event_date);
+        tvTime = (TextView) itemView.findViewById(R.id.tv_event_time);
+        tvSeat = (TextView) itemView.findViewById(R.id.tv_ticket_description);
 
-        llHidingMask = (LinearLayout)itemView.findViewById(R.id.ll_hiding_mask);
+        llHidingMask = (LinearLayout) itemView.findViewById(R.id.ll_hiding_mask);
         tvShowMoreLess = (TextView) itemView.findViewById(R.id.tv_show_more_less);
 
-        maskingRowView = (LinearLayout)itemView.findViewById(R.id.row_view_ticket);
-        rowDate = (TextView)itemView.findViewById(R.id.row_date);
-        rowBookingId = (TextView)itemView.findViewById(R.id.row_booking_id);
+        maskingRowView = (LinearLayout) itemView.findViewById(R.id.row_view_ticket);
+        rowDate = (TextView) itemView.findViewById(R.id.row_date);
+        rowBookingId = (TextView) itemView.findViewById(R.id.row_booking_id);
     }
 
 
-    public void bindData(final MyTicketObject myTicketObject, final BaseContextActivity activity, final int position, final EventsAdapter.OnMyTicketItemClickedListener myTicketItemClickedListener, MyTicketsFragment myTicketsFragment){
+    public void bindData(final MyTicketObject myTicketObject, final BaseContextActivity activity, final int position, final EventsAdapter.OnMyTicketItemClickedListener myTicketItemClickedListener, MyTicketsActivity ticketsActivity) {
 
         tvShowMoreLess.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,12 +91,12 @@ public class MyTicketCard extends RecyclerView.ViewHolder{
         rowDate.setText(myTicketObject.getEventTime());
         rowBookingId.setText(myTicketObject.getBookingId());
 
-        if(myTicketsFragment.clickPosition == position){
+        if (ticketsActivity.clickPosition == position) {
             llHidingMask.setVisibility(View.VISIBLE);
             maskingRowView.setVisibility(View.GONE);
             tvNoTickets.setVisibility(View.VISIBLE);
             tvShowMoreLess.setText("Show Less");
-        }else{
+        } else {
             llHidingMask.setVisibility(View.GONE);
             maskingRowView.setVisibility(View.VISIBLE);
             tvNoTickets.setVisibility(View.GONE);

@@ -140,7 +140,7 @@ public class MyTicketsFragment extends Fragment {
         adapter = new EventsAdapter((BaseContextActivity) getActivity());
         adapter.setOnMyTicketClickListener(myTicketItemClickedListener);
         myTicketsList.setAdapter(adapter);
-        adapter.setMyTicketsData(objs, this);
+        // adapter.setMyTicketsData(objs, this);
     }
 
     public static int clickPosition = -1;

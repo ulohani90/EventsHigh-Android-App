@@ -123,13 +123,13 @@ public class NewContactsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public int getItemCount() {
         if (friendList != null)
-            return friendList.size();
-        return 0;
+            return friendList.size() + 1;
+        return 1;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position == friendList.size() - 1) {
+        if (position == friendList.size()) {
             return TYPE_INVITE_FRIENDS;
         } else {
             return TYPE_USER_CONTACT;
