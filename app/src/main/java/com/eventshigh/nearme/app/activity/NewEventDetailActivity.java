@@ -152,15 +152,17 @@ public class NewEventDetailActivity extends BaseContextActivity {
         favAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (favAction.isSelected()) {
-                    removeFavourite(v);
-                    favAction.setSelected(false);
-                    showMessage("Removed from favourites");
-                } else {
-                    addFavourite(v);
-                    favAction.setSelected(true);
-                    showMessage("Added to favourites");
+                if (event != null) {
+                    if (favAction.isSelected()) {
+                        removeFavourite(v);
+                        favAction.setSelected(false);
+                        showMessage("Removed from favourites");
+                    } else {
+                        addFavourite(v);
+                        favAction.setSelected(true);
+                        showMessage("Added to favourites");
 
+                    }
                 }
             }
         });
@@ -188,7 +190,13 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
             if (getIntent().hasExtra(EXTRA_EVENT_PARAM)) {
                 event = getIntent().getParcelableExtra(EXTRA_EVENT_PARAM);
-                makeMyReviewsServerRequest(false);
+                if (event != null) {
+                    makeMyReviewsServerRequest(false);
+                } else {
+                    Toast.makeText(NewEventDetailActivity.this, R.string.failed_load,
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                }
             } else if (getIntent().getData() != null) {
 
                 EventRequest.submit(this, getIntent().getData(), Request.Priority.IMMEDIATE, mEventListener,
@@ -293,9 +301,11 @@ public class NewEventDetailActivity extends BaseContextActivity {
     private Response.Listener<List<MovieUserReviewObject>> mReviewListener = new Response.Listener<List<MovieUserReviewObject>>() {
         @Override
         public void onResponse(List<MovieUserReviewObject> reviews, boolean isIntermediate) {
-            findReviewsByUserForMovie(reviews);
-            //if (fragment == null)
-            addAdapterData();
+            if (event != null) {
+                findReviewsByUserForMovie(reviews);
+                //if (fragment == null)
+                addAdapterData();
+            }
           /*  if (fragment != null)
                 fragment.updateReview(event);*/
         }
@@ -494,58 +504,59 @@ public class NewEventDetailActivity extends BaseContextActivity {
                 new Response.Listener<SocialActionsRequest.SocialActions>() {
                     @Override
                     public void onResponse(SocialActionsRequest.SocialActions socialActions, boolean isIntermediate) {
-                        Set<SocialFriend> likedBy = socialActions.eventFavourites.get(event.id);
-                        reportActionToAnalytics("showSocialInfo", "likes",
-                                likedBy == null ? 0 : likedBy.size());
-                        if (likedBy != null && likedBy.size() > 0) {
-                            statsLayout.setVisibility(View.VISIBLE);
-                            ((ImageView) findViewById(R.id.img1)).setVisibility(View.GONE);
-                            ((ImageView) findViewById(R.id.img2)).setVisibility(View.GONE);
-                            ((ContactListView) findViewById(R.id.followed_by)).setVisibility(View.VISIBLE);
-                            ((ContactListView) findViewById(R.id.followed_by)).setFollowers(
-                                    NewEventDetailActivity.this, likedBy);
-                            StringBuilder builder = new StringBuilder();
-                            int pos = 0;
-                            for (SocialFriend socialFriend : likedBy) {
-                                if (pos > 0) {
-                                    break;
-                                }
-                                builder.append(socialFriend.getName());
-                                pos++;
-                            }
-                            if (builder.length() > 0 && event.numViews > 0) {
-                                builder.append(" and ");
-                            }
-                            builder.append(event.numViews > 0 ? (event.numViews + " people interested") : " interested");
-                            statsView.setText(builder.toString());
-                            ((View) statsView.getParent()).setVisibility(View.VISIBLE);
-                            statsView.setVisibility(View.VISIBLE);
-                        } else {
-                            if (event.numViews > 0) {
+                        if (event != null) {
+                            Set<SocialFriend> likedBy = socialActions.eventFavourites.get(event.id);
+                            reportActionToAnalytics("showSocialInfo", "likes",
+                                    likedBy == null ? 0 : likedBy.size());
+                            if (likedBy != null && likedBy.size() > 0) {
                                 statsLayout.setVisibility(View.VISIBLE);
-                                ((ImageView) findViewById(R.id.img1)).setVisibility(View.VISIBLE);
-                                ((ImageView) findViewById(R.id.img2)).setVisibility(View.VISIBLE);
-                                int resource1 = -1;
-                                int resource2 = -1;
-                                if (getIntent().getExtras() != null) {
-                                    resource1 = getIntent().getExtras().getInt("resource_1", -1);
-                                    resource2 = getIntent().getExtras().getInt("resource_2", -1);
-                                }
-                                // ((ImageView) findViewById(R.id.img1)).setImageDrawable(getResources().getDrawable());
-
-                                ((ImageView) findViewById(R.id.img1)).setImageResource((resource1 != -1 ? resource1 : Utils.getDummyImageResource()));
-                                ((ImageView) findViewById(R.id.img2)).setImageResource(resource2 != -1 ? resource2 : Utils.getDummyImageResource());
+                                ((ImageView) findViewById(R.id.img1)).setVisibility(View.GONE);
+                                ((ImageView) findViewById(R.id.img2)).setVisibility(View.GONE);
+                                ((ContactListView) findViewById(R.id.followed_by)).setVisibility(View.VISIBLE);
+                                ((ContactListView) findViewById(R.id.followed_by)).setFollowers(
+                                        NewEventDetailActivity.this, likedBy);
                                 StringBuilder builder = new StringBuilder();
-                                builder.append(event.numViews + " people interested");
+                                int pos = 0;
+                                for (SocialFriend socialFriend : likedBy) {
+                                    if (pos > 0) {
+                                        break;
+                                    }
+                                    builder.append(socialFriend.getName());
+                                    pos++;
+                                }
+                                if (builder.length() > 0 && event.numViews > 0) {
+                                    builder.append(" and ");
+                                }
+                                builder.append(event.numViews > 0 ? (event.numViews + " people interested") : " interested");
                                 statsView.setText(builder.toString());
                                 ((View) statsView.getParent()).setVisibility(View.VISIBLE);
                                 statsView.setVisibility(View.VISIBLE);
                             } else {
-                                statsLayout.setVisibility(View.GONE);
+                                if (event.numViews > 0) {
+                                    statsLayout.setVisibility(View.VISIBLE);
+                                    ((ImageView) findViewById(R.id.img1)).setVisibility(View.VISIBLE);
+                                    ((ImageView) findViewById(R.id.img2)).setVisibility(View.VISIBLE);
+                                    int resource1 = -1;
+                                    int resource2 = -1;
+                                    if (getIntent().getExtras() != null) {
+                                        resource1 = getIntent().getExtras().getInt("resource_1", -1);
+                                        resource2 = getIntent().getExtras().getInt("resource_2", -1);
+                                    }
+                                    // ((ImageView) findViewById(R.id.img1)).setImageDrawable(getResources().getDrawable());
+
+                                    ((ImageView) findViewById(R.id.img1)).setImageResource((resource1 != -1 ? resource1 : Utils.getDummyImageResource()));
+                                    ((ImageView) findViewById(R.id.img2)).setImageResource(resource2 != -1 ? resource2 : Utils.getDummyImageResource());
+                                    StringBuilder builder = new StringBuilder();
+                                    builder.append(event.numViews + " people interested");
+                                    statsView.setText(builder.toString());
+                                    ((View) statsView.getParent()).setVisibility(View.VISIBLE);
+                                    statsView.setVisibility(View.VISIBLE);
+                                } else {
+                                    statsLayout.setVisibility(View.GONE);
+                                }
                             }
+
                         }
-
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -555,8 +566,6 @@ public class NewEventDetailActivity extends BaseContextActivity {
                     }
                 }
         );
-
-
     }
 
 
@@ -584,7 +593,6 @@ public class NewEventDetailActivity extends BaseContextActivity {
         }*/
 
         showRateAppDialog = true;
-        addToFavourite = true;
         reportEventAction(event, "bookTicket");
         new UserActionHelper(this).recordAction(UserActionHelper.EventAction.BOOK, event.id);
 
@@ -755,7 +763,7 @@ public class NewEventDetailActivity extends BaseContextActivity {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            View view = NewEventDetailActivity.this.getLayoutInflater().inflate(R.layout.card_refer, container, false);
+            View view = ((LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.card_refer, container, false);
             TextView helloUserText = (TextView) view.findViewById(R.id.hello_user_text);
             helloUserText.setVisibility(View.GONE);
             ImageView banner = (ImageView) view.findViewById(R.id.banner_img);

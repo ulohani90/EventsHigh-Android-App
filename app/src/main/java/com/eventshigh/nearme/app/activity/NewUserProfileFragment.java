@@ -1,5 +1,6 @@
 package com.eventshigh.nearme.app.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -196,9 +197,11 @@ public class NewUserProfileFragment extends Fragment {
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        setData();
-                        progressBar.setVisibility(View.GONE);
-                        profileLayout.setVisibility(View.VISIBLE);
+                        if (getActivity() != null) {
+                            setData();
+                            progressBar.setVisibility(View.GONE);
+                            profileLayout.setVisibility(View.VISIBLE);
+                        }
                     }
                 }, true);
     }
@@ -207,8 +210,9 @@ public class NewUserProfileFragment extends Fragment {
         if (basicProfileInfo != null) {
             userName.setText(basicProfileInfo.getName());
             userEmail.setText(basicProfileInfo.getEmail());
-            if (!Utils.checkIfStringEmpty(basicProfileInfo.getProfilePic())) {
-                Glide.with(activity).load(basicProfileInfo.getProfilePic())
+            if (!Utils.checkIfStringEmpty(basicProfileInfo.getProfilePic()) && getActivity() != null) {
+
+                Glide.with(getActivity()).load(basicProfileInfo.getProfilePic())
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait).crossFade().centerCrop()
                         .into(userImage);
@@ -249,26 +253,27 @@ public class NewUserProfileFragment extends Fragment {
             }
 
         } else {
-            Account.UserInfo userInfo = new Account(getActivity()).getUserInfo();
-            userName.setText(userInfo.name);
-            userEmail.setText(userInfo.email);
-            if (!Utils.checkIfStringEmpty(userInfo.profilePic)) {
-                Glide.with(activity).load(userInfo.profilePic)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait).crossFade().centerCrop()
-                        .into(userImage);
+            if (getActivity() != null) {
+                Account.UserInfo userInfo = new Account(getActivity()).getUserInfo();
+                userName.setText(userInfo.name);
+                userEmail.setText(userInfo.email);
+                if (!Utils.checkIfStringEmpty(userInfo.profilePic)) {
+                    Glide.with(getActivity()).load(userInfo.profilePic)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait).crossFade().centerCrop()
+                            .into(userImage);
+                }
+                numInterests.setVisibility(View.GONE);
+
+                numFavourites.setVisibility(View.GONE);
+
+                numFriends.setVisibility(View.GONE);
+
+                numReviews.setVisibility(View.GONE);
+
+                numTickets.setVisibility(View.GONE);
             }
-            numInterests.setVisibility(View.GONE);
-
-            numFavourites.setVisibility(View.GONE);
-
-            numFriends.setVisibility(View.GONE);
-
-            numReviews.setVisibility(View.GONE);
-
-            numTickets.setVisibility(View.GONE);
         }
-
     }
 
 
